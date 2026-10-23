@@ -54,7 +54,9 @@ from app.spam import issue_form_token  # noqa: E402
 API_ROOT = Path(__file__).resolve().parents[1]
 ADMIN_EMAIL = "admin.test@example.com"
 ADMIN_PASSWORD = "Test-Password-2026"
-TABLES = ["ai_action_requests", "audit_logs", "lead_notes", "leads", "admin_sessions", "admin_users"]
+TABLES = [
+    "advisor_assessments", "ai_action_requests", "audit_logs", "lead_notes", "leads", "admin_sessions", "admin_users",
+]
 
 
 def recreate_database(name: str) -> None:

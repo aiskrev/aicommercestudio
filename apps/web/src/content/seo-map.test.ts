@@ -18,6 +18,7 @@ const titles: Record<string, string> = {
   [routes.home]: withBrand(content.home.metaTitle),
   [routes.services]: withBrand(content.servicesPage.metaTitle),
   [routes.aiSolutions]: withBrand(content.aiSolutions.metaTitle),
+  [routes.advisor]: withBrand(content.advisor.metaTitle),
   [routes.industries]: withBrand(content.industries.metaTitle),
   [routes.process]: withBrand(content.processPage.metaTitle),
   [routes.about]: withBrand(content.about.metaTitle),

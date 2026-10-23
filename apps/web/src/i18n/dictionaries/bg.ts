@@ -4,6 +4,7 @@ export const bg = {
     label: "Основна навигация",
     services: "Услуги",
     aiSolutions: "AI решения",
+    advisor: "AI съветник за автоматизация",
     industries: "За кого",
     process: "Процес",
     insights: "Статии",

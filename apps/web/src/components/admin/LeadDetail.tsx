@@ -19,7 +19,15 @@ import {
   statusLabels,
   timelineLabels,
 } from "@/lib/admin-labels";
-import { type AuditEntry, LEAD_STATUSES, type LeadDetail as Lead, type LeadNote, type LeadStatus, type LeadTriage } from "@/lib/admin-types";
+import {
+  type AuditEntry,
+  LEAD_STATUSES,
+  type LeadDetail as Lead,
+  type LeadNote,
+  type LeadStatus,
+  type LeadTriage,
+  type LinkedAssessment,
+} from "@/lib/admin-types";
 import { formatDateTime } from "@/lib/format";
 import { routes } from "@/lib/routes";
 import { useAdminData } from "@/lib/use-admin-data";
@@ -112,6 +120,8 @@ export function LeadDetail({ id }: { id: string }) {
               </p>
             </div>
           </Panel>
+
+          {data.advisor_assessment && <LinkedAssessmentPanel linked={data.advisor_assessment} />}
 
           <Notes lead={data} onAdded={(note) => refresh({ ...data, notes: [note, ...data.notes] })} />
           <AiTriage
@@ -512,6 +522,48 @@ function DeleteLead({ lead }: { lead: Lead }) {
           Изтрий запитването
         </button>
       )}
+    </Panel>
+  );
+}
+
+const complexityLabels: Record<string, string> = { low: "Ниска", medium: "Средна", high: "Висока" };
+
+/** Advisor assessment the visitor attached when requesting a consultation (read-only). */
+function LinkedAssessmentPanel({ linked }: { linked: LinkedAssessment }) {
+  const a = linked.assessment;
+  return (
+    <Panel title={`AI оценка #${linked.reference}`}>
+      <div className="grid gap-4 text-sm" data-testid="linked-assessment">
+        <p className="flex flex-wrap items-center gap-2">
+          <Pill tone={linked.mode === "demo" ? "bg-amber-400/10 text-amber-200 ring-amber-400/30" : "bg-cyan-400/10 text-cyan-200 ring-cyan-400/30"}>
+            {linked.mode === "demo" ? "Демонстрационен режим (шаблони)" : "Генерирана от AI"}
+          </Pill>
+          <Pill tone="bg-white/5 text-slate-300 ring-white/15">
+            Сложност: {complexityLabels[a.complexity.level] ?? a.complexity.level}
+          </Pill>
+          <span className="text-xs text-slate-400">{formatDateTime(linked.created_at)}</span>
+        </p>
+        <p className="leading-relaxed text-slate-200">{a.problem_summary}</p>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Възможности</p>
+          <ul className="mt-2 list-disc pl-5 text-slate-300">
+            {a.opportunities.map((o) => (
+              <li key={o.title}>{o.title}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Въпроси за уточняване</p>
+          <ul className="mt-2 list-disc pl-5 text-slate-300">
+            {a.clarification_questions.map((q) => (
+              <li key={q}>{q}</li>
+            ))}
+          </ul>
+        </div>
+        <p className="text-xs text-slate-400">
+          Системи: {linked.tools.join(", ") || "—"} · Обем: {linked.monthly_volume} · Екип: {linked.team_size}
+        </p>
+      </div>
     </Panel>
   );
 }

@@ -18,6 +18,7 @@ from sqlalchemy import delete, func, or_, select
 from sqlalchemy.orm import Session
 
 from app import audit
+from app.advisor import service as advisor
 from app.config import get_settings
 from app.db import get_sessionmaker
 from app.models import AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
@@ -162,6 +163,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         result = leads.purge_expired(
             db, settings.lead_retention_days, settings.audit_retention_days, dry_run=args.dry_run
         )
+        assessments = advisor.purge_expired(db, dry_run=args.dry_run)
         sessions_removed = 0
         if not args.dry_run:
             cutoff = utcnow() - timedelta(days=1)
@@ -174,6 +176,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
     prefix = "[dry-run] would delete" if args.dry_run else "deleted"
     _print(
         f"{prefix}: leads={result.leads_deleted} audit_entries={result.audit_entries_deleted} "
+        f"advisor_assessments={assessments.due if args.dry_run else assessments.deleted} "
         f"sessions={sessions_removed}"
     )
     return 0

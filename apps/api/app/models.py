@@ -253,3 +253,43 @@ class AIActionRequest(Base):
     decision_comment: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     decided_by: Mapped[AdminUser | None] = relationship(lazy="joined")
+
+
+class AdvisorMode(enum.StrEnum):
+    DEMO = "demo"
+    AI = "ai"
+
+
+class AdvisorAssessment(Base):
+    """An anonymous automation assessment. No personal data is collected: the description is stored
+    with e-mail addresses, phone numbers and links removed. Unlinked rows expire after
+    ADVISOR_RETENTION_DAYS; a row linked to a lead is deleted together with that lead."""
+
+    __tablename__ = "advisor_assessments"
+    __table_args__ = (
+        CheckConstraint(_in_check("mode", AdvisorMode), name="mode"),
+        Index("ix_advisor_assessments_expires_at", "expires_at"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    business_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    monthly_volume: Mapped[str] = mapped_column(String(16), nullable=False)
+    team_size: Mapped[str] = mapped_column(String(16), nullable=False)
+    tools: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    process_description: Mapped[str] = mapped_column(Text, nullable=False)
+    result: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    mode: Mapped[str] = mapped_column(String(8), nullable=False)
+    provider: Mapped[str] = mapped_column(String(32), nullable=False)
+    model: Mapped[str] = mapped_column(String(64), nullable=False)
+    prompt_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    injection_suspected: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    lead_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("leads.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    linked_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+
+    @property
+    def reference(self) -> str:
+        return self.id.hex[:8].upper()

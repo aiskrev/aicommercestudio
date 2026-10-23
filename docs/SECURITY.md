@@ -38,6 +38,13 @@ status changes, notes, deletions, AI triage and AI action decisions.
 config. Containers run as non-root users. DB and API ports are bound to `127.0.0.1` locally and not
 published at all in the production override.
 
+
+**AI Business Automation Advisor** — public, anonymous, no tools and no credentials for the model.
+Input: PII and links removed, prompt delimiters neutralised, injection phrasing flagged. Output:
+schema-validated, links and financial promises removed, human approval forced for side-effect steps.
+Rate limited per client and globally; logs carry metadata only. Details: [AI_ADVISOR.md](AI_ADVISOR.md).
+The Anthropic API key is read only by the API container and never reaches the browser.
+
 **Dependencies** — exact versions pinned (`requirements.txt`, `package-lock.json`).
 `.\scripts\test.ps1 -Suite audit` runs `pip-audit` and `npm audit`; run it before each release.
 
@@ -45,10 +52,10 @@ published at all in the production override.
 
 | Requirement | Implementation |
 | --- | --- |
-| Data minimisation | only fields needed to answer an inquiry; phone optional; no tracking; IP hashed |
+| Data minimisation | only fields needed to answer an inquiry; phone optional; no tracking; IP hashed; the AI advisor asks for no personal data and strips e-mails/phones from the description |
 | Transparency | privacy policy draft; acknowledgement required, timestamped, notice version stored |
 | Separate marketing consent | optional checkbox, stored separately with timestamp; never required |
-| Retention | `LEAD_RETENTION_DAYS` (730), `AUDIT_RETENTION_DAYS` (1095); `app.cli maintenance` |
+| Retention | `LEAD_RETENTION_DAYS` (730), `AUDIT_RETENTION_DAYS` (1095), `ADVISOR_RETENTION_DAYS` (30, unlinked assessments); `app.cli maintenance` |
 | Erasure | admin "Изтрий запитването" deletes lead + notes; audit keeps no personal data |
 | Access control | individual admin accounts, sessions, audit trail |
 | Cookies | only strictly necessary admin cookies; no consent banner needed; documented on `/biskvitki` |

@@ -25,5 +25,6 @@ def get_ai_provider() -> AIProvider:
             api_key=settings.anthropic_api_key,
             model=settings.anthropic_model,
             timeout_seconds=settings.anthropic_timeout_seconds,
+            advisor_timeout_seconds=settings.advisor_timeout_seconds,
         )
     return MockProvider()

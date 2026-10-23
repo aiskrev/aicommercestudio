@@ -34,6 +34,11 @@ interface Props {
   initialInquiry?: InquiryKind;
   privacyHref: string;
   nextSteps?: string[];
+  /** Pre-filled project description (e.g. a consultation request from the AI advisor). */
+  initialMessage?: string;
+  /** Stored advisor assessment to attach to the lead, with a note explaining that to the visitor. */
+  advisorAssessmentId?: string;
+  advisorNote?: string;
 }
 
 type Status = "idle" | "submitting" | "success";
@@ -61,11 +66,15 @@ export function ContactForm({
   initialInquiry = "contact",
   privacyHref,
   nextSteps,
+  initialMessage = "",
+  advisorAssessmentId,
+  advisorNote,
 }: Props) {
   const allowed = services.map((s) => s.value);
-  const [values, setValues] = useState<ContactValues>(() =>
-    emptyContactValues(allowed.includes(initialService) ? initialService : "", initialInquiry),
-  );
+  const [values, setValues] = useState<ContactValues>(() => ({
+    ...emptyContactValues(allowed.includes(initialService) ? initialService : "", initialInquiry),
+    message: initialMessage,
+  }));
   const [errors, setErrors] = useState<ContactErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -123,7 +132,11 @@ export function ContactForm({
     }
 
     setStatus("submitting");
-    const result = await submitLead(toPayload(values, token), submissionEndpoint(values));
+    const payload = toPayload(values, token);
+    const result = await submitLead(
+      advisorAssessmentId ? { ...payload, advisor_assessment_id: advisorAssessmentId } : payload,
+      submissionEndpoint(values),
+    );
     if (result.ok) {
       setReference(result.reference);
       setStatus("success");
@@ -212,6 +225,11 @@ export function ContactForm({
           </Alert>
         )}
       </div>
+      {advisorAssessmentId && advisorNote && (
+        <Alert tone="info" role="note">
+          {advisorNote}
+        </Alert>
+      )}
 
       <fieldset>
         <legend className="mb-2 block text-sm font-medium text-slate-200">{inquiry.legend}</legend>

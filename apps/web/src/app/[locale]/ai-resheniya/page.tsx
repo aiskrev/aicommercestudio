@@ -1,3 +1,4 @@
+import { AdvisorPromo } from "@/components/advisor/AdvisorPromo";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
@@ -28,7 +29,7 @@ const riskTone: Record<string, string> = {
 
 export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/ai-resheniya">) {
   const locale = await resolveLocale(params);
-  const { aiSolutions: page } = getContent(locale);
+  const { aiSolutions: page, advisor } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const aiTools = serviceByKey(locale, "ai_tools");
@@ -49,6 +50,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
             <FeatureCard key={item.title} {...item} />
           ))}
         </div>
+        <AdvisorPromo promo={advisor.promo} href={href(routes.advisor)} className="mt-10" />
       </Section>
 
       <Section labelledBy="ai-principles" alt>

@@ -26,6 +26,7 @@ migrated with Alembic (the same path production uses). Tables are truncated betw
 | `test_units.py` | form-token lifecycle and tampering, link heuristic, sliding-window limiter |
 | `test_migrations_and_retention.py` | `alembic check` (models = migrations), upgrade/downgrade round trip, 0001→0002 data migration (backfill), retention (dry run, deletion, audit purge), idempotent synthetic seed |
 | `test_production_features.py` | quote requests (persistence, 9 invalid cases, required fields, honeypot, shared rate limit), error envelope codes + request id, persistent lockout (persistence across limiter reset, unknown-account parity, counter reset), idle-session revocation, logout-all + session list, service re-categorisation, optimistic concurrency (409), throttled `lead.viewed` audit, inquiry-type filter/stats, audit search (filters, pagination, wildcard escaping), retention preview + confirmed run, purge-synthetic, **full lifecycle visitor → admin → audit verified with raw SQL** |
+| `test_advisor.py` | AI advisor: demo mode labelling, all 11 output sections, determinism, no financial claims in demo output, storage opt-out, PII/link removal before storage, 11 invalid-input cases, form token, rate limit (invalid requests count), prompt-injection flagging and delimiter neutralising, invalid model output → 502 (6 cases), truncation of over-long output, removal of financial promises and links, forced human approval, provider error mapping (5 kinds), logs without description/output, structured-output schema compatibility, consultation link + admin view + audit flag, unknown/reused/expired ids ignored, cascade delete with the lead, retention; Anthropic adapter with a fake SDK client (request shape, no tools, refusal, truncation, invalid JSON, timeout/connection errors) |
 
 Lint: `ruff check` (pyflakes, pycodestyle, isort, bugbear, pyupgrade, bandit-style `S` rules, simplify).
 
@@ -37,6 +38,7 @@ Lint: `ruff check` (pyflakes, pycodestyle, isort, bugbear, pyupgrade, bandit-sty
 | `components/contact/ContactForm.test.tsx` | accessible labels, service pre-selection, error display without submitting, successful submit payload + reference, server field-error mapping, 429 message |
 | `content/content.test.ts` | 6 services + audit, keys match the API enum, unique URL-safe slugs, unique titles/descriptions within length limits, complete service pages, no TODO / invented guarantees, legal texts marked as drafts |
 | `lib/routing-and-seo.test.ts` | locale rewrite/redirect and admin guard decisions, open-redirect protection, canonical URLs, FAQ JSON-LD, sitemap completeness, robots rules, public-path mapping for client components |
+| `components/advisor/AdvisorTool.test.tsx` | advisor validation helpers (required fields, links, exclusive "none", no personal-data fields in the payload); demo notice before submit; errors without sending; full result with demo disclaimer and focus; consultation form pre-filled and sending `advisor_assessment_id`; timeout message |
 | `content/seo-map.test.ts` | keyword map: one page per primary keyword, no cross-page overlap, keyword in title, mapped paths in sitemap, unverified volume unless evidence; editorial integrity (categories, related services/articles, inline links, tables, unique service H2s, every article reachable); case-study publish guard; draft legal + thin topic pages excluded from sitemap |
 
 The `web-tests` container also runs `next typegen && tsc --noEmit` and `eslint .` (Next core-web-vitals + TypeScript rules).
@@ -52,8 +54,9 @@ and Pixel 7 emulation. Admin credentials come from `.env`.
 | `links.spec.ts` | crawls every sitemap URL and every internal link found — none may fail |
 | `contact.spec.ts` | invalid form shows errors and sends nothing; server rejects invalid payloads; **quote request** (`?tip=oferta`) with structured fields; valid submission (with `?usluga=` pre-selection) returns a reference |
 | `admin.spec.ts` | anonymous redirect to login; admin API 401 with `code` (GET, PATCH, retention run); wrong credentials; full flow: login → dashboard → search lead → change status → add note → reload persists → AI triage → **audit log shows the status change by the admin and the `lead.viewed` access** → logout → protected again |
-| `mobile.spec.ts` | no horizontal overflow on 9 pages at phone width; mobile menu; sticky quote bar (appears after scrolling, hides at the footer, absent on `/kontakti`, dismiss persists for the session); contact form usable |
+| `mobile.spec.ts` | no horizontal overflow on 10 pages at phone width; mobile menu; sticky quote bar (appears after scrolling, hides at the footer, absent on `/kontakti`, dismiss persists for the session); contact form usable |
 | `seo.spec.ts` | crawls **every sitemap URL**: status 200, exactly one H1, unique title, description ≥ 70 chars, self-canonical, `og:title`, not `noindex`, valid JSON-LD; draft legal + thin topic pages are `noindex`; article features (key points, table, inline CTA, related services, `Article` JSON-LD); `/proekti` 404; quote CTA pre-fills the form; message helper + blur validation; nav `aria-current` |
+| `advisor.spec.ts` | demo-mode journey: fill the advisor form → structured result with demo disclaimer and approval flags, no money/percentage figures → consultation linked to the assessment → admin sees `AI оценка #<ref>` on the lead; API rejects invalid input and personal-data fields; promo link from `/ai-resheniya` |
 
 Lighthouse is not part of `test.ps1`; the method used for the lab measurements is described in
 [SEO_IMPLEMENTATION.md §5](SEO_IMPLEMENTATION.md#5-performance-measurements-lab-only).
@@ -77,3 +80,11 @@ suite as passing unless it was actually run.
 
 Runs the complete lead lifecycle against the running stack through the public origin and prints PostgreSQL
 rows for the lead and its audit events (see IMPLEMENTATION_STATUS.md for a recorded run).
+
+```powershell
+.\scripts\demo-advisor.ps1
+```
+
+Runs the AI advisor with synthetic data against the running stack (demo mode): validation, assessment,
+prompt-injection and personal-data handling, non-storage, PostgreSQL rows, consultation linked to a lead,
+admin view, retention preview and a log check (see [AI_ADVISOR.md](AI_ADVISOR.md)).

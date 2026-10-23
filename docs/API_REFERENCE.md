@@ -41,8 +41,12 @@ Validation errors (422) add `errors`:
 | 409 | `already_decided` | AI action was already approved/rejected |
 | 413 | `payload_too_large` | body > 64 KB |
 | 422 | `validation_error` | see `errors` |
+| 422 | `advisor_declined` | the AI model declined to assess the text |
 | 429 | `rate_limited` | rate limit or locked account; see `Retry-After` |
 | 502 | `ai_unavailable` | external AI provider failed |
+| 502 | `advisor_invalid_output` | the AI output failed schema validation or was truncated |
+| 503 | `advisor_unavailable`, `advisor_busy` | AI provider unreachable / rate-limited |
+| 504 | `advisor_timeout` | AI provider did not answer within `ADVISOR_TIMEOUT_SECONDS` (one retry) |
 | 500 | `internal_error` | unexpected error (logged with the request id) |
 
 ## Health
@@ -106,6 +110,56 @@ All contact fields plus:
 
 Response as above with `"inquiry_type": "quote"`.
 
+Both lead endpoints accept an optional `advisor_assessment_id` (UUID of a stored advisor assessment).
+A valid, unexpired, not yet linked assessment is attached to the new lead; an unknown, expired or
+already linked id is ignored and never blocks the request.
+
+## Public: AI Business Automation Advisor
+
+Details, safety controls and limits: [AI_ADVISOR.md](AI_ADVISOR.md).
+
+### `GET /api/public/advisor/status`
+
+```json
+{ "mode": "demo", "disclaimer": "Демонстрационен режим: …", "retention_days": 30, "description_min": 40, "description_max": 2000 }
+```
+
+### `POST /api/public/advisor/assessments` → 201
+
+Rate limited per client and globally (`ADVISOR_*`), requires a form token. No personal-data fields exist;
+unknown fields are rejected.
+
+| Field | Rules |
+| --- | --- |
+| business_type | `online_store, retail, wholesale, services, professional, manufacturing, logistics, hospitality, agency, other` |
+| process_description | 40–2000 chars, no control characters, ≤ 3 links (links, e-mails and phones are removed before processing) |
+| monthly_volume | `under_100, 100_500, 500_2000, 2000_10000, over_10000` |
+| team_size | `solo, 2_5, 6_20, 21_50, over_50` |
+| tools | list of `shopify, woocommerce, other_ecommerce, spreadsheets, google_workspace, microsoft_365, email, crm, erp, accounting, invoicing, courier, payments, helpdesk, messaging, none` (duplicates removed; `none` is dropped if combined) |
+| other_tools | optional, ≤ 200 chars, no links/HTML |
+| save_assessment | bool, default `true`; `false` → nothing is stored |
+| form_token | from `GET /api/public/form-token`, ≥ 3 s old |
+
+```json
+{
+  "assessment_id": "b20e2bcc-…", "reference": "B20E2BCC", "mode": "demo", "provider": "mock", "model": "rule-based-v1",
+  "disclaimer": "Демонстрационен режим: …", "notices": [], "stored": true,
+  "expires_at": "2026-11-22T15:16:06Z", "created_at": "2026-10-23T15:16:06Z",
+  "assessment": {
+    "problem_summary": "…", "opportunities": [{ "title": "…", "description": "…", "approach": "integration", "priority": "high" }],
+    "proposed_workflow": [{ "title": "…", "description": "…", "actor": "system", "requires_human_approval": true }],
+    "integrations": [{ "system": "WooCommerce", "purpose": "…", "access": "read_write" }],
+    "human_approvals": [{ "decision": "…", "reason": "…" }], "data_protection": ["…"],
+    "risks": [{ "risk": "…", "mitigation": "…" }], "complexity": { "level": "medium", "rationale": "…" },
+    "phases": [{ "name": "…", "description": "…", "deliverables": ["…"], "indicative_duration": "2–3 седмици" }],
+    "clarification_questions": ["…"], "next_steps": ["…"]
+  }
+}
+```
+
+Errors: `422 validation_error`, `400 form_token_invalid`, `429 rate_limited`, `504 advisor_timeout`,
+`503 advisor_busy`, `503 advisor_unavailable`, `422 advisor_declined`, `502 advisor_invalid_output`.
+
 ## Admin authentication
 
 | Method | Path | Notes |
@@ -128,15 +182,15 @@ Admin responses are `Cache-Control: no-store`.
 | GET | `/api/admin/dashboard/stats` | totals, new, last 7/30 days, open pipeline, won/lost, `by_status`, `by_service`, `by_inquiry_type`, pending AI actions, recent activity |
 | GET | `/api/admin/audit` | Paginated audit search → `{items,total,page,page_size}`. Query: `action`, `action_prefix` (e.g. `lead.`), `entity_type`, `entity_id`, `actor` (substring), `created_from`, `created_to`, `page`, `page_size` ≤ 200 |
 | GET | `/api/admin/system/status` | environment, AI provider, e-mail enabled, retention, integration flags (never secrets) |
-| GET | `/api/admin/retention` | Preview: `lead_retention_days`, `audit_retention_days`, `leads_due`, `audit_entries_due`, cut-off dates. Changes nothing. |
-| POST | `/api/admin/retention/run` | Body must be `{"confirm": true}` (else 422). Deletes expired leads/notes and old audit entries; audited as `retention.run` → `{"leads_deleted","audit_entries_deleted"}` |
+| GET | `/api/admin/retention` | Preview: `lead_retention_days`, `audit_retention_days`, `leads_due`, `audit_entries_due`, cut-off dates, `advisor_retention_days`, `advisor_assessments_due`. Changes nothing. |
+| POST | `/api/admin/retention/run` | Body must be `{"confirm": true}` (else 422). Deletes expired leads/notes, old audit entries and expired unlinked advisor assessments; audited as `retention.run` → `{"leads_deleted","audit_entries_deleted","advisor_assessments_deleted"}` |
 
 ## Admin: leads
 
 | Method | Path | Description |
 | --- | --- | --- |
 | GET | `/api/admin/leads` | Query: `status`, `service`, `inquiry_type`, `q` (name/company/e-mail, ≤ 100), `created_from`, `created_to` (ISO 8601), `sort` = `newest`/`oldest`, `page`, `page_size` ≤ 100 |
-| GET | `/api/admin/leads/{id}` | Full lead incl. consents, quote fields, `submitted_service`, notes. Audited as `lead.viewed` (once per admin per 15 min). |
+| GET | `/api/admin/leads/{id}` | Full lead incl. consents, quote fields, `submitted_service`, notes, linked `advisor_assessment` (or `null`). Audited as `lead.viewed` (once per admin per 15 min). |
 | PATCH | `/api/admin/leads/{id}` | `{"status"?, "service"?, "expected_status"?}` — at least one of status/service. Row-locked; with `expected_status` a stale update returns 409 `status_conflict`. Audits `lead.status_changed` / `lead.service_changed` with `from`/`to`. `submitted_service` is never changed. |
 | POST | `/api/admin/leads/{id}/notes` | `{"body": "..."}` (1–4000) → 201, audited |
 | DELETE | `/api/admin/leads/{id}` | GDPR erasure (lead + notes) → 204; audit keeps only id + reason |

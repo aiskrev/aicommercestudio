@@ -20,13 +20,17 @@ export function RetentionPanel() {
     setRunning(true);
     setResult(null);
     try {
-      const out = await adminFetch<{ leads_deleted: number; audit_entries_deleted: number }>(
+      const out = await adminFetch<{
+        leads_deleted: number;
+        audit_entries_deleted: number;
+        advisor_assessments_deleted?: number;
+      }>(
         "/api/admin/retention/run",
         { method: "POST", body: JSON.stringify({ confirm: true }) },
       );
       setResult({
         tone: "success",
-        text: `Изтрити запитвания: ${out.leads_deleted}; изтрити записи в журнала: ${out.audit_entries_deleted}.`,
+        text: `Изтрити запитвания: ${out.leads_deleted}; изтрити записи в журнала: ${out.audit_entries_deleted}; изтрити AI оценки: ${out.advisor_assessments_deleted ?? 0}.`,
       });
       preview.reload();
     } catch (err) {
@@ -38,7 +42,7 @@ export function RetentionPanel() {
   }
 
   const data = preview.data;
-  const due = data ? data.leads_due + data.audit_entries_due : 0;
+  const due = data ? data.leads_due + data.audit_entries_due + (data.advisor_assessments_due ?? 0) : 0;
 
   return (
     <Panel title="Съхранение на данни (GDPR)">
@@ -53,9 +57,10 @@ export function RetentionPanel() {
         <div className="grid gap-4 text-sm">
           <p className="text-slate-300">
             Запитванията се пазят <strong className="text-white">{data.lead_retention_days} дни</strong> след последната
-            промяна, а журналът — <strong className="text-white">{data.audit_retention_days} дни</strong>.
+            промяна, журналът — <strong className="text-white">{data.audit_retention_days} дни</strong>, а
+            незаявените AI оценки — <strong className="text-white">{data.advisor_retention_days} дни</strong>.
           </p>
-          <dl className="grid gap-3 sm:grid-cols-2">
+          <dl className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-white/[0.07] p-3">
               <dt className="text-xs text-slate-400">Запитвания за изтриване</dt>
               <dd className="mt-1 font-display text-2xl font-semibold text-white" data-testid="retention-leads-due">
@@ -67,6 +72,11 @@ export function RetentionPanel() {
               <dt className="text-xs text-slate-400">Записи в журнала за изтриване</dt>
               <dd className="mt-1 font-display text-2xl font-semibold text-white">{data.audit_entries_due}</dd>
               <dd className="text-xs text-slate-400">по-стари от {formatDate(data.audit_cutoff)}</dd>
+            </div>
+            <div className="rounded-xl border border-white/[0.07] p-3">
+              <dt className="text-xs text-slate-400">AI оценки за изтриване</dt>
+              <dd className="mt-1 font-display text-2xl font-semibold text-white">{data.advisor_assessments_due ?? 0}</dd>
+              <dd className="text-xs text-slate-400">изтекли и несвързани със запитване</dd>
             </div>
           </dl>
           {result && (

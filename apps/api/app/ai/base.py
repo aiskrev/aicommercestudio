@@ -9,9 +9,12 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Literal, Protocol
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 
 from app.models import ServiceKey
+
+if TYPE_CHECKING:
+    from app.advisor.prompt import AdvisorPromptInput
 
 Priority = Literal["low", "medium", "high"]
 
@@ -47,14 +50,30 @@ class LeadTriage:
     disclaimer: str = DISCLAIMER
 
 
+ProviderErrorKind = Literal["unavailable", "timeout", "rate_limited", "invalid_output", "declined"]
+
+
 class AIProviderError(RuntimeError):
-    pass
+    def __init__(self, message: str, kind: ProviderErrorKind = "unavailable") -> None:
+        super().__init__(message)
+        self.kind = kind
+
+
+@dataclass(frozen=True)
+class AssessmentDraft:
+    """Raw provider output for the automation advisor; validated by the advisor service."""
+
+    provider: str
+    model: str
+    data: dict[str, Any]
 
 
 class AIProvider(Protocol):
     name: str
 
     def triage_lead(self, data: LeadTriageInput) -> LeadTriage: ...
+
+    def assess_automation(self, data: AdvisorPromptInput) -> AssessmentDraft: ...
 
 
 VALID_SERVICES = [s.value for s in ServiceKey]

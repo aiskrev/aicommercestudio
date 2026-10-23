@@ -59,6 +59,15 @@ class Settings(BaseSettings):
     anthropic_model: str = "claude-opus-5-5"
     anthropic_timeout_seconds: float = 30.0
 
+    # AI Business Automation Advisor (public, anonymous).
+    advisor_rate_limit: int = Field(default=5, ge=1)
+    advisor_rate_window_seconds: int = Field(default=3600, ge=1)
+    advisor_global_rate_limit: int = Field(default=120, ge=1)
+    # Per-attempt timeout for the AI provider; at most one retry (~2× worst case).
+    advisor_timeout_seconds: float = Field(default=45.0, ge=5, le=120)
+    # Unlinked assessments are deleted after this many days; linked ones follow the lead.
+    advisor_retention_days: int = Field(default=30, ge=1, le=365)
+
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None

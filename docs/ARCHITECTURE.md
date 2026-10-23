@@ -90,8 +90,11 @@ policy.evaluate(action) → risk + requires_approval   (unknown actions fail clo
 services.ai_actions.propose_action / decide           → ai_action_requests + audit_logs
 ```
 
-* V1 uses AI for one **read-only** feature: lead triage in the admin panel (classification,
-  priority, suggested next step). It is low risk under the policy and audited.
+* AI is used for two **text-only** features: lead triage in the admin panel (classification,
+  priority, suggested next step — low risk under the policy and audited) and the public
+  **AI Business Automation Advisor** (`/ai-automation-advisor`, `AIProvider.assess_automation`,
+  `app/advisor/`). The advisor runs in a clearly labelled demo mode without an API key; see
+  [AI_ADVISOR.md](AI_ADVISOR.md) for its validation, injection defences, retention and limits.
 * Any future action that sends messages, changes products/prices/orders or touches sensitive data
   must be proposed as an `AIActionRequest`, approved by an administrator in **Admin → AI одобрения**
   and only then executed. V1 records decisions but ships no executors.

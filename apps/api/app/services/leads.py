@@ -10,6 +10,7 @@ from sqlalchemy import Select, delete, func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from app import audit
+from app.advisor import service as advisor
 from app.models import (
     AdminUser,
     AIActionRequest,
@@ -62,6 +63,8 @@ def create_lead(
     )
     db.add(lead)
     db.flush()
+    # An unknown or expired assessment id is ignored: it must never block a contact request.
+    advisor_linked = bool(data.advisor_assessment_id) and advisor.link_to_lead(db, data.advisor_assessment_id, lead.id)
     audit.record(
         db,
         "lead.created",
@@ -73,6 +76,7 @@ def create_lead(
             "inquiry_type": lead.inquiry_type,
             "source": source,
             "marketing_consent": lead.marketing_consent,
+            **({"advisor_assessment_linked": True} if advisor_linked else {}),
         },
         ip_hash=ip_hash,
     )

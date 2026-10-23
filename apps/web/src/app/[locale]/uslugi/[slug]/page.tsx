@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { AdvisorPromo } from "@/components/advisor/AdvisorPromo";
 import { ArticleCard } from "@/components/editorial/ArticleCard";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -26,6 +27,9 @@ import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
 
 export const dynamicParams = false;
 
+/** Services whose visitors are offered the AI automation advisor. */
+const ADVISOR_SERVICES = new Set(["automation", "ai_tools"]);
+
 export function generateStaticParams() {
   return getContent("bg").services.map((service) => ({ slug: service.slug }));
 }
@@ -50,7 +54,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   if (!service) notFound();
 
   const dict = getDictionary(locale);
-  const { home } = getContent(locale);
+  const { home, advisor } = getContent(locale);
   const href = (path: string) => localizePath(locale, path);
   const path = href(routes.service(service.slug));
   const related = service.related.map((key) => serviceByKey(locale, key));
@@ -224,6 +228,9 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
           <SectionHeading id="service-faq-title" eyebrow={service.shortTitle} title={dict.service.faq} />
           <Faq items={service.faqs} />
         </div>
+        {ADVISOR_SERVICES.has(service.key) && (
+          <AdvisorPromo promo={advisor.promo} href={href(routes.advisor)} className="mt-12" />
+        )}
       </Section>
 
       {/* ------------------------------------------------------------ related articles */}

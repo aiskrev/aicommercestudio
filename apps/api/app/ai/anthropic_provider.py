@@ -12,9 +12,12 @@ import json
 import logging
 from typing import Any
 
+from app.advisor.prompt import SYSTEM_PROMPT as ADVISOR_SYSTEM_PROMPT
+from app.advisor.prompt import AdvisorPromptInput, output_schema, render_user_message
 from app.ai.base import (
     VALID_SERVICES,
     AIProviderError,
+    AssessmentDraft,
     LeadTriage,
     LeadTriageInput,
     redact_personal_data,
@@ -49,12 +52,20 @@ _SCHEMA: dict[str, Any] = {
 class AnthropicProvider:
     name = "anthropic"
 
-    def __init__(self, api_key: str, model: str, timeout_seconds: float = 30.0) -> None:
+    def __init__(
+        self,
+        api_key: str,
+        model: str,
+        timeout_seconds: float = 30.0,
+        advisor_timeout_seconds: float = 45.0,
+        client: Any = None,
+    ) -> None:
         import anthropic  # imported lazily so the mock path has no SDK dependency at runtime
 
         self._anthropic = anthropic
-        self._client = anthropic.Anthropic(api_key=api_key, timeout=timeout_seconds, max_retries=2)
+        self._client = client or anthropic.Anthropic(api_key=api_key, timeout=timeout_seconds, max_retries=2)
         self.model = model
+        self._advisor_timeout = advisor_timeout_seconds
 
     def triage_lead(self, data: LeadTriageInput) -> LeadTriage:
         anthropic = self._anthropic
@@ -101,3 +112,47 @@ class AnthropicProvider:
             suggested_next_step=parsed["suggested_next_step"][:600],
             signals=[str(s)[:200] for s in parsed.get("signals", [])][:10],
         )
+
+    def assess_automation(self, data: AdvisorPromptInput) -> AssessmentDraft:
+        """Automation assessment as schema-constrained JSON. No tools are offered to the model.
+
+        One retry at most, so the worst-case wall-clock time is about 2 × ADVISOR_TIMEOUT_SECONDS.
+        Only the screened description (personal data and links removed) and the selected options
+        are sent; nothing the model returns is executed.
+        """
+        anthropic = self._anthropic
+        client = self._client.with_options(timeout=self._advisor_timeout, max_retries=1)
+        try:
+            response = client.beta.messages.create(
+                model=self.model,
+                max_tokens=16000,
+                betas=["server-side-fallback-2026-07-01"],
+                fallbacks="default",
+                system=ADVISOR_SYSTEM_PROMPT,
+                output_config={"effort": "medium", "format": {"type": "json_schema", "schema": output_schema()}},
+                messages=[{"role": "user", "content": render_user_message(data)}],
+            )
+        except anthropic.APITimeoutError as exc:
+            raise AIProviderError("AI provider timed out", "timeout") from exc
+        except anthropic.RateLimitError as exc:
+            raise AIProviderError("AI provider rate limit reached", "rate_limited") from exc
+        except anthropic.APIStatusError as exc:
+            logger.warning("anthropic_api_error", extra={"status_code": exc.status_code, "operation": "advisor"})
+            raise AIProviderError(f"AI provider error ({exc.status_code})") from exc
+        except anthropic.APIConnectionError as exc:
+            raise AIProviderError("AI provider unreachable") from exc
+
+        if response.stop_reason == "refusal":
+            raise AIProviderError("AI provider declined the request", "declined")
+        if response.stop_reason == "max_tokens":
+            raise AIProviderError("AI output was truncated", "invalid_output")
+        text = next((b.text for b in response.content if b.type == "text"), None)
+        if not text:
+            raise AIProviderError("AI provider returned no text", "invalid_output")
+        try:
+            parsed = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise AIProviderError("AI provider returned invalid JSON", "invalid_output") from exc
+        if not isinstance(parsed, dict):
+            raise AIProviderError("AI provider returned a non-object", "invalid_output")
+        return AssessmentDraft(provider=self.name, model=response.model, data=parsed)

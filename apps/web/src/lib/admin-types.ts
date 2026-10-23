@@ -1,3 +1,5 @@
+import type { AutomationAssessment } from "@/lib/advisor";
+
 /** Types mirroring the FastAPI response models (apps/api/app/schemas.py). */
 
 export const LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "PROPOSAL", "WON", "LOST"] as const;
@@ -51,6 +53,7 @@ export interface LeadDetail extends LeadSummary {
   timeline: string | null;
   website_url: string | null;
   notes: LeadNote[];
+  advisor_assessment?: LinkedAssessment | null;
 }
 
 export interface LeadPage {
@@ -132,6 +135,8 @@ export interface RetentionPreview {
   audit_entries_due: number;
   lead_cutoff: string;
   audit_cutoff: string;
+  advisor_retention_days?: number;
+  advisor_assessments_due?: number;
 }
 
 export interface AdminSessionInfo {
@@ -141,4 +146,17 @@ export interface AdminSessionInfo {
   expires_at: string;
   user_agent: string | null;
   current: boolean;
+}
+
+/** AI advisor assessment attached to a lead (when the visitor requested a consultation from it). */
+export interface LinkedAssessment {
+  id: string;
+  reference: string;
+  mode: "demo" | "ai" | string;
+  created_at: string;
+  business_type: string;
+  monthly_volume: string;
+  team_size: string;
+  tools: string[];
+  assessment: AutomationAssessment;
 }

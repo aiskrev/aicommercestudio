@@ -13,6 +13,7 @@ export function Footer({ locale, dict, services }: { locale: Locale; dict: Dicti
   const href = (path: string) => localizePath(locale, path);
   const company = [
     { href: href(routes.aiSolutions), label: dict.nav.aiSolutions },
+    { href: href(routes.advisor), label: dict.nav.advisor },
     { href: href(routes.industries), label: dict.nav.industries },
     { href: href(routes.process), label: dict.nav.process },
     { href: href(routes.about), label: dict.nav.about },

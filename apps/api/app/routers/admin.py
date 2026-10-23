@@ -10,6 +10,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Query, Response, status
 
 from app import audit
+from app.advisor import service as advisor
 from app.ai.base import AIProviderError, LeadTriageInput
 from app.ai.factory import get_ai_provider
 from app.ai.policy import ActionType, evaluate
@@ -53,7 +54,7 @@ def _note_out(note: LeadNote) -> LeadNoteOut:
     )
 
 
-def _lead_detail(lead: Lead) -> LeadDetailOut:
+def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
     base = LeadSummaryOut.model_validate(lead).model_dump()
     return LeadDetailOut(
         **base,
@@ -70,6 +71,7 @@ def _lead_detail(lead: Lead) -> LeadDetailOut:
         timeline=lead.timeline,
         website_url=lead.website_url,
         notes=[_note_out(n) for n in lead.notes],
+        advisor_assessment=advisor.summary_for_lead(db, lead.id),
     )
 
 
@@ -148,6 +150,8 @@ def retention_preview(ctx: Admin, db: DbSession, settings: AppSettings, response
         audit_entries_due=preview.audit_entries_due,
         lead_cutoff=preview.lead_cutoff,
         audit_cutoff=preview.audit_cutoff,
+        advisor_retention_days=settings.advisor_retention_days,
+        advisor_assessments_due=advisor.count_expired(db),
     )
 
 
@@ -155,13 +159,22 @@ def retention_preview(ctx: Admin, db: DbSession, settings: AppSettings, response
 def retention_run(payload: RetentionRunIn, ctx: Admin, db: DbSession, settings: AppSettings) -> RetentionRunOut:
     """Apply the retention policy now. Requires `{"confirm": true}`; the run itself is audited."""
     result = leads.purge_expired(db, settings.lead_retention_days, settings.audit_retention_days)
+    assessments = advisor.purge_expired(db)
     audit.record(
         db, "retention.run", actor=ctx.user, entity_type="system",
-        details={"leads_deleted": result.leads_deleted, "audit_entries_deleted": result.audit_entries_deleted},
+        details={
+            "leads_deleted": result.leads_deleted,
+            "audit_entries_deleted": result.audit_entries_deleted,
+            "advisor_assessments_deleted": assessments.deleted,
+        },
         ip_hash=ctx.ip_hash,
     )
     db.commit()
-    return RetentionRunOut(leads_deleted=result.leads_deleted, audit_entries_deleted=result.audit_entries_deleted)
+    return RetentionRunOut(
+        leads_deleted=result.leads_deleted,
+        audit_entries_deleted=result.audit_entries_deleted,
+        advisor_assessments_deleted=assessments.deleted,
+    )
 
 
 # --------------------------------------------------------------------------- leads
@@ -204,7 +217,7 @@ def get_lead(lead_id: uuid.UUID, ctx: Admin, db: DbSession, response: Response) 
     _no_store(response)
     lead = _get_lead_or_404(db, lead_id)
     leads.record_view(db, lead, ctx.user, ctx.ip_hash)
-    return _lead_detail(_get_lead_or_404(db, lead_id))
+    return _lead_detail(db, _get_lead_or_404(db, lead_id))
 
 
 @router.patch(
@@ -222,7 +235,7 @@ def update_lead(lead_id: uuid.UUID, payload: LeadUpdate, ctx: Admin, db: DbSessi
             "Запитването е променено от друг администратор. Презаредете страницата и опитайте отново.",
             "status_conflict",
         ) from exc
-    return _lead_detail(_get_lead_or_404(db, lead_id))
+    return _lead_detail(db, _get_lead_or_404(db, lead_id))
 
 
 @router.post("/leads/{lead_id}/notes", response_model=LeadNoteOut, status_code=status.HTTP_201_CREATED)

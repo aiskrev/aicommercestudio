@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from app.ai.base import LeadTriage, LeadTriageInput, Priority
+from app.advisor.prompt import AdvisorPromptInput
+from app.ai.advisor_mock import build_demo_assessment
+from app.ai.base import AssessmentDraft, LeadTriage, LeadTriageInput, Priority
 
 # (service key, keywords) — matched case-insensitively against the inquiry text.
 _RULES: list[tuple[str, tuple[str, ...]]] = [
@@ -66,3 +68,7 @@ class MockProvider:
             suggested_next_step=_NEXT_STEPS.get(suggested, _NEXT_STEPS["other"]),
             signals=signals,
         )
+
+    def assess_automation(self, data: AdvisorPromptInput) -> AssessmentDraft:
+        """Template-based demo output — the advisor labels it as a demonstration, not AI analysis."""
+        return AssessmentDraft(provider=self.name, model=self.model, data=build_demo_assessment(data))

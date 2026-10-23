@@ -19,6 +19,69 @@ images `python:3.13-slim`, `node:24-alpine`, `postgres:17-alpine`, `mcr.microsof
 | Stack health | `docker compose ps` | db, api, web **healthy** |
 | Manual browser check | in-app browser at 1024 px and 375 px | home, service, contact, admin login/dashboard/leads/detail rendered; issues found were fixed (see below) |
 
+## AI Business Automation Advisor (fifth iteration)
+
+Public page `/ai-automation-advisor`, API `POST /api/public/advisor/assessments`, migration `0003`.
+Full description: [AI_ADVISOR.md](AI_ADVISOR.md).
+
+| Requirement | Implementation | Verified by |
+| --- | --- | --- |
+| User flow 1–7 | form (business type, process, volume, team, tools) → validation → structured result → optional consultation linked to the lead | Vitest `AdvisorTool.test.tsx`, Playwright `advisor.spec.ts`, demo script |
+| Output structure (9 required + risks, next steps) | `AutomationAssessment` Pydantic model, rendered in 11 sections | pytest (all sections), Vitest (all headings) |
+| FastAPI endpoint + Pydantic schemas | `routers/advisor.py`, `advisor/schemas.py` (`extra="forbid"`) | 11 invalid-input cases |
+| Provider-agnostic interface | `AIProvider.assess_automation()` → `AssessmentDraft` | fake-provider tests |
+| Anthropic adapter | structured JSON output, no tools, server-side refusal fallback, timeout/refusal/truncation/invalid-JSON handling | fake SDK client tests — **not called against the real API (no key)** |
+| Deterministic mock, clearly labelled | template engine, `mode: "demo"`, disclaimer on page, in response, in admin | pytest, Vitest, e2e, demo |
+| Persistence with retention and notice | `advisor_assessments`, opt-out checkbox, 30-day expiry, cascade with lead, admin retention panel | retention/cascade/expiry tests |
+| Rate limiting | per client 5/h + global 120/h, counted before validation | rate-limit test |
+| Structured logs without prompt content | metadata-only log events | log test + demo step 10 |
+| Timeout and error handling | 504/503/502/422 with codes; proxy waits 100 s for this path | 5 mapped provider errors |
+| Model output validation | schema validation, truncation, link/claim scrubbing, approval enforcement | 9 tests |
+| Prompt injection defences | PII/link removal, delimiter neutralising, detection, untrusted-data framing, no tools | 7 tests + demo step 4 |
+| No autonomous third-party access, no ROI/savings, no API key in browser, no personal data required | by construction; documented | e2e (no money/% figures), payload tests |
+
+Executed with `.\scripts\test.ps1` (exit code 0): **pytest 218 passed** (57 new), ruff clean,
+`tsc` 0 errors, ESLint 0 problems, **Vitest 87 passed** (9 new), production build succeeded
+(`/[locale]/ai-automation-advisor` prerendered), **Playwright 31 passed** (3 new; the sitemap crawl and the
+mobile overflow check now include the advisor page). `pip-audit` / `npm audit` were not re-run — no
+dependencies were added.
+
+### Demonstration (`.\scripts\demo-advisor.ps1`, executed against the running stack, synthetic data)
+
+```
+▶ 1. Advisor status: no API key configured -> demo mode
+  ✔ mode=demo, retention=30 days
+▶ 2. Invalid input is rejected (too short, personal-data field not accepted)
+  ✔ 422 validation_error: process_description, email
+▶ 3. Visitor requests an assessment (synthetic online store, no personal data)
+  ✔ 201 mode=demo provider=mock reference=B20E2BCC stored=True
+    Opportunities: Автоматично създаване на товарителници | Синхронизация на наличностите | …
+    Workflow: Нова поръчка -> Проверка по правила -> Преглед на маркираните поръчки [одобрение]
+              -> Създаване на товарителница [одобрение] -> Уведомяване на клиента [одобрение]
+    Complexity: medium — … процесът обхваща повече от една област; част от стъпките изискват AI с човешка проверка.
+▶ 4. Prompt injection + personal data in the description are neutralised
+  ✔ Описанието съдържаше текст, който прилича на инструкции към AI система. Той беше третиран само като данни …
+  ✔ Имейл адреси и телефонни номера бяха премахнати от описанието, преди то да бъде обработено.
+▶ 5. Assessment without storage
+  ✔ 201 stored=False assessment_id=null — first opportunity: Автоматично извличане на данни от входящи фактури
+▶ 6. PostgreSQL: stored assessments (description stored redacted, expiry set)
+  B20E2BCC | demo | mock | f | 2026-11-22 | f
+  48AE1293 | demo | mock | t | 2026-11-22 | f      email_pos 0, tag_pos 0, "… visitor_input› Пишете ми на [имейл] или [телефон]."
+▶ 7. Visitor requests a consultation from the assessment
+  ✔ 201 lead reference 4763259F     assessment B20E2BCC ↔ lead 4763259F linked
+▶ 8. Admin sees the assessment on the lead
+  ✔ lead #4763259F has assessment #B20E2BCC (mode demo, complexity medium)
+▶ 9. Retention preview
+  ✔ advisor_retention_days=30, assessments due now=0
+▶ 10. API logs: metadata only, no description or generated text
+  {"msg": "advisor_assessment_created", "mode": "demo", "business_type": "online_store", "tools_count": 3,
+   "description_chars": 222, "injection_suspected": false, "stored": true, "claims_removed": 0, …}
+  ✔ no description text or personal data in the API logs
+```
+
+Not verified: the Anthropic path against the real API (no key); output quality of a real model; the
+page in browsers other than Chromium; print layout beyond hiding the controls.
+
 ## SEO, content and conversion (fourth iteration)
 
 Full checklist, keyword map, indexation rules, editorial guidelines and lab performance:

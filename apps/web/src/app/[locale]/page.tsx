@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AdvisorPromo } from "@/components/advisor/AdvisorPromo";
 import { ArticleCard } from "@/components/editorial/ArticleCard";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Faq } from "@/components/sections/Faq";
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">) {
 
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
-  const { home, coreServices, industries } = getContent(locale);
+  const { home, coreServices, industries, advisor } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const audit = serviceByKey(locale, "audit");
@@ -256,6 +257,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             {dict.nav.aiSolutions}
           </ButtonLink>
         </div>
+        <AdvisorPromo promo={advisor.promo} href={href(routes.advisor)} className="mt-12" />
       </Section>
 
       {/* ------------------------------------------------------------ advantages */}

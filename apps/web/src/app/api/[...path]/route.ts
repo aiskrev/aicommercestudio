@@ -25,6 +25,15 @@ function apiBaseUrl(): string {
   return (process.env.API_INTERNAL_URL || "http://localhost:8000").replace(/\/$/, "");
 }
 
+/**
+ * The AI advisor may wait for an AI provider: the API allows ADVISOR_TIMEOUT_SECONDS (default 45 s)
+ * per attempt with one retry, so this proxy waits longer than that and the API's own 504 reaches
+ * the visitor instead of a generic proxy error.
+ */
+function upstreamTimeout(path: string[]): number {
+  return path[0] === "public" && path[1] === "advisor" ? 100_000 : 30_000;
+}
+
 function json(status: number, detail: string): Response {
   return Response.json({ detail }, { status, headers: { "Cache-Control": "no-store" } });
 }
@@ -59,7 +68,7 @@ async function proxy(request: NextRequest, ctx: RouteContext<"/api/[...path]">):
       body,
       redirect: "manual",
       cache: "no-store",
-      signal: AbortSignal.timeout(30_000),
+      signal: AbortSignal.timeout(upstreamTimeout(path)),
     });
   } catch {
     return json(502, "Услугата временно не е достъпна. Моля, опитайте отново.");

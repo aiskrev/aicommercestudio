@@ -153,6 +153,68 @@
         }
       }
     },
+    "/api/public/advisor/status": {
+      "get": {
+        "tags": [
+          "advisor"
+        ],
+        "summary": "Advisor Status",
+        "operationId": "advisor_status_api_public_advisor_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdvisorStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/advisor/assessments": {
+      "post": {
+        "tags": [
+          "advisor"
+        ],
+        "summary": "Generate an automation assessment (no personal data required)",
+        "operationId": "create_assessment_api_public_advisor_assessments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdvisorRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdvisorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/auth/login": {
       "post": {
         "tags": [
@@ -1329,6 +1391,248 @@
         ],
         "title": "AdminUserOut"
       },
+      "AdvisorAssessmentSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "business_type": {
+            "type": "string",
+            "title": "Business Type"
+          },
+          "monthly_volume": {
+            "type": "string",
+            "title": "Monthly Volume"
+          },
+          "team_size": {
+            "type": "string",
+            "title": "Team Size"
+          },
+          "tools": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "assessment": {
+            "$ref": "#/components/schemas/AutomationAssessment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "reference",
+          "mode",
+          "created_at",
+          "business_type",
+          "monthly_volume",
+          "team_size",
+          "tools",
+          "assessment"
+        ],
+        "title": "AdvisorAssessmentSummary",
+        "description": "Shown to administrators on a lead that was submitted from an assessment."
+      },
+      "AdvisorRequest": {
+        "properties": {
+          "business_type": {
+            "$ref": "#/components/schemas/BusinessType"
+          },
+          "process_description": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 40,
+            "title": "Process Description"
+          },
+          "monthly_volume": {
+            "$ref": "#/components/schemas/MonthlyVolume"
+          },
+          "team_size": {
+            "$ref": "#/components/schemas/TeamSize"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/ToolKey"
+            },
+            "type": "array",
+            "maxItems": 16,
+            "title": "Tools"
+          },
+          "other_tools": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Other Tools",
+            "default": ""
+          },
+          "save_assessment": {
+            "type": "boolean",
+            "title": "Save Assessment",
+            "default": true
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "business_type",
+          "process_description",
+          "monthly_volume",
+          "team_size"
+        ],
+        "title": "AdvisorRequest",
+        "description": "What a visitor submits. No personal data is requested."
+      },
+      "AdvisorResponse": {
+        "properties": {
+          "assessment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessment Id"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "demo",
+              "ai"
+            ],
+            "title": "Mode"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          },
+          "notices": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notices"
+          },
+          "stored": {
+            "type": "boolean",
+            "title": "Stored"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "assessment": {
+            "$ref": "#/components/schemas/AutomationAssessment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assessment_id",
+          "reference",
+          "mode",
+          "provider",
+          "model",
+          "disclaimer",
+          "notices",
+          "stored",
+          "expires_at",
+          "created_at",
+          "assessment"
+        ],
+        "title": "AdvisorResponse"
+      },
+      "AdvisorStatus": {
+        "properties": {
+          "mode": {
+            "type": "string",
+            "enum": [
+              "demo",
+              "ai"
+            ],
+            "title": "Mode"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          },
+          "retention_days": {
+            "type": "integer",
+            "title": "Retention Days"
+          },
+          "description_min": {
+            "type": "integer",
+            "title": "Description Min",
+            "default": 40
+          },
+          "description_max": {
+            "type": "integer",
+            "title": "Description Max",
+            "default": 2000
+          }
+        },
+        "type": "object",
+        "required": [
+          "mode",
+          "disclaimer",
+          "retention_days"
+        ],
+        "title": "AdvisorStatus"
+      },
       "AuditLogOut": {
         "properties": {
           "id": {
@@ -1419,6 +1723,109 @@
         ],
         "title": "AuditPage"
       },
+      "AutomationAssessment": {
+        "properties": {
+          "problem_summary": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Problem Summary"
+          },
+          "opportunities": {
+            "items": {
+              "$ref": "#/components/schemas/Opportunity"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Opportunities"
+          },
+          "proposed_workflow": {
+            "items": {
+              "$ref": "#/components/schemas/WorkflowStep"
+            },
+            "type": "array",
+            "minItems": 2,
+            "title": "Proposed Workflow"
+          },
+          "integrations": {
+            "items": {
+              "$ref": "#/components/schemas/IntegrationCandidate"
+            },
+            "type": "array",
+            "minItems": 0,
+            "title": "Integrations"
+          },
+          "human_approvals": {
+            "items": {
+              "$ref": "#/components/schemas/HumanApproval"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Human Approvals"
+          },
+          "data_protection": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Data Protection"
+          },
+          "risks": {
+            "items": {
+              "$ref": "#/components/schemas/Risk"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Risks"
+          },
+          "complexity": {
+            "$ref": "#/components/schemas/Complexity"
+          },
+          "phases": {
+            "items": {
+              "$ref": "#/components/schemas/Phase"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Phases"
+          },
+          "clarification_questions": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "minItems": 2,
+            "title": "Clarification Questions"
+          },
+          "next_steps": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Next Steps"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "problem_summary",
+          "opportunities",
+          "proposed_workflow",
+          "integrations",
+          "human_approvals",
+          "data_protection",
+          "risks",
+          "complexity",
+          "phases",
+          "clarification_questions",
+          "next_steps"
+        ],
+        "title": "AutomationAssessment"
+      },
       "BudgetRange": {
         "type": "string",
         "enum": [
@@ -1429,6 +1836,47 @@
           "over_25000"
         ],
         "title": "BudgetRange"
+      },
+      "BusinessType": {
+        "type": "string",
+        "enum": [
+          "online_store",
+          "retail",
+          "wholesale",
+          "services",
+          "professional",
+          "manufacturing",
+          "logistics",
+          "hospitality",
+          "agency",
+          "other"
+        ],
+        "title": "BusinessType"
+      },
+      "Complexity": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Level"
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Rationale"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "level",
+          "rationale"
+        ],
+        "title": "Complexity"
       },
       "DashboardStats": {
         "properties": {
@@ -1536,6 +1984,27 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "HumanApproval": {
+        "properties": {
+          "decision": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Decision"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "decision",
+          "reason"
+        ],
+        "title": "HumanApproval"
+      },
       "InquiryType": {
         "type": "string",
         "enum": [
@@ -1543,6 +2012,37 @@
           "quote"
         ],
         "title": "InquiryType"
+      },
+      "IntegrationCandidate": {
+        "properties": {
+          "system": {
+            "type": "string",
+            "minLength": 1,
+            "title": "System"
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Purpose"
+          },
+          "access": {
+            "type": "string",
+            "enum": [
+              "read",
+              "write",
+              "read_write"
+            ],
+            "title": "Access"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "system",
+          "purpose",
+          "access"
+        ],
+        "title": "IntegrationCandidate"
       },
       "IntegrationStatus": {
         "properties": {
@@ -1633,6 +2133,18 @@
             "maxLength": 200,
             "title": "Form Token",
             "default": ""
+          },
+          "advisor_assessment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Advisor Assessment Id"
           }
         },
         "additionalProperties": false,
@@ -1830,6 +2342,16 @@
             },
             "type": "array",
             "title": "Notes"
+          },
+          "advisor_assessment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdvisorAssessmentSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -2152,6 +2674,96 @@
         ],
         "title": "LogoutAllOut"
       },
+      "MonthlyVolume": {
+        "type": "string",
+        "enum": [
+          "under_100",
+          "100_500",
+          "500_2000",
+          "2000_10000",
+          "over_10000"
+        ],
+        "title": "MonthlyVolume"
+      },
+      "Opportunity": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Description"
+          },
+          "approach": {
+            "type": "string",
+            "enum": [
+              "rules",
+              "ai_assisted",
+              "integration",
+              "reporting"
+            ],
+            "title": "Approach"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Priority"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "approach",
+          "priority"
+        ],
+        "title": "Opportunity"
+      },
+      "Phase": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Description"
+          },
+          "deliverables": {
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Deliverables"
+          },
+          "indicative_duration": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Indicative Duration"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "deliverables",
+          "indicative_duration"
+        ],
+        "title": "Phase"
+      },
       "Platform": {
         "type": "string",
         "enum": [
@@ -2225,6 +2837,18 @@
             "title": "Form Token",
             "default": ""
           },
+          "advisor_assessment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Advisor Assessment Id"
+          },
           "platform": {
             "$ref": "#/components/schemas/Platform"
           },
@@ -2290,6 +2914,16 @@
             "type": "string",
             "format": "date-time",
             "title": "Audit Cutoff"
+          },
+          "advisor_retention_days": {
+            "type": "integer",
+            "title": "Advisor Retention Days",
+            "default": 0
+          },
+          "advisor_assessments_due": {
+            "type": "integer",
+            "title": "Advisor Assessments Due",
+            "default": 0
           }
         },
         "type": "object",
@@ -2327,6 +2961,11 @@
           "audit_entries_deleted": {
             "type": "integer",
             "title": "Audit Entries Deleted"
+          },
+          "advisor_assessments_deleted": {
+            "type": "integer",
+            "title": "Advisor Assessments Deleted",
+            "default": 0
           }
         },
         "type": "object",
@@ -2335,6 +2974,27 @@
           "audit_entries_deleted"
         ],
         "title": "RetentionRunOut"
+      },
+      "Risk": {
+        "properties": {
+          "risk": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Risk"
+          },
+          "mitigation": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Mitigation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "risk",
+          "mitigation"
+        ],
+        "title": "Risk"
       },
       "ServiceKey": {
         "type": "string",
@@ -2404,6 +3064,17 @@
         ],
         "title": "SystemStatus"
       },
+      "TeamSize": {
+        "type": "string",
+        "enum": [
+          "solo",
+          "2_5",
+          "6_20",
+          "21_50",
+          "over_50"
+        ],
+        "title": "TeamSize"
+      },
       "Timeline": {
         "type": "string",
         "enum": [
@@ -2413,6 +3084,28 @@
           "flexible"
         ],
         "title": "Timeline"
+      },
+      "ToolKey": {
+        "type": "string",
+        "enum": [
+          "shopify",
+          "woocommerce",
+          "other_ecommerce",
+          "spreadsheets",
+          "google_workspace",
+          "microsoft_365",
+          "email",
+          "crm",
+          "erp",
+          "accounting",
+          "invoicing",
+          "courier",
+          "payments",
+          "helpdesk",
+          "messaging",
+          "none"
+        ],
+        "title": "ToolKey"
       },
       "ValidationError": {
         "properties": {
@@ -2453,6 +3146,42 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "WorkflowStep": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Description"
+          },
+          "actor": {
+            "type": "string",
+            "enum": [
+              "system",
+              "ai",
+              "human"
+            ],
+            "title": "Actor"
+          },
+          "requires_human_approval": {
+            "type": "boolean",
+            "title": "Requires Human Approval"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "actor",
+          "requires_human_approval"
+        ],
+        "title": "WorkflowStep"
       }
     }
   }

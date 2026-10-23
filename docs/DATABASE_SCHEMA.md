@@ -10,6 +10,7 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | --- | --- |
 | `0001` | admin users & sessions, leads, notes, audit log, AI action approvals |
 | `0002` | quote requests (`inquiry_type`, `platform`, `budget_range`, `timeline`, `website_url`), service re-categorisation (`submitted_service`, backfilled from `service`), persistent login lockout (`failed_login_count`, `locked_until`), indexes on `leads.service`, `leads.inquiry_type`, `audit_logs.action`, `audit_logs.actor_id` |
+| `0003` | `advisor_assessments` (anonymous AI advisor assessments with expiry and optional lead link, FK `ON DELETE CASCADE`) |
 
 Apply: automatic on container start (`RUN_MIGRATIONS_ON_START=true`), or manually
 `docker compose exec api alembic upgrade head`. Inspect: `docker compose exec api alembic current`.
@@ -124,6 +125,26 @@ Append-only activity log. `details` must never contain raw personal data.
 | created_at, decided_at | timestamptz | |
 | decision_comment | text | |
 
+
+## advisor_assessments
+
+Anonymous AI advisor assessments ([AI_ADVISOR.md](AI_ADVISOR.md)). No personal data is collected; the
+description is stored after e-mails, phone numbers and links were removed.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| id | uuid PK | reference = first 8 hex chars, upper case |
+| created_at, expires_at | timestamptz | `expires_at = created_at + ADVISOR_RETENTION_DAYS`; index `ix_advisor_assessments_expires_at` |
+| business_type, monthly_volume, team_size | varchar | API enums (validated by Pydantic) |
+| tools | jsonb | list of tool keys |
+| process_description | text | screened text (PII and links removed, `<`/`>` neutralised) |
+| result | jsonb | validated and sanitised `AutomationAssessment` |
+| mode | varchar(8) | `demo` or `ai` (CHECK `ck_advisor_assessments_mode`) |
+| provider, model, prompt_version | varchar | which engine produced the result |
+| injection_suspected | bool | injection phrasing detected in the input |
+| lead_id | uuid FK → leads.id **ON DELETE CASCADE**, nullable | set when the visitor requests a consultation; index `ix_advisor_assessments_lead_id` |
+| linked_at | timestamptz | when it was linked |
+
 ## Retention & erasure
 
 | Data | Rule | Mechanism |
@@ -131,7 +152,8 @@ Append-only activity log. `details` must never contain raw personal data.
 | Leads + notes | deleted when `updated_at` older than `LEAD_RETENTION_DAYS` (default 730) | `python -m app.cli maintenance`, or admin dashboard (`GET /api/admin/retention` preview, `POST /api/admin/retention/run` with confirmation) |
 | Audit log | deleted after `AUDIT_RETENTION_DAYS` (default 1095) | same command |
 | Sessions | removed after expiry / 1 day after revocation | same command |
-| Individual erasure request | admin deletes the lead in the UI (`DELETE /api/admin/leads/{id}`) | audit keeps only id + reason |
+| Advisor assessments | unlinked rows deleted after `expires_at` (`ADVISOR_RETENTION_DAYS`, default 30); linked rows are deleted with their lead | same command and admin retention panel |
+| Individual erasure request | admin deletes the lead in the UI (`DELETE /api/admin/leads/{id}`); a linked advisor assessment is deleted with it | audit keeps only id + reason |
 
 ## Seed data
 

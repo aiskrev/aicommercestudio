@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["/", "/uslugi", "/uslugi/seo-optimizatsiya", "/ai-resheniya", "/za-kogo", "/proces", "/kontakti", "/statii", "/admin/login"];
+const PAGES = ["/", "/uslugi", "/uslugi/seo-optimizatsiya", "/ai-resheniya", "/ai-automation-advisor", "/za-kogo", "/proces", "/kontakti", "/statii", "/admin/login"];
 
 test("pages fit the mobile viewport without horizontal scrolling", async ({ page }) => {
   for (const path of PAGES) {

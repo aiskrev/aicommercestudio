@@ -1,3 +1,4 @@
+import { advisor } from "@/content/bg/advisor";
 import { articles, insightsPage } from "@/content/bg/articles";
 import { editorialCategories, publishableCaseStudies } from "@/content/bg/editorial";
 import { home } from "@/content/bg/home";
@@ -23,6 +24,7 @@ const bg = {
   about,
   processPage,
   aiSolutions,
+  advisor,
   articles,
   insightsPage,
   editorialCategories,

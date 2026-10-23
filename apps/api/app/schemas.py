@@ -11,6 +11,7 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
+from app.advisor.schemas import AdvisorAssessmentSummary
 from app.models import BudgetRange, InquiryType, LeadStatus, Platform, ServiceKey, Timeline
 
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
@@ -47,6 +48,8 @@ class LeadCreate(StrictModel):
     # Honeypot: real users never see or fill this field.
     website: str = Field(default="", max_length=200)
     form_token: str = Field(default="", max_length=200)
+    # Set when the visitor requests a consultation from an AI advisor assessment.
+    advisor_assessment_id: uuid.UUID | None = None
 
     @field_validator("name", "company")
     @classmethod
@@ -193,6 +196,7 @@ class LeadDetailOut(LeadSummaryOut):
     timeline: str | None
     website_url: str | None
     notes: list[LeadNoteOut]
+    advisor_assessment: AdvisorAssessmentSummary | None = None
 
 
 class LeadPage(BaseModel):
@@ -273,6 +277,8 @@ class RetentionPreview(BaseModel):
     audit_entries_due: int
     lead_cutoff: datetime
     audit_cutoff: datetime
+    advisor_retention_days: int = 0
+    advisor_assessments_due: int = 0
 
 
 class RetentionRunIn(StrictModel):
@@ -282,6 +288,7 @@ class RetentionRunIn(StrictModel):
 class RetentionRunOut(BaseModel):
     leads_deleted: int
     audit_entries_deleted: int
+    advisor_assessments_deleted: int = 0
 
 
 class IntegrationStatus(BaseModel):

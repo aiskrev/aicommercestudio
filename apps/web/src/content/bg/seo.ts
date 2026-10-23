@@ -113,6 +113,14 @@ export const keywordMap: KeywordTarget[] = [
     volumeStatus: "unverified",
   },
   {
+    path: "/ai-automation-advisor",
+    primaryKeyword: "AI съветник за автоматизация",
+    secondaryKeywords: ["оценка на процес за автоматизация", "какво може да се автоматизира в бизнеса"],
+    intent: "commercial",
+    rationale: "Инструмент за самооценка; води към услугата за автоматизация и към консултация.",
+    volumeStatus: "unverified",
+  },
+  {
     path: "/za-kogo",
     primaryKeyword: "технически партньор за онлайн търговци",
     secondaryKeywords: ["IT поддръжка за малък бизнес", "партньор за Shopify търговци"],
