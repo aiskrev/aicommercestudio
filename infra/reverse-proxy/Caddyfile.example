@@ -1,0 +1,20 @@
+# Example Caddy configuration for production (automatic HTTPS).
+# Replace example.com with the real domain. Caddy overwrites X-Forwarded-For
+# with the real client address, which the API uses for rate limiting.
+
+example.com {
+	encode zstd gzip
+
+	reverse_proxy 127.0.0.1:3000 {
+		header_up X-Forwarded-For {remote_host}
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+}
+
+www.example.com {
+	redir https://example.com{uri} permanent
+}

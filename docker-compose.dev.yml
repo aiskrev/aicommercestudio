@@ -1,0 +1,35 @@
+# Hot-reload development override.
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+# Source folders are bind-mounted; file watching uses polling because
+# Docker Desktop on Windows does not forward filesystem events reliably.
+
+services:
+  api:
+    build:
+      target: dev
+    command: ["sh", "-c", "alembic upgrade head && python -m app.cli seed && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+    environment:
+      RUN_MIGRATIONS_ON_START: "false"
+      WATCHFILES_FORCE_POLLING: "true"
+    volumes:
+      - ./apps/api:/app
+
+  web:
+    build:
+      target: dev
+    command: ["npm", "run", "dev"]
+    environment:
+      API_INTERNAL_URL: http://api:8000
+      SITE_URL: ${SITE_URL:-http://localhost:3000}
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./apps/web:/app
+      - web_node_modules:/app/node_modules
+      - web_next:/app/.next
+    healthcheck:
+      start_period: 90s
+
+volumes:
+  web_node_modules:
+  web_next:

@@ -1,0 +1,23 @@
+# Production override (template). Use behind a TLS-terminating reverse proxy.
+#   docker compose -f docker-compose.yml -f infra/docker-compose.prod.yml up -d --build
+# Requirements before using it:
+#   * APP_ENV=production, COOKIE_SECURE=true, a unique SECRET_KEY, SITE_URL=https://<your-domain>
+#   * CORS_ORIGINS=https://<your-domain>
+#   * secrets supplied by the host / secret manager, not by a committed file
+# The API and database are not published on host ports; only the web container is,
+# and only on 127.0.0.1 so the reverse proxy (see infra/reverse-proxy/Caddyfile.example) fronts it.
+
+services:
+  db:
+    ports: !reset []
+
+  api:
+    ports: !reset []
+    environment:
+      APP_ENV: production
+      ENABLE_API_DOCS: "false"
+      SEED_SAMPLE_DATA: "false"
+
+  web:
+    ports: !override
+      - "127.0.0.1:3000:3000"

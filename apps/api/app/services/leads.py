@@ -1,0 +1,242 @@
+"""Lead business logic, kept independent of HTTP so it can be reused by CLI and tests."""
+
+from __future__ import annotations
+
+import uuid
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+
+from sqlalchemy import Select, delete, func, or_, select
+from sqlalchemy.orm import Session, selectinload
+
+from app import audit
+from app.models import (
+    AdminUser,
+    AIActionRequest,
+    AIActionStatus,
+    AuditLog,
+    Lead,
+    LeadNote,
+    LeadStatus,
+    ServiceKey,
+    utcnow,
+)
+from app.schemas import LeadCreate
+
+OPEN_STATUSES = (LeadStatus.NEW, LeadStatus.CONTACTED, LeadStatus.QUALIFIED, LeadStatus.PROPOSAL)
+
+
+def create_lead(
+    db: Session,
+    data: LeadCreate,
+    *,
+    privacy_notice_version: str,
+    ip_hash: str | None,
+    source: str = "website_contact_form",
+) -> Lead:
+    now = utcnow()
+    lead = Lead(
+        service=data.service.value,
+        name=data.name,
+        company=data.company,
+        email=data.email,
+        phone=data.phone,
+        message=data.message,
+        status=LeadStatus.NEW.value,
+        source=source,
+        privacy_acknowledged_at=now,
+        privacy_notice_version=privacy_notice_version,
+        marketing_consent=data.marketing_consent,
+        marketing_consent_at=now if data.marketing_consent else None,
+        ip_hash=ip_hash,
+        created_at=now,
+        updated_at=now,
+    )
+    db.add(lead)
+    db.flush()
+    audit.record(
+        db,
+        "lead.created",
+        actor_label="website",
+        entity_type="lead",
+        entity_id=str(lead.id),
+        details={"service": lead.service, "source": source, "marketing_consent": lead.marketing_consent},
+        ip_hash=ip_hash,
+    )
+    db.commit()
+    return lead
+
+
+@dataclass(frozen=True)
+class LeadFilters:
+    status: LeadStatus | None = None
+    service: ServiceKey | None = None
+    q: str | None = None
+    created_from: datetime | None = None
+    created_to: datetime | None = None
+    sort: str = "newest"
+
+
+def _escape_like(value: str) -> str:
+    return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
+
+def _filtered(filters: LeadFilters) -> Select[tuple[Lead]]:
+    stmt = select(Lead)
+    if filters.status:
+        stmt = stmt.where(Lead.status == filters.status.value)
+    if filters.service:
+        stmt = stmt.where(Lead.service == filters.service.value)
+    if filters.q:
+        pattern = f"%{_escape_like(filters.q.strip())}%"
+        stmt = stmt.where(
+            or_(
+                Lead.name.ilike(pattern, escape="\\"),
+                Lead.company.ilike(pattern, escape="\\"),
+                Lead.email.ilike(pattern, escape="\\"),
+            )
+        )
+    if filters.created_from:
+        stmt = stmt.where(Lead.created_at >= filters.created_from)
+    if filters.created_to:
+        stmt = stmt.where(Lead.created_at <= filters.created_to)
+    return stmt
+
+
+def list_leads(db: Session, filters: LeadFilters, page: int, page_size: int) -> tuple[list[Lead], int]:
+    base = _filtered(filters)
+    total = db.scalar(select(func.count()).select_from(base.subquery())) or 0
+    order = Lead.created_at.asc() if filters.sort == "oldest" else Lead.created_at.desc()
+    items = db.scalars(base.order_by(order, Lead.id).offset((page - 1) * page_size).limit(page_size)).all()
+    return list(items), total
+
+
+def get_lead(db: Session, lead_id: uuid.UUID) -> Lead | None:
+    return db.scalar(select(Lead).where(Lead.id == lead_id).options(selectinload(Lead.notes)))
+
+
+def update_status(db: Session, lead: Lead, new_status: LeadStatus, actor: AdminUser, ip_hash: str | None) -> Lead:
+    old = lead.status
+    if old != new_status.value:
+        lead.status = new_status.value
+        lead.status_changed_at = utcnow()
+        audit.record(
+            db,
+            "lead.status_changed",
+            actor=actor,
+            entity_type="lead",
+            entity_id=str(lead.id),
+            details={"from": old, "to": new_status.value},
+            ip_hash=ip_hash,
+        )
+        db.commit()
+    return lead
+
+
+def add_note(db: Session, lead: Lead, body: str, actor: AdminUser, ip_hash: str | None) -> LeadNote:
+    note = LeadNote(lead_id=lead.id, author_id=actor.id, body=body)
+    db.add(note)
+    lead.updated_at = utcnow()
+    db.flush()
+    audit.record(
+        db,
+        "lead.note_added",
+        actor=actor,
+        entity_type="lead",
+        entity_id=str(lead.id),
+        details={"note_id": str(note.id), "length": len(body)},
+        ip_hash=ip_hash,
+    )
+    db.commit()
+    db.refresh(note)
+    return note
+
+
+def delete_lead(db: Session, lead: Lead, actor: AdminUser | None, ip_hash: str | None, reason: str) -> None:
+    """Hard-delete a lead and its notes (GDPR erasure). The audit entry keeps no personal data."""
+    lead_id = str(lead.id)
+    db.delete(lead)
+    audit.record(
+        db,
+        "lead.deleted",
+        actor=actor,
+        actor_label=None if actor else "retention-job",
+        entity_type="lead",
+        entity_id=lead_id,
+        details={"reason": reason},
+        ip_hash=ip_hash,
+    )
+    db.commit()
+
+
+def lead_audit(db: Session, lead_id: uuid.UUID, limit: int = 100) -> list[AuditLog]:
+    stmt = (
+        select(AuditLog)
+        .where(AuditLog.entity_type == "lead", AuditLog.entity_id == str(lead_id))
+        .order_by(AuditLog.created_at.desc(), AuditLog.id.desc())
+        .limit(limit)
+    )
+    return list(db.scalars(stmt).all())
+
+
+def recent_audit(db: Session, limit: int = 50) -> list[AuditLog]:
+    stmt = select(AuditLog).order_by(AuditLog.created_at.desc(), AuditLog.id.desc()).limit(limit)
+    return list(db.scalars(stmt).all())
+
+
+def dashboard_stats(db: Session, now: datetime | None = None) -> dict:
+    now = now or utcnow()
+    by_status = {s.value: 0 for s in LeadStatus}
+    for status_value, count in db.execute(select(Lead.status, func.count()).group_by(Lead.status)):
+        by_status[status_value] = count
+    by_service = {s.value: 0 for s in ServiceKey}
+    for service_value, count in db.execute(select(Lead.service, func.count()).group_by(Lead.service)):
+        by_service[service_value] = count
+
+    def _since(days: int) -> int:
+        stmt = select(func.count()).select_from(Lead).where(Lead.created_at >= now - timedelta(days=days))
+        return db.scalar(stmt) or 0
+
+    pending_ai = db.scalar(
+        select(func.count())
+        .select_from(AIActionRequest)
+        .where(AIActionRequest.status == AIActionStatus.PENDING.value)
+    )
+    return {
+        "total_leads": sum(by_status.values()),
+        "new_leads": by_status[LeadStatus.NEW.value],
+        "leads_last_7_days": _since(7),
+        "leads_last_30_days": _since(30),
+        "open_pipeline": sum(by_status[s.value] for s in OPEN_STATUSES),
+        "won": by_status[LeadStatus.WON.value],
+        "lost": by_status[LeadStatus.LOST.value],
+        "by_status": by_status,
+        "by_service": by_service,
+        "pending_ai_actions": pending_ai or 0,
+        "recent_activity": recent_audit(db, limit=8),
+    }
+
+
+@dataclass(frozen=True)
+class RetentionResult:
+    leads_deleted: int
+    audit_entries_deleted: int
+
+
+def purge_expired(
+    db: Session, lead_retention_days: int, audit_retention_days: int, *, dry_run: bool = False,
+    now: datetime | None = None,
+) -> RetentionResult:
+    """Delete leads not updated within the retention period and audit entries older than theirs."""
+    now = now or utcnow()
+    lead_cutoff = now - timedelta(days=lead_retention_days)
+    audit_cutoff = now - timedelta(days=audit_retention_days)
+    expired = list(db.scalars(select(Lead).where(Lead.updated_at < lead_cutoff)).all())
+    old_audit = db.scalar(select(func.count()).select_from(AuditLog).where(AuditLog.created_at < audit_cutoff)) or 0
+    if dry_run:
+        return RetentionResult(len(expired), old_audit)
+    for lead in expired:
+        delete_lead(db, lead, actor=None, ip_hash=None, reason=f"retention>{lead_retention_days}d")
+    db.execute(delete(AuditLog).where(AuditLog.created_at < audit_cutoff))
+    db.commit()
+    return RetentionResult(len(expired), old_audit)
