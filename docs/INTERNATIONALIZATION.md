@@ -114,6 +114,38 @@ No locale in admin URLs. The admin root layout reads `acs_locale` (`src/lib/admi
 its own BG | EN toggle (login page and sidebar) that writes the same cookie and refreshes the server
 components. Admin API calls send `Accept-Language`, so server messages match.
 
+## Why a custom solution instead of next-intl
+
+The project already had a typed `getDictionary(locale)` / `getContent(locale)` layer and a
+`[locale]` route tree. Extending it kept the stable routing, gave compile-time completeness checks
+for large typed content objects (not only flat message keys) and added no dependency. next-intl
+would mainly have replaced the message lookup and still required the same route mapping, so it was
+not introduced.
+
+## Adding a third language (e.g. `de`)
+
+1. `src/i18n/config.ts`: add the code to `locales`, `localeMeta` (html lang, OG locale, label,
+   date locale) and a segment map (like `EN_SEGMENTS`) for translated URLs; extend
+   `localizePath` / `toInternalPath` / `localizeSearch` for that map.
+2. Add `src/i18n/dictionaries/de.ts` (`de: Dictionary`), `src/content/de/*` (typed against the
+   Bulgarian shape) and `src/i18n/admin/de.ts`; register them in the index files.
+3. `buildSlugMap()` and the switcher: extend the slug maps to more than two languages (the switcher
+   currently toggles between two).
+4. API: add the code to `Locale`/`SUPPORTED` in `app/i18n.py`, every catalogue entry, the
+   `LeadLocale` enum + a migration extending `ck_leads_locale`, advisor messages and demo templates.
+5. SEO: the sitemap and `buildMetadata` iterate over `locales` automatically; add a keyword map.
+6. Tests: extend the parity / no-foreign-script tests and add e2e routes.
+
+## Testing requirements
+
+* Unit (`src/lib/i18n.test.ts`): same keys in every dictionary, no empty strings, no Bulgarian
+  script in English UI/content, no raw keys.
+* Routing/SEO unit tests (`src/lib/routing-and-seo.test.ts`): redirects, rewrites, switcher
+  mapping, canonical/hreflang, bilingual sitemap with reciprocal alternates.
+* E2E (`e2e/tests/i18n.spec.ts`, `seo.spec.ts`, `links.spec.ts`, `mobile.spec.ts`): real pages in
+  both languages, switcher on desktop and mobile, localized validation and API messages, admin
+  language, every sitemap URL crawled, no overflow at phone width.
+
 ## Adding or changing text
 
 1. Add the key to the Bulgarian file, then the English one (tsc fails until both exist).

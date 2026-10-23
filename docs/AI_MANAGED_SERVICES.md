@@ -73,6 +73,55 @@ Rules enforced by content and tests (`content.test.ts`, `e2e/tests/i18n.spec.ts`
 
 Internal pricing guidance (hypothetical, not published): [AI_MANAGED_SERVICES_PRICING.md](AI_MANAGED_SERVICES_PRICING.md).
 
+## Deliverables (what the client receives)
+
+| Deliverable | Monitor | Care | Optimize |
+| --- | --- | --- | --- |
+| Initial technical assessment (architecture, instrumentation, access, risks, cost baseline) | ✓ | ✓ | ✓ |
+| Health checks where the system supports them, issue reports | basic | detailed | comprehensive |
+| Usage and cost overview | ✓ | ✓ | ✓ (with optimisation reviews) |
+| Evaluation set and regression review before changes | — | scheduled | custom evaluations |
+| Prompt / configuration / integration maintenance within the agreed hours | — | ✓ | ✓ |
+| Incident handling | reporting | triage | agreed procedure |
+| Change log with rollback reference | — | recommendations | managed changes |
+| Monthly report | summary | summary + review | summary + improvement plan |
+
+## Technical prerequisites (agreed after the assessment, never through the website)
+
+* A named technical owner on the client side and a written description of the AI system
+  (providers, models, tools, data sources, environments).
+* Read access to logs/metrics or permission to add instrumentation (e.g. OpenTelemetry exporter,
+  provider usage dashboards) — granted through the client's own access management, with a
+  dedicated, least-privilege account; never by sending passwords or keys by e-mail or form.
+* A non-production environment or another safe way to test changes, or an agreed change window.
+* Example cases for the evaluation set (anonymised where they contain personal data).
+* A data processing agreement before any production data is received.
+
+## Monthly reporting model
+
+Each month the client receives a short report: what was checked, incidents and their status,
+changes made (with links to the change log), evaluation results compared with the previous
+release, usage and cost trend (from provider data, labelled with its source), open risks and the
+improvement backlog for the next month. Figures are reported only when they were actually measured.
+
+## Incident handling approach
+
+Classification by impact (e.g. wrong answers to customers, workflow stopped, cost spike, security
+concern) → detection and triage → client notification through the agreed channel → investigation →
+mitigation or rollback where available → post-incident review with preventive actions. Response
+times are defined only in a signed contract that matches real staffing; the website publishes none.
+
+## Upsell and cross-sell opportunities
+
+* From **custom AI tools** or **automation** projects: offer AI Care after launch instead of ad-hoc fixes.
+* From **AI Managed Services** to **API integrations & security** (hardening, secret rotation,
+  least-privilege access), **analytics** (measuring business outcomes of the AI system) and
+  **custom AI tools** (new capabilities as separate projects or change requests).
+* From the **AI advisor** and **technical audit**: assessments that reveal an existing, unmaintained
+  agent are natural AI Monitor / AI Care leads.
+* Package upgrades (Monitor → Care → Optimize) when usage, number of workflows or business
+  criticality grows.
+
 ## Intake form
 
 Shown when the selected service is `ai_managed` (on the service page it is pre-selected).

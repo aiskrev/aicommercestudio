@@ -21,6 +21,21 @@ Date: 2026-10-24. Environment: Windows 11 Pro, Docker Desktop, local stack only 
 One Next.js app (`apps/web`) and one FastAPI service (`apps/api`) — no second frontend or backend.
 See [INTERNATIONALIZATION.md](INTERNATIONALIZATION.md) and [AI_MANAGED_SERVICES.md](AI_MANAGED_SERVICES.md).
 
+### New pages
+
+* `/bg/uslugi/ai-managed-services`, `/en/services/ai-managed-services` (new service page).
+* The complete English site under `/en/...` (home, services + 8 service pages, AI solutions,
+  industries, process, about, contact, insights + 6 articles + topics, advisor, legal drafts, 404).
+
+### Differences from the requested URLs (documented, intentional)
+
+| Requested example | Actual | Reason |
+| --- | --- | --- |
+| `/bg/uslugi/seo`, `/en/services/seo` | `/bg/uslugi/seo-optimizatsiya`, `/en/services/seo-optimization` | existing, already indexed SEO slugs were kept |
+| `http://localhost:8000/docs` | `http://localhost:8000/api/docs` | existing API docs path (disabled in production) |
+| `D:\Projects\AI-Commerce-Studio` | working copy `D:\Projects\Site` | INSTALL_WINDOWS.md §2 covers cloning to the requested path |
+| switcher without full reload | full navigation on language change | `<html lang>` lives in the per-locale root layout; Next.js reloads when the root layout changes |
+
 ## 3. Added files
 
 | Area | Files |
@@ -88,9 +103,12 @@ triage text; the admin shows a note about the latter when in English.
 | API lint | `ruff check --no-cache .` | **All checks passed** |
 | Web typecheck + lint + unit | `docker compose --profile test run --rm --build web-tests` (typegen, `tsc`, `eslint`, `vitest`) | **0 type errors, 0 lint findings, 135 passed (9 files)** |
 | Production build | `docker compose up --build -d` (Next.js production build in the web image) | **succeeded**, stack healthy |
-| End-to-end | `docker compose --profile test run --rm --build e2e` | **43 passed** (desktop Chromium + Pixel 7), final full run |
+| End-to-end | `docker compose --profile test run --rm --build e2e` | **44 passed** (desktop Chromium + Pixel 7), final full run |
 | Dependency audit | `.\scripts\test.ps1 -Suite audit` | pip-audit: **no known vulnerabilities**; npm audit: **0 vulnerabilities** |
 | Visual check | in-app browser, `/en/services/ai-managed-services` at 1280 px and 375 px | layout correct; no horizontal overflow (`scrollWidth = clientWidth = 375`) |
+
+**Failed tests in the final runs: none.** Failures seen earlier and fixed before the final runs are
+listed below.
 
 Fixes made during verification: English article meta title over 70 characters; the advisor status
 request did not send the page language; admin language test clicked the hidden mobile switch; the

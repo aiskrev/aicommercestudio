@@ -43,6 +43,11 @@ test.describe("language routing", () => {
       const visible = (await page.locator("main").innerText()).replaceAll("Български", "");
       expect(CYRILLIC.test(visible), `${path} shows Cyrillic text`).toBe(false);
       expect(visible, path).not.toMatch(/\b[a-z]+\.[a-z]+\.[a-zA-Z]+\b/); // no raw dictionary keys
+      // Header and footer are localized too (the switcher's "Превключи на български" label is not visible text).
+      for (const part of ["header", "footer"]) {
+        const text = await page.locator(part).first().innerText();
+        expect(CYRILLIC.test(text), `${path} ${part} shows Cyrillic text`).toBe(false);
+      }
 
       const canonical = await page.locator("link[rel='canonical']").getAttribute("href");
       expect(new URL(canonical!).pathname, path).toBe(path);
@@ -60,6 +65,15 @@ test.describe("language routing", () => {
       expect(new URL(back!).pathname, `${hreflang.bg} → en`).toBe(path);
     }
   });
+});
+
+test("navigation labels are localized", async ({ page }) => {
+  const nav = (path: string) =>
+    page.goto(path).then(() => page.locator("header nav").first().innerText());
+  const bg = await nav("/bg");
+  for (const label of ["Услуги", "AI решения", "Процес"]) expect(bg).toContain(label);
+  const en = await nav("/en");
+  for (const label of ["Services", "AI solutions", "Industries", "Process", "Insights", "About"]) expect(en).toContain(label);
 });
 
 test.describe("language switcher", () => {

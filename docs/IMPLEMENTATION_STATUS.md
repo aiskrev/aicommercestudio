@@ -13,7 +13,7 @@ Details: [IMPLEMENTATION_REPORT.md](IMPLEMENTATION_REPORT.md). Executed results 
 | Backend lint (`ruff check`) | **0 issues** |
 | Web typecheck / lint / unit (`web-tests`) | **0 errors / 0 findings / 135 passed (9 files)** |
 | Production web build (`docker compose up --build`) | **succeeded**, db/api/web healthy, `alembic current` = `0004 (head)` |
-| End-to-end (`e2e`, desktop Chromium + Pixel 7) | **43 passed** |
+| End-to-end (`e2e`, desktop Chromium + Pixel 7) | **44 passed** |
 | pip-audit / npm audit | **no known vulnerabilities / 0 vulnerabilities** |
 
 The tables below describe earlier iterations and are kept as history.

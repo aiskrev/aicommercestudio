@@ -38,6 +38,44 @@ of the AI systems we operate, without ever weakening the client's own security b
 | `change` | prompt/model/tool/config changes with approval and rollback reference |
 | `audit_log` | every human and system action, as in the current admin |
 
+## Telemetry ingestion
+
+* **Push (preferred):** the client's OpenTelemetry SDK/collector sends traces and metrics (request
+  count, latency per model/tool, errors, token usage) to a per-tenant ingestion endpoint
+  authenticated with a tenant-scoped ingestion key. Content fields are dropped or redacted at the
+  collector by default.
+* **Pull:** read-only provider usage/cost APIs and platform status APIs, using scoped keys from the
+  secrets manager.
+* **Synthetic probes:** scheduled test requests against a non-production or dedicated test route.
+
+## Metrics and evaluation storage
+
+| Data | Store | Retention (default, configurable) |
+| --- | --- | --- |
+| Metrics (rates, latency, tokens, cost) | time-series / columnar store, tenant column + RLS | 13 months, aggregated after 30 days |
+| Traces (redacted) | object / columnar store | 14–30 days |
+| Evaluation sets, runs, scores | PostgreSQL (versioned, linked to `change`) | life of the contract |
+| Incidents, changes, approvals, audit | PostgreSQL | per contract / legal requirement |
+
+## Alerting
+
+Rules per system (error rate, latency, cost per day, probe failures, evaluation score drop) with
+severity and quiet hours; deduplication and grouping into incidents; delivery by e-mail or chat
+webhook to the on-duty contact. Alerts never trigger changes in client systems automatically.
+
+## Incident lifecycle
+
+`detected → triaged (severity) → client notified → investigating → mitigated / rolled back →
+resolved → post-incident review → preventive actions tracked in the backlog`. Every transition is
+audited with actor and timestamp.
+
+## Rollback and change management
+
+Every change to prompts, models, tools or configuration is a `change` record: description, risk,
+evaluation run before/after, approver, deployment time and a rollback reference (previous version).
+Changes that affect production need human approval; failed evaluation blocks the change unless an
+approver overrides it with a recorded reason.
+
 ## Security requirements
 
 * **No client secrets in the website or lead database.** Credentials for read-only provider APIs

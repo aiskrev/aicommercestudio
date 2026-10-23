@@ -31,6 +31,57 @@
 * client-side change frequency (prompt/model/tool changes per month)
 * reporting cadence and meeting time
 
+## Onboarding cost drivers
+
+* depth of the initial assessment (number of systems, environments, integrations)
+* missing instrumentation that must be added before anything can be monitored
+* building the first evaluation set (collecting and anonymising examples, defining criteria)
+* documentation gaps (no architecture description, unknown prompt/model versions)
+* access setup through the client's identity management and the DPA
+
+Onboarding is quoted separately from the monthly fee (one-off), or amortised over a minimum term
+only when agreed in writing.
+
+## Client complexity factors
+
+| Factor | Lower complexity | Higher complexity |
+| --- | --- | --- |
+| Systems in scope | 1 assistant | many agents / workflows |
+| Actions | read-only answers | writes to CRM/ERP/store, sends messages |
+| Data | public product info | personal, health or financial data |
+| Change rate | stable | frequent prompt/model/tool changes |
+| Instrumentation | logs + provider dashboard exist | nothing, must be built |
+| Stakeholders | one owner | several teams / agency in between |
+
+## Margin calculation framework
+
+```
+monthly fee  ≥  (estimated hours × internal cost per hour)        // delivery cost
+              + tooling share (observability, eval runs we pay for)
+              + risk buffer (10–25 % of hours, by complexity)     // hypothetical range
+              ÷ (1 − target gross margin)                         // e.g. 0.35–0.50, hypothetical
+```
+
+Third-party model and hosting costs stay outside this formula (paid by the client or re-invoiced
+at cost). Track actual hours per client monthly; re-quote at renewal if the margin falls below target.
+
+## Optional add-on services
+
+* additional agents / workflows beyond the package scope
+* custom evaluation suites, red-team / prompt-injection review
+* extended support windows (only when staffing allows and contracted)
+* integration work (new tools, CRM/ERP connectors) as change requests
+* security hardening: secret rotation, least-privilege review, audit logging setup
+* training for the client's team; quarterly executive review
+
+## Suggested contract considerations
+
+Scope and systems covered; included hours/tasks and the overage rate; what counts as a change
+request; response targets only if contractually supported (with exclusions), otherwise "business
+hours, best effort"; third-party costs and who pays them; access, credentials handling and
+offboarding (revocation of access); DPA and sub-processors; confidentiality; liability caps; term,
+notice period and price review; client responsibilities (provider accounts, decisions, approvals).
+
 ## Hypothetical scenarios (illustrative only)
 
 The figures are placeholders to make the structure concrete. Replace them with your own estimates.
