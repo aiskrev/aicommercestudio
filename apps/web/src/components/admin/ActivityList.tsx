@@ -25,7 +25,7 @@ export function ActivityList({ entries, linkLeads = true }: { entries: AuditEntr
         const linkable = linkLeads && entry.entity_type === "lead" && entry.entity_id && entry.action !== "lead.deleted";
         return (
           <li key={entry.id} className="grid gap-1 rounded-lg px-2 py-2.5 text-sm sm:grid-cols-[10rem_1fr] sm:gap-4">
-            <time dateTime={entry.created_at} className="text-xs text-slate-500 sm:text-sm">
+            <time dateTime={entry.created_at} className="text-xs text-slate-400 sm:text-sm">
               {formatDateTime(entry.created_at)}
             </time>
             <div className="min-w-0">
@@ -37,7 +37,7 @@ export function ActivityList({ entries, linkLeads = true }: { entries: AuditEntr
                 ) : (
                   actionLabel(entry.action)
                 )}
-                <span className="text-slate-500"> · {entry.actor_label}</span>
+                <span className="text-slate-400"> · {entry.actor_label}</span>
               </p>
               {detail && <p className="mt-0.5 truncate text-xs text-slate-400">{detail}</p>}
             </div>

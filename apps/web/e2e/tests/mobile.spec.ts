@@ -15,8 +15,16 @@ test("mobile menu opens, navigates and closes", async ({ page }) => {
   const toggle = page.getByRole("button", { name: "Отвори менюто" });
   await expect(toggle).toBeVisible();
   await toggle.click();
-  await expect(page.getByRole("button", { name: "Затвори менюто" })).toHaveAttribute("aria-expanded", "true");
-  await page.getByRole("link", { name: "Процес" }).last().click();
+  const close = page.getByRole("button", { name: "Затвори менюто" });
+  await expect(close).toHaveAttribute("aria-expanded", "true");
+  // The link must be visible inside the opened panel (not the footer link further down).
+  const panel = page.locator(`[id="${await close.getAttribute("aria-controls")}"]`);
+  await expect(panel).toBeVisible();
+  const box = await panel.boundingBox();
+  expect(box && box.height > 300).toBeTruthy();
+  const link = panel.getByRole("link", { name: "Процес", exact: true });
+  await expect(link).toBeVisible();
+  await link.click();
   await expect(page).toHaveURL(/\/proces$/);
   await expect(page.getByRole("button", { name: "Отвори менюто" })).toHaveAttribute("aria-expanded", "false");
 });

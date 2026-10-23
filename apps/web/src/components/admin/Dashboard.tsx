@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { AdminPageHeader } from "@/components/admin/AdminShell";
 import { ActivityList } from "@/components/admin/ActivityList";
-import { EmptyState, ErrorState, LoadingState, Panel, StatCard } from "@/components/admin/ui";
+import { EmptyState, ErrorState, LoadingState, Panel, StatCard, StatsSkeleton } from "@/components/admin/ui";
 import { Icon } from "@/components/ui/Icon";
 import { cx } from "@/components/ui/primitives";
 import { serviceLabels, statusLabels, statusTone } from "@/lib/admin-labels";
@@ -19,7 +19,7 @@ export function Dashboard() {
   return (
     <>
       <AdminPageHeader title="Табло" description="Обобщение въз основа на реалните данни в базата." />
-      {stats.loading && !stats.data && <LoadingState />}
+      {stats.loading && !stats.data && <StatsSkeleton />}
       {stats.error && <ErrorState message={stats.error} onRetry={stats.reload} />}
       {stats.data && <StatsView stats={stats.data} />}
 
@@ -42,7 +42,7 @@ export function Dashboard() {
                       <span className={cx("h-2 w-2 rounded-full", integration.configured ? "bg-emerald-400" : "bg-slate-500")} />
                       {integration.label}
                     </p>
-                    <p className="mt-1 text-xs text-slate-500">{integration.note}</p>
+                    <p className="mt-1 text-xs text-slate-400">{integration.note}</p>
                   </li>
                 ))}
               </ul>

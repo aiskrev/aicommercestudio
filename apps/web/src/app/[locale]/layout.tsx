@@ -39,8 +39,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const { services } = getContent(locale);
   const href = (path: string) => localizePath(locale, path);
 
+  const navServices = services.map((service) => ({
+    href: href(routes.service(service.slug)),
+    label: service.shortTitle,
+    description: service.summary,
+    icon: service.icon,
+  }));
   const navItems = [
-    { href: href(routes.services), label: dict.nav.services },
     { href: href(routes.aiSolutions), label: dict.nav.aiSolutions },
     { href: href(routes.industries), label: dict.nav.industries },
     { href: href(routes.process), label: dict.nav.process },
@@ -53,15 +58,23 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"
-          className="sr-only z-[100] rounded-full bg-cyan-300 px-4 py-2 font-semibold text-ink-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+          className="sr-only z-[100] rounded-full bg-cyan-300 px-5 py-2.5 font-semibold text-ink-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-3"
         >
           {dict.skipToContent}
         </a>
         <Header
           homeHref={href(routes.home)}
+          servicesHref={href(routes.services)}
+          services={navServices}
           items={navItems}
           cta={{ href: href(routes.contact), label: dict.nav.cta }}
-          labels={{ nav: dict.nav.label, openMenu: dict.nav.openMenu, closeMenu: dict.nav.closeMenu }}
+          labels={{
+            nav: dict.nav.label,
+            openMenu: dict.nav.openMenu,
+            closeMenu: dict.nav.closeMenu,
+            services: dict.nav.services,
+            allServices: dict.common.allServices,
+          }}
         />
         <main id="main" className="flex-1">
           {children}

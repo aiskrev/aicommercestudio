@@ -44,7 +44,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/za-nas"
         </div>
       </Section>
 
-      <Section className="bg-ink-900/50">
+      <Section alt>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {page.principles.map((item) => (
             <FeatureCard key={item.title} {...item} />
@@ -53,7 +53,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/za-nas"
       </Section>
 
       <Section labelledBy="company-title">
-        <div className="glass flex gap-5 rounded-2xl p-6 sm:p-8">
+        <div className="card flex gap-5 rounded-2xl p-6 sm:p-8">
           <Icon name="info" className="mt-1 h-6 w-6 shrink-0 text-cyan-300" />
           <div>
             <h2 id="company-title" className="text-xl font-semibold">

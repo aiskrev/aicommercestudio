@@ -9,7 +9,7 @@ test.describe("public website", () => {
     await expect(page.getByRole("link", { name: "Заяви консултация" }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: "Разгледай услугите" })).toBeVisible();
     const servicesSection = page.locator("section[aria-labelledby='services-title']");
-    await expect(servicesSection.locator("ul > li")).toHaveCount(6);
+    await expect(servicesSection.locator("article")).toHaveCount(6);
     await expect(page.locator("html")).toHaveAttribute("lang", "bg");
   });
 

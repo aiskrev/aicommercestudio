@@ -10,7 +10,7 @@ export function Breadcrumbs({ items }: { items: { name: string; path: string }[]
     <Container className="pt-6">
       <JsonLd data={breadcrumbJsonLd(items)} />
       <nav aria-label="Навигационна пътека">
-        <ol className="flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
+        <ol className="flex flex-wrap items-center gap-1.5 text-sm text-slate-400">
           {items.map((item, index) => {
             const last = index === items.length - 1;
             return (

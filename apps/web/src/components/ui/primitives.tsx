@@ -1,11 +1,13 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 import { Icon, type IconName } from "@/components/ui/Icon";
 
 export function cx(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
 }
+
+/* ------------------------------------------------------------------ layout */
 
 export function Container({ children, className }: { children: ReactNode; className?: string }) {
   return <div className={cx("mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8", className)}>{children}</div>;
@@ -16,14 +18,16 @@ export function Section({
   className,
   id,
   labelledBy,
+  alt = false,
 }: {
   children: ReactNode;
   className?: string;
   id?: string;
   labelledBy?: string;
+  alt?: boolean;
 }) {
   return (
-    <section id={id} aria-labelledby={labelledBy} className={cx("py-16 sm:py-24", className)}>
+    <section id={id} aria-labelledby={labelledBy} className={cx("py-16 sm:py-24", alt && "section-alt", className)}>
       <Container>{children}</Container>
     </section>
   );
@@ -31,7 +35,7 @@ export function Section({
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
+    <p className="t-eyebrow">
       <span className="h-px w-6 bg-gradient-to-r from-cyan-400 to-violet-400" aria-hidden="true" />
       {children}
     </p>
@@ -44,38 +48,76 @@ export function SectionHeading({
   title,
   lead,
   align = "left",
+  as: Heading = "h2",
 }: {
   id?: string;
   eyebrow?: string;
   title: string;
   lead?: string;
   align?: "left" | "center";
+  as?: "h1" | "h2";
 }) {
   return (
     <div className={cx("max-w-3xl", align === "center" && "mx-auto text-center")}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h2 id={id} className="mt-4 text-3xl font-semibold leading-tight sm:text-4xl">
+      <Heading id={id} className={cx(Heading === "h1" ? "t-h1" : "t-h2", eyebrow && "mt-4")}>
         {title}
-      </h2>
-      {lead && <p className="mt-4 text-lg leading-relaxed text-slate-400">{lead}</p>}
+      </Heading>
+      {lead && <p className="t-lead mt-4">{lead}</p>}
     </div>
   );
 }
 
-type ButtonVariant = "primary" | "secondary" | "ghost";
+/* ------------------------------------------------------------------ buttons */
 
-const buttonStyles: Record<ButtonVariant, string> = {
-  primary:
-    "bg-gradient-to-r from-cyan-400 to-blue-500 text-ink-950 shadow-[0_8px_30px_-8px_rgb(34_211_238_/_0.55)] hover:from-cyan-300 hover:to-blue-400",
-  secondary: "border border-slate-500/30 bg-white/[0.04] text-white hover:border-cyan-400/50 hover:bg-white/[0.07]",
-  ghost: "text-cyan-300 hover:text-cyan-200",
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger" | "dangerOutline";
+export type ButtonSize = "sm" | "md" | "lg";
+
+const variantClass: Record<ButtonVariant, string> = {
+  primary: "btn-primary",
+  secondary: "btn-secondary",
+  ghost: "btn-ghost",
+  danger: "btn-danger",
+  dangerOutline: "btn-danger-outline",
 };
 
-export function buttonClass(variant: ButtonVariant = "primary", size: "md" | "lg" = "md"): string {
-  return cx(
-    "inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60",
-    size === "lg" ? "px-6 py-3.5 text-base" : "px-5 py-2.5 text-sm",
-    buttonStyles[variant],
+export function buttonClass(variant: ButtonVariant = "primary", size: ButtonSize = "md"): string {
+  return cx("btn", `btn-${size}`, variantClass[variant]);
+}
+
+export function Spinner({ className }: { className?: string }) {
+  return <span className={cx("spinner", className)} aria-hidden="true" />;
+}
+
+export function Button({
+  variant = "primary",
+  size = "md",
+  loading = false,
+  loadingLabel,
+  icon,
+  className,
+  children,
+  disabled,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  loading?: boolean;
+  loadingLabel?: string;
+  icon?: IconName;
+}) {
+  return (
+    <button
+      type="button"
+      {...props}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      className={cx(buttonClass(variant, size), className)}
+    >
+      {loading && <Spinner />}
+      {loading && loadingLabel ? loadingLabel : children}
+      {!loading && icon && <Icon name={icon} className="h-4 w-4" />}
+    </button>
   );
 }
 
@@ -90,23 +132,25 @@ export function ButtonLink({
   href: string;
   children: ReactNode;
   variant?: ButtonVariant;
-  size?: "md" | "lg";
+  size?: ButtonSize;
   icon?: IconName;
   className?: string;
 }) {
   return (
-    <Link href={href} className={cx(buttonClass(variant, size), className)}>
+    <Link href={href} className={cx(buttonClass(variant, size), "group", className)}>
       {children}
-      {icon && <Icon name={icon} className="h-4 w-4" />}
+      {icon && <Icon name={icon} className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />}
     </Link>
   );
 }
+
+/* ------------------------------------------------------------------ content blocks */
 
 export function IconBadge({ name, className }: { name: IconName; className?: string }) {
   return (
     <span
       className={cx(
-        "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-cyan-400/20 bg-gradient-to-br from-cyan-400/15 via-blue-500/10 to-violet-500/15 text-cyan-200",
+        "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-cyan-400/25 bg-gradient-to-br from-cyan-400/15 via-blue-500/10 to-violet-500/15 text-cyan-200 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.08)]",
         className,
       )}
     >
@@ -120,17 +164,19 @@ export function FeatureCard({
   title,
   description,
   headingLevel = 3,
+  className,
 }: {
   icon?: IconName;
   title: string;
   description: string;
   headingLevel?: 3 | 4;
+  className?: string;
 }) {
   const Heading = headingLevel === 3 ? "h3" : "h4";
   return (
-    <div className="glass rounded-2xl p-6">
+    <div className={cx("card p-6", className)}>
       {icon && <IconBadge name={icon} />}
-      <Heading className={cx("text-lg font-semibold", icon && "mt-5")}>{title}</Heading>
+      <Heading className={cx("t-h3", icon && "mt-5")}>{title}</Heading>
       <p className="mt-2 leading-relaxed text-slate-400">{description}</p>
     </div>
   );
@@ -151,6 +197,45 @@ export function CheckList({ items, className }: { items: string[]; className?: s
   );
 }
 
+export function Badge({ children, accent = false, className }: { children: ReactNode; accent?: boolean; className?: string }) {
+  return <span className={cx("badge", accent && "badge-accent", className)}>{children}</span>;
+}
+
+const alertIcon: Record<"error" | "success" | "warning" | "info", IconName> = {
+  error: "alert",
+  success: "check",
+  warning: "alert",
+  info: "info",
+};
+
+export function Alert({
+  tone = "info",
+  title,
+  children,
+  role,
+  className,
+}: {
+  tone?: "error" | "success" | "warning" | "info";
+  title?: string;
+  children?: ReactNode;
+  role?: "alert" | "status" | "note";
+  className?: string;
+}) {
+  return (
+    <div role={role} className={cx("alert", `alert-${tone}`, className)}>
+      <Icon name={alertIcon[tone]} className="mt-0.5 h-5 w-5 shrink-0" />
+      <div className="min-w-0">
+        {title && <p className="font-semibold">{title}</p>}
+        {children && <div className={cx(title && "mt-0.5", "opacity-95")}>{children}</div>}
+      </div>
+    </div>
+  );
+}
+
+export function Skeleton({ className }: { className?: string }) {
+  return <div className={cx("skeleton", className)} aria-hidden="true" />;
+}
+
 export function PageHero({
   eyebrow,
   title,
@@ -166,10 +251,10 @@ export function PageHero({
     <div className="relative overflow-hidden border-b border-white/5">
       <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
       <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
-      <Container className="relative py-16 sm:py-24">
+      <Container className="relative py-14 sm:py-20">
         <Eyebrow>{eyebrow}</Eyebrow>
-        <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-[1.1] sm:text-5xl">{title}</h1>
-        <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-400 sm:text-xl">{lead}</p>
+        <h1 className="t-h1 mt-5 max-w-4xl">{title}</h1>
+        <p className="t-lead mt-6 max-w-3xl">{lead}</p>
         {children}
       </Container>
     </div>

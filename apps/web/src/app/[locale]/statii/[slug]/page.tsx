@@ -75,7 +75,7 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
             <Eyebrow>{article.category}</Eyebrow>
             <h1 className="mt-5 text-3xl font-semibold leading-tight sm:text-5xl">{article.title}</h1>
             <p className="mt-5 text-lg leading-relaxed text-slate-400">{article.description}</p>
-            <p className="mt-6 flex flex-wrap gap-4 text-sm text-slate-500">
+            <p className="mt-6 flex flex-wrap gap-4 text-sm text-slate-400">
               <time dateTime={article.publishedAt}>
                 {dict.common.published}: {formatDate(article.publishedAt, locale)}
               </time>
@@ -96,7 +96,7 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
               </section>
             ))}
           </div>
-          <aside className="glass mt-14 rounded-2xl p-6">
+          <aside className="card mt-14 rounded-2xl p-6">
             <p className="text-sm text-slate-400">{dict.service.related}</p>
             <Link
               href={href(routes.service(service.slug))}

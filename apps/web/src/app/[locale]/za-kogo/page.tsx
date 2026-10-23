@@ -40,7 +40,7 @@ export default async function IndustriesPage({ params }: PageProps<"/[locale]/za
       <Section>
         <ul className="grid gap-5 lg:grid-cols-2">
           {page.segments.map((segment) => (
-            <li key={segment.title} className="glass flex flex-col rounded-2xl p-6 sm:p-7">
+            <li key={segment.title} className="card flex flex-col rounded-2xl p-6 sm:p-7">
               <div className="flex items-start gap-4">
                 {segment.icon && <IconBadge name={segment.icon} />}
                 <div>
@@ -68,11 +68,11 @@ export default async function IndustriesPage({ params }: PageProps<"/[locale]/za
         </ul>
       </Section>
 
-      <Section labelledBy="sectors-title" className="bg-ink-900/50">
+      <Section labelledBy="sectors-title" alt>
         <SectionHeading id="sectors-title" title={page.sectorsTitle} lead={page.sectorsLead} />
         <ul className="mt-8 flex flex-wrap gap-3">
           {page.sectors.map((sector) => (
-            <li key={sector} className="glass rounded-full px-4 py-2 text-sm text-slate-200">
+            <li key={sector} className="card rounded-full px-4 py-2 text-sm text-slate-200">
               {sector}
             </li>
           ))}

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Faq } from "@/components/sections/Faq";
 import { HeroVisual } from "@/components/sections/HeroVisual";
+import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
+import { ServiceCard } from "@/components/sections/ServiceCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
 import {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">) {
 
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
-  const { home, coreServices } = getContent(locale);
+  const { home, coreServices, industries } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const audit = serviceByKey(locale, "audit");
@@ -44,17 +46,17 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     <>
       <JsonLd data={faqJsonLd(home.faq.items)} />
 
-      {/* Hero */}
+      {/* ------------------------------------------------------------ hero */}
       <div className="relative overflow-hidden">
         <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
-        <Container className="relative grid items-center gap-14 py-16 sm:py-24 lg:grid-cols-[1.05fr_1fr] lg:py-28">
-          <div>
+        <Container className="relative grid items-center gap-14 pb-16 pt-14 sm:pb-20 sm:pt-20 lg:grid-cols-[1.08fr_1fr] lg:pb-24 lg:pt-24">
+          <div className="animate-fade-up">
             <Eyebrow>{home.hero.eyebrow}</Eyebrow>
-            <h1 className="mt-6 text-4xl font-semibold leading-[1.08] sm:text-5xl xl:text-6xl">
+            <h1 className="t-display mt-6">
               {home.hero.title} <span className="text-gradient">{home.hero.titleHighlight}</span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-400 sm:text-xl">{home.hero.lead}</p>
+            <p className="t-lead mt-6 max-w-xl">{home.hero.lead}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href={href(routes.contact)} size="lg" icon="arrowRight">
                 {home.hero.primaryCta}
@@ -63,10 +65,10 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
                 {home.hero.secondaryCta}
               </ButtonLink>
             </div>
-            <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-400">
+            <ul className="mt-10 flex flex-wrap gap-2">
               {home.hero.highlights.map((item) => (
-                <li key={item} className="inline-flex items-center gap-2">
-                  <Icon name="check" className="h-4 w-4 text-cyan-300" />
+                <li key={item} className="badge">
+                  <Icon name="check" className="h-3.5 w-3.5 text-cyan-300" />
                   {item}
                 </li>
               ))}
@@ -78,89 +80,170 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </Container>
       </div>
 
-      {/* Services */}
-      <Section labelledBy="services-title" className="border-t border-white/5">
-        <SectionHeading
-          id="services-title"
-          eyebrow={home.servicesIntro.eyebrow}
-          title={home.servicesIntro.title}
-          lead={home.servicesIntro.lead}
-        />
+      {/* ------------------------------------------------------------ technologies */}
+      <div className="border-y border-white/[0.06] bg-ink-900/60">
+        <Container className="flex flex-col gap-4 py-6 lg:flex-row lg:items-center lg:gap-10">
+          <p className="shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+            {home.technologies.label}
+          </p>
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-slate-300">
+            {home.technologies.items.map((item) => (
+              <li key={item} className="inline-flex items-center gap-2">
+                <span className="h-1 w-1 rounded-full bg-cyan-400/70" aria-hidden="true" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </Container>
+      </div>
+
+      {/* ------------------------------------------------------------ services */}
+      <Section labelledBy="services-title">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <SectionHeading
+            id="services-title"
+            eyebrow={home.servicesIntro.eyebrow}
+            title={home.servicesIntro.title}
+            lead={home.servicesIntro.lead}
+          />
+          <ButtonLink href={href(routes.services)} variant="secondary" icon="arrowRight" className="self-start lg:self-auto">
+            {dict.common.allServices}
+          </ButtonLink>
+        </div>
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {coreServices.map((service) => (
+          {coreServices.map((service, index) => (
             <li key={service.key}>
-              <Link
+              <ServiceCard
+                service={service}
                 href={href(routes.service(service.slug))}
-                className="glass glass-hover group flex h-full flex-col rounded-2xl p-6"
-              >
-                <IconBadge name={service.icon} />
-                <h3 className="mt-5 text-lg font-semibold">{service.shortTitle}</h3>
-                <p className="mt-2 flex-1 leading-relaxed text-slate-400">{service.summary}</p>
-                <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-300">
-                  {dict.common.learnMore}
-                  <Icon name="arrowRight" className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </span>
-              </Link>
+                cta={dict.common.learnMore}
+                index={index}
+              />
             </li>
           ))}
         </ul>
-        <Link
-          href={href(routes.service(audit.slug))}
-          className="glass glass-hover mt-5 flex flex-col gap-4 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between"
-        >
+        <div className="card card-interactive card-accent mt-5 flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7">
           <div className="flex items-start gap-4">
             <IconBadge name={audit.icon} />
             <div>
-              <h3 className="text-lg font-semibold">{audit.shortTitle}</h3>
-              <p className="mt-1 text-slate-400">{audit.summary}</p>
+              <p className="badge badge-accent mb-2">Препоръчителна първа стъпка</p>
+              <h3 className="t-h3 text-xl">
+                <Link href={href(routes.service(audit.slug))} className="after:absolute after:inset-0 focus-visible:outline-none">
+                  {audit.shortTitle}
+                </Link>
+              </h3>
+              <p className="mt-1 max-w-2xl text-slate-400">{audit.summary}</p>
             </div>
           </div>
-          <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-cyan-300">
+          <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-cyan-300" aria-hidden="true">
             {dict.common.learnMore}
             <Icon name="arrowRight" className="h-4 w-4" />
           </span>
-        </Link>
-      </Section>
-
-      {/* Problems */}
-      <Section labelledBy="problems-title" className="bg-ink-900/50">
-        <SectionHeading id="problems-title" eyebrow={home.problems.eyebrow} title={home.problems.title} />
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {home.problems.items.map((item) => (
-            <FeatureCard key={item.title} {...item} />
-          ))}
         </div>
       </Section>
 
-      {/* Process */}
-      <Section labelledBy="process-title">
+      {/* ------------------------------------------------------------ problems → solutions */}
+      <Section labelledBy="problems-title" alt>
+        <SectionHeading id="problems-title" eyebrow={home.problems.eyebrow} title={home.problems.title} lead={home.problems.lead} />
+        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {home.problems.items.map((item) => {
+            const service = serviceByKey(locale, item.service);
+            return (
+              <li key={item.title} className="card flex flex-col p-6">
+                {item.icon && <IconBadge name={item.icon} />}
+                <h3 className="t-h3 mt-5">{item.title}</h3>
+                <p className="mt-2 flex-1 leading-relaxed text-slate-400">{item.description}</p>
+                <Link
+                  href={href(routes.service(service.slug))}
+                  className="mt-5 flex items-center justify-between gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-4 py-3 text-sm transition-colors hover:border-cyan-400/40"
+                >
+                  <span>
+                    <span className="block text-xs text-slate-400">{home.problems.solutionLabel}</span>
+                    <span className="font-semibold text-white">{service.shortTitle}</span>
+                  </span>
+                  <Icon name="arrowRight" className="h-4 w-4 shrink-0 text-cyan-300" />
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </Section>
+
+      {/* ------------------------------------------------------------ industries */}
+      <Section labelledBy="industries-title">
+        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <SectionHeading
+              id="industries-title"
+              eyebrow={home.industriesIntro.eyebrow}
+              title={home.industriesIntro.title}
+              lead={home.industriesIntro.lead}
+            />
+            <ButtonLink href={href(routes.industries)} variant="secondary" icon="arrowRight" className="mt-8">
+              {home.industriesIntro.cta}
+            </ButtonLink>
+          </div>
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {industries.segments.slice(0, 6).map((segment) => (
+              <li key={segment.title} className="card p-6">
+                {segment.icon && <IconBadge name={segment.icon} />}
+                <h3 className="t-h3 mt-4">{segment.title}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-slate-400">{segment.description}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Section>
+
+      {/* ------------------------------------------------------------ process */}
+      <Section labelledBy="process-title" alt>
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
           <SectionHeading id="process-title" eyebrow={home.process.eyebrow} title={home.process.title} />
           <ButtonLink href={href(routes.process)} variant="ghost" icon="arrowRight">
             {dict.common.learnMore}
           </ButtonLink>
         </div>
-        <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {home.process.steps.map((step, index) => (
-            <li key={step.title} className="glass relative rounded-2xl p-6">
-              <span className="font-display text-sm font-semibold text-cyan-300">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <h3 className="mt-3 text-lg font-semibold">{step.title}</h3>
-              <p className="mt-2 leading-relaxed text-slate-400">{step.description}</p>
-            </li>
-          ))}
-        </ol>
+        <ProcessTimeline steps={home.process.steps} className="mt-14" />
       </Section>
 
-      {/* Use cases */}
-      <Section labelledBy="usecases-title" className="bg-ink-900/50">
-        <SectionHeading
-          id="usecases-title"
-          eyebrow={home.useCases.eyebrow}
-          title={home.useCases.title}
-          lead={home.useCases.lead}
-        />
+      {/* ------------------------------------------------------------ AI with human control */}
+      <Section labelledBy="ai-control-title">
+        <div className="card-accent relative overflow-hidden rounded-[1.75rem] p-6 sm:p-10 lg:p-12">
+          <div className="hero-glow pointer-events-none absolute inset-0 opacity-70" aria-hidden="true" />
+          <div className="relative">
+            <SectionHeading
+              id="ai-control-title"
+              eyebrow={home.aiControl.eyebrow}
+              title={home.aiControl.title}
+              lead={home.aiControl.lead}
+            />
+            <ol className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {home.aiControl.steps.map((step, index) => (
+                <li key={step.title} className="relative rounded-2xl border border-white/[0.08] bg-ink-950/60 p-5">
+                  <div className="flex items-center justify-between">
+                    {step.icon && <IconBadge name={step.icon} className="h-10 w-10" />}
+                    <span className="font-display text-sm font-semibold text-slate-400">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <h3 className="t-h3 mt-4">{step.title}</h3>
+                  <p className="mt-1.5 text-[15px] leading-relaxed text-slate-400">{step.description}</p>
+                  {index < home.aiControl.steps.length - 1 && (
+                    <Icon
+                      name="arrowRight"
+                      className="absolute -right-3.5 top-1/2 hidden h-5 w-5 -translate-y-1/2 text-cyan-300/70 xl:block"
+                    />
+                  )}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </Section>
+
+      {/* ------------------------------------------------------------ use cases */}
+      <Section labelledBy="usecases-title" alt>
+        <SectionHeading id="usecases-title" eyebrow={home.useCases.eyebrow} title={home.useCases.title} lead={home.useCases.lead} />
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {home.useCases.items.map((item) => (
             <FeatureCard key={item.title} {...item} />
@@ -173,7 +256,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
       </Section>
 
-      {/* Advantages */}
+      {/* ------------------------------------------------------------ advantages */}
       <Section labelledBy="advantages-title">
         <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="lg:sticky lg:top-28 lg:self-start">
@@ -181,10 +264,10 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           </div>
           <ul className="grid gap-4">
             {home.advantages.items.map((item) => (
-              <li key={item.title} className="glass flex gap-5 rounded-2xl p-6">
+              <li key={item.title} className="card flex gap-5 p-6">
                 {item.icon && <IconBadge name={item.icon} />}
                 <div>
-                  <h3 className="text-lg font-semibold">{item.title}</h3>
+                  <h3 className="t-h3">{item.title}</h3>
                   <p className="mt-1.5 leading-relaxed text-slate-400">{item.description}</p>
                 </div>
               </li>
@@ -193,8 +276,8 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
       </Section>
 
-      {/* Engagement models */}
-      <Section labelledBy="engagement-title" className="bg-ink-900/50">
+      {/* ------------------------------------------------------------ engagement models */}
+      <Section labelledBy="engagement-title" alt>
         <SectionHeading
           id="engagement-title"
           eyebrow={home.engagement.eyebrow}
@@ -208,10 +291,18 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
       </Section>
 
-      {/* FAQ */}
+      {/* ------------------------------------------------------------ FAQ */}
       <Section labelledBy="faq-title">
         <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
-          <SectionHeading id="faq-title" eyebrow={home.faq.eyebrow} title={home.faq.title} />
+          <div>
+            <SectionHeading id="faq-title" eyebrow={home.faq.eyebrow} title={home.faq.title} />
+            <p className="mt-6 text-slate-400">
+              {dict.common.moreQuestions}{" "}
+              <Link href={href(routes.contact)} className="font-semibold text-cyan-300 underline-offset-4 hover:underline">
+                {dict.common.writeToUs}
+              </Link>
+            </p>
+          </div>
           <Faq items={home.faq.items} />
         </div>
       </Section>
@@ -221,6 +312,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         lead={home.finalCta.lead}
         primary={{ href: href(routes.contact), label: home.finalCta.primary }}
         secondary={{ href: href(routes.service(audit.slug)), label: home.finalCta.secondary }}
+        points={dict.cta.points}
       />
     </>
   );

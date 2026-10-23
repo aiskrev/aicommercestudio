@@ -38,6 +38,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
       { value: "other", label: dict.form.serviceOther },
     ],
     privacyHref: href(routes.privacy),
+    nextSteps: dict.contact.nextSteps,
   };
 
   return (
@@ -57,7 +58,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
             <p className="mt-6 text-lg leading-relaxed text-slate-400">{dict.contact.lead}</p>
 
             <div className="mt-10 grid gap-5">
-              <section className="glass rounded-2xl p-6" aria-labelledby="next-steps-title">
+              <section className="card rounded-2xl p-6" aria-labelledby="next-steps-title">
                 <h2 id="next-steps-title" className="text-lg font-semibold">
                   {dict.contact.nextTitle}
                 </h2>
@@ -71,7 +72,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
                 </ol>
               </section>
 
-              <section className="glass rounded-2xl p-6" aria-labelledby="direct-title">
+              <section className="card rounded-2xl p-6" aria-labelledby="direct-title">
                 <h2 id="direct-title" className="text-lg font-semibold">
                   {dict.contact.directTitle}
                 </h2>

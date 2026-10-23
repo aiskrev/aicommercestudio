@@ -24,7 +24,7 @@ export default async function AdminLoginPage({ searchParams }: PageProps<"/admin
           <h1 className="mt-5 text-2xl font-semibold">Вход за администратори</h1>
           <p className="mt-2 text-sm text-slate-400">Достъпът е само за упълномощени служители.</p>
         </div>
-        <div className="glass rounded-2xl p-6">
+        <div className="card-accent rounded-2xl p-6">
           {check.state === "unavailable" && (
             <p role="alert" className="mb-4 rounded-xl border border-amber-300/30 bg-amber-300/10 p-3 text-sm text-amber-100">
               API услугата не отговаря. Входът може да е недостъпен.
@@ -32,7 +32,7 @@ export default async function AdminLoginPage({ searchParams }: PageProps<"/admin
           )}
           <LoginForm next={nextPath} />
         </div>
-        <Link href="/" className="mt-6 block text-center text-sm text-slate-500 hover:text-slate-300">
+        <Link href="/" className="mt-6 block text-center text-sm text-slate-400 hover:text-slate-300">
           ← Към сайта
         </Link>
       </div>

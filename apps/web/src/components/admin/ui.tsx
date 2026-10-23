@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { buttonClass, cx } from "@/components/ui/primitives";
+import { Alert, Button, cx, Skeleton } from "@/components/ui/primitives";
 import { statusLabels, statusTone } from "@/lib/admin-labels";
 import type { LeadStatus } from "@/lib/admin-types";
 
@@ -17,11 +17,21 @@ export function Pill({ children, tone }: { children: ReactNode; tone: string }) 
   return <span className={cx("inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1", tone)}>{children}</span>;
 }
 
-export function Panel({ title, children, actions, className }: { title?: string; children: ReactNode; actions?: ReactNode; className?: string }) {
+export function Panel({
+  title,
+  children,
+  actions,
+  className,
+}: {
+  title?: string;
+  children: ReactNode;
+  actions?: ReactNode;
+  className?: string;
+}) {
   return (
-    <section className={cx("rounded-2xl border border-white/[0.08] bg-ink-900/70", className)}>
+    <section className={cx("card overflow-hidden", className)}>
       {(title || actions) && (
-        <header className="flex items-center justify-between gap-4 border-b border-white/[0.06] px-5 py-4">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.06] px-5 py-4">
           {title && <h2 className="text-base font-semibold">{title}</h2>}
           {actions}
         </header>
@@ -31,38 +41,69 @@ export function Panel({ title, children, actions, className }: { title?: string;
   );
 }
 
-export function LoadingState({ label = "Зареждане…" }: { label?: string }) {
+/** Generic loading placeholder: skeleton rows plus an accessible status message. */
+export function LoadingState({ label = "Зареждане…", rows = 4 }: { label?: string; rows?: number }) {
   return (
-    <div role="status" className="flex items-center gap-3 py-10 text-sm text-slate-400" data-testid="loading">
-      <span className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300" aria-hidden="true" />
-      {label}
+    <div role="status" aria-live="polite" className="grid gap-3 py-2" data-testid="loading">
+      <span className="sr-only">{label}</span>
+      {Array.from({ length: rows }, (_, index) => (
+        <div key={index} className="flex items-center gap-4">
+          <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
+          <div className="grid flex-1 gap-2">
+            <Skeleton className={cx("h-3.5", index % 2 ? "w-2/3" : "w-1/2")} />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function StatsSkeleton() {
+  return (
+    <div role="status" aria-live="polite" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" data-testid="loading">
+      <span className="sr-only">Зареждане на статистиката…</span>
+      {Array.from({ length: 4 }, (_, index) => (
+        <div key={index} className="card p-5">
+          <Skeleton className="h-3.5 w-1/2" />
+          <Skeleton className="mt-4 h-8 w-16" />
+          <Skeleton className="mt-3 h-3 w-2/3" />
+        </div>
+      ))}
     </div>
   );
 }
 
 export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div role="alert" className="flex flex-col items-start gap-4 rounded-xl border border-rose-400/30 bg-rose-400/[0.07] p-5 text-sm text-rose-100">
-      <p className="flex gap-2">
-        <Icon name="alert" className="h-5 w-5 shrink-0 text-rose-300" />
-        {message}
-      </p>
+    <Alert tone="error" role="alert" title="Данните не могат да бъдат заредени">
+      <p>{message}</p>
       {onRetry && (
-        <button type="button" onClick={onRetry} className={buttonClass("secondary")}>
+        <Button variant="secondary" size="sm" icon="refresh" onClick={onRetry} className="mt-3">
           Опитай отново
-        </button>
+        </Button>
       )}
-    </div>
+    </Alert>
   );
 }
 
-export function EmptyState({ icon = "inbox", title, description, action }: { icon?: IconName; title: string; description?: string; action?: ReactNode }) {
+export function EmptyState({
+  icon = "inbox",
+  title,
+  description,
+  action,
+}: {
+  icon?: IconName;
+  title: string;
+  description?: string;
+  action?: ReactNode;
+}) {
   return (
     <div className="flex flex-col items-center gap-3 py-12 text-center" data-testid="empty-state">
-      <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/[0.04] text-slate-400">
+      <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/[0.08] bg-gradient-to-br from-cyan-400/10 to-violet-500/10 text-cyan-200">
         <Icon name={icon} className="h-6 w-6" />
       </span>
-      <p className="font-semibold text-white">{title}</p>
+      <p className="mt-1 font-semibold text-white">{title}</p>
       {description && <p className="max-w-sm text-sm text-slate-400">{description}</p>}
       {action}
     </div>
@@ -71,13 +112,15 @@ export function EmptyState({ icon = "inbox", title, description, action }: { ico
 
 export function StatCard({ label, value, hint, icon }: { label: string; value: number | string; hint?: string; icon: IconName }) {
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-ink-900/70 p-5">
+    <div className="card p-5">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-400">{label}</p>
-        <Icon name={icon} className="h-5 w-5 text-cyan-300" />
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-400/10 text-cyan-300">
+          <Icon name={icon} className="h-4 w-4" />
+        </span>
       </div>
       <p className="mt-3 font-display text-3xl font-semibold text-white">{value}</p>
-      {hint && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-slate-400">{hint}</p>}
     </div>
   );
 }

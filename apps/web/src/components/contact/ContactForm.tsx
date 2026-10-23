@@ -4,7 +4,7 @@ import Link from "next/link";
 import { type FormEvent, type ReactNode, useEffect, useRef, useState } from "react";
 
 import { Icon } from "@/components/ui/Icon";
-import { buttonClass, cx } from "@/components/ui/primitives";
+import { Alert, Button, buttonClass, cx } from "@/components/ui/primitives";
 import type { Dictionary } from "@/i18n";
 import {
   type ContactErrors,
@@ -28,13 +28,14 @@ interface Props {
   services: ServiceOption[];
   initialService?: string;
   privacyHref: string;
+  nextSteps?: string[];
 }
 
 type Status = "idle" | "submitting" | "success";
 
 const FIELD_ORDER: ContactField[] = ["service", "name", "company", "email", "phone", "message", "privacy_acknowledged"];
 
-export function ContactForm({ labels, messages, services, initialService = "", privacyHref }: Props) {
+export function ContactForm({ labels, messages, services, initialService = "", privacyHref, nextSteps }: Props) {
   const allowed = services.map((s) => s.value);
   const [values, setValues] = useState<ContactValues>(() =>
     emptyContactValues(allowed.includes(initialService) ? initialService : ""),
@@ -123,16 +124,29 @@ export function ContactForm({ labels, messages, services, initialService = "", p
         ref={successRef}
         tabIndex={-1}
         role="status"
-        className="glass rounded-3xl p-8 text-center outline-none sm:p-12"
+        className="card-accent animate-fade-up rounded-[1.5rem] p-8 outline-none sm:p-10"
         data-testid="contact-success"
       >
-        <span className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-400/15 text-emerald-300">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-300/30 bg-emerald-400/15 text-emerald-200">
           <Icon name="check" className="h-7 w-7" />
         </span>
-        <h2 className="mt-6 text-2xl font-semibold">{labels.successTitle}</h2>
-        <p className="mt-3 text-slate-400">
-          {labels.successReference}: <strong className="font-mono text-white">{reference}</strong>
+        <h2 className="t-h2 mt-6 text-2xl sm:text-3xl">{labels.successTitle}</h2>
+        <p className="mt-3 text-slate-300">{labels.successLead}</p>
+        <p className="mt-5 inline-flex flex-wrap items-center gap-2 rounded-xl border border-white/[0.08] bg-ink-950/60 px-4 py-3 text-slate-300">
+          {labels.successReference}: <strong className="font-mono text-lg tracking-wider text-white">{reference}</strong>
         </p>
+        {nextSteps && nextSteps.length > 0 && (
+          <ol className="mt-6 grid gap-3">
+            {nextSteps.map((step, index) => (
+              <li key={step} className="flex gap-3 text-slate-300">
+                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-semibold text-cyan-200">
+                  {index + 1}
+                </span>
+                {step}
+              </li>
+            ))}
+          </ol>
+        )}
         <button type="button" onClick={reset} className={cx(buttonClass("secondary"), "mt-8")}>
           {labels.successAnother}
         </button>
@@ -144,13 +158,22 @@ export function ContactForm({ labels, messages, services, initialService = "", p
     [hint, errors[field] ? `contact-${field}-error` : null].filter(Boolean).join(" ") || undefined;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="glass relative grid gap-6 rounded-3xl p-6 sm:p-8" aria-label={labels.submit}>
-      <div ref={summaryRef} tabIndex={-1} aria-live="assertive" className="outline-none">
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className="card-accent relative grid gap-6 rounded-[1.5rem] p-6 sm:p-8"
+      aria-label={labels.submit}
+      aria-busy={status === "submitting" || undefined}
+    >
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="t-h3 text-xl">{labels.formTitle}</h2>
+        <p className="text-xs text-slate-400">{labels.requiredNote}</p>
+      </div>
+      <div ref={summaryRef} tabIndex={-1} aria-live="assertive" className="outline-none empty:hidden">
         {formError && (
-          <p role="alert" className="flex gap-3 rounded-xl border border-rose-400/30 bg-rose-400/10 p-4 text-sm text-rose-200">
-            <Icon name="alert" className="h-5 w-5 shrink-0" />
+          <Alert tone="error" role="alert">
             {formError}
-          </p>
+          </Alert>
         )}
       </div>
 
@@ -282,7 +305,7 @@ export function ContactForm({ labels, messages, services, initialService = "", p
               id="contact-privacy_acknowledged"
               name="privacy_acknowledged"
               type="checkbox"
-              className="mt-0.5 h-5 w-5 shrink-0 accent-cyan-400"
+              className="checkbox mt-0.5"
               checked={values.privacy_acknowledged}
               aria-invalid={Boolean(errors.privacy_acknowledged)}
               aria-describedby={describedBy("privacy_acknowledged")}
@@ -307,7 +330,7 @@ export function ContactForm({ labels, messages, services, initialService = "", p
             id="contact-marketing_consent"
             name="marketing_consent"
             type="checkbox"
-            className="mt-0.5 h-5 w-5 shrink-0 accent-cyan-400"
+            className="checkbox mt-0.5"
             checked={values.marketing_consent}
             onChange={(e) => update("marketing_consent", e.target.checked)}
           />
@@ -315,10 +338,22 @@ export function ContactForm({ labels, messages, services, initialService = "", p
         </label>
       </div>
 
-      <button type="submit" className={cx(buttonClass("primary", "lg"), "w-full sm:w-auto sm:justify-self-start")} disabled={status === "submitting"}>
-        {status === "submitting" ? labels.submitting : labels.submit}
-        {status !== "submitting" && <Icon name="arrowRight" className="h-4 w-4" />}
-      </button>
+      <div className="flex flex-col gap-4 border-t border-white/[0.07] pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <Button
+          type="submit"
+          size="lg"
+          icon="arrowRight"
+          loading={status === "submitting"}
+          loadingLabel={labels.submitting}
+          className="w-full sm:w-auto"
+        >
+          {labels.submit}
+        </Button>
+        <p className="flex items-center gap-2 text-xs text-slate-400">
+          <Icon name="lock" className="h-4 w-4 text-cyan-300" />
+          {labels.secureNote}
+        </p>
+      </div>
     </form>
   );
 }
@@ -354,7 +389,7 @@ function Field({
       </label>
       {children}
       {hint && !error && (
-        <p id={`contact-${id}-hint`} className="mt-2 text-xs text-slate-500">
+        <p id={`contact-${id}-hint`} className="mt-2 text-xs text-slate-400">
           {hint}
         </p>
       )}

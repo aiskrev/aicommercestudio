@@ -130,7 +130,11 @@ export function LeadsTable() {
       </Panel>
 
       {error && <ErrorState message={error} onRetry={reload} />}
-      {loading && !data && <LoadingState />}
+      {loading && !data && (
+        <Panel>
+          <LoadingState rows={6} label="Зареждане на запитванията…" />
+        </Panel>
+      )}
       {data && data.items.length === 0 && (
         <Panel>
           <EmptyState
@@ -147,7 +151,7 @@ export function LeadsTable() {
         <div className={cx("rounded-2xl border border-white/[0.08] bg-ink-900/70 transition-opacity", loading && "opacity-60")}>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-sm" data-testid="leads-table">
-              <thead className="border-b border-white/[0.06] text-xs uppercase tracking-wider text-slate-500">
+              <thead className="border-b border-white/[0.06] text-xs uppercase tracking-wider text-slate-400">
                 <tr>
                   <th scope="col" className="px-5 py-3 font-medium">Запитване</th>
                   <th scope="col" className="px-5 py-3 font-medium">Услуга</th>
@@ -165,7 +169,7 @@ export function LeadsTable() {
                       <p className="text-xs text-slate-400">
                         {lead.company} · {lead.email}
                       </p>
-                      <p className="font-mono text-[11px] text-slate-600">
+                      <p className="font-mono text-[11px] text-slate-400">
                         #{lead.reference}
                         {lead.source === "synthetic_seed" && <span className="ml-2 text-amber-300/80">синтетичен</span>}
                       </p>
@@ -183,7 +187,7 @@ export function LeadsTable() {
           <nav aria-label="Страници" className="flex items-center justify-between border-t border-white/[0.06] px-5 py-3 text-sm">
             <button
               type="button"
-              className="text-cyan-300 disabled:text-slate-600"
+              className="rounded-full px-3 py-1.5 text-cyan-300 hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:text-slate-400 disabled:opacity-50 disabled:hover:bg-transparent"
               disabled={page <= 1}
               onClick={() => setFilters({ page: String(page - 1) })}
             >
@@ -194,7 +198,7 @@ export function LeadsTable() {
             </span>
             <button
               type="button"
-              className="text-cyan-300 disabled:text-slate-600"
+              className="rounded-full px-3 py-1.5 text-cyan-300 hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:text-slate-400 disabled:opacity-50 disabled:hover:bg-transparent"
               disabled={page >= totalPages}
               onClick={() => setFilters({ page: String(page + 1) })}
             >

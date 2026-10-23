@@ -99,11 +99,11 @@ function ActionCard({ action, onDecided }: { action: AIAction; onDecided: () => 
       <div className="flex flex-wrap items-center gap-2">
         <Pill tone={risk.tone}>{risk.label}</Pill>
         <Pill tone="bg-white/5 text-slate-300 ring-white/10">{aiStatusLabels[action.status] ?? action.status}</Pill>
-        <span className="text-xs text-slate-500">{formatDateTime(action.created_at)}</span>
+        <span className="text-xs text-slate-400">{formatDateTime(action.created_at)}</span>
       </div>
       <h2 className="mt-3 text-lg font-semibold">{aiActionTypeLabels[action.action_type] ?? action.action_type}</h2>
       <p className="mt-1 text-slate-300">{action.summary}</p>
-      <p className="mt-1 text-xs text-slate-500">Заявено от: {action.requested_by}</p>
+      <p className="mt-1 text-xs text-slate-400">Заявено от: {action.requested_by}</p>
       <details className="mt-3">
         <summary className="cursor-pointer text-sm text-cyan-300">Данни на действието</summary>
         <pre className="mt-2 overflow-x-auto rounded-xl bg-ink-950 p-3 text-xs text-slate-300">

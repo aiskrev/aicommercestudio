@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
-import { Container } from "@/components/ui/primitives";
+import { ButtonLink, Container } from "@/components/ui/primitives";
 import type { Service } from "@/content/types";
 import { type Locale, localizePath } from "@/i18n/config";
 import type { Dictionary } from "@/i18n";
@@ -32,6 +32,9 @@ export function Footer({ locale, dict, services }: { locale: Locale; dict: Dicti
         <div>
           <Logo href={href(routes.home)} />
           <p className="mt-4 max-w-sm leading-relaxed text-slate-400">{dict.footer.tagline}</p>
+          <ButtonLink href={href(routes.contact)} variant="secondary" icon="arrowRight" className="mt-6">
+            {dict.nav.cta}
+          </ButtonLink>
           {(site.contactEmail || site.contactPhone) && (
             <ul className="mt-5 grid gap-2 text-sm">
               {site.contactEmail && (
@@ -60,10 +63,10 @@ export function Footer({ locale, dict, services }: { locale: Locale; dict: Dicti
         <FooterColumn title={dict.footer.company} links={company} />
         <div>
           <FooterColumn title={dict.footer.legal} links={legal} />
-          <p className="mt-4 text-xs leading-relaxed text-slate-500">{dict.footer.draftNote}</p>
+          <p className="mt-4 text-xs leading-relaxed text-slate-400">{dict.footer.draftNote}</p>
         </div>
       </Container>
-      <Container className="flex flex-col gap-2 border-t border-white/[0.06] py-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+      <Container className="flex flex-col gap-2 border-t border-white/[0.06] py-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
         <p>
           © {new Date().getFullYear()} {site.name}. {dict.footer.rights}
         </p>
@@ -80,7 +83,7 @@ function FooterColumn({ title, links }: { title: string; links: { href: string; 
       <ul className="mt-4 grid gap-2.5">
         {links.map((link) => (
           <li key={link.href}>
-            <Link href={link.href} className="text-sm text-slate-400 transition-colors hover:text-white">
+            <Link href={link.href} className="text-sm text-slate-300 transition-colors hover:text-cyan-200">
               {link.label}
             </Link>
           </li>

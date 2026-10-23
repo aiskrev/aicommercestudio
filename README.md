@@ -58,6 +58,7 @@ docker-compose.yml, docker-compose.dev.yml, .env.example
 | [SECURITY.md](docs/SECURITY.md) | Threat model, controls, GDPR, production checklist |
 | [ROADMAP.md](docs/ROADMAP.md) | Next versions |
 | [BUSINESS_PLAN.md](docs/BUSINESS_PLAN.md) | Positioning, offer, commercial model (no invented figures) |
+| [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Tokens, contrast, typography, components, motion, accessibility |
 | [IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) | What is done, what was tested, known limitations |
 
 ## Important notes

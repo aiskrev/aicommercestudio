@@ -81,7 +81,7 @@ export function AdminShell({ userName, children }: { userName: string; children:
             <Icon name="logout" className="h-4 w-4" />
             {loggingOut ? "Изход…" : "Изход"}
           </button>
-          <Link href="/" className="mt-3 block text-xs text-slate-500 hover:text-slate-300">
+          <Link href="/" className="mt-3 block text-xs text-slate-400 hover:text-slate-300">
             ← Към сайта
           </Link>
         </div>

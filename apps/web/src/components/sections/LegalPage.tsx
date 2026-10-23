@@ -20,7 +20,7 @@ export function LegalPage({
       <Breadcrumbs items={breadcrumbs} />
       <Container className="max-w-3xl py-12 sm:py-16">
         <h1 className="text-3xl font-semibold sm:text-5xl">{document.title}</h1>
-        <p className="mt-4 text-sm text-slate-500">
+        <p className="mt-4 text-sm text-slate-400">
           {updatedLabel}: <time dateTime={document.updated}>{formatDate(document.updated)}</time>
         </p>
         <div

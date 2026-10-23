@@ -19,6 +19,30 @@ images `python:3.13-slim`, `node:24-alpine`, `postgres:17-alpine`, `mcr.microsof
 | Stack health | `docker compose ps` | db, api, web **healthy** |
 | Manual browser check | in-app browser at 1024 px and 375 px | home, service, contact, admin login/dashboard/leads/detail rendered; issues found were fixed (see below) |
 
+## UI/UX redesign (2026-10-23, second iteration)
+
+Design system, header/navigation, homepage, service pages, process diagrams, FAQ, CTAs, contact-form
+and admin states were redesigned — see [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md). API contracts, routes,
+forms and authentication are unchanged (all API tests and e2e journeys pass unmodified except two
+locators that were made stricter).
+
+| Check | Result |
+| --- | --- |
+| `tsc --noEmit` | 0 errors |
+| `eslint .` | 0 errors, 0 warnings |
+| Vitest | **44 passed** (6 files; +8 new tests for header keyboard/focus/scroll-lock, button states, alert, timeline) |
+| Playwright | **18 passed** (mobile-menu test strengthened: panel must be visible and > 300 px tall) |
+| Pytest / Ruff | 121 passed / clean (backend untouched) |
+| Production build | succeeded, 32 static routes |
+| Manual browser check | hero, mega menu, services, problems→solutions, industries, process diagram, AI-control flow, service page, contact error state, mobile hero and menu |
+
+Bug found and fixed during verification: the mobile menu panel was invisible because the header's
+`backdrop-filter` created a containing block for the `position: fixed` panel. The previous e2e test
+did not detect it (it clicked the footer link); the test now asserts the panel itself.
+
+Not verified: the reduced-motion rendering was reviewed in CSS but not visually emulated; the
+`::details-content` accordion animation only runs in browsers that support it (others open instantly).
+
 ## Acceptance criteria
 
 | # | Criterion | Status | Evidence |

@@ -1,5 +1,6 @@
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { CheckList, FeatureCard, PageHero, Section, SectionHeading, cx } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
@@ -50,7 +51,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
         </div>
       </Section>
 
-      <Section labelledBy="ai-principles" className="bg-ink-900/50">
+      <Section labelledBy="ai-principles" alt>
         <SectionHeading id="ai-principles" title={page.principlesTitle} />
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {page.principles.map((item) => (
@@ -61,7 +62,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
 
       <Section labelledBy="ai-approval">
         <SectionHeading id="ai-approval" title={page.approvalTitle} lead={page.approvalLead} />
-        <div className="glass mt-10 overflow-hidden rounded-2xl">
+        <div className="card mt-10 overflow-hidden rounded-2xl">
           <table className="w-full text-left text-sm">
             <caption className="sr-only">{page.approvalTitle}</caption>
             <thead className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-400">
@@ -91,23 +92,13 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
         </div>
       </Section>
 
-      <Section labelledBy="ai-lifecycle" className="bg-ink-900/50">
+      <Section labelledBy="ai-lifecycle" alt>
         <SectionHeading id="ai-lifecycle" title={page.lifecycleTitle} />
-        <ol className="mt-10 grid gap-4 md:grid-cols-5">
-          {page.lifecycle.map((step, index) => (
-            <li key={step.title} className="glass rounded-2xl p-5">
-              <span className="font-display text-sm font-semibold text-cyan-300">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <h3 className="mt-2 font-semibold">{step.title}</h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-400">{step.description}</p>
-            </li>
-          ))}
-        </ol>
+        <ProcessTimeline steps={page.lifecycle} className="mt-14" />
       </Section>
 
       <Section labelledBy="ai-not-for">
-        <div className="glass rounded-3xl p-8 sm:p-10">
+        <div className="card rounded-3xl p-8 sm:p-10">
           <h2 id="ai-not-for" className="text-2xl font-semibold">
             {page.notForTitle}
           </h2>

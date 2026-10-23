@@ -60,7 +60,7 @@ export function LeadDetail({ id }: { id: string }) {
                   {data.email}
                 </a>
               </Info>
-              <Info label="Телефон">{data.phone ?? <span className="text-slate-500">Не е посочен</span>}</Info>
+              <Info label="Телефон">{data.phone ?? <span className="text-slate-400">Не е посочен</span>}</Info>
               <Info label="Услуга">{serviceLabels[data.service] ?? data.service}</Info>
               <Info label="Получено">{formatDateTime(data.created_at)}</Info>
               <Info label="Източник">{data.source === "synthetic_seed" ? "Синтетични данни (разработка)" : "Контактна форма"}</Info>
@@ -69,7 +69,7 @@ export function LeadDetail({ id }: { id: string }) {
               </Info>
             </dl>
             <div className="mt-6">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Съобщение</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Съобщение</p>
               <p className="mt-2 whitespace-pre-wrap rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 leading-relaxed text-slate-200">
                 {data.message}
               </p>
@@ -113,7 +113,7 @@ export function LeadDetail({ id }: { id: string }) {
 function Info({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="text-xs text-slate-500">{label}</dt>
+      <dt className="text-xs text-slate-400">{label}</dt>
       <dd className="mt-1 text-slate-200">{children}</dd>
     </div>
   );
@@ -223,13 +223,13 @@ function Notes({ lead, onAdded }: { lead: Lead; onAdded: (note: LeadNote) => voi
         </button>
       </form>
       {lead.notes.length === 0 ? (
-        <p className="mt-5 text-sm text-slate-500">Все още няма бележки.</p>
+        <p className="mt-5 text-sm text-slate-400">Все още няма бележки.</p>
       ) : (
         <ul className="mt-5 grid gap-3" data-testid="notes-list">
           {lead.notes.map((note) => (
             <li key={note.id} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">{note.body}</p>
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-slate-400">
                 {note.author_name ?? "Изтрит потребител"} · {formatDateTime(note.created_at)}
               </p>
             </li>
@@ -290,7 +290,7 @@ function AiTriage({ leadId, onDone }: { leadId: string; onDone: () => void }) {
           </div>
           <p className="text-slate-200">{result.summary}</p>
           <p>
-            <span className="text-slate-500">Следваща стъпка: </span>
+            <span className="text-slate-400">Следваща стъпка: </span>
             <span className="text-slate-200">{result.suggested_next_step}</span>
           </p>
           {result.signals.length > 0 && (
