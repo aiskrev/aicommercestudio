@@ -15,7 +15,8 @@ hosting, paid AI model or Shopify credentials are required.
 ## Quick start (Windows 11, PowerShell, Docker Desktop running)
 
 ```powershell
-cd D:\Projects\Site            # or wherever you cloned/moved the project
+git clone https://github.com/aiskrev/aicommercestudio.git D:\Projects\AI-Commerce-Studio
+cd D:\Projects\AI-Commerce-Studio
 .\scripts\setup.ps1            # creates .env with random local secrets, prints the dev admin login
 .\scripts\start.ps1            # builds and starts db + api + web, waits for health checks
 ```
@@ -38,10 +39,10 @@ The latest executed results are recorded in [docs/IMPLEMENTATION_STATUS.md](docs
 ## Repository layout
 
 ```
-apps/api/        FastAPI backend, Alembic migrations, CLI (seed, create-admin, maintenance), tests
+apps/api/        FastAPI backend, Alembic migrations, CLI (seed, create-admin, set-password, maintenance), tests
 apps/web/        Next.js site + admin UI, unit tests; apps/web/e2e = Playwright suite
-infra/           production compose override, reverse proxy example
-scripts/         PowerShell helpers: setup, start, stop, test
+infra/           production compose override, Caddy example, Linux backup script
+scripts/         PowerShell helpers: setup, start, stop, test, backup-db, restore-db, demos
 docs/            architecture, schema, API, security, testing, roadmap, business plan, status
 docker-compose.yml, docker-compose.dev.yml, .env.example
 ```
@@ -61,6 +62,8 @@ docker-compose.yml, docker-compose.dev.yml, .env.example
 | [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Tokens, contrast, typography, components, motion, accessibility |
 | [AI_ADVISOR.md](docs/AI_ADVISOR.md) | AI Business Automation Advisor: flow, architecture, safety controls, retention, demo |
 | [SEO_IMPLEMENTATION.md](docs/SEO_IMPLEMENTATION.md) | SEO checklist, keyword map (unverified), indexation rules, editorial guidelines, lab performance |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production deployment (prepared, not executed): proxy, DNS, secrets, backups, monitoring, checklist, rollback |
+| [VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md) | Independent QA/security/DevOps review: what was verified, issues by severity |
 | [IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) | What is done, what was tested, known limitations |
 
 ## Important notes

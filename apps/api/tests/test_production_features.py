@@ -388,3 +388,32 @@ def test_full_lifecycle_visitor_to_audited_status_change(client, admin_user, db)
     assert status_event.actor_label == ADMIN_EMAIL
     assert status_event.details == {"from": "NEW", "to": "QUALIFIED"}
     assert db.execute(text("SELECT status FROM leads WHERE id = :id"), {"id": lead_id}).scalar() == "QUALIFIED"
+
+
+def test_cli_set_password_clears_lockout_and_revokes_sessions(admin_client, admin_user, db):
+    from app.cli import set_admin_password
+
+    admin_user = db.get(AdminUser, admin_user.id)
+    admin_user.failed_login_count = 5
+    admin_user.locked_until = utcnow() + timedelta(minutes=10)
+    db.commit()
+
+    with pytest.raises(ValueError):
+        set_admin_password(db, ADMIN_EMAIL, "weak")
+    with pytest.raises(LookupError):
+        set_admin_password(db, "nobody@example.com", "New-Strong-Pass-2026")
+
+    assert set_admin_password(db, ADMIN_EMAIL.upper(), "New-Strong-Pass-2026") >= 1
+    db.refresh(admin_user)
+    assert admin_user.failed_login_count == 0 and admin_user.locked_until is None
+    # The old browser session is revoked; the old password no longer works; the new one does.
+    assert admin_client.get("/api/admin/auth/me").status_code == 401
+    fresh = TestClient(admin_client.app)
+
+    def login(password: str) -> int:
+        return fresh.post("/api/admin/auth/login", json={"email": ADMIN_EMAIL, "password": password}).status_code
+
+    assert login(ADMIN_PASSWORD) == 401
+    assert login("New-Strong-Pass-2026") == 200
+    reset = db.scalar(select(AuditLog).where(AuditLog.action == "admin.password_reset"))
+    assert reset is not None and reset.details["sessions_revoked"] >= 1

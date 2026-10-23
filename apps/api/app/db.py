@@ -31,6 +31,8 @@ def get_engine() -> Engine:
         pool_pre_ping=True,
         pool_size=5,
         max_overflow=10,
+        # Database errors are logged with tracebacks; never include bound values (names, e-mails, messages).
+        hide_parameters=True,
     )
 
 

@@ -125,6 +125,10 @@ class Settings(BaseSettings):
             problems.append("COOKIE_SECURE=false is not allowed in production")
         if self.seed_sample_data:
             problems.append("SEED_SAMPLE_DATA must be false in production")
+        if not self.site_url.startswith("https://"):
+            problems.append("SITE_URL must use https:// in production")
+        if any(not origin.startswith("https://") for origin in self.cors_origin_list):
+            problems.append("CORS_ORIGINS must only contain https:// origins in production")
         if problems:
             raise ValueError("Unsafe production configuration: " + "; ".join(problems))
         return self

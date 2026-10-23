@@ -36,6 +36,12 @@ do {
 
 if (-not $ok) {
     Write-Host "Services did not become healthy in time. Check: docker compose logs" -ForegroundColor Red
+    if (docker compose logs api 2>&1 | Select-String -Quiet "password authentication failed") {
+        Write-Host ""
+        Write-Host "PostgreSQL rejects POSTGRES_PASSWORD from .env. The database volume was created earlier with a" -ForegroundColor Yellow
+        Write-Host "different password (for example a fresh clone or a regenerated .env). Either restore the previous" -ForegroundColor Yellow
+        Write-Host ".env, or back up and recreate the volume: .\scripts\stop.ps1 -RemoveData (deletes local data)." -ForegroundColor Yellow
+    }
     exit 1
 }
 

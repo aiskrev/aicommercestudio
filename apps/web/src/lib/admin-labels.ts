@@ -34,6 +34,7 @@ const actionLabels: Record<string, string> = {
   "auth.logout": "Изход от системата",
   "auth.login_failed": "Неуспешен опит за вход",
   "admin.created": "Създаден администратор",
+  "admin.password_reset": "Сменена парола (CLI)",
   "ai.lead_triage": "AI анализ на запитване",
   "ai_action.proposed": "Предложено AI действие",
   "ai_action.approved": "Одобрено AI действие",

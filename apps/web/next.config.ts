@@ -30,6 +30,9 @@ const nextConfig: NextConfig = {
   output: "standalone",
   poweredByHeader: false,
   reactStrictMode: true,
+  // Docker Desktop on Windows does not forward file events into bind mounts, so the hot-reload
+  // override (docker-compose.dev.yml) sets NEXT_DEV_POLL_MS. Unset everywhere else: no polling.
+  ...(process.env.NEXT_DEV_POLL_MS ? { watchOptions: { pollIntervalMs: Number(process.env.NEXT_DEV_POLL_MS) } } : {}),
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

@@ -1,17 +1,27 @@
 # Example Caddy configuration for production (automatic HTTPS).
-# Replace example.com with the real domain. Caddy overwrites X-Forwarded-For
-# with the real client address, which the API uses for rate limiting.
+# Replace example.com with the real domain. Caddy (>= 2.5) ignores any client-supplied
+# X-Forwarded-For (no trusted_proxies configured) and sends the real client address,
+# which the API uses for rate limiting. Do not add trusted_proxies unless a CDN is in front.
+# Only Caddy may be reachable from the internet; port 3000 stays on 127.0.0.1.
 
 example.com {
 	encode zstd gzip
 
-	reverse_proxy 127.0.0.1:3000 {
-		header_up X-Forwarded-For {remote_host}
-	}
+	reverse_proxy 127.0.0.1:3000
 
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		-Server
+	}
+
+	# Access log with rotation: 10 files × 50 MB, at most 30 days.
+	log {
+		output file /var/log/caddy/ai-commerce-studio.log {
+			roll_size 50mb
+			roll_keep 10
+			roll_keep_for 720h
+		}
+		format json
 	}
 }
 

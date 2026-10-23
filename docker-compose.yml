@@ -11,8 +11,16 @@ name: ai-commerce-studio
 x-api-env: &api-env
   DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-acs}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env (run scripts/setup.ps1)}@db:5432/${POSTGRES_DB:-acs}
 
+# Docker's default json-file driver never rotates; cap each container's logs (≈ 50 MB).
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
 services:
   db:
+    logging: *logging
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
@@ -30,6 +38,7 @@ services:
       retries: 20
 
   api:
+    logging: *logging
     build:
       context: ./apps/api
       target: runtime
@@ -51,6 +60,7 @@ services:
       start_period: 20s
 
   web:
+    logging: *logging
     build:
       context: ./apps/web
       target: runner

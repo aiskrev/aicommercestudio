@@ -108,7 +108,7 @@ Append-only activity log. `details` must never contain raw personal data.
 | `auth.session_idle_timeout` | session revoked for inactivity |
 | `retention.run` | an admin applied the retention policy (counts) |
 | `ai.lead_triage`, `ai_action.proposed/approved/rejected` | AI suggestion and approval workflow |
-| `admin.created`, `seed.synthetic_data`, `seed.synthetic_purged` | CLI operations |
+| `admin.created`, `admin.password_reset`, `seed.synthetic_data`, `seed.synthetic_purged` | CLI operations |
 
 ## ai_action_requests
 

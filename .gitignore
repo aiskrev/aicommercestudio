@@ -32,3 +32,6 @@ blob-report/
 Thumbs.db
 .idea/
 *.log
+
+# Local database backups contain personal data
+backups/

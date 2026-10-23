@@ -71,6 +71,7 @@ def _production(**overrides) -> Settings:
         "app_env": "production",
         "secret_key": "Zx8k2P0q-unique-production-grade-key-9f3a1c7e",
         "cors_origins": "https://shop-studio.invalid",
+        "site_url": "https://shop-studio.invalid",
         "database_url": "postgresql+psycopg://u:p@localhost/db",
         "seed_sample_data": False,
         "cookie_secure": None,
@@ -90,6 +91,24 @@ def test_production_rejects_wildcard_cors_and_insecure_cookies():
         _production(cors_origins="*")
     with pytest.raises(ValidationError):
         _production(cookie_secure=False)
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"site_url": "http://shop-studio.invalid"},
+        {"cors_origins": "https://shop-studio.invalid,http://localhost:3000"},
+    ],
+)
+def test_production_requires_https_urls(overrides):
+    with pytest.raises(ValidationError):
+        _production(**overrides)
+
+
+def test_database_errors_never_log_bound_parameters():
+    from app.db import get_engine
+
+    assert get_engine().hide_parameters is True
 
 
 def test_production_forces_secure_cookies_and_hides_docs():

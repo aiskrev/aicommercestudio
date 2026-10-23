@@ -2,6 +2,7 @@
 
     python -m app.cli seed                      # bootstrap admin (+ synthetic demo data in development)
     python -m app.cli create-admin --email x@y  # password read from ADMIN_PASSWORD env or prompted
+    python -m app.cli set-password --email x@y  # reset a password, clear lockout, revoke sessions
     python -m app.cli maintenance [--dry-run]   # GDPR retention + expired session cleanup
     python -m app.cli purge-synthetic           # remove synthetic development data
 """
@@ -14,7 +15,7 @@ import os
 import sys
 from datetime import timedelta
 
-from sqlalchemy import delete, func, or_, select
+from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.orm import Session
 
 from app import audit
@@ -128,6 +129,8 @@ def cmd_seed(_: argparse.Namespace) -> int:
                 _print(f"[seed] Admin not created: {exc}")
                 return 1
             _print(f"[seed] Admin {'created' if created else 'already exists'}: {admin.email}")
+            if settings.is_production:
+                _print("[seed] WARNING: remove ADMIN_BOOTSTRAP_PASSWORD from the production environment now.")
         else:
             _print("[seed] ADMIN_BOOTSTRAP_EMAIL/PASSWORD not set — skipping admin bootstrap")
 
@@ -137,8 +140,21 @@ def cmd_seed(_: argparse.Namespace) -> int:
     return 0
 
 
+def _read_password() -> str | None:
+    """ADMIN_PASSWORD (non-interactive) or a hidden prompt entered twice. Never echoed or logged."""
+    if os.environ.get("ADMIN_PASSWORD"):
+        return os.environ["ADMIN_PASSWORD"]
+    password = getpass.getpass("Password (min. 12 chars, upper/lower case and digits): ")
+    if getpass.getpass("Repeat password: ") != password:
+        _print("Error: passwords do not match")
+        return None
+    return password
+
+
 def cmd_create_admin(args: argparse.Namespace) -> int:
-    password = os.environ.get("ADMIN_PASSWORD") or getpass.getpass("Password (min. 12 chars): ")
+    password = _read_password()
+    if password is None:
+        return 1
     with get_sessionmaker()() as db:
         try:
             user, created = ensure_admin(db, args.email, password, args.name)
@@ -146,6 +162,44 @@ def cmd_create_admin(args: argparse.Namespace) -> int:
             _print(f"Error: {exc}")
             return 1
     _print(f"Admin {'created' if created else 'already exists'}: {user.email}")
+    return 0
+
+
+def set_admin_password(db: Session, email: str, password: str) -> int:
+    """Reset an administrator's password: clears the lockout and revokes all open sessions (audited).
+    Returns the number of revoked sessions."""
+    user = db.scalar(select(AdminUser).where(func.lower(AdminUser.email) == email.lower()))
+    if user is None:
+        raise LookupError(f"no administrator with e-mail {email}")
+    validate_password_strength(password)
+    now = utcnow()
+    user.password_hash = hash_password(password)
+    user.failed_login_count = 0
+    user.locked_until = None
+    revoked = db.execute(
+        update(AdminSession)
+        .where(AdminSession.user_id == user.id, AdminSession.revoked_at.is_(None))
+        .values(revoked_at=now)
+    ).rowcount
+    audit.record(
+        db, "admin.password_reset", actor_label="cli", entity_type="admin_user", entity_id=str(user.id),
+        details={"sessions_revoked": revoked},
+    )
+    db.commit()
+    return revoked
+
+
+def cmd_set_password(args: argparse.Namespace) -> int:
+    password = _read_password()
+    if password is None:
+        return 1
+    with get_sessionmaker()() as db:
+        try:
+            revoked = set_admin_password(db, args.email, password)
+        except (LookupError, ValueError) as exc:
+            _print(f"Error: {exc}")
+            return 1
+    _print(f"Password updated for {args.email.lower()}; lockout cleared; sessions revoked: {revoked}")
     return 0
 
 
@@ -190,6 +244,9 @@ def main(argv: list[str] | None = None) -> int:
     create.add_argument("--email", required=True)
     create.add_argument("--name", default="Администратор")
     create.set_defaults(func=cmd_create_admin)
+    reset = sub.add_parser("set-password", help="Reset an administrator's password (clears lockout, revokes sessions)")
+    reset.add_argument("--email", required=True)
+    reset.set_defaults(func=cmd_set_password)
     maint = sub.add_parser("maintenance", help="Apply retention policy and remove expired sessions")
     maint.add_argument("--dry-run", action="store_true")
     maint.set_defaults(func=cmd_maintenance)

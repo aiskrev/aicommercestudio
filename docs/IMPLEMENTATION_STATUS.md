@@ -19,6 +19,24 @@ images `python:3.13-slim`, `node:24-alpine`, `postgres:17-alpine`, `mcr.microsof
 | Stack health | `docker compose ps` | db, api, web **healthy** |
 | Manual browser check | in-app browser at 1024 px and 375 px | home, service, contact, admin login/dashboard/leads/detail rendered; issues found were fixed (see below) |
 
+## Independent QA / security / DevOps review (sixth iteration)
+
+Full report with issues by severity: [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md). Acceptance
+criterion (lead submitted → saved → viewed → updated through the admin) **met on a clean copy** with
+fresh secrets and on the existing stack.
+
+Executed with `.\scripts\test.ps1` (exit 0) on the clean copy and again on the main stack:
+**pytest 222 passed**, ruff clean, tsc 0 errors, ESLint 0 problems, **Vitest 87 passed**, production
+build ok, **Playwright 31 passed**; `-Suite audit`: pip-audit and npm audit report no known
+vulnerabilities. Also executed: live security probe (13/13), backup → restore round trip, admin CLI
+(`create-admin`, `set-password`, `maintenance`), hot-reload mode, production compose rendering,
+Caddyfile parsing.
+
+Fixed: H1 (fresh clone vs existing volume), H2 (no backup/restore), M1–M5 (DB parameters in logs,
+log rotation, https enforcement, password recovery, dev hot reload), L1–L3. Remaining: M6–M9 and
+L4–L8 (documented in the report). Windows commands: [INSTALL_WINDOWS.md](INSTALL_WINDOWS.md);
+production (prepared, not executed): [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## AI Business Automation Advisor (fifth iteration)
 
 Public page `/ai-automation-advisor`, API `POST /api/public/advisor/assessments`, migration `0003`.
@@ -213,19 +231,20 @@ Not verified: the reduced-motion rendering was reviewed in CSS but not visually 
 
 ## Not verified / known limitations
 
-- **Hot-reload mode** (`docker-compose.dev.yml`, `start.ps1 -Dev`) was written but not run in this session.
+- Hot-reload mode (`start.ps1 -Dev`) was verified on 2026-10-23 after fixing web file polling (see VERIFICATION_REPORT.md, M5).
 - **Production override** (`infra/docker-compose.prod.yml`) and the Caddy example were not deployed;
   production settings validation is covered by unit tests only.
 - **Anthropic provider** is implemented with the official SDK (`anthropic==2.1.0`) but was not called
   (no API key). Only the mock provider was exercised.
 - **SMTP notifications** were not tested against a real server (disabled by default; skip path tested via logs).
-- **Non-Docker local workflow** (section 6 of INSTALL_WINDOWS.md) was not executed — the machine has no Node.js and only Python 3.9.
+- **Non-Docker local workflow** (section 11 of INSTALL_WINDOWS.md) was not executed — the machine has no Node.js and only Python 3.9.
 - The PowerShell API example in `API_REFERENCE.md` is illustrative and was not executed.
 - Rate limiting is in-memory (single API instance); restarts reset counters.
 - `eslint@10` triggers npm peer-dependency warnings from some plugins bundled in `eslint-config-next`
   (lint itself runs cleanly). ESLint 9 was avoided because it is end-of-life.
 - Legal texts, company details and contact data are placeholders/drafts.
-- The project lives in `D:\Projects\Site`; see INSTALL_WINDOWS.md §2 to move it to `D:\Projects\AI-Commerce-Studio`.
+- The working copy used during development is `D:\Projects\Site`; INSTALL_WINDOWS.md §2 covers cloning or
+  moving to `D:\Projects\AI-Commerce-Studio` (mind the shared database volume).
 - `apps/web/node_modules` on the host was installed by a Linux container (used for tooling); run
   `npm ci` again if you later develop with a local Windows Node.js.
 

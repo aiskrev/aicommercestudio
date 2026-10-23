@@ -67,13 +67,17 @@ legally review the privacy policy/terms, maintain records of processing, define 
 
 ## Production checklist
 
-- [ ] `APP_ENV=production`, unique `SECRET_KEY` (≥32 random chars), strong DB password, `COOKIE_SECURE=true`
-- [ ] `SITE_URL` and `CORS_ORIGINS` set to the real `https://` domain; rebuild the web image
+Full procedure, rollback and monitoring: [DEPLOYMENT.md](DEPLOYMENT.md). The API refuses to start in
+production when the items marked (enforced) are wrong.
+
+
+- [ ] `APP_ENV=production`, unique `SECRET_KEY` (≥32 random chars, enforced), strong DB password, `COOKIE_SECURE=true` (enforced)
+- [ ] `SITE_URL` and `CORS_ORIGINS` set to the real `https://` domain (enforced); rebuild the web image
 - [ ] Use `infra/docker-compose.prod.yml`; put Caddy (or similar) in front with TLS and HSTS
 - [ ] Secrets supplied by the host/secret manager, `.env` not copied into images (already in `.dockerignore`)
-- [ ] `SEED_SAMPLE_DATA=false`; remove or rotate the bootstrap admin password after first login
+- [ ] `SEED_SAMPLE_DATA=false` (enforced); create admins with `create-admin` and keep `ADMIN_BOOTSTRAP_PASSWORD` empty
 - [ ] Schedule `python -m app.cli maintenance` daily
-- [ ] Encrypted, tested PostgreSQL backups
+- [ ] Encrypted, tested PostgreSQL backups (`infra/backup-db.sh`, restore drill monthly)
 - [ ] Run `.\scripts\test.ps1` and `-Suite audit`; review results
 - [ ] Legal texts completed and reviewed; contact details verified
 - [ ] For multiple API instances: move rate limiting to Redis

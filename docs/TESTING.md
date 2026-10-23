@@ -21,11 +21,11 @@ migrated with Alembic (the same path production uses). Tables are truncated betw
 | `test_public_leads.py` | valid lead persisted with consents & IP hash; 11 invalid-input cases; Bulgarian messages; honeypot; form-token missing/forged/too fast/expired; link spam; per-IP and global rate limits; SQL-injection payload stored as plain text; no public lead listing |
 | `test_admin_auth.py` | all 14 admin endpoints return 401 anonymously; cookie flags (HttpOnly, SameSite); token stored hashed; generic login errors + audit; login rate limit; CSRF missing/forged; logout revocation; expired session; deactivated user; forged cookie |
 | `test_admin_leads.py` | pagination, sorting, filters, LIKE-wildcard escaping, invalid filters, details, status updates (all 6 statuses) with audit trail, notes, GDPR deletion without PII in audit, 404/422 ids, dashboard stats from real data, system status, audit endpoint |
-| `test_security.py` | origin check, CORS preflight, 413 body limit, security headers, no-store caching, malformed JSON, production config refusal (placeholder secret, wildcard CORS, insecure cookies), docs hidden + HSTS in production, Argon2id, password policy |
+| `test_security.py` | origin check, CORS preflight, 413 body limit, security headers, no-store caching, malformed JSON, production config refusal (placeholder secret, wildcard CORS, insecure cookies, non-https SITE_URL/CORS), DB errors without bound parameters, docs hidden + HSTS in production, Argon2id, password policy |
 | `test_ai.py` | mock triage classification, urgency, PII redaction, provider fallback without key, approval policy for every action type, unknown actions fail closed, proposal/approval/rejection workflow + 409 |
 | `test_units.py` | form-token lifecycle and tampering, link heuristic, sliding-window limiter |
 | `test_migrations_and_retention.py` | `alembic check` (models = migrations), upgrade/downgrade round trip, 0001→0002 data migration (backfill), retention (dry run, deletion, audit purge), idempotent synthetic seed |
-| `test_production_features.py` | quote requests (persistence, 9 invalid cases, required fields, honeypot, shared rate limit), error envelope codes + request id, persistent lockout (persistence across limiter reset, unknown-account parity, counter reset), idle-session revocation, logout-all + session list, service re-categorisation, optimistic concurrency (409), throttled `lead.viewed` audit, inquiry-type filter/stats, audit search (filters, pagination, wildcard escaping), retention preview + confirmed run, purge-synthetic, **full lifecycle visitor → admin → audit verified with raw SQL** |
+| `test_production_features.py` | CLI `set-password` (lockout cleared, sessions revoked, audited), quote requests (persistence, 9 invalid cases, required fields, honeypot, shared rate limit), error envelope codes + request id, persistent lockout (persistence across limiter reset, unknown-account parity, counter reset), idle-session revocation, logout-all + session list, service re-categorisation, optimistic concurrency (409), throttled `lead.viewed` audit, inquiry-type filter/stats, audit search (filters, pagination, wildcard escaping), retention preview + confirmed run, purge-synthetic, **full lifecycle visitor → admin → audit verified with raw SQL** |
 | `test_advisor.py` | AI advisor: demo mode labelling, all 11 output sections, determinism, no financial claims in demo output, storage opt-out, PII/link removal before storage, 11 invalid-input cases, form token, rate limit (invalid requests count), prompt-injection flagging and delimiter neutralising, invalid model output → 502 (6 cases), truncation of over-long output, removal of financial promises and links, forced human approval, provider error mapping (5 kinds), logs without description/output, structured-output schema compatibility, consultation link + admin view + audit flag, unknown/reused/expired ids ignored, cascade delete with the lead, retention; Anthropic adapter with a fake SDK client (request shape, no tools, refusal, truncation, invalid JSON, timeout/connection errors) |
 
 Lint: `ruff check` (pyflakes, pycodestyle, isort, bugbear, pyupgrade, bandit-style `S` rules, simplify).
@@ -88,3 +88,13 @@ rows for the lead and its audit events (see IMPLEMENTATION_STATUS.md for a recor
 Runs the AI advisor with synthetic data against the running stack (demo mode): validation, assessment,
 prompt-injection and personal-data handling, non-storage, PostgreSQL rows, consultation linked to a lead,
 admin view, retention preview and a log check (see [AI_ADVISOR.md](AI_ADVISOR.md)).
+
+## Backup and restore check
+
+```powershell
+pwsh .\scripts\backup-db.ps1
+pwsh .\scripts\restore-db.ps1 -File .\backups\<file>.dump   # destructive; asks for confirmation
+```
+
+The round trip (backup → new lead → restore → lead gone) was executed on a throw-away stack; see
+[VERIFICATION_REPORT.md](VERIFICATION_REPORT.md).
