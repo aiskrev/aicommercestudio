@@ -10,7 +10,15 @@ import { EmptyState, ErrorState, LoadingState, Panel, Pill, StatusBadge } from "
 import { Icon } from "@/components/ui/Icon";
 import { buttonClass, cx } from "@/components/ui/primitives";
 import { adminFetch, ApiError } from "@/lib/admin-api";
-import { priorityLabels, serviceLabels, statusLabels } from "@/lib/admin-labels";
+import {
+  budgetLabels,
+  inquiryTypeLabels,
+  platformLabels,
+  priorityLabels,
+  serviceLabels,
+  statusLabels,
+  timelineLabels,
+} from "@/lib/admin-labels";
 import { type AuditEntry, LEAD_STATUSES, type LeadDetail as Lead, type LeadNote, type LeadStatus, type LeadTriage } from "@/lib/admin-types";
 import { formatDateTime } from "@/lib/format";
 import { routes } from "@/lib/routes";
@@ -24,7 +32,7 @@ export function LeadDetail({ id }: { id: string }) {
   if (lead.error && !lead.data) {
     return (
       <div className="grid gap-4">
-        <ErrorState message={lead.error} onRetry={lead.reload} />
+        <ErrorState message={lead.error} requestId={lead.errorId} onRetry={lead.reload} />
         <Link href={routes.adminLeads} className="text-sm text-cyan-300">
           ← Към запитванията
         </Link>
@@ -61,7 +69,36 @@ export function LeadDetail({ id }: { id: string }) {
                 </a>
               </Info>
               <Info label="Телефон">{data.phone ?? <span className="text-slate-400">Не е посочен</span>}</Info>
-              <Info label="Услуга">{serviceLabels[data.service] ?? data.service}</Info>
+              <Info label="Тип">{inquiryTypeLabels[data.inquiry_type] ?? data.inquiry_type}</Info>
+              <Info label="Услуга">
+                {serviceLabels[data.service] ?? data.service}
+                {data.submitted_service !== data.service && (
+                  <span className="block text-xs text-slate-400">
+                    Първоначално избрана: {serviceLabels[data.submitted_service] ?? data.submitted_service}
+                  </span>
+                )}
+              </Info>
+              {data.inquiry_type === "quote" && (
+                <>
+                  <Info label="Платформа">{platformLabels[data.platform ?? ""] ?? "—"}</Info>
+                  <Info label="Ориентировъчен бюджет">{budgetLabels[data.budget_range ?? ""] ?? "—"}</Info>
+                  <Info label="Желан срок">{timelineLabels[data.timeline ?? ""] ?? "—"}</Info>
+                  <Info label="Сайт">
+                    {data.website_url ? (
+                      <a
+                        href={data.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer nofollow"
+                        className="break-all text-cyan-300 hover:text-cyan-200"
+                      >
+                        {data.website_url}
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </Info>
+                </>
+              )}
               <Info label="Получено">{formatDateTime(data.created_at)}</Info>
               <Info label="Източник">{data.source === "synthetic_seed" ? "Синтетични данни (разработка)" : "Контактна форма"}</Info>
               <Info label="Последна промяна на статус">
@@ -77,11 +114,16 @@ export function LeadDetail({ id }: { id: string }) {
           </Panel>
 
           <Notes lead={data} onAdded={(note) => refresh({ ...data, notes: [note, ...data.notes] })} />
-          <AiTriage leadId={data.id} onDone={() => history.reload()} />
+          <AiTriage
+            lead={data}
+            onDone={() => history.reload()}
+            onApplied={(updated) => refresh(updated)}
+          />
         </div>
 
         <div className="grid content-start gap-6">
-          <StatusEditor lead={data} onSaved={(updated) => refresh(updated)} />
+          <StatusEditor lead={data} onSaved={(updated) => refresh(updated)} onConflict={() => refresh()} />
+          <ServiceEditor lead={data} onSaved={(updated) => refresh(updated)} />
 
           <Panel title="Съгласия (GDPR)">
             <dl className="grid gap-3 text-sm">
@@ -98,7 +140,7 @@ export function LeadDetail({ id }: { id: string }) {
 
           <Panel title="История">
             {history.loading && !history.data && <LoadingState />}
-            {history.error && <ErrorState message={history.error} onRetry={history.reload} />}
+            {history.error && <ErrorState message={history.error} requestId={history.errorId} onRetry={history.reload} />}
             {history.data && history.data.length === 0 && <EmptyState icon="activity" title="Няма записи" />}
             {history.data && history.data.length > 0 && <ActivityList entries={history.data} linkLeads={false} />}
           </Panel>
@@ -119,10 +161,26 @@ function Info({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
-function StatusEditor({ lead, onSaved }: { lead: Lead; onSaved: (lead: Lead) => void }) {
+function StatusEditor({
+  lead,
+  onSaved,
+  onConflict,
+}: {
+  lead: Lead;
+  onSaved: (lead: Lead) => void;
+  onConflict: () => void;
+}) {
   const [status, setStatus] = useState<LeadStatus>(lead.status);
+  const [synced, setSynced] = useState(lead.status);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  const [conflict, setConflict] = useState(false);
+  // Follow server-side changes (e.g. after a conflict reload) without an effect.
+  if (lead.status !== synced) {
+    setSynced(lead.status);
+    setStatus(lead.status);
+    setConflict(false);
+  }
 
   async function save(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -131,11 +189,13 @@ function StatusEditor({ lead, onSaved }: { lead: Lead; onSaved: (lead: Lead) => 
     try {
       const updated = await adminFetch<Lead>(`/api/admin/leads/${lead.id}`, {
         method: "PATCH",
-        body: JSON.stringify({ status }),
+        // expected_status: the server rejects the change (409) if someone else changed the status meanwhile.
+        body: JSON.stringify({ status, expected_status: lead.status }),
       });
       onSaved(updated);
       setMessage({ ok: true, text: "Статусът е запазен." });
     } catch (err) {
+      setConflict(err instanceof ApiError && err.code === "status_conflict");
       setMessage({ ok: false, text: err instanceof ApiError ? err.message : "Грешка при запазване." });
     } finally {
       setSaving(false);
@@ -162,6 +222,63 @@ function StatusEditor({ lead, onSaved }: { lead: Lead; onSaved: (lead: Lead) => 
         </select>
         <button type="submit" className={buttonClass("primary")} disabled={saving || status === lead.status}>
           {saving ? "Запазване…" : "Запази статуса"}
+        </button>
+        <p aria-live="polite" className={cx("text-sm", message?.ok ? "text-emerald-300" : "text-rose-300")}>
+          {message?.text}
+        </p>
+        {conflict && (
+          <button type="button" onClick={onConflict} className={buttonClass("secondary", "sm")}>
+            Презареди актуалните данни
+          </button>
+        )}
+      </form>
+    </Panel>
+  );
+}
+
+function ServiceEditor({ lead, onSaved }: { lead: Lead; onSaved: (lead: Lead) => void }) {
+  const [service, setService] = useState(lead.service);
+  const [synced, setSynced] = useState(lead.service);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null);
+  if (lead.service !== synced) {
+    setSynced(lead.service);
+    setService(lead.service);
+  }
+
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    try {
+      const updated = await adminFetch<Lead>(`/api/admin/leads/${lead.id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ service }),
+      });
+      onSaved(updated);
+      setMessage({ ok: true, text: "Категорията е запазена." });
+    } catch (err) {
+      setMessage({ ok: false, text: err instanceof ApiError ? err.message : "Грешка при запазване." });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Panel title="Категория (интерес към услуга)">
+      <form onSubmit={save} className="grid gap-3">
+        <label htmlFor="lead-service" className="sr-only">
+          Услуга
+        </label>
+        <select id="lead-service" className="field" value={service} onChange={(e) => setService(e.target.value)}>
+          {Object.entries(serviceLabels).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <button type="submit" className={buttonClass("secondary")} disabled={saving || service === lead.service}>
+          {saving ? "Запазване…" : "Запази категорията"}
         </button>
         <p aria-live="polite" className={cx("text-sm", message?.ok ? "text-emerald-300" : "text-rose-300")}>
           {message?.text}
@@ -240,10 +357,34 @@ function Notes({ lead, onAdded }: { lead: Lead; onAdded: (note: LeadNote) => voi
   );
 }
 
-function AiTriage({ leadId, onDone }: { leadId: string; onDone: () => void }) {
+function AiTriage({
+  lead,
+  onDone,
+  onApplied,
+}: {
+  lead: Lead;
+  onDone: () => void;
+  onApplied: (lead: Lead) => void;
+}) {
+  const leadId = lead.id;
   const [result, setResult] = useState<LeadTriage | null>(null);
   const [loading, setLoading] = useState(false);
+  const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  async function applySuggestion(service: string) {
+    setApplying(true);
+    setError(null);
+    try {
+      onApplied(
+        await adminFetch<Lead>(`/api/admin/leads/${leadId}`, { method: "PATCH", body: JSON.stringify({ service }) }),
+      );
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Предложението не можа да бъде приложено.");
+    } finally {
+      setApplying(false);
+    }
+  }
 
   async function run() {
     setLoading(true);
@@ -293,6 +434,21 @@ function AiTriage({ leadId, onDone }: { leadId: string; onDone: () => void }) {
             <span className="text-slate-400">Следваща стъпка: </span>
             <span className="text-slate-200">{result.suggested_next_step}</span>
           </p>
+          {result.suggested_service !== lead.service && (
+            <div>
+              <button
+                type="button"
+                onClick={() => applySuggestion(result.suggested_service)}
+                disabled={applying}
+                className={buttonClass("secondary", "sm")}
+              >
+                {applying
+                  ? "Прилагане…"
+                  : `Смени категорията на „${serviceLabels[result.suggested_service] ?? result.suggested_service}“`}
+              </button>
+              <p className="mt-1 text-xs text-slate-400">Промяната се прави само след вашето потвърждение и се записва в журнала.</p>
+            </div>
+          )}
           {result.signals.length > 0 && (
             <ul className="list-inside list-disc text-xs text-slate-400">
               {result.signals.map((signal) => (

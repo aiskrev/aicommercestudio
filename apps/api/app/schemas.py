@@ -7,10 +7,11 @@ import re
 import uuid
 from datetime import datetime
 from typing import Any, Literal
+from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
-from app.models import LeadStatus, ServiceKey
+from app.models import BudgetRange, InquiryType, LeadStatus, Platform, ServiceKey, Timeline
 
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _PHONE_RE = re.compile(r"^\+?[0-9 ()\-./]{6,40}$")
@@ -82,10 +83,37 @@ class LeadCreate(StrictModel):
         return value
 
 
+class QuoteRequestCreate(LeadCreate):
+    """Request for a written quote: the contact fields plus structured project information."""
+
+    platform: Platform
+    budget_range: BudgetRange
+    timeline: Timeline
+    website_url: str | None = Field(default=None, max_length=300)
+
+    @field_validator("website_url", mode="before")
+    @classmethod
+    def _website_url(cls, value: Any) -> Any:
+        if value is None or (isinstance(value, str) and not value.strip()):
+            return None
+        if not isinstance(value, str):
+            raise ValueError("Невалиден адрес на сайт.")
+        candidate = value.strip()
+        if not candidate.lower().startswith(("http://", "https://")):
+            candidate = f"https://{candidate}"
+        parts = urlsplit(candidate)
+        host = parts.hostname or ""
+        invalid = parts.scheme not in ("http", "https") or "." not in host
+        if invalid or _CONTROL_CHARS.search(candidate) or " " in candidate:
+            raise ValueError("Въведете валиден адрес на сайт, например https://example.bg.")
+        return candidate
+
+
 class LeadCreated(BaseModel):
     status: Literal["received"] = "received"
     reference: str
     message: str
+    inquiry_type: InquiryType = InquiryType.CONTACT
 
 
 # --------------------------------------------------------------------------- auth
@@ -108,6 +136,19 @@ class AdminUserOut(BaseModel):
 class SessionOut(BaseModel):
     user: AdminUserOut
     expires_at: datetime
+
+
+class AdminSessionInfo(BaseModel):
+    id: uuid.UUID
+    created_at: datetime
+    last_seen_at: datetime
+    expires_at: datetime
+    user_agent: str | None
+    current: bool
+
+
+class LogoutAllOut(BaseModel):
+    sessions_revoked: int
 
 
 # --------------------------------------------------------------------------- leads
@@ -133,6 +174,7 @@ class LeadSummaryOut(BaseModel):
     email: str
     status: str
     source: str
+    inquiry_type: str
     created_at: datetime
     updated_at: datetime
 
@@ -145,6 +187,11 @@ class LeadDetailOut(LeadSummaryOut):
     marketing_consent: bool
     marketing_consent_at: datetime | None
     status_changed_at: datetime | None
+    submitted_service: str
+    platform: str | None
+    budget_range: str | None
+    timeline: str | None
+    website_url: str | None
     notes: list[LeadNoteOut]
 
 
@@ -156,7 +203,21 @@ class LeadPage(BaseModel):
 
 
 class LeadUpdate(StrictModel):
-    status: LeadStatus
+    """Change pipeline status and/or service categorisation.
+
+    `expected_status` enables optimistic concurrency: if another administrator changed the
+    status in the meantime, the update is rejected with 409 instead of silently overwriting it.
+    """
+
+    status: LeadStatus | None = None
+    service: ServiceKey | None = None
+    expected_status: LeadStatus | None = None
+
+    @model_validator(mode="after")
+    def _something_to_change(self) -> LeadUpdate:
+        if self.status is None and self.service is None:
+            raise ValueError("Посочете статус или услуга за промяна.")
+        return self
 
 
 class LeadNoteCreate(StrictModel):
@@ -193,8 +254,34 @@ class DashboardStats(BaseModel):
     lost: int
     by_status: dict[str, int]
     by_service: dict[str, int]
+    by_inquiry_type: dict[str, int]
     pending_ai_actions: int
     recent_activity: list[AuditLogOut]
+
+
+class AuditPage(BaseModel):
+    items: list[AuditLogOut]
+    total: int
+    page: int
+    page_size: int
+
+
+class RetentionPreview(BaseModel):
+    lead_retention_days: int
+    audit_retention_days: int
+    leads_due: int
+    audit_entries_due: int
+    lead_cutoff: datetime
+    audit_cutoff: datetime
+
+
+class RetentionRunIn(StrictModel):
+    confirm: Literal[True]
+
+
+class RetentionRunOut(BaseModel):
+    leads_deleted: int
+    audit_entries_deleted: int
 
 
 class IntegrationStatus(BaseModel):

@@ -6,12 +6,14 @@ from dataclasses import dataclass
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import Depends, Request, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app import audit
 from app.config import Settings, get_settings
 from app.db import get_db
+from app.errors import ApiError
 from app.models import AdminSession, AdminUser, utcnow
 from app.rate_limit import limiter
 from app.security import hash_ip, hash_token, tokens_match
@@ -41,11 +43,16 @@ def client_ip_hash(request: Request) -> str | None:
 def enforce_rate_limit(key: str, limit: int, window_seconds: int) -> None:
     result = limiter.hit(key, limit, window_seconds)
     if not result.allowed:
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Твърде много заявки. Моля, опитайте отново по-късно.",
-            headers={"Retry-After": str(result.retry_after)},
-        )
+        raise rate_limited(result.retry_after)
+
+
+def rate_limited(retry_after: int) -> ApiError:
+    return ApiError(
+        status.HTTP_429_TOO_MANY_REQUESTS,
+        "Твърде много заявки. Моля, опитайте отново по-късно.",
+        "rate_limited",
+        headers={"Retry-After": str(retry_after)},
+    )
 
 
 @dataclass
@@ -55,8 +62,8 @@ class AdminContext:
     ip_hash: str | None
 
 
-def _unauthorized() -> HTTPException:
-    return HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Необходим е вход в системата.")
+def _unauthorized(detail: str = "Необходим е вход в системата.", code: str = "unauthorized") -> ApiError:
+    return ApiError(status.HTTP_401_UNAUTHORIZED, detail, code)
 
 
 def require_admin(request: Request, db: DbSession) -> AdminContext:
@@ -74,10 +81,19 @@ def require_admin(request: Request, db: DbSession) -> AdminContext:
     ):
         raise _unauthorized()
 
+    if now - session.last_seen_at > timedelta(minutes=settings.session_idle_minutes):
+        session.revoked_at = now
+        audit.record(
+            db, "auth.session_idle_timeout", actor=session.user, entity_type="admin_user",
+            entity_id=str(session.user_id), ip_hash=client_ip_hash(request),
+        )
+        db.commit()
+        raise _unauthorized("Сесията изтече поради неактивност. Моля, влезте отново.", "session_expired")
+
     if request.method not in SAFE_METHODS:
         header = request.headers.get(CSRF_HEADER)
         if not header or not tokens_match(header, session.csrf_hash):
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Невалиден CSRF токен.")
+            raise ApiError(status.HTTP_403_FORBIDDEN, "Невалиден CSRF токен. Презаредете страницата.", "csrf_failed")
 
     if now - session.last_seen_at > timedelta(minutes=1):
         session.last_seen_at = now

@@ -1,8 +1,20 @@
 # Database schema
 
 PostgreSQL 17. Schema is managed exclusively by Alembic (`apps/api/alembic/versions`).
-`tests/test_migrations_and_retention.py` runs `alembic check` (models ↔ migrations must match) and a
-full upgrade/downgrade round trip on a fresh database.
+`tests/test_migrations_and_retention.py` runs `alembic check` (models ↔ migrations must match), a full
+upgrade/downgrade round trip on a fresh database, and a data-migration test (rows written under 0001 survive 0002).
+
+## Migrations
+
+| Revision | Content |
+| --- | --- |
+| `0001` | admin users & sessions, leads, notes, audit log, AI action approvals |
+| `0002` | quote requests (`inquiry_type`, `platform`, `budget_range`, `timeline`, `website_url`), service re-categorisation (`submitted_service`, backfilled from `service`), persistent login lockout (`failed_login_count`, `locked_until`), indexes on `leads.service`, `leads.inquiry_type`, `audit_logs.action`, `audit_logs.actor_id` |
+
+Apply: automatic on container start (`RUN_MIGRATIONS_ON_START=true`), or manually
+`docker compose exec api alembic upgrade head`. Inspect: `docker compose exec api alembic current`.
+New migration: change `app/models.py`, then `docker compose exec api alembic revision --autogenerate -m "..."`
+and review the generated file (CHECK constraints must be added by hand).
 
 Naming convention: `pk_<table>`, `fk_<table>_<column>_<ref>`, `uq_<table>_<column>`, `ck_<table>_<name>`, `ix_<table>_<column>`.
 All timestamps are `timestamptz` in UTC.
@@ -17,6 +29,8 @@ All timestamps are `timestamptz` in UTC.
 | password_hash | varchar(255) | Argon2id |
 | is_active | boolean | inactive users cannot log in or use sessions |
 | created_at, last_login_at | timestamptz | |
+| failed_login_count | integer, default 0 | consecutive failed logins; reset on success or when a lock is applied |
+| locked_until | timestamptz null | set after `LOGIN_LOCKOUT_THRESHOLD` failures for `LOGIN_LOCKOUT_MINUTES` |
 
 ## admin_sessions
 
@@ -35,7 +49,13 @@ All timestamps are `timestamptz` in UTC.
 | Column | Type | Notes |
 | --- | --- | --- |
 | id | uuid PK | public reference = first 8 hex chars, upper-case |
-| service | varchar(32) | CHECK in (`maintenance`, `seo`, `ai_tools`, `automation`, `analytics`, `integrations`, `audit`, `other`) |
+| service | varchar(32) | current categorisation (admins may change it); CHECK in (`maintenance`, `seo`, `ai_tools`, `automation`, `analytics`, `integrations`, `audit`, `other`); indexed |
+| submitted_service | varchar(32) | what the visitor selected — never changed; same CHECK |
+| inquiry_type | varchar(16), default `contact` | CHECK in (`contact`, `quote`); indexed |
+| platform | varchar(32) null | quotes only: CHECK in (`shopify`, `woocommerce`, `custom`, `other`, `none`) |
+| budget_range | varchar(32) null | quotes only: CHECK in (`undisclosed`, `under_2500`, `2500_10000`, `10000_25000`, `over_25000`) — indicative, not a price |
+| timeline | varchar(32) null | quotes only: CHECK in (`asap`, `within_1_month`, `within_3_months`, `flexible`) |
+| website_url | varchar(300) null | quotes only, validated http(s) URL |
 | name, company | varchar(120), varchar(160) | |
 | email | varchar(254) | lower-case |
 | phone | varchar(40) null | optional |
@@ -67,12 +87,27 @@ Append-only activity log. `details` must never contain raw personal data.
 | --- | --- | --- |
 | id | bigint PK | |
 | created_at | timestamptz | indexed |
-| actor_id | uuid FK → admin_users (SET NULL) | |
+| actor_id | uuid FK → admin_users (SET NULL) | indexed |
 | actor_label | varchar(254) | admin e-mail, `website`, `cli`, `retention-job`, `anonymous` … |
-| action | varchar(64) | e.g. `lead.created`, `lead.status_changed`, `auth.login_failed`, `ai_action.approved` |
+| action | varchar(64) | indexed; see the action catalogue below |
 | entity_type, entity_id | varchar | composite index |
 | details | jsonb | e.g. `{"from":"NEW","to":"QUALIFIED"}` |
 | ip_hash | varchar(64) | |
+
+### Audit action catalogue
+
+| Action | Recorded when |
+| --- | --- |
+| `lead.created` | a contact or quote request is stored (`details.inquiry_type`) |
+| `lead.viewed` | an admin opens a lead (personal-data access; at most once per admin / lead / 15 min) |
+| `lead.status_changed`, `lead.service_changed` | pipeline or categorisation change (`from`, `to`) |
+| `lead.note_added`, `lead.deleted` | note added; GDPR erasure or retention deletion (`reason`) |
+| `auth.login`, `auth.logout`, `auth.logout_all` | session lifecycle |
+| `auth.login_failed`, `auth.account_locked`, `auth.login_blocked` | failed login (hash of e-mail only), lockout applied, attempt on a locked account |
+| `auth.session_idle_timeout` | session revoked for inactivity |
+| `retention.run` | an admin applied the retention policy (counts) |
+| `ai.lead_triage`, `ai_action.proposed/approved/rejected` | AI suggestion and approval workflow |
+| `admin.created`, `seed.synthetic_data`, `seed.synthetic_purged` | CLI operations |
 
 ## ai_action_requests
 
@@ -93,7 +128,7 @@ Append-only activity log. `details` must never contain raw personal data.
 
 | Data | Rule | Mechanism |
 | --- | --- | --- |
-| Leads + notes | deleted when `updated_at` older than `LEAD_RETENTION_DAYS` (default 730) | `python -m app.cli maintenance` |
+| Leads + notes | deleted when `updated_at` older than `LEAD_RETENTION_DAYS` (default 730) | `python -m app.cli maintenance`, or admin dashboard (`GET /api/admin/retention` preview, `POST /api/admin/retention/run` with confirmation) |
 | Audit log | deleted after `AUDIT_RETENTION_DAYS` (default 1095) | same command |
 | Sessions | removed after expiry / 1 day after revocation | same command |
 | Individual erasure request | admin deletes the lead in the UI (`DELETE /api/admin/leads/{id}`) | audit keeps only id + reason |
@@ -104,4 +139,6 @@ Append-only activity log. `details` must never contain raw personal data.
 
 * creates the bootstrap admin if `ADMIN_BOOTSTRAP_EMAIL` and `ADMIN_BOOTSTRAP_PASSWORD` are set;
 * when `SEED_SAMPLE_DATA=true` and not production: 7 synthetic leads (`@example.com`,
-  `[СИНТЕТИЧНИ ДАННИ]`, `source=synthetic_seed`) and one pending synthetic AI action. Idempotent.
+  `[СИНТЕТИЧНИ ДАННИ]`, `source=synthetic_seed`; three of them are quote requests) and one pending
+  synthetic AI action. Idempotent. Refused in production by configuration validation.
+* `python -m app.cli purge-synthetic` removes all synthetic leads and synthetic AI actions (real leads untouched).

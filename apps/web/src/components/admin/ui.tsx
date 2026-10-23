@@ -74,10 +74,19 @@ export function StatsSkeleton() {
   );
 }
 
-export function ErrorState({ message, onRetry }: { message: string; onRetry?: () => void }) {
+export function ErrorState({
+  message,
+  onRetry,
+  requestId,
+}: {
+  message: string;
+  onRetry?: () => void;
+  requestId?: string | null;
+}) {
   return (
     <Alert tone="error" role="alert" title="Данните не могат да бъдат заредени">
       <p>{message}</p>
+      {requestId && <p className="mt-1 font-mono text-xs opacity-80">Код за поддръжка: {requestId}</p>}
       {onRetry && (
         <Button variant="secondary" size="sm" icon="refresh" onClick={onRetry} className="mt-3">
           Опитай отново

@@ -8,14 +8,19 @@ import { AdminPageHeader } from "@/components/admin/AdminShell";
 import { EmptyState, ErrorState, LoadingState, Panel, StatusBadge } from "@/components/admin/ui";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClass, cx } from "@/components/ui/primitives";
-import { serviceLabels, statusLabels } from "@/lib/admin-labels";
+import { inquiryTypeLabels, serviceLabels, statusLabels } from "@/lib/admin-labels";
 import { LEAD_STATUSES, type LeadPage } from "@/lib/admin-types";
 import { formatDateTime } from "@/lib/format";
 import { routes } from "@/lib/routes";
 import { useAdminData } from "@/lib/use-admin-data";
 
 const PAGE_SIZE = 20;
-type FilterKey = "status" | "service" | "q" | "sort" | "page";
+type FilterKey = "status" | "service" | "inquiry_type" | "from" | "to" | "q" | "sort" | "page";
+
+/** Local calendar date (YYYY-MM-DD) → ISO instant at the start or end of that day in the browser's zone. */
+function dayBoundary(date: string, end: boolean): string {
+  return new Date(`${date}T${end ? "23:59:59.999" : "00:00:00"}`).toISOString();
+}
 
 export function LeadsTable() {
   const router = useRouter();
@@ -24,6 +29,9 @@ export function LeadsTable() {
 
   const status = searchParams.get("status") ?? "";
   const service = searchParams.get("service") ?? "";
+  const inquiryType = searchParams.get("inquiry_type") ?? "";
+  const from = searchParams.get("from") ?? "";
+  const to = searchParams.get("to") ?? "";
   const q = searchParams.get("q") ?? "";
   const sort = searchParams.get("sort") ?? "newest";
   const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
@@ -32,8 +40,11 @@ export function LeadsTable() {
   const query = new URLSearchParams({ page: String(page), page_size: String(PAGE_SIZE), sort });
   if (status) query.set("status", status);
   if (service) query.set("service", service);
+  if (inquiryType) query.set("inquiry_type", inquiryType);
+  if (from) query.set("created_from", dayBoundary(from, false));
+  if (to) query.set("created_to", dayBoundary(to, true));
   if (q) query.set("q", q);
-  const { data, error, loading, reload } = useAdminData<LeadPage>(`/api/admin/leads?${query.toString()}`);
+  const { data, error, errorId, loading, reload } = useAdminData<LeadPage>(`/api/admin/leads?${query.toString()}`);
 
   function setFilters(changes: Partial<Record<FilterKey, string>>) {
     const next = new URLSearchParams(searchParams.toString());
@@ -50,7 +61,7 @@ export function LeadsTable() {
     setFilters({ q: search.trim() });
   }
 
-  const filtered = Boolean(status || service || q);
+  const filtered = Boolean(status || service || inquiryType || from || to || q);
   const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
 
   return (
@@ -115,6 +126,43 @@ export function LeadsTable() {
             <option value="oldest">Най-стари</option>
           </select>
         </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+          <select
+            aria-label="Филтър по тип запитване"
+            className="field"
+            value={inquiryType}
+            onChange={(e) => setFilters({ inquiry_type: e.target.value })}
+          >
+            <option value="">Всички типове</option>
+            {Object.entries(inquiryTypeLabels).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <label className="flex items-center gap-2 text-sm text-slate-400">
+            <span className="shrink-0">От</span>
+            <input
+              type="date"
+              aria-label="Получени от дата"
+              className="field"
+              value={from}
+              max={to || undefined}
+              onChange={(e) => setFilters({ from: e.target.value })}
+            />
+          </label>
+          <label className="flex items-center gap-2 text-sm text-slate-400">
+            <span className="shrink-0">До</span>
+            <input
+              type="date"
+              aria-label="Получени до дата"
+              className="field"
+              value={to}
+              min={from || undefined}
+              onChange={(e) => setFilters({ to: e.target.value })}
+            />
+          </label>
+        </div>
         {filtered && (
           <button
             type="button"
@@ -129,7 +177,7 @@ export function LeadsTable() {
         )}
       </Panel>
 
-      {error && <ErrorState message={error} onRetry={reload} />}
+      {error && <ErrorState message={error} requestId={errorId} onRetry={reload} />}
       {loading && !data && (
         <Panel>
           <LoadingState rows={6} label="Зареждане на запитванията…" />
@@ -171,6 +219,9 @@ export function LeadsTable() {
                       </p>
                       <p className="font-mono text-[11px] text-slate-400">
                         #{lead.reference}
+                        {lead.inquiry_type === "quote" && (
+                          <span className="ml-2 rounded bg-violet-400/15 px-1.5 py-0.5 font-sans text-violet-200">оферта</span>
+                        )}
                         {lead.source === "synthetic_seed" && <span className="ml-2 text-amber-300/80">синтетичен</span>}
                       </p>
                     </td>

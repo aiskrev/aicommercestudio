@@ -1,8 +1,11 @@
 /**
- * Client-side validation for the contact form. Mirrors the server rules in
- * apps/api/app/schemas.py (LeadCreate) — the server remains the source of truth.
+ * Client-side validation for the contact / quote form. Mirrors the server rules in
+ * apps/api/app/schemas.py (LeadCreate, QuoteRequestCreate) — the server remains the source of truth.
  */
+export type InquiryKind = "contact" | "quote";
+
 export interface ContactValues {
+  inquiry_type: InquiryKind;
   service: string;
   name: string;
   company: string;
@@ -12,6 +15,11 @@ export interface ContactValues {
   privacy_acknowledged: boolean;
   marketing_consent: boolean;
   website: string;
+  // quote requests only
+  platform: string;
+  budget_range: string;
+  timeline: string;
+  website_url: string;
 }
 
 export type ContactField = keyof ContactValues;
@@ -26,6 +34,8 @@ export interface ValidationMessages {
   service: string;
   privacy: string;
   noLinks: string;
+  select: string;
+  url: string;
 }
 
 export const LIMITS = {
@@ -34,13 +44,22 @@ export const LIMITS = {
   email: { max: 254 },
   phone: { max: 40 },
   message: { min: 20, max: 5000 },
+  websiteUrl: { max: 300 },
+} as const;
+
+export const QUOTE_OPTIONS = {
+  platform: ["shopify", "woocommerce", "custom", "other", "none"],
+  budget_range: ["undisclosed", "under_2500", "2500_10000", "10000_25000", "over_25000"],
+  timeline: ["asap", "within_1_month", "within_3_months", "flexible"],
 } as const;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PHONE_RE = /^\+?[0-9 ()\-./]{6,40}$/;
 const LINK_RE = /https?:\/\/|www\.|<|>/i;
+const SITE_RE = /^(https?:\/\/)?[^\s/?#]+\.[^\s/?#]{2,}([/?#]\S*)?$/i;
 
-export const emptyContactValues = (service = ""): ContactValues => ({
+export const emptyContactValues = (service = "", inquiry_type: InquiryKind = "contact"): ContactValues => ({
+  inquiry_type,
   service,
   name: "",
   company: "",
@@ -50,6 +69,10 @@ export const emptyContactValues = (service = ""): ContactValues => ({
   privacy_acknowledged: false,
   marketing_consent: false,
   website: "",
+  platform: "",
+  budget_range: "",
+  timeline: "",
+  website_url: "",
 });
 
 function fill(template: string, n: number): string {
@@ -91,11 +114,19 @@ export function validateContact(
 
   if (!values.privacy_acknowledged) errors.privacy_acknowledged = m.privacy;
 
+  if (values.inquiry_type === "quote") {
+    for (const field of ["platform", "budget_range", "timeline"] as const) {
+      if (!(QUOTE_OPTIONS[field] as readonly string[]).includes(values[field])) errors[field] = m.select;
+    }
+    const site = values.website_url.trim();
+    if (site && (site.length > LIMITS.websiteUrl.max || !SITE_RE.test(site))) errors.website_url = m.url;
+  }
+
   return errors;
 }
 
 export function toPayload(values: ContactValues, formToken: string) {
-  return {
+  const base = {
     service: values.service,
     name: values.name.trim(),
     company: values.company.trim(),
@@ -107,4 +138,17 @@ export function toPayload(values: ContactValues, formToken: string) {
     website: values.website,
     form_token: formToken,
   };
+  if (values.inquiry_type !== "quote") return base;
+  // The quote endpoint accepts the structured project fields; the contact endpoint rejects them.
+  return {
+    ...base,
+    platform: values.platform,
+    budget_range: values.budget_range,
+    timeline: values.timeline,
+    website_url: values.website_url.trim() || null,
+  };
+}
+
+export function submissionEndpoint(values: ContactValues): string {
+  return values.inquiry_type === "quote" ? "/api/public/quote-requests" : "/api/public/leads";
 }

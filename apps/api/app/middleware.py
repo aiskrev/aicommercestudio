@@ -13,6 +13,7 @@ from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.config import Settings
+from app.errors import error_body
 from app.logging_config import request_id_ctx
 
 logger = logging.getLogger("app.request")
@@ -31,9 +32,10 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         incoming = request.headers.get("x-request-id", "")
         request_id = incoming if 8 <= len(incoming) <= 64 and incoming.isalnum() else uuid.uuid4().hex
         token = request_id_ctx.set(request_id)
+        request.state.request_id = request_id
         started = time.perf_counter()
         try:
-            rejection = self._check_origin(request)
+            rejection = self._check_origin(request, request_id)
             response = rejection or await call_next(request)
         finally:
             request_id_ctx.reset(token)
@@ -63,7 +65,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         )
         return response
 
-    def _check_origin(self, request: Request) -> Response | None:
+    def _check_origin(self, request: Request, request_id: str) -> Response | None:
         """Reject cross-site state-changing requests (defence in depth on top of CSRF tokens)."""
         if request.method not in UNSAFE_METHODS or not request.url.path.startswith("/api/"):
             return None
@@ -78,7 +80,10 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         if origin_host and origin_host in {forwarded_host, request.headers.get("host")}:
             return None
         logger.warning("origin_rejected", extra={"origin": origin[:100], "path": request.url.path})
-        return JSONResponse(status_code=403, content={"detail": "Заявката е отхвърлена (невалиден произход)."})
+        return JSONResponse(
+            status_code=403,
+            content=error_body(403, "Заявката е отхвърлена (невалиден произход).", "origin_rejected", request_id),
+        )
 
 
 class _BodyTooLarge(Exception):
@@ -127,5 +132,6 @@ class BodySizeLimitMiddleware:
 
     @staticmethod
     async def _reject(scope: Scope, receive: Receive, send: Send) -> None:
-        response = JSONResponse(status_code=413, content={"detail": "Заявката е твърде голяма."})
+        body = error_body(413, "Заявката е твърде голяма.", "payload_too_large")
+        response = JSONResponse(status_code=413, content=body)
         await response(scope, receive, send)

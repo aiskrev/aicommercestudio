@@ -19,8 +19,14 @@ export const routes = {
   adminLead: (id: string) => `/admin/leads/${id}`,
   adminActivity: "/admin/activity",
   adminAiActions: "/admin/ai",
+  adminAccount: "/admin/account",
 } as const;
 
 export function contactWithService(serviceKey: string): string {
   return `${routes.contact}?usluga=${encodeURIComponent(serviceKey)}`;
+}
+
+/** Contact page opened as a quote request for the given service. */
+export function quoteWithService(serviceKey: string): string {
+  return `${contactWithService(serviceKey)}&tip=oferta`;
 }

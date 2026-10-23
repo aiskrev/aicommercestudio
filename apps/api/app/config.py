@@ -27,6 +27,11 @@ class Settings(BaseSettings):
     session_cookie_name: str = "acs_session"
     csrf_cookie_name: str = "acs_csrf"
     session_ttl_hours: int = Field(default=8, ge=1, le=72)
+    # Sessions without activity for this long are revoked (absolute TTL still applies).
+    session_idle_minutes: int = Field(default=60, ge=5, le=24 * 60)
+    # Persistent account lockout after consecutive failed logins.
+    login_lockout_threshold: int = Field(default=5, ge=3, le=50)
+    login_lockout_minutes: int = Field(default=15, ge=1, le=24 * 60)
     trust_proxy_headers: bool = True
     enable_api_docs: bool | None = None
     max_request_body_bytes: int = 64 * 1024

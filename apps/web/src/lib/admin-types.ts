@@ -2,6 +2,7 @@
 
 export const LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "PROPOSAL", "WON", "LOST"] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
+export type InquiryType = "contact" | "quote";
 
 export interface AdminUser {
   id: string;
@@ -24,6 +25,7 @@ export interface LeadSummary {
   email: string;
   status: LeadStatus;
   source: string;
+  inquiry_type: InquiryType;
   created_at: string;
   updated_at: string;
 }
@@ -43,6 +45,11 @@ export interface LeadDetail extends LeadSummary {
   marketing_consent: boolean;
   marketing_consent_at: string | null;
   status_changed_at: string | null;
+  submitted_service: string;
+  platform: string | null;
+  budget_range: string | null;
+  timeline: string | null;
+  website_url: string | null;
   notes: LeadNote[];
 }
 
@@ -73,6 +80,7 @@ export interface DashboardStats {
   lost: number;
   by_status: Record<LeadStatus, number>;
   by_service: Record<string, number>;
+  by_inquiry_type: Record<InquiryType, number>;
   pending_ai_actions: number;
   recent_activity: AuditEntry[];
 }
@@ -108,4 +116,29 @@ export interface AIAction {
   decided_at: string | null;
   decision_comment: string | null;
   decided_by_name: string | null;
+}
+
+export interface AuditPage {
+  items: AuditEntry[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface RetentionPreview {
+  lead_retention_days: number;
+  audit_retention_days: number;
+  leads_due: number;
+  audit_entries_due: number;
+  lead_cutoff: string;
+  audit_cutoff: string;
+}
+
+export interface AdminSessionInfo {
+  id: string;
+  created_at: string;
+  last_seen_at: string;
+  expires_at: string;
+  user_agent: string | null;
+  current: boolean;
 }

@@ -5,7 +5,7 @@
 | Asset | Threats | Main controls |
 | --- | --- | --- |
 | Lead data (personal data) | unauthorised access, leaks via public API, excessive retention | no public read endpoint; admin-only API with server-side sessions; retention job; minimal fields; IP stored only as keyed hash |
-| Admin accounts | credential stuffing, brute force, session theft, CSRF | Argon2id; per-IP + per-e-mail login rate limits; generic errors; HttpOnly SameSite cookies; hashed session tokens; CSRF double submit; Origin check; 8 h expiry; logout revocation |
+| Admin accounts | credential stuffing, brute force, session theft, CSRF | Argon2id; per-IP + per-e-mail rate limits; **persistent account lockout** (survives restarts; unknown e-mails behave identically); generic errors; HttpOnly SameSite cookies; hashed session tokens; CSRF double submit; Origin check; 8 h absolute + 60 min idle expiry; logout and **logout-all**; session list |
 | Contact form | spam, bots, floods, oversized payloads | signed timing token, honeypot, link heuristic, per-client and global rate limits, 64 KB body limit, strict schema (`extra=forbid`) |
 | Database | SQL injection | SQLAlchemy parameter binding everywhere; LIKE wildcards escaped; tested with injection payloads |
 | Browser | XSS, clickjacking, mixed content | React escaping; JSON-LD `<` escaped; CSP (`default-src 'self'`, `frame-ancestors 'none'`, `object-src 'none'`); `X-Frame-Options: DENY`; `nosniff`; HSTS at the proxy/API in production |
@@ -30,7 +30,7 @@ taken from `X-Forwarded-For` (right-most entry), which Caddy overwrites with the
 expose the web container directly to the internet** — without the proxy, clients can choose their own
 `X-Forwarded-For` value (the global contact limit still caps abuse).
 
-**Logging & audit** — JSON logs with request IDs, no request bodies, no personal data. `audit_logs`
+**Logging & audit** — JSON logs with request IDs (returned to clients in every error as `request_id`), no request bodies, no personal data. Access to a lead's personal data is audited (`lead.viewed`). `audit_logs`
 records logins (successful/failed — failed attempts store only a hash of the e-mail), lead creation,
 status changes, notes, deletions, AI triage and AI action decisions.
 

@@ -3,6 +3,7 @@
     python -m app.cli seed                      # bootstrap admin (+ synthetic demo data in development)
     python -m app.cli create-admin --email x@y  # password read from ADMIN_PASSWORD env or prompted
     python -m app.cli maintenance [--dry-run]   # GDPR retention + expired session cleanup
+    python -m app.cli purge-synthetic           # remove synthetic development data
 """
 
 from __future__ import annotations
@@ -69,7 +70,17 @@ def seed_synthetic_data(db: Session, admin: AdminUser | None) -> int:
     for index, (service, name, company, status, days_ago, message) in enumerate(_SYNTHETIC_LEADS, start=1):
         moment = now - timedelta(days=days_ago, hours=index)
         lead = Lead(
-            service=service, name=name, company=company,
+            service=service, submitted_service=service, name=name, company=company,
+            **(
+                {
+                    "inquiry_type": "quote",
+                    "platform": "woocommerce",
+                    "budget_range": "undisclosed",
+                    "timeline": "flexible",
+                }
+                if index % 2 == 0
+                else {}
+            ),
             email=f"demo.lead{index}@example.com", phone=None,
             message=f"[СИНТЕТИЧНИ ДАННИ] {message}",
             status=status.value, source=SYNTHETIC_SOURCE,
@@ -137,6 +148,14 @@ def cmd_create_admin(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_purge_synthetic(_: argparse.Namespace) -> int:
+    settings = get_settings()
+    with get_sessionmaker()() as db:
+        removed = leads.purge_synthetic(db, SYNTHETIC_SOURCE)
+    _print(f"[purge-synthetic] Removed synthetic leads: {removed} (environment: {settings.app_env})")
+    return 0
+
+
 def cmd_maintenance(args: argparse.Namespace) -> int:
     settings = get_settings()
     with get_sessionmaker()() as db:
@@ -171,6 +190,9 @@ def main(argv: list[str] | None = None) -> int:
     maint = sub.add_parser("maintenance", help="Apply retention policy and remove expired sessions")
     maint.add_argument("--dry-run", action="store_true")
     maint.set_defaults(func=cmd_maintenance)
+    sub.add_parser(
+        "purge-synthetic", help="Delete all synthetic development leads (source=synthetic_seed)"
+    ).set_defaults(func=cmd_purge_synthetic)
     args = parser.parse_args(argv)
     return args.func(args)
 

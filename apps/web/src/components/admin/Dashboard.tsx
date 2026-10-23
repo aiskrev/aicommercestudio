@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { AdminPageHeader } from "@/components/admin/AdminShell";
 import { ActivityList } from "@/components/admin/ActivityList";
+import { RetentionPanel } from "@/components/admin/RetentionPanel";
 import { EmptyState, ErrorState, LoadingState, Panel, StatCard, StatsSkeleton } from "@/components/admin/ui";
 import { Icon } from "@/components/ui/Icon";
 import { cx } from "@/components/ui/primitives";
@@ -20,10 +21,11 @@ export function Dashboard() {
     <>
       <AdminPageHeader title="Табло" description="Обобщение въз основа на реалните данни в базата." />
       {stats.loading && !stats.data && <StatsSkeleton />}
-      {stats.error && <ErrorState message={stats.error} onRetry={stats.reload} />}
+      {stats.error && <ErrorState message={stats.error} requestId={stats.errorId} onRetry={stats.reload} />}
       {stats.data && <StatsView stats={stats.data} />}
 
-      <div className="mt-6">
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_1.4fr]">
+        <RetentionPanel />
         <Panel title="Състояние на системата">
           {system.loading && !system.data && <LoadingState />}
           {system.error && <ErrorState message={system.error} onRetry={system.reload} />}
@@ -68,7 +70,12 @@ function StatsView({ stats }: { stats: DashboardStats }) {
   return (
     <div className="grid gap-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Общо запитвания" value={stats.total_leads} icon="inbox" hint={`${stats.leads_last_30_days} за последните 30 дни`} />
+        <StatCard
+          label="Общо запитвания"
+          value={stats.total_leads}
+          icon="inbox"
+          hint={`${stats.by_inquiry_type.quote ?? 0} ${(stats.by_inquiry_type.quote ?? 0) === 1 ? "заявка" : "заявки"} за оферта · ${stats.leads_last_30_days} за 30 дни`}
+        />
         <StatCard label="Нови (необработени)" value={stats.new_leads} icon="alert" hint={`${stats.leads_last_7_days} за последните 7 дни`} />
         <StatCard label="Активни в процес" value={stats.open_pipeline} icon="workflow" hint="Нови, контакт, квалифицирани, оферта" />
         <StatCard label="AI действия за одобрение" value={stats.pending_ai_actions} icon="bot" hint={`Спечелени: ${stats.won} · Загубени: ${stats.lost}`} />

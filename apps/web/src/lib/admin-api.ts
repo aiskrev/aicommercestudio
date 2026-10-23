@@ -3,11 +3,14 @@
 import { routes } from "@/lib/routes";
 import { site } from "@/lib/site";
 
+/** Error from the admin API, carrying the server's machine-readable `code` and `requestId`. */
 export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
     public fieldErrors: Record<string, string> = {},
+    public code: string = "error",
+    public requestId: string | null = null,
   ) {
     super(message);
   }
@@ -33,7 +36,7 @@ export async function adminFetch<T>(path: string, init: RequestInit = {}): Promi
   try {
     response = await fetch(path, { ...init, method, headers, credentials: "same-origin", cache: "no-store" });
   } catch {
-    throw new ApiError(0, "Няма връзка със сървъра.");
+    throw new ApiError(0, "Няма връзка със сървъра.", {}, "network_error");
   }
 
   if (response.status === 401 && !path.endsWith("/auth/login")) {
@@ -41,17 +44,30 @@ export async function adminFetch<T>(path: string, init: RequestInit = {}): Promi
     // A full page load is intentional: it discards all client state of the expired session.
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign(`${routes.adminLogin}?next=${next}`);
-    throw new ApiError(401, "Сесията е изтекла.");
+    throw new ApiError(401, "Сесията е изтекла.", {}, "unauthorized");
   }
   if (response.status === 204) return undefined as T;
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
+    const body = data as {
+      detail?: unknown;
+      code?: string;
+      request_id?: string | null;
+      errors?: { field: string | null; message: string }[];
+    };
     const fieldErrors: Record<string, string> = {};
-    for (const error of (data as { errors?: { field: string | null; message: string }[] }).errors ?? []) {
+    for (const error of body.errors ?? []) {
       if (error.field) fieldErrors[error.field] = error.message;
     }
-    throw new ApiError(response.status, (data as { detail?: string }).detail ?? "Възникна грешка.", fieldErrors);
+    const message = typeof body.detail === "string" ? body.detail : "Възникна грешка.";
+    throw new ApiError(
+      response.status,
+      message,
+      fieldErrors,
+      body.code ?? "error",
+      body.request_id ?? response.headers.get("x-request-id"),
+    );
   }
   return data as T;
 }

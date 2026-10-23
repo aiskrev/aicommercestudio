@@ -8,6 +8,7 @@ interface State<T> {
   path: string | null;
   data?: T;
   error?: string;
+  errorId?: string | null;
   version: number;
 }
 
@@ -28,6 +29,7 @@ export function useAdminData<T>(path: string | null) {
           data: current.data,
           version,
           error: error instanceof ApiError ? error.message : "Възникна неочаквана грешка.",
+          errorId: error instanceof ApiError ? error.requestId : null,
         })),
     );
     return () => {
@@ -39,5 +41,12 @@ export function useAdminData<T>(path: string | null) {
   const replace = useCallback((data: T) => setState((current) => ({ ...current, data, error: undefined })), []);
 
   const loading = state.path !== path || state.version !== version;
-  return { data: state.data, error: loading ? undefined : state.error, loading, reload, replace };
+  return {
+    data: state.data,
+    error: loading ? undefined : state.error,
+    errorId: loading ? undefined : state.errorId,
+    loading,
+    reload,
+    replace,
+  };
 }

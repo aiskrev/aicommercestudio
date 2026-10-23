@@ -27,6 +27,28 @@ test.describe("contact form", () => {
     expect(fields).toEqual(expect.arrayContaining(["name", "email", "message", "privacy_acknowledged", "company"]));
   });
 
+  test("quote request form collects structured project data", async ({ page }) => {
+    await page.goto("/kontakti?usluga=ai_tools&tip=oferta");
+    await expect(page.getByRole("radio", { name: /Заявка за оферта/ })).toBeChecked();
+    await expect(page.getByTestId("quote-fields")).toBeVisible();
+
+    await page.getByLabel(/Име и фамилия/).fill("E2E Оферта");
+    await page.getByLabel(/^Фирма/).fill(`E2E Оферта ${Date.now()}`);
+    await page.getByLabel(/Служебен имейл/).fill("e2e.quote@example.com");
+    await page.getByLabel(/Платформа/).selectOption("woocommerce");
+    await page.getByLabel(/Ориентировъчен бюджет/).selectOption("undisclosed");
+    await page.getByLabel(/Желан срок/).selectOption("within_3_months");
+    await page.getByLabel(/Адрес на сайта/).fill("example-shop.bg");
+    await page.getByLabel(/Описание на проекта/).fill("Автоматизиран E2E тест: искаме оферта за AI асистент.");
+    await page.getByRole("checkbox", { name: /информацията за поверителност/ }).check();
+    await page.waitForTimeout(3500);
+
+    const response = page.waitForResponse((r) => r.url().endsWith("/api/public/quote-requests"));
+    await page.getByRole("button", { name: "Изпрати запитването" }).click();
+    expect((await response).status()).toBe(201);
+    await expect(page.getByTestId("contact-success")).toContainText(/Референтен номер: [0-9A-F]{8}/);
+  });
+
   test("valid submission is stored and confirmed with a reference", async ({ page }) => {
     await page.goto("/kontakti?usluga=automation");
     await expect(page.getByLabel(/Услуга/)).toHaveValue("automation");

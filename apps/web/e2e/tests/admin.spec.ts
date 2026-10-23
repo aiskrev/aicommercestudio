@@ -30,9 +30,13 @@ test.describe("admin access control", () => {
   });
 
   test("admin API rejects anonymous requests", async ({ request }) => {
-    for (const path of ["/api/admin/leads", "/api/admin/dashboard/stats", "/api/admin/audit"]) {
-      expect((await request.get(path)).status(), path).toBe(401);
+    for (const path of ["/api/admin/leads", "/api/admin/dashboard/stats", "/api/admin/audit", "/api/admin/auth/sessions"]) {
+      const response = await request.get(path);
+      expect(response.status(), path).toBe(401);
+      expect((await response.json()).code).toBe("unauthorized");
     }
+    expect((await request.post("/api/admin/retention/run", { data: { confirm: true } })).status()).toBe(401);
+    expect((await request.patch("/api/admin/leads/00000000-0000-0000-0000-000000000000", { data: { status: "WON" } })).status()).toBe(401);
   });
 
   test("wrong credentials are rejected", async ({ page }) => {
@@ -87,6 +91,17 @@ test.describe("admin lead management", () => {
 
     await page.getByRole("button", { name: "Анализирай" }).click();
     await expect(page.getByTestId("ai-triage")).toContainText("mock");
+
+    // The status change is recorded in the audit log with the administrator as actor.
+    const leadId = page.url().split("/").pop()!;
+    await page.goto(`/admin/activity?action=lead.status_changed&entity=${leadId}`);
+    const log = page.getByTestId("activity-list");
+    await expect(log).toContainText("Промяна на статус");
+    await expect(log).toContainText(email.toLowerCase());
+    await expect(log).toContainText("Ново → Осъществен контакт");
+    // Viewing the lead's personal data was audited as well.
+    await page.goto(`/admin/activity?action=lead.viewed&entity=${leadId}`);
+    await expect(page.getByTestId("activity-list")).toContainText("Преглед на лични данни");
 
     await page.getByRole("button", { name: "Изход" }).last().click();
     await expect(page).toHaveURL(/\/admin\/login/);

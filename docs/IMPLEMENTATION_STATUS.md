@@ -19,6 +19,61 @@ images `python:3.13-slim`, `node:24-alpine`, `postgres:17-alpine`, `mcr.microsof
 | Stack health | `docker compose ps` | db, api, web **healthy** |
 | Manual browser check | in-app browser at 1024 px and 375 px | home, service, contact, admin login/dashboard/leads/detail rendered; issues found were fixed (see below) |
 
+## Backend & admin production hardening (third iteration)
+
+| # | Requirement | Implementation | Verified by |
+| --- | --- | --- | --- |
+| 1 | Persistent leads | PostgreSQL `leads` (+ notes, audit) | pytest (real PostgreSQL), demo SQL output |
+| 2 | Alembic migrations | `0001` + `0002`; live dev DB upgraded `0001 → 0002` with 22 existing rows backfilled | `alembic check`, round trip, data-migration test, container log |
+| 3 | Contact **and** quote API | `POST /api/public/leads`, `POST /api/public/quote-requests` (platform, budget, timeline, URL) | 13 quote/contact validation tests, e2e quote journey |
+| 4 | Secure login/logout | Argon2id, generic errors, **persistent lockout** (5 failures → 15 min), logout, **logout-all** | lockout persistence + unknown-account parity tests |
+| 5 | HTTP-only sessions | hashed opaque tokens, HttpOnly/SameSite cookies (Secure in prod), absolute TTL + **idle timeout**, session list | cookie flag, idle-revocation, logout-all tests |
+| 6 | Protected routes | `require_admin` on every admin route; Next.js proxy + server-side layout check | 18 parametrised anonymous-401 cases, e2e |
+| 7 | Dashboard filters/search | status, service, **inquiry type**, **date range**, text search, sort, pagination | API filter tests, e2e search |
+| 8 | Pipeline | NEW→CONTACTED→QUALIFIED→PROPOSAL→WON/LOST, row lock + **`expected_status` (409)** | concurrency test, demo step 7 |
+| 9 | Notes & history | notes + per-lead audit history in the UI | tests, e2e |
+| 10 | Service categorisation | `service` (re-categorisable, audited) vs immutable `submitted_service`; AI suggestion can be applied with one click | re-categorisation test |
+| 11 | Audit log | 20 action types incl. **`lead.viewed`** (personal-data access); filterable + paginated `GET /api/admin/audit`; activity page filters | audit search tests, e2e audit check |
+| 12 | Configurable retention | `LEAD_RETENTION_DAYS`, `AUDIT_RETENTION_DAYS`; CLI + **admin preview / confirmed run** (audited) | retention API tests |
+| 13 | Safe seeding | synthetic data only outside production; **`purge-synthetic`** | seed/purge tests |
+| 14 | API errors + UI handling | uniform envelope `detail` / `code` / `request_id`; admin UI shows a support code, handles 409 with reload | error-code tests, unit tests |
+| 15 | Rate limiting, anti-spam, authz tests | per-client + global limits, honeypot, signed timing token, link heuristic, CSRF, origin check | 40 new tests incl. negative authorization |
+| 16 | Environment configuration | new: `SESSION_IDLE_MINUTES`, `LOGIN_LOCKOUT_THRESHOLD`, `LOGIN_LOCKOUT_MINUTES`; production validation | config tests |
+| 17 | API + schema docs | `API_REFERENCE.md` (incl. error catalogue), generated `openapi.json`, `DATABASE_SCHEMA.md` (migrations, audit catalogue) | — |
+
+Executed results: **pytest 161 passed**, ruff clean, **Vitest 55 passed**, tsc/ESLint clean,
+**Playwright 19 passed** (incl. quote request and audit-event check in the UI).
+
+### Demonstrated path (`.\scripts\demo-lead-flow.ps1`, executed against the running stack)
+
+```
+▶ 1. Visitor: invalid submission is rejected by server-side validation
+  ✔ 422 validation_error: name, company, email, message, privacy_acknowledged
+▶ 2. Visitor: valid submission (anti-bot timing token + 3.5 s like a human)
+  ✔ 201 received, reference 637CD2CA
+▶ 3. PostgreSQL: the lead is persisted
+ reference | status |  service   | inquiry_type |        company
+ 637CD2CA  | NEW    | automation | contact      | Демо Поток 132145 ООД
+▶ 4. Admin API is closed to anonymous users
+  ✔ 401 unauthorized
+▶ 5. Admin logs in (HTTP-only session cookie + CSRF token)
+  ✔ logged in as admin@example.com; session cookie HttpOnly=True
+▶ 6. Admin finds and views the lead
+  ✔ found 1 lead: #637CD2CA · Демо Поток 132145 ООД · status NEW
+▶ 7. Admin changes the status — without CSRF token it is refused
+  ✔ 403 csrf_failed
+  ✔ 200 status is now QUALIFIED
+  ✔ stale concurrent update rejected: 409 status_conflict
+▶ 9. PostgreSQL: lead status and audit events
+  status QUALIFIED | status_changed t
+  63 | lead.created        | website           | {"source": "website_contact_form", "service": "automation", ...}
+  65 | lead.viewed         | admin@example.com | {}
+  66 | lead.status_changed | admin@example.com | {"to": "QUALIFIED", "from": "NEW"}
+```
+
+No real e-mail sending, payments or customer-data transfers were added; SMTP and the Anthropic provider
+remain disabled unless explicitly configured.
+
 ## UI/UX redesign (2026-10-23, second iteration)
 
 Design system, header/navigation, homepage, service pages, process diagrams, FAQ, CTAs, contact-form

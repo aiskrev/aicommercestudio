@@ -9,8 +9,10 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import Settings, get_settings
+from app.errors import error_body
 from app.logging_config import configure_logging
 from app.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
 from app.routers import admin, admin_auth, health, public
@@ -74,20 +76,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.add_middleware(RequestContextMiddleware, settings=settings)
     app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_body_bytes)
 
+    def _request_id(request: Request) -> str | None:
+        return getattr(request.state, "request_id", None)
+
+    @app.exception_handler(StarletteHTTPException)
+    async def _http_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+        body = error_body(exc.status_code, exc.detail, getattr(exc, "code", None), _request_id(request))
+        return JSONResponse(status_code=exc.status_code, content=body, headers=getattr(exc, "headers", None))
+
     @app.exception_handler(RequestValidationError)
-    async def _validation_handler(_: Request, exc: RequestValidationError) -> JSONResponse:
-        return JSONResponse(
-            status_code=422,
-            content={
-                "detail": "Моля, коригирайте маркираните полета.",
-                "errors": [_translate_error(e) for e in exc.errors()],
-            },
-        )
+    async def _validation_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+        body = error_body(422, "Моля, коригирайте маркираните полета.", "validation_error", _request_id(request))
+        body["errors"] = [_translate_error(e) for e in exc.errors()]
+        return JSONResponse(status_code=422, content=body)
 
     @app.exception_handler(Exception)
-    async def _unhandled_handler(_: Request, exc: Exception) -> JSONResponse:
+    async def _unhandled_handler(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("unhandled_error", exc_info=exc)
-        return JSONResponse(status_code=500, content={"detail": "Възникна вътрешна грешка. Моля, опитайте отново."})
+        message = "Възникна вътрешна грешка. Моля, опитайте отново."
+        body = error_body(500, message, "internal_error", _request_id(request))
+        return JSONResponse(status_code=500, content=body)
 
     app.include_router(health.router)
     app.include_router(public.router)

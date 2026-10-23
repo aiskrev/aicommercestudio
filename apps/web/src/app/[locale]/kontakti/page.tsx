@@ -33,6 +33,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
   const formProps = {
     labels: dict.form,
     messages: dict.validation,
+    inquiry: dict.inquiry,
     services: [
       ...services.map((s) => ({ value: s.key, label: s.shortTitle })),
       { value: "other", label: dict.form.serviceOther },

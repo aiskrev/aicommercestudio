@@ -11,7 +11,10 @@ import {
   type ContactField,
   type ContactValues,
   emptyContactValues,
+  type InquiryKind,
   LIMITS,
+  QUOTE_OPTIONS,
+  submissionEndpoint,
   toPayload,
   validateContact,
 } from "@/lib/contact-validation";
@@ -25,20 +28,43 @@ export interface ServiceOption {
 interface Props {
   labels: Dictionary["form"];
   messages: Dictionary["validation"];
+  inquiry: Dictionary["inquiry"];
   services: ServiceOption[];
   initialService?: string;
+  initialInquiry?: InquiryKind;
   privacyHref: string;
   nextSteps?: string[];
 }
 
 type Status = "idle" | "submitting" | "success";
 
-const FIELD_ORDER: ContactField[] = ["service", "name", "company", "email", "phone", "message", "privacy_acknowledged"];
+const FIELD_ORDER: ContactField[] = [
+  "service",
+  "name",
+  "company",
+  "email",
+  "phone",
+  "platform",
+  "budget_range",
+  "timeline",
+  "website_url",
+  "message",
+  "privacy_acknowledged",
+];
 
-export function ContactForm({ labels, messages, services, initialService = "", privacyHref, nextSteps }: Props) {
+export function ContactForm({
+  labels,
+  messages,
+  inquiry,
+  services,
+  initialService = "",
+  initialInquiry = "contact",
+  privacyHref,
+  nextSteps,
+}: Props) {
   const allowed = services.map((s) => s.value);
   const [values, setValues] = useState<ContactValues>(() =>
-    emptyContactValues(allowed.includes(initialService) ? initialService : ""),
+    emptyContactValues(allowed.includes(initialService) ? initialService : "", initialInquiry),
   );
   const [errors, setErrors] = useState<ContactErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -87,7 +113,7 @@ export function ContactForm({ labels, messages, services, initialService = "", p
     }
 
     setStatus("submitting");
-    const result = await submitLead(toPayload(values, token));
+    const result = await submitLead(toPayload(values, token), submissionEndpoint(values));
     if (result.ok) {
       setReference(result.reference);
       setStatus("success");
@@ -110,7 +136,7 @@ export function ContactForm({ labels, messages, services, initialService = "", p
   }
 
   function reset() {
-    setValues(emptyContactValues());
+    setValues((current) => emptyContactValues("", current.inquiry_type));
     setErrors({});
     setFormError(null);
     setReference("");
@@ -176,6 +202,36 @@ export function ContactForm({ labels, messages, services, initialService = "", p
           </Alert>
         )}
       </div>
+
+      <fieldset>
+        <legend className="mb-2 block text-sm font-medium text-slate-200">{inquiry.legend}</legend>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {(["contact", "quote"] as const).map((kind) => (
+            <label
+              key={kind}
+              className={cx(
+                "flex cursor-pointer gap-3 rounded-xl border p-4 transition-colors",
+                values.inquiry_type === kind
+                  ? "border-cyan-400/60 bg-cyan-400/[0.07]"
+                  : "border-white/[0.12] hover:border-white/25",
+              )}
+            >
+              <input
+                type="radio"
+                name="inquiry_type"
+                value={kind}
+                checked={values.inquiry_type === kind}
+                onChange={() => update("inquiry_type", kind)}
+                className="checkbox mt-0.5"
+              />
+              <span>
+                <span className="block text-sm font-semibold text-white">{inquiry.types[kind].label}</span>
+                <span className="block text-xs text-slate-400">{inquiry.types[kind].hint}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       <Field id="service" label={labels.service} required requiredLabel={labels.required} error={errors.service}>
         <div className="relative">
@@ -263,6 +319,61 @@ export function ContactForm({ labels, messages, services, initialService = "", p
           />
         </Field>
       </div>
+
+      {values.inquiry_type === "quote" && (
+        <div className="grid gap-6 rounded-2xl border border-white/[0.08] bg-ink-950/40 p-4 sm:p-5" data-testid="quote-fields">
+          <div className="grid gap-6 sm:grid-cols-3">
+            {(
+              [
+                ["platform", inquiry.platform, inquiry.platformPlaceholder, inquiry.platforms],
+                ["budget_range", inquiry.budget, inquiry.budgetPlaceholder, inquiry.budgets],
+                ["timeline", inquiry.timeline, inquiry.timelinePlaceholder, inquiry.timelines],
+              ] as const
+            ).map(([field, label, placeholder, options]) => (
+              <Field key={field} id={field} label={label} required requiredLabel={labels.required} error={errors[field]}>
+                <div className="relative">
+                  <select
+                    id={`contact-${field}`}
+                    name={field}
+                    className="field"
+                    value={values[field]}
+                    aria-invalid={Boolean(errors[field])}
+                    aria-describedby={describedBy(field)}
+                    onChange={(e) => update(field, e.target.value)}
+                  >
+                    <option value="">{placeholder}</option>
+                    {QUOTE_OPTIONS[field].map((value) => (
+                      <option key={value} value={value}>
+                        {(options as Record<string, string>)[value]}
+                      </option>
+                    ))}
+                  </select>
+                  <Icon
+                    name="chevronDown"
+                    className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                  />
+                </div>
+              </Field>
+            ))}
+          </div>
+          <Field id="website_url" label={`${inquiry.website} (${labels.optional})`} error={errors.website_url} hint={inquiry.websiteHint}>
+            <input
+              id="contact-website_url"
+              name="website_url"
+              type="url"
+              inputMode="url"
+              className="field"
+              autoComplete="url"
+              maxLength={LIMITS.websiteUrl.max}
+              value={values.website_url}
+              aria-invalid={Boolean(errors.website_url)}
+              aria-describedby={describedBy("website_url", errors.website_url ? undefined : "contact-website_url-hint")}
+              onChange={(e) => update("website_url", e.target.value)}
+            />
+          </Field>
+          <p className="text-xs text-slate-400">{inquiry.budgetNote}</p>
+        </div>
+      )}
 
       <Field
         id="message"

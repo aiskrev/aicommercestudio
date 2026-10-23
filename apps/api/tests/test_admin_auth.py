@@ -10,6 +10,10 @@ from tests.conftest import ADMIN_EMAIL, ADMIN_PASSWORD
 PROTECTED = [
     ("get", "/api/admin/auth/me"),
     ("post", "/api/admin/auth/logout"),
+    ("post", "/api/admin/auth/logout-all"),
+    ("get", "/api/admin/auth/sessions"),
+    ("get", "/api/admin/retention"),
+    ("post", "/api/admin/retention/run"),
     ("get", "/api/admin/dashboard/stats"),
     ("get", "/api/admin/audit"),
     ("get", "/api/admin/system/status"),

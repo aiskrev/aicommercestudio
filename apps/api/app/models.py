@@ -15,9 +15,11 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    Integer,
     String,
     Text,
     Uuid,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -49,6 +51,34 @@ class ServiceKey(enum.StrEnum):
     OTHER = "other"
 
 
+class InquiryType(enum.StrEnum):
+    CONTACT = "contact"
+    QUOTE = "quote"
+
+
+class Platform(enum.StrEnum):
+    SHOPIFY = "shopify"
+    WOOCOMMERCE = "woocommerce"
+    CUSTOM = "custom"
+    OTHER = "other"
+    NONE = "none"
+
+
+class BudgetRange(enum.StrEnum):
+    UNDISCLOSED = "undisclosed"
+    UNDER_2500 = "under_2500"
+    FROM_2500_TO_10000 = "2500_10000"
+    FROM_10000_TO_25000 = "10000_25000"
+    OVER_25000 = "over_25000"
+
+
+class Timeline(enum.StrEnum):
+    ASAP = "asap"
+    WITHIN_1_MONTH = "within_1_month"
+    WITHIN_3_MONTHS = "within_3_months"
+    FLEXIBLE = "flexible"
+
+
 class AIActionStatus(enum.StrEnum):
     PENDING = "PENDING"
     APPROVED = "APPROVED"
@@ -56,9 +86,10 @@ class AIActionStatus(enum.StrEnum):
     EXECUTED = "EXECUTED"
 
 
-def _in_check(column: str, values: type[enum.StrEnum]) -> str:
+def _in_check(column: str, values: type[enum.StrEnum], nullable: bool = False) -> str:
     joined = ", ".join(f"'{v.value}'" for v in values)
-    return f"{column} IN ({joined})"
+    check = f"{column} IN ({joined})"
+    return f"{column} IS NULL OR {check}" if nullable else check
 
 
 TZDateTime = DateTime(timezone=True)
@@ -74,6 +105,9 @@ class AdminUser(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
     last_login_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    # Persistent brute-force protection (survives API restarts, unlike the in-memory limiter).
+    failed_login_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default=text("0"))
+    locked_until: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
 
 
 class AdminSession(Base):
@@ -102,13 +136,30 @@ class Lead(Base):
     __table_args__ = (
         CheckConstraint(_in_check("status", LeadStatus), name="status"),
         CheckConstraint(_in_check("service", ServiceKey), name="service"),
+        CheckConstraint(_in_check("submitted_service", ServiceKey), name="submitted_service"),
+        CheckConstraint(_in_check("inquiry_type", InquiryType), name="inquiry_type"),
+        CheckConstraint(_in_check("platform", Platform, nullable=True), name="platform"),
+        CheckConstraint(_in_check("budget_range", BudgetRange, nullable=True), name="budget_range"),
+        CheckConstraint(_in_check("timeline", Timeline, nullable=True), name="timeline"),
         Index("ix_leads_created_at", "created_at"),
         Index("ix_leads_status", "status"),
         Index("ix_leads_updated_at", "updated_at"),
+        Index("ix_leads_service", "service"),
+        Index("ix_leads_inquiry_type", "inquiry_type"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    # `service` is the current categorisation (admins may re-categorise);
+    # `submitted_service` keeps what the visitor originally selected.
     service: Mapped[str] = mapped_column(String(32), nullable=False)
+    submitted_service: Mapped[str] = mapped_column(String(32), nullable=False)
+    inquiry_type: Mapped[str] = mapped_column(
+        String(16), nullable=False, default=InquiryType.CONTACT.value, server_default=text("'contact'")
+    )
+    platform: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    budget_range: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    timeline: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    website_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     company: Mapped[str] = mapped_column(String(160), nullable=False)
     email: Mapped[str] = mapped_column(String(254), nullable=False)
@@ -161,6 +212,8 @@ class AuditLog(Base):
     __table_args__ = (
         Index("ix_audit_logs_created_at", "created_at"),
         Index("ix_audit_logs_entity", "entity_type", "entity_id"),
+        Index("ix_audit_logs_action", "action"),
+        Index("ix_audit_logs_actor_id", "actor_id"),
     )
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)

@@ -1,4 +1,5 @@
 import { getContent } from "@/content";
+import { bg } from "@/i18n/dictionaries/bg";
 import type { LeadStatus } from "@/lib/admin-types";
 
 export const statusLabels: Record<LeadStatus, string> = {
@@ -38,6 +39,14 @@ const actionLabels: Record<string, string> = {
   "ai_action.approved": "Одобрено AI действие",
   "ai_action.rejected": "Отхвърлено AI действие",
   "seed.synthetic_data": "Заредени синтетични данни",
+  "seed.synthetic_purged": "Изтрити синтетични данни",
+  "lead.viewed": "Преглед на лични данни",
+  "lead.service_changed": "Промяна на услуга",
+  "auth.account_locked": "Заключен акаунт (неуспешни опити)",
+  "auth.login_blocked": "Блокиран опит за вход",
+  "auth.session_idle_timeout": "Изтекла сесия (неактивност)",
+  "auth.logout_all": "Изход от всички устройства",
+  "retention.run": "Изпълнена политика за съхранение",
 };
 
 export function actionLabel(action: string): string {
@@ -70,3 +79,26 @@ export const aiStatusLabels: Record<string, string> = {
 };
 
 export const priorityLabels: Record<string, string> = { low: "Нисък", medium: "Среден", high: "Висок" };
+
+const inquiry = bg.inquiry;
+
+export const inquiryTypeLabels: Record<string, string> = {
+  contact: inquiry.types.contact.label,
+  quote: inquiry.types.quote.label,
+};
+
+export const platformLabels: Record<string, string> = inquiry.platforms;
+export const budgetLabels: Record<string, string> = inquiry.budgets;
+export const timelineLabels: Record<string, string> = inquiry.timelines;
+
+/** Audit action filter options grouped for the activity page. */
+export const auditActionGroups: { label: string; prefix: string }[] = [
+  { label: "Запитвания", prefix: "lead." },
+  { label: "Вход и сесии", prefix: "auth." },
+  { label: "AI", prefix: "ai" },
+  { label: "Съхранение на данни", prefix: "retention." },
+];
+
+export function knownAuditActions(): { value: string; label: string }[] {
+  return Object.entries(actionLabels).map(([value, label]) => ({ value, label }));
+}

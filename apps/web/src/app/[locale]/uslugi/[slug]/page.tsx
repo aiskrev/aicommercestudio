@@ -20,7 +20,7 @@ import { findService, getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
-import { contactWithService, routes } from "@/lib/routes";
+import { contactWithService, quoteWithService, routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
 
 export const dynamicParams = false;
@@ -54,6 +54,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   const path = href(routes.service(service.slug));
   const related = service.related.map((key) => serviceByKey(locale, key));
   const contactHref = href(contactWithService(service.key));
+  const quoteHref = href(quoteWithService(service.key));
 
   return (
     <>
@@ -84,7 +85,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
             <h1 className="t-h1 mt-6">{service.title}</h1>
             <p className="t-lead mt-6 max-w-2xl">{service.intro}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={contactHref} size="lg" icon="arrowRight">
+              <ButtonLink href={quoteHref} size="lg" icon="arrowRight">
                 {dict.common.requestQuote}
               </ButtonLink>
               <ButtonLink href={href(routes.services)} size="lg" variant="secondary">
@@ -173,7 +174,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
               ))}
             </ul>
             <p className="mt-4 text-sm text-slate-400">{dict.service.pricingNote}</p>
-            <ButtonLink href={contactHref} icon="arrowRight" className="mt-6 w-full sm:w-auto">
+            <ButtonLink href={quoteHref} icon="arrowRight" className="mt-6 w-full sm:w-auto">
               {dict.common.requestQuote}
             </ButtonLink>
           </div>

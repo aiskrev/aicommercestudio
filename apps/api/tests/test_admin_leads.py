@@ -144,5 +144,6 @@ def test_system_status_reports_mock_ai_and_disabled_email(admin_client):
 
 def test_audit_log_endpoint(admin_client, make_lead):
     make_lead()
-    entries = admin_client.get("/api/admin/audit", params={"limit": 5}).json()
-    assert {"lead.created", "auth.login"} <= {e["action"] for e in entries}
+    page = admin_client.get("/api/admin/audit", params={"page_size": 5}).json()
+    assert page["total"] >= 2 and page["page_size"] == 5
+    assert {"lead.created", "auth.login"} <= {e["action"] for e in page["items"]}

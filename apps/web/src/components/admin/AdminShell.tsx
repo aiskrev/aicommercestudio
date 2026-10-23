@@ -15,6 +15,7 @@ const NAV: { href: string; label: string; icon: IconName; exact?: boolean }[] = 
   { href: routes.adminLeads, label: "Запитвания", icon: "inbox" },
   { href: routes.adminAiActions, label: "AI одобрения", icon: "bot" },
   { href: routes.adminActivity, label: "Активност", icon: "activity" },
+  { href: routes.adminAccount, label: "Акаунт и сесии", icon: "lock" },
 ];
 
 export function AdminShell({ userName, children }: { userName: string; children: ReactNode }) {

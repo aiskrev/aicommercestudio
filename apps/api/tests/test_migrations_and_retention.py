@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from alembic import command
-from sqlalchemy import create_engine, func, inspect, select
+from sqlalchemy import create_engine, func, inspect, select, text
 
 from app.cli import SYNTHETIC_SOURCE, ensure_admin, seed_synthetic_data
 from app.models import AIActionRequest, AuditLog, Lead, utcnow
@@ -25,6 +25,29 @@ def test_migration_upgrade_downgrade_roundtrip():
     )
     command.downgrade(cfg, "base")
     assert "leads" not in inspect(engine).get_table_names()
+    engine.dispose()
+
+
+def test_migration_0002_backfills_existing_leads():
+    """Data written under schema 0001 survives the upgrade: submitted_service is backfilled."""
+    url = TEST_DATABASE_URL.rsplit("/", 1)[0] + "/acs_migration_backfill"
+    recreate_database("acs_migration_backfill")
+    cfg = alembic_config(url)
+    command.upgrade(cfg, "0001")
+    engine = create_engine(url)
+    with engine.begin() as conn:
+        conn.execute(text(
+            "INSERT INTO leads (id, service, name, company, email, message, status, source, "
+            "privacy_acknowledged_at, privacy_notice_version, marketing_consent, created_at, updated_at) "
+            "VALUES (gen_random_uuid(), 'seo', 'Стар', 'Стара ООД', 'old@example.com', "
+            "'Стар запис отпреди миграцията', "
+            "'NEW', 'website_contact_form', now(), 'v1', false, now(), now())"
+        ))
+    command.upgrade(cfg, "head")
+    with engine.connect() as conn:
+        row = conn.execute(text("SELECT service, submitted_service, inquiry_type, platform FROM leads")).one()
+    assert tuple(row) == ("seo", "seo", "contact", None)
+    command.downgrade(cfg, "0001")
     engine.dispose()
 
 

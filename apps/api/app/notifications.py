@@ -23,7 +23,9 @@ SERVICE_LABELS = {
 }
 
 
-def notify_new_lead(settings: Settings, lead_id: str, reference: str, service: str) -> None:
+def notify_new_lead(
+    settings: Settings, lead_id: str, reference: str, service: str, inquiry_type: str = "contact"
+) -> None:
     """Notify the team about a new inquiry. The e-mail deliberately contains no personal data —
     details are only visible after logging in to the admin panel."""
     if not settings.email_enabled:
@@ -31,7 +33,8 @@ def notify_new_lead(settings: Settings, lead_id: str, reference: str, service: s
         return
 
     message = EmailMessage()
-    message["Subject"] = f"Ново запитване {reference}: {SERVICE_LABELS.get(service, service)}"
+    kind = "Заявка за оферта" if inquiry_type == "quote" else "Ново запитване"
+    message["Subject"] = f"{kind} {reference}: {SERVICE_LABELS.get(service, service)}"
     message["From"] = settings.smtp_from
     message["To"] = settings.lead_notification_email
     message.set_content(

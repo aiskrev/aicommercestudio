@@ -38,13 +38,15 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function renderForm(initialService = "") {
+function renderForm(initialService = "", initialInquiry: "contact" | "quote" = "contact") {
   return render(
     <ContactForm
       labels={bg.form}
       messages={bg.validation}
+      inquiry={bg.inquiry}
       services={services}
       initialService={initialService}
+      initialInquiry={initialInquiry}
       privacyHref="/poveritelnost"
     />,
   );
@@ -136,5 +138,58 @@ describe("ContactForm", () => {
     await fillValid(user);
     await user.click(screen.getByRole("button", { name: bg.form.submit }));
     expect(await screen.findByText(bg.form.rateLimited)).toBeInTheDocument();
+  });
+});
+
+describe("ContactForm — quote requests", () => {
+  it("shows the quote fields only for quote requests", async () => {
+    const user = userEvent.setup();
+    renderForm();
+    expect(screen.queryByTestId("quote-fields")).not.toBeInTheDocument();
+    await user.click(screen.getByRole("radio", { name: /Заявка за оферта/ }));
+    expect(screen.getByTestId("quote-fields")).toBeInTheDocument();
+    expect(screen.getByLabelText(/Платформа/)).toBeInTheDocument();
+  });
+
+  it("requires platform, budget and timeline for a quote", async () => {
+    const user = userEvent.setup();
+    renderForm("", "quote");
+    await fillValid(user);
+    await user.click(screen.getByRole("button", { name: bg.form.submit }));
+    expect(await screen.findAllByText(bg.validation.select)).toHaveLength(3);
+    expect(fetchMock.mock.calls.filter(([url]) => String(url).includes("quote-requests"))).toHaveLength(0);
+  });
+
+  it("submits a quote to the quote endpoint with structured fields", async () => {
+    const user = userEvent.setup();
+    renderForm("", "quote");
+    await fillValid(user);
+    await user.selectOptions(screen.getByLabelText(/Платформа/), "shopify");
+    await user.selectOptions(screen.getByLabelText(/Ориентировъчен бюджет/), "2500_10000");
+    await user.selectOptions(screen.getByLabelText(/Желан срок/), "asap");
+    await user.type(screen.getByLabelText(/Адрес на сайта/), "example.bg");
+    await user.click(screen.getByRole("button", { name: bg.form.submit }));
+
+    expect(await screen.findByTestId("contact-success")).toBeInTheDocument();
+    const [url, init] = fetchMock.mock.calls.find(([u]) => String(u).includes("quote-requests"))!;
+    expect(url).toBe("/api/public/quote-requests");
+    expect(JSON.parse(init.body)).toMatchObject({
+      platform: "shopify",
+      budget_range: "2500_10000",
+      timeline: "asap",
+      website_url: "example.bg",
+    });
+  });
+
+  it("does not send quote fields to the contact endpoint", async () => {
+    const user = userEvent.setup();
+    renderForm();
+    await fillValid(user);
+    await user.click(screen.getByRole("button", { name: bg.form.submit }));
+    await screen.findByTestId("contact-success");
+    const [, init] = fetchMock.mock.calls.find(([u]) => u === "/api/public/leads")!;
+    const body = JSON.parse(init.body);
+    expect(body).not.toHaveProperty("platform");
+    expect(body).not.toHaveProperty("website_url");
   });
 });

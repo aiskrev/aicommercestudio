@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { bg } from "@/i18n/dictionaries/bg";
-import { type ContactValues, emptyContactValues, toPayload, validateContact } from "@/lib/contact-validation";
+import {
+  type ContactValues,
+  emptyContactValues,
+  submissionEndpoint,
+  toPayload,
+  validateContact,
+} from "@/lib/contact-validation";
 
 const services = ["seo", "maintenance", "other"];
 
@@ -61,5 +67,34 @@ describe("toPayload", () => {
     expect(payload.phone).toBeNull();
     expect(payload.form_token).toBe("token-123");
     expect(payload.website).toBe("");
+  });
+});
+
+describe("quote validation", () => {
+  const quote = (overrides: Partial<ContactValues> = {}) =>
+    valid({ inquiry_type: "quote", platform: "shopify", budget_range: "undisclosed", timeline: "flexible", ...overrides });
+
+  it("accepts a complete quote request", () => {
+    expect(validateContact(quote(), bg.validation, services)).toEqual({});
+  });
+
+  it.each([
+    [{ platform: "" }, "platform"],
+    [{ budget_range: "huge" }, "budget_range"],
+    [{ timeline: "" }, "timeline"],
+    [{ website_url: "not a site" }, "website_url"],
+  ] as const)("rejects %o", (overrides, field) => {
+    expect(validateContact(quote(overrides), bg.validation, services)[field]).toBeTruthy();
+  });
+
+  it("ignores quote fields for contact inquiries", () => {
+    expect(validateContact(valid({ platform: "bogus" }), bg.validation, services)).toEqual({});
+  });
+
+  it("routes submissions to the right endpoint", () => {
+    expect(submissionEndpoint(quote())).toBe("/api/public/quote-requests");
+    expect(submissionEndpoint(valid())).toBe("/api/public/leads");
+    expect(toPayload(quote({ website_url: " " }), "t")).toMatchObject({ platform: "shopify", website_url: null });
+    expect(toPayload(valid(), "t")).not.toHaveProperty("platform");
   });
 });
