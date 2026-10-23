@@ -115,11 +115,14 @@ Hot-reload development (sources bind-mounted): `.\scripts\start.ps1 -Dev`.
 
 | URL | What |
 | --- | --- |
-| http://localhost:3000 | website |
-| http://localhost:3000/kontakti | contact / quote form |
-| http://localhost:3000/ai-automation-advisor | AI automation advisor (demo mode without API key) |
+| http://localhost:3000 | website (redirects to `/bg`, or to `/en` after choosing English) |
+| http://localhost:3000/bg | website in Bulgarian |
+| http://localhost:3000/en | website in English |
+| http://localhost:3000/bg/kontakti · http://localhost:3000/en/contact | contact / quote form |
+| http://localhost:3000/bg/uslugi/ai-managed-services · http://localhost:3000/en/services/ai-managed-services | AI Managed Services page and intake form |
+| http://localhost:3000/bg/ai-automation-advisor · http://localhost:3000/en/ai-automation-advisor | AI automation advisor (demo mode without API key) |
 | http://localhost:3000/admin | admin panel (redirects to `/admin/login`) |
-| http://localhost:8000/api/docs | Swagger UI (development only; off in production) |
+| http://localhost:8000/api/docs | Swagger UI (development only; off in production). Note: the path is `/api/docs`, not `/docs`. |
 | http://localhost:8000/api/health/ready | API + database readiness |
 | `127.0.0.1:5433` | PostgreSQL (database/user/password from `.env`) |
 

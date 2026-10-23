@@ -18,6 +18,7 @@ from app.models import (
     AuditLog,
     InquiryType,
     Lead,
+    LeadLocale,
     LeadNote,
     LeadStatus,
     ServiceKey,
@@ -46,6 +47,10 @@ def create_lead(
         budget_range=data.budget_range.value if is_quote else None,
         timeline=data.timeline.value if is_quote else None,
         website_url=data.website_url if is_quote else None,
+        locale=data.locale.value,
+        service_details=(
+            {"kind": "ai_managed", **data.ai_managed.model_dump(mode="json")} if data.ai_managed is not None else None
+        ),
         name=data.name,
         company=data.company,
         email=data.email,
@@ -76,6 +81,7 @@ def create_lead(
             "inquiry_type": lead.inquiry_type,
             "source": source,
             "marketing_consent": lead.marketing_consent,
+            "locale": lead.locale,
             **({"advisor_assessment_linked": True} if advisor_linked else {}),
         },
         ip_hash=ip_hash,
@@ -89,6 +95,7 @@ class LeadFilters:
     status: LeadStatus | None = None
     service: ServiceKey | None = None
     inquiry_type: InquiryType | None = None
+    locale: LeadLocale | None = None
     q: str | None = None
     created_from: datetime | None = None
     created_to: datetime | None = None
@@ -107,6 +114,8 @@ def _filtered(filters: LeadFilters) -> Select[tuple[Lead]]:
         stmt = stmt.where(Lead.service == filters.service.value)
     if filters.inquiry_type:
         stmt = stmt.where(Lead.inquiry_type == filters.inquiry_type.value)
+    if filters.locale:
+        stmt = stmt.where(Lead.locale == filters.locale.value)
     if filters.q:
         pattern = f"%{_escape_like(filters.q.strip())}%"
         stmt = stmt.where(
@@ -281,6 +290,9 @@ def dashboard_stats(db: Session, now: datetime | None = None) -> dict:
     by_inquiry_type = {t.value: 0 for t in InquiryType}
     for inquiry_value, count in db.execute(select(Lead.inquiry_type, func.count()).group_by(Lead.inquiry_type)):
         by_inquiry_type[inquiry_value] = count
+    by_locale = {loc.value: 0 for loc in LeadLocale}
+    for locale_value, count in db.execute(select(Lead.locale, func.count()).group_by(Lead.locale)):
+        by_locale[locale_value] = count
 
     def _since(days: int) -> int:
         stmt = select(func.count()).select_from(Lead).where(Lead.created_at >= now - timedelta(days=days))
@@ -302,6 +314,7 @@ def dashboard_stats(db: Session, now: datetime | None = None) -> dict:
         "by_status": by_status,
         "by_service": by_service,
         "by_inquiry_type": by_inquiry_type,
+        "by_locale": by_locale,
         "pending_ai_actions": pending_ai or 0,
         "recent_activity": recent_audit(db, limit=8),
     }

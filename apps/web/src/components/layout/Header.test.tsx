@@ -4,8 +4,10 @@ import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { Header } from "@/components/layout/Header";
+import { buildSlugMap } from "@/content";
+import { bg } from "@/i18n/dictionaries/bg";
 
-vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+vi.mock("next/navigation", () => ({ usePathname: () => "/bg/uslugi/ai-managed-services" }));
 vi.mock("next/link", () => ({
   default: ({ href, children, ...rest }: { href: string; children: ReactNode }) => (
     <a href={href} {...rest}>
@@ -30,6 +32,9 @@ const props = {
     services: "Услуги",
     allServices: "Всички услуги",
   },
+  locale: "bg" as const,
+  slugs: buildSlugMap(),
+  languageLabels: bg.language,
 };
 
 describe("Header", () => {

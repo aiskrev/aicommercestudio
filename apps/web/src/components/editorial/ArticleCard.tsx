@@ -2,15 +2,9 @@ import Link from "next/link";
 
 import { Icon } from "@/components/ui/Icon";
 import type { Article } from "@/content/types";
+import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
 import { formatDate } from "@/lib/format";
-
-export const articleTypeLabels: Record<Article["type"], string> = {
-  guide: "Ръководство",
-  checklist: "Чеклист",
-  comparison: "Сравнение",
-  explainer: "Обяснение",
-};
 
 export function ArticleCard({
   article,
@@ -31,7 +25,7 @@ export function ArticleCard({
   return (
     <article className="card card-interactive group relative flex h-full flex-col p-6">
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400">
-        <span className="badge badge-accent">{articleTypeLabels[article.type]}</span>
+        <span className="badge badge-accent">{getDictionary(locale).ui.articleTypes[article.type]}</span>
         {categoryName && <span>{categoryName}</span>}
         <span aria-hidden="true">·</span>
         <time dateTime={article.publishedAt}>{formatDate(article.publishedAt, locale)}</time>

@@ -1,6 +1,26 @@
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["/", "/uslugi", "/uslugi/seo-optimizatsiya", "/ai-resheniya", "/ai-automation-advisor", "/za-kogo", "/proces", "/kontakti", "/statii", "/admin/login"];
+const PAGES = [
+  "/bg",
+  "/bg/uslugi",
+  "/bg/uslugi/seo-optimizatsiya",
+  "/bg/uslugi/ai-managed-services",
+  "/bg/ai-resheniya",
+  "/bg/ai-automation-advisor",
+  "/bg/za-kogo",
+  "/bg/proces",
+  "/bg/kontakti",
+  "/bg/statii",
+  "/en",
+  "/en/services",
+  "/en/services/ai-managed-services",
+  "/en/ai-solutions",
+  "/en/ai-automation-advisor",
+  "/en/industries",
+  "/en/contact",
+  "/en/insights",
+  "/admin/login",
+];
 
 test("pages fit the mobile viewport without horizontal scrolling", async ({ page }) => {
   for (const path of PAGES) {
@@ -11,7 +31,7 @@ test("pages fit the mobile viewport without horizontal scrolling", async ({ page
 });
 
 test("mobile menu opens, navigates and closes", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/bg");
   const toggle = page.getByRole("button", { name: "Отвори менюто" });
   await expect(toggle).toBeVisible();
   await toggle.click();
@@ -30,34 +50,34 @@ test("mobile menu opens, navigates and closes", async ({ page }) => {
 });
 
 test("sticky quote bar appears after scrolling, hides at CTAs, never on the contact page", async ({ page }) => {
-  await page.goto("/uslugi/poddrazhka-na-online-magazini");
+  await page.goto("/bg/uslugi/poddrazhka-na-online-magazini");
   const bar = page.getByTestId("sticky-quote-bar");
   await expect(bar).toHaveAttribute("aria-hidden", "true");
   await page.evaluate(() => window.scrollTo(0, 1600));
   await expect(bar).toHaveAttribute("aria-hidden", "false");
-  await expect(bar.getByRole("link", { name: "Поискай оферта" })).toHaveAttribute("href", "/kontakti?tip=oferta");
+  await expect(bar.getByRole("link", { name: "Поискай оферта" })).toHaveAttribute("href", "/bg/kontakti?tip=oferta");
 
   await page.locator("footer").scrollIntoViewIfNeeded();
   await expect(bar).toHaveAttribute("aria-hidden", "true");
 
-  await page.goto("/kontakti");
+  await page.goto("/bg/kontakti");
   await expect(page.getByTestId("sticky-quote-bar")).toHaveCount(0);
 });
 
 test("sticky quote bar can be dismissed for the session", async ({ page }) => {
-  await page.goto("/ai-resheniya");
+  await page.goto("/bg/ai-resheniya");
   await page.evaluate(() => window.scrollTo(0, 1400));
   const bar = page.getByTestId("sticky-quote-bar");
   await expect(bar).toHaveAttribute("aria-hidden", "false");
   await bar.getByRole("button", { name: "Скрий" }).click();
   await expect(bar).toHaveAttribute("aria-hidden", "true");
-  await page.goto("/za-kogo");
+  await page.goto("/bg/za-kogo");
   await page.evaluate(() => window.scrollTo(0, 1400));
   await expect(page.getByTestId("sticky-quote-bar")).toHaveAttribute("aria-hidden", "true");
 });
 
 test("contact form is usable on mobile", async ({ page }) => {
-  await page.goto("/kontakti");
+  await page.goto("/bg/kontakti");
   await expect(page.getByRole("button", { name: "Изпрати запитването" })).toBeVisible();
   const box = await page.getByLabel(/Описание на проекта/).boundingBox();
   const viewport = page.viewportSize();

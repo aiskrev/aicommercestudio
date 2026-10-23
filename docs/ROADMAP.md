@@ -17,8 +17,18 @@ Priorities are indicative and depend on business decisions.
 - Real OG image with Cyrillic typography; logo finalisation
 - Admin: password change, second administrator, optional TOTP 2FA
 
+## V1.1a (this iteration) — AI Managed Services & bilingual platform
+- English locale (`/en`) with translated URLs, switcher, hreflang, localized API messages and admin
+- AI Managed Services page, packages (custom quote), intake form, lead storage and admin display
+- Bilingual AI advisor (English demo templates, output language for the AI provider)
+
+## Next iteration — AI Operations Console (multi-tenant)
+- Internal console for operated AI systems: tenants, systems, incidents, changes, evaluations
+- Telemetry ingestion (OpenTelemetry), health probes, evaluation runner, cost import, alerts
+- Client portal (read-only) — see [AI_OPERATIONS_ARCHITECTURE.md](AI_OPERATIONS_ARCHITECTURE.md)
+- Contract templates for AI Managed Services (scope, hours, response targets only where staffed)
+
 ## V1.2 — content & growth
-- English locale (`/en`) using the existing i18n structure
 - Articles managed through a headless CMS or Markdown files; article categories and RSS
 - Privacy-friendly analytics with consent management (only if needed)
 - Case studies — only once real, approved client projects exist

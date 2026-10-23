@@ -1,15 +1,20 @@
 import { type NextRequest, NextResponse } from "next/server";
 
+import { LOCALE_COOKIE } from "@/i18n/config";
 import { decideRoute } from "@/lib/locale-routing";
 import { site } from "@/lib/site";
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const decision = decideRoute(pathname, request.cookies.has(site.sessionCookieName));
+  const { pathname, search } = request.nextUrl;
+  const decision = decideRoute(
+    pathname,
+    request.cookies.has(site.sessionCookieName),
+    request.cookies.get(LOCALE_COOKIE)?.value,
+    search,
+  );
 
   if (decision.type === "redirect") {
-    const target = new URL(decision.location, request.url);
-    return NextResponse.redirect(target, decision.location.startsWith("/admin/login") ? 307 : 308);
+    return NextResponse.redirect(new URL(decision.location, request.url), decision.permanent ? 308 : 307);
   }
   if (decision.type === "rewrite") {
     const url = request.nextUrl.clone();

@@ -18,8 +18,8 @@ import {
   Section,
   SectionHeading,
 } from "@/components/ui/primitives";
-import { findArticle, findService, getContent, serviceByKey } from "@/content";
-import { localizePath } from "@/i18n/config";
+import { articleByKey, findService, getContent, serviceByKey, serviceRoutePaths } from "@/content";
+import { isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { contactWithService, quoteWithService, routes } from "@/lib/routes";
@@ -30,20 +30,25 @@ export const dynamicParams = false;
 /** Services whose visitors are offered the AI automation advisor. */
 const ADVISOR_SERVICES = new Set(["automation", "ai_tools"]);
 
-export function generateStaticParams() {
-  return getContent("bg").services.map((service) => ({ slug: service.slug }));
+// Services with a dedicated route (e.g. uslugi/ai-managed-services) are not rendered by this template.
+export function generateStaticParams({ params }: { params: { locale: string } }) {
+  const { locale } = params;
+  if (!isLocale(locale)) return [];
+  return getContent(locale)
+    .services.filter((service) => !service.customPage)
+    .map((service) => ({ slug: service.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/uslugi/[slug]">) {
   const locale = await resolveLocale(params);
   const { slug } = await params;
   const service = findService(locale, slug);
-  if (!service) return {};
+  if (!service || service.customPage) return {};
   return buildMetadata({
     locale,
     title: service.metaTitle,
     description: service.metaDescription,
-    path: routes.service(service.slug),
+    path: serviceRoutePaths(service.key),
   });
 }
 
@@ -51,7 +56,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   const locale = await resolveLocale(params);
   const { slug } = await params;
   const service = findService(locale, slug);
-  if (!service) notFound();
+  if (!service || service.customPage) notFound();
 
   const dict = getDictionary(locale);
   const { home, advisor } = getContent(locale);
@@ -59,7 +64,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   const path = href(routes.service(service.slug));
   const related = service.related.map((key) => serviceByKey(locale, key));
   const relatedArticles = service.relatedArticles
-    .map((articleSlug) => findArticle(locale, articleSlug))
+    .map((articleKey) => articleByKey(locale, articleKey))
     .filter((a): a is NonNullable<typeof a> => Boolean(a));
   const contactHref = href(contactWithService(service.key));
   const quoteHref = href(quoteWithService(service.key));
@@ -68,7 +73,10 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
     <>
       <JsonLd
         data={[
-          serviceJsonLd({ title: service.title, metaDescription: service.metaDescription, path, type: service.shortTitle }),
+          serviceJsonLd(
+            { title: service.title, metaDescription: service.metaDescription, path, type: service.shortTitle },
+            locale,
+          ),
           faqJsonLd(service.faqs),
         ]}
       />

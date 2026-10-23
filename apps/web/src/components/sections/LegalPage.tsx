@@ -2,6 +2,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Icon } from "@/components/ui/Icon";
 import { CheckList, Container } from "@/components/ui/primitives";
 import type { LegalDocument } from "@/content/types";
+import { defaultLocale, splitLocale } from "@/i18n/config";
 import { formatDate } from "@/lib/format";
 
 export function LegalPage({
@@ -21,7 +22,10 @@ export function LegalPage({
       <Container className="max-w-3xl py-12 sm:py-16">
         <h1 className="text-3xl font-semibold sm:text-5xl">{document.title}</h1>
         <p className="mt-4 text-sm text-slate-400">
-          {updatedLabel}: <time dateTime={document.updated}>{formatDate(document.updated)}</time>
+          {updatedLabel}:{" "}
+          <time dateTime={document.updated}>
+            {formatDate(document.updated, splitLocale(breadcrumbs[0]?.path ?? "")?.locale ?? defaultLocale)}
+          </time>
         </p>
         <div
           role="note"

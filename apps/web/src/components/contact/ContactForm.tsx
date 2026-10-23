@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 
 import { Icon } from "@/components/ui/Icon";
 import { Alert, Button, buttonClass, cx } from "@/components/ui/primitives";
 import type { Dictionary } from "@/i18n";
+import { AiManagedFields } from "@/components/contact/AiManagedFields";
+import { Field } from "@/components/contact/FormField";
 import {
+  AI_MANAGED_SERVICE,
   type ContactErrors,
   type ContactField,
   type ContactValues,
@@ -39,6 +42,10 @@ interface Props {
   /** Stored advisor assessment to attach to the lead, with a note explaining that to the visitor. */
   advisorAssessmentId?: string;
   advisorNote?: string;
+  /** UI language: sent with the inquiry and used as the default communication language. */
+  locale?: "bg" | "en";
+  /** Labels for the AI Managed Services section (shown when that service is selected). */
+  aiLabels: Dictionary["aiManagedForm"];
 }
 
 type Status = "idle" | "submitting" | "success";
@@ -53,6 +60,14 @@ const FIELD_ORDER: ContactField[] = [
   "budget_range",
   "timeline",
   "website_url",
+  "ai_sector",
+  "ai_system_types",
+  "ai_agents_count",
+  "ai_provider",
+  "ai_hosting",
+  "ai_support_interests",
+  "ai_communication_language",
+  "ai_additional_notes",
   "message",
   "privacy_acknowledged",
 ];
@@ -69,12 +84,16 @@ export function ContactForm({
   initialMessage = "",
   advisorAssessmentId,
   advisorNote,
+  locale = "bg",
+  aiLabels,
 }: Props) {
   const allowed = services.map((s) => s.value);
   const [values, setValues] = useState<ContactValues>(() => ({
     ...emptyContactValues(allowed.includes(initialService) ? initialService : "", initialInquiry),
     message: initialMessage,
+    ai_communication_language: locale,
   }));
+  const aiManaged = values.service === AI_MANAGED_SERVICE;
   const [errors, setErrors] = useState<ContactErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>("idle");
@@ -132,10 +151,11 @@ export function ContactForm({
     }
 
     setStatus("submitting");
-    const payload = toPayload(values, token);
+    const payload = toPayload(values, token, locale);
     const result = await submitLead(
       advisorAssessmentId ? { ...payload, advisor_assessment_id: advisorAssessmentId } : payload,
       submissionEndpoint(values),
+      locale,
     );
     if (result.ok) {
       setReference(result.reference);
@@ -159,7 +179,7 @@ export function ContactForm({
   }
 
   function reset() {
-    setValues((current) => emptyContactValues("", current.inquiry_type));
+    setValues((current) => ({ ...emptyContactValues("", current.inquiry_type), ai_communication_language: locale }));
     setErrors({});
     setFormError(null);
     setReference("");
@@ -408,13 +428,26 @@ export function ContactForm({
         </div>
       )}
 
+      {aiManaged && (
+        <AiManagedFields
+          values={values}
+          errors={errors}
+          labels={aiLabels}
+          requiredLabel={labels.required}
+          optionalLabel={labels.optional}
+          update={update}
+          validateOnBlur={validateOnBlur}
+          describedBy={describedBy}
+        />
+      )}
+
       <Field
         id="message"
-        label={labels.message}
+        label={aiManaged ? aiLabels.problems : labels.message}
         required
         requiredLabel={labels.required}
         error={errors.message}
-        hint={labels.messageHint}
+        hint={aiManaged ? aiLabels.problemsHint : labels.messageHint}
       >
         <textarea
           id="contact-message"
@@ -434,7 +467,7 @@ export function ContactForm({
               .replace("{n}", String(values.message.trim().length))
               .replace("{max}", String(LIMITS.message.max))}
           </span>
-          {!values.message.trim() && (
+          {!values.message.trim() && !aiManaged && (
             <button
               type="button"
               className="font-semibold text-cyan-300 hover:text-cyan-200"
@@ -511,7 +544,7 @@ export function ContactForm({
           loadingLabel={labels.submitting}
           className="w-full sm:w-auto"
         >
-          {labels.submit}
+          {aiManaged ? aiLabels.submit : labels.submit}
         </Button>
         <p className="flex items-center gap-2 text-xs text-slate-400">
           <Icon name="lock" className="h-4 w-4 text-cyan-300" />
@@ -519,49 +552,5 @@ export function ContactForm({
         </p>
       </div>
     </form>
-  );
-}
-
-function Field({
-  id,
-  label,
-  required,
-  requiredLabel,
-  error,
-  hint,
-  children,
-}: {
-  id: ContactField;
-  label: string;
-  required?: boolean;
-  requiredLabel?: string;
-  error?: string;
-  hint?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div>
-      <label htmlFor={`contact-${id}`} className="mb-2 block text-sm font-medium text-slate-200">
-        {label}
-        {required && (
-          <span className="text-rose-300" aria-hidden="true">
-            {" "}
-            *
-          </span>
-        )}
-        {required && <span className="sr-only"> ({requiredLabel})</span>}
-      </label>
-      {children}
-      {hint && !error && (
-        <p id={`contact-${id}-hint`} className="mt-2 text-xs text-slate-400">
-          {hint}
-        </p>
-      )}
-      {error && (
-        <p id={`contact-${id}-error`} className="mt-2 text-sm text-rose-300">
-          {error}
-        </p>
-      )}
-    </div>
   );
 }

@@ -3,12 +3,14 @@
 import { useEffect } from "react";
 
 import { Button, ButtonLink, Container } from "@/components/ui/primitives";
-import { defaultLocale } from "@/i18n/config";
+import { defaultLocale, localizePath, splitLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
+import { usePublicPathname } from "@/lib/use-public-pathname";
 
 /** Error boundary for public pages: friendly message, retry and a way home. */
 export default function PublicError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  const t = getDictionary(defaultLocale).error;
+  const locale = splitLocale(usePublicPathname())?.locale ?? defaultLocale;
+  const t = getDictionary(locale).error;
 
   useEffect(() => {
     console.error(error);
@@ -28,7 +30,7 @@ export default function PublicError({ error, reset }: { error: Error & { digest?
         <Button icon="refresh" onClick={reset}>
           {t.retry}
         </Button>
-        <ButtonLink href="/" variant="secondary">
+        <ButtonLink href={localizePath(locale, "/")} variant="secondary">
           {t.home}
         </ButtonLink>
       </div>

@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 
+import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { ErrorState, Panel } from "@/components/admin/ui";
 import { Alert, Button, Skeleton } from "@/components/ui/primitives";
+import { fmt, fmtNodes } from "@/i18n/admin";
 import { adminFetch, ApiError } from "@/lib/admin-api";
 import type { RetentionPreview } from "@/lib/admin-types";
 import { formatDate } from "@/lib/format";
@@ -12,6 +14,9 @@ import { useAdminData } from "@/lib/use-admin-data";
 /** GDPR retention: shows what the policy would delete and lets an admin apply it (confirmed, audited). */
 export function RetentionPanel() {
   const preview = useAdminData<RetentionPreview>("/api/admin/retention");
+  const { t: dict, locale } = useAdminI18n();
+  const t = dict.retention;
+  const days = (n: number | undefined) => <strong className="text-white">{fmt(dict.common.days, { n: n ?? 0 })}</strong>;
   const [confirming, setConfirming] = useState(false);
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<{ tone: "success" | "error"; text: string } | null>(null);
@@ -30,11 +35,15 @@ export function RetentionPanel() {
       );
       setResult({
         tone: "success",
-        text: `Изтрити запитвания: ${out.leads_deleted}; изтрити записи в журнала: ${out.audit_entries_deleted}; изтрити AI оценки: ${out.advisor_assessments_deleted ?? 0}.`,
+        text: fmt(t.result, {
+          leads: out.leads_deleted,
+          audit: out.audit_entries_deleted,
+          advisor: out.advisor_assessments_deleted ?? 0,
+        }),
       });
       preview.reload();
     } catch (err) {
-      setResult({ tone: "error", text: err instanceof ApiError ? err.message : "Политиката не можа да бъде приложена." });
+      setResult({ tone: "error", text: err instanceof ApiError ? err.message : t.failed });
     } finally {
       setRunning(false);
       setConfirming(false);
@@ -45,7 +54,7 @@ export function RetentionPanel() {
   const due = data ? data.leads_due + data.audit_entries_due + (data.advisor_assessments_due ?? 0) : 0;
 
   return (
-    <Panel title="Съхранение на данни (GDPR)">
+    <Panel title={t.title}>
       {preview.error && <ErrorState message={preview.error} requestId={preview.errorId} onRetry={preview.reload} />}
       {!data && !preview.error && (
         <div className="grid gap-2" aria-hidden="true">
@@ -56,27 +65,29 @@ export function RetentionPanel() {
       {data && (
         <div className="grid gap-4 text-sm">
           <p className="text-slate-300">
-            Запитванията се пазят <strong className="text-white">{data.lead_retention_days} дни</strong> след последната
-            промяна, журналът — <strong className="text-white">{data.audit_retention_days} дни</strong>, а
-            незаявените AI оценки — <strong className="text-white">{data.advisor_retention_days} дни</strong>.
+            {fmtNodes(t.policy, {
+              leadDays: days(data.lead_retention_days),
+              auditDays: days(data.audit_retention_days),
+              advisorDays: days(data.advisor_retention_days),
+            })}
           </p>
           <dl className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-xl border border-white/[0.07] p-3">
-              <dt className="text-xs text-slate-400">Запитвания за изтриване</dt>
+              <dt className="text-xs text-slate-400">{t.leadsDue}</dt>
               <dd className="mt-1 font-display text-2xl font-semibold text-white" data-testid="retention-leads-due">
                 {data.leads_due}
               </dd>
-              <dd className="text-xs text-slate-400">непроменяни преди {formatDate(data.lead_cutoff)}</dd>
+              <dd className="text-xs text-slate-400">{fmt(t.leadsCutoff, { date: formatDate(data.lead_cutoff, locale) })}</dd>
             </div>
             <div className="rounded-xl border border-white/[0.07] p-3">
-              <dt className="text-xs text-slate-400">Записи в журнала за изтриване</dt>
+              <dt className="text-xs text-slate-400">{t.auditDue}</dt>
               <dd className="mt-1 font-display text-2xl font-semibold text-white">{data.audit_entries_due}</dd>
-              <dd className="text-xs text-slate-400">по-стари от {formatDate(data.audit_cutoff)}</dd>
+              <dd className="text-xs text-slate-400">{fmt(t.auditCutoff, { date: formatDate(data.audit_cutoff, locale) })}</dd>
             </div>
             <div className="rounded-xl border border-white/[0.07] p-3">
-              <dt className="text-xs text-slate-400">AI оценки за изтриване</dt>
+              <dt className="text-xs text-slate-400">{t.advisorDue}</dt>
               <dd className="mt-1 font-display text-2xl font-semibold text-white">{data.advisor_assessments_due ?? 0}</dd>
-              <dd className="text-xs text-slate-400">изтекли и несвързани със запитване</dd>
+              <dd className="text-xs text-slate-400">{t.advisorNote}</dd>
             </div>
           </dl>
           {result && (
@@ -85,23 +96,23 @@ export function RetentionPanel() {
             </Alert>
           )}
           {due === 0 ? (
-            <p className="text-slate-400">Няма данни с изтекъл срок за съхранение.</p>
+            <p className="text-slate-400">{t.nothingDue}</p>
           ) : confirming ? (
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="danger" size="sm" icon="trash" loading={running} loadingLabel="Изтриване…" onClick={run}>
-                Потвърди окончателното изтриване
+              <Button variant="danger" size="sm" icon="trash" loading={running} loadingLabel={t.deleting} onClick={run}>
+                {t.confirm}
               </Button>
               <Button variant="secondary" size="sm" onClick={() => setConfirming(false)}>
-                Отказ
+                {dict.common.cancel}
               </Button>
             </div>
           ) : (
             <Button variant="dangerOutline" size="sm" icon="trash" onClick={() => setConfirming(true)}>
-              Приложи политиката сега
+              {t.apply}
             </Button>
           )}
           <p className="text-xs text-slate-400">
-            Автоматично изпълнение: <code className="font-mono">python -m app.cli maintenance</code> по график.
+            {t.schedule} <code className="font-mono">python -m app.cli maintenance</code> {t.scheduleSuffix}
           </p>
         </div>
       )}

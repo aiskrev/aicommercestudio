@@ -4,9 +4,11 @@ import Link from "next/link";
 import { usePublicPathname } from "@/lib/use-public-pathname";
 import { useEffect, useId, useRef, useState } from "react";
 
+import { LanguageSwitcher, type LanguageSwitcherLabels } from "@/components/layout/LanguageSwitcher";
 import { Logo } from "@/components/layout/Logo";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { buttonClass, Container, cx } from "@/components/ui/primitives";
+import type { Locale, SlugMap } from "@/i18n/config";
 
 export interface NavItem {
   href: string;
@@ -33,6 +35,9 @@ export function Header({
   items,
   cta,
   labels,
+  locale,
+  slugs,
+  languageLabels,
 }: {
   homeHref: string;
   servicesHref: string;
@@ -40,6 +45,9 @@ export function Header({
   items: NavItem[];
   cta: NavItem;
   labels: Labels;
+  locale: Locale;
+  slugs: SlugMap;
+  languageLabels: LanguageSwitcherLabels;
 }) {
   const pathname = usePublicPathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -196,7 +204,8 @@ export function Header({
           </nav>
   
           <div className="flex items-center gap-3">
-            <div className="hidden sm:block">
+            <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="hidden lg:block" />
+            <div className="hidden sm:block lg:hidden xl:block">
               <Link href={cta.href} className={buttonClass("primary")}>
                 {cta.label}
               </Link>
@@ -268,7 +277,8 @@ export function Header({
               ))}
             </ul>
           </nav>
-          <div className="mt-auto pt-6">
+          <div className="mt-auto flex flex-col gap-4 pt-6">
+            <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="self-start" />
             <Link href={cta.href} className={cx(buttonClass("primary", "lg"), "w-full")}>
               {cta.label}
             </Link>

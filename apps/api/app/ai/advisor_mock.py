@@ -1,56 +1,28 @@
 """Deterministic demo engine for the automation advisor.
 
 This is NOT AI analysis: it matches keywords in the description against a fixed set of
-process patterns and fills pre-written Bulgarian templates with the visitor's selections.
-The same input always gives the same output. The advisor labels it as a demonstration.
+process patterns and fills pre-written templates (Bulgarian here, English in
+`advisor_mock_en.py`) with the visitor's selections. The same input always gives the same
+output. The advisor labels it as a demonstration.
 """
 
 from __future__ import annotations
 
 import copy
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from app.advisor.prompt import AdvisorPromptInput
-from app.advisor.safety import WRITE_APPROVAL
-from app.advisor.schemas import (
-    BUSINESS_TYPE_LABELS,
-    TEAM_LABELS,
-    VOLUME_LABELS,
-    MonthlyVolume,
-    TeamSize,
-    ToolKey,
-)
+from app.advisor.safety import write_approval
+from app.advisor.schemas import MonthlyVolume, TeamSize, ToolKey, option_labels
+from app.ai import advisor_mock_en as en
+from app.ai.advisor_template_base import ProcessPattern
+from app.ai.advisor_template_base import approval as _approval
+from app.ai.advisor_template_base import opp as _opp
+from app.ai.advisor_template_base import risk as _risk
+from app.ai.advisor_template_base import step as _step
 
-
-@dataclass(frozen=True)
-class ProcessPattern:
-    key: str
-    label: str
-    keywords: tuple[str, ...]
-    uses_ai: bool
-    opportunities: list[dict[str, str]]
-    workflow: list[dict[str, Any]]
-    approvals: list[dict[str, str]]
-    risks: list[dict[str, str]]
-    data_protection: list[str] = field(default_factory=list)
-    questions: list[str] = field(default_factory=list)
-
-
-def _opp(title: str, description: str, approach: str, priority: str) -> dict[str, str]:
-    return {"title": title, "description": description, "approach": approach, "priority": priority}
-
-
-def _step(title: str, description: str, actor: str, approval: bool = False) -> dict[str, Any]:
-    return {"title": title, "description": description, "actor": actor, "requires_human_approval": approval}
-
-
-def _approval(decision: str, reason: str) -> dict[str, str]:
-    return {"decision": decision, "reason": reason}
-
-
-def _risk(risk: str, mitigation: str) -> dict[str, str]:
-    return {"risk": risk, "mitigation": mitigation}
+__all__ = ["GENERAL", "PATTERNS", "ProcessPattern", "build_demo_assessment"]
 
 
 PATTERNS: list[ProcessPattern] = [
@@ -488,40 +460,6 @@ _NEXT_STEPS = [
 ]
 
 
-def _match(description: str) -> list[ProcessPattern]:
-    text = description.lower()
-    scored = [(sum(k in text for k in p.keywords), i, p) for i, p in enumerate(PATTERNS)]
-    hits = sorted((s for s in scored if s[0] > 0), key=lambda s: (-s[0], s[1]))
-    return [p for _, _, p in hits[:2]] or [GENERAL]
-
-
-def _complexity(data: AdvisorPromptInput, patterns: list[ProcessPattern]) -> dict[str, str]:
-    reasons: list[str] = []
-    score = 0
-    if len(patterns) > 1:
-        score += 1
-        reasons.append("процесът обхваща повече от една област")
-    heavy = [t for t in data.tools if t in (ToolKey.ERP, ToolKey.ACCOUNTING, ToolKey.INVOICING, ToolKey.CRM)]
-    if heavy:
-        score += min(len(heavy), 2)
-        reasons.append("има интеграции със системи, в които се записват бизнес данни")
-    if data.monthly_volume in (MonthlyVolume.FROM_2000_TO_10000, MonthlyVolume.OVER_10000):
-        score += 2 if data.monthly_volume == MonthlyVolume.OVER_10000 else 1
-        reasons.append("обемът изисква надеждна обработка на грешки и повторни опити")
-    if data.team_size in (TeamSize.FROM_21_TO_50, TeamSize.OVER_50):
-        score += 1
-        reasons.append("повече участници означава повече роли и права за достъп")
-    if any(p.uses_ai for p in patterns):
-        score += 1
-        reasons.append("част от стъпките изискват AI с човешка проверка")
-    if not data.tools or data.tools == (ToolKey.NONE,):
-        reasons.append("няма посочени системи, така че първо трябва да се избере къде ще се пазят данните")
-    level = "low" if score <= 1 else "medium" if score <= 3 else "high"
-    rationale = "Ниска" if level == "low" else "Средна" if level == "medium" else "Висока"
-    detail = "; ".join(reasons) if reasons else "процесът е ясно ограничен и използва малко системи"
-    return {"level": level, "rationale": f"{rationale} сложност, защото {detail}."}
-
-
 _PHASES: dict[str, list[dict[str, Any]]] = {
     "low": [
         {
@@ -609,56 +547,156 @@ def _dedupe(items: list[Any], key: str | None = None) -> list[Any]:
     return result
 
 
+_TEXT_BG = {
+    "spreadsheet_title": "По-малко ръчно копиране между таблици",
+    "spreadsheet_description": (
+        "Таблиците, които днес се попълват ръчно, се захранват автоматично от основната система."
+    ),
+    "storage_system": "Централно хранилище на данни",
+    "storage_purpose": "Едно място (база данни или таблица), от което автоматизацията чете и в което записва.",
+    "volume_question": "Има ли пикови периоди и колко бързо трябва да се обработва всеки случай?",
+    "other_tools_question": "Какви възможности за интеграция имат другите посочени от вас системи?",
+    "owner_question": "Кой ще отговаря за одобренията и за преглед на изключенията?",
+    "label_joiner": " и ",
+    "summary": (
+        "Бизнес: {business}; екип: {team}; обем: {volume}. По ключовите думи в описанието процесът е свързан с "
+        "{labels}. Вашето описание: „{excerpt}“"
+    ),
+    "reason_areas": "процесът обхваща повече от една област",
+    "reason_writes": "има интеграции със системи, в които се записват бизнес данни",
+    "reason_volume": "обемът изисква надеждна обработка на грешки и повторни опити",
+    "reason_team": "повече участници означава повече роли и права за достъп",
+    "reason_ai": "част от стъпките изискват AI с човешка проверка",
+    "reason_no_tools": "няма посочени системи, така че първо трябва да се избере къде ще се пазят данните",
+    "reason_default": "процесът е ясно ограничен и използва малко системи",
+    "level_low": "Ниска",
+    "level_medium": "Средна",
+    "level_high": "Висока",
+    "complexity": "{level} сложност, защото {detail}.",
+}
+
+
+@dataclass(frozen=True)
+class _Templates:
+    patterns: dict[str, ProcessPattern]
+    general: ProcessPattern
+    integrations: dict[ToolKey, tuple[str, str, str]]
+    data_protection: list[str]
+    risks: list[dict[str, str]]
+    next_steps: list[str]
+    phases: dict[str, list[dict[str, Any]]]
+    text: dict[str, str]
+
+
+_TEMPLATES = {
+    "bg": _Templates(
+        patterns={p.key: p for p in PATTERNS},
+        general=GENERAL,
+        integrations=_TOOL_INTEGRATIONS,
+        data_protection=_BASE_DATA_PROTECTION,
+        risks=_BASE_RISKS,
+        next_steps=_NEXT_STEPS,
+        phases=_PHASES,
+        text=_TEXT_BG,
+    ),
+    "en": _Templates(
+        patterns=en.PATTERNS,
+        general=en.GENERAL,
+        integrations=en.TOOL_INTEGRATIONS,
+        data_protection=en.BASE_DATA_PROTECTION,
+        risks=en.BASE_RISKS,
+        next_steps=en.NEXT_STEPS,
+        phases=en.PHASES,
+        text=en.TEXT,
+    ),
+}
+
+# Keywords of both languages, so an English description on the Bulgarian page (or the reverse)
+# still matches. Pattern order (the tie-breaker) is the Bulgarian list order.
+_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
+    (p.key, tuple(dict.fromkeys(p.keywords + en.PATTERNS[p.key].keywords))) for p in PATTERNS
+]
+
+
+def _match(description: str) -> list[str]:
+    """Keys of the (at most two) best-matching patterns; empty when nothing matches."""
+    text = description.lower()
+    scored = [(sum(k in text for k in keywords), i, key) for i, (key, keywords) in enumerate(_KEYWORDS)]
+    hits = sorted((s for s in scored if s[0] > 0), key=lambda s: (-s[0], s[1]))
+    return [key for _, _, key in hits[:2]]
+
+
+def _complexity(data: AdvisorPromptInput, patterns: list[ProcessPattern], text: dict[str, str]) -> dict[str, str]:
+    reasons: list[str] = []
+    score = 0
+    if len(patterns) > 1:
+        score += 1
+        reasons.append(text["reason_areas"])
+    heavy = [t for t in data.tools if t in (ToolKey.ERP, ToolKey.ACCOUNTING, ToolKey.INVOICING, ToolKey.CRM)]
+    if heavy:
+        score += min(len(heavy), 2)
+        reasons.append(text["reason_writes"])
+    if data.monthly_volume in (MonthlyVolume.FROM_2000_TO_10000, MonthlyVolume.OVER_10000):
+        score += 2 if data.monthly_volume == MonthlyVolume.OVER_10000 else 1
+        reasons.append(text["reason_volume"])
+    if data.team_size in (TeamSize.FROM_21_TO_50, TeamSize.OVER_50):
+        score += 1
+        reasons.append(text["reason_team"])
+    if any(p.uses_ai for p in patterns):
+        score += 1
+        reasons.append(text["reason_ai"])
+    if not data.tools or data.tools == (ToolKey.NONE,):
+        reasons.append(text["reason_no_tools"])
+    level = "low" if score <= 1 else "medium" if score <= 3 else "high"
+    detail = "; ".join(reasons) if reasons else text["reason_default"]
+    return {"level": level, "rationale": text["complexity"].format(level=text[f"level_{level}"], detail=detail)}
+
+
 def build_demo_assessment(data: AdvisorPromptInput) -> dict[str, Any]:
-    patterns = _match(data.process_description)
+    tpl = _TEMPLATES.get(data.locale, _TEMPLATES["bg"])
+    text = tpl.text
+    patterns = [tpl.patterns[key] for key in _match(data.process_description)] or [tpl.general]
     primary = patterns[0]
 
     opportunities = [o for p in patterns for o in p.opportunities]
     if ToolKey.SPREADSHEETS in data.tools and primary.key != "reporting":
         opportunities.append(
-            _opp(
-                "По-малко ръчно копиране между таблици",
-                "Таблиците, които днес се попълват ръчно, се захранват автоматично от основната система.",
-                "integration",
-                "medium",
-            )
+            _opp(text["spreadsheet_title"], text["spreadsheet_description"], "integration", "medium")
         )
 
     integrations = [
         {"system": s, "purpose": purpose, "access": access}
         for tool in data.tools
-        if (entry := _TOOL_INTEGRATIONS.get(tool)) is not None
+        if (entry := tpl.integrations.get(tool)) is not None
         for s, purpose, access in [entry]
     ]
     if not integrations:
         integrations = [
-            {
-                "system": "Централно хранилище на данни",
-                "purpose": "Едно място (база данни или таблица), от което автоматизацията чете и в което записва.",
-                "access": "read_write",
-            }
+            {"system": text["storage_system"], "purpose": text["storage_purpose"], "access": "read_write"}
         ]
 
     approvals = _dedupe([a for p in patterns for a in p.approvals], "decision")[:5]
     if any(i["access"] != "read" for i in integrations):
-        approvals.append(WRITE_APPROVAL.model_dump())
+        approvals.append(write_approval(data.locale).model_dump())
 
     questions = [q for p in patterns for q in p.questions]
     if data.monthly_volume in (MonthlyVolume.FROM_2000_TO_10000, MonthlyVolume.OVER_10000):
-        questions.append("Има ли пикови периоди и колко бързо трябва да се обработва всеки случай?")
+        questions.append(text["volume_question"])
     if data.other_tools:
-        questions.append("Какви възможности за интеграция имат другите посочени от вас системи?")
-    questions.append("Кой ще отговаря за одобренията и за преглед на изключенията?")
+        questions.append(text["other_tools_question"])
+    questions.append(text["owner_question"])
 
+    labels = option_labels(data.locale)
     excerpt = " ".join(data.process_description.split())[:220].rstrip()
-    labels = " и ".join(p.label for p in patterns)
-    summary = (
-        f"Бизнес: {BUSINESS_TYPE_LABELS[data.business_type]}; екип: {TEAM_LABELS[data.team_size]}; "
-        f"обем: {VOLUME_LABELS[data.monthly_volume]}. По ключовите думи в описанието процесът е свързан с "
-        f"{labels}. Вашето описание: „{excerpt}{'…' if len(data.process_description) > 220 else ''}“"
+    summary = text["summary"].format(
+        business=labels.business[data.business_type],
+        team=labels.team[data.team_size],
+        volume=labels.volume[data.monthly_volume],
+        labels=text["label_joiner"].join(p.label for p in patterns),
+        excerpt=excerpt + ("…" if len(data.process_description) > 220 else ""),
     )
 
-    complexity = _complexity(data, patterns)
+    complexity = _complexity(data, patterns, text)
     # Deep copy: callers may mutate the result, and the templates above are shared module state.
     return copy.deepcopy({
         "problem_summary": summary,
@@ -666,10 +704,10 @@ def build_demo_assessment(data: AdvisorPromptInput) -> dict[str, Any]:
         "proposed_workflow": primary.workflow,
         "integrations": integrations[:8],
         "human_approvals": approvals,
-        "data_protection": _dedupe(_BASE_DATA_PROTECTION + [d for p in patterns for d in p.data_protection])[:6],
-        "risks": _dedupe([r for p in patterns for r in p.risks] + _BASE_RISKS, "risk")[:6],
+        "data_protection": _dedupe(tpl.data_protection + [d for p in patterns for d in p.data_protection])[:6],
+        "risks": _dedupe([r for p in patterns for r in p.risks] + tpl.risks, "risk")[:6],
         "complexity": complexity,
-        "phases": _PHASES[complexity["level"]],
+        "phases": tpl.phases[complexity["level"]],
         "clarification_questions": _dedupe(questions)[:8],
-        "next_steps": _NEXT_STEPS,
+        "next_steps": tpl.next_steps,
     })

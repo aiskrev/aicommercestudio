@@ -48,6 +48,8 @@ function renderForm(initialService = "", initialInquiry: "contact" | "quote" = "
       initialService={initialService}
       initialInquiry={initialInquiry}
       privacyHref="/poveritelnost"
+      aiLabels={bg.aiManagedForm}
+      locale="bg"
     />,
   );
 }

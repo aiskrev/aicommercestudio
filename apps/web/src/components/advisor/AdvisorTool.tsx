@@ -14,6 +14,7 @@ import {
   type AdvisorContent,
 } from "@/content/bg/advisor";
 import type { Dictionary } from "@/i18n";
+import type { Locale } from "@/i18n/config";
 import {
   ADVISOR_LIMITS,
   type AdvisorErrors,
@@ -36,16 +37,19 @@ interface Props {
     labels: Dictionary["form"];
     messages: Dictionary["validation"];
     inquiry: Dictionary["inquiry"];
+    aiLabels: Dictionary["aiManagedForm"];
+    locale: Locale;
     services: ServiceOption[];
     privacyHref: string;
     nextSteps: string[];
   };
   retentionDays: number;
+  locale: Locale;
 }
 
 const FIELD_ORDER: AdvisorField[] = ["business_type", "process_description", "monthly_volume", "team_size", "tools", "other_tools"];
 
-export function AdvisorTool({ content, contact, retentionDays }: Props) {
+export function AdvisorTool({ content, contact, retentionDays, locale }: Props) {
   const f = content.form;
   const [values, setValues] = useState<AdvisorValues>(emptyAdvisorValues);
   const [errors, setErrors] = useState<AdvisorErrors>({});
@@ -63,11 +67,11 @@ export function AdvisorTool({ content, contact, retentionDays }: Props) {
   useEffect(() => {
     let active = true;
     fetchFormToken().then((value) => active && setToken(value));
-    fetchAdvisorStatus().then((value) => active && setStatus(value));
+    fetchAdvisorStatus(locale).then((value) => active && setStatus(value));
     return () => {
       active = false;
     };
-  }, []);
+  }, [locale]);
 
   useEffect(() => {
     if (result) resultHeadingRef.current?.focus();
@@ -109,7 +113,7 @@ export function AdvisorTool({ content, contact, retentionDays }: Props) {
     }
 
     setSubmitting(true);
-    const response = await requestAssessment(toAdvisorPayload(values, token));
+    const response = await requestAssessment(toAdvisorPayload(values, token, locale), locale);
     setSubmitting(false);
     fetchFormToken().then(setToken);
 
@@ -136,7 +140,7 @@ export function AdvisorTool({ content, contact, retentionDays }: Props) {
     const ref = result.reference ?? "";
     return (
       <div className="grid gap-8">
-        <AdvisorResult result={result} content={content} headingRef={resultHeadingRef} />
+        <AdvisorResult result={result} content={content} headingRef={resultHeadingRef} locale={locale} />
 
         <div className="flex flex-wrap gap-3 print:hidden">
           {!consulting && (

@@ -82,6 +82,7 @@ function renderTool() {
     <AdvisorTool
       content={advisor}
       retentionDays={30}
+      locale="bg"
       contact={{
         labels: bg.form,
         messages: bg.validation,
@@ -92,6 +93,8 @@ function renderTool() {
         ],
         privacyHref: "/poveritelnost",
         nextSteps: [],
+        aiLabels: bg.aiManagedForm,
+        locale: "bg",
       }}
     />,
   );
@@ -133,12 +136,23 @@ describe("advisor validation helpers", () => {
     expect(toggleTool(["crm"], "crm")).toEqual([]);
   });
 
-  it("sends no personal-data fields", () => {
-    const payload = toAdvisorPayload({ ...emptyAdvisorValues(), process_description: "  текст  " }, "tok");
+  it("sends no personal-data fields, only the output language", () => {
+    const payload = toAdvisorPayload({ ...emptyAdvisorValues(), process_description: "  текст  " }, "tok", "en");
     expect(Object.keys(payload).sort()).toEqual(
-      ["business_type", "form_token", "monthly_volume", "other_tools", "process_description", "save_assessment", "team_size", "tools"].sort(),
+      [
+        "business_type",
+        "form_token",
+        "locale",
+        "monthly_volume",
+        "other_tools",
+        "process_description",
+        "save_assessment",
+        "team_size",
+        "tools",
+      ].sort(),
     );
     expect(payload.process_description).toBe("текст");
+    expect(payload.locale).toBe("en");
   });
 });
 

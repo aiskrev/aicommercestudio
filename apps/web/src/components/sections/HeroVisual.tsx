@@ -3,15 +3,17 @@
  * systems of an online business. Pure SVG + CSS (stroke-dashoffset / transform / opacity only),
  * no JavaScript. Moving "packets" are hidden for users who prefer reduced motion.
  */
+import type { Dictionary } from "@/i18n";
+
 const CENTER = { x: 260, y: 250 };
 
-const nodes = [
-  { x: 100, y: 92, label: "Онлайн магазин", sub: "Shopify · WooCommerce", inbound: false },
-  { x: 420, y: 92, label: "CRM и ERP", sub: "API · webhooks", inbound: true },
-  { x: 92, y: 250, label: "SEO", sub: "индексиране · CWV", inbound: true },
-  { x: 428, y: 250, label: "Анализи", sub: "GA4 · табла", inbound: false },
-  { x: 100, y: 408, label: "Автоматизации", sub: "планирани задачи", inbound: false },
-  { x: 420, y: 408, label: "Сигурност", sub: "достъп · журнал", inbound: true },
+const positions = [
+  { x: 100, y: 92, inbound: false },
+  { x: 420, y: 92, inbound: true },
+  { x: 92, y: 250, inbound: true },
+  { x: 428, y: 250, inbound: false },
+  { x: 100, y: 408, inbound: false },
+  { x: 420, y: 408, inbound: true },
 ];
 
 function connector(x: number, y: number): string {
@@ -19,7 +21,8 @@ function connector(x: number, y: number): string {
   return `M${CENTER.x} ${CENTER.y} C ${midX} ${CENTER.y}, ${midX} ${y}, ${x} ${y}`;
 }
 
-export function HeroVisual() {
+export function HeroVisual({ labels }: { labels: Dictionary["ui"]["heroVisual"] }) {
+  const nodes = positions.map((position, index) => ({ ...position, ...labels.nodes[index] }));
   return (
     <div className="relative" aria-hidden="true">
       <div className="absolute -inset-8 rounded-[2.5rem] bg-gradient-to-br from-cyan-500/10 via-blue-500/5 to-violet-500/10 blur-2xl" />
@@ -95,10 +98,10 @@ export function HeroVisual() {
           {/* core */}
           <rect x="174" y="212" width="172" height="76" rx="20" fill="url(#hv-core)" stroke="url(#hv-stroke)" strokeWidth="1.6" />
           <text x={CENTER.x} y="244" textAnchor="middle" className="fill-white font-display" fontSize="15.5" fontWeight="600">
-            AI оркестрация
+            {labels.core}
           </text>
           <text x={CENTER.x} y="266" textAnchor="middle" className="fill-cyan-200" fontSize="11">
-            с човешко одобрение
+            {labels.coreSub}
           </text>
 
           {/* system nodes */}
@@ -135,9 +138,9 @@ export function HeroVisual() {
         <div className="glass animate-float absolute -bottom-5 left-6 hidden rounded-2xl px-4 py-3 text-left shadow-[0_20px_50px_-20px_rgb(0_0_0_/_0.8)] sm:block">
           <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-300">
             <span className="h-2 w-2 rounded-full bg-amber-300" />
-            Действие на AI агент
+            {labels.actionLabel}
           </p>
-          <p className="mt-1 text-sm font-semibold text-white">Промяна на цена → чака одобрение</p>
+          <p className="mt-1 text-sm font-semibold text-white">{labels.actionText}</p>
         </div>
       </div>
     </div>

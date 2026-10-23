@@ -1,10 +1,10 @@
-import type { Article } from "@/content/types";
+import type { ArticleSource } from "@/content/types";
 
 /**
  * Editorial articles, October 2026. Practical technical guidance only: no client results,
  * rankings, traffic figures or prices are claimed. Illustrative calculations are labelled as such.
  */
-export const newArticles: Article[] = [
+export const newArticles: ArticleSource[] = [
   {
     slug: "tehnicheski-problemi-pri-online-magazinite",
     title: "Най-честите технически проблеми при онлайн магазините и как да ги откриете навреме",

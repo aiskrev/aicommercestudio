@@ -14,6 +14,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 from app.config import Settings
 from app.errors import error_body
+from app.i18n import error_message, parse_locale, request_locale
 from app.logging_config import request_id_ctx
 
 logger = logging.getLogger("app.request")
@@ -82,7 +83,9 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         logger.warning("origin_rejected", extra={"origin": origin[:100], "path": request.url.path})
         return JSONResponse(
             status_code=403,
-            content=error_body(403, "Заявката е отхвърлена (невалиден произход).", "origin_rejected", request_id),
+            content=error_body(
+                403, error_message("origin_rejected", request_locale(request), ""), "origin_rejected", request_id
+            ),
         )
 
 
@@ -132,6 +135,8 @@ class BodySizeLimitMiddleware:
 
     @staticmethod
     async def _reject(scope: Scope, receive: Receive, send: Send) -> None:
-        body = error_body(413, "Заявката е твърде голяма.", "payload_too_large")
+        headers = dict(scope.get("headers") or [])
+        locale = parse_locale(headers.get(b"accept-language", b"").decode("latin-1"))
+        body = error_body(413, error_message("payload_too_large", locale, ""), "payload_too_large")
         response = JSONResponse(status_code=413, content=body)
         await response(scope, receive, send)

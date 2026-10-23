@@ -17,6 +17,7 @@ from datetime import datetime
 from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator
+from pydantic_core import PydanticCustomError
 
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _URL_RE = re.compile(r"https?://|www\.", re.IGNORECASE)
@@ -119,10 +120,77 @@ TOOL_LABELS: dict[ToolKey, str] = {
     ToolKey.NONE: "без специализиран софтуер",
 }
 
+BUSINESS_TYPE_LABELS_EN: dict[BusinessType, str] = {
+    BusinessType.ONLINE_STORE: "online store",
+    BusinessType.RETAIL: "brick-and-mortar retail",
+    BusinessType.WHOLESALE: "wholesale and distribution",
+    BusinessType.SERVICES: "consumer services",
+    BusinessType.PROFESSIONAL: "professional services (accounting, legal, consulting)",
+    BusinessType.MANUFACTURING: "manufacturing",
+    BusinessType.LOGISTICS: "logistics and transport",
+    BusinessType.HOSPITALITY: "hospitality and restaurants",
+    BusinessType.AGENCY: "agency (marketing, design, IT)",
+    BusinessType.OTHER: "other type of business",
+}
+VOLUME_LABELS_EN: dict[MonthlyVolume, str] = {
+    MonthlyVolume.UNDER_100: "under 100 per month",
+    MonthlyVolume.FROM_100_TO_500: "100–500 per month",
+    MonthlyVolume.FROM_500_TO_2000: "500–2,000 per month",
+    MonthlyVolume.FROM_2000_TO_10000: "2,000–10,000 per month",
+    MonthlyVolume.OVER_10000: "over 10,000 per month",
+}
+TEAM_LABELS_EN: dict[TeamSize, str] = {
+    TeamSize.SOLO: "1 person",
+    TeamSize.FROM_2_TO_5: "2–5 people",
+    TeamSize.FROM_6_TO_20: "6–20 people",
+    TeamSize.FROM_21_TO_50: "21–50 people",
+    TeamSize.OVER_50: "over 50 people",
+}
+TOOL_LABELS_EN: dict[ToolKey, str] = {
+    ToolKey.SHOPIFY: "Shopify",
+    ToolKey.WOOCOMMERCE: "WooCommerce",
+    ToolKey.OTHER_ECOMMERCE: "another e-commerce platform",
+    ToolKey.SPREADSHEETS: "Excel / Google Sheets spreadsheets",
+    ToolKey.GOOGLE_WORKSPACE: "Google Workspace",
+    ToolKey.MICROSOFT_365: "Microsoft 365",
+    ToolKey.EMAIL: "email",
+    ToolKey.CRM: "CRM system",
+    ToolKey.ERP: "ERP system",
+    ToolKey.ACCOUNTING: "accounting software",
+    ToolKey.INVOICING: "invoicing software",
+    ToolKey.COURIER: "courier services with an online account",
+    ToolKey.PAYMENTS: "payment provider",
+    ToolKey.HELPDESK: "customer support system",
+    ToolKey.MESSAGING: "Viber / WhatsApp / Messenger",
+    ToolKey.NONE: "no specialised software",
+}
+
+AdvisorLocale = Literal["bg", "en"]
+
+
+class OptionLabels(BaseModel):
+    business: dict[BusinessType, str]
+    volume: dict[MonthlyVolume, str]
+    team: dict[TeamSize, str]
+    tools: dict[ToolKey, str]
+
+
+_LABELS: dict[str, OptionLabels] = {
+    "bg": OptionLabels(business=BUSINESS_TYPE_LABELS, volume=VOLUME_LABELS, team=TEAM_LABELS, tools=TOOL_LABELS),
+    "en": OptionLabels(
+        business=BUSINESS_TYPE_LABELS_EN, volume=VOLUME_LABELS_EN, team=TEAM_LABELS_EN, tools=TOOL_LABELS_EN
+    ),
+}
+
+
+def option_labels(locale: str) -> OptionLabels:
+    """Human-readable option labels in the visitor's language (Bulgarian for anything unknown)."""
+    return _LABELS.get(locale, _LABELS["bg"])
+
 
 def _clean(value: str) -> str:
     if _CONTROL_CHARS.search(value):
-        raise ValueError("Текстът съдържа непозволени символи.")
+        raise PydanticCustomError("control_chars", "Текстът съдържа непозволени символи.")
     return value.strip()
 
 
@@ -139,13 +207,17 @@ class AdvisorRequest(BaseModel):
     other_tools: str = Field(default="", max_length=200)
     save_assessment: bool = True
     form_token: str = Field(default="", max_length=200)
+    # Language of the generated assessment (the page the visitor is on).
+    locale: AdvisorLocale = "bg"
 
     @field_validator("process_description")
     @classmethod
     def _description(cls, value: str) -> str:
         value = _clean(value)
         if len(_URL_RE.findall(value)) > MAX_LINKS_IN_DESCRIPTION:
-            raise ValueError("Описанието съдържа твърде много връзки. Опишете процеса с думи.")
+            raise PydanticCustomError(
+                "too_many_links", "Описанието съдържа твърде много връзки. Опишете процеса с думи."
+            )
         return value
 
     @field_validator("other_tools")
@@ -153,7 +225,7 @@ class AdvisorRequest(BaseModel):
     def _other_tools(cls, value: str) -> str:
         value = _clean(value)
         if _URL_RE.search(value) or "<" in value or ">" in value:
-            raise ValueError("Полето не може да съдържа връзки или HTML.")
+            raise PydanticCustomError("no_links", "Полето не може да съдържа връзки или HTML.")
         return value
 
     @field_validator("tools")

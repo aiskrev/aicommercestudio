@@ -2,7 +2,7 @@ import { AdvisorPromo } from "@/components/advisor/AdvisorPromo";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
-import { CheckList, FeatureCard, PageHero, Section, SectionHeading, cx } from "@/components/ui/primitives";
+import { ButtonLink, CheckList, FeatureCard, IconBadge, PageHero, Section, SectionHeading, cx } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -22,9 +22,9 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/ai-reshe
 }
 
 const riskTone: Record<string, string> = {
-  Нисък: "bg-emerald-400/10 text-emerald-300 ring-emerald-400/30",
-  Висок: "bg-amber-400/10 text-amber-300 ring-amber-400/30",
-  Критичен: "bg-rose-400/10 text-rose-300 ring-rose-400/30",
+  low: "bg-emerald-400/10 text-emerald-300 ring-emerald-400/30",
+  high: "bg-amber-400/10 text-amber-300 ring-amber-400/30",
+  critical: "bg-rose-400/10 text-rose-300 ring-rose-400/30",
 };
 
 export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/ai-resheniya">) {
@@ -33,6 +33,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const aiTools = serviceByKey(locale, "ai_tools");
+  const managedService = serviceByKey(locale, "ai_managed");
 
   return (
     <>
@@ -69,9 +70,9 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
             <caption className="sr-only">{page.approvalTitle}</caption>
             <thead className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-400">
               <tr>
-                <th scope="col" className="px-5 py-4 font-medium">Действие</th>
-                <th scope="col" className="px-5 py-4 font-medium">Риск</th>
-                <th scope="col" className="hidden px-5 py-4 font-medium sm:table-cell">Контрол</th>
+                <th scope="col" className="px-5 py-4 font-medium">{page.approvalHeaders.action}</th>
+                <th scope="col" className="px-5 py-4 font-medium">{page.approvalHeaders.risk}</th>
+                <th scope="col" className="hidden px-5 py-4 font-medium sm:table-cell">{page.approvalHeaders.control}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.06]">
@@ -82,7 +83,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
                     <span className="mt-1 block text-xs font-normal text-slate-400 sm:hidden">{row.control}</span>
                   </th>
                   <td className="px-5 py-4">
-                    <span className={cx("inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1", riskTone[row.risk])}>
+                    <span className={cx("inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1", riskTone[row.level])}>
                       {row.risk}
                     </span>
                   </td>
@@ -99,7 +100,22 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
         <ProcessTimeline steps={page.lifecycle} className="mt-14" />
       </Section>
 
-      <Section labelledBy="ai-not-for">
+      <Section labelledBy="ai-managed-title">
+        <div className="card-accent grid gap-6 rounded-[1.5rem] p-8 sm:p-10 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+          <IconBadge name={managedService.icon} className="h-14 w-14" />
+          <div>
+            <h2 id="ai-managed-title" className="t-h2 text-2xl sm:text-3xl">
+              {page.managed.title}
+            </h2>
+            <p className="mt-2 max-w-2xl leading-relaxed text-slate-300">{page.managed.lead}</p>
+          </div>
+          <ButtonLink href={href(routes.service(managedService.slug))} icon="arrowRight">
+            {page.managed.cta}
+          </ButtonLink>
+        </div>
+      </Section>
+
+      <Section labelledBy="ai-not-for" alt>
         <div className="card rounded-3xl p-8 sm:p-10">
           <h2 id="ai-not-for" className="text-2xl font-semibold">
             {page.notForTitle}

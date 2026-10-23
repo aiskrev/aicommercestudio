@@ -5,21 +5,15 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 
 import { ActivityList } from "@/components/admin/ActivityList";
+import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { AdminPageHeader } from "@/components/admin/AdminShell";
 import { EmptyState, ErrorState, LoadingState, Panel, Pill, StatusBadge } from "@/components/admin/ui";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClass, cx } from "@/components/ui/primitives";
+import { fmt } from "@/i18n/admin";
 import { adminFetch, ApiError } from "@/lib/admin-api";
 import {
-  budgetLabels,
-  inquiryTypeLabels,
-  platformLabels,
-  priorityLabels,
-  serviceLabels,
-  statusLabels,
-  timelineLabels,
-} from "@/lib/admin-labels";
-import {
+  type AiManagedDetails,
   type AuditEntry,
   LEAD_STATUSES,
   type LeadDetail as Lead,
@@ -35,6 +29,8 @@ import { useAdminData } from "@/lib/use-admin-data";
 export function LeadDetail({ id }: { id: string }) {
   const lead = useAdminData<Lead>(`/api/admin/leads/${id}`);
   const history = useAdminData<AuditEntry[]>(`/api/admin/leads/${id}/audit`);
+  const { t: dict, labels, locale } = useAdminI18n();
+  const t = dict.lead;
 
   if (lead.loading && !lead.data) return <LoadingState />;
   if (lead.error && !lead.data) {
@@ -42,7 +38,7 @@ export function LeadDetail({ id }: { id: string }) {
       <div className="grid gap-4">
         <ErrorState message={lead.error} requestId={lead.errorId} onRetry={lead.reload} />
         <Link href={routes.adminLeads} className="text-sm text-cyan-300">
-          ← Към запитванията
+          {t.backToList}
         </Link>
       </div>
     );
@@ -50,6 +46,7 @@ export function LeadDetail({ id }: { id: string }) {
   if (!lead.data) return null;
 
   const data = lead.data;
+  const date = (value: string) => formatDateTime(value, locale);
   const refresh = (updated?: Lead) => {
     if (updated) lead.replace(updated);
     else lead.reload();
@@ -59,7 +56,7 @@ export function LeadDetail({ id }: { id: string }) {
   return (
     <>
       <Link href={routes.adminLeads} className="mb-4 inline-flex items-center gap-1 text-sm text-slate-400 hover:text-white">
-        ← Всички запитвания
+        {t.back}
       </Link>
       <AdminPageHeader
         title={data.name}
@@ -69,29 +66,32 @@ export function LeadDetail({ id }: { id: string }) {
 
       <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
         <div className="grid content-start gap-6">
-          <Panel title="Запитване">
+          <Panel title={t.panel}>
             <dl className="grid gap-4 text-sm sm:grid-cols-2">
-              <Info label="Имейл">
+              <Info label={t.email}>
                 <a href={`mailto:${data.email}`} className="text-cyan-300 hover:text-cyan-200">
                   {data.email}
                 </a>
               </Info>
-              <Info label="Телефон">{data.phone ?? <span className="text-slate-400">Не е посочен</span>}</Info>
-              <Info label="Тип">{inquiryTypeLabels[data.inquiry_type] ?? data.inquiry_type}</Info>
-              <Info label="Услуга">
-                {serviceLabels[data.service] ?? data.service}
+              <Info label={t.phone}>{data.phone ?? <span className="text-slate-400">{t.noPhone}</span>}</Info>
+              <Info label={t.type}>{labels.inquiryType[data.inquiry_type] ?? data.inquiry_type}</Info>
+              <Info label={t.service}>
+                {labels.service[data.service] ?? data.service}
                 {data.submitted_service !== data.service && (
                   <span className="block text-xs text-slate-400">
-                    Първоначално избрана: {serviceLabels[data.submitted_service] ?? data.submitted_service}
+                    {fmt(t.originally, { service: labels.service[data.submitted_service] ?? data.submitted_service })}
                   </span>
                 )}
               </Info>
+              <Info label={t.language}>
+                <span data-testid="lead-locale">{labels.locale[data.locale] ?? data.locale}</span>
+              </Info>
               {data.inquiry_type === "quote" && (
                 <>
-                  <Info label="Платформа">{platformLabels[data.platform ?? ""] ?? "—"}</Info>
-                  <Info label="Ориентировъчен бюджет">{budgetLabels[data.budget_range ?? ""] ?? "—"}</Info>
-                  <Info label="Желан срок">{timelineLabels[data.timeline ?? ""] ?? "—"}</Info>
-                  <Info label="Сайт">
+                  <Info label={t.platform}>{labels.platform[data.platform ?? ""] ?? "—"}</Info>
+                  <Info label={t.budget}>{labels.budget[data.budget_range ?? ""] ?? "—"}</Info>
+                  <Info label={t.timeline}>{labels.timeline[data.timeline ?? ""] ?? "—"}</Info>
+                  <Info label={t.website}>
                     {data.website_url ? (
                       <a
                         href={data.website_url}
@@ -107,51 +107,46 @@ export function LeadDetail({ id }: { id: string }) {
                   </Info>
                 </>
               )}
-              <Info label="Получено">{formatDateTime(data.created_at)}</Info>
-              <Info label="Източник">{data.source === "synthetic_seed" ? "Синтетични данни (разработка)" : "Контактна форма"}</Info>
-              <Info label="Последна промяна на статус">
-                {data.status_changed_at ? formatDateTime(data.status_changed_at) : "—"}
-              </Info>
+              <Info label={t.received}>{date(data.created_at)}</Info>
+              <Info label={t.source}>{data.source === "synthetic_seed" ? t.sourceSynthetic : t.sourceForm}</Info>
+              <Info label={t.statusChanged}>{data.status_changed_at ? date(data.status_changed_at) : "—"}</Info>
             </dl>
             <div className="mt-6">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Съобщение</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t.message}</p>
               <p className="mt-2 whitespace-pre-wrap rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 leading-relaxed text-slate-200">
                 {data.message}
               </p>
             </div>
           </Panel>
 
+          {data.ai_managed && <AiManagedPanel details={data.ai_managed} />}
           {data.advisor_assessment && <LinkedAssessmentPanel linked={data.advisor_assessment} />}
 
           <Notes lead={data} onAdded={(note) => refresh({ ...data, notes: [note, ...data.notes] })} />
-          <AiTriage
-            lead={data}
-            onDone={() => history.reload()}
-            onApplied={(updated) => refresh(updated)}
-          />
+          <AiTriage lead={data} onDone={() => history.reload()} onApplied={(updated) => refresh(updated)} />
         </div>
 
         <div className="grid content-start gap-6">
           <StatusEditor lead={data} onSaved={(updated) => refresh(updated)} onConflict={() => refresh()} />
           <ServiceEditor lead={data} onSaved={(updated) => refresh(updated)} />
 
-          <Panel title="Съгласия (GDPR)">
+          <Panel title={t.consents}>
             <dl className="grid gap-3 text-sm">
-              <Info label="Информация за поверителност">
-                Потвърдена на {formatDateTime(data.privacy_acknowledged_at)} (версия {data.privacy_notice_version})
+              <Info label={t.privacy}>
+                {fmt(t.privacyAck, { date: date(data.privacy_acknowledged_at), version: data.privacy_notice_version })}
               </Info>
-              <Info label="Маркетингово съгласие">
+              <Info label={t.marketing}>
                 {data.marketing_consent && data.marketing_consent_at
-                  ? `Дадено на ${formatDateTime(data.marketing_consent_at)}`
-                  : "Не е дадено"}
+                  ? fmt(t.marketingGiven, { date: date(data.marketing_consent_at) })
+                  : t.marketingNone}
               </Info>
             </dl>
           </Panel>
 
-          <Panel title="История">
+          <Panel title={t.history}>
             {history.loading && !history.data && <LoadingState />}
             {history.error && <ErrorState message={history.error} requestId={history.errorId} onRetry={history.reload} />}
-            {history.data && history.data.length === 0 && <EmptyState icon="activity" title="Няма записи" />}
+            {history.data && history.data.length === 0 && <EmptyState icon="activity" title={t.noHistory} />}
             {history.data && history.data.length > 0 && <ActivityList entries={history.data} linkLeads={false} />}
           </Panel>
 
@@ -171,6 +166,40 @@ function Info({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
+/** What the client told us about their AI system (descriptive only — no access data is collected). */
+function AiManagedPanel({ details }: { details: AiManagedDetails }) {
+  const { t: dict, labels } = useAdminI18n();
+  const t = dict.aiManaged;
+  const ai = labels.aiManaged;
+  const list = (values: string[], map: Record<string, string>) => values.map((v) => map[v] ?? v).join(", ");
+  return (
+    <Panel title={t.title}>
+      <div className="grid gap-4 text-sm" data-testid="ai-managed-details">
+        <p className="text-xs text-slate-400">{t.note}</p>
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <Info label={t.sector}>{ai.sector[details.sector] ?? details.sector}</Info>
+          <Info label={t.agentsCount}>{ai.agentsCount[details.agents_count] ?? details.agents_count}</Info>
+          <Info label={t.systemTypes}>{list(details.system_types, ai.systemType)}</Info>
+          <Info label={t.interests}>{list(details.support_interests, ai.interest)}</Info>
+          <Info label={t.provider}>{details.ai_provider || "—"}</Info>
+          <Info label={t.hosting}>{details.hosting ? (ai.hosting[details.hosting] ?? details.hosting) : "—"}</Info>
+          <Info label={t.communication}>
+            {labels.locale[details.communication_language] ?? details.communication_language}
+          </Info>
+        </dl>
+        {details.additional_notes && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t.notes}</p>
+            <p className="mt-2 whitespace-pre-wrap rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 leading-relaxed text-slate-200">
+              {details.additional_notes}
+            </p>
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
 function StatusEditor({
   lead,
   onSaved,
@@ -180,6 +209,8 @@ function StatusEditor({
   onSaved: (lead: Lead) => void;
   onConflict: () => void;
 }) {
+  const { t: dict, labels } = useAdminI18n();
+  const t = dict.lead;
   const [status, setStatus] = useState<LeadStatus>(lead.status);
   const [synced, setSynced] = useState(lead.status);
   const [saving, setSaving] = useState(false);
@@ -203,20 +234,20 @@ function StatusEditor({
         body: JSON.stringify({ status, expected_status: lead.status }),
       });
       onSaved(updated);
-      setMessage({ ok: true, text: "Статусът е запазен." });
+      setMessage({ ok: true, text: t.statusSaved });
     } catch (err) {
       setConflict(err instanceof ApiError && err.code === "status_conflict");
-      setMessage({ ok: false, text: err instanceof ApiError ? err.message : "Грешка при запазване." });
+      setMessage({ ok: false, text: err instanceof ApiError ? err.message : dict.common.saveError });
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <Panel title="Статус">
+    <Panel title={t.status}>
       <form onSubmit={save} className="grid gap-3">
         <label htmlFor="lead-status" className="sr-only">
-          Статус на запитването
+          {t.statusLabel}
         </label>
         <select
           id="lead-status"
@@ -226,19 +257,19 @@ function StatusEditor({
         >
           {LEAD_STATUSES.map((s) => (
             <option key={s} value={s}>
-              {statusLabels[s]}
+              {labels.status[s]}
             </option>
           ))}
         </select>
         <button type="submit" className={buttonClass("primary")} disabled={saving || status === lead.status}>
-          {saving ? "Запазване…" : "Запази статуса"}
+          {saving ? dict.common.saving : t.saveStatus}
         </button>
         <p aria-live="polite" className={cx("text-sm", message?.ok ? "text-emerald-300" : "text-rose-300")}>
           {message?.text}
         </p>
         {conflict && (
           <button type="button" onClick={onConflict} className={buttonClass("secondary", "sm")}>
-            Презареди актуалните данни
+            {t.reload}
           </button>
         )}
       </form>
@@ -247,6 +278,8 @@ function StatusEditor({
 }
 
 function ServiceEditor({ lead, onSaved }: { lead: Lead; onSaved: (lead: Lead) => void }) {
+  const { t: dict, labels } = useAdminI18n();
+  const t = dict.lead;
   const [service, setService] = useState(lead.service);
   const [synced, setSynced] = useState(lead.service);
   const [saving, setSaving] = useState(false);
@@ -266,29 +299,29 @@ function ServiceEditor({ lead, onSaved }: { lead: Lead; onSaved: (lead: Lead) =>
         body: JSON.stringify({ service }),
       });
       onSaved(updated);
-      setMessage({ ok: true, text: "Категорията е запазена." });
+      setMessage({ ok: true, text: t.categorySaved });
     } catch (err) {
-      setMessage({ ok: false, text: err instanceof ApiError ? err.message : "Грешка при запазване." });
+      setMessage({ ok: false, text: err instanceof ApiError ? err.message : dict.common.saveError });
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <Panel title="Категория (интерес към услуга)">
+    <Panel title={t.category}>
       <form onSubmit={save} className="grid gap-3">
         <label htmlFor="lead-service" className="sr-only">
-          Услуга
+          {t.service}
         </label>
         <select id="lead-service" className="field" value={service} onChange={(e) => setService(e.target.value)}>
-          {Object.entries(serviceLabels).map(([key, label]) => (
+          {Object.entries(labels.service).map(([key, label]) => (
             <option key={key} value={key}>
               {label}
             </option>
           ))}
         </select>
         <button type="submit" className={buttonClass("secondary")} disabled={saving || service === lead.service}>
-          {saving ? "Запазване…" : "Запази категорията"}
+          {saving ? dict.common.saving : t.saveCategory}
         </button>
         <p aria-live="polite" className={cx("text-sm", message?.ok ? "text-emerald-300" : "text-rose-300")}>
           {message?.text}
@@ -299,6 +332,8 @@ function ServiceEditor({ lead, onSaved }: { lead: Lead; onSaved: (lead: Lead) =>
 }
 
 function Notes({ lead, onAdded }: { lead: Lead; onAdded: (note: LeadNote) => void }) {
+  const { t: dict, locale } = useAdminI18n();
+  const t = dict.lead;
   const [body, setBody] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -306,7 +341,7 @@ function Notes({ lead, onAdded }: { lead: Lead; onAdded: (note: LeadNote) => voi
   async function add(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!body.trim()) {
-      setError("Бележката не може да е празна.");
+      setError(t.noteEmpty);
       return;
     }
     setSaving(true);
@@ -319,24 +354,24 @@ function Notes({ lead, onAdded }: { lead: Lead; onAdded: (note: LeadNote) => voi
       setBody("");
       onAdded(note);
     } catch (err) {
-      setError(err instanceof ApiError ? err.fieldErrors.body ?? err.message : "Грешка при запазване.");
+      setError(err instanceof ApiError ? (err.fieldErrors.body ?? err.message) : dict.common.saveError);
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <Panel title="Бележки">
+    <Panel title={t.notes}>
       <form onSubmit={add} className="grid gap-3">
         <label htmlFor="note-body" className="sr-only">
-          Нова бележка
+          {t.newNote}
         </label>
         <textarea
           id="note-body"
           rows={3}
           maxLength={4000}
           className="field"
-          placeholder="Добавете вътрешна бележка (видима само за администратори)"
+          placeholder={t.notePlaceholder}
           value={body}
           onChange={(e) => setBody(e.target.value)}
         />
@@ -346,18 +381,18 @@ function Notes({ lead, onAdded }: { lead: Lead; onAdded: (note: LeadNote) => voi
           </p>
         )}
         <button type="submit" className={cx(buttonClass("secondary"), "justify-self-start")} disabled={saving}>
-          {saving ? "Запазване…" : "Добави бележка"}
+          {saving ? dict.common.saving : t.addNote}
         </button>
       </form>
       {lead.notes.length === 0 ? (
-        <p className="mt-5 text-sm text-slate-400">Все още няма бележки.</p>
+        <p className="mt-5 text-sm text-slate-400">{t.noNotes}</p>
       ) : (
         <ul className="mt-5 grid gap-3" data-testid="notes-list">
           {lead.notes.map((note) => (
             <li key={note.id} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
               <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">{note.body}</p>
               <p className="mt-2 text-xs text-slate-400">
-                {note.author_name ?? "Изтрит потребител"} · {formatDateTime(note.created_at)}
+                {note.author_name ?? t.deletedUser} · {formatDateTime(note.created_at, locale)}
               </p>
             </li>
           ))}
@@ -376,6 +411,8 @@ function AiTriage({
   onDone: () => void;
   onApplied: (lead: Lead) => void;
 }) {
+  const { t: dict, labels, locale } = useAdminI18n();
+  const t = dict.lead;
   const leadId = lead.id;
   const [result, setResult] = useState<LeadTriage | null>(null);
   const [loading, setLoading] = useState(false);
@@ -390,7 +427,7 @@ function AiTriage({
         await adminFetch<Lead>(`/api/admin/leads/${leadId}`, { method: "PATCH", body: JSON.stringify({ service }) }),
       );
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Предложението не можа да бъде приложено.");
+      setError(err instanceof ApiError ? err.message : t.applyFailed);
     } finally {
       setApplying(false);
     }
@@ -403,37 +440,32 @@ function AiTriage({
       setResult(await adminFetch<LeadTriage>(`/api/admin/leads/${leadId}/ai/triage`, { method: "POST" }));
       onDone();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "AI анализът не е наличен.");
+      setError(err instanceof ApiError ? err.message : t.triageUnavailable);
     } finally {
       setLoading(false);
     }
   }
 
+  const suggested = result ? (labels.service[result.suggested_service] ?? result.suggested_service) : "";
+
   return (
     <Panel
-      title="AI анализ (предложение)"
+      title={t.triage}
       actions={
         <button type="button" onClick={run} disabled={loading} className={buttonClass("secondary")}>
           <Icon name="sparkles" className="h-4 w-4" />
-          {loading ? "Анализ…" : result ? "Анализирай отново" : "Анализирай"}
+          {loading ? t.analysing : result ? t.analyseAgain : t.analyse}
         </button>
       }
     >
       {error && <ErrorState message={error} />}
-      {!result && !error && (
-        <p className="text-sm text-slate-400">
-          Класифицира запитването и предлага следваща стъпка. Действието е само за четене — нищо не се изпраща и не се
-          променя автоматично.
-        </p>
-      )}
+      {!result && !error && <p className="text-sm text-slate-400">{t.triageIntro}</p>}
       {result && (
         <div className="grid gap-4 text-sm" data-testid="ai-triage">
           <div className="flex flex-wrap gap-2">
-            <Pill tone="bg-cyan-400/10 text-cyan-200 ring-cyan-400/30">
-              {serviceLabels[result.suggested_service] ?? result.suggested_service}
-            </Pill>
+            <Pill tone="bg-cyan-400/10 text-cyan-200 ring-cyan-400/30">{suggested}</Pill>
             <Pill tone="bg-violet-400/10 text-violet-200 ring-violet-400/30">
-              Приоритет: {priorityLabels[result.priority]}
+              {fmt(t.priority, { priority: labels.priority[result.priority] ?? result.priority })}
             </Pill>
             <Pill tone="bg-white/5 text-slate-300 ring-white/10">
               {result.provider} · {result.model}
@@ -441,7 +473,7 @@ function AiTriage({
           </div>
           <p className="text-slate-200">{result.summary}</p>
           <p>
-            <span className="text-slate-400">Следваща стъпка: </span>
+            <span className="text-slate-400">{t.nextStep}</span>
             <span className="text-slate-200">{result.suggested_next_step}</span>
           </p>
           {result.suggested_service !== lead.service && (
@@ -452,11 +484,9 @@ function AiTriage({
                 disabled={applying}
                 className={buttonClass("secondary", "sm")}
               >
-                {applying
-                  ? "Прилагане…"
-                  : `Смени категорията на „${serviceLabels[result.suggested_service] ?? result.suggested_service}“`}
+                {applying ? t.applying : fmt(t.applyCategory, { service: suggested })}
               </button>
-              <p className="mt-1 text-xs text-slate-400">Промяната се прави само след вашето потвърждение и се записва в журнала.</p>
+              <p className="mt-1 text-xs text-slate-400">{t.applyNote}</p>
             </div>
           )}
           {result.signals.length > 0 && (
@@ -467,6 +497,7 @@ function AiTriage({
             </ul>
           )}
           <p className="text-xs text-amber-200/80">{result.disclaimer}</p>
+          {locale === "en" && result.provider === "mock" && <p className="text-xs text-slate-400">{t.triageLanguageNote}</p>}
         </div>
       )}
     </Panel>
@@ -475,6 +506,8 @@ function AiTriage({
 
 function DeleteLead({ lead }: { lead: Lead }) {
   const router = useRouter();
+  const { t: dict } = useAdminI18n();
+  const t = dict.lead;
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -486,16 +519,13 @@ function DeleteLead({ lead }: { lead: Lead }) {
       router.push(routes.adminLeads);
     } catch (err) {
       setDeleting(false);
-      setError(err instanceof ApiError ? err.message : "Грешка при изтриване.");
+      setError(err instanceof ApiError ? err.message : t.deleteError);
     }
   }
 
   return (
-    <Panel title="Изтриване (GDPR)">
-      <p className="text-sm text-slate-400">
-        Изтрива окончателно запитването и бележките към него, например при искане за изтриване на лични данни. В журнала
-        остава само записът за изтриването, без лични данни.
-      </p>
+    <Panel title={t.delete}>
+      <p className="text-sm text-slate-400">{t.deleteBody}</p>
       {error && <p className="mt-3 text-sm text-rose-300">{error}</p>}
       {confirming ? (
         <div className="mt-4 flex flex-wrap gap-2">
@@ -506,10 +536,10 @@ function DeleteLead({ lead }: { lead: Lead }) {
             className="inline-flex items-center gap-2 rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-400"
           >
             <Icon name="trash" className="h-4 w-4" />
-            {deleting ? "Изтриване…" : "Потвърди изтриването"}
+            {deleting ? t.deleting : t.confirmDelete}
           </button>
           <button type="button" onClick={() => setConfirming(false)} className={buttonClass("secondary")}>
-            Отказ
+            {dict.common.cancel}
           </button>
         </div>
       ) : (
@@ -519,33 +549,33 @@ function DeleteLead({ lead }: { lead: Lead }) {
           className="mt-4 inline-flex items-center gap-2 rounded-full border border-rose-400/40 px-4 py-2 text-sm font-semibold text-rose-200 hover:bg-rose-400/10"
         >
           <Icon name="trash" className="h-4 w-4" />
-          Изтрий запитването
+          {t.deleteLead}
         </button>
       )}
     </Panel>
   );
 }
 
-const complexityLabels: Record<string, string> = { low: "Ниска", medium: "Средна", high: "Висока" };
-
 /** Advisor assessment the visitor attached when requesting a consultation (read-only). */
 function LinkedAssessmentPanel({ linked }: { linked: LinkedAssessment }) {
+  const { t: dict, labels, locale } = useAdminI18n();
+  const t = dict.lead;
   const a = linked.assessment;
   return (
-    <Panel title={`AI оценка #${linked.reference}`}>
+    <Panel title={fmt(t.assessment, { reference: linked.reference })}>
       <div className="grid gap-4 text-sm" data-testid="linked-assessment">
         <p className="flex flex-wrap items-center gap-2">
           <Pill tone={linked.mode === "demo" ? "bg-amber-400/10 text-amber-200 ring-amber-400/30" : "bg-cyan-400/10 text-cyan-200 ring-cyan-400/30"}>
-            {linked.mode === "demo" ? "Демонстрационен режим (шаблони)" : "Генерирана от AI"}
+            {linked.mode === "demo" ? t.assessmentDemo : t.assessmentAi}
           </Pill>
           <Pill tone="bg-white/5 text-slate-300 ring-white/15">
-            Сложност: {complexityLabels[a.complexity.level] ?? a.complexity.level}
+            {fmt(t.complexity, { level: labels.complexity[a.complexity.level] ?? a.complexity.level })}
           </Pill>
-          <span className="text-xs text-slate-400">{formatDateTime(linked.created_at)}</span>
+          <span className="text-xs text-slate-400">{formatDateTime(linked.created_at, locale)}</span>
         </p>
         <p className="leading-relaxed text-slate-200">{a.problem_summary}</p>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Възможности</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t.opportunities}</p>
           <ul className="mt-2 list-disc pl-5 text-slate-300">
             {a.opportunities.map((o) => (
               <li key={o.title}>{o.title}</li>
@@ -553,7 +583,7 @@ function LinkedAssessmentPanel({ linked }: { linked: LinkedAssessment }) {
           </ul>
         </div>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Въпроси за уточняване</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t.questions}</p>
           <ul className="mt-2 list-disc pl-5 text-slate-300">
             {a.clarification_questions.map((q) => (
               <li key={q}>{q}</li>
@@ -561,7 +591,11 @@ function LinkedAssessmentPanel({ linked }: { linked: LinkedAssessment }) {
           </ul>
         </div>
         <p className="text-xs text-slate-400">
-          Системи: {linked.tools.join(", ") || "—"} · Обем: {linked.monthly_volume} · Екип: {linked.team_size}
+          {fmt(t.assessmentMeta, {
+            tools: linked.tools.join(", ") || "—",
+            volume: linked.monthly_volume,
+            team: linked.team_size,
+          })}
         </p>
       </div>
     </Panel>

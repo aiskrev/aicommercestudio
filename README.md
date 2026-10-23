@@ -1,7 +1,8 @@
 # A.I. Commerce Studio — website & lead management (V1)
 
-Bulgarian-language marketing website and administration panel for an AI-powered
-e-commerce engineering studio. Runs fully on `localhost` with Docker — no domain,
+Bilingual (Bulgarian / English) marketing website and administration panel for an AI-powered
+e-commerce engineering studio, including the AI Business Automation Advisor and the
+AI Managed Services offering (AI agent operations & optimization). Runs fully on `localhost` with Docker — no domain,
 hosting, paid AI model or Shopify credentials are required.
 
 | Part | Technology |
@@ -21,7 +22,8 @@ cd D:\Projects\AI-Commerce-Studio
 .\scripts\start.ps1            # builds and starts db + api + web, waits for health checks
 ```
 
-- Website: http://localhost:3000
+- Website: http://localhost:3000 (redirects to http://localhost:3000/bg; English: http://localhost:3000/en)
+- AI Managed Services: http://localhost:3000/bg/uslugi/ai-managed-services · http://localhost:3000/en/services/ai-managed-services
 - Admin: http://localhost:3000/admin (credentials are in `.env`: `ADMIN_BOOTSTRAP_EMAIL` / `ADMIN_BOOTSTRAP_PASSWORD`)
 - API docs (development only): http://localhost:8000/api/docs
 
@@ -61,6 +63,11 @@ docker-compose.yml, docker-compose.dev.yml, .env.example
 | [BUSINESS_PLAN.md](docs/BUSINESS_PLAN.md) | Positioning, offer, commercial model (no invented figures) |
 | [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Tokens, contrast, typography, components, motion, accessibility |
 | [AI_ADVISOR.md](docs/AI_ADVISOR.md) | AI Business Automation Advisor: flow, architecture, safety controls, retention, demo |
+| [AI_MANAGED_SERVICES.md](docs/AI_MANAGED_SERVICES.md) | AI Managed Services: page, packages, intake form, storage, admin, limits |
+| [AI_MANAGED_SERVICES_PRICING.md](docs/AI_MANAGED_SERVICES_PRICING.md) | Internal, hypothetical pricing guidance (not published) |
+| [AI_OPERATIONS_ARCHITECTURE.md](docs/AI_OPERATIONS_ARCHITECTURE.md) | Target architecture of the future AI Operations Console (not implemented) |
+| [INTERNATIONALIZATION.md](docs/INTERNATIONALIZATION.md) | BG/EN URLs, switcher, cookie, translations, SEO, API and admin languages |
+| [IMPLEMENTATION_REPORT.md](docs/IMPLEMENTATION_REPORT.md) | AI Managed Services + bilingual platform: changes, migration, endpoints, test evidence |
 | [SEO_IMPLEMENTATION.md](docs/SEO_IMPLEMENTATION.md) | SEO checklist, keyword map (unverified), indexation rules, editorial guidelines, lab performance |
 | [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production deployment (prepared, not executed): proxy, DNS, secrets, backups, monitoring, checklist, rollback |
 | [VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md) | Independent QA/security/DevOps review: what was verified, issues by severity |

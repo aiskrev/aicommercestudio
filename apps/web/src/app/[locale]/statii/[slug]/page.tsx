@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArticleBody } from "@/components/editorial/ArticleBody";
-import { ArticleCard, articleTypeLabels } from "@/components/editorial/ArticleCard";
+import { ArticleCard } from "@/components/editorial/ArticleCard";
 import { InlineCta } from "@/components/editorial/InlineCta";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -10,8 +10,8 @@ import { ServiceCard } from "@/components/sections/ServiceCard";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
 import { Container } from "@/components/ui/primitives";
-import { findArticle, findCategory, getContent, serviceByKey } from "@/content";
-import { localizePath } from "@/i18n/config";
+import { articleByKey, articleRoutePaths, categoryByKey, findArticle, getContent, serviceByKey } from "@/content";
+import { isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { formatDate } from "@/lib/format";
 import { resolveLocale } from "@/lib/params";
@@ -20,8 +20,10 @@ import { articleJsonLd, buildMetadata } from "@/lib/seo";
 
 export const dynamicParams = false;
 
-export function generateStaticParams() {
-  return getContent("bg").articles.map((article) => ({ slug: article.slug }));
+export function generateStaticParams({ params }: { params: { locale: string } }) {
+  const { locale } = params;
+  if (!isLocale(locale)) return [];
+  return getContent(locale).articles.map((article) => ({ slug: article.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/statii/[slug]">) {
@@ -29,15 +31,17 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/statii/[
   const { slug } = await params;
   const article = findArticle(locale, slug);
   if (!article) return {};
+  const { paths, availableIn } = articleRoutePaths(article.key);
   return buildMetadata({
     locale,
     title: article.metaTitle ?? article.title,
     description: article.description,
-    path: routes.article(article.slug),
+    path: paths,
+    availableIn,
     type: "article",
     publishedTime: article.publishedAt,
     modifiedTime: article.updatedAt,
-    section: findCategory(locale, article.category)?.name,
+    section: categoryByKey(locale, article.category)?.name,
   });
 }
 
@@ -50,11 +54,11 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const path = href(routes.article(article.slug));
-  const category = findCategory(locale, article.category);
+  const category = categoryByKey(locale, article.category);
   const primaryService = serviceByKey(locale, article.relatedService);
   const relatedServices = article.relatedServices.map((key) => serviceByKey(locale, key));
   const relatedArticles = article.relatedArticles
-    .map((s) => findArticle(locale, s))
+    .map((key) => articleByKey(locale, key))
     .filter((a): a is NonNullable<typeof a> => Boolean(a));
   const ctaAfter = Math.max(1, Math.floor(article.sections.length / 2) - 1);
 
@@ -86,7 +90,7 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
         <Container className="max-w-3xl py-10 sm:py-14">
           <header>
             <div className="flex flex-wrap items-center gap-2 text-sm">
-              <span className="badge badge-accent">{articleTypeLabels[article.type]}</span>
+              <span className="badge badge-accent">{dict.ui.articleTypes[article.type]}</span>
               {category && (
                 <Link href={href(routes.insightsCategory(category.slug))} className="text-cyan-300 hover:text-cyan-200">
                   {category.name}
@@ -187,7 +191,7 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
                   <ArticleCard
                     article={related}
                     href={href(routes.article(related.slug))}
-                    categoryName={findCategory(locale, related.category)?.name}
+                    categoryName={categoryByKey(locale, related.category)?.name}
                     locale={locale}
                     labels={{ minutesRead: dict.common.minutesRead, readArticle: dict.common.readArticle }}
                     headingLevel={3}

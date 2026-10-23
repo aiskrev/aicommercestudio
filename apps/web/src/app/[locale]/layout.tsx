@@ -7,7 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { StickyQuoteBar } from "@/components/editorial/StickyQuoteBar";
 import { Header } from "@/components/layout/Header";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getContent } from "@/content";
+import { buildSlugMap, getContent } from "@/content";
 import { localeMeta, localizePath, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
@@ -69,6 +69,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           services={navServices}
           items={navItems}
           cta={{ href: href(routes.contact), label: dict.nav.cta }}
+          locale={locale}
+          slugs={buildSlugMap()}
+          languageLabels={dict.language}
           labels={{
             nav: dict.nav.label,
             openMenu: dict.nav.openMenu,
@@ -82,13 +85,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         </main>
         <Footer locale={locale} dict={dict} services={services} />
         <StickyQuoteBar
-          href={`${href(routes.contact)}?tip=oferta`}
+          href={href(`${routes.contact}?tip=oferta`)}
           label={dict.quoteBar.label}
           hint={dict.quoteBar.hint}
           dismissLabel={dict.quoteBar.dismiss}
           hiddenOn={[href(routes.contact)]}
         />
-        <JsonLd data={[organizationJsonLd(), websiteJsonLd(locale)]} />
+        <JsonLd data={[organizationJsonLd(locale), websiteJsonLd(locale)]} />
       </body>
     </html>
   );

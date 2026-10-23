@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import { adminFetch, ApiError } from "@/lib/admin-api";
+import { adminDictionaries } from "@/i18n/admin";
+import { adminClientLocale, adminFetch, ApiError } from "@/lib/admin-api";
 
 interface State<T> {
   path: string | null;
@@ -28,7 +29,7 @@ export function useAdminData<T>(path: string | null) {
           path,
           data: current.data,
           version,
-          error: error instanceof ApiError ? error.message : "Възникна неочаквана грешка.",
+          error: error instanceof ApiError ? error.message : adminDictionaries[adminClientLocale()].common.unexpected,
           errorId: error instanceof ApiError ? error.requestId : null,
         })),
     );

@@ -5,7 +5,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { PageHero, Section } from "@/components/ui/primitives";
-import { articlesInCategory, findCategory, getContent, sortedArticles } from "@/content";
+import { articlesInCategory, categoryByKey, getContent, sortedArticles } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
@@ -54,7 +54,7 @@ export default async function InsightsPage({ params }: PageProps<"/[locale]/stat
                   className="badge transition-colors hover:border-cyan-400/50 hover:text-white"
                 >
                   {category.name}
-                  <span className="text-slate-400">{articlesInCategory(locale, category.slug).length}</span>
+                  <span className="text-slate-400">{articlesInCategory(locale, category.key).length}</span>
                 </Link>
               </li>
             ))}
@@ -71,7 +71,7 @@ export default async function InsightsPage({ params }: PageProps<"/[locale]/stat
                 <ArticleCard
                   article={article}
                   href={href(routes.article(article.slug))}
-                  categoryName={findCategory(locale, article.category)?.name}
+                  categoryName={categoryByKey(locale, article.category)?.name}
                   locale={locale}
                   labels={{ minutesRead: dict.common.minutesRead, readArticle: dict.common.readArticle }}
                 />

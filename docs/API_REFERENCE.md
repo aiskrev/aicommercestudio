@@ -9,8 +9,13 @@ proxy); directly: `http://localhost:8000/api/...`.
 
 ## Error envelope
 
-Every error has the same shape. Clients branch on `code`, show `detail` (Bulgarian), and quote
+Every error has the same shape. Clients branch on `code`, show `detail`, and quote
 `request_id` (also returned as the `X-Request-ID` header and present in the API logs) in support requests.
+
+**Language.** `detail` and field `message`s are Bulgarian by default and English when the request
+sends `Accept-Language: en` (any `en-*` tag). Other languages fall back to Bulgarian. `code` values
+never change with the language. The web app sends the page language on every call; the admin UI
+sends the admin language.
 
 ```json
 { "detail": "Невалиден CSRF токен. Презаредете страницата.", "code": "csrf_failed", "request_id": "9f2c…" }
@@ -79,23 +84,62 @@ Signed timing token: `{"token": "1761200000.ab12cd34ef56.<sig>"}`, valid between
   "privacy_acknowledged": true,
   "marketing_consent": false,
   "website": "",
-  "form_token": "<from /form-token>"
+  "form_token": "<from /form-token>",
+  "locale": "bg"
 }
 ```
 
 | Field | Rules |
 | --- | --- |
-| service | `maintenance, seo, ai_tools, automation, analytics, integrations, audit, other` |
+| service | `maintenance, seo, ai_tools, automation, analytics, integrations, audit, ai_managed, other` |
+| locale | optional `bg` (default) or `en` — website language, stored on the lead; other values → 422. The success `message` is returned in this language. |
+| ai_managed | only with `service = "ai_managed"` (otherwise 422 `ai_details_service`), optional — see below |
 | name / company | 2–120 / 2–160 chars, no links or HTML |
 | email | valid address ≤ 254, stored lower-case |
 | phone | optional, `+?[0-9 ()-./]{6,40}` |
-| message | 20–5000 chars, no control characters, ≤ 3 links |
+| message | 20–5000 chars, no control characters, ≤ 3 links, must not contain anything that looks like a credential (422 `secrets`) |
 | privacy_acknowledged | must be `true` (timestamp + notice version are stored) |
 | marketing_consent | optional, stored separately with timestamp |
 | website | honeypot — must be empty (filled → fake 201, nothing stored) |
 | unknown fields | rejected (422) — e.g. quote fields are not accepted here |
 
 Response: `{"status": "received", "reference": "3B78AEBC", "message": "…", "inquiry_type": "contact"}`.
+
+#### AI Managed Services details (`ai_managed`)
+
+```json
+{
+  "service": "ai_managed",
+  "locale": "en",
+  "message": "Our support agent started giving wrong answers after the last prompt change.",
+  "ai_managed": {
+    "sector": "ecommerce",
+    "system_types": ["customer_support", "knowledge_assistant"],
+    "agents_count": "2_5",
+    "ai_provider": "Anthropic",
+    "hosting": "public_cloud",
+    "support_interests": ["monitoring", "cost_optimization"],
+    "communication_language": "en",
+    "additional_notes": ""
+  },
+  "...": "all other contact fields"
+}
+```
+
+| Field | Rules |
+| --- | --- |
+| sector | `ecommerce, retail, professional_services, manufacturing, logistics, healthcare, finance, software_saas, agency, other` |
+| system_types | 1+ of `customer_support, knowledge_assistant, workflow_automation, sales_assistant, document_processing, custom_llm_app, other` (duplicates removed) |
+| agents_count | `1, 2_5, 6_20, over_20, unknown` |
+| ai_provider | optional, ≤ 120 chars, no links/HTML, no credentials |
+| hosting | optional: `vendor_platform, public_cloud, private_server, on_premise, unknown, other` |
+| support_interests | 1+ of `monitoring, maintenance, security, cost_optimization, quality_evaluation, incident_support, full_managed` |
+| communication_language | `bg` or `en` |
+| additional_notes | optional, ≤ 2000 chars, no credentials |
+| unknown fields | rejected (e.g. `api_key`) |
+
+Field errors inside `ai_managed` are reported with flat names (`ai_system_types`, `ai_provider`, …).
+Stored in `leads.service_details` as `{"kind": "ai_managed", ...}`; never returned by public endpoints.
 
 ### `POST /api/public/quote-requests` → 201 — request for a written quote
 
@@ -124,10 +168,14 @@ Details, safety controls and limits: [AI_ADVISOR.md](AI_ADVISOR.md).
 { "mode": "demo", "disclaimer": "Демонстрационен режим: …", "retention_days": 30, "description_min": 40, "description_max": 2000 }
 ```
 
+The disclaimer follows `Accept-Language` (`bg` | `en`).
+
 ### `POST /api/public/advisor/assessments` → 201
 
 Rate limited per client and globally (`ADVISOR_*`), requires a form token. No personal-data fields exist;
-unknown fields are rejected.
+unknown fields are rejected. Optional `locale` (`bg` default | `en`) selects the language of the generated
+assessment, disclaimer and notices (the demo engine uses English templates; the AI provider is
+instructed to answer in English).
 
 | Field | Rules |
 | --- | --- |
@@ -179,7 +227,7 @@ Admin responses are `Cache-Control: no-store`.
 
 | Method | Path | Description |
 | --- | --- | --- |
-| GET | `/api/admin/dashboard/stats` | totals, new, last 7/30 days, open pipeline, won/lost, `by_status`, `by_service`, `by_inquiry_type`, pending AI actions, recent activity |
+| GET | `/api/admin/dashboard/stats` | totals, new, last 7/30 days, open pipeline, won/lost, `by_status`, `by_service`, `by_inquiry_type`, `by_locale`, pending AI actions, recent activity |
 | GET | `/api/admin/audit` | Paginated audit search → `{items,total,page,page_size}`. Query: `action`, `action_prefix` (e.g. `lead.`), `entity_type`, `entity_id`, `actor` (substring), `created_from`, `created_to`, `page`, `page_size` ≤ 200 |
 | GET | `/api/admin/system/status` | environment, AI provider, e-mail enabled, retention, integration flags (never secrets) |
 | GET | `/api/admin/retention` | Preview: `lead_retention_days`, `audit_retention_days`, `leads_due`, `audit_entries_due`, cut-off dates, `advisor_retention_days`, `advisor_assessments_due`. Changes nothing. |
@@ -189,8 +237,8 @@ Admin responses are `Cache-Control: no-store`.
 
 | Method | Path | Description |
 | --- | --- | --- |
-| GET | `/api/admin/leads` | Query: `status`, `service`, `inquiry_type`, `q` (name/company/e-mail, ≤ 100), `created_from`, `created_to` (ISO 8601), `sort` = `newest`/`oldest`, `page`, `page_size` ≤ 100 |
-| GET | `/api/admin/leads/{id}` | Full lead incl. consents, quote fields, `submitted_service`, notes, linked `advisor_assessment` (or `null`). Audited as `lead.viewed` (once per admin per 15 min). |
+| GET | `/api/admin/leads` | Query: `status`, `service`, `inquiry_type`, `locale` (`bg`/`en`), `q` (name/company/e-mail, ≤ 100), `created_from`, `created_to` (ISO 8601), `sort` = `newest`/`oldest`, `page`, `page_size` ≤ 100. Items include `locale`. |
+| GET | `/api/admin/leads/{id}` | Full lead incl. consents, quote fields, `submitted_service`, `locale`, `ai_managed` details (or `null`), notes, linked `advisor_assessment` (or `null`). Audited as `lead.viewed` (once per admin per 15 min). |
 | PATCH | `/api/admin/leads/{id}` | `{"status"?, "service"?, "expected_status"?}` — at least one of status/service. Row-locked; with `expected_status` a stale update returns 409 `status_conflict`. Audits `lead.status_changed` / `lead.service_changed` with `from`/`to`. `submitted_service` is never changed. |
 | POST | `/api/admin/leads/{id}/notes` | `{"body": "..."}` (1–4000) → 201, audited |
 | DELETE | `/api/admin/leads/{id}` | GDPR erasure (lead + notes) → 204; audit keeps only id + reason |

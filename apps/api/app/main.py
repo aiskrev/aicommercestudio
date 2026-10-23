@@ -13,42 +13,37 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import Settings, get_settings
 from app.errors import error_body
+from app.i18n import Locale, error_message, request_locale, validation_message
 from app.logging_config import configure_logging
 from app.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
 from app.routers import admin, admin_auth, advisor, health, public
 
 logger = logging.getLogger(__name__)
 
-_GENERIC_MESSAGES = {
-    "missing": "Полето е задължително.",
-    "enum": "Изберете валидна стойност.",
-    "literal_error": "Изберете валидна стойност.",
-    "extra_forbidden": "Непознато поле.",
-    "json_invalid": "Невалиден формат на заявката.",
-    "uuid_parsing": "Невалиден идентификатор.",
-    "bool_parsing": "Невалидна стойност.",
-    "bool_type": "Невалидна стойност.",
-    "string_type": "Очаква се текст.",
-    "datetime_from_date_parsing": "Невалидна дата.",
-    "datetime_parsing": "Невалидна дата.",
-}
+def _error_field(loc: tuple[Any, ...]) -> str | None:
+    """Form field name for an error location. Nested AI Managed Services fields map to the form's
+    `ai_<name>` fields; list indexes (e.g. tools.1) map to the list field."""
+    if len(loc) < 2 or loc[0] not in ("body", "query", "path"):
+        return None
+    names = [str(part) for part in loc[1:] if isinstance(part, str)]
+    if not names:
+        return None
+    field = names[-1]
+    if "ai_managed" in names[:-1]:
+        return field if field.startswith("ai_") else f"ai_{field}"
+    return field
 
 
-def _translate_error(error: dict[str, Any]) -> dict[str, str | None]:
-    loc = error.get("loc", ())
-    field = str(loc[-1]) if len(loc) > 1 and loc[0] in ("body", "query", "path") else None
+def _translate_error(error: dict[str, Any], locale: Locale = "bg") -> dict[str, str | None]:
+    field = _error_field(tuple(error.get("loc", ())))
     err_type = error.get("type", "")
     ctx = error.get("ctx") or {}
-    if err_type == "string_too_short":
-        message = f"Въведете поне {ctx.get('min_length')} символа."
-    elif err_type == "string_too_long":
-        message = f"Допустими са най-много {ctx.get('max_length')} символа."
-    elif err_type == "value_error" and field == "email":
-        message = "Въведете валиден имейл адрес."
-    elif err_type == "value_error":
-        message = str(ctx.get("error") or "Невалидна стойност.")
+    if err_type == "value_error" and field == "email":
+        message = validation_message("email", locale)
+    elif err_type == "value_error" and locale == "bg" and ctx.get("error"):
+        message = str(ctx["error"])
     else:
-        message = _GENERIC_MESSAGES.get(err_type, "Невалидна стойност.")
+        message = validation_message(err_type, locale, ctx) or validation_message("value_error", locale)
     return {"field": field, "message": message, "type": err_type}
 
 
@@ -82,18 +77,22 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.exception_handler(StarletteHTTPException)
     async def _http_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
         body = error_body(exc.status_code, exc.detail, getattr(exc, "code", None), _request_id(request))
+        # Localize the human-readable message by stable error code (Accept-Language: bg | en).
+        if isinstance(body["detail"], str):
+            body["detail"] = error_message(body["code"], request_locale(request), body["detail"])
         return JSONResponse(status_code=exc.status_code, content=body, headers=getattr(exc, "headers", None))
 
     @app.exception_handler(RequestValidationError)
     async def _validation_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
-        body = error_body(422, "Моля, коригирайте маркираните полета.", "validation_error", _request_id(request))
-        body["errors"] = [_translate_error(e) for e in exc.errors()]
+        locale = request_locale(request)
+        body = error_body(422, error_message("validation_error", locale, ""), "validation_error", _request_id(request))
+        body["errors"] = [_translate_error(e, locale) for e in exc.errors()]
         return JSONResponse(status_code=422, content=body)
 
     @app.exception_handler(Exception)
     async def _unhandled_handler(request: Request, exc: Exception) -> JSONResponse:
         logger.exception("unhandled_error", exc_info=exc)
-        message = "Възникна вътрешна грешка. Моля, опитайте отново."
+        message = error_message("internal_error", request_locale(request), "")
         body = error_body(500, message, "internal_error", _request_id(request))
         return JSONResponse(status_code=500, content=body)
 

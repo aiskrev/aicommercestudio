@@ -4,13 +4,22 @@ import { getContent } from "@/content";
 import { locales } from "@/i18n/config";
 
 // Must stay in sync with ServiceKey in apps/api/app/models.py (minus "other").
-const API_SERVICE_KEYS = ["maintenance", "seo", "ai_tools", "automation", "analytics", "integrations", "audit"];
+const API_SERVICE_KEYS = [
+  "maintenance",
+  "seo",
+  "ai_tools",
+  "automation",
+  "analytics",
+  "integrations",
+  "audit",
+  "ai_managed",
+];
 
 describe.each(locales)("content integrity (%s)", (locale) => {
   const content = getContent(locale);
 
-  it("has six core services plus the audit offering", () => {
-    expect(content.coreServices).toHaveLength(6);
+  it("has seven core services plus the audit offering", () => {
+    expect(content.coreServices).toHaveLength(7);
     expect(content.services.map((s) => s.key).sort()).toEqual([...API_SERVICE_KEYS].sort());
     expect(content.services.find((s) => s.key === "audit")?.isOffering).toBe(true);
   });
@@ -60,12 +69,23 @@ describe.each(locales)("content integrity (%s)", (locale) => {
     expect(text).not.toMatch(/TODO|lorem ipsum/i);
     // Affirmative promises only — disclaimers such as "не обещаваме гарантиран ръст" are fine.
     expect(text).not.toMatch(/гарантираме (ръст|първо място|позиции|резултат)/i);
+    expect(text).not.toMatch(/we guarantee (growth|first place|rankings|results)/i);
   });
 
   it("marks legal texts as drafts", () => {
-    expect(content.legal.draftNotice).toMatch(/Чернова/);
+    expect(content.legal.draftNotice).toMatch(locale === "bg" ? /Чернова/ : /Draft/);
     for (const doc of [content.legal.privacyPolicy, content.legal.cookiePolicy, content.legal.termsOfUse]) {
       expect(doc.sections.length).toBeGreaterThan(2);
     }
+  });
+
+  it("AI Managed Services plans promise no unlimited work, 24/7 cover, SLA or public price", () => {
+    const { packages } = content.aiManaged;
+    const offered = JSON.stringify([packages.items, packages.comparison]);
+    expect(offered).not.toMatch(/unlimited|неограничен|24\/7|SLA|uptime|€|лв\.|\$\d/i);
+    for (const item of packages.items) expect(item.includes.length).toBeGreaterThan(3);
+    expect(packages.items.map((p) => p.key)).toEqual(["monitor", "care", "optimize"]);
+    expect(packages.noSlaNote).toMatch(/SLA/);
+    expect(packages.priceLabel).toBe(locale === "bg" ? "По индивидуална оферта" : "Custom quote");
   });
 });

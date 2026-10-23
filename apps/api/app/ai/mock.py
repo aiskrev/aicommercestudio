@@ -6,19 +6,49 @@ from app.advisor.prompt import AdvisorPromptInput
 from app.ai.advisor_mock import build_demo_assessment
 from app.ai.base import AssessmentDraft, LeadTriage, LeadTriageInput, Priority
 
-# (service key, keywords) — matched case-insensitively against the inquiry text.
+# (service key, keywords) — matched case-insensitively against the inquiry text (Bulgarian and English).
 _RULES: list[tuple[str, tuple[str, ...]]] = [
-    ("seo", ("seo", "класиране", "google", "органич", "search console", "ключови думи", "core web vitals")),
-    ("maintenance", ("поддръжк", "shopify", "woocommerce", "бавен", "грешк", "срив", "обновяван", "бекъп")),
-    ("ai_tools", ("чатбот", "асистент", "ai ", "изкуствен интелект", "rag", "описания на продукти", "gpt")),
-    ("automation", ("автоматиз", "ръчно", "workflow", "фактур", "имейли", "crm процес", "повтаря")),
-    ("analytics", ("анализ", "ga4", "конверс", "отчет", "dashboard", "табло", "колич", "изоставени")),
-    ("integrations", ("api", "интеграц", "erp", "синхрониз", "webhook", "склад", "облак", "сигурност")),
-    ("audit", ("одит", "оценка", "преглед", "план за подобрение")),
+    (
+        "seo",
+        ("seo", "класиране", "google", "органич", "search console", "ключови думи", "core web vitals", "ranking",
+         "organic", "keywords"),
+    ),
+    (
+        "maintenance",
+        ("поддръжк", "shopify", "woocommerce", "бавен", "грешк", "срив", "обновяван", "бекъп", "maintenance",
+         "slow", "bug", "backup", "outage"),
+    ),
+    (
+        "ai_tools",
+        ("чатбот", "асистент", "ai ", "изкуствен интелект", "rag", "описания на продукти", "gpt", "chatbot",
+         "assistant", "artificial intelligence", "product descriptions"),
+    ),
+    (
+        "ai_managed",
+        ("ai агент", "агентът", "llm", "промпт", "токени", "мониторинг на ai", "rag система", "ai agent",
+         "prompt", "tokens", "hallucinat", "model cost"),
+    ),
+    (
+        "automation",
+        ("автоматиз", "ръчно", "workflow", "фактур", "имейли", "crm процес", "повтаря", "automat", "manual",
+         "invoice", "repetitive"),
+    ),
+    (
+        "analytics",
+        ("анализ", "ga4", "конверс", "отчет", "dashboard", "табло", "колич", "изоставени", "analytics",
+         "conversion", "report", "abandoned"),
+    ),
+    (
+        "integrations",
+        ("api", "интеграц", "erp", "синхрониз", "webhook", "склад", "облак", "сигурност", "integration", "sync",
+         "warehouse", "cloud", "security"),
+    ),
+    ("audit", ("одит", "оценка", "преглед", "план за подобрение", "audit", "assessment", "review")),
 ]
 
-_URGENT = ("спешно", "веднага", "не работи", "срив", "спря", "загубваме", "down")
-_SCOPE = ("бюджет", "срок", "оферта", "проект", "месечно", "договор")
+_URGENT = ("спешно", "веднага", "не работи", "срив", "спря", "загубваме", "down", "urgent", "not working", "stopped")
+_SCOPE = ("бюджет", "срок", "оферта", "проект", "месечно", "договор", "budget", "deadline", "quote", "project",
+          "monthly", "contract")
 
 _NEXT_STEPS = {
     "maintenance": "Поискайте временен достъп за технически преглед и договорете първоначален одит на магазина.",
@@ -28,6 +58,9 @@ _NEXT_STEPS = {
     "analytics": "Проверете наличните източници на данни (GA4, платформа, ERP) и договорете базов отчет.",
     "integrations": "Съберете списък със системите, наличните API и обема на данните за техническа оценка.",
     "audit": "Изпратете кратък въпросник за обхвата на одита и предложете времева рамка за изпълнение.",
+    "ai_managed": (
+        "Предложете техническа оценка на AI системата: архитектура, налична инструментация, достъпи и разходи."
+    ),
     "other": "Свържете се за уточняващ разговор, за да определите правилната услуга.",
 }
 

@@ -48,12 +48,13 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
       <Section>
         <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {coreServices.map((service, index) => (
-            <li key={service.key}>
+            <li key={service.key} className={service.key === "ai_managed" ? "sm:col-span-2 lg:col-span-3" : undefined}>
               <ServiceCard
                 service={service}
                 href={href(routes.service(service.slug))}
                 cta={dict.common.learnMore}
                 index={index}
+                wide={service.key === "ai_managed"}
                 headingLevel={2}
               />
             </li>

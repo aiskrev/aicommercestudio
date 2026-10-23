@@ -97,6 +97,14 @@ export const keywordMap: KeywordTarget[] = [
     volumeStatus: "unverified",
   },
   {
+    path: "/uslugi/ai-managed-services",
+    primaryKeyword: "поддръжка и мониторинг на AI агенти",
+    secondaryKeywords: ["управление на AI агенти", "AI managed services", "LLMOps", "оценка на качеството на AI агент"],
+    intent: "transactional",
+    rationale: "Текуща услуга след пускането на AI система; разграничена от разработката на AI инструменти.",
+    volumeStatus: "unverified",
+  },
+  {
     path: "/uslugi/tehnicheski-odit",
     primaryKeyword: "технически одит на онлайн магазин",
     secondaryKeywords: ["одит на WooCommerce магазин", "одит на Shopify магазин", "AI готовност"],

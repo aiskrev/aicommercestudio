@@ -3,8 +3,11 @@ import { Suspense } from "react";
 
 import { LeadsTable } from "@/components/admin/LeadsTable";
 import { LoadingState } from "@/components/admin/ui";
+import { getAdminDictionary } from "@/lib/admin-locale";
 
-export const metadata: Metadata = { title: "Запитвания" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getAdminDictionary()).meta.leads };
+}
 
 export default function AdminLeadsPage() {
   return (

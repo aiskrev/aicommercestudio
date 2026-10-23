@@ -7,7 +7,8 @@ export type ServiceKey =
   | "automation"
   | "analytics"
   | "integrations"
-  | "audit";
+  | "audit"
+  | "ai_managed";
 
 export type FormServiceKey = ServiceKey | "other";
 
@@ -37,8 +38,10 @@ export interface Service {
   engagement: string[];
   faqs: FaqItem[];
   related: ServiceKey[];
-  /** Commercial offerings that are not one of the six core categories (e.g. the audit). */
+  /** Commercial offerings that are not one of the core service categories (e.g. the audit). */
   isOffering?: boolean;
+  /** Rendered by a dedicated route (e.g. uslugi/ai-managed-services) instead of the generic service template. */
+  customPage?: boolean;
   /** Service-specific H2 headings (descriptive, written for the search intent of the page). */
   headings: {
     problems: string;
@@ -53,13 +56,13 @@ export interface Service {
   workflow: Capability[];
   /** What the client needs to provide. */
   inputs: string[];
-  /** Slugs of articles that deepen the topic (internal linking). */
+  /** Keys of articles that deepen the topic (internal linking). */
   relatedArticles: string[];
 }
 
 export interface InlineLink {
   label: string;
-  /** Canonical (locale-independent) path, e.g. /uslugi/seo-optimizatsiya */
+  /** Canonical route path with this locale's slug, e.g. /uslugi/seo-optimizatsiya (bg) or /uslugi/seo-optimization (en). */
   href: string;
 }
 
@@ -76,13 +79,16 @@ export interface ArticleSection {
 export type ArticleType = "guide" | "checklist" | "comparison" | "explainer";
 
 export interface Article {
+  /** Stable cross-locale identifier (the Bulgarian slug); used for references and the language switcher. */
+  key: string;
+  /** URL slug in this locale. */
   slug: string;
   title: string;
   /** Shorter <title> when the H1 is long; falls back to `title`. */
   metaTitle?: string;
   description: string;
   type: ArticleType;
-  /** Editorial category slug (see content/bg/editorial.ts). */
+  /** Editorial category key (see content/<locale>/editorial.ts). */
   category: string;
   publishedAt: string;
   updatedAt: string;
@@ -95,7 +101,12 @@ export interface Article {
   sections: ArticleSection[];
 }
 
+/** Article as written in the Bulgarian content files, where the key equals the slug. */
+export type ArticleSource = Omit<Article, "key">;
+
 export interface EditorialCategory {
+  /** Stable cross-locale identifier (the Bulgarian slug). */
+  key: string;
   slug: string;
   name: string;
   title: string;

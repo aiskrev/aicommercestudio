@@ -49,7 +49,7 @@ export default async function ProcessPage({ params }: PageProps<"/[locale]/proce
                 <CheckList items={step.details} className="mt-5" />
               </div>
               <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 lg:self-start">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Резултат</p>
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{dict.ui.processResult}</p>
                 <p className="mt-2 text-slate-200">{step.outcome}</p>
               </div>
             </li>

@@ -116,8 +116,9 @@ export function toggleTool(current: Tool[], tool: Tool): Tool[] {
   return [...current.filter((t) => t !== "none"), tool];
 }
 
-export function toAdvisorPayload(values: AdvisorValues, formToken: string) {
+export function toAdvisorPayload(values: AdvisorValues, formToken: string, locale = "bg") {
   return {
+    locale,
     business_type: values.business_type,
     process_description: values.process_description.trim(),
     monthly_volume: values.monthly_volume,
@@ -134,21 +135,28 @@ export type AdvisorResult =
   | { ok: false; kind: "validation"; message: string; fieldErrors: AdvisorErrors }
   | { ok: false; kind: "rate_limited" | "network" | "timeout" | "token" | "server"; message?: string };
 
-export async function fetchAdvisorStatus(): Promise<AdvisorStatus | null> {
+/** Mode and disclaimer; the disclaimer comes back in the page language (Accept-Language). */
+export async function fetchAdvisorStatus(locale = "bg"): Promise<AdvisorStatus | null> {
   try {
-    const response = await fetch("/api/public/advisor/status", { cache: "no-store" });
+    const response = await fetch("/api/public/advisor/status", {
+      cache: "no-store",
+      headers: { "Accept-Language": locale },
+    });
     return response.ok ? ((await response.json()) as AdvisorStatus) : null;
   } catch {
     return null;
   }
 }
 
-export async function requestAssessment(payload: ReturnType<typeof toAdvisorPayload>): Promise<AdvisorResult> {
+export async function requestAssessment(
+  payload: ReturnType<typeof toAdvisorPayload>,
+  locale = "bg",
+): Promise<AdvisorResult> {
   let response: Response;
   try {
     response = await fetch("/api/public/advisor/assessments", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "Accept-Language": locale },
       body: JSON.stringify(payload),
     });
   } catch {

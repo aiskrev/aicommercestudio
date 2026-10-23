@@ -6,8 +6,15 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { IconBadge, PageHero, Section } from "@/components/ui/primitives";
-import { articlesInCategory, findCategory, getContent, isIndexableCategory, serviceByKey } from "@/content";
-import { localizePath } from "@/i18n/config";
+import {
+  articlesInCategory,
+  findCategory,
+  getContent,
+  isIndexableCategory,
+  serviceByKey,
+  topicRoutePaths,
+} from "@/content";
+import { isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { contactWithService, routes } from "@/lib/routes";
@@ -15,8 +22,10 @@ import { buildMetadata, collectionPageJsonLd, itemListJsonLd } from "@/lib/seo";
 
 export const dynamicParams = false;
 
-export function generateStaticParams() {
-  return getContent("bg").editorialCategories.map((category) => ({ category: category.slug }));
+export function generateStaticParams({ params }: { params: { locale: string } }) {
+  const { locale } = params;
+  if (!isLocale(locale)) return [];
+  return getContent(locale).editorialCategories.map((category) => ({ category: category.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/statii/tema/[category]">) {
@@ -28,9 +37,9 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/statii/t
     locale,
     title: category.title,
     description: category.description,
-    path: routes.insightsCategory(category.slug),
+    path: topicRoutePaths(category.key),
     // Topics with a single article are thin pages: keep them crawlable but out of the index.
-    noindex: !isIndexableCategory(locale, category.slug),
+    noindex: !isIndexableCategory(locale, category.key),
   });
 }
 
@@ -43,7 +52,7 @@ export default async function CategoryPage({ params }: PageProps<"/[locale]/stat
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const path = href(routes.insightsCategory(category.slug));
-  const articles = articlesInCategory(locale, category.slug);
+  const articles = articlesInCategory(locale, category.key);
   const service = serviceByKey(locale, category.relatedService);
 
   return (

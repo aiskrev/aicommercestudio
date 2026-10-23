@@ -4,10 +4,11 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, Suspense, useState } from "react";
 
 import { ActivityList } from "@/components/admin/ActivityList";
+import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { AdminPageHeader } from "@/components/admin/AdminShell";
 import { EmptyState, ErrorState, LoadingState, Panel } from "@/components/admin/ui";
 import { Button, cx } from "@/components/ui/primitives";
-import { auditActionGroups, knownAuditActions } from "@/lib/admin-labels";
+import { fmt } from "@/i18n/admin";
 import type { AuditPage } from "@/lib/admin-types";
 import { useAdminData } from "@/lib/use-admin-data";
 
@@ -25,6 +26,9 @@ function ActivityLog() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const { t: dict, labels } = useAdminI18n();
+  const t = dict.activity;
+  const common = dict.common;
   const action = params.get("action") ?? "";
   const group = params.get("group") ?? "";
   const actor = params.get("actor") ?? "";
@@ -61,58 +65,56 @@ function ActivityLog() {
   return (
     <>
       <AdminPageHeader
-        title="Активност"
-        description={
-          data ? `Журнал на действията в системата · ${data.total} записа` : "Журнал на действията в системата"
-        }
+        title={t.title}
+        description={data ? fmt(t.descriptionCount, { n: data.total }) : t.description}
       />
 
       <Panel className="mb-6">
         <form onSubmit={onSubmit} className="grid gap-3 md:grid-cols-2 xl:grid-cols-[auto_1fr_1fr_1fr_auto]">
           <select
-            aria-label="Група действия"
+            aria-label={t.group}
             className="field xl:w-48"
             value={group}
             onChange={(e) => setFilters({ group: e.target.value, action: "" })}
           >
-            <option value="">Всички групи</option>
-            {auditActionGroups.map((g) => (
+            <option value="">{t.allGroups}</option>
+            {labels.auditGroups.map((g) => (
               <option key={g.prefix} value={g.prefix}>
                 {g.label}
               </option>
             ))}
           </select>
           <select
-            aria-label="Конкретно действие"
+            aria-label={t.action}
             className="field"
             value={action}
             onChange={(e) => setFilters({ action: e.target.value, group: "" })}
           >
-            <option value="">Всички действия</option>
-            {knownAuditActions().map((a) => (
+            <option value="">{t.allActions}</option>
+            {labels.knownAuditActions().map((a) => (
               <option key={a.value} value={a.value}>
                 {a.label}
               </option>
             ))}
           </select>
           <input
-            aria-label="Изпълнител"
+            aria-label={t.actor}
             className="field"
-            placeholder="Изпълнител (имейл, website, cli…)"
+            placeholder={t.actorPlaceholder}
             value={actorInput}
             maxLength={120}
             onChange={(e) => setActorInput(e.target.value)}
           />
           <input
-            aria-label="ID на запис"
+            aria-label={t.entity}
             className="field font-mono text-sm"
-            placeholder="ID на запитване"
+            placeholder={t.entityPlaceholder}
             value={entityInput}
             maxLength={64}
             onChange={(e) => setEntityInput(e.target.value)}
           />
           <Button type="submit" variant="secondary" icon="search">
-            Филтрирай
+            {t.filter}
           </Button>
         </form>
         {filtered && (
@@ -125,7 +127,7 @@ function ActivityLog() {
               router.replace(pathname);
             }}
           >
-            Изчисти филтрите
+            {common.clearFilters}
           </button>
         )}
       </Panel>
@@ -136,7 +138,7 @@ function ActivityLog() {
         {data && data.items.length === 0 && (
           <EmptyState
             icon="activity"
-            title={filtered ? "Няма записи за избраните филтри" : "Няма записана активност"}
+            title={filtered ? t.noResults : t.empty}
           />
         )}
         {data && data.items.length > 0 && (
@@ -145,20 +147,18 @@ function ActivityLog() {
           </div>
         )}
         {data && data.total > PAGE_SIZE && (
-          <nav aria-label="Страници" className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-4 text-sm">
+          <nav aria-label={common.pages} className="mt-4 flex items-center justify-between border-t border-white/[0.06] pt-4 text-sm">
             <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => setFilters({ page: String(page - 1) })}>
-              ← Предишна
+              {common.previous}
             </Button>
-            <span className="text-slate-400">
-              Страница {page} от {totalPages}
-            </span>
+            <span className="text-slate-400">{fmt(common.pageOf, { page, total: totalPages })}</span>
             <Button
               variant="ghost"
               size="sm"
               disabled={page >= totalPages}
               onClick={() => setFilters({ page: String(page + 1) })}
             >
-              Следваща →
+              {common.next}
             </Button>
           </nav>
         )}

@@ -2,7 +2,7 @@ import { type Locale, localeMeta } from "@/i18n/config";
 
 export function formatDate(value: string | Date, locale: Locale = "bg"): string {
   const date = typeof value === "string" ? new Date(value) : value;
-  return new Intl.DateTimeFormat(localeMeta[locale].htmlLang, {
+  return new Intl.DateTimeFormat(localeMeta[locale].dateLocale, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -12,7 +12,7 @@ export function formatDate(value: string | Date, locale: Locale = "bg"): string 
 
 export function formatDateTime(value: string | Date, locale: Locale = "bg"): string {
   const date = typeof value === "string" ? new Date(value) : value;
-  return new Intl.DateTimeFormat(localeMeta[locale].htmlLang, {
+  return new Intl.DateTimeFormat(localeMeta[locale].dateLocale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

@@ -12,8 +12,8 @@ import json
 import logging
 from typing import Any
 
-from app.advisor.prompt import SYSTEM_PROMPT as ADVISOR_SYSTEM_PROMPT
 from app.advisor.prompt import AdvisorPromptInput, output_schema, render_user_message
+from app.advisor.prompt import system_prompt as advisor_system_prompt
 from app.ai.base import (
     VALID_SERVICES,
     AIProviderError,
@@ -128,7 +128,7 @@ class AnthropicProvider:
                 max_tokens=16000,
                 betas=["server-side-fallback-2026-07-01"],
                 fallbacks="default",
-                system=ADVISOR_SYSTEM_PROMPT,
+                system=advisor_system_prompt(data.locale),
                 output_config={"effort": "medium", "format": {"type": "json_schema", "schema": output_schema()}},
                 messages=[{"role": "user", "content": render_user_message(data)}],
             )

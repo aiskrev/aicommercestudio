@@ -31,6 +31,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
   const study = getContent(locale).caseStudies.find((s) => s.slug === slug);
   if (!study) notFound();
   const dict = getDictionary(locale);
+  const copy = dict.ui.caseStudies;
   const href = (path: string) => localizePath(locale, path);
 
   return (
@@ -38,7 +39,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
       <Breadcrumbs
         items={[
           { name: dict.common.home, path: href(routes.home) },
-          { name: "Проекти", path: href(routes.caseStudies) },
+          { name: copy.eyebrow, path: href(routes.caseStudies) },
           { name: study.title, path: href(routes.caseStudy(study.slug)) },
         ]}
       />
@@ -48,13 +49,13 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
         </p>
         <h1 className="t-h1 mt-4">{study.title}</h1>
         <p className="t-lead mt-4">{study.description}</p>
-        <h2 className="t-h2 mt-10 text-2xl">Задачата</h2>
+        <h2 className="t-h2 mt-10 text-2xl">{copy.challenge}</h2>
         <p className="mt-3 text-slate-300">{study.challenge}</p>
-        <h2 className="t-h2 mt-10 text-2xl">Решението</h2>
+        <h2 className="t-h2 mt-10 text-2xl">{copy.solution}</h2>
         <CheckList items={study.solution} className="mt-4" />
         {study.results.length > 0 && (
           <>
-            <h2 className="t-h2 mt-10 text-2xl">Измерени резултати</h2>
+            <h2 className="t-h2 mt-10 text-2xl">{copy.results}</h2>
             <ul className="mt-4 grid gap-3">
               {study.results.map((result) => (
                 <li key={result.metric} className="card p-4">
@@ -62,7 +63,7 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
                     {result.metric}: {result.value}
                   </p>
                   <p className="mt-1 text-xs text-slate-400">
-                    Източник: {result.source} · измерено {formatDate(result.measuredAt, locale)}
+                    {copy.source}: {result.source} · {copy.measured} {formatDate(result.measuredAt, locale)}
                   </p>
                 </li>
               ))}
@@ -70,8 +71,8 @@ export default async function CaseStudyPage({ params }: PageProps<"/[locale]/pro
           </>
         )}
         <p className="mt-10 text-sm text-slate-400">
-          Услуги: {study.services.map((key) => serviceByKey(locale, key).shortTitle).join(", ")} · Публикувано със
-          съгласието на клиента на {formatDate(study.verification.approvedAt, locale)}.
+          {copy.services}: {study.services.map((key) => serviceByKey(locale, key).shortTitle).join(", ")} · {copy.approved}{" "}
+          {formatDate(study.verification.approvedAt, locale)}.
         </p>
       </Container>
     </>

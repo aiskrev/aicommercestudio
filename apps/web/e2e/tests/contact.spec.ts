@@ -6,7 +6,7 @@ test.describe("contact form", () => {
     page.on("request", (req) => {
       if (req.url().endsWith("/api/public/leads") && req.method() === "POST") leadRequests += 1;
     });
-    await page.goto("/kontakti");
+    await page.goto("/bg/kontakti");
     await page.getByRole("button", { name: "Изпрати запитването" }).click();
     await expect(page.getByText("Моля, коригирайте маркираните полета.")).toBeVisible();
     await expect(page.getByLabel(/^Имейл/)).toHaveAttribute("aria-invalid", "true");
@@ -28,7 +28,7 @@ test.describe("contact form", () => {
   });
 
   test("quote request form collects structured project data", async ({ page }) => {
-    await page.goto("/kontakti?usluga=ai_tools&tip=oferta");
+    await page.goto("/bg/kontakti?usluga=ai_tools&tip=oferta");
     await expect(page.getByRole("radio", { name: /Заявка за оферта/ })).toBeChecked();
     await expect(page.getByTestId("quote-fields")).toBeVisible();
 
@@ -50,7 +50,7 @@ test.describe("contact form", () => {
   });
 
   test("valid submission is stored and confirmed with a reference", async ({ page }) => {
-    await page.goto("/kontakti?usluga=automation");
+    await page.goto("/bg/kontakti?usluga=automation");
     await expect(page.getByLabel(/Услуга/)).toHaveValue("automation");
 
     await page.getByLabel(/Име и фамилия/).fill("E2E Тестов Потребител");

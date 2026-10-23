@@ -1,5 +1,5 @@
 import { newArticles } from "@/content/bg/articles-new";
-import type { Article } from "@/content/types";
+import type { Article, ArticleSource } from "@/content/types";
 
 export const insightsPage = {
   metaTitle: "Статии за онлайн магазини, SEO и AI автоматизация",
@@ -11,7 +11,7 @@ export const insightsPage = {
   empty: "Все още няма публикувани статии. Очаквайте скоро.",
 };
 
-const foundationArticles: Article[] = [
+const foundationArticles: ArticleSource[] = [
   {
     slug: "tehnicheski-seo-odit-na-online-magazin",
     title: "Технически SEO одит на онлайн магазин: какво да проверите първо",
@@ -201,4 +201,5 @@ const foundationArticles: Article[] = [
   },
 ];
 
-export const articles: Article[] = [...foundationArticles, ...newArticles];
+// In Bulgarian the stable key is the slug itself.
+export const articles: Article[] = [...foundationArticles, ...newArticles].map((article) => ({ ...article, key: article.slug }));

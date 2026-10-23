@@ -34,6 +34,16 @@ function upstreamTimeout(path: string[]): number {
   return path[0] === "public" && path[1] === "advisor" ? 100_000 : 30_000;
 }
 
+/** Proxy-level errors in the language the browser client asked for (Accept-Language: bg | en). */
+const PROXY_ERRORS = {
+  bg: { path: "Невалиден адрес.", tooLarge: "Заявката е твърде голяма.", unavailable: "Услугата временно не е достъпна. Моля, опитайте отново." },
+  en: { path: "Invalid address.", tooLarge: "The request is too large.", unavailable: "The service is temporarily unavailable. Please try again." },
+} as const;
+
+function proxyErrors(request: NextRequest) {
+  return request.headers.get("accept-language")?.toLowerCase().startsWith("en") ? PROXY_ERRORS.en : PROXY_ERRORS.bg;
+}
+
 function json(status: number, detail: string): Response {
   return Response.json({ detail }, { status, headers: { "Cache-Control": "no-store" } });
 }
@@ -41,7 +51,7 @@ function json(status: number, detail: string): Response {
 async function proxy(request: NextRequest, ctx: RouteContext<"/api/[...path]">): Promise<Response> {
   const { path } = await ctx.params;
   if (path.some((segment) => segment === "." || segment === ".." || segment.includes("\\"))) {
-    return json(400, "Невалиден адрес.");
+    return json(400, proxyErrors(request).path);
   }
 
   const target = new URL(`${apiBaseUrl()}/api/${path.map(encodeURIComponent).join("/")}`);
@@ -57,7 +67,7 @@ async function proxy(request: NextRequest, ctx: RouteContext<"/api/[...path]">):
   let body: ArrayBuffer | undefined;
   if (request.method !== "GET" && request.method !== "HEAD") {
     body = await request.arrayBuffer();
-    if (body.byteLength > MAX_BODY_BYTES) return json(413, "Заявката е твърде голяма.");
+    if (body.byteLength > MAX_BODY_BYTES) return json(413, proxyErrors(request).tooLarge);
   }
 
   let upstream: Response;
@@ -71,7 +81,7 @@ async function proxy(request: NextRequest, ctx: RouteContext<"/api/[...path]">):
       signal: AbortSignal.timeout(upstreamTimeout(path)),
     });
   } catch {
-    return json(502, "Услугата временно не е достъпна. Моля, опитайте отново.");
+    return json(502, proxyErrors(request).unavailable);
   }
 
   const responseHeaders = new Headers();

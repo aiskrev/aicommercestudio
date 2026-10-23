@@ -9,7 +9,7 @@ export const site = {
   url: (process.env.SITE_URL || "http://localhost:3000").replace(/\/$/, ""),
   contactEmail: process.env.PUBLIC_CONTACT_EMAIL || null,
   contactPhone: process.env.PUBLIC_CONTACT_PHONE || null,
-  areaServed: ["България", "Европейски съюз"],
+  areaServed: { bg: ["България", "Европейски съюз"], en: ["Bulgaria", "European Union"] },
   sessionCookieName: "acs_session",
   csrfCookieName: "acs_csrf",
 } as const;

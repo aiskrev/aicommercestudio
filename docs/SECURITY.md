@@ -45,6 +45,20 @@ schema-validated, links and financial promises removed, human approval forced fo
 Rate limited per client and globally; logs carry metadata only. Details: [AI_ADVISOR.md](AI_ADVISOR.md).
 The Anthropic API key is read only by the API container and never reaches the browser.
 
+**AI Managed Services intake** — the form collects descriptive information only. A visible warning
+asks visitors not to send API keys, passwords, access tokens, customer records, production database
+credentials or confidential documents; the client (`looksLikeSecret`) and the API
+(`looks_like_secret`, 422 `secrets`) reject text that looks like a credential in the message,
+provider and notes fields. Details are validated by a strict model (`extra="forbid"`), stored as
+JSONB, re-validated when read and never exposed publicly. The public flow never connects to a
+client's AI system. Principle for future operations work: model output must never bypass
+deterministic authorisation or business rules ([AI_OPERATIONS_ARCHITECTURE.md](AI_OPERATIONS_ARCHITECTURE.md)).
+
+**Locale handling** — the language is an allow-list (`bg`, `en`); unknown values in payloads are
+rejected (422), in `Accept-Language` they fall back to `bg`. The `acs_locale` preference cookie
+contains only `bg`/`en`, is validated before use and never reflected unescaped; locale redirects
+build paths from fixed segment maps (no open redirect).
+
 **Dependencies** — exact versions pinned (`requirements.txt`, `package-lock.json`).
 `.\scripts\test.ps1 -Suite audit` runs `pip-audit` and `npm audit`; run it before each release.
 
@@ -52,13 +66,13 @@ The Anthropic API key is read only by the API container and never reaches the br
 
 | Requirement | Implementation |
 | --- | --- |
-| Data minimisation | only fields needed to answer an inquiry; phone optional; no tracking; IP hashed; the AI advisor asks for no personal data and strips e-mails/phones from the description |
+| Data minimisation | only fields needed to answer an inquiry; phone optional; no tracking; IP hashed; the AI advisor asks for no personal data and strips e-mails/phones from the description; AI Managed inquiries collect descriptive system information only, never credentials or customer records |
 | Transparency | privacy policy draft; acknowledgement required, timestamped, notice version stored |
 | Separate marketing consent | optional checkbox, stored separately with timestamp; never required |
 | Retention | `LEAD_RETENTION_DAYS` (730), `AUDIT_RETENTION_DAYS` (1095), `ADVISOR_RETENTION_DAYS` (30, unlinked assessments); `app.cli maintenance` |
 | Erasure | admin "Изтрий запитването" deletes lead + notes; audit keeps no personal data |
 | Access control | individual admin accounts, sessions, audit trail |
-| Cookies | only strictly necessary admin cookies; no consent banner needed; documented on `/biskvitki` |
+| Cookies | strictly necessary admin cookies plus the functional `acs_locale` language preference (set only on an explicit switch); no consent banner needed; documented on `/bg/biskvitki` and `/en/cookies` |
 | Third parties | none on public pages (verified by e2e); e-mail and AI providers disabled by default |
 | Processors | when enabling SMTP or an AI provider: sign a DPA, list them in the privacy policy, check data transfers |
 

@@ -1,14 +1,19 @@
+"use client";
+
 import type { ReactNode } from "react";
 
+import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Alert, Button, cx, Skeleton } from "@/components/ui/primitives";
-import { statusLabels, statusTone } from "@/lib/admin-labels";
+import { fmt } from "@/i18n/admin";
+import { statusTone } from "@/lib/admin-labels";
 import type { LeadStatus } from "@/lib/admin-types";
 
 export function StatusBadge({ status }: { status: LeadStatus }) {
+  const { labels } = useAdminI18n();
   return (
     <span className={cx("inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ring-1", statusTone[status])}>
-      {statusLabels[status] ?? status}
+      {labels.status[status] ?? status}
     </span>
   );
 }
@@ -42,10 +47,11 @@ export function Panel({
 }
 
 /** Generic loading placeholder: skeleton rows plus an accessible status message. */
-export function LoadingState({ label = "Зареждане…", rows = 4 }: { label?: string; rows?: number }) {
+export function LoadingState({ label, rows = 4 }: { label?: string; rows?: number }) {
+  const { t } = useAdminI18n();
   return (
     <div role="status" aria-live="polite" className="grid gap-3 py-2" data-testid="loading">
-      <span className="sr-only">{label}</span>
+      <span className="sr-only">{label ?? t.common.loading}</span>
       {Array.from({ length: rows }, (_, index) => (
         <div key={index} className="flex items-center gap-4">
           <Skeleton className="h-10 w-10 shrink-0 rounded-full" />
@@ -60,9 +66,10 @@ export function LoadingState({ label = "Зареждане…", rows = 4 }: { la
 }
 
 export function StatsSkeleton() {
+  const { t } = useAdminI18n();
   return (
     <div role="status" aria-live="polite" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4" data-testid="loading">
-      <span className="sr-only">Зареждане на статистиката…</span>
+      <span className="sr-only">{t.common.loadingStats}</span>
       {Array.from({ length: 4 }, (_, index) => (
         <div key={index} className="card p-5">
           <Skeleton className="h-3.5 w-1/2" />
@@ -83,13 +90,14 @@ export function ErrorState({
   onRetry?: () => void;
   requestId?: string | null;
 }) {
+  const { t } = useAdminI18n();
   return (
-    <Alert tone="error" role="alert" title="Данните не могат да бъдат заредени">
+    <Alert tone="error" role="alert" title={t.common.loadError}>
       <p>{message}</p>
-      {requestId && <p className="mt-1 font-mono text-xs opacity-80">Код за поддръжка: {requestId}</p>}
+      {requestId && <p className="mt-1 font-mono text-xs opacity-80">{fmt(t.common.supportCode, { id: requestId })}</p>}
       {onRetry && (
         <Button variant="secondary" size="sm" icon="refresh" onClick={onRetry} className="mt-3">
-          Опитай отново
+          {t.common.retry}
         </Button>
       )}
     </Alert>

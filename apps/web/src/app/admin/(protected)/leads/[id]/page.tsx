@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { LeadDetail } from "@/components/admin/LeadDetail";
+import { getAdminDictionary } from "@/lib/admin-locale";
 
-export const metadata: Metadata = { title: "Запитване" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getAdminDictionary()).meta.lead };
+}
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

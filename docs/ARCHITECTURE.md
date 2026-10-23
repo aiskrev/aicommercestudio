@@ -25,23 +25,21 @@ Browser ──HTTPS──▶ Reverse proxy (production: Caddy) ──▶ web: Ne
 | --- | --- |
 | Locale routing | `src/proxy.ts` (Next 16 "proxy", formerly middleware) + pure logic in `src/lib/locale-routing.ts` |
 | Public pages | `src/app/[locale]/…` — home, services, service detail, AI solutions, industries, about, process, contact, articles, legal |
-| Admin | `src/app/admin/login`, `src/app/admin/(protected)/…` (server-verified session in the group layout) |
-| Content | `src/content/bg/*.ts` (typed), accessed through `getContent(locale)` |
-| UI strings | `src/i18n/dictionaries/bg.ts` via `getDictionary(locale)` |
+| Admin | `src/app/admin/login`, `src/app/admin/(protected)/…` (server-verified session in the group layout); strings in `src/i18n/admin/{bg,en}.ts` via `useAdminI18n()` |
+| Content | `src/content/{bg,en}/*.ts` (typed; English typed against the Bulgarian shape), accessed through `getContent(locale)` |
+| UI strings | `src/i18n/dictionaries/{bg,en}.ts` via `getDictionary(locale)` |
+| AI Managed Services | `src/app/[locale]/uslugi/ai-managed-services/page.tsx`, `src/components/contact/AiManagedFields.tsx`, `src/components/sections/AiOpsDiagram.tsx` |
 | SEO | `src/lib/seo.ts` (metadata, canonical, Open Graph, JSON-LD), `app/sitemap.ts`, `app/robots.ts`, `app/opengraph-image.tsx` |
 | Design system | Tailwind 4 tokens in `src/app/globals.css`, primitives in `src/components/ui`, in-house SVG icons |
 
 ### Internationalisation
 
-All pages live under `app/[locale]`. Bulgarian (`bg`) is the default locale and is served **without a
-prefix**: the proxy rewrites `/uslugi` → `/bg/uslugi` internally and redirects `/bg/...` to the
-unprefixed canonical URL. Adding English requires:
-
-1. add `"en"` to `locales` in `src/i18n/config.ts`;
-2. create `src/i18n/dictionaries/en.ts` and `src/content/en/*` and register them;
-3. optionally map translated slugs (e.g. `/en/services`) with rewrites.
-
-No page files need to move. Content types are shared, so TypeScript reports anything missing.
+All pages live under `app/[locale]` and every public URL is locale-prefixed: `/bg/...` (default)
+and `/en/...` with translated segments and slugs (`/en/services/seo-optimization`). The proxy
+redirects `/` to the explicitly chosen language (cookie `acs_locale`) or `/bg`, permanently
+redirects legacy unprefixed URLs to `/bg/...`, and rewrites English segments to the internal
+Bulgarian-named folders. The root layout per locale sets `<html lang>`. Details, URL table, switcher,
+SEO and API languages: [INTERNATIONALIZATION.md](INTERNATIONALIZATION.md).
 
 ## Backend (`apps/api`)
 

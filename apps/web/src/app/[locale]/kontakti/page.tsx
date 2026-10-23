@@ -5,11 +5,11 @@ import { ContactFormWithParams } from "@/components/contact/ContactFormWithParam
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Icon } from "@/components/ui/Icon";
 import { Container, Eyebrow } from "@/components/ui/primitives";
-import { getContent } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
+import { contactFormProps } from "@/lib/contact-form-props";
 import { buildMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
@@ -27,20 +27,9 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/kontakti
 export default async function ContactPage({ params }: PageProps<"/[locale]/kontakti">) {
   const locale = await resolveLocale(params);
   const dict = getDictionary(locale);
-  const { services } = getContent(locale);
   const href = (path: string) => localizePath(locale, path);
 
-  const formProps = {
-    labels: dict.form,
-    messages: dict.validation,
-    inquiry: dict.inquiry,
-    services: [
-      ...services.map((s) => ({ value: s.key, label: s.shortTitle })),
-      { value: "other", label: dict.form.serviceOther },
-    ],
-    privacyHref: href(routes.privacy),
-    nextSteps: dict.contact.nextSteps,
-  };
+  const formProps = contactFormProps(locale);
 
   return (
     <>

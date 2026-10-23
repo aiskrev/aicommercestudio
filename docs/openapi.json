@@ -159,6 +159,7 @@
           "advisor"
         ],
         "summary": "Advisor Status",
+        "description": "The disclaimer follows `Accept-Language` (bg | en).",
         "operationId": "advisor_status_api_public_advisor_status_get",
         "responses": {
           "200": {
@@ -677,6 +678,22 @@
                 }
               ],
               "title": "Inquiry Type"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/LeadLocale"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Locale"
             }
           },
           {
@@ -1490,6 +1507,15 @@
             "maxLength": 200,
             "title": "Form Token",
             "default": ""
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "bg",
+              "en"
+            ],
+            "title": "Locale",
+            "default": "bg"
           }
         },
         "additionalProperties": false,
@@ -1632,6 +1658,135 @@
           "retention_days"
         ],
         "title": "AdvisorStatus"
+      },
+      "AiAgentsCount": {
+        "type": "string",
+        "enum": [
+          "1",
+          "2_5",
+          "6_20",
+          "over_20",
+          "unknown"
+        ],
+        "title": "AiAgentsCount"
+      },
+      "AiHosting": {
+        "type": "string",
+        "enum": [
+          "vendor_platform",
+          "public_cloud",
+          "private_server",
+          "on_premise",
+          "unknown",
+          "other"
+        ],
+        "title": "AiHosting"
+      },
+      "AiManagedDetails": {
+        "properties": {
+          "sector": {
+            "$ref": "#/components/schemas/AiSector"
+          },
+          "system_types": {
+            "items": {
+              "$ref": "#/components/schemas/AiSystemType"
+            },
+            "type": "array",
+            "maxItems": 7,
+            "minItems": 1,
+            "title": "System Types"
+          },
+          "agents_count": {
+            "$ref": "#/components/schemas/AiAgentsCount"
+          },
+          "ai_provider": {
+            "type": "string",
+            "maxLength": 120,
+            "title": "Ai Provider",
+            "default": ""
+          },
+          "hosting": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiHosting"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "support_interests": {
+            "items": {
+              "$ref": "#/components/schemas/AiSupportInterest"
+            },
+            "type": "array",
+            "maxItems": 7,
+            "minItems": 1,
+            "title": "Support Interests"
+          },
+          "communication_language": {
+            "$ref": "#/components/schemas/LeadLocale"
+          },
+          "additional_notes": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Additional Notes",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sector",
+          "system_types",
+          "agents_count",
+          "support_interests",
+          "communication_language"
+        ],
+        "title": "AiManagedDetails",
+        "description": "Descriptive information about a client's AI system (AI Managed Services inquiries).\n\nNever credentials, keys, customer records or documents: free text is checked for secrets.\nStored in `leads.service_details` (JSONB, `{\"kind\": \"ai_managed\", ...}`)."
+      },
+      "AiSector": {
+        "type": "string",
+        "enum": [
+          "ecommerce",
+          "retail",
+          "professional_services",
+          "manufacturing",
+          "logistics",
+          "healthcare",
+          "finance",
+          "software_saas",
+          "agency",
+          "other"
+        ],
+        "title": "AiSector"
+      },
+      "AiSupportInterest": {
+        "type": "string",
+        "enum": [
+          "monitoring",
+          "maintenance",
+          "security",
+          "cost_optimization",
+          "quality_evaluation",
+          "incident_support",
+          "full_managed"
+        ],
+        "title": "AiSupportInterest"
+      },
+      "AiSystemType": {
+        "type": "string",
+        "enum": [
+          "customer_support",
+          "knowledge_assistant",
+          "workflow_automation",
+          "sales_assistant",
+          "document_processing",
+          "custom_llm_app",
+          "other"
+        ],
+        "title": "AiSystemType"
       },
       "AuditLogOut": {
         "properties": {
@@ -1929,6 +2084,14 @@
             "type": "object",
             "title": "By Inquiry Type"
           },
+          "by_locale": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Locale",
+            "default": {}
+          },
           "pending_ai_actions": {
             "type": "integer",
             "title": "Pending Ai Actions"
@@ -2145,6 +2308,20 @@
               }
             ],
             "title": "Advisor Assessment Id"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "ai_managed": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiManagedDetails"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -2225,6 +2402,10 @@
           "inquiry_type": {
             "type": "string",
             "title": "Inquiry Type"
+          },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
           },
           "created_at": {
             "type": "string",
@@ -2352,6 +2533,16 @@
                 "type": "null"
               }
             ]
+          },
+          "ai_managed": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiManagedDetails"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
@@ -2365,6 +2556,7 @@
           "status",
           "source",
           "inquiry_type",
+          "locale",
           "created_at",
           "updated_at",
           "phone",
@@ -2382,6 +2574,15 @@
           "notes"
         ],
         "title": "LeadDetailOut"
+      },
+      "LeadLocale": {
+        "type": "string",
+        "enum": [
+          "bg",
+          "en"
+        ],
+        "title": "LeadLocale",
+        "description": "Language of the website the inquiry was sent from (and preferred communication language)."
       },
       "LeadNoteCreate": {
         "properties": {
@@ -2517,6 +2718,10 @@
             "type": "string",
             "title": "Inquiry Type"
           },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -2539,6 +2744,7 @@
           "status",
           "source",
           "inquiry_type",
+          "locale",
           "created_at",
           "updated_at"
         ],
@@ -2849,6 +3055,20 @@
             ],
             "title": "Advisor Assessment Id"
           },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "ai_managed": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiManagedDetails"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "platform": {
             "$ref": "#/components/schemas/Platform"
           },
@@ -3006,6 +3226,7 @@
           "analytics",
           "integrations",
           "audit",
+          "ai_managed",
           "other"
         ],
         "title": "ServiceKey"

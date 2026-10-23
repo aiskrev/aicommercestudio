@@ -12,6 +12,7 @@ from app.ai.factory import get_ai_provider
 from app.config import get_settings
 from app.deps import AppSettings, DbSession, client_ip, enforce_rate_limit
 from app.errors import ApiError
+from app.i18n import request_locale
 from app.spam import check_form_token
 
 logger = logging.getLogger(__name__)
@@ -56,10 +57,13 @@ def advisor_rate_limit(request: Request) -> None:
 
 
 @router.get("/status", response_model=AdvisorStatus)
-def advisor_status(settings: AppSettings) -> AdvisorStatus:
+def advisor_status(request: Request, settings: AppSettings) -> AdvisorStatus:
+    """The disclaimer follows `Accept-Language` (bg | en)."""
     mode = service.mode_for(get_ai_provider())
     return AdvisorStatus(
-        mode=mode.value, disclaimer=service.disclaimer_for(mode), retention_days=settings.advisor_retention_days
+        mode=mode.value,
+        disclaimer=service.disclaimer_for(mode, request_locale(request)),
+        retention_days=settings.advisor_retention_days,
     )
 
 

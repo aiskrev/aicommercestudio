@@ -1,7 +1,14 @@
 /** Browser-side client for the protected admin API. Sends the CSRF token on state-changing calls. */
 
+import { adminDictionaries } from "@/i18n/admin";
+import { type Locale } from "@/i18n/config";
 import { routes } from "@/lib/routes";
 import { site } from "@/lib/site";
+
+/** The admin root layout sets `<html lang>` from the language preference; API messages follow it. */
+export function adminClientLocale(): Locale {
+  return typeof document !== "undefined" && document.documentElement.lang === "en" ? "en" : "bg";
+}
 
 /** Error from the admin API, carrying the server's machine-readable `code` and `requestId`. */
 export class ApiError extends Error {
@@ -25,7 +32,10 @@ const UNSAFE = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 export async function adminFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const method = (init.method ?? "GET").toUpperCase();
+  const locale = adminClientLocale();
+  const common = adminDictionaries[locale].common;
   const headers = new Headers(init.headers);
+  headers.set("Accept-Language", locale);
   if (init.body !== undefined) headers.set("Content-Type", "application/json");
   if (UNSAFE.has(method)) {
     const csrf = readCookie(site.csrfCookieName);
@@ -36,7 +46,7 @@ export async function adminFetch<T>(path: string, init: RequestInit = {}): Promi
   try {
     response = await fetch(path, { ...init, method, headers, credentials: "same-origin", cache: "no-store" });
   } catch {
-    throw new ApiError(0, "Няма връзка със сървъра.", {}, "network_error");
+    throw new ApiError(0, common.network, {}, "network_error");
   }
 
   if (response.status === 401 && !path.endsWith("/auth/login")) {
@@ -44,7 +54,7 @@ export async function adminFetch<T>(path: string, init: RequestInit = {}): Promi
     // A full page load is intentional: it discards all client state of the expired session.
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign(`${routes.adminLogin}?next=${next}`);
-    throw new ApiError(401, "Сесията е изтекла.", {}, "unauthorized");
+    throw new ApiError(401, common.sessionExpired, {}, "unauthorized");
   }
   if (response.status === 204) return undefined as T;
 
@@ -60,7 +70,7 @@ export async function adminFetch<T>(path: string, init: RequestInit = {}): Promi
     for (const error of body.errors ?? []) {
       if (error.field) fieldErrors[error.field] = error.message;
     }
-    const message = typeof body.detail === "string" ? body.detail : "Възникна грешка.";
+    const message = typeof body.detail === "string" ? body.detail : common.genericError;
     throw new ApiError(
       response.status,
       message,

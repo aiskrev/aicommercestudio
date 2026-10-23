@@ -1,7 +1,7 @@
 import type { CaseStudy, EditorialCategory } from "@/content/types";
 
-/** Editorial taxonomy for articles. Category pages live at /statii/tema/<slug>. */
-export const editorialCategories: EditorialCategory[] = [
+/** Editorial taxonomy for articles. Category pages live at /statii/tema/<slug>; in Bulgarian key = slug. */
+const categorySources: Omit<EditorialCategory, "key">[] = [
   {
     slug: "tehnicheska-poddrazhka",
     name: "Техническа поддръжка",
@@ -39,6 +39,8 @@ export const editorialCategories: EditorialCategory[] = [
     relatedService: "integrations",
   },
 ];
+
+export const editorialCategories: EditorialCategory[] = categorySources.map((category) => ({ ...category, key: category.slug }));
 
 /**
  * Client case studies. Intentionally EMPTY: there are no published client projects yet.

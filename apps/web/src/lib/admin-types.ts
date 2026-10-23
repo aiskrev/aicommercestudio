@@ -5,6 +5,7 @@ import type { AutomationAssessment } from "@/lib/advisor";
 export const LEAD_STATUSES = ["NEW", "CONTACTED", "QUALIFIED", "PROPOSAL", "WON", "LOST"] as const;
 export type LeadStatus = (typeof LEAD_STATUSES)[number];
 export type InquiryType = "contact" | "quote";
+export type LeadLocale = "bg" | "en";
 
 export interface AdminUser {
   id: string;
@@ -28,8 +29,22 @@ export interface LeadSummary {
   status: LeadStatus;
   source: string;
   inquiry_type: InquiryType;
+  /** Website language the inquiry was sent from. */
+  locale: LeadLocale;
   created_at: string;
   updated_at: string;
+}
+
+/** Descriptive AI-system information from an AI Managed Services inquiry (never credentials). */
+export interface AiManagedDetails {
+  sector: string;
+  system_types: string[];
+  agents_count: string;
+  ai_provider: string;
+  hosting: string | null;
+  support_interests: string[];
+  communication_language: LeadLocale;
+  additional_notes: string;
 }
 
 export interface LeadNote {
@@ -54,6 +69,7 @@ export interface LeadDetail extends LeadSummary {
   website_url: string | null;
   notes: LeadNote[];
   advisor_assessment?: LinkedAssessment | null;
+  ai_managed?: AiManagedDetails | null;
 }
 
 export interface LeadPage {
@@ -84,6 +100,7 @@ export interface DashboardStats {
   by_status: Record<LeadStatus, number>;
   by_service: Record<string, number>;
   by_inquiry_type: Record<InquiryType, number>;
+  by_locale?: Partial<Record<LeadLocale, number>>;
   pending_ai_actions: number;
   recent_activity: AuditEntry[];
 }

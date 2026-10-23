@@ -34,8 +34,18 @@ Status: ✅ implemented and verified automatically · 🟡 implemented, verified
 
 ## 2. Keyword map (unverified hypotheses)
 
-Source of truth: [`apps/web/src/content/bg/seo.ts`](../apps/web/src/content/bg/seo.ts). All rows have
-`volumeStatus: "unverified"`.
+Source of truth: [`apps/web/src/content/bg/seo.ts`](../apps/web/src/content/bg/seo.ts) (Bulgarian) and
+[`apps/web/src/content/en/seo.ts`](../apps/web/src/content/en/seo.ts) (English, separate keywords chosen
+for English-language searches — not translations of the Bulgarian ones). All rows have
+`volumeStatus: "unverified"`. Paths in the maps are internal paths; the public URL is
+`localizePath(locale, path)` (e.g. `/uslugi/ai-managed-services` → `/bg/uslugi/ai-managed-services`,
+`/en/services/ai-managed-services`). New in this release: `/uslugi/ai-managed-services` —
+BG primary “поддръжка и мониторинг на AI агенти”.
+
+**International SEO:** every page has a self-referencing canonical, `hreflang` alternates for `bg`
+and `en` plus `x-default` (→ Bulgarian), `og:locale` / `og:locale:alternate`, localized JSON-LD
+(`inLanguage`, localized URLs). The sitemap lists both languages with reciprocal alternates. See
+[INTERNATIONALIZATION.md](INTERNATIONALIZATION.md).
 
 | Path | Primary keyword | Intent |
 | --- | --- | --- |
@@ -72,9 +82,9 @@ serves customers; they are a reason not to expect traffic from it.
 | Page type | Indexed | In sitemap | Rule |
 | --- | --- | --- | --- |
 | Home, hubs, services, articles, about, process, contact | yes | yes | — |
-| Legal pages (`/poveritelnost`, `/biskvitki`, `/obshti-usloviya`) | **no** (`noindex, follow`) | no | while `LEGAL_TEXTS_ARE_DRAFTS = true` in `content/bg/legal.ts` — set to `false` after legal review |
-| Topic pages `/statii/tema/<slug>` | only with ≥ 2 articles | only when indexed | `MIN_ARTICLES_FOR_INDEXED_CATEGORY` in `content/index.ts`; currently only *Автоматизация* qualifies |
-| Case studies `/proekti` | — | — | 404 until a publishable case study exists |
+| Legal pages (`/bg/poveritelnost`, `/bg/biskvitki`, `/bg/obshti-usloviya`, `/en/privacy`, `/en/cookies`, `/en/terms`) | **no** (`noindex, follow`) | no | while `LEGAL_TEXTS_ARE_DRAFTS = true` in `content/bg/legal.ts` (re-exported for English) — set to `false` after legal review |
+| Topic pages `/bg/statii/tema/<slug>`, `/en/insights/topic/<slug>` | only with ≥ 2 articles | only when indexed | `MIN_ARTICLES_FOR_INDEXED_CATEGORY` in `content/index.ts`; currently only *Автоматизация* qualifies |
+| Case studies `/bg/proekti`, `/en/case-studies` | — | — | 404 until a publishable case study exists |
 | Admin, API | no | no | `X-Robots-Tag: noindex, nofollow`, disallowed in `robots.txt` |
 
 ## 4. Editorial guidelines

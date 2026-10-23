@@ -18,7 +18,7 @@ import {
   Section,
   SectionHeading,
 } from "@/components/ui/primitives";
-import { findCategory, getContent, serviceByKey, sortedArticles } from "@/content";
+import { categoryByKey, getContent, serviceByKey, sortedArticles } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
@@ -78,7 +78,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </ul>
           </div>
           <div className="hidden md:block">
-            <HeroVisual />
+            <HeroVisual labels={dict.ui.heroVisual} />
           </div>
         </Container>
       </div>
@@ -115,12 +115,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {coreServices.map((service, index) => (
-            <li key={service.key}>
+            <li key={service.key} className={service.key === "ai_managed" ? "sm:col-span-2 lg:col-span-3" : undefined}>
               <ServiceCard
                 service={service}
                 href={href(routes.service(service.slug))}
                 cta={dict.common.learnMore}
                 index={index}
+                wide={service.key === "ai_managed"}
               />
             </li>
           ))}
@@ -129,7 +130,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           <div className="flex items-start gap-4">
             <IconBadge name={audit.icon} />
             <div>
-              <p className="badge badge-accent mb-2">Препоръчителна първа стъпка</p>
+              <p className="badge badge-accent mb-2">{dict.ui.firstStepBadge}</p>
               <h3 className="t-h3 text-xl">
                 <Link href={href(routes.service(audit.slug))} className="after:absolute after:inset-0 focus-visible:outline-none">
                   {audit.shortTitle}
@@ -314,7 +315,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               <ArticleCard
                 article={article}
                 href={href(routes.article(article.slug))}
-                categoryName={findCategory(locale, article.category)?.name}
+                categoryName={categoryByKey(locale, article.category)?.name}
                 locale={locale}
                 labels={{ minutesRead: dict.common.minutesRead, readArticle: dict.common.readArticle }}
                 headingLevel={3}

@@ -48,7 +48,15 @@ class ServiceKey(enum.StrEnum):
     ANALYTICS = "analytics"
     INTEGRATIONS = "integrations"
     AUDIT = "audit"
+    AI_MANAGED = "ai_managed"
     OTHER = "other"
+
+
+class LeadLocale(enum.StrEnum):
+    """Language of the website the inquiry was sent from (and preferred communication language)."""
+
+    BG = "bg"
+    EN = "en"
 
 
 class InquiryType(enum.StrEnum):
@@ -141,6 +149,8 @@ class Lead(Base):
         CheckConstraint(_in_check("platform", Platform, nullable=True), name="platform"),
         CheckConstraint(_in_check("budget_range", BudgetRange, nullable=True), name="budget_range"),
         CheckConstraint(_in_check("timeline", Timeline, nullable=True), name="timeline"),
+        CheckConstraint(_in_check("locale", LeadLocale), name="locale"),
+        Index("ix_leads_locale", "locale"),
         Index("ix_leads_created_at", "created_at"),
         Index("ix_leads_status", "status"),
         Index("ix_leads_updated_at", "updated_at"),
@@ -160,6 +170,11 @@ class Lead(Base):
     budget_range: Mapped[str | None] = mapped_column(String(32), nullable=True)
     timeline: Mapped[str | None] = mapped_column(String(32), nullable=True)
     website_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    locale: Mapped[str] = mapped_column(
+        String(2), nullable=False, default=LeadLocale.BG.value, server_default=text("'bg'")
+    )
+    # Validated service-specific details, e.g. {"kind": "ai_managed", ...} (see schemas.AiManagedDetails).
+    service_details: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     company: Mapped[str] = mapped_column(String(160), nullable=False)
     email: Mapped[str] = mapped_column(String(254), nullable=False)

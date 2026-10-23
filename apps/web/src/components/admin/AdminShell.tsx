@@ -4,22 +4,27 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, useState } from "react";
 
+import { useAdminI18n } from "@/components/admin/AdminI18n";
+import { AdminLanguageSwitch } from "@/components/admin/AdminLanguage";
 import { LogoMark } from "@/components/layout/Logo";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { cx } from "@/components/ui/primitives";
 import { adminFetch } from "@/lib/admin-api";
 import { routes } from "@/lib/routes";
 
-const NAV: { href: string; label: string; icon: IconName; exact?: boolean }[] = [
-  { href: routes.admin, label: "Табло", icon: "dashboard", exact: true },
-  { href: routes.adminLeads, label: "Запитвания", icon: "inbox" },
-  { href: routes.adminAiActions, label: "AI одобрения", icon: "bot" },
-  { href: routes.adminActivity, label: "Активност", icon: "activity" },
-  { href: routes.adminAccount, label: "Акаунт и сесии", icon: "lock" },
+type NavKey = "dashboard" | "leads" | "ai" | "activity" | "account";
+
+const NAV: { href: string; key: NavKey; icon: IconName; exact?: boolean }[] = [
+  { href: routes.admin, key: "dashboard", icon: "dashboard", exact: true },
+  { href: routes.adminLeads, key: "leads", icon: "inbox" },
+  { href: routes.adminAiActions, key: "ai", icon: "bot" },
+  { href: routes.adminActivity, key: "activity", icon: "activity" },
+  { href: routes.adminAccount, key: "account", icon: "lock" },
 ];
 
 export function AdminShell({ userName, children }: { userName: string; children: ReactNode }) {
   const pathname = usePathname();
+  const { t, locale } = useAdminI18n();
   const [loggingOut, setLoggingOut] = useState(false);
 
   async function logout() {
@@ -40,19 +45,22 @@ export function AdminShell({ userName, children }: { userName: string; children:
         <div className="flex items-center justify-between gap-3 px-4 py-4 lg:px-5 lg:py-6">
           <Link href={routes.admin} className="flex items-center gap-2.5">
             <LogoMark className="h-7 w-7" />
-            <span className="text-sm font-semibold text-white">Администрация</span>
+            <span className="text-sm font-semibold text-white">{t.shell.brand}</span>
           </Link>
-          <button
-            type="button"
-            onClick={logout}
-            disabled={loggingOut}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-xs text-slate-300 hover:text-white lg:hidden"
-          >
-            <Icon name="logout" className="h-4 w-4" />
-            Изход
-          </button>
+          <div className="flex items-center gap-2 lg:hidden">
+            <AdminLanguageSwitch />
+            <button
+              type="button"
+              onClick={logout}
+              disabled={loggingOut}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1.5 text-xs text-slate-300 hover:text-white"
+            >
+              <Icon name="logout" className="h-4 w-4" />
+              {t.shell.logout}
+            </button>
+          </div>
         </div>
-        <nav aria-label="Администрация" className="overflow-x-auto px-2 pb-3 lg:px-3">
+        <nav aria-label={t.shell.navLabel} className="overflow-x-auto px-2 pb-3 lg:px-3">
           <ul className="flex gap-1 lg:flex-col">
             {NAV.map((item) => (
               <li key={item.href}>
@@ -65,7 +73,7 @@ export function AdminShell({ userName, children }: { userName: string; children:
                   )}
                 >
                   <Icon name={item.icon} className="h-4 w-4" />
-                  {item.label}
+                  {t.shell.nav[item.key]}
                 </Link>
               </li>
             ))}
@@ -73,17 +81,20 @@ export function AdminShell({ userName, children }: { userName: string; children:
         </nav>
         <div className="hidden px-5 pb-6 lg:absolute lg:bottom-0 lg:block lg:w-64">
           <p className="truncate text-sm text-white">{userName}</p>
-          <button
-            type="button"
-            onClick={logout}
-            disabled={loggingOut}
-            className="mt-3 inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white"
-          >
-            <Icon name="logout" className="h-4 w-4" />
-            {loggingOut ? "Изход…" : "Изход"}
-          </button>
-          <Link href="/" className="mt-3 block text-xs text-slate-400 hover:text-slate-300">
-            ← Към сайта
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={logout}
+              disabled={loggingOut}
+              className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white"
+            >
+              <Icon name="logout" className="h-4 w-4" />
+              {loggingOut ? t.shell.loggingOut : t.shell.logout}
+            </button>
+            <AdminLanguageSwitch />
+          </div>
+          <Link href={`/${locale}`} className="mt-3 block text-xs text-slate-400 hover:text-slate-300">
+            {t.shell.toSite}
           </Link>
         </div>
       </aside>

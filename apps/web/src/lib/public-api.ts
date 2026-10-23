@@ -19,12 +19,14 @@ export async function fetchFormToken(): Promise<string> {
 export async function submitLead(
   payload: Record<string, unknown>,
   endpoint = "/api/public/leads",
+  locale = "bg",
 ): Promise<SubmitResult> {
   let response: Response;
   try {
     response = await fetch(endpoint, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      // The API returns validation and error messages in this language (bg or en).
+      headers: { "Content-Type": "application/json", "Accept-Language": locale },
       body: JSON.stringify(payload),
     });
   } catch {

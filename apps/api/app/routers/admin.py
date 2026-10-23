@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Query, Response, status
+from pydantic import ValidationError
 
 from app import audit
 from app.advisor import service as advisor
@@ -17,10 +18,11 @@ from app.ai.policy import ActionType, evaluate
 from app.deps import Admin, AppSettings, DbSession
 from app.errors import ApiError
 from app.integrations import integration_status
-from app.models import AIActionStatus, InquiryType, Lead, LeadNote, LeadStatus, ServiceKey
+from app.models import AIActionStatus, InquiryType, Lead, LeadLocale, LeadNote, LeadStatus, ServiceKey
 from app.schemas import (
     AIActionDecision,
     AIActionOut,
+    AiManagedDetails,
     AuditLogOut,
     AuditPage,
     DashboardStats,
@@ -54,6 +56,18 @@ def _note_out(note: LeadNote) -> LeadNoteOut:
     )
 
 
+def _ai_managed_details(lead: Lead) -> AiManagedDetails | None:
+    """Validated AI Managed Services details, or None (other services, older leads, unexpected data)."""
+    details = lead.service_details or {}
+    if details.get("kind") != "ai_managed":
+        return None
+    try:
+        return AiManagedDetails.model_validate({k: v for k, v in details.items() if k != "kind"})
+    except ValidationError:
+        logger.warning("lead_service_details_invalid", extra={"lead": lead.reference})
+        return None
+
+
 def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
     base = LeadSummaryOut.model_validate(lead).model_dump()
     return LeadDetailOut(
@@ -72,6 +86,7 @@ def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
         website_url=lead.website_url,
         notes=[_note_out(n) for n in lead.notes],
         advisor_assessment=advisor.summary_for_lead(db, lead.id),
+        ai_managed=_ai_managed_details(lead),
     )
 
 
@@ -188,6 +203,7 @@ def list_leads(
     status_filter: Annotated[LeadStatus | None, Query(alias="status")] = None,
     service: ServiceKey | None = None,
     inquiry_type: InquiryType | None = None,
+    locale: LeadLocale | None = None,
     q: Annotated[str | None, Query(max_length=100)] = None,
     created_from: datetime | None = None,
     created_to: datetime | None = None,
@@ -200,6 +216,7 @@ def list_leads(
         status=status_filter,
         service=service,
         inquiry_type=inquiry_type,
+        locale=locale,
         q=q or None,
         created_from=created_from,
         created_to=created_to,

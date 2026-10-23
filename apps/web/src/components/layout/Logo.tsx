@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { getDictionary } from "@/i18n";
+import { defaultLocale, splitLocale } from "@/i18n/config";
 import { site } from "@/lib/site";
 
 export function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
@@ -21,7 +23,11 @@ export function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
 
 export function Logo({ href }: { href: string }) {
   return (
-    <Link href={href} className="group inline-flex items-center gap-2.5" aria-label={`${site.name} — начална страница`}>
+    <Link
+      href={href}
+      className="group inline-flex items-center gap-2.5"
+      aria-label={`${site.name} — ${getDictionary(splitLocale(href)?.locale ?? defaultLocale).ui.logoHome}`}
+    >
       <LogoMark />
       <span className="font-display text-[15px] font-semibold tracking-tight text-white">
         A.I. Commerce <span className="text-gradient">Studio</span>

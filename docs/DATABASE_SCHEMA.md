@@ -11,6 +11,7 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0001` | admin users & sessions, leads, notes, audit log, AI action approvals |
 | `0002` | quote requests (`inquiry_type`, `platform`, `budget_range`, `timeline`, `website_url`), service re-categorisation (`submitted_service`, backfilled from `service`), persistent login lockout (`failed_login_count`, `locked_until`), indexes on `leads.service`, `leads.inquiry_type`, `audit_logs.action`, `audit_logs.actor_id` |
 | `0003` | `advisor_assessments` (anonymous AI advisor assessments with expiry and optional lead link, FK `ON DELETE CASCADE`) |
+| `0004` | AI Managed Services and lead language: `ai_managed` added to the `service` / `submitted_service` CHECKs; `leads.locale` (`bg`/`en`, NOT NULL, server default `bg` — existing rows become `bg`, CHECK `ck_leads_locale`, index `ix_leads_locale`); `leads.service_details` JSONB null. Downgrade re-categorises `ai_managed` leads as `other` (details are dropped with the column) instead of deleting them. |
 
 Apply: automatic on container start (`RUN_MIGRATIONS_ON_START=true`), or manually
 `docker compose exec api alembic upgrade head`. Inspect: `docker compose exec api alembic current`.
@@ -50,7 +51,7 @@ All timestamps are `timestamptz` in UTC.
 | Column | Type | Notes |
 | --- | --- | --- |
 | id | uuid PK | public reference = first 8 hex chars, upper-case |
-| service | varchar(32) | current categorisation (admins may change it); CHECK in (`maintenance`, `seo`, `ai_tools`, `automation`, `analytics`, `integrations`, `audit`, `other`); indexed |
+| service | varchar(32) | current categorisation (admins may change it); CHECK in (`maintenance`, `seo`, `ai_tools`, `automation`, `analytics`, `integrations`, `audit`, `ai_managed`, `other`); indexed |
 | submitted_service | varchar(32) | what the visitor selected — never changed; same CHECK |
 | inquiry_type | varchar(16), default `contact` | CHECK in (`contact`, `quote`); indexed |
 | platform | varchar(32) null | quotes only: CHECK in (`shopify`, `woocommerce`, `custom`, `other`, `none`) |
@@ -68,6 +69,8 @@ All timestamps are `timestamptz` in UTC.
 | marketing_consent | boolean | separate, optional consent |
 | marketing_consent_at | timestamptz null | |
 | ip_hash | varchar(64) null | abuse correlation without storing the IP |
+| locale | varchar(2), default `bg` | website language of the inquiry; CHECK in (`bg`, `en`); indexed (admin filter) |
+| service_details | jsonb null | service-specific, validated data. AI Managed Services: `{"kind": "ai_managed", "sector", "system_types"[], "agents_count", "ai_provider", "hosting", "support_interests"[], "communication_language", "additional_notes"}` — descriptive only, never credentials (free text is screened for secrets) |
 | created_at, updated_at, status_changed_at | timestamptz | `created_at`, `updated_at` indexed |
 
 ## lead_notes

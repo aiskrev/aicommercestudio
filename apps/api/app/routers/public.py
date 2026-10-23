@@ -20,7 +20,10 @@ from app.spam import check_form_token, issue_form_token, looks_like_link_spam
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/public", tags=["public"])
 
-SUCCESS_MESSAGE = "Благодарим ви! Получихме запитването и ще се свържем с вас в рамките на работното време."
+SUCCESS_MESSAGES = {
+    "bg": "Благодарим ви! Получихме запитването и ще се свържем с вас в рамките на работното време.",
+    "en": "Thank you! We have received your inquiry and will get back to you during business hours.",
+}
 
 
 def contact_rate_limit(request: Request) -> None:
@@ -86,7 +89,11 @@ def _accept_submission(
     if payload.website:
         # Honeypot filled: pretend success so bots get no signal, but store nothing.
         logger.warning("contact_spam_rejected", extra={"reason": "honeypot", "ip_hash": ip_hash})
-        return LeadCreated(reference=secrets.token_hex(4).upper(), message=SUCCESS_MESSAGE, inquiry_type=inquiry_type)
+        return LeadCreated(
+            reference=secrets.token_hex(4).upper(),
+            message=SUCCESS_MESSAGES[payload.locale.value],
+            inquiry_type=inquiry_type,
+        )
 
     token_problem = check_form_token(
         payload.form_token,
@@ -113,5 +120,9 @@ def _accept_submission(
         "lead_created",
         extra={"lead": lead.reference, "service": lead.service, "inquiry_type": lead.inquiry_type},
     )
-    background.add_task(notify_new_lead, settings, str(lead.id), lead.reference, lead.service, lead.inquiry_type)
-    return LeadCreated(reference=lead.reference, message=SUCCESS_MESSAGE, inquiry_type=inquiry_type)
+    background.add_task(
+        notify_new_lead, settings, str(lead.id), lead.reference, lead.service, lead.inquiry_type, lead.locale
+    )
+    return LeadCreated(
+        reference=lead.reference, message=SUCCESS_MESSAGES[payload.locale.value], inquiry_type=inquiry_type
+    )

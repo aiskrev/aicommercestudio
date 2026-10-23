@@ -16,10 +16,11 @@ import { buildMetadata } from "@/lib/seo";
  */
 export async function generateMetadata({ params }: PageProps<"/[locale]/proekti">) {
   const locale = await resolveLocale(params);
+  const { caseStudies: copy } = getDictionary(locale).ui;
   return buildMetadata({
     locale,
-    title: "Реализирани проекти",
-    description: "Проекти, публикувани с изричното съгласие на клиентите, с описание на задачата, решението и измерените резултати.",
+    title: copy.title,
+    description: copy.description,
     path: routes.caseStudies,
   });
 }
@@ -36,13 +37,13 @@ export default async function CaseStudiesPage({ params }: PageProps<"/[locale]/p
       <Breadcrumbs
         items={[
           { name: dict.common.home, path: href(routes.home) },
-          { name: "Проекти", path: href(routes.caseStudies) },
+          { name: dict.ui.caseStudies.eyebrow, path: href(routes.caseStudies) },
         ]}
       />
       <PageHero
-        eyebrow="Проекти"
-        title="Реализирани проекти"
-        lead="Публикуваме само реални проекти с писменото съгласие на клиента. Резултатите са посочени с източник и период на измерване."
+        eyebrow={dict.ui.caseStudies.eyebrow}
+        title={dict.ui.caseStudies.title}
+        lead={dict.ui.caseStudies.lead}
       />
       <Section>
         <ul className="grid gap-5 md:grid-cols-2">

@@ -10,6 +10,7 @@ import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
+import { contactFormProps } from "@/lib/contact-form-props";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
 
 /** Default shown before the client reads the configured value from /api/public/advisor/status. */
@@ -28,21 +29,11 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/ai-autom
 
 export default async function AdvisorPage({ params }: PageProps<"/[locale]/ai-automation-advisor">) {
   const locale = await resolveLocale(params);
-  const { advisor, services } = getContent(locale);
+  const { advisor } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
 
-  const contact = {
-    labels: dict.form,
-    messages: dict.validation,
-    inquiry: dict.inquiry,
-    services: [
-      ...services.map((s) => ({ value: s.key, label: s.shortTitle })),
-      { value: "other", label: dict.form.serviceOther },
-    ],
-    privacyHref: href(routes.privacy),
-    nextSteps: dict.contact.nextSteps,
-  };
+  const contact = contactFormProps(locale);
 
   return (
     <>
@@ -68,7 +59,7 @@ export default async function AdvisorPage({ params }: PageProps<"/[locale]/ai-au
       <section aria-label={advisor.form.title} className="py-12 sm:py-16">
         <Container className="grid gap-10 lg:grid-cols-[1fr_20rem]">
           <div className="min-w-0">
-            <AdvisorTool content={advisor} contact={contact} retentionDays={DEFAULT_RETENTION_DAYS} />
+            <AdvisorTool content={advisor} contact={contact} retentionDays={DEFAULT_RETENTION_DAYS} locale={locale} />
           </div>
           <aside className="grid content-start gap-5 print:hidden">
             <section className="card rounded-2xl p-6" aria-labelledby="advisor-privacy-title">

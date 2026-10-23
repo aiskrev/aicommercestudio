@@ -3,7 +3,9 @@ import type { ReactNode, Ref } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Alert, Badge, CheckList, cx } from "@/components/ui/primitives";
 import type { AdvisorContent } from "@/content/bg/advisor";
+import type { Locale } from "@/i18n/config";
 import type { AdvisorResponse, Level } from "@/lib/advisor";
+import { formatDate } from "@/lib/format";
 
 const levelTone: Record<Level, string> = {
   low: "bg-emerald-400/10 text-emerald-200 ring-emerald-400/30",
@@ -33,16 +35,18 @@ export function AdvisorResult({
   result,
   content,
   headingRef,
+  locale = "bg",
 }: {
   result: AdvisorResponse;
   content: AdvisorContent;
   headingRef?: Ref<HTMLHeadingElement>;
+  locale?: Locale;
 }) {
   const { assessment: a } = result;
   const t = content.result;
   const l = content.labels;
   const demo = result.mode === "demo";
-  const expires = result.expires_at ? new Date(result.expires_at).toLocaleDateString("bg-BG") : null;
+  const expires = result.expires_at ? formatDate(result.expires_at, locale) : null;
 
   return (
     <div className="grid gap-6" data-testid="advisor-result" data-mode={result.mode}>

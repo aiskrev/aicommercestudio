@@ -15,7 +15,7 @@ test("advisor works in demo mode end to end: assessment → consultation → adm
   test.setTimeout(90_000);
   const company = `E2E Съветник ${Date.now()}`;
 
-  await page.goto("/ai-automation-advisor");
+  await page.goto("/bg/ai-automation-advisor");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("автоматизация");
   await expect(page.getByTestId("advisor-demo-notice")).toContainText("не е анализ, генериран от изкуствен интелект");
 
@@ -86,7 +86,7 @@ test("advisor API rejects invalid input and never asks for personal data", async
 });
 
 test("advisor page is linked from the AI solutions page", async ({ page }) => {
-  await page.goto("/ai-resheniya");
+  await page.goto("/bg/ai-resheniya");
   await page.getByTestId("advisor-promo").getByRole("link", { name: "Изпробвай съветника" }).click();
   await expect(page).toHaveURL(/\/ai-automation-advisor$/);
 });

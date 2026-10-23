@@ -6,18 +6,14 @@ import type { ComponentProps } from "react";
 import { ContactForm } from "@/components/contact/ContactForm";
 
 /**
- * Pre-fills the form from the URL: `?usluga=<service key>` selects the service and
- * `?tip=oferta` opens the quote-request variant (used by "Поискай оферта" links).
+ * Pre-fills the form from the URL. Bulgarian URLs use `?usluga=<service key>&tip=oferta`, English
+ * URLs `?service=<service key>&type=quote` (see `localizeSearch`); both are accepted.
  */
 export function ContactFormWithParams(
   props: Omit<ComponentProps<typeof ContactForm>, "initialService" | "initialInquiry">,
 ) {
   const searchParams = useSearchParams();
-  return (
-    <ContactForm
-      {...props}
-      initialService={searchParams.get("usluga") ?? ""}
-      initialInquiry={searchParams.get("tip") === "oferta" ? "quote" : "contact"}
-    />
-  );
+  const service = searchParams.get("usluga") ?? searchParams.get("service") ?? "";
+  const quote = searchParams.get("tip") === "oferta" || searchParams.get("type") === "quote";
+  return <ContactForm {...props} initialService={service} initialInquiry={quote ? "quote" : "contact"} />;
 }
