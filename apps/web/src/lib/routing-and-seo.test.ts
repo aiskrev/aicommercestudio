@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { getContent } from "@/content";
-import { localizePath } from "@/i18n/config";
+import { localizePath, toPublicPath } from "@/i18n/config";
 import { safeAdminRedirect } from "@/lib/admin-api";
 import { decideRoute } from "@/lib/locale-routing";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
@@ -67,7 +67,7 @@ describe("SEO helpers", () => {
     const { services, articles } = getContent("bg");
     for (const service of services) expect(urls).toContain(`/uslugi/${service.slug}`);
     for (const article of articles) expect(urls).toContain(`/statii/${article.slug}`);
-    for (const path of ["/", "/uslugi", "/kontakti", "/poveritelnost", "/za-nas", "/proces", "/za-kogo", "/ai-resheniya"]) {
+    for (const path of ["/", "/uslugi", "/kontakti", "/za-nas", "/proces", "/za-kogo", "/ai-resheniya", "/statii"]) {
       expect(urls).toContain(path);
     }
     expect(urls.some((u) => u.startsWith("/admin"))).toBe(false);
@@ -77,5 +77,18 @@ describe("SEO helpers", () => {
     const rules = robots().rules;
     const rule = Array.isArray(rules) ? rules[0] : rules;
     expect(rule.disallow).toEqual(expect.arrayContaining(["/admin", "/api/"]));
+  });
+});
+
+describe("toPublicPath", () => {
+  it.each([
+    ["/bg", "/"],
+    ["/bg/uslugi", "/uslugi"],
+    ["/bg/uslugi/seo-optimizatsiya", "/uslugi/seo-optimizatsiya"],
+    ["/uslugi", "/uslugi"],
+    ["/bgx/test", "/bgx/test"],
+    ["/admin", "/admin"],
+  ])("%s -> %s", (input, expected) => {
+    expect(toPublicPath(input)).toBe(expected);
   });
 });

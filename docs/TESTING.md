@@ -36,7 +36,8 @@ Lint: `ruff check` (pyflakes, pycodestyle, isort, bugbear, pyupgrade, bandit-sty
 | `lib/contact-validation.test.ts` | client validation rules mirror the API; payload normalisation |
 | `components/contact/ContactForm.test.tsx` | accessible labels, service pre-selection, error display without submitting, successful submit payload + reference, server field-error mapping, 429 message |
 | `content/content.test.ts` | 6 services + audit, keys match the API enum, unique URL-safe slugs, unique titles/descriptions within length limits, complete service pages, no TODO / invented guarantees, legal texts marked as drafts |
-| `lib/routing-and-seo.test.ts` | locale rewrite/redirect and admin guard decisions, open-redirect protection, canonical URLs, FAQ JSON-LD, sitemap completeness, robots rules |
+| `lib/routing-and-seo.test.ts` | locale rewrite/redirect and admin guard decisions, open-redirect protection, canonical URLs, FAQ JSON-LD, sitemap completeness, robots rules, public-path mapping for client components |
+| `content/seo-map.test.ts` | keyword map: one page per primary keyword, no cross-page overlap, keyword in title, mapped paths in sitemap, unverified volume unless evidence; editorial integrity (categories, related services/articles, inline links, tables, unique service H2s, every article reachable); case-study publish guard; draft legal + thin topic pages excluded from sitemap |
 
 The `web-tests` container also runs `next typegen && tsc --noEmit` and `eslint .` (Next core-web-vitals + TypeScript rules).
 
@@ -51,7 +52,11 @@ and Pixel 7 emulation. Admin credentials come from `.env`.
 | `links.spec.ts` | crawls every sitemap URL and every internal link found — none may fail |
 | `contact.spec.ts` | invalid form shows errors and sends nothing; server rejects invalid payloads; **quote request** (`?tip=oferta`) with structured fields; valid submission (with `?usluga=` pre-selection) returns a reference |
 | `admin.spec.ts` | anonymous redirect to login; admin API 401 with `code` (GET, PATCH, retention run); wrong credentials; full flow: login → dashboard → search lead → change status → add note → reload persists → AI triage → **audit log shows the status change by the admin and the `lead.viewed` access** → logout → protected again |
-| `mobile.spec.ts` | no horizontal overflow on 9 pages at phone width; mobile menu; contact form usable |
+| `mobile.spec.ts` | no horizontal overflow on 9 pages at phone width; mobile menu; sticky quote bar (appears after scrolling, hides at the footer, absent on `/kontakti`, dismiss persists for the session); contact form usable |
+| `seo.spec.ts` | crawls **every sitemap URL**: status 200, exactly one H1, unique title, description ≥ 70 chars, self-canonical, `og:title`, not `noindex`, valid JSON-LD; draft legal + thin topic pages are `noindex`; article features (key points, table, inline CTA, related services, `Article` JSON-LD); `/proekti` 404; quote CTA pre-fills the form; message helper + blur validation; nav `aria-current` |
+
+Lighthouse is not part of `test.ps1`; the method used for the lab measurements is described in
+[SEO_IMPLEMENTATION.md §5](SEO_IMPLEMENTATION.md#5-performance-measurements-lab-only).
 
 Notes:
 * The contact form has an anti-bot timing check, so e2e waits 3.5 s before submitting.

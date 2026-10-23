@@ -91,6 +91,14 @@ export function ContactForm({
     if (errors[field]) setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
+  /** Validate a single field when the visitor leaves it (only once something was typed). */
+  function validateOnBlur(field: ContactField) {
+    const value = values[field];
+    if (typeof value === "string" && !value.trim()) return;
+    const fieldError = validateContact(values, messages, allowed)[field];
+    setErrors((current) => ({ ...current, [field]: fieldError }));
+  }
+
   function showErrors(next: ContactErrors, message: string) {
     setErrors(next);
     setFormError(message);
@@ -107,6 +115,8 @@ export function ContactForm({
     setFormError(null);
 
     const clientErrors = validateContact(values, messages, allowed);
+    // The outline alone is not a project description.
+    if (values.message.trim() === labels.messageTemplate.trim()) clientErrors.message = messages.required;
     if (Object.keys(clientErrors).length > 0) {
       showErrors(clientErrors, labels.errorSummary);
       return;
@@ -270,6 +280,7 @@ export function ContactForm({
             aria-invalid={Boolean(errors.name)}
             aria-describedby={describedBy("name")}
             onChange={(e) => update("name", e.target.value)}
+            onBlur={() => validateOnBlur("name")}
           />
         </Field>
         <Field id="company" label={labels.company} required requiredLabel={labels.required} error={errors.company}>
@@ -283,12 +294,13 @@ export function ContactForm({
             aria-invalid={Boolean(errors.company)}
             aria-describedby={describedBy("company")}
             onChange={(e) => update("company", e.target.value)}
+            onBlur={() => validateOnBlur("company")}
           />
         </Field>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <Field id="email" label={labels.email} required requiredLabel={labels.required} error={errors.email}>
+        <Field id="email" label={labels.email} required requiredLabel={labels.required} error={errors.email} hint={labels.emailHint}>
           <input
             id="contact-email"
             name="email"
@@ -299,8 +311,9 @@ export function ContactForm({
             maxLength={LIMITS.email.max}
             value={values.email}
             aria-invalid={Boolean(errors.email)}
-            aria-describedby={describedBy("email")}
+            aria-describedby={describedBy("email", errors.email ? undefined : "contact-email-hint")}
             onChange={(e) => update("email", e.target.value)}
+            onBlur={() => validateOnBlur("email")}
           />
         </Field>
         <Field id="phone" label={`${labels.phone} (${labels.optional})`} error={errors.phone}>
@@ -316,6 +329,7 @@ export function ContactForm({
             aria-invalid={Boolean(errors.phone)}
             aria-describedby={describedBy("phone")}
             onChange={(e) => update("phone", e.target.value)}
+            onBlur={() => validateOnBlur("phone")}
           />
         </Field>
       </div>
@@ -369,6 +383,7 @@ export function ContactForm({
               aria-invalid={Boolean(errors.website_url)}
               aria-describedby={describedBy("website_url", errors.website_url ? undefined : "contact-website_url-hint")}
               onChange={(e) => update("website_url", e.target.value)}
+              onBlur={() => validateOnBlur("website_url")}
             />
           </Field>
           <p className="text-xs text-slate-400">{inquiry.budgetNote}</p>
@@ -391,9 +406,29 @@ export function ContactForm({
           maxLength={LIMITS.message.max}
           value={values.message}
           aria-invalid={Boolean(errors.message)}
-          aria-describedby={describedBy("message", "contact-message-hint")}
+          aria-describedby={describedBy("message", "contact-message-hint contact-message-counter")}
           onChange={(e) => update("message", e.target.value)}
+          onBlur={() => validateOnBlur("message")}
         />
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+          <span id="contact-message-counter">
+            {labels.messageCounter
+              .replace("{n}", String(values.message.trim().length))
+              .replace("{max}", String(LIMITS.message.max))}
+          </span>
+          {!values.message.trim() && (
+            <button
+              type="button"
+              className="font-semibold text-cyan-300 hover:text-cyan-200"
+              onClick={() => {
+                update("message", labels.messageTemplate);
+                document.getElementById("contact-message")?.focus();
+              }}
+            >
+              {labels.messageTemplateButton}
+            </button>
+          )}
+        </div>
       </Field>
 
       {/* Honeypot — hidden from people and assistive technology */}

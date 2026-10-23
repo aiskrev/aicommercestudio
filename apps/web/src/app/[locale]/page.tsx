@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ArticleCard } from "@/components/editorial/ArticleCard";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Faq } from "@/components/sections/Faq";
 import { HeroVisual } from "@/components/sections/HeroVisual";
@@ -16,7 +17,7 @@ import {
   Section,
   SectionHeading,
 } from "@/components/ui/primitives";
-import { getContent, serviceByKey } from "@/content";
+import { findCategory, getContent, serviceByKey, sortedArticles } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
@@ -41,6 +42,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const audit = serviceByKey(locale, "audit");
+  const latestArticles = sortedArticles(locale).slice(0, 3);
 
   return (
     <>
@@ -51,7 +53,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
         <Container className="relative grid items-center gap-14 pb-16 pt-14 sm:pb-20 sm:pt-20 lg:grid-cols-[1.08fr_1fr] lg:pb-24 lg:pt-24">
-          <div className="animate-fade-up">
+          <div>
             <Eyebrow>{home.hero.eyebrow}</Eyebrow>
             <h1 className="t-display mt-6">
               {home.hero.title} <span className="text-gradient">{home.hero.titleHighlight}</span>
@@ -291,8 +293,37 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
       </Section>
 
+      {/* ------------------------------------------------------------ latest articles */}
+      <Section labelledBy="latest-articles-title">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <SectionHeading
+            id="latest-articles-title"
+            eyebrow={dict.nav.insights}
+            title={dict.editorial.latestTitle}
+            lead={dict.editorial.latestLead}
+          />
+          <ButtonLink href={href(routes.insights)} variant="secondary" icon="arrowRight" className="self-start lg:self-auto">
+            {dict.common.allArticles}
+          </ButtonLink>
+        </div>
+        <ul className="mt-12 grid gap-5 md:grid-cols-3">
+          {latestArticles.map((article) => (
+            <li key={article.slug}>
+              <ArticleCard
+                article={article}
+                href={href(routes.article(article.slug))}
+                categoryName={findCategory(locale, article.category)?.name}
+                locale={locale}
+                labels={{ minutesRead: dict.common.minutesRead, readArticle: dict.common.readArticle }}
+                headingLevel={3}
+              />
+            </li>
+          ))}
+        </ul>
+      </Section>
+
       {/* ------------------------------------------------------------ FAQ */}
-      <Section labelledBy="faq-title">
+      <Section labelledBy="faq-title" alt>
         <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <SectionHeading id="faq-title" eyebrow={home.faq.eyebrow} title={home.faq.title} />

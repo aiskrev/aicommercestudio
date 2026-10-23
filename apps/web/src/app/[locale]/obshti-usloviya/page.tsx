@@ -8,8 +8,15 @@ import { buildMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/obshti-usloviya">) {
   const locale = await resolveLocale(params);
-  const document = getContent(locale).legal.termsOfUse;
-  return buildMetadata({ locale, title: document.title, description: document.metaDescription, path: routes.terms });
+  const { legal } = getContent(locale);
+  const document = legal.termsOfUse;
+  return buildMetadata({
+    locale,
+    title: document.title,
+    description: document.metaDescription,
+    path: routes.terms,
+    noindex: legal.isDraft,
+  });
 }
 
 export default async function TermsPage({ params }: PageProps<"/[locale]/obshti-usloviya">) {

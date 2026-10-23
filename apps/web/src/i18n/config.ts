@@ -22,3 +22,13 @@ export function localizePath(locale: Locale, path: string): string {
   if (locale === defaultLocale) return clean;
   return clean === "/" ? `/${locale}` : `/${locale}${clean}`;
 }
+
+/**
+ * Client components see the internally rewritten path (`/bg/uslugi`) from `usePathname()`.
+ * Map it back to the public URL (`/uslugi`) so it can be compared with localized hrefs.
+ */
+export function toPublicPath(pathname: string): string {
+  const prefix = `/${defaultLocale}`;
+  if (pathname === prefix) return "/";
+  return pathname.startsWith(`${prefix}/`) ? pathname.slice(prefix.length) : pathname;
+}

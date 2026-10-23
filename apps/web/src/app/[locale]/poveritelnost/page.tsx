@@ -8,8 +8,15 @@ import { buildMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/poveritelnost">) {
   const locale = await resolveLocale(params);
-  const document = getContent(locale).legal.privacyPolicy;
-  return buildMetadata({ locale, title: document.title, description: document.metaDescription, path: routes.privacy });
+  const { legal } = getContent(locale);
+  const document = legal.privacyPolicy;
+  return buildMetadata({
+    locale,
+    title: document.title,
+    description: document.metaDescription,
+    path: routes.privacy,
+    noindex: legal.isDraft,
+  });
 }
 
 export default async function PrivacyPage({ params }: PageProps<"/[locale]/poveritelnost">) {

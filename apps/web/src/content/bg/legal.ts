@@ -4,6 +4,12 @@ import type { LegalDocument } from "@/content/types";
  * DRAFT legal texts. Placeholders in [square brackets] must be completed and the texts
  * reviewed by a qualified lawyer before the site is published.
  */
+/**
+ * While the legal texts contain placeholders they must not appear in search results: the pages are
+ * served with `noindex, follow` and left out of the sitemap. Set to false after legal review.
+ */
+export const LEGAL_TEXTS_ARE_DRAFTS = true;
+
 export const legalDraftNotice =
   "Чернова: този текст е примерен и трябва да бъде допълнен с данните на дружеството и прегледан от юрист преди публикуване.";
 

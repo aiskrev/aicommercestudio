@@ -1,9 +1,9 @@
 import type { FaqItem, ServiceKey, TitledText } from "@/content/types";
 
 export const home = {
-  metaTitle: "AI решения, автоматизация и поддръжка за онлайн магазини",
+  metaTitle: "AI решения за онлайн магазини, SEO и автоматизация",
   metaDescription:
-    "Студио за e-commerce инженерство и AI решения: поддръжка на Shopify и WooCommerce, SEO, автоматизация на процеси, анализи и интеграции за малки и средни бизнеси.",
+    "Технически партньор за онлайн магазини в България и ЕС: поддръжка на Shopify и WooCommerce, SEO, автоматизация на процеси и AI решения с човешки контрол.",
   hero: {
     eyebrow: "E-commerce инженерство · AI · Автоматизация",
     title: "AI решения и автоматизация",

@@ -4,6 +4,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Manrope } from "next/font/google";
 
 import { Footer } from "@/components/layout/Footer";
+import { StickyQuoteBar } from "@/components/editorial/StickyQuoteBar";
 import { Header } from "@/components/layout/Header";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { getContent } from "@/content";
@@ -80,6 +81,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           {children}
         </main>
         <Footer locale={locale} dict={dict} services={services} />
+        <StickyQuoteBar
+          href={`${href(routes.contact)}?tip=oferta`}
+          label={dict.quoteBar.label}
+          hint={dict.quoteBar.hint}
+          dismissLabel={dict.quoteBar.dismiss}
+          hiddenOn={[href(routes.contact)]}
+        />
         <JsonLd data={[organizationJsonLd(), websiteJsonLd(locale)]} />
       </body>
     </html>

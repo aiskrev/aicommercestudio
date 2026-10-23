@@ -24,7 +24,7 @@ describe.each(locales)("content integrity (%s)", (locale) => {
   it("has unique, reasonably sized titles and meta descriptions", () => {
     const pages = [
       ...content.services.map((s) => ({ title: s.metaTitle, description: s.metaDescription })),
-      ...content.articles.map((a) => ({ title: a.title, description: a.description })),
+      ...content.articles.map((a) => ({ title: a.metaTitle ?? a.title, description: a.description })),
       { title: content.home.metaTitle, description: content.home.metaDescription },
       { title: content.servicesPage.metaTitle, description: content.servicesPage.metaDescription },
       { title: content.aiSolutions.metaTitle, description: content.aiSolutions.metaDescription },

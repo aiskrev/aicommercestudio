@@ -56,7 +56,7 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
   await user.selectOptions(screen.getByLabelText(/Услуга/), "seo");
   await user.type(screen.getByLabelText(/Име и фамилия/), "Иван Петров");
   await user.type(screen.getByLabelText(/^Фирма/), "Примерна Фирма ЕООД");
-  await user.type(screen.getByLabelText(/Служебен имейл/), "ivan@example.com");
+  await user.type(screen.getByLabelText(/^Имейл/), "ivan@example.com");
   await user.type(screen.getByLabelText(/Описание на проекта/), "Нуждаем се от технически SEO одит на магазина.");
   await user.click(screen.getByRole("checkbox", { name: /информацията за поверителност/ }));
 }
@@ -64,7 +64,7 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
 describe("ContactForm", () => {
   it("renders all fields with accessible labels", () => {
     renderForm();
-    for (const label of [/Услуга/, /Име и фамилия/, /^Фирма/, /Служебен имейл/, /Телефон/, /Описание на проекта/]) {
+    for (const label of [/Услуга/, /Име и фамилия/, /^Фирма/, /^Имейл/, /Телефон/, /Описание на проекта/]) {
       expect(screen.getByLabelText(label)).toBeInTheDocument();
     }
     expect(screen.getByRole("link", { name: "информацията за поверителност" })).toHaveAttribute("href", "/poveritelnost");
@@ -126,7 +126,7 @@ describe("ContactForm", () => {
     await user.click(screen.getByRole("button", { name: bg.form.submit }));
 
     expect(await screen.findByText("Въведете валиден имейл адрес.")).toBeInTheDocument();
-    expect(screen.getByLabelText(/Служебен имейл/)).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getByLabelText(/^Имейл/)).toHaveAttribute("aria-invalid", "true");
   });
 
   it("shows a friendly message when rate limited", async () => {

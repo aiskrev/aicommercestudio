@@ -8,8 +8,15 @@ import { buildMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/biskvitki">) {
   const locale = await resolveLocale(params);
-  const document = getContent(locale).legal.cookiePolicy;
-  return buildMetadata({ locale, title: document.title, description: document.metaDescription, path: routes.cookies });
+  const { legal } = getContent(locale);
+  const document = legal.cookiePolicy;
+  return buildMetadata({
+    locale,
+    title: document.title,
+    description: document.metaDescription,
+    path: routes.cookies,
+    noindex: legal.isDraft,
+  });
 }
 
 export default async function CookiesPage({ params }: PageProps<"/[locale]/biskvitki">) {

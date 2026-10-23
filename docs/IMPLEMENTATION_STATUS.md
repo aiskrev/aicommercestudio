@@ -19,6 +19,26 @@ images `python:3.13-slim`, `node:24-alpine`, `postgres:17-alpine`, `mcr.microsof
 | Stack health | `docker compose ps` | db, api, web **healthy** |
 | Manual browser check | in-app browser at 1024 px and 375 px | home, service, contact, admin login/dashboard/leads/detail rendered; issues found were fixed (see below) |
 
+## SEO, content and conversion (fourth iteration)
+
+Full checklist, keyword map, indexation rules, editorial guidelines and lab performance:
+[SEO_IMPLEMENTATION.md](SEO_IMPLEMENTATION.md).
+
+Executed with `.\scripts\test.ps1` (all suites, exit code 0): **pytest 161 passed**, ruff clean,
+`next typegen && tsc --noEmit` 0 errors, ESLint 0 problems, **Vitest 78 passed** (7 files, new
+`seo-map.test.ts`), production image built, **Playwright 28 passed** (new `seo.spec.ts` crawls every
+sitemap URL; sticky-quote-bar tests in `mobile.spec.ts`).
+
+Lighthouse 13.5.0 (lab, 3 runs per page): SEO 100 and Accessibility 100 on all measured pages, CLS 0;
+performance is unchanged within run-to-run variance (no improvement is claimed).
+
+Bug found and fixed: client components compared `usePathname()` (which returns the internally
+rewritten `/bg/...` path) with public URLs, so the header never marked the current page. Fixed with
+`toPublicPath` / `usePublicPathname`.
+
+Not verified: keyword search volume (no Keyword Planner / Search Console access), field Core Web Vitals,
+rich-result eligibility in Google's Rich Results Test (JSON-LD is only checked for valid JSON and `@type`).
+
 ## Backend & admin production hardening (third iteration)
 
 | # | Requirement | Implementation | Verified by |
@@ -145,12 +165,11 @@ Not verified: the reduced-motion rendering was reviewed in CSS but not visually 
 - The project lives in `D:\Projects\Site`; see INSTALL_WINDOWS.md §2 to move it to `D:\Projects\AI-Commerce-Studio`.
 - `apps/web/node_modules` on the host was installed by a Linux container (used for tooling); run
   `npm ci` again if you later develop with a local Windows Node.js.
-- Not a Git repository yet — run `git init` before the first commit (`.gitignore` is prepared).
 
 ## Exact next actions
 
 1. Fill in real company details, contact e-mail/phone (`PUBLIC_CONTACT_EMAIL`, `PUBLIC_CONTACT_PHONE`) and have the legal drafts reviewed.
-2. `git init` and commit; push to a private repository.
+2. Verify the SEO keyword map in Keyword Planner / Search Console ([SEO_IMPLEMENTATION.md](SEO_IMPLEMENTATION.md) §6).
 3. Choose hosting, set production `.env`, deploy with `infra/docker-compose.prod.yml` behind Caddy, schedule `app.cli maintenance` and backups.
 4. Configure SMTP for lead notifications.
 5. Continue with [ROADMAP.md](ROADMAP.md) V1.1.

@@ -29,6 +29,33 @@ test("mobile menu opens, navigates and closes", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Отвори менюто" })).toHaveAttribute("aria-expanded", "false");
 });
 
+test("sticky quote bar appears after scrolling, hides at CTAs, never on the contact page", async ({ page }) => {
+  await page.goto("/uslugi/poddrazhka-na-online-magazini");
+  const bar = page.getByTestId("sticky-quote-bar");
+  await expect(bar).toHaveAttribute("aria-hidden", "true");
+  await page.evaluate(() => window.scrollTo(0, 1600));
+  await expect(bar).toHaveAttribute("aria-hidden", "false");
+  await expect(bar.getByRole("link", { name: "Поискай оферта" })).toHaveAttribute("href", "/kontakti?tip=oferta");
+
+  await page.locator("footer").scrollIntoViewIfNeeded();
+  await expect(bar).toHaveAttribute("aria-hidden", "true");
+
+  await page.goto("/kontakti");
+  await expect(page.getByTestId("sticky-quote-bar")).toHaveCount(0);
+});
+
+test("sticky quote bar can be dismissed for the session", async ({ page }) => {
+  await page.goto("/ai-resheniya");
+  await page.evaluate(() => window.scrollTo(0, 1400));
+  const bar = page.getByTestId("sticky-quote-bar");
+  await expect(bar).toHaveAttribute("aria-hidden", "false");
+  await bar.getByRole("button", { name: "Скрий" }).click();
+  await expect(bar).toHaveAttribute("aria-hidden", "true");
+  await page.goto("/za-kogo");
+  await page.evaluate(() => window.scrollTo(0, 1400));
+  await expect(page.getByTestId("sticky-quote-bar")).toHaveAttribute("aria-hidden", "true");
+});
+
 test("contact form is usable on mobile", async ({ page }) => {
   await page.goto("/kontakti");
   await expect(page.getByRole("button", { name: "Изпрати запитването" })).toBeVisible();

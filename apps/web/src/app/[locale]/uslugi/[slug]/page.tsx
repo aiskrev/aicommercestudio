@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { ArticleCard } from "@/components/editorial/ArticleCard";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Faq } from "@/components/sections/Faq";
@@ -16,7 +17,7 @@ import {
   Section,
   SectionHeading,
 } from "@/components/ui/primitives";
-import { findService, getContent, serviceByKey } from "@/content";
+import { findArticle, findService, getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
@@ -53,6 +54,9 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   const href = (path: string) => localizePath(locale, path);
   const path = href(routes.service(service.slug));
   const related = service.related.map((key) => serviceByKey(locale, key));
+  const relatedArticles = service.relatedArticles
+    .map((articleSlug) => findArticle(locale, articleSlug))
+    .filter((a): a is NonNullable<typeof a> => Boolean(a));
   const contactHref = href(contactWithService(service.key));
   const quoteHref = href(quoteWithService(service.key));
 
@@ -77,7 +81,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
         <Container className="relative grid gap-12 py-12 sm:py-16 lg:grid-cols-[1.3fr_0.7fr] lg:items-start lg:py-20">
-          <div className="animate-fade-up">
+          <div>
             <div className="flex items-center gap-4">
               <IconBadge name={service.icon} className="h-12 w-12" />
               <Eyebrow>{service.shortTitle}</Eyebrow>
@@ -127,7 +131,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
 
       {/* ------------------------------------------------------------ customer problems */}
       <Section labelledBy="problems-title">
-        <SectionHeading id="problems-title" eyebrow={dict.service.problemsEyebrow} title={dict.service.problemsTitle} />
+        <SectionHeading id="problems-title" eyebrow={dict.service.problemsEyebrow} title={service.headings.problems} />
         <ul className="mt-10 grid gap-4 sm:grid-cols-2">
           {service.signals.map((signal) => (
             <li key={signal} className="card flex items-start gap-4 p-5">
@@ -142,7 +146,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
 
       {/* ------------------------------------------------------------ capabilities */}
       <Section labelledBy="capabilities-title" alt>
-        <SectionHeading id="capabilities-title" eyebrow={service.shortTitle} title={dict.service.capabilities} />
+        <SectionHeading id="capabilities-title" eyebrow={service.shortTitle} title={service.headings.capabilities} />
         <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {service.capabilities.map((capability, index) => (
             <li key={capability.title} className="card p-6">
@@ -154,12 +158,30 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         </ol>
       </Section>
 
+      {/* ------------------------------------------------------------ technical checks */}
+      <Section labelledBy="checks-title">
+        <SectionHeading id="checks-title" eyebrow={dict.service.checksEyebrow} title={service.headings.checks} />
+        <ul className="mt-10 grid gap-4 md:grid-cols-2">
+          {service.checks.map((check) => (
+            <li key={check.title} className="card flex gap-4 p-5">
+              <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-cyan-400/25 bg-cyan-400/[0.08] text-cyan-200">
+                <Icon name="search" className="h-4 w-4" />
+              </span>
+              <div>
+                <h3 className="t-h3">{check.title}</h3>
+                <p className="mt-1.5 leading-relaxed text-slate-400">{check.description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
       {/* ------------------------------------------------------------ deliverables + engagement */}
-      <Section labelledBy="deliverables-title">
+      <Section labelledBy="deliverables-title" alt>
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="card p-6 sm:p-8">
             <h2 id="deliverables-title" className="t-h2 text-2xl sm:text-3xl">
-              {dict.service.deliverables}
+              {service.headings.deliverables}
             </h2>
             <CheckList items={service.deliverables} className="mt-6" />
           </div>
@@ -182,25 +204,51 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
       </Section>
 
       {/* ------------------------------------------------------------ process */}
-      <Section labelledBy="service-process-title" alt>
+      <Section labelledBy="service-process-title">
         <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-          <SectionHeading id="service-process-title" eyebrow={home.process.eyebrow} title={dict.service.process} />
+          <SectionHeading id="service-process-title" eyebrow={home.process.eyebrow} title={service.headings.workflow} />
           <ButtonLink href={href(routes.process)} variant="ghost" icon="arrowRight">
-            {dict.common.learnMore}
+            {dict.service.fullProcess}
           </ButtonLink>
         </div>
-        <ProcessTimeline steps={home.process.steps} className="mt-14" />
+        <ProcessTimeline steps={service.workflow} className="mt-14" />
+        <div className="card mt-12 p-6 sm:p-8">
+          <h3 className="t-h3 text-xl">{dict.service.inputsTitle}</h3>
+          <CheckList items={service.inputs} className="mt-5 sm:grid-cols-2" />
+        </div>
       </Section>
 
       {/* ------------------------------------------------------------ FAQ */}
-      <Section labelledBy="service-faq-title">
+      <Section labelledBy="service-faq-title" alt>
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <SectionHeading id="service-faq-title" eyebrow={service.shortTitle} title={dict.service.faq} />
           <Faq items={service.faqs} />
         </div>
       </Section>
 
-      {/* ------------------------------------------------------------ related */}
+      {/* ------------------------------------------------------------ related articles */}
+      {relatedArticles.length > 0 && (
+        <Section labelledBy="service-articles-title">
+          <h2 id="service-articles-title" className="t-h2 text-2xl sm:text-3xl">
+            {dict.editorial.servicesArticles}
+          </h2>
+          <ul className="mt-8 grid gap-5 md:grid-cols-2">
+            {relatedArticles.map((article) => (
+              <li key={article.slug}>
+                <ArticleCard
+                  article={article}
+                  href={href(routes.article(article.slug))}
+                  locale={locale}
+                  labels={{ minutesRead: dict.common.minutesRead, readArticle: dict.common.readArticle }}
+                  headingLevel={3}
+                />
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
+
+      {/* ------------------------------------------------------------ related services */}
       <Section labelledBy="related-title" alt>
         <h2 id="related-title" className="t-h2 text-2xl sm:text-3xl">
           {dict.service.related}

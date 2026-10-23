@@ -9,9 +9,9 @@ test.describe("contact form", () => {
     await page.goto("/kontakti");
     await page.getByRole("button", { name: "Изпрати запитването" }).click();
     await expect(page.getByText("Моля, коригирайте маркираните полета.")).toBeVisible();
-    await expect(page.getByLabel(/Служебен имейл/)).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByLabel(/^Имейл/)).toHaveAttribute("aria-invalid", "true");
 
-    await page.getByLabel(/Служебен имейл/).fill("not-an-email");
+    await page.getByLabel(/^Имейл/).fill("not-an-email");
     await page.getByRole("button", { name: "Изпрати запитването" }).click();
     await expect(page.getByText("Въведете валиден имейл адрес.")).toBeVisible();
     expect(leadRequests).toBe(0);
@@ -34,7 +34,7 @@ test.describe("contact form", () => {
 
     await page.getByLabel(/Име и фамилия/).fill("E2E Оферта");
     await page.getByLabel(/^Фирма/).fill(`E2E Оферта ${Date.now()}`);
-    await page.getByLabel(/Служебен имейл/).fill("e2e.quote@example.com");
+    await page.getByLabel(/^Имейл/).fill("e2e.quote@example.com");
     await page.getByLabel(/Платформа/).selectOption("woocommerce");
     await page.getByLabel(/Ориентировъчен бюджет/).selectOption("undisclosed");
     await page.getByLabel(/Желан срок/).selectOption("within_3_months");
@@ -55,7 +55,7 @@ test.describe("contact form", () => {
 
     await page.getByLabel(/Име и фамилия/).fill("E2E Тестов Потребител");
     await page.getByLabel(/^Фирма/).fill(`E2E Тест ${Date.now()}`);
-    await page.getByLabel(/Служебен имейл/).fill("e2e.test@example.com");
+    await page.getByLabel(/^Имейл/).fill("e2e.test@example.com");
     await page.getByLabel(/Описание на проекта/).fill("Автоматизиран E2E тест: искаме автоматизация на обработката на поръчки.");
     await page.getByRole("checkbox", { name: /информацията за поверителност/ }).check();
     // The API rejects forms submitted faster than FORM_TOKEN_MIN_SECONDS (anti-bot timing check).

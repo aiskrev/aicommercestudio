@@ -39,23 +39,91 @@ export interface Service {
   related: ServiceKey[];
   /** Commercial offerings that are not one of the six core categories (e.g. the audit). */
   isOffering?: boolean;
+  /** Service-specific H2 headings (descriptive, written for the search intent of the page). */
+  headings: {
+    problems: string;
+    capabilities: string;
+    checks: string;
+    workflow: string;
+    deliverables: string;
+  };
+  /** Concrete technical points that are reviewed first — practical knowledge, not claims about results. */
+  checks: Capability[];
+  /** How the first weeks of an engagement typically run, specific to this service. */
+  workflow: Capability[];
+  /** What the client needs to provide. */
+  inputs: string[];
+  /** Slugs of articles that deepen the topic (internal linking). */
+  relatedArticles: string[];
+}
+
+export interface InlineLink {
+  label: string;
+  /** Canonical (locale-independent) path, e.g. /uslugi/seo-optimizatsiya */
+  href: string;
 }
 
 export interface ArticleSection {
   heading: string;
   paragraphs: string[];
   bullets?: string[];
+  /** Optional comparison table (first column = criterion). */
+  table?: { caption: string; headers: string[]; rows: string[][] };
+  /** Contextual internal links shown at the end of the section. */
+  links?: InlineLink[];
 }
+
+export type ArticleType = "guide" | "checklist" | "comparison" | "explainer";
 
 export interface Article {
   slug: string;
   title: string;
+  /** Shorter <title> when the H1 is long; falls back to `title`. */
+  metaTitle?: string;
   description: string;
+  type: ArticleType;
+  /** Editorial category slug (see content/bg/editorial.ts). */
   category: string;
   publishedAt: string;
+  updatedAt: string;
   readingMinutes: number;
   relatedService: ServiceKey;
+  relatedServices: ServiceKey[];
+  relatedArticles: string[];
+  /** 3–5 key takeaways shown above the article body. */
+  keyPoints: string[];
   sections: ArticleSection[];
+}
+
+export interface EditorialCategory {
+  slug: string;
+  name: string;
+  title: string;
+  description: string;
+  relatedService: ServiceKey;
+}
+
+/**
+ * Case study (client project). Only published when the work is real and the client approved
+ * publication — enforced by `isPublishable` and by content tests. Results must cite their source.
+ */
+export interface CaseStudy {
+  slug: string;
+  title: string;
+  description: string;
+  client: { name: string; industry: string; anonymised: boolean };
+  services: ServiceKey[];
+  challenge: string;
+  solution: string[];
+  /** Measured outcomes only, each with how and when it was measured. */
+  results: { metric: string; value: string; source: string; measuredAt: string }[];
+  verification: {
+    realProject: boolean;
+    clientApproved: boolean;
+    approvedBy: string;
+    approvedAt: string;
+  };
+  publishedAt: string;
 }
 
 export interface TitledText {

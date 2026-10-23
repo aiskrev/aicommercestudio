@@ -1,7 +1,8 @@
+import { newArticles } from "@/content/bg/articles-new";
 import type { Article } from "@/content/types";
 
 export const insightsPage = {
-  metaTitle: "Статии за e-commerce, SEO, AI и автоматизация",
+  metaTitle: "Статии за онлайн магазини, SEO и AI автоматизация",
   metaDescription:
     "Практични статии за собственици на онлайн магазини: технически SEO, AI асистенти, автоматизация с човешко одобрение и техническа поддръжка.",
   eyebrow: "Статии",
@@ -10,16 +11,26 @@ export const insightsPage = {
   empty: "Все още няма публикувани статии. Очаквайте скоро.",
 };
 
-export const articles: Article[] = [
+const foundationArticles: Article[] = [
   {
     slug: "tehnicheski-seo-odit-na-online-magazin",
     title: "Технически SEO одит на онлайн магазин: какво да проверите първо",
     description:
       "Практичен списък с техническите проверки, които най-често ограничават органичния трафик на онлайн магазините — от индексирането до Core Web Vitals.",
-    category: "SEO",
+    type: "checklist",
+    category: "seo",
     publishedAt: "2026-10-23",
+    updatedAt: "2026-10-24",
     readingMinutes: 6,
     relatedService: "seo",
+    relatedServices: ["seo", "audit", "maintenance"],
+    relatedArticles: ["tehnicheski-problemi-pri-online-magazinite", "shopify-ili-woocommerce"],
+    keyPoints: [
+      "Техническото SEO отговаря на въпроса какво пречи, преди да инвестирате в ново съдържание.",
+      "Най-големите рискове в магазините са филтрите, дублираните адреси и бавните шаблони.",
+      "Измервайте по тип страница — категория, продукт, количка — а не само началната страница.",
+      "Добрият одит завършва с приоритизиран план, а не само със списък с проблеми.",
+    ],
     sections: [
       {
         heading: "Защо техническото SEO е първата стъпка",
@@ -76,10 +87,20 @@ export const articles: Article[] = [
     title: "AI асистент за клиенти: кога има смисъл и как да го въведете безопасно",
     description:
       "Кога AI асистентът за обслужване на клиенти носи реална стойност за онлайн магазин, какви са рисковете и как да го внедрите с контрол на качеството.",
-    category: "AI",
+    type: "guide",
+    category: "ai",
     publishedAt: "2026-10-23",
+    updatedAt: "2026-10-24",
     readingMinutes: 5,
     relatedService: "ai_tools",
+    relatedServices: ["ai_tools", "automation"],
+    relatedArticles: ["ai-avtomatizatsiya-v-malkiya-biznes", "avtomatizatsiya-s-choveshko-odobrenie"],
+    keyPoints: [
+      "Започнете от реалните въпроси на клиентите, не от избора на модел.",
+      "Ограничете отговорите до проверени източници и посочвайте източника.",
+      "Предвидете прехвърляне към служител при несигурност или недоволство.",
+      "Измервайте качеството с тестов набор преди и след пускане.",
+    ],
     sections: [
       {
         heading: "Започнете от въпросите, не от технологията",
@@ -122,12 +143,23 @@ export const articles: Article[] = [
   {
     slug: "avtomatizatsiya-s-choveshko-odobrenie",
     title: "Автоматизация с човешко одобрение: защо не всичко трябва да е напълно автоматично",
+    metaTitle: "Автоматизация с човешко одобрение: кога и защо",
     description:
       "Как да проектирате бизнес автоматизации и AI агенти така, че рутинните стъпки да са автоматични, а рисковите действия — одобрени от човек.",
-    category: "Автоматизация",
+    type: "explainer",
+    category: "avtomatizatsiya",
     publishedAt: "2026-10-23",
+    updatedAt: "2026-10-24",
     readingMinutes: 5,
     relatedService: "automation",
+    relatedServices: ["automation", "ai_tools"],
+    relatedArticles: ["ai-avtomatizatsiya-v-malkiya-biznes", "ai-asistent-za-klienti"],
+    keyPoints: [
+      "Различните действия носят различен риск и изискват различен контрол.",
+      "Автоматизацията подготвя действието, а човек одобрява онова, което има ефект навън.",
+      "Всяко предложение и решение трябва да е проследимо в журнал.",
+      "Разширявайте автономията постепенно, когато имате история и увереност в качеството.",
+    ],
     sections: [
       {
         heading: "Не всяко действие носи еднакъв риск",
@@ -168,3 +200,5 @@ export const articles: Article[] = [
     ],
   },
 ];
+
+export const articles: Article[] = [...foundationArticles, ...newArticles];

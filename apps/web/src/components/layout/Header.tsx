@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePublicPathname } from "@/lib/use-public-pathname";
 import { useEffect, useId, useRef, useState } from "react";
 
 import { Logo } from "@/components/layout/Logo";
@@ -41,7 +41,7 @@ export function Header({
   cta: NavItem;
   labels: Labels;
 }) {
-  const pathname = usePathname();
+  const pathname = usePublicPathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);

@@ -8,7 +8,8 @@ import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
-import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { buildMetadata, itemListJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/uslugi">) {
   const locale = await resolveLocale(params);
@@ -30,6 +31,12 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
 
   return (
     <>
+      <JsonLd
+        data={itemListJsonLd(
+          servicesPage.title,
+          [...coreServices, audit].map((s) => ({ name: s.shortTitle, path: href(routes.service(s.slug)) })),
+        )}
+      />
       <Breadcrumbs
         items={[
           { name: dict.common.home, path: href(routes.home) },
