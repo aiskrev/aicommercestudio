@@ -31,7 +31,7 @@ export function Footer({ locale, dict, services }: { locale: Locale; dict: Dicti
       {/* statement + primary action */}
       <Container className="grid gap-8 border-b border-line-subtle py-12 lg:grid-cols-[1.4fr_1fr] lg:items-end lg:py-16">
         <div>
-          <Logo href={href(routes.home)} />
+          <Logo href={href(routes.home)} gradientId="logo-gradient-footer" />
           <p className="mt-6 max-w-2xl font-display text-[clamp(1.35rem,1.1rem+0.8vw,1.75rem)] font-bold leading-snug tracking-[-0.02em] text-fg">
             {dict.footer.tagline}
           </p>
