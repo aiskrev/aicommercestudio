@@ -20,7 +20,7 @@ import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
-import { toolHrefs } from "@/lib/tools";
+import { toolHrefs, toolMinutes } from "@/lib/tools";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">) {
@@ -154,7 +154,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           }
         />
         <div className="mt-12">
-          <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} showcase={advisor.showcase} />
+          <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} minutes={toolMinutes()} showcase={advisor.showcase} />
         </div>
       </Section>
 

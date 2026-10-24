@@ -26,7 +26,7 @@ import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { contactWithService, quoteWithService, routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
-import { SERVICE_TOOLS, toolHrefs } from "@/lib/tools";
+import { SERVICE_TOOLS, toolHrefs, toolMinutes } from "@/lib/tools";
 
 export const dynamicParams = false;
 
@@ -282,7 +282,13 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
           <Faq items={service.faqs} />
         </EditorialSplit>
         <div className="mt-14 border-t border-line-subtle pt-12 empty:hidden">
-          <RelatedTools catalog={tools} hrefs={toolHrefs(locale)} keys={SERVICE_TOOLS[service.key]} id="service-tools-title" />
+          <RelatedTools
+            catalog={tools}
+            hrefs={toolHrefs(locale)}
+            minutes={toolMinutes()}
+            keys={SERVICE_TOOLS[service.key]}
+            id="service-tools-title"
+          />
         </div>
       </Section>
 

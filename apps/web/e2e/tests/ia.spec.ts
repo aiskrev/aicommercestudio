@@ -25,10 +25,13 @@ for (const [locale, path, heading, upcoming] of [
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
-    const section = page.locator("main section").first();
-    const links = await section.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
-    expect(links).toEqual([`/${locale}/ai-automation-advisor`]);
-    await expect(section.getByText(upcoming, { exact: true })).toHaveCount(3);
+    const live = page.locator("section[aria-labelledby='tools-live-title']");
+    const links = await live.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+    expect(links).toEqual([`/${locale}/ai-automation-advisor`, locale === "bg" ? "/bg/instrumenti/ai-gotovnost" : "/en/tools/ai-readiness"]);
+    const planned = page.locator("section[aria-labelledby='tools-upcoming-title']");
+    await expect(planned.locator("article[data-status='planned']")).toHaveCount(4);
+    await expect(planned.getByText(upcoming, { exact: true }).first()).toBeVisible();
+    await expect(planned.getByRole("link")).toHaveCount(0);
   });
 }
 

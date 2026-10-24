@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { articleRoutePaths, getContent, isIndexableCategory, serviceRoutePaths, topicRoutePaths } from "@/content";
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
 import { routes } from "@/lib/routes";
+import { isToolAvailable, TOOLS } from "@/lib/tools";
 import { type LocalizedPaths, samePathEverywhere } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/site";
 
@@ -51,6 +52,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: entry.priority,
         alternates: alternates(samePathEverywhere(entry.path)),
       })),
+      // Tool pages under /instrumenti that are available (implemented + flag on).
+      ...TOOLS.filter(isToolAvailable)
+        .filter((tool) => tool.path.startsWith(`${routes.tools}/`))
+        .map((tool) => ({
+          url: url(tool.path),
+          lastModified: CONTENT_REVISED,
+          changeFrequency: "monthly" as const,
+          priority: 0.7,
+          alternates: alternates(samePathEverywhere(tool.path)),
+        })),
       ...services.map((service) => ({
         url: url(routes.service(service.slug)),
         lastModified: CONTENT_REVISED,

@@ -45,7 +45,11 @@ const EN_SEGMENTS: Record<string, string> = {
   "obshti-usloviya": "terms",
 };
 /** Second-level segments (e.g. `/statii/tema/<topic>`). */
-const EN_SUBSEGMENTS: Record<string, Record<string, string>> = { statii: { tema: "topic" } };
+const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
+  statii: { tema: "topic" },
+  // Tool slugs (lib/tools.ts → TOOL_SLUGS). Only implemented tools have pages.
+  instrumenti: { "ai-gotovnost": "ai-readiness" },
+};
 
 const BG_SEGMENTS = Object.fromEntries(Object.entries(EN_SEGMENTS).map(([bg, en]) => [en, bg]));
 const BG_SUBSEGMENTS: Record<string, Record<string, string>> = Object.fromEntries(

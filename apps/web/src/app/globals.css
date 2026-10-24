@@ -683,6 +683,16 @@
   .surface-light .spec-list dt { color: var(--color-ink-muted); }
   .surface-light .spec-list dd { color: var(--color-ink); }
 
+  /* Score bar for tool results (<meter low=40 high=70 optimum=100>); the number is always shown as text. */
+  .tool-meter { appearance: none; border: 0; border-radius: 9999px; background: var(--color-line-default); overflow: hidden; }
+  .tool-meter::-webkit-meter-bar { background: var(--color-line-default); border: 0; border-radius: 9999px; height: 0.5rem; }
+  .tool-meter::-webkit-meter-optimum-value { background: var(--color-success); border-radius: 9999px; }
+  .tool-meter::-webkit-meter-suboptimum-value { background: var(--color-warning); border-radius: 9999px; }
+  .tool-meter::-webkit-meter-even-less-good-value { background: var(--color-danger); border-radius: 9999px; }
+  .tool-meter:-moz-meter-optimum::-moz-meter-bar { background: var(--color-success); }
+  .tool-meter:-moz-meter-sub-optimum::-moz-meter-bar { background: var(--color-warning); }
+  .tool-meter:-moz-meter-sub-sub-optimum::-moz-meter-bar { background: var(--color-danger); }
+
   /* Workflow connector (vertical dashed line that "flows" when motion is allowed). */
   .flow-line {
     background-image: linear-gradient(var(--color-brand) 50%, transparent 0);

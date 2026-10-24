@@ -137,6 +137,14 @@ export const keywordMap: KeywordTarget[] = [
     volumeStatus: "unverified",
   },
   {
+    path: "/instrumenti/ai-gotovnost",
+    primaryKeyword: "оценка на AI готовността",
+    secondaryKeywords: ["тест за AI готовност", "готова ли е фирмата за AI"],
+    intent: "informational",
+    rationale: "Самостоятелна оценка; платената техническа оценка е на страницата на AI стратегията и готовността.",
+    volumeStatus: "unverified",
+  },
+  {
     path: "/ai-automation-advisor",
     primaryKeyword: "AI съветник за автоматизация",
     secondaryKeywords: ["оценка на процес за автоматизация", "какво може да се автоматизира в бизнеса"],

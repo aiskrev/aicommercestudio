@@ -26,9 +26,9 @@ describe("homepage sections", () => {
   });
 
   it("tools preview links only the live tool and labels the others as upcoming", () => {
-    render(<ToolsPreview catalog={tools} hrefs={{ advisor: "/bg/ai-automation-advisor" }} showcase={advisor.showcase} />);
+    render(<ToolsPreview catalog={tools} hrefs={{ advisor: "/bg/ai-automation-advisor" }} minutes={{}} showcase={advisor.showcase} />);
     expect(screen.getAllByRole("link").map((link) => link.getAttribute("href"))).toEqual(["/bg/ai-automation-advisor"]);
-    expect(screen.getAllByText(tools.upcomingBadge, { exact: true })).toHaveLength(tools.items.length - 1);
+    expect(screen.getAllByText(tools.upcomingBadge, { exact: true })).toHaveLength(3);
   });
 
   it("use cases expose what AI does and where a person decides as labelled terms", () => {

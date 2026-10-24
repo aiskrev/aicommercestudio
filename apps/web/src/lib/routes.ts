@@ -6,6 +6,7 @@ export const routes = {
   aiSolutions: "/ai-resheniya",
   advisor: "/ai-automation-advisor",
   tools: "/instrumenti",
+  tool: (slug: string) => `/instrumenti/${slug}`,
   industries: "/za-kogo",
   about: "/za-nas",
   process: "/proces",

@@ -1,14 +1,14 @@
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
-import { ToolsPreview } from "@/components/home/ToolsPreview";
 import { CtaBand } from "@/components/sections/CtaBand";
-import { PageHero, Section } from "@/components/ui/primitives";
+import { ToolCard } from "@/components/tools/ToolCard";
+import { PageHero, Section, SectionHeading } from "@/components/ui/primitives";
 import { getContent } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
-import { toolHrefs } from "@/lib/tools";
+import { toolHrefs, toolMinutes } from "@/lib/tools";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/instrumenti">) {
   const locale = await resolveLocale(params);
@@ -22,14 +22,20 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/instrume
 }
 
 /**
- * Interactive tools hub. Lists the tools from the shared catalog: live tools link to their page,
- * planned tools are shown as "in preparation" without links (lib/tools.ts decides which is which).
+ * Interactive tools hub. Availability comes from the registry (lib/tools.ts): implemented tools
+ * whose feature flag is on are linked; every other tool is listed under "in preparation" with no
+ * link, so visitors are never routed into an unfinished workflow.
  */
 export default async function ToolsPage({ params }: PageProps<"/[locale]/instrumenti">) {
   const locale = await resolveLocale(params);
-  const { toolsPage, tools, advisor, home } = getContent(locale);
+  const { toolsPage, tools, home } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
+  const hrefs = toolHrefs(locale);
+  const minutes = toolMinutes();
+  const labels = { liveBadge: tools.liveBadge, upcomingBadge: tools.upcomingBadge, ...tools.labels };
+  const live = tools.items.filter((tool) => hrefs[tool.key]);
+  const upcoming = tools.items.filter((tool) => !hrefs[tool.key]);
 
   return (
     <>
@@ -41,9 +47,29 @@ export default async function ToolsPage({ params }: PageProps<"/[locale]/instrum
       />
       <PageHero eyebrow={toolsPage.eyebrow} title={toolsPage.title} lead={toolsPage.lead} />
 
-      <Section>
-        <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} showcase={advisor.showcase} headingLevel={2} />
+      <Section labelledBy="tools-live-title">
+        <SectionHeading id="tools-live-title" size="sm" title={tools.liveTitle} />
+        <ul className="mt-8 grid gap-5 md:grid-cols-2">
+          {live.map((tool) => (
+            <li key={tool.key}>
+              <ToolCard tool={tool} href={hrefs[tool.key]} minutes={minutes[tool.key]} labels={labels} headingLevel={3} />
+            </li>
+          ))}
+        </ul>
       </Section>
+
+      {upcoming.length > 0 && (
+        <Section labelledBy="tools-upcoming-title" tone="raised">
+          <SectionHeading id="tools-upcoming-title" size="sm" title={tools.upcomingTitle} lead={tools.upcomingLead} />
+          <ul className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            {upcoming.map((tool) => (
+              <li key={tool.key}>
+                <ToolCard tool={tool} labels={labels} headingLevel={3} />
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
 
       <CtaBand
         title={home.finalCta.title}

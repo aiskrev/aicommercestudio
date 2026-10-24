@@ -12,6 +12,7 @@ const PAGES = [
   "/bg/kontakti",
   "/bg/statii",
   "/bg/instrumenti",
+  "/bg/instrumenti/ai-gotovnost",
   "/bg/uslugi/razrabotka-na-ai-agenti",
   "/en",
   "/en/services",
@@ -22,6 +23,7 @@ const PAGES = [
   "/en/contact",
   "/en/insights",
   "/en/tools",
+  "/en/tools/ai-readiness",
   "/en/services/ai-agent-development",
   "/admin/login",
 ];
