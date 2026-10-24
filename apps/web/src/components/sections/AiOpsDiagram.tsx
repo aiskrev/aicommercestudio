@@ -1,56 +1,73 @@
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { cx } from "@/components/ui/primitives";
 
 const ICONS: IconName[] = ["bot", "gauge", "alert", "sparkles", "check"];
 
 /**
  * Conceptual diagram of AI Managed Services: application → monitoring & evaluation → incident
  * management → optimization → reliable operations. Purely illustrative (no data, no live status);
- * the caption says so. Horizontal from `lg`, vertical on small screens.
+ * the caption says so. `vertical` keeps the stacked layout at every width (used in the hero).
  */
 export function AiOpsDiagram({
   title,
   caption,
   steps,
+  vertical = false,
 }: {
   title: string;
   caption: string;
   steps: { title: string; description: string }[];
+  vertical?: boolean;
 }) {
   return (
-    <figure className="card-accent rounded-[1.5rem] p-6 sm:p-8" data-testid="ai-ops-diagram">
-      <figcaption className="sr-only">{`${title}. ${caption}`}</figcaption>
-      <ol className="grid gap-3 lg:grid-cols-5 lg:gap-0">
-        {steps.map((step, index) => (
-          <li key={step.title} className="relative flex items-center gap-4 lg:flex-col lg:items-stretch lg:gap-0">
-            <div className="flex flex-1 items-center gap-4 rounded-2xl border border-white/[0.08] bg-ink-950/60 p-4 lg:mx-2 lg:flex-col lg:items-start lg:p-5">
-              <span
-                className={
-                  index === steps.length - 1
-                    ? "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-emerald-300/30 bg-emerald-400/10 text-emerald-200"
-                    : "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-400/25 bg-cyan-400/10 text-cyan-200"
-                }
-                aria-hidden="true"
+    <figure className="panel p-5 sm:p-6" data-testid="ai-ops-diagram">
+      <figcaption className="t-label flex items-center gap-3">
+        <span>{title}</span>
+        <span className="h-px flex-1 bg-line-subtle" aria-hidden="true" />
+      </figcaption>
+      <ol className={cx("mt-5 grid gap-2.5", !vertical && "lg:grid-cols-5 lg:gap-0")}>
+        {steps.map((step, index) => {
+          const last = index === steps.length - 1;
+          return (
+            <li key={step.title} className={cx("relative flex", !vertical && "lg:flex-col")}>
+              <div
+                className={cx(
+                  "flex flex-1 items-start gap-3.5 rounded-[var(--radius-md)] border p-3.5",
+                  last ? "border-success/40 bg-success/[0.06]" : "border-line-default bg-surface-2",
+                  !vertical && "lg:mx-1.5 lg:flex-col lg:p-4",
+                )}
               >
-                <Icon name={ICONS[index] ?? "check"} className="h-5 w-5" />
-              </span>
-              <div className="min-w-0 lg:mt-4">
-                <p className="font-semibold text-white">{step.title}</p>
-                <p className="mt-1 text-sm text-slate-400">{step.description}</p>
+                <span
+                  className={cx(
+                    "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] border",
+                    last ? "border-success/45 text-success" : "border-line-default bg-surface-page text-brand",
+                  )}
+                  aria-hidden="true"
+                >
+                  <Icon name={ICONS[index] ?? "check"} className="h-4.5 w-4.5" />
+                </span>
+                <div className={cx("min-w-0", !vertical && "lg:mt-1")}>
+                  <p className="text-[15px] font-semibold text-fg">{step.title}</p>
+                  <p className="mt-0.5 text-[13.5px] leading-snug text-fg-muted">{step.description}</p>
+                </div>
               </div>
-            </div>
-            {index < steps.length - 1 && (
-              <span
-                className="absolute -bottom-3 left-8 z-10 text-cyan-300 lg:-right-2 lg:bottom-auto lg:left-auto lg:top-1/2 lg:-translate-y-1/2"
-                aria-hidden="true"
-              >
-                <Icon name="arrowRight" className="h-4 w-4 rotate-90 lg:rotate-0" />
-              </span>
-            )}
-          </li>
-        ))}
+              {!last && (
+                <span
+                  className={cx(
+                    "absolute -bottom-2.5 left-7 z-10 text-brand",
+                    !vertical && "lg:-right-2 lg:bottom-auto lg:left-auto lg:top-1/2 lg:-translate-y-1/2",
+                  )}
+                  aria-hidden="true"
+                >
+                  <Icon name="arrowRight" className={cx("h-4 w-4 rotate-90", !vertical && "lg:rotate-0")} />
+                </span>
+              )}
+            </li>
+          );
+        })}
       </ol>
-      <p className="mt-5 flex items-center gap-2 text-xs text-slate-400" aria-hidden="true">
-        <Icon name="info" className="h-4 w-4 shrink-0" />
+      <p className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-fg-subtle">
+        <Icon name="info" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
         {caption}
       </p>
     </figure>

@@ -72,6 +72,7 @@ export const bg = {
     ],
   },
   service: {
+    conceptLabel: "Концептуална схема на работата",
     problemsEyebrow: "Кога ви е нужна",
     problemsTitle: "Проблемите, които решаваме",
     signals: "Подходящо е, ако",

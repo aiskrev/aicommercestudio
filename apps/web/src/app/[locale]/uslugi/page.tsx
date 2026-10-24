@@ -1,8 +1,9 @@
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
-import { ServiceCard } from "@/components/sections/ServiceCard";
-import { ButtonLink, IconBadge, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
+import { ServiceBento } from "@/components/sections/ServiceBento";
+import { ServiceMotif } from "@/components/sections/ServiceMotif";
+import { ButtonLink, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -46,28 +47,21 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
       <PageHero eyebrow={servicesPage.eyebrow} title={servicesPage.title} lead={servicesPage.lead} />
 
       <Section>
-        <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {coreServices.map((service, index) => (
-            <li key={service.key} className={service.key === "ai_managed" ? "sm:col-span-2 lg:col-span-3" : undefined}>
-              <ServiceCard
-                service={service}
-                href={href(routes.service(service.slug))}
-                cta={dict.common.learnMore}
-                index={index}
-                wide={service.key === "ai_managed"}
-                headingLevel={2}
-              />
-            </li>
-          ))}
-        </ul>
+        <ServiceBento
+          services={coreServices}
+          hrefFor={(service) => href(routes.service(service.slug))}
+          cta={dict.common.learnMore}
+          headingLevel={2}
+        />
 
-        <div className="card-accent mt-10 grid gap-6 rounded-[1.5rem] p-8 sm:p-10 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-          <IconBadge name={audit.icon} className="h-14 w-14" />
+        <div className="mt-10 grid gap-6 rounded-[var(--radius-lg)] border border-dashed border-line-strong p-7 sm:p-9 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+          <ServiceMotif service="audit" className="h-16 w-24" />
           <div>
-            <h2 className="t-h2 text-2xl sm:text-3xl">{servicesPage.offeringTitle}</h2>
-            <p className="mt-2 max-w-2xl leading-relaxed text-slate-300">{servicesPage.offeringLead}</p>
+            <p className="t-label text-brand">{dict.ui.firstStepBadge}</p>
+            <h2 className="t-h3-lg mt-2">{servicesPage.offeringTitle}</h2>
+            <p className="mt-2 max-w-2xl leading-relaxed text-fg-muted">{servicesPage.offeringLead}</p>
           </div>
-          <ButtonLink href={href(routes.service(audit.slug))} icon="arrowRight">
+          <ButtonLink href={href(routes.service(audit.slug))} icon="arrowRight" className="w-full whitespace-normal text-center sm:w-auto">
             {audit.shortTitle}
           </ButtonLink>
         </div>

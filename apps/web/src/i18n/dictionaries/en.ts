@@ -75,6 +75,7 @@ export const en: Dictionary = {
     ],
   },
   service: {
+    conceptLabel: "Conceptual outline of the work",
     problemsEyebrow: "When you need it",
     problemsTitle: "Problems we solve",
     signals: "A good fit if",

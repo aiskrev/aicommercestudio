@@ -51,7 +51,7 @@ export default async function InsightsPage({ params }: PageProps<"/[locale]/stat
               <li key={category.slug}>
                 <Link
                   href={href(routes.insightsCategory(category.slug))}
-                  className="badge transition-colors hover:border-cyan-400/50 hover:text-white"
+                  className="badge transition-colors hover:border-brand/50 hover:text-fg"
                 >
                   {category.name}
                   <span className="text-slate-400">{articlesInCategory(locale, category.key).length}</span>
@@ -65,19 +65,30 @@ export default async function InsightsPage({ params }: PageProps<"/[locale]/stat
         {articles.length === 0 ? (
           <p className="card p-8 text-center text-slate-400">{page.empty}</p>
         ) : (
-          <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {articles.map((article) => (
-              <li key={article.slug}>
-                <ArticleCard
-                  article={article}
-                  href={href(routes.article(article.slug))}
-                  categoryName={categoryByKey(locale, article.category)?.name}
-                  locale={locale}
-                  labels={{ minutesRead: dict.common.minutesRead, readArticle: dict.common.readArticle }}
-                />
-              </li>
-            ))}
-          </ul>
+          <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+            <ArticleCard
+              article={articles[0]}
+              href={href(routes.article(articles[0].slug))}
+              categoryName={categoryByKey(locale, articles[0].category)?.name}
+              locale={locale}
+              labels={{ minutesRead: dict.common.minutesRead, readArticle: dict.common.readArticle }}
+              variant="featured"
+            />
+            <ul className="-mt-6 divide-y divide-line-subtle">
+              {articles.slice(1).map((article) => (
+                <li key={article.slug}>
+                  <ArticleCard
+                    article={article}
+                    href={href(routes.article(article.slug))}
+                    categoryName={categoryByKey(locale, article.category)?.name}
+                    locale={locale}
+                    labels={{ minutesRead: dict.common.minutesRead, readArticle: dict.common.readArticle }}
+                    variant="row"
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </Section>
       <CtaBand

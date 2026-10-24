@@ -60,7 +60,7 @@ export function LanguageSwitcher({
 
   return (
     <nav aria-label={labels.label} className={className}>
-      <ul className="flex items-center gap-0.5 rounded-full border border-white/10 p-0.5 text-xs font-semibold">
+      <ul className="flex items-center gap-0.5 rounded-[var(--radius-md)] border border-line-default p-0.5 font-mono text-xs font-medium">
         {locales.map((target) => {
           const active = target === locale;
           return (
@@ -74,8 +74,8 @@ export function LanguageSwitcher({
                 onClick={(event) => onSelect(event, target)}
                 data-testid={`lang-${target}`}
                 className={cx(
-                  "inline-flex h-8 min-w-9 items-center justify-center rounded-full px-2.5 transition-colors",
-                  active ? "bg-white/[0.1] text-white" : "text-slate-400 hover:text-white",
+                  "inline-flex h-9 min-w-10 items-center justify-center rounded-[7px] px-2.5 transition-colors",
+                  active ? "bg-surface-3 text-fg" : "text-fg-muted hover:text-fg",
                 )}
               >
                 {localeMeta[target].short}

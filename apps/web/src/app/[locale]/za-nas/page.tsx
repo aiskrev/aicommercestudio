@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Icon } from "@/components/ui/Icon";
-import { FeatureCard, PageHero, Section } from "@/components/ui/primitives";
+import { FeatureMatrix, PageHero, Section } from "@/components/ui/primitives";
 import { getContent } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -44,12 +44,8 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/za-nas"
         </div>
       </Section>
 
-      <Section alt>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {page.principles.map((item) => (
-            <FeatureCard key={item.title} {...item} />
-          ))}
-        </div>
+      <Section tone="light">
+        <FeatureMatrix items={page.principles} />
       </Section>
 
       <Section labelledBy="company-title">

@@ -1,5 +1,7 @@
 # Design system
 
+> Superseded for visual decisions by [UI_DESIGN_SYSTEM.md](UI_DESIGN_SYSTEM.md) (premium redesign, 2026-10-24). Kept for history.
+
 Source of truth: `apps/web/src/app/globals.css` (tokens + component classes) and
 `apps/web/src/components/ui/primitives.tsx` (React primitives). No UI library, no icon font,
 no third-party scripts.

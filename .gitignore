@@ -35,3 +35,6 @@ Thumbs.db
 
 # Local database backups contain personal data
 backups/
+
+# Visual review screenshots (local artefacts)
+apps/web/e2e/screenshots/
