@@ -6,17 +6,12 @@ import { site } from "@/lib/site";
 
 export function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
   return (
+    // Monogram: an "A" drawn as a routed path that ends in a node — commerce flow + automation.
     <svg viewBox="0 0 32 32" className={className} aria-hidden="true" focusable="false">
-      <defs>
-        <linearGradient id="logo-gradient" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#22d3ee" />
-          <stop offset="0.55" stopColor="#3b82f6" />
-          <stop offset="1" stopColor="#8b5cf6" />
-        </linearGradient>
-      </defs>
-      <rect x="1" y="1" width="30" height="30" rx="9" fill="#0c1222" stroke="url(#logo-gradient)" strokeWidth="1.5" />
-      <path d="M9 22 15 9l6 13M11.6 17h6.8" fill="none" stroke="url(#logo-gradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="23" cy="10" r="2" fill="#22d3ee" />
+      <rect x="0.75" y="0.75" width="30.5" height="30.5" rx="7" fill="#111c2b" stroke="#69d9df" strokeOpacity="0.55" strokeWidth="1.5" />
+      <path d="M8.5 23 15 8.5 21.5 23M11.2 17.4h7.6" fill="none" stroke="#f4f7fb" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M21.5 23h2.5" stroke="#69d9df" strokeWidth="2.1" strokeLinecap="round" />
+      <circle cx="24.6" cy="23" r="2.1" fill="#69d9df" />
     </svg>
   );
 }
@@ -29,8 +24,9 @@ export function Logo({ href }: { href: string }) {
       aria-label={`${site.name} — ${getDictionary(splitLocale(href)?.locale ?? defaultLocale).ui.logoHome}`}
     >
       <LogoMark />
-      <span className="font-display text-[15px] font-semibold tracking-tight text-white">
-        A.I. Commerce <span className="text-gradient">Studio</span>
+      <span className="flex items-baseline gap-1.5 leading-none">
+        <span className="font-display text-[15.5px] font-bold tracking-[-0.02em] text-fg">A.I. Commerce</span>
+        <span className="font-mono text-[12px] font-medium uppercase tracking-[0.08em] text-brand">Studio</span>
       </span>
     </Link>
   );

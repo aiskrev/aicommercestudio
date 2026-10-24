@@ -13,19 +13,20 @@ export const home: typeof bgHome = {
     primaryCta: "Book a consultation",
     secondaryCta: "Explore our services",
     highlights: ["Shopify and WooCommerce", "AI with human approval", "GDPR by default"],
-  },
-  technologies: {
-    label: "Platforms and technologies we work with",
-    items: [
-      "Shopify",
-      "WooCommerce",
-      "Google Analytics 4",
-      "Search Console",
-      "REST APIs and webhooks",
-      "PostgreSQL",
-      "Docker",
-      "Anthropic Claude",
-    ],
+    context: "Shopify · WooCommerce · Next.js · FastAPI · LLM integrations",
+    workflow: {
+      label: "Example workflow",
+      demo: "Demo · sample data",
+      title: "Product return request",
+      caption: "An illustration of how we design automations. The data is sample data, not from a real client.",
+      steps: [
+        { kind: "event", label: "Online store", detail: "New return request for order DEMO-1042" },
+        { kind: "api", label: "Event / API", detail: "Webhook to the processing service", code: "returns.created · order: DEMO-1042" },
+        { kind: "ai", label: "AI assistant", detail: "Classifies the reason and drafts a reply", output: [["category", "damaged item"], ["language", "English"], ["suggestion", "refund"]] },
+        { kind: "approval", label: "Validation & approval", detail: "Business rules pass. A team member confirms the decision.", status: "Awaiting approval" },
+        { kind: "action", label: "Business action", detail: "Refund and email to the customer", status: "Runs only after approval" },
+      ],
+    },
   },
   servicesIntro: {
     eyebrow: "Services",
@@ -74,6 +75,12 @@ export const home: typeof bgHome = {
         description: "The store, CRM, ERP and warehouse work in isolation and the data drifts apart.",
         service: "integrations",
       },
+      {
+        icon: "activity",
+        title: "The AI solution runs, but nobody maintains it",
+        description: "Answers degrade after changes, costs creep up and nobody watches how the system behaves.",
+        service: "ai_managed",
+      },
     ],
   },
   industriesIntro: {
@@ -83,80 +90,30 @@ export const home: typeof bgHome = {
     cta: "See all profiles",
   },
   aiControl: {
-    eyebrow: "AI with human oversight",
-    title: "AI proposes. People decide.",
-    lead: "We design AI solutions so that routine work runs automatically, while actions with a real effect on customers, prices or orders go through approval.",
-    steps: [
-      {
-        icon: "sparkles",
-        title: "AI analyzes",
-        description: "Classifies inquiries, prepares drafts and spots anomalies in the data.",
-      },
-      {
-        icon: "shield",
-        title: "Risk policy",
-        description: "Every action is assessed: reading and drafting are allowed, changes are not.",
-      },
-      {
-        icon: "users",
-        title: "Human approval",
-        description: "Messages and changes to products, prices or orders require explicit approval.",
-      },
-      {
-        icon: "fileText",
-        title: "Decision log",
-        description: "Every proposal and decision is recorded — who, when and why.",
-      },
+    eyebrow: "AI with human control",
+    title: "AI suggests. People decide.",
+    lead: "We design AI solutions so routine work runs automatically, while actions with real impact on customers, prices or orders pass through business rules and approval.",
+    stages: [
+      { kind: "input", title: "Input", description: "An inquiry, document, order or event from your systems." },
+      { kind: "ai", title: "AI processing", description: "Classification, data extraction and drafts — suggestions only." },
+      { kind: "rules", title: "Business rules", description: "Deterministic checks: permissions, limits, stock, statuses." },
+      { kind: "human", title: "Human approval", description: "Actions with real impact require an explicit decision." },
+      { kind: "output", title: "Output & record", description: "Executed through the integration and logged — who, when and why." },
     ],
+    allowedTitle: "AI may do on its own",
+    allowed: ["read and summarise", "classify and extract data", "prepare drafts"],
+    approvalTitle: "Requires approval",
+    approval: ["messages to customers", "changes to prices, products and orders", "payments and refunds"],
   },
   process: {
     eyebrow: "How we work",
-    title: "A clear process from the first call to a measurable result",
+    title: "A clear process from the first conversation to stable operation",
+    lead: "Each stage ends with a concrete result you can see and approve before we move on.",
     steps: [
-      { title: "Conversation", description: "We clarify goals, constraints and the current state." },
-      { title: "Analysis", description: "We review the systems, data and processes involved in the task." },
-      { title: "Plan and quote", description: "We propose priorities, scope, timelines and an engagement model." },
-      { title: "Delivery", description: "We work in short iterations with visible progress and regular feedback." },
-      { title: "Measurement", description: "We compare the result with the agreed success criteria." },
-      { title: "Evolution", description: "We maintain the solution and plan the next improvements." },
-    ],
-  },
-  useCases: {
-    eyebrow: "Use cases",
-    title: "Where AI and automation create real value in e-commerce",
-    lead: "Typical scenarios we design and implement. Each one starts with a clear goal and success criteria.",
-    items: [
-      {
-        icon: "message",
-        title: "Customer question assistant",
-        description:
-          "Answers questions about stock, delivery and returns from your own data and hands complex cases over to a person.",
-      },
-      {
-        icon: "fileText",
-        title: "Product description drafts",
-        description: "Generates descriptions in your brand voice that an editor reviews before publishing.",
-      },
-      {
-        icon: "inbox",
-        title: "Inbound inquiry classification",
-        description: "Routes emails and form submissions by topic and urgency to the right person.",
-      },
-      {
-        icon: "refresh",
-        title: "Inventory synchronization",
-        description: "Keeps stock levels aligned between the store, warehouse and ERP without manual work.",
-      },
-      {
-        icon: "chart",
-        title: "Automated weekly report",
-        description: "Summarizes sales, top products and anomalies and sends it to the team.",
-      },
-      {
-        icon: "search",
-        title: "Early detection of SEO issues",
-        description: "Monitors indexing and technical errors before they affect traffic.",
-      },
+      { title: "Discovery", description: "We clarify goals, constraints and the current state of your systems and data.", outputs: ["Short problem statement", "Success criteria"] },
+      { title: "Architecture & planning", description: "We propose the solution, priorities, scope and timeline in a written quote.", outputs: ["Technical outline", "Written quote"] },
+      { title: "Development & validation", description: "We work in short iterations, test with real examples and measure the result.", outputs: ["Working solution", "Tests and documentation"] },
+      { title: "Support & optimization", description: "We watch how the solution performs and plan the next improvements.", outputs: ["Monthly review", "Improvement plan"] },
     ],
   },
   advantages: {
@@ -277,9 +234,22 @@ export const home: typeof bgHome = {
     ],
   },
   finalCta: {
-    title: "Let's discuss the next step for your online business",
-    lead: "Briefly describe the task or problem. We will review your inquiry and suggest a suitable approach.",
-    primary: "Book a consultation",
+    title: "Have a technical challenge or an automation idea?",
+    lead: "Let's build the right solution. Describe the task briefly — we will review your inquiry and suggest a suitable approach.",
+    primary: "Discuss your project",
     secondary: "Technical audit",
+  },
+  capabilities: {
+    eyebrow: "Technical capabilities",
+    title: "Expertise you can verify",
+    lead: "No invented logos or results. These are the technologies and practices we work with every day.",
+    groups: [
+      { icon: "cart", title: "Shopify & WooCommerce", items: ["Themes and apps", "Performance", "Updates and migrations"] },
+      { icon: "layers", title: "Next.js & FastAPI", items: ["Web applications", "Admin dashboards", "REST APIs"] },
+      { icon: "plug", title: "API integrations", items: ["Webhooks", "CRM, ERP, couriers", "Data synchronisation"] },
+      { icon: "database", title: "Cloud infrastructure", items: ["Docker", "PostgreSQL", "Backups"] },
+      { icon: "sparkles", title: "AI & LLM applications", items: ["Assistants and RAG", "Structured output", "Quality evaluation"] },
+      { icon: "shield", title: "Observability & security", items: ["Logging and alerts", "Least privilege", "GDPR practices"] },
+    ],
   },
 };

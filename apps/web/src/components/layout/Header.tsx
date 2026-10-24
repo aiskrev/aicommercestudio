@@ -122,8 +122,8 @@ export function Header({
         className={cx(
           "sticky top-0 z-50 border-b transition-colors duration-300",
           scrolled || mobileOpen
-            ? "border-white/[0.08] bg-ink-950/85 backdrop-blur-xl"
-            : "border-transparent bg-ink-950/40 backdrop-blur-md",
+            ? "border-line-subtle bg-ink-950/92 backdrop-blur-xl"
+            : "border-transparent bg-ink-950/70 backdrop-blur-md",
         )}
       >
         <Container className="flex h-16 items-center justify-between gap-6">
@@ -139,8 +139,8 @@ export function Header({
                   aria-controls={servicesPanelId}
                   onClick={() => setServicesOpen((value) => !value)}
                   className={cx(
-                    "inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
-                    servicesActive || servicesOpen ? "bg-white/[0.07] text-white" : "text-slate-300 hover:text-white",
+                    "nav-link inline-flex items-center gap-1 px-3 py-2 text-[14.5px] font-medium transition-colors",
+                    servicesActive || servicesOpen ? "text-fg" : "text-fg-muted hover:text-fg",
                   )}
                 >
                   {labels.services}
@@ -152,18 +152,18 @@ export function Header({
                 <div
                   id={servicesPanelId}
                   hidden={!servicesOpen}
-                  className="absolute left-0 top-full z-50 mt-3 w-[min(44rem,calc(100vw-4rem))] -translate-x-4"
+                  className="absolute left-0 top-full z-50 mt-3 w-[min(46rem,calc(100vw-4rem))] -translate-x-4"
                 >
-                  <div className="card-accent rounded-2xl p-3 shadow-[0_30px_80px_-30px_rgb(0_0_0_/_0.9)]">
+                  <div className="panel p-2.5">
                     <ul className="grid grid-cols-2 gap-1">
                       {services.map((service) => (
                         <li key={service.href}>
                           <Link
                             href={service.href}
                             aria-current={isActive(service.href) ? "page" : undefined}
-                            className="group flex gap-3 rounded-xl p-3 transition-colors hover:bg-white/[0.05] aria-[current=page]:bg-white/[0.06]"
+                            className="group flex gap-3 rounded-[var(--radius-md)] p-3 transition-colors hover:bg-surface-2 aria-[current=page]:bg-surface-2"
                           >
-                            <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-cyan-400/20 bg-cyan-400/[0.08] text-cyan-200">
+                            <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand transition-colors group-hover:border-brand/50">
                               <Icon name={service.icon} className="h-4.5 w-4.5" />
                             </span>
                             <span>
@@ -178,7 +178,7 @@ export function Header({
                     </ul>
                     <Link
                       href={servicesHref}
-                      className="mt-2 flex items-center justify-between rounded-xl border border-white/[0.06] px-4 py-3 text-sm font-semibold text-cyan-300 hover:bg-white/[0.04]"
+                      className="mt-1.5 flex items-center justify-between rounded-[var(--radius-md)] border-t border-line-subtle px-4 py-3 text-sm font-semibold text-brand hover:bg-surface-2"
                     >
                       {labels.allServices}
                       <Icon name="arrowRight" className="h-4 w-4" />
@@ -192,8 +192,8 @@ export function Header({
                     href={item.href}
                     aria-current={isActive(item.href) ? "page" : undefined}
                     className={cx(
-                      "rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
-                      isActive(item.href) ? "bg-white/[0.07] text-white" : "text-slate-300 hover:text-white",
+                      "nav-link px-3 py-2 text-[14.5px] font-medium transition-colors",
+                      isActive(item.href) ? "text-fg" : "text-fg-muted hover:text-fg",
                     )}
                   >
                     {item.label}
@@ -213,7 +213,7 @@ export function Header({
             <button
               ref={mobileButtonRef}
               type="button"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 text-slate-100 transition-colors hover:border-cyan-400/50 lg:hidden"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-line-default text-fg transition-colors hover:border-brand/50 lg:hidden"
               aria-expanded={mobileOpen}
               aria-controls={mobilePanelId}
               aria-label={mobileOpen ? labels.closeMenu : labels.openMenu}
@@ -230,11 +230,11 @@ export function Header({
         id={mobilePanelId}
         ref={mobilePanelRef}
         hidden={!mobileOpen}
-        className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto overscroll-contain border-t border-white/[0.08] bg-ink-950 lg:hidden"
+        className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto overscroll-contain border-t border-line-subtle bg-ink-950 lg:hidden"
       >
         <Container className="flex min-h-full flex-col py-5">
           <nav aria-label={labels.nav}>
-            <p className="px-4 pb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{labels.services}</p>
+            <p className="t-label px-4 pb-2">{labels.services}</p>
             <ul className="grid gap-0.5">
               {services.map((service) => (
                 <li key={service.href}>

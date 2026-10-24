@@ -2,7 +2,8 @@ import { AdvisorPromo } from "@/components/advisor/AdvisorPromo";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
-import { ButtonLink, CheckList, FeatureCard, IconBadge, PageHero, Section, SectionHeading, cx } from "@/components/ui/primitives";
+import { ServiceMotif } from "@/components/sections/ServiceMotif";
+import { ButtonLink, CheckList, cx, FeatureIndex, FeatureMatrix, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -46,21 +47,13 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
       <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
 
       <Section>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {page.types.map((item) => (
-            <FeatureCard key={item.title} {...item} />
-          ))}
-        </div>
+        <FeatureIndex items={page.types} />
         <AdvisorPromo promo={advisor.promo} href={href(routes.advisor)} className="mt-10" />
       </Section>
 
-      <Section labelledBy="ai-principles" alt>
+      <Section labelledBy="ai-principles" tone="light">
         <SectionHeading id="ai-principles" title={page.principlesTitle} />
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {page.principles.map((item) => (
-            <FeatureCard key={item.title} {...item} />
-          ))}
-        </div>
+        <FeatureMatrix items={page.principles} className="mt-10" />
       </Section>
 
       <Section labelledBy="ai-approval">
@@ -101,13 +94,13 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
       </Section>
 
       <Section labelledBy="ai-managed-title">
-        <div className="card-accent grid gap-6 rounded-[1.5rem] p-8 sm:p-10 lg:grid-cols-[auto_1fr_auto] lg:items-center">
-          <IconBadge name={managedService.icon} className="h-14 w-14" />
+        <div className="card card-accent grid gap-6 p-8 sm:p-10 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+          <ServiceMotif service="ai_managed" className="h-20 w-28" />
           <div>
             <h2 id="ai-managed-title" className="t-h2 text-2xl sm:text-3xl">
               {page.managed.title}
             </h2>
-            <p className="mt-2 max-w-2xl leading-relaxed text-slate-300">{page.managed.lead}</p>
+            <p className="mt-2 max-w-2xl leading-relaxed text-fg-secondary">{page.managed.lead}</p>
           </div>
           <ButtonLink href={href(routes.service(managedService.slug))} icon="arrowRight">
             {page.managed.cta}
@@ -116,11 +109,11 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
       </Section>
 
       <Section labelledBy="ai-not-for" alt>
-        <div className="card rounded-3xl p-8 sm:p-10">
-          <h2 id="ai-not-for" className="text-2xl font-semibold">
+        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+          <h2 id="ai-not-for" className="t-h2">
             {page.notForTitle}
           </h2>
-          <CheckList items={page.notFor} className="mt-6" />
+          <CheckList items={page.notFor} />
         </div>
       </Section>
 

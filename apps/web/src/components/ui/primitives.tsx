@@ -10,36 +10,59 @@ export function cx(...classes: (string | false | null | undefined)[]): string {
 /* ------------------------------------------------------------------ layout */
 
 export function Container({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx("mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8", className)}>{children}</div>;
+  return <div className={cx("mx-auto w-full max-w-[76rem] px-4 sm:px-6 lg:px-8", className)}>{children}</div>;
 }
 
+export type SectionTone = "default" | "raised" | "light";
+export type SectionDensity = "compact" | "default" | "spacious";
+
+const toneClass: Record<SectionTone, string> = {
+  default: "",
+  raised: "section-alt",
+  light: "surface-light",
+};
+
+const densityClass: Record<SectionDensity, string> = {
+  compact: "py-12 sm:py-16",
+  default: "py-16 sm:py-24",
+  spacious: "py-20 sm:py-28 lg:py-32",
+};
+
+/**
+ * Page section. `tone` changes the surface (dark page, raised dark, light editorial) and
+ * `density` the vertical rhythm, so consecutive sections do not all look the same.
+ */
 export function Section({
   children,
   className,
   id,
   labelledBy,
   alt = false,
+  tone,
+  density = "default",
 }: {
   children: ReactNode;
   className?: string;
   id?: string;
   labelledBy?: string;
+  /** Legacy alias for `tone="raised"`. */
   alt?: boolean;
+  tone?: SectionTone;
+  density?: SectionDensity;
 }) {
   return (
-    <section id={id} aria-labelledby={labelledBy} className={cx("py-16 sm:py-24", alt && "section-alt", className)}>
+    <section
+      id={id}
+      aria-labelledby={labelledBy}
+      className={cx(densityClass[density], toneClass[tone ?? (alt ? "raised" : "default")], className)}
+    >
       <Container>{children}</Container>
     </section>
   );
 }
 
-export function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <p className="t-eyebrow">
-      <span className="h-px w-6 bg-gradient-to-r from-cyan-400 to-violet-400" aria-hidden="true" />
-      {children}
-    </p>
-  );
+export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
+  return <p className={cx("t-eyebrow", className)}>{children}</p>;
 }
 
 export function SectionHeading({
@@ -150,7 +173,7 @@ export function IconBadge({ name, className }: { name: IconName; className?: str
   return (
     <span
       className={cx(
-        "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-cyan-400/25 bg-gradient-to-br from-cyan-400/15 via-blue-500/10 to-violet-500/15 text-cyan-200 shadow-[inset_0_1px_0_rgb(255_255_255_/_0.08)]",
+        "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand",
         className,
       )}
     >
@@ -187,7 +210,7 @@ export function CheckList({ items, className }: { items: string[]; className?: s
     <ul className={cx("grid gap-3", className)}>
       {items.map((item) => (
         <li key={item} className="flex gap-3">
-          <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-cyan-300">
+          <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] bg-brand/12 text-brand">
             <Icon name="check" className="h-3.5 w-3.5" />
           </span>
           <span className="leading-relaxed text-slate-300">{item}</span>
@@ -248,15 +271,76 @@ export function PageHero({
   children?: ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden border-b border-white/5">
-      <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
+    <div className="relative overflow-hidden border-b border-line-subtle">
       <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
-      <Container className="relative py-14 sm:py-20">
+      <Container className="relative pb-14 pt-12 sm:pb-20 sm:pt-16">
         <Eyebrow>{eyebrow}</Eyebrow>
         <h1 className="t-h1 mt-5 max-w-4xl">{title}</h1>
         <p className="t-lead mt-6 max-w-3xl">{lead}</p>
         {children}
       </Container>
     </div>
+  );
+}
+
+/**
+ * Editorial alternative to a card grid: items as rows separated by hairlines, in one or two
+ * columns. Use for lists of capabilities, use cases or principles.
+ */
+export function FeatureIndex({
+  items,
+  columns = 2,
+  className,
+}: {
+  items: { icon?: IconName; title: string; description: string }[];
+  columns?: 1 | 2;
+  className?: string;
+}) {
+  return (
+    <ul className={cx("grid gap-x-12", columns === 2 && "md:grid-cols-2", className)}>
+      {items.map((item) => (
+        <li key={item.title} className="flex gap-4 border-t border-line-subtle py-6">
+          {item.icon && (
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand">
+              <Icon name={item.icon} className="h-5 w-5" />
+            </span>
+          )}
+          <div>
+            <h3 className="t-h3">{item.title}</h3>
+            <p className="mt-1.5 leading-relaxed text-fg-muted">{item.description}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Hairline matrix for the light editorial surface (`<Section tone="light">`). */
+export function FeatureMatrix({
+  items,
+  className,
+}: {
+  items: { icon?: IconName; title: string; description: string }[];
+  className?: string;
+}) {
+  return (
+    <ul
+      className={cx(
+        "grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-ink/15 bg-ink/15 sm:grid-cols-2 lg:grid-cols-3",
+        className,
+      )}
+    >
+      {items.map((item) => (
+        <li key={item.title} className="bg-surface-light p-6 sm:p-7">
+          {item.icon && (
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-ink text-brand" aria-hidden="true">
+              <Icon name={item.icon} className="h-5 w-5" />
+            </span>
+          )}
+          <h3 className={cx("t-h3", item.icon && "mt-4")}>{item.title}</h3>
+          <p className="mt-1.5 leading-relaxed text-ink-muted">{item.description}</p>
+        </li>
+      ))}
+    </ul>
   );
 }

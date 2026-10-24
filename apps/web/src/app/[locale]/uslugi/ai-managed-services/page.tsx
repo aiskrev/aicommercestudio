@@ -13,6 +13,7 @@ import {
   Container,
   Eyebrow,
   FeatureCard,
+  FeatureIndex,
   Section,
   SectionHeading,
   cx,
@@ -94,10 +95,10 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
       />
 
       {/* 1. hero */}
-      <div className="relative overflow-hidden border-b border-white/5">
-        <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div className="relative overflow-hidden border-b border-line-subtle">
         <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
-        <Container className="relative py-14 sm:py-20">
+        <Container className="relative grid gap-12 pb-14 pt-10 sm:pb-20 sm:pt-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
           <Eyebrow>{page.hero.eyebrow}</Eyebrow>
           <h1 className="t-h1 mt-5 max-w-4xl">{page.hero.title}</h1>
           <p className="t-lead mt-6 max-w-3xl">{page.hero.subtitle}</p>
@@ -109,20 +110,22 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
               {page.hero.secondaryCta}
             </ButtonLink>
           </div>
-          <blockquote className="mt-10 max-w-3xl border-l-2 border-cyan-400/60 pl-5 text-lg leading-relaxed text-slate-200">
+          <blockquote className="mt-10 max-w-3xl border-l-2 border-brand pl-5 text-lg leading-relaxed text-fg-secondary">
             {page.hero.positioning}
           </blockquote>
           <nav aria-label={dict.common.onThisPage} className="mt-10">
             <ul className="flex flex-wrap gap-2">
               {page.sectionNav.map((item) => (
                 <li key={item.id}>
-                  <a href={`#${item.id}`} className="badge transition-colors hover:border-cyan-400/50 hover:text-white">
+                  <a href={`#${item.id}`} className="badge transition-colors hover:border-brand/50 hover:text-fg">
                     {item.label}
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
+          </div>
+          <AiOpsDiagram title={page.diagram.title} caption={page.diagram.caption} steps={page.diagram.steps} vertical />
         </Container>
       </div>
 
@@ -148,35 +151,25 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
       {/* 3. who this is for */}
       <Section labelledBy="ams-audience" alt>
         <SectionHeading id="ams-audience" title={page.audience.title} lead={page.audience.lead} />
-        <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {page.audience.segments.map((segment, index) => (
-            <li key={segment.title} className={index === page.audience.segments.length - 1 ? "sm:col-span-2 lg:col-span-3" : undefined}>
-              <FeatureCard {...segment} className="h-full" />
-            </li>
-          ))}
-        </ul>
+        <FeatureIndex items={page.audience.segments} className="mt-10" />
       </Section>
 
       {/* 4. problems we solve */}
-      <Section labelledBy="ams-problems">
-        <SectionHeading id="ams-problems" title={page.problems.title} />
-        <p className="mt-6 max-w-3xl rounded-2xl border border-amber-300/30 bg-amber-300/[0.07] p-5 text-lg font-medium text-amber-100">
-          {page.problems.keyMessage}
-        </p>
-        <p className="t-lead mt-6 max-w-3xl">{page.problems.lead}</p>
-        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <Section labelledBy="ams-problems" tone="light">
+        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-end">
+          <SectionHeading id="ams-problems" title={page.problems.title} />
+          <p className="border-l-2 border-brand-ink pl-5 text-lg font-semibold leading-relaxed text-ink">{page.problems.keyMessage}</p>
+        </div>
+        <p className="t-lead mt-8 max-w-3xl">{page.problems.lead}</p>
+        <ul className="mt-10 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-ink/15 bg-ink/15 sm:grid-cols-2 lg:grid-cols-3">
           {page.problems.causes.map((cause) => (
-            <li key={cause.title} className="card p-5">
-              <p className="font-semibold text-white">{cause.title}</p>
-              <p className="mt-1 text-sm leading-relaxed text-slate-400">{cause.description}</p>
+            <li key={cause.title} className="bg-surface-light p-5">
+              <p className="font-semibold text-ink">{cause.title}</p>
+              <p className="mt-1 text-[14.5px] leading-relaxed text-ink-muted">{cause.description}</p>
             </li>
           ))}
         </ul>
-        <p className="mt-6 max-w-3xl text-sm text-slate-400">{page.problems.disclaimer}</p>
-        <div className="mt-12">
-          <h3 className="t-h3 mb-5 text-xl">{page.diagram.title}</h3>
-          <AiOpsDiagram title={page.diagram.title} caption={page.diagram.caption} steps={page.diagram.steps} />
-        </div>
+        <p className="mt-6 max-w-3xl text-sm text-ink-muted">{page.problems.disclaimer}</p>
       </Section>
 
       {/* 5. what we monitor */}
