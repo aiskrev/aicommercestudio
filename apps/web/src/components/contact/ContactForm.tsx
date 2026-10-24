@@ -473,7 +473,7 @@ export function ContactForm({
           {!values.message.trim() && !aiManaged && (
             <button
               type="button"
-              className="font-semibold text-cyan-300 hover:text-cyan-200"
+              className="link"
               onClick={() => {
                 update("message", labels.messageTemplate);
                 document.getElementById("contact-message")?.focus();

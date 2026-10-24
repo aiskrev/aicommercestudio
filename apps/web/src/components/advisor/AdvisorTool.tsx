@@ -257,7 +257,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
           {!values.process_description.trim() && (
             <button
               type="button"
-              className="font-semibold text-cyan-300 hover:text-cyan-200"
+              className="link"
               onClick={() => {
                 update("process_description", f.example);
                 document.getElementById("advisor-process_description")?.focus();

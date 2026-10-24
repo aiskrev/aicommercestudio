@@ -120,7 +120,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           </span>
           <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-brand">
             {dict.common.learnMore}
-            <Icon name="arrowRight" className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
           </span>
         </Link>
       </Section>
@@ -261,7 +261,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               <SectionHeading id="faq-title" eyebrow={home.faq.eyebrow} title={home.faq.title} />
               <p className="mt-6 text-fg-muted">
                 {dict.common.moreQuestions}{" "}
-                <Link href={href(routes.contact)} className="font-semibold text-brand underline-offset-4 hover:underline">
+                <Link href={href(routes.contact)} className="link">
                   {dict.common.writeToUs}
                 </Link>
               </p>

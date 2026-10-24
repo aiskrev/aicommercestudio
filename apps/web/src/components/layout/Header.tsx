@@ -154,14 +154,14 @@ export function Header({
                   hidden={!servicesOpen}
                   className="absolute left-0 top-full z-50 mt-3 w-[min(46rem,calc(100vw-4rem))] -translate-x-4"
                 >
-                  <div className="panel p-2.5">
+                  <div className="panel menu-enter origin-top-left p-2.5">
                     <ul className="grid grid-cols-2 gap-1">
                       {services.map((service) => (
                         <li key={service.href}>
                           <Link
                             href={service.href}
                             aria-current={isActive(service.href) ? "page" : undefined}
-                            className="group flex gap-3 rounded-[var(--radius-md)] p-3 transition-colors hover:bg-surface-2 aria-[current=page]:bg-surface-2"
+                            className="group flex gap-3 rounded-[var(--radius-md)] p-3 transition-colors duration-150 hover:bg-surface-2 focus-visible:bg-surface-2 aria-[current=page]:bg-surface-2"
                           >
                             <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand transition-colors group-hover:border-brand/50">
                               <Icon name={service.icon} className="h-4.5 w-4.5" />
@@ -178,10 +178,10 @@ export function Header({
                     </ul>
                     <Link
                       href={servicesHref}
-                      className="mt-1.5 flex items-center justify-between rounded-[var(--radius-md)] border-t border-line-subtle px-4 py-3 text-sm font-semibold text-brand hover:bg-surface-2"
+                      className="group mt-1.5 flex items-center justify-between rounded-[var(--radius-md)] border-t border-line-subtle px-4 py-3 text-sm font-semibold text-brand transition-colors duration-150 hover:bg-surface-2"
                     >
                       {labels.allServices}
-                      <Icon name="arrowRight" className="h-4 w-4" />
+                      <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
                     </Link>
                   </div>
                 </div>
@@ -219,7 +219,7 @@ export function Header({
               aria-label={mobileOpen ? labels.closeMenu : labels.openMenu}
               onClick={() => setMobileOpen((value) => !value)}
             >
-              <Icon name={mobileOpen ? "close" : "menu"} />
+              <Icon key={mobileOpen ? "close" : "menu"} name={mobileOpen ? "close" : "menu"} className="menu-enter h-5 w-5" />
             </button>
           </div>
         </Container>
@@ -230,7 +230,7 @@ export function Header({
         id={mobilePanelId}
         ref={mobilePanelRef}
         hidden={!mobileOpen}
-        className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto overscroll-contain border-t border-line-subtle bg-ink-950 lg:hidden"
+        className="menu-sheet-enter fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto overscroll-contain border-t border-line-subtle bg-ink-950 lg:hidden"
       >
         <Container className="flex min-h-full flex-col py-5">
           <nav aria-label={labels.nav}>

@@ -72,7 +72,7 @@ export function ServiceShowcase({
                     </ul>
                     <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-semibold text-brand" aria-hidden="true">
                       {cta}
-                      <Icon name="arrowRight" className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
                     </span>
                   </div>
                 </article>
@@ -100,7 +100,7 @@ export function ServiceShowcase({
                     </Heading>
                     <p className="mt-1 text-[15px] leading-relaxed text-fg-muted">{service.summary}</p>
                   </div>
-                  <Icon name="arrowRight" className="mt-1 h-5 w-5 text-fg-subtle transition-all group-hover:translate-x-1 group-hover:text-brand" />
+                  <Icon name="arrowRight" className="arrow-nudge mt-1 h-5 w-5 text-fg-subtle group-hover:text-brand group-focus-within:text-brand" />
                 </article>
               </li>
             ))}

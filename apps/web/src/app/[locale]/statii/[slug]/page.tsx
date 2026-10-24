@@ -92,7 +92,7 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className="badge badge-accent">{dict.ui.articleTypes[article.type]}</span>
               {category && (
-                <Link href={href(routes.insightsCategory(category.slug))} className="text-cyan-300 hover:text-cyan-200">
+                <Link href={href(routes.insightsCategory(category.slug))} className="link">
                   {category.name}
                 </Link>
               )}

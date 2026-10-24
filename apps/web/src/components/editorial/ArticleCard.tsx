@@ -60,7 +60,7 @@ export function ArticleCard({
           <Heading className="t-h3 mt-2 leading-snug transition-colors group-focus-within:text-brand group-hover:text-brand">{link}</Heading>
           <p className="mt-1.5 line-clamp-2 text-[15px] leading-relaxed text-fg-muted">{article.description}</p>
         </div>
-        <Icon name="arrowRight" className="hidden h-5 w-5 text-brand transition-transform group-hover:translate-x-1 sm:block" />
+        <Icon name="arrowRight" className="arrow-nudge hidden h-5 w-5 text-brand sm:block" />
       </article>
     );
   }
@@ -87,7 +87,7 @@ export function ArticleCard({
       )}
       <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-brand" aria-hidden="true">
         {labels.readArticle}
-        <Icon name="arrowRight" className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+        <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
       </span>
     </article>
   );

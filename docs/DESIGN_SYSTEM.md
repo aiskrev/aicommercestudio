@@ -185,6 +185,51 @@ Usage example:
 Colour semantics in diagrams: teal = system/integration, periwinkle = AI suggestion, amber = human
 approval, green = completed outcome.
 
+## Interaction system
+
+All interaction styling lives in `app/globals.css` and the shared primitives; pages only apply
+class names. No animation library and no extra client JavaScript (the scroll reveal is CSS-only).
+
+| Token | Value | Use |
+| --- | --- | --- |
+| `--duration-press` | 90 ms | pressed state |
+| `--duration-fast` | 160 ms | colour, border, focus, text links |
+| `--duration-base` | 220 ms | transforms, shadows, cards, nav underline, menus |
+| `--duration-slow` | 320 ms | mobile menu sheet |
+| `--duration-reveal` | 420 ms | reference for larger transitions |
+| `--ease-out-soft` / `--ease-standard` | `cubic-bezier(.22,1,.36,1)` / `(.2,0,0,1)` | entering & movement / state changes |
+| `--lift` / `--lift-card` | −1 px / −2 px | hover lift for buttons / cards |
+| `--press-scale` | 0.985 | pressed buttons (cards 0.995) |
+| `--nudge` | 3 px | arrow/icon movement |
+
+| Element | Hover (fine pointers only) | Keyboard focus | Pressed | Other states |
+| --- | --- | --- | --- | --- |
+| Primary button | lifts 1 px; fill interpolates brand cyan → `#8fe5ea`/`#93c5fd` (registered `@property --btn-a/--btn-b`, text ≥ 10:1); azure glow; arrow +3 px | 2 px ring + arrow +3 px | scale 0.985 | disabled 50 % opacity, no motion; loading = spinner + `aria-busy`, label swap, no icon |
+| Secondary button | lifts 1 px, brand border, `surface-3`, soft shadow; arrow +3 px | ring + arrow | scale 0.985 | as above |
+| Tertiary (ghost) | lighter colour, underline fades in (`.btn-label`) | underline + ring | scale 0.985 | — |
+| Text link `.link` | brand → `brand-soft`, underline 35 % → 100 % | underline 100 % + ring | — | `.surface-light` uses `brand-ink` |
+| Card `.card-interactive` | lifts 2 px, brand border, `surface-2`, lift shadow; `.arrow-nudge` +3 px | 2 px brand ring around the card (`:has(:focus-visible)`) | scale 0.995 | — |
+| Rows `.focus-frame` + `group` | heading turns brand; arrow nudge | outline around the row; arrow nudge | — | — |
+| Nav link `.nav-link` | underline grows at 45 % | underline at 45 % + ring | — | current page / open menu: underline 100 % |
+| Services dropdown / mobile sheet | — | Escape closes, focus returns | — | `.menu-enter` / `.menu-sheet-enter` on open (fade + 6–8 px drop); closing is instant |
+| Section headings, diagram frames | — | — | — | `.reveal`: fade + 16 px rise driven by `animation-timeline: view()` |
+
+Rules:
+* Every hover rule written in CSS sits in `@media (hover: hover) and (pointer: fine)`; Tailwind
+  `hover:` utilities already behave that way. Touch devices never get a stuck hover and nothing
+  is reachable only by hover.
+* Focus always shows a visible ring; anything that moves on hover also moves on keyboard focus.
+* Only `transform`, `opacity`, colours and shadows animate.
+* Reveals are progressive enhancement: without view timelines (e.g. Firefox today), with reduced
+  motion, or when printing, content is simply shown. They are never applied to a page H1.
+* `prefers-reduced-motion: reduce`: all transforms and entry/reveal animations are removed;
+  colour and border feedback stay because they carry state.
+* No infinite decorative animation was added (the existing flowing connector in the hero workflow
+  remains the only loop and is reduced-motion aware).
+* New interactive pieces reuse `.arrow-nudge`, `.link`, `.btn-*`, `.card-interactive`,
+  `.focus-frame`, `.menu-enter` and `.reveal` instead of page-level `transition-*`/`hover:translate`
+  utilities.
+
 ## Composition rules
 
 * No two consecutive sections share the same composition; use `tone` and `density` to vary rhythm.

@@ -117,7 +117,14 @@ export function SectionHeading({
 }) {
   const headingClass = Heading === "h1" ? "t-h1" : size === "sm" || Heading === "h3" ? "t-h3-lg" : "t-h2";
   const text = (
-    <div className={cx("max-w-3xl min-w-0", align === "center" && "mx-auto text-center", !action && className)}>
+    <div
+      className={cx(
+        "max-w-3xl min-w-0",
+        Heading !== "h1" && "reveal",
+        align === "center" && "mx-auto text-center",
+        !action && className,
+      )}
+    >
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
       <Heading id={id} className={cx(headingClass, eyebrow && (size === "sm" ? "mt-3" : "mt-4"))}>
         {title}
@@ -181,8 +188,8 @@ export function Button({
       className={cx(buttonClass(variant, size), className)}
     >
       {loading && <Spinner />}
-      {loading && loadingLabel ? loadingLabel : children}
-      {!loading && icon && <Icon name={icon} className="h-4 w-4" />}
+      <span className="btn-label">{loading && loadingLabel ? loadingLabel : children}</span>
+      {!loading && icon && <Icon name={icon} className="btn-icon h-4 w-4" />}
     </button>
   );
 }
@@ -203,9 +210,9 @@ export function ButtonLink({
   className?: string;
 }) {
   return (
-    <Link href={href} className={cx(buttonClass(variant, size), "group", className)}>
-      {children}
-      {icon && <Icon name={icon} className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />}
+    <Link href={href} className={cx(buttonClass(variant, size), className)}>
+      <span className="btn-label">{children}</span>
+      {icon && <Icon name={icon} className="btn-icon h-4 w-4" />}
     </Link>
   );
 }

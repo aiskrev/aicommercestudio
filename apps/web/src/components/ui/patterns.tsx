@@ -60,7 +60,11 @@ export function DiagramFrame({
   testId?: string;
 }) {
   return (
-    <figure className={cx("diagram-frame diagram-grid p-5 sm:p-6", className)} aria-labelledby={titleId} data-testid={testId}>
+    <figure
+      className={cx("diagram-frame diagram-grid reveal p-5 sm:p-6", className)}
+      aria-labelledby={titleId}
+      data-testid={testId}
+    >
       <div className="diagram-bar">
         <p id={titleId} className="t-label min-w-0">
           {title}

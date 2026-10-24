@@ -36,7 +36,7 @@ export function ProblemIndex({ rows, solutionLabel }: { rows: ProblemRow[]; solu
             <span className="inline-flex items-center gap-2 text-sm font-semibold text-brand-ink sm:col-start-2 md:col-start-auto md:justify-self-end">
               <span className="font-mono text-[11px] font-medium uppercase tracking-[0.06em] text-ink-muted">{solutionLabel}</span>
               <span className="underline decoration-brand-ink/30 underline-offset-4 group-hover:decoration-brand-ink">{row.service.title}</span>
-              <Icon name="arrowRight" className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-1" />
+              <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
             </span>
           </Link>
         </li>
