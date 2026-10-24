@@ -1,7 +1,8 @@
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Icon } from "@/components/ui/Icon";
-import { CheckList, PageHero, Section } from "@/components/ui/primitives";
+import { EditorialSplit } from "@/components/ui/patterns";
+import { CheckList, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
 import { getContent } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -39,18 +40,24 @@ export default async function ProcessPage({ params }: PageProps<"/[locale]/proce
       <Section>
         <ol className="relative grid gap-6">
           {page.steps.map((step, index) => (
-            <li key={step.title} className="card grid gap-6 rounded-2xl p-6 sm:p-8 lg:grid-cols-[auto_1fr_0.8fr]">
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-cyan-400/30 bg-cyan-400/10 font-display font-semibold text-cyan-200">
-                {index + 1}
+            <li
+              key={step.title}
+              className="card grid gap-6 p-6 sm:p-8 lg:grid-cols-[3rem_minmax(0,1fr)_minmax(0,0.8fr)] lg:gap-8"
+            >
+              <span
+                className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-brand/35 bg-brand/[0.08] font-mono text-sm font-medium text-brand"
+                aria-hidden="true"
+              >
+                {String(index + 1).padStart(2, "0")}
               </span>
-              <div>
-                <h2 className="text-xl font-semibold">{step.title}</h2>
-                <p className="mt-1 text-slate-400">{step.summary}</p>
+              <div className="min-w-0">
+                <h2 className="t-h3-lg">{step.title}</h2>
+                <p className="mt-2 text-fg-muted">{step.summary}</p>
                 <CheckList items={step.details} className="mt-5" />
               </div>
-              <div className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 lg:self-start">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{dict.ui.processResult}</p>
-                <p className="mt-2 text-slate-200">{step.outcome}</p>
+              <div className="rounded-[var(--radius-md)] border border-line-subtle bg-surface-page p-5 lg:self-start">
+                <p className="t-label">{dict.ui.processResult}</p>
+                <p className="mt-2 text-fg-secondary">{step.outcome}</p>
               </div>
             </li>
           ))}
@@ -58,19 +65,16 @@ export default async function ProcessPage({ params }: PageProps<"/[locale]/proce
       </Section>
 
       <Section labelledBy="needs-title" alt>
-        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-          <h2 id="needs-title" className="text-3xl font-semibold">
-            {page.needsTitle}
-          </h2>
+        <EditorialSplit aside={<SectionHeading id="needs-title" title={page.needsTitle} />}>
           <ul className="grid gap-3 sm:grid-cols-2">
             {page.needs.map((need) => (
-              <li key={need} className="card flex gap-3 rounded-xl p-4 text-slate-200">
-                <Icon name="check" className="mt-0.5 h-5 w-5 shrink-0 text-cyan-300" />
+              <li key={need} className="card flex gap-3 p-4 text-fg-secondary">
+                <Icon name="check" className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
                 {need}
               </li>
             ))}
           </ul>
-        </div>
+        </EditorialSplit>
       </Section>
 
       <CtaBand

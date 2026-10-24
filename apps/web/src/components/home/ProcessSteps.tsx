@@ -15,7 +15,7 @@ export function ProcessSteps({ steps, layout = "vertical" }: { steps: ProcessSte
     return (
       <ol className={cx("grid gap-8 lg:gap-6", steps.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3")}>
         {steps.map((step, index) => (
-          <li key={step.title} className="relative grid grid-cols-[3rem_1fr] gap-4 lg:block">
+          <li key={step.title} className="relative grid grid-cols-[3rem_minmax(0,1fr)] gap-4 lg:block">
             {/* rail: vertical on mobile, horizontal from lg */}
             {index < steps.length - 1 && (
               <span
@@ -49,7 +49,7 @@ export function ProcessSteps({ steps, layout = "vertical" }: { steps: ProcessSte
   return (
     <ol className="relative">
       {steps.map((step, index) => (
-        <li key={step.title} className="relative grid grid-cols-[3.5rem_1fr] gap-4 pb-10 last:pb-0 sm:grid-cols-[5rem_1fr] sm:gap-6">
+        <li key={step.title} className="relative grid grid-cols-[3.5rem_minmax(0,1fr)] gap-4 pb-10 last:pb-0 sm:grid-cols-[5rem_minmax(0,1fr)] sm:gap-6">
           {index < steps.length - 1 && (
             <span className="absolute bottom-0 left-[1.15rem] top-12 w-px bg-line-default sm:left-[1.6rem]" aria-hidden="true" />
           )}

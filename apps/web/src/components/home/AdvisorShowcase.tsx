@@ -35,7 +35,7 @@ export function AdvisorShowcase({
 }) {
   const { labels } = content;
   return (
-    <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-14">
+    <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-14">
       <div>
         <Eyebrow>{content.eyebrow}</Eyebrow>
         <h2 id={id} className="t-h2 mt-4">
@@ -45,7 +45,7 @@ export function AdvisorShowcase({
         <h3 className="mt-8 text-[15px] font-semibold text-ink">{stepsTitle}</h3>
         <ol className="mt-3 grid gap-3">
           {steps.slice(0, 3).map((step, index) => (
-            <li key={step.title} className="grid grid-cols-[2rem_1fr] gap-3">
+            <li key={step.title} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3">
               <span className="font-mono text-sm text-brand-ink">{String(index + 1).padStart(2, "0")}</span>
               <span>
                 <span className="block font-semibold text-ink">{step.title}</span>
@@ -74,7 +74,7 @@ export function AdvisorShowcase({
         <div className="grid gap-4 p-5 sm:p-6">
           <section aria-label={content.inputTitle} className="rounded-[var(--radius-md)] border border-line-subtle bg-surface-1 p-4">
             <p className="t-label">{content.inputTitle}</p>
-            <dl className="mt-3 grid gap-x-4 gap-y-2 text-[14px] sm:grid-cols-[auto_1fr]">
+            <dl className="mt-3 grid gap-x-4 gap-y-2 text-[14px] sm:grid-cols-[auto_minmax(0,1fr)]">
               <dt className="text-fg-subtle">{labels.business}</dt>
               <dd className="text-fg">{content.input.business}</dd>
               <dt className="text-fg-subtle">{labels.volume}</dt>

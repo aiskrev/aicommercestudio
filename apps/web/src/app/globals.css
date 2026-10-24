@@ -1,51 +1,62 @@
 @import "tailwindcss";
 
 /* =============================================================================
-   A.I. Commerce Studio — design system ("Precision Commerce × Intelligent Automation")
+   A.I. Commerce Studio — design system v2 ("Engineering editorial")
    Full reference: docs/DESIGN_SYSTEM.md
 
-   Palette (contrast on --surface-page #080f19, WCAG 2.2):
-     fg            #f4f7fb  17.3:1      fg-secondary #d3dee8  13.4:1
-     fg-muted      #a9b9c9   9.2:1      fg-subtle    #7d8fa3   5.6:1 (≥ 14 px only)
-     brand         #69d9df  11.3:1      brand-2      #83a9f9   7.9:1
-     on light surface #edf3f4: ink #14232d 14.6:1, ink-muted #45606e 6.0:1, brand-ink #0f6f75 5.4:1
-     primary button: #06121c on #69d9df = 11.5:1
+   Surfaces: deep navy page, near-black "deep" band, raised navy panels, warm off-white paper.
+   One controlled accent (teal/cyan), one secondary (blue) for diagrams. No glow blobs, no neon.
+
+   Contrast (WCAG 2.2), text on the darkest surface it is used on:
+     fg            #f4f7fb  ≥ 13:1      fg-secondary #d3dee8 ≥ 10:1
+     fg-muted      #a9b9c9  7.3:1 (s3)  fg-subtle    #8798ab  4.9:1 (s3), 6.5:1 (page)
+     brand         #69d9df  8.7:1 (s3)  brand-2      #83a9f9  6.3:1 (s3)
+     paper #f4f1ea: ink #14232d 14.2:1, ink-muted #45606e 5.9:1, brand-ink #0c6670 5.9:1
+     paper-2 #ebe6dc: ink-muted 5.4:1, brand-ink 5.4:1
+     primary button: #06121c on #69d9df = 11.3:1
+   Non-text (≥ 3:1): field border line-strong #5a6e85 3.4:1 on surface-1, ink-line #7a8a93 3.2:1
+   on paper; focus ring brand 11.5:1 on page, brand-ink 5.9:1 on paper.
 
    Compatibility: Tailwind's `slate`, `cyan`, `blue` and `violet` scales are re-tuned below to the
-   brand neutrals and accents, so existing utility classes follow the new identity. New code should
-   prefer the semantic tokens (bg-surface-*, text-fg*, text-brand, border-line*).
+   brand neutrals and accents, so existing utility classes follow the identity. New code uses the
+   semantic tokens (bg-surface-*, text-fg*, text-brand, border-line*, max-w-content, py-section).
    ============================================================================= */
 
 @theme {
-  /* Surfaces (dark) */
+  /* Surfaces (dark) — legacy aliases kept for existing utilities */
   --color-ink-950: #080f19;
   --color-ink-900: #0b1520;
   --color-ink-850: #0e1926;
   --color-ink-800: #111c2b;
   --color-ink-700: #192a3d;
   --color-ink-600: #22364d;
-  --color-line: #4d6178;
+  --color-line: #5a6e85;
 
-  /* Semantic */
+  /* Semantic colour */
+  --color-surface-deep: #05080d;
   --color-surface-page: #080f19;
   --color-surface-1: #0d1724;
   --color-surface-2: #111c2b;
   --color-surface-3: #192a3d;
-  --color-surface-light: #edf3f4;
-  --color-surface-light-2: #e1eaec;
+  --color-surface-light: #f4f1ea;
+  --color-surface-light-2: #ebe6dc;
+  --color-surface-paper-card: #fbfaf6;
   --color-fg: #f4f7fb;
   --color-fg-secondary: #d3dee8;
   --color-fg-muted: #a9b9c9;
-  --color-fg-subtle: #7d8fa3;
+  --color-fg-subtle: #8798ab;
+  --color-fg-placeholder: #8698ac;
   --color-brand: #69d9df;
   --color-brand-strong: #45c7ce;
+  --color-brand-soft: #a8ebee;
   --color-brand-2: #83a9f9;
-  --color-brand-ink: #0f6f75;
+  --color-brand-ink: #0c6670;
   --color-ink: #14232d;
   --color-ink-muted: #45606e;
+  --color-ink-line: #7a8a93;
   --color-line-subtle: rgb(169 185 201 / 0.12);
   --color-line-default: rgb(169 185 201 / 0.2);
-  --color-line-strong: #4d6178;
+  --color-line-strong: #5a6e85;
   --color-success: #5fd4a0;
   --color-warning: #f2c46d;
   --color-danger: #f47a8a;
@@ -56,7 +67,7 @@
   --color-slate-200: #d3dee8;
   --color-slate-300: #bfccd9;
   --color-slate-400: #a9b9c9;
-  --color-slate-500: #7d8fa3;
+  --color-slate-500: #8798ab;
   --color-slate-600: #5c6e82;
   --color-slate-700: #3c4d60;
   --color-slate-800: #22364d;
@@ -76,19 +87,35 @@
   --color-violet-400: #9bb6fa;
   --color-violet-500: #83a9f9;
 
+  /* Typography */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-display: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-face), ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
 
+  /* Layout: containers (max-w-*) and fluid section rhythm (py-section*, gap-section*) */
+  --container-reading: 44rem;
+  --container-narrow: 60rem;
+  --container-content: 76rem;
+  --container-wide: 88rem;
+  --spacing-section-compact: clamp(3rem, 2.25rem + 3vw, 4rem);
+  --spacing-section: clamp(4rem, 2.75rem + 5vw, 6rem);
+  --spacing-section-spacious: clamp(5rem, 3rem + 7.5vw, 8rem);
+  --spacing-stack: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+
+  /* Shape */
   --radius-sm: 0.375rem;
   --radius-md: 0.625rem;
   --radius-lg: 0.875rem;
   --radius-xl: 1.25rem;
 
+  /* Elevation: depth from borders first, shadows are quiet. */
   --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 30px 60px -30px rgb(0 0 0 / 0.65);
-  --shadow-lift: 0 18px 40px -26px rgb(105 217 223 / 0.35);
+  --shadow-lift: 0 18px 40px -26px rgb(0 0 0 / 0.85), 0 10px 30px -24px rgb(105 217 223 / 0.3);
+  --shadow-paper: 0 1px 2px rgb(20 35 45 / 0.06), 0 14px 32px -22px rgb(20 35 45 / 0.28);
 
+  /* Motion */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 
   --animate-pulse-soft: pulse-soft 3.2s ease-in-out infinite;
   --animate-shimmer: shimmer 1.6s linear infinite;
@@ -124,10 +151,32 @@
     --border-subtle: var(--color-line-subtle);
     --border-default: var(--color-line-default);
     --border-strong: var(--color-line-strong);
-    --ring: var(--color-brand);
     --radius-card: var(--radius-lg);
     --header-h: 4rem;
     --container: 76rem;
+
+    /* Type scale (fluid, 360 → 1440 px). Display + section headings: Manrope; the rest: Inter. */
+    --type-display: clamp(2.35rem, 1.5rem + 3.1vw, 4.15rem);
+    --type-h1: clamp(2.15rem, 1.6rem + 2.4vw, 3.6rem);
+    --type-h2: clamp(1.8rem, 1.35rem + 1.8vw, 3rem);
+    --type-h3-lg: clamp(1.3rem, 1.15rem + 0.6vw, 1.75rem);
+    --type-h3: 1.1875rem;
+    --type-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+    --type-body: 1rem;
+    --type-small: 0.875rem;
+    --type-label: 0.78rem;
+    --measure: 68ch;
+    --measure-narrow: 56ch;
+
+    /* Focus */
+    --ring: var(--color-brand);
+    --ring-width: 2px;
+    --ring-offset: 3px;
+
+    /* Motion */
+    --duration-fast: 140ms;
+    --duration-base: 200ms;
+    --duration-slow: 320ms;
   }
   html {
     color-scheme: dark;
@@ -140,12 +189,14 @@
     background-color: var(--surface-page);
     color: var(--text-secondary);
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: var(--type-body);
     line-height: 1.6;
     font-feature-settings: "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Long Bulgarian compounds and URLs wrap instead of widening the page. */
+    overflow-wrap: break-word;
   }
   /* Small headings use the text face: Manrope's Cyrillic is reserved for display sizes. */
   h1, h2, h3, h4 {
@@ -164,8 +215,8 @@
     color: var(--text-primary);
   }
   :focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 3px;
+    outline: var(--ring-width) solid var(--ring);
+    outline-offset: var(--ring-offset);
     border-radius: 6px;
   }
   [hidden] { display: none !important; }
@@ -173,10 +224,10 @@
 
 /* ---------------------------------------------------------------- components */
 @layer components {
-  /* Type scale (fluid). Display + section headings: Manrope; everything else: Inter. */
+  /* Type scale */
   .t-display {
     font-family: var(--font-display);
-    font-size: clamp(2.35rem, 1.5rem + 3.1vw, 4.15rem);
+    font-size: var(--type-display);
     line-height: 1.02;
     font-weight: 700;
     letter-spacing: -0.03em;
@@ -184,19 +235,30 @@
     font-feature-settings: "locl" 0;
   }
   .t-h1, .t-h2 { font-family: var(--font-display); font-feature-settings: "locl" 0; }
-  .t-h1 { font-size: clamp(2.15rem, 1.6rem + 2.4vw, 3.6rem); line-height: 1.06; font-weight: 700; letter-spacing: -0.028em; }
-  .t-h2 { font-size: clamp(1.8rem, 1.35rem + 1.8vw, 3rem); line-height: 1.1; font-weight: 700; letter-spacing: -0.024em; }
-  .t-h3 { font-size: 1.1875rem; line-height: 1.35; font-weight: 600; }
-  .t-h3-lg { font-size: clamp(1.3rem, 1.15rem + 0.6vw, 1.75rem); line-height: 1.22; font-weight: 600; letter-spacing: -0.016em; }
-  .t-lead { font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem); line-height: 1.65; color: var(--text-muted); }
-  .t-body { font-size: 1rem; line-height: 1.65; color: var(--text-muted); }
+  .t-h1 { font-size: var(--type-h1); line-height: 1.06; font-weight: 700; letter-spacing: -0.028em; }
+  .t-h2 { font-size: var(--type-h2); line-height: 1.1; font-weight: 700; letter-spacing: -0.024em; }
+  .t-h3 { font-size: var(--type-h3); line-height: 1.35; font-weight: 600; }
+  .t-h3-lg { font-size: var(--type-h3-lg); line-height: 1.22; font-weight: 600; letter-spacing: -0.016em; }
+  .t-lead { font-size: var(--type-lead); line-height: 1.65; color: var(--text-muted); }
+  .t-body { font-size: var(--type-body); line-height: 1.65; color: var(--text-muted); }
+  .t-small { font-size: var(--type-small); line-height: 1.55; color: var(--text-muted); }
   .t-label {
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: var(--type-label);
     font-weight: 500;
     letter-spacing: 0.01em;
     color: var(--color-fg-muted);
   }
+  /* Tabular numerals for indices, dates and figures. */
+  .t-index {
+    font-family: var(--font-mono);
+    font-size: var(--type-label);
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-brand);
+  }
+  .measure { max-width: var(--measure); }
+  .measure-narrow { max-width: var(--measure-narrow); }
   /* Section label: mono, small square marker. */
   .t-eyebrow {
     display: inline-flex;
@@ -212,6 +274,7 @@
     content: "";
     width: 0.45rem;
     height: 0.45rem;
+    flex-shrink: 0;
     border-radius: 1px;
     background: currentColor;
   }
@@ -224,7 +287,11 @@
     background: var(--color-surface-1);
   }
   .card-interactive {
-    transition: border-color 200ms ease, background 200ms ease, transform 200ms var(--ease-out-soft), box-shadow 200ms ease;
+    transition:
+      border-color var(--duration-base) ease,
+      background var(--duration-base) ease,
+      transform var(--duration-base) var(--ease-out-soft),
+      box-shadow var(--duration-base) ease;
   }
   .card-interactive:hover {
     border-color: color-mix(in oklab, var(--color-brand) 45%, transparent);
@@ -240,6 +307,8 @@
       linear-gradient(180deg, color-mix(in oklab, var(--color-brand) 7%, transparent), transparent 55%),
       var(--color-surface-1);
   }
+  /* Quiet card: hairline only, for dense lists inside a raised section. */
+  .card-quiet { background: transparent; border-color: var(--border-default); }
   .panel {
     border-radius: var(--radius-xl);
     border: 1px solid var(--border-default);
@@ -252,19 +321,39 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
-  .glass-hover { transition: border-color 200ms ease; }
+  .glass-hover { transition: border-color var(--duration-base) ease; }
   .glass-hover:hover { border-color: color-mix(in oklab, var(--color-brand) 40%, transparent); }
 
-  /* Light editorial surface: used for contrast sections (problems, capabilities). */
+  /* Composite links (a card or row whose single link covers it): the frame carries the focus ring. */
+  .focus-frame { border-radius: var(--radius-md); }
+  .focus-frame :focus-visible { outline: none; }
+  .focus-frame:has(:focus-visible) {
+    outline: var(--ring-width) solid var(--ring);
+    outline-offset: 4px;
+  }
+
+  /* Near-black band: the strongest dark surface, for technical deep-dives and diagrams. */
+  .surface-deep {
+    background: var(--color-surface-deep);
+    border-block: 1px solid var(--border-subtle);
+  }
+
+  /* Warm paper surface: editorial contrast sections (problems, capabilities, showcases). */
   .surface-light {
     background: var(--color-surface-light);
     color: var(--color-ink-muted);
     color-scheme: light;
+    --ring: var(--color-brand-ink);
   }
   .surface-light h2, .surface-light h3, .surface-light h4 { color: var(--color-ink); }
-  .surface-light .t-lead, .surface-light .t-body { color: var(--color-ink-muted); }
-  .surface-light .t-eyebrow { color: var(--color-brand-ink); }
-  .surface-light :focus-visible { outline-color: var(--color-brand-ink); }
+  .surface-light .t-lead, .surface-light .t-body, .surface-light .t-small { color: var(--color-ink-muted); }
+  .surface-light .t-eyebrow, .surface-light .t-index { color: var(--color-brand-ink); }
+  .surface-light .t-label { color: var(--color-ink-muted); }
+  .surface-light .card {
+    background: var(--color-surface-paper-card);
+    border-color: rgb(20 35 45 / 0.12);
+    box-shadow: var(--shadow-paper);
+  }
 
   /* Buttons */
   .btn {
@@ -277,7 +366,12 @@
     font-weight: 600;
     line-height: 1.2;
     white-space: nowrap;
-    transition: background 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+    transition:
+      background var(--duration-fast) ease,
+      border-color var(--duration-fast) ease,
+      color var(--duration-fast) ease,
+      box-shadow var(--duration-fast) ease,
+      transform 120ms ease;
     -webkit-tap-highlight-color: transparent;
   }
   .btn:active:not(:disabled) { transform: translateY(1px); }
@@ -286,6 +380,10 @@
   .btn-md { padding: 0.65rem 1.15rem; font-size: 0.9375rem; min-height: 2.75rem; }
   .btn-lg { padding: 0.9rem 1.5rem; font-size: 1rem; min-height: 3.25rem; }
   .btn-sm { padding: 0.45rem 0.85rem; font-size: 0.8125rem; min-height: 2.25rem; }
+  /* Long Bulgarian labels wrap on narrow screens instead of overflowing. */
+  @media (max-width: 30rem) {
+    .btn-md, .btn-lg { white-space: normal; text-align: center; }
+  }
   .btn-primary {
     color: #06121c;
     background: var(--color-brand);
@@ -299,13 +397,15 @@
   }
   .btn-secondary:hover:not(:disabled) { border-color: color-mix(in oklab, var(--color-brand) 55%, transparent); background: var(--color-surface-3); }
   .btn-ghost { color: var(--color-brand); padding-inline: 0.25rem; }
-  .btn-ghost:hover:not(:disabled) { color: #a8ebee; }
+  .btn-ghost:hover:not(:disabled) { color: var(--color-brand-soft); }
   .btn-danger { color: #fff; background: #d6455a; }
   .btn-danger:hover:not(:disabled) { background: #e45a6e; }
   .btn-danger-outline { color: #ffd4da; border: 1px solid rgb(244 122 138 / 0.5); }
   .btn-danger-outline:hover:not(:disabled) { background: rgb(244 122 138 / 0.12); }
   .surface-light .btn-secondary { color: var(--color-ink); background: #fff; border-color: rgb(20 35 45 / 0.16); }
   .surface-light .btn-secondary:hover:not(:disabled) { border-color: var(--color-brand-ink); background: #fff; }
+  .surface-light .btn-ghost { color: var(--color-brand-ink); }
+  .surface-light .btn-ghost:hover:not(:disabled) { color: var(--color-ink); }
 
   .spinner {
     width: 1rem;
@@ -317,23 +417,42 @@
   }
 
   /* Form fields */
+  .field-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: var(--type-small);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-fg-secondary);
+  }
+  .field-required { color: var(--color-danger); }
+  .field-hint { margin-top: 0.5rem; font-size: 0.8125rem; line-height: 1.5; color: var(--color-fg-muted); }
+  .field-error { margin-top: 0.5rem; font-size: var(--type-small); line-height: 1.45; color: var(--color-danger); }
   .field {
     width: 100%;
+    min-width: 0;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-strong);
     background: var(--color-surface-page);
     padding: 0.75rem 0.95rem;
     color: var(--text-primary);
     font-size: 1rem;
-    transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+    transition:
+      border-color var(--duration-fast) ease,
+      box-shadow var(--duration-fast) ease,
+      background var(--duration-fast) ease;
   }
-  .field::placeholder { color: #8698ac; }
-  .field:hover:not(:disabled) { border-color: #6b7f96; }
-  .field:focus { outline: none; border-color: var(--color-brand); box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-brand) 25%, transparent); }
+  .field::placeholder { color: var(--color-fg-placeholder); }
+  .field:hover:not(:disabled) { border-color: #71859c; }
+  .field:focus { outline: none; border-color: var(--color-brand); box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-brand) 28%, transparent); }
   .field:disabled { opacity: 0.6; cursor: not-allowed; }
   .field[aria-invalid="true"] { border-color: var(--color-danger); }
   .field[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgb(244 122 138 / 0.25); }
   select.field { appearance: none; padding-right: 2.75rem; }
+  .surface-light .field { background: #fff; border-color: var(--color-ink-line); color: var(--color-ink); }
+  .surface-light .field:focus { border-color: var(--color-brand-ink); box-shadow: 0 0 0 3px rgb(12 102 112 / 0.2); }
+  .surface-light .field-label { color: var(--color-ink); }
+  .surface-light .field-hint { color: var(--color-ink-muted); }
   .checkbox {
     width: 1.25rem;
     height: 1.25rem;
@@ -358,8 +477,21 @@
   .badge-accent {
     border-color: color-mix(in oklab, var(--color-brand) 35%, transparent);
     background: color-mix(in oklab, var(--color-brand) 10%, transparent);
-    color: #a8ebee;
+    color: var(--color-brand-soft);
   }
+  .badge-success { border-color: rgb(95 212 160 / 0.35); background: rgb(95 212 160 / 0.09); color: #bff0d8; }
+  .badge-warning { border-color: rgb(242 196 109 / 0.38); background: rgb(242 196 109 / 0.09); color: #fbe3b0; }
+  .badge-outline { background: transparent; }
+  /* Status dot before the label (decorative; the label carries the meaning). */
+  .badge-dot::before {
+    content: "";
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 9999px;
+    background: currentColor;
+  }
+  .surface-light .badge { background: #fff; border-color: rgb(20 35 45 / 0.16); color: var(--color-ink-muted); }
+  .surface-light .badge-accent { border-color: rgb(12 102 112 / 0.3); background: rgb(12 102 112 / 0.07); color: var(--color-brand-ink); }
   .alert {
     display: flex;
     gap: 0.75rem;
@@ -384,6 +516,16 @@
 
   /* Backdrops — restrained: a fine engineering grid, no glow blobs. */
   .text-gradient { color: var(--color-brand); }
+  /* Logo wordmark: "Studio" in the V1 logo gradient (same stops as the mark and the favicon). */
+  .logo-gradient-text {
+    background: linear-gradient(100deg, #67e8f9 0%, #60a5fa 50%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  @media (forced-colors: active) {
+    .logo-gradient-text { background: none; color: CanvasText; }
+  }
   .grid-backdrop {
     background-image:
       linear-gradient(rgb(169 185 201 / 0.06) 1px, transparent 1px),
@@ -397,6 +539,88 @@
   .divider-glow { height: 1px; background: var(--border-default); }
   .section-alt { background: var(--color-surface-1); border-block: 1px solid var(--border-subtle); }
   .rule { height: 1px; background: var(--border-subtle); }
+
+  /* ------------------------------------------------------------ patterns */
+  /* Technical figure: blueprint grid, registration ticks at the corners, mono title bar. */
+  .diagram-frame {
+    position: relative;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-default);
+    background-color: var(--color-surface-1);
+    box-shadow: var(--shadow-panel);
+  }
+  .diagram-frame::after {
+    --tick: color-mix(in oklab, var(--color-brand) 55%, transparent);
+    content: "";
+    position: absolute;
+    inset: 0.5rem;
+    pointer-events: none;
+    background:
+      linear-gradient(var(--tick) 0 0) top left / 10px 1px no-repeat,
+      linear-gradient(var(--tick) 0 0) top left / 1px 10px no-repeat,
+      linear-gradient(var(--tick) 0 0) top right / 10px 1px no-repeat,
+      linear-gradient(var(--tick) 0 0) top right / 1px 10px no-repeat,
+      linear-gradient(var(--tick) 0 0) bottom left / 10px 1px no-repeat,
+      linear-gradient(var(--tick) 0 0) bottom left / 1px 10px no-repeat,
+      linear-gradient(var(--tick) 0 0) bottom right / 10px 1px no-repeat,
+      linear-gradient(var(--tick) 0 0) bottom right / 1px 10px no-repeat;
+  }
+  .diagram-grid {
+    background-image:
+      linear-gradient(rgb(169 185 201 / 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(169 185 201 / 0.045) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -1px -1px;
+  }
+  .diagram-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+  }
+  .diagram-bar::after {
+    content: "";
+    order: 1;
+    flex: 1;
+    height: 1px;
+    background: var(--border-subtle);
+  }
+  .diagram-bar > [data-slot="meta"] { order: 2; }
+
+  /* Interactive tool frame: brand hairline at the top edge marks the working surface. */
+  .tool-frame {
+    position: relative;
+    border-radius: var(--radius-xl);
+    border: 1px solid color-mix(in oklab, var(--color-brand) 30%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--color-brand) 5%, transparent), transparent 40%),
+      var(--color-surface-1);
+    box-shadow: var(--shadow-panel);
+  }
+  .tool-frame::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    inset-inline: 1.5rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-brand), transparent);
+    opacity: 0.8;
+  }
+
+  /* Key/value facts (dl): mono labels, hairline rows. */
+  .spec-list { display: grid; }
+  .spec-list > div {
+    display: grid;
+    gap: 0.25rem;
+    border-top: 1px solid var(--border-subtle);
+    padding-block: 0.85rem;
+  }
+  .spec-list > div:last-child { border-bottom: 1px solid var(--border-subtle); }
+  .spec-list dt { font-family: var(--font-mono); font-size: var(--type-label); color: var(--color-fg-subtle); }
+  .spec-list dd { color: var(--text-primary); font-size: 0.9375rem; line-height: 1.5; }
+  .surface-light .spec-list > div { border-color: rgb(20 35 45 / 0.14); }
+  .surface-light .spec-list dt { color: var(--color-ink-muted); }
+  .surface-light .spec-list dd { color: var(--color-ink); }
 
   /* Workflow connector (vertical dashed line that "flows" when motion is allowed). */
   .flow-line {
@@ -420,12 +644,13 @@
     border-radius: 2px;
     background: var(--color-brand);
     transform: scaleX(0);
-    transition: transform 200ms var(--ease-out-soft);
+    transition: transform var(--duration-base) var(--ease-out-soft);
   }
   .nav-link[aria-current="page"]::after,
   .nav-link[aria-expanded="true"]::after { transform: scaleX(1); }
 
   /* Long-form content */
+  .prose-content { max-width: var(--measure); }
   .prose-content p { margin-top: 1rem; line-height: 1.8; }
   .prose-content ul { margin-top: 1rem; display: grid; gap: 0.6rem; }
   .prose-content a { color: var(--color-brand); text-decoration: underline; text-underline-offset: 4px; }
@@ -439,6 +664,13 @@
   .accordion details[open]::details-content { block-size: auto; }
 }
 
+/* ---------------------------------------------------------------- forced colours */
+/* Box-shadow rings disappear in Windows High Contrast; fall back to a system-colour outline. */
+@media (forced-colors: active) {
+  .card-interactive:has(:focus-visible) { outline: 2px solid CanvasText; outline-offset: 2px; }
+  .field:focus { outline: 2px solid Highlight; outline-offset: 1px; }
+}
+
 /* ---------------------------------------------------------------- motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -447,6 +679,7 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+  .card-interactive:hover { transform: none; }
   .motion-decorative { display: none !important; }
   .skeleton { animation: none; }
 }

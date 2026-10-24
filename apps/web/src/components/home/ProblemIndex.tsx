@@ -20,7 +20,7 @@ export function ProblemIndex({ rows, solutionLabel }: { rows: ProblemRow[]; solu
         <li key={row.title} className="border-b border-ink/15">
           <Link
             href={row.service.href}
-            className="group grid gap-3 py-6 transition-colors sm:grid-cols-[2.5rem_1fr] md:grid-cols-[2.5rem_1.1fr_1fr_auto] md:items-center md:gap-8 md:py-7"
+            className="group grid gap-3 py-6 transition-colors sm:grid-cols-[2.5rem_minmax(0,1fr)] md:grid-cols-[2.5rem_minmax(0,1.1fr)_minmax(0,1fr)_18rem] md:items-center md:gap-8 md:py-7"
           >
             {row.icon ? (
               <span className="hidden h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-ink text-brand sm:inline-flex" aria-hidden="true">

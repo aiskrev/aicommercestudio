@@ -1,4 +1,5 @@
 import { Icon } from "@/components/ui/Icon";
+import { DiagramFrame } from "@/components/ui/patterns";
 import { cx } from "@/components/ui/primitives";
 import type { ServiceKey } from "@/content/types";
 
@@ -29,12 +30,8 @@ export function ServiceConcept({ service, steps, label }: { service: ServiceKey;
   const layout = LAYOUT[service];
   const items = steps.slice(0, 4);
   return (
-    <figure className="panel p-5 sm:p-6" aria-label={label}>
-      <figcaption className="t-label flex items-center justify-between gap-3">
-        <span>{label}</span>
-        <span className="h-px flex-1 bg-line-subtle" aria-hidden="true" />
-      </figcaption>
-      <div className="mt-5">
+    <DiagramFrame title={label} titleId="service-concept-title">
+      <div>
         {layout === "cycle" && <Cycle items={items} />}
         {layout === "tree" && <Tree items={items} />}
         {layout === "stack" && <Stack items={items} />}
@@ -43,7 +40,7 @@ export function ServiceConcept({ service, steps, label }: { service: ServiceKey;
         {layout === "hub" && <Hub items={items} />}
         {layout === "checklist" && <Checklist items={items} />}
       </div>
-    </figure>
+    </DiagramFrame>
   );
 }
 
@@ -111,7 +108,7 @@ function Flow({ items }: { items: Step[] }) {
   return (
     <ol className="grid gap-2">
       {items.map((step, i) => (
-        <li key={step.title} className="grid grid-cols-[1fr_auto] items-center gap-3">
+        <li key={step.title} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
           <Node step={step} index={i} accent={i === items.length - 1} />
           <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line-default text-fg-muted" aria-hidden="true">
             <Icon name={i === items.length - 2 ? "users" : i === items.length - 1 ? "check" : "arrowRight"} className="h-4 w-4 rotate-0" />

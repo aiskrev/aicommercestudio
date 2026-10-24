@@ -127,9 +127,9 @@ export function AiManagedFields({
       />
 
       <fieldset>
-        <legend className="mb-2 block text-sm font-medium text-slate-200">
+        <legend className="field-label">
           {labels.communicationLanguage}
-          <span className="text-rose-300" aria-hidden="true">
+          <span className="field-required" aria-hidden="true">
             {" "}
             *
           </span>
@@ -160,7 +160,7 @@ export function AiManagedFields({
           ))}
         </div>
         {errors.ai_communication_language && (
-          <p className="mt-2 text-sm text-rose-300">{errors.ai_communication_language}</p>
+          <p className="field-error">{errors.ai_communication_language}</p>
         )}
       </fieldset>
 
@@ -249,15 +249,15 @@ function CheckboxGroup({
       aria-describedby={[`contact-${id}-hint`, error ? `contact-${id}-error` : null].filter(Boolean).join(" ")}
       aria-invalid={Boolean(error) || undefined}
     >
-      <legend className="block text-sm font-medium text-slate-200">
+      <legend className="field-label mb-0">
         {legend}
-        <span className="text-rose-300" aria-hidden="true">
+        <span className="field-required" aria-hidden="true">
           {" "}
           *
         </span>
         <span className="sr-only"> ({requiredLabel})</span>
       </legend>
-      <p id={`contact-${id}-hint`} className="mt-1 text-xs text-slate-400">
+      <p id={`contact-${id}-hint`} className="field-hint mt-1">
         {hint}
       </p>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -278,7 +278,7 @@ function CheckboxGroup({
         })}
       </div>
       {error && (
-        <p id={`contact-${id}-error`} className="mt-2 text-sm text-rose-300">
+        <p id={`contact-${id}-error`} className="field-error">
           {error}
         </p>
       )}

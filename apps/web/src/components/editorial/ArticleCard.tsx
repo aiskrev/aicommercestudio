@@ -54,10 +54,10 @@ export function ArticleCard({
 
   if (variant === "row") {
     return (
-      <article className="group relative grid gap-2 py-6 transition-colors sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8">
-        <div>
+      <article className="focus-frame group relative grid gap-2 py-6 transition-colors sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-8">
+        <div className="min-w-0">
           {meta}
-          <Heading className="t-h3 mt-2 leading-snug transition-colors group-hover:text-brand">{link}</Heading>
+          <Heading className="t-h3 mt-2 leading-snug transition-colors group-focus-within:text-brand group-hover:text-brand">{link}</Heading>
           <p className="mt-1.5 line-clamp-2 text-[15px] leading-relaxed text-fg-muted">{article.description}</p>
         </div>
         <Icon name="arrowRight" className="hidden h-5 w-5 text-brand transition-transform group-hover:translate-x-1 sm:block" />

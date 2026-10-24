@@ -3,6 +3,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { ServiceMotif } from "@/components/sections/ServiceMotif";
+import { EditorialSplit } from "@/components/ui/patterns";
 import { ButtonLink, CheckList, cx, FeatureIndex, FeatureMatrix, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
@@ -94,7 +95,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
       </Section>
 
       <Section labelledBy="ai-managed-title">
-        <div className="card card-accent grid gap-6 p-8 sm:p-10 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+        <div className="card card-accent grid gap-6 p-8 sm:p-10 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center">
           <ServiceMotif service="ai_managed" className="h-20 w-28" />
           <div>
             <h2 id="ai-managed-title" className="t-h2 text-2xl sm:text-3xl">
@@ -109,12 +110,9 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
       </Section>
 
       <Section labelledBy="ai-not-for" alt>
-        <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-          <h2 id="ai-not-for" className="t-h2">
-            {page.notForTitle}
-          </h2>
+        <EditorialSplit aside={<SectionHeading id="ai-not-for" title={page.notForTitle} />}>
           <CheckList items={page.notFor} />
-        </div>
+        </EditorialSplit>
       </Section>
 
       <CtaBand

@@ -14,6 +14,7 @@ import { ServiceMotif } from "@/components/sections/ServiceMotif";
 import { ServiceShowcase } from "@/components/sections/ServiceShowcase";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
+import { EditorialSplit } from "@/components/ui/patterns";
 import { ButtonLink, Container, Eyebrow, Section, SectionHeading } from "@/components/ui/primitives";
 import { categoryByKey, getContent, serviceByKey, sortedArticles } from "@/content";
 import { localizePath } from "@/i18n/config";
@@ -53,7 +54,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <div className="relative overflow-hidden">
         <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
-        <Container className="relative grid items-center gap-10 pb-14 pt-10 sm:gap-12 sm:pt-16 lg:grid-cols-[1.12fr_1fr] lg:gap-14 lg:pb-24 lg:pt-20">
+        <Container className="relative grid items-center gap-10 pb-14 pt-10 sm:gap-12 sm:pt-16 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:gap-14 lg:pb-24 lg:pt-20">
           <div>
             <Eyebrow>{home.hero.eyebrow}</Eyebrow>
             <h1 className="t-display mt-6">
@@ -86,17 +87,17 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
       {/* 3 ---------------------------------------------------------------- curated services */}
       <Section labelledBy="services-title" density="spacious">
-        <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
-          <SectionHeading
-            id="services-title"
-            eyebrow={home.servicesIntro.eyebrow}
-            title={home.servicesIntro.title}
-            lead={home.servicesIntro.lead}
-          />
-          <ButtonLink href={href(routes.services)} variant="secondary" icon="arrowRight" className="self-start lg:self-auto">
-            {dict.common.allServices}
-          </ButtonLink>
-        </div>
+        <SectionHeading
+          id="services-title"
+          eyebrow={home.servicesIntro.eyebrow}
+          title={home.servicesIntro.title}
+          lead={home.servicesIntro.lead}
+          action={
+            <ButtonLink href={href(routes.services)} variant="secondary" icon="arrowRight">
+              {dict.common.allServices}
+            </ButtonLink>
+          }
+        />
         <div className="mt-14">
           <ServiceShowcase
             services={coreServices}
@@ -126,7 +127,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
       {/* 4 ---------------------------------------------------------------- problems → solutions (light) */}
       <Section labelledBy="problems-title" tone="light" density="spacious">
-        <div className="grid gap-6 lg:grid-cols-[1fr_0.8fr] lg:items-end">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:items-end">
           <SectionHeading id="problems-title" eyebrow={home.problems.eyebrow} title={home.problems.title} />
           <p className="t-lead lg:pb-1">{home.problems.lead}</p>
         </div>
@@ -182,12 +183,17 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
       {/* 7 ---------------------------------------------------------------- process (horizontal timeline) */}
       <Section labelledBy="process-title">
-        <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
-          <SectionHeading id="process-title" eyebrow={home.process.eyebrow} title={home.process.title} lead={home.process.lead} />
-          <ButtonLink href={href(routes.process)} variant="ghost" icon="arrowRight" className="self-start lg:self-auto">
-            {dict.common.learnMore}
-          </ButtonLink>
-        </div>
+        <SectionHeading
+          id="process-title"
+          eyebrow={home.process.eyebrow}
+          title={home.process.title}
+          lead={home.process.lead}
+          action={
+            <ButtonLink href={href(routes.process)} variant="ghost" icon="arrowRight">
+              {dict.common.learnMore}
+            </ButtonLink>
+          }
+        />
         <div className="mt-14">
           <ProcessSteps steps={home.process.steps} layout="horizontal" />
         </div>
@@ -206,18 +212,18 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
       {/* 9 ---------------------------------------------------------------- insights */}
       <Section labelledBy="latest-articles-title">
-        <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
-          <SectionHeading
-            id="latest-articles-title"
-            eyebrow={dict.nav.insights}
-            title={dict.editorial.latestTitle}
-            lead={dict.editorial.latestLead}
-          />
-          <ButtonLink href={href(routes.insights)} variant="secondary" icon="arrowRight" className="self-start lg:self-auto">
-            {dict.common.allArticles}
-          </ButtonLink>
-        </div>
-        <div className="mt-12 grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+        <SectionHeading
+          id="latest-articles-title"
+          eyebrow={dict.nav.insights}
+          title={dict.editorial.latestTitle}
+          lead={dict.editorial.latestLead}
+          action={
+            <ButtonLink href={href(routes.insights)} variant="secondary" icon="arrowRight">
+              {dict.common.allArticles}
+            </ButtonLink>
+          }
+        />
+        <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14">
           {featuredArticle && (
             <ArticleCard
               article={featuredArticle}
@@ -248,18 +254,22 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
       {/* 10 --------------------------------------------------------------- FAQ */}
       <Section labelledBy="faq-title" tone="raised">
-        <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
-          <div>
-            <SectionHeading id="faq-title" eyebrow={home.faq.eyebrow} title={home.faq.title} />
-            <p className="mt-6 text-fg-muted">
-              {dict.common.moreQuestions}{" "}
-              <Link href={href(routes.contact)} className="font-semibold text-brand underline-offset-4 hover:underline">
-                {dict.common.writeToUs}
-              </Link>
-            </p>
-          </div>
+        <EditorialSplit
+          sticky
+          aside={
+            <>
+              <SectionHeading id="faq-title" eyebrow={home.faq.eyebrow} title={home.faq.title} />
+              <p className="mt-6 text-fg-muted">
+                {dict.common.moreQuestions}{" "}
+                <Link href={href(routes.contact)} className="font-semibold text-brand underline-offset-4 hover:underline">
+                  {dict.common.writeToUs}
+                </Link>
+              </p>
+            </>
+          }
+        >
           <Faq items={home.faq.items} />
-        </div>
+        </EditorialSplit>
       </Section>
 
       {/* 11 --------------------------------------------------------------- conversion */}

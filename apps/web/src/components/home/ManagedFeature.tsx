@@ -27,7 +27,7 @@ export function ManagedFeature({
   secondary: { href: string; label: string };
 }) {
   return (
-    <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+    <div className="grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16">
       <div>
         <Eyebrow>{eyebrow}</Eyebrow>
         <h2 id={id} className="t-h2 mt-4">

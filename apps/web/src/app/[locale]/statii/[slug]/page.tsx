@@ -87,7 +87,7 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
         ]}
       />
       <article>
-        <Container className="max-w-3xl py-10 sm:py-14">
+        <Container size="reading" className="py-10 sm:py-14">
           <header>
             <div className="flex flex-wrap items-center gap-2 text-sm">
               <span className="badge badge-accent">{dict.ui.articleTypes[article.type]}</span>

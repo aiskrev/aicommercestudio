@@ -88,12 +88,12 @@ export function ServiceShowcase({
           <ul className="mt-6 grid border-t border-line-subtle md:grid-cols-2 md:gap-x-10">
             {core.map((service) => (
               <li key={service.key} className="min-w-0 border-b border-line-subtle">
-                <article className="group relative grid grid-cols-[2.75rem_1fr_auto] items-start gap-4 py-5">
+                <article className="focus-frame group relative grid grid-cols-[2.75rem_minmax(0,1fr)_auto] items-start gap-4 py-5">
                   <span className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand transition-colors group-hover:border-brand/50">
                     <Icon name={service.icon} className="h-5 w-5" />
                   </span>
                   <div className="min-w-0">
-                    <Heading className="t-h3 transition-colors group-hover:text-brand">
+                    <Heading className="t-h3 transition-colors group-focus-within:text-brand group-hover:text-brand">
                       <Link href={hrefFor(service)} className="after:absolute after:inset-0 focus-visible:outline-none">
                         {service.shortTitle}
                       </Link>

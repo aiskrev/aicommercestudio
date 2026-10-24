@@ -1,4 +1,5 @@
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { DiagramFrame } from "@/components/ui/patterns";
 import { cx } from "@/components/ui/primitives";
 
 const ICONS: IconName[] = ["bot", "gauge", "alert", "sparkles", "check"];
@@ -20,12 +21,8 @@ export function AiOpsDiagram({
   vertical?: boolean;
 }) {
   return (
-    <figure className="panel p-5 sm:p-6" data-testid="ai-ops-diagram">
-      <figcaption className="t-label flex items-center gap-3">
-        <span>{title}</span>
-        <span className="h-px flex-1 bg-line-subtle" aria-hidden="true" />
-      </figcaption>
-      <ol className={cx("mt-5 grid gap-2.5", !vertical && "lg:grid-cols-5 lg:gap-0")}>
+    <DiagramFrame title={title} titleId="ai-ops-diagram-title" caption={caption} testId="ai-ops-diagram">
+      <ol className={cx("grid gap-2.5", !vertical && "lg:grid-cols-5 lg:gap-0")}>
         {steps.map((step, index) => {
           const last = index === steps.length - 1;
           return (
@@ -66,10 +63,6 @@ export function AiOpsDiagram({
           );
         })}
       </ol>
-      <p className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-fg-subtle">
-        <Icon name="info" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        {caption}
-      </p>
-    </figure>
+    </DiagramFrame>
   );
 }
