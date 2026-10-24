@@ -34,7 +34,11 @@ Full step-by-step instructions, troubleshooting and the non-Docker workflow: [do
 ```powershell
 .\scripts\test.ps1             # API (pytest + ruff), web (typecheck + lint + unit), e2e (Playwright)
 .\scripts\test.ps1 -Suite audit  # dependency vulnerability audit (pip-audit, npm audit)
+.\scripts\lighthouse.ps1         # Lighthouse lab baseline (mobile + desktop, median of 3)
 ```
+
+The same suites run in GitHub Actions on every pull request and push to `main`
+(`.github/workflows/ci.yml`; weekly dependency audit in `audit.yml`). See [docs/TESTING.md](docs/TESTING.md).
 
 The latest executed results are recorded in [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md).
 

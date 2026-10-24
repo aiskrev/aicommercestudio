@@ -8,7 +8,27 @@ All suites run in Docker; no local Node or Python is needed.
 .\scripts\test.ps1 -Suite web      # docker compose --profile test run --rm --build web-tests
 .\scripts\test.ps1 -Suite e2e      # docker compose up -d --build; docker compose --profile test run --rm --build e2e
 .\scripts\test.ps1 -Suite audit    # pip-audit + npm audit --omit=dev
+.\scripts\lighthouse.ps1           # Lighthouse lab baseline (not a test; see PERFORMANCE_BASELINE.md)
 ```
+
+## Continuous integration (GitHub Actions)
+
+`.github/workflows/ci.yml` runs on every pull request, on pushes to `main` and on demand. Each job
+checks out the repository, creates a throwaway `.env` with `scripts/setup.ps1` (output suppressed,
+values never printed) and calls **the same `scripts/test.ps1` suites** in the same Docker images:
+
+| Job | Command | Extra |
+| --- | --- | --- |
+| `api` | `./scripts/test.ps1 -Suite api` | pytest against PostgreSQL + ruff |
+| `web` | `./scripts/test.ps1 -Suite web` | then `docker compose build web` (production build) |
+| `e2e` | `./scripts/test.ps1 -Suite e2e` | on failure: API/web logs and the Playwright HTML report as an artifact (7 days) |
+
+`.github/workflows/audit.yml` runs `./scripts/test.ps1 -Suite audit` weekly (Monday 05:17 UTC) and
+on demand — not on pull requests, because new advisories appear without code changes.
+
+Runners: `ubuntu-24.04` (Docker and PowerShell 7 are preinstalled). Permissions: `contents: read`.
+Concurrent runs for the same branch are cancelled. Lint the workflows with
+`docker run --rm -v ${PWD}:/repo -w /repo rhysd/actionlint:1.7.7`.
 
 ## Backend — Pytest (`apps/api/tests`)
 
