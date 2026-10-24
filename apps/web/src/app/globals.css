@@ -2,7 +2,7 @@
 
 /* =============================================================================
    A.I. Commerce Studio — design system ("Precision Commerce × Intelligent Automation")
-   Full reference: docs/UI_DESIGN_SYSTEM.md
+   Full reference: docs/DESIGN_SYSTEM.md
 
    Palette (contrast on --surface-page #080f19, WCAG 2.2):
      fg            #f4f7fb  17.3:1      fg-secondary #d3dee8  13.4:1
@@ -157,6 +157,8 @@
   /* Manrope's Bulgarian localized glyphs clash with Inter; use the standard Cyrillic forms. */
   .font-display, .t-display, .t-h1, .t-h2 { font-feature-settings: "locl" 0; }
   p { text-wrap: pretty; }
+  /* In-page anchors land below the sticky header (and a page's sticky sub-navigation). */
+  h2[id], section[id] { scroll-margin-top: calc(var(--header-h) + 4rem); }
   ::selection {
     background: color-mix(in oklab, var(--color-brand) 35%, transparent);
     color: var(--text-primary);
@@ -190,10 +192,9 @@
   .t-body { font-size: 1rem; line-height: 1.65; color: var(--text-muted); }
   .t-label {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 500;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    letter-spacing: 0.01em;
     color: var(--color-fg-muted);
   }
   /* Section label: mono, small square marker. */

@@ -193,22 +193,22 @@ export function ContactForm({
         ref={successRef}
         tabIndex={-1}
         role="status"
-        className="card-accent animate-fade-up rounded-[1.5rem] p-8 outline-none sm:p-10"
+        className="panel border-success/40 p-8 outline-none sm:p-10"
         data-testid="contact-success"
       >
-        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full border border-emerald-300/30 bg-emerald-400/15 text-emerald-200">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-[var(--radius-md)] border border-success/40 bg-success/10 text-success">
           <Icon name="check" className="h-7 w-7" />
         </span>
         <h2 className="t-h2 mt-6 text-2xl sm:text-3xl">{labels.successTitle}</h2>
         <p className="mt-3 text-slate-300">{labels.successLead}</p>
-        <p className="mt-5 inline-flex flex-wrap items-center gap-2 rounded-xl border border-white/[0.08] bg-ink-950/60 px-4 py-3 text-slate-300">
+        <p className="mt-5 inline-flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-line-default bg-surface-page px-4 py-3 text-fg-secondary">
           {labels.successReference}: <strong className="font-mono text-lg tracking-wider text-white">{reference}</strong>
         </p>
         {nextSteps && nextSteps.length > 0 && (
           <ol className="mt-6 grid gap-3">
             {nextSteps.map((step, index) => (
               <li key={step} className="flex gap-3 text-slate-300">
-                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-xs font-semibold text-cyan-200">
+                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[5px] border border-brand/40 font-mono text-xs text-brand">
                   {index + 1}
                 </span>
                 {step}
@@ -230,7 +230,7 @@ export function ContactForm({
     <form
       onSubmit={onSubmit}
       noValidate
-      className="card-accent relative grid gap-6 rounded-[1.5rem] p-6 sm:p-8"
+      className="panel relative grid gap-6 p-6 sm:p-8"
       aria-label={labels.submit}
       aria-busy={status === "submitting" || undefined}
     >
@@ -251,6 +251,7 @@ export function ContactForm({
         </Alert>
       )}
 
+      <FormGroup index={1} label={labels.groupRequest} />
       <fieldset>
         <legend className="mb-2 block text-sm font-medium text-slate-200">{inquiry.legend}</legend>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -306,6 +307,7 @@ export function ContactForm({
         </div>
       </Field>
 
+      <FormGroup index={2} label={labels.groupAbout} />
       <div className="grid gap-6 sm:grid-cols-2">
         <Field id="name" label={labels.name} required requiredLabel={labels.required} error={errors.name}>
           <input
@@ -372,8 +374,9 @@ export function ContactForm({
         </Field>
       </div>
 
+      <FormGroup index={3} label={labels.groupProject} />
       {values.inquiry_type === "quote" && (
-        <div className="grid gap-6 rounded-2xl border border-white/[0.08] bg-ink-950/40 p-4 sm:p-5" data-testid="quote-fields">
+        <div className="grid gap-6 rounded-[var(--radius-lg)] border border-line-subtle bg-surface-page/60 p-4 sm:p-5" data-testid="quote-fields">
           <div className="grid gap-6 sm:grid-cols-3">
             {(
               [
@@ -495,7 +498,7 @@ export function ContactForm({
         />
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 rounded-[var(--radius-md)] border border-line-subtle bg-surface-page/60 p-4 sm:p-5">
         <div>
           <label className="flex cursor-pointer gap-3 text-sm leading-relaxed text-slate-300">
             <input
@@ -552,5 +555,16 @@ export function ContactForm({
         </p>
       </div>
     </form>
+  );
+}
+
+/** Numbered divider that groups related fields (visual only; fields keep their own labels). */
+function FormGroup({ index, label }: { index: number; label: string }) {
+  return (
+    <p className="-mb-1 flex items-center gap-3 text-[13px] font-semibold text-fg-muted" aria-hidden="true">
+      <span className="font-mono text-brand">{String(index).padStart(2, "0")}</span>
+      {label}
+      <span className="h-px flex-1 bg-line-subtle" />
+    </p>
   );
 }

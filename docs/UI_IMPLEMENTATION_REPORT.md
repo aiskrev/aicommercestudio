@@ -16,7 +16,7 @@ neon gradients and gradient text, an orbital "AI hub" hero, the same rounded ico
 Deep navy surfaces, a single teal accent, periwinkle only for AI, amber only for human approval, and
 a light editorial surface that changes the rhythm. Visuals show *how the studio works* (workflows,
 approval gates, discipline-specific schemas) and are always labelled as illustrations/demo data.
-Tokens and rules: [UI_DESIGN_SYSTEM.md](UI_DESIGN_SYSTEM.md).
+Tokens and rules: [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
 
 ## 3. What changed
 
@@ -86,7 +86,7 @@ stages, 4-stage process, capabilities, new final CTA; removed unused technology/
 **Tooling:** `e2e/visual/screenshots.spec.ts` + `e2e/playwright.screens.config.ts` (screenshot and
 overflow capture, not part of the test run); `.gitignore` (screenshot artefacts).
 
-**Docs:** `UI_AUDIT.md`, `UI_DESIGN_SYSTEM.md`, this report; `DESIGN_SYSTEM.md` marked superseded.
+**Docs:** `UI_AUDIT.md`, `DESIGN_SYSTEM.md`, this report; `DESIGN_SYSTEM.md` marked superseded.
 
 ## 5. Screenshots
 

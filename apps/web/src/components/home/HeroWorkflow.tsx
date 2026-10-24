@@ -41,8 +41,8 @@ export function HeroWorkflow({ content }: { content: WorkflowContent }) {
           <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
           <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
         </div>
-        <p className="t-label truncate">{content.label}</p>
-        <span className="rounded-[5px] border border-warning/40 bg-warning/10 px-2 py-0.5 font-mono text-[11px] font-medium text-warning">
+        <p className="t-label min-w-0 truncate">{content.label}</p>
+        <span className="shrink-0 whitespace-nowrap rounded-[5px] border border-warning/40 bg-warning/10 px-2 py-0.5 font-mono text-[11px] font-medium text-warning">
           {content.demo}
         </span>
       </div>
@@ -52,13 +52,13 @@ export function HeroWorkflow({ content }: { content: WorkflowContent }) {
           {content.title}
         </p>
 
-        <ol className="relative mt-4">
+        <ol className="relative mt-3 sm:mt-4">
           {content.steps.map((step, index) => {
             const last = index === content.steps.length - 1;
             const isAi = step.kind === "ai";
             const isApproval = step.kind === "approval";
             return (
-              <li key={step.label} className="relative grid grid-cols-[2.25rem_1fr] gap-3 pb-3.5 last:pb-0">
+              <li key={step.label} className="relative grid grid-cols-[2.25rem_1fr] gap-3 pb-2 last:pb-0 sm:pb-3.5">
                 {!last && <span className="flow-line absolute bottom-0 left-[1.1rem] top-9 w-px" aria-hidden="true" />}
                 <span
                   className={cx(
@@ -92,14 +92,15 @@ export function HeroWorkflow({ content }: { content: WorkflowContent }) {
                       </span>
                     )}
                   </div>
-                  <p className="mt-0.5 text-[13px] leading-snug text-fg-muted">{step.detail}</p>
+                  {/* Phones: titles and status only, so the CTA above stays close to the fold. */}
+                  <p className="mt-0.5 hidden text-[13px] leading-snug text-fg-muted sm:block">{step.detail}</p>
                   {step.code && (
-                    <p className="mt-2 truncate rounded-[5px] bg-surface-page px-2 py-1 font-mono text-[11.5px] text-brand">
+                    <p className="mt-2 hidden truncate rounded-[5px] bg-surface-page px-2 py-1 font-mono text-[11.5px] text-brand sm:block">
                       {step.code}
                     </p>
                   )}
                   {step.output && (
-                    <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 rounded-[5px] bg-surface-page px-2.5 py-1.5 font-mono text-[11.5px]">
+                    <dl className="mt-2 hidden grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 rounded-[5px] bg-surface-page px-2.5 py-1.5 font-mono text-[11.5px] sm:grid">
                       {step.output.map(([key, value]) => (
                         <div key={key} className="contents">
                           <dt className="text-fg-subtle">{key}</dt>

@@ -1,76 +1,118 @@
-# Design system
-
-> Superseded for visual decisions by [UI_DESIGN_SYSTEM.md](UI_DESIGN_SYSTEM.md) (premium redesign, 2026-10-24). Kept for history.
+# UI design system — "Precision Commerce × Intelligent Automation"
 
 Source of truth: `apps/web/src/app/globals.css` (tokens + component classes) and
-`apps/web/src/components/ui/primitives.tsx` (React primitives). No UI library, no icon font,
-no third-party scripts.
+`apps/web/src/components/ui/primitives.tsx` (layout and content primitives). It replaces the
+original V1 design-system notes (see git history before `42173f5`).
 
-## Colour tokens & contrast
+## Direction
 
-Measured WCAG 2.1 contrast ratios (text on the darkest and lightest surfaces used):
+A credible engineering studio, not an "AI agency": deep navy surfaces, one teal brand accent, a
+periwinkle secondary used only for AI-related elements, a warm amber reserved for *human approval*,
+and a light editorial surface that breaks the dark rhythm. Visuals are diagrams of real working
+methods (workflows, approval gates, service-specific schemas), always labelled as illustrations —
+never fake dashboards, metrics, logos or testimonials.
 
-| Token | Value | Use | Contrast |
-| --- | --- | --- | --- |
-| `--surface-page` / `ink-950` | `#050811` | page background | — |
-| `--surface-raised` / `ink-900` | `#0a1020` | alternating sections, highlighted cards | — |
-| `ink-800` | `#121a2c` | card surface (approx.) | — |
-| `--text-primary` | `#f8fafc` | headings | ≥ 15:1 |
-| `--text-secondary` / `slate-300` | `#cbd5e1` | body text | ≥ 10.7:1 |
-| `--text-muted` / `slate-400` | `#94a3b8` | secondary and small text — **the minimum for any text** | ≥ 6.2:1 |
-| accent `cyan-300` | `#67e8f9` | links, eyebrows, focus ring | ≥ 10.9:1 |
-| field border `--border-strong` | `#5b6b85` | input boundaries (non-text, needs 3:1) | 3.7:1 |
-| primary button | `#050811` on `#22d3ee → #3b82f6` | CTA | 11.1 – 5.4:1 |
+## Colour tokens
 
-`slate-500` (≈3.3–4.2:1) and `slate-600` fail AA for text and are not used for text anywhere.
-Purple (`violet-400/500`) is used only as a restrained gradient accent, never for body text.
+| Token (Tailwind name) | Value | Use |
+| --- | --- | --- |
+| `surface-page` / `ink-950` | `#080f19` | page background |
+| `surface-1` | `#0d1724` | cards, raised sections (`tone="raised"`) |
+| `surface-2` | `#111c2b` | icon wells, inputs on cards, nested panels |
+| `surface-3` | `#192a3d` | active states |
+| `surface-light` | `#edf3f4` | light editorial sections (`tone="light"`) |
+| `fg` | `#f4f7fb` | headings, primary text (17.3:1) |
+| `fg-secondary` | `#d3dee8` | body on dark (13.4:1) |
+| `fg-muted` | `#a9b9c9` | supporting text (9.2:1) |
+| `fg-subtle` | `#7d8fa3` | captions ≥ 12 px only (5.6:1) |
+| `brand` | `#69d9df` | links, accents, primary button (11.3:1) |
+| `brand-2` | `#83a9f9` | AI-specific elements only |
+| `warning` | `#f2c46d` | human approval, alerts |
+| `success` / `danger` | `#5fd4a0` / `#f47a8a` | status |
+| `ink` / `ink-muted` / `brand-ink` | `#14232d` / `#45606e` / `#0f6f75` | text on the light surface (14.6 / 6.0 / 5.4:1) |
+| `line-subtle` / `line-default` / `line-strong` | 12 % / 20 % / `#4d6178` | hairlines, borders, field borders (≥ 3:1) |
+
+Compatibility: Tailwind's `slate`, `cyan`, `blue` and `violet` scales are re-tuned in `@theme` to the
+brand neutrals/accents, so older utility classes follow the new identity. New code uses the semantic
+names above. No component should hard-code hex values (the logo SVG is the documented exception).
 
 ## Typography
 
-Inter (body) + Manrope (headings), self-hosted via `next/font` with Latin and Cyrillic subsets.
-Headings disable Manrope's Bulgarian localized glyphs (`locl`) for consistency with the body font.
+| Role | Face | Size / weight | Class |
+| --- | --- | --- | --- |
+| Display (hero H1) | Manrope 700 | clamp(2.35 → 4.15 rem), lh 1.02, −0.03em | `t-display` |
+| Page H1 | Manrope 700 | clamp(2.15 → 3.6 rem) | `t-h1` |
+| Section H2 | Manrope 700 | clamp(1.8 → 3 rem) | `t-h2` |
+| Large H3 | Inter 600 | clamp(1.3 → 1.75 rem) | `t-h3-lg` |
+| H3 | Inter 600 | 19 px | `t-h3` |
+| Lead | Inter 400 | clamp(17 → 20 px), lh 1.65 | `t-lead` |
+| Body | Inter 400 | 16 px, lh 1.6 | — |
+| Labels, eyebrows, technical data | JetBrains Mono 400/500 | 12.5–13 px, sentence case | `t-label`, `t-eyebrow` |
 
-| Class | Size | Use |
-| --- | --- | --- |
-| `.t-display` | clamp(2.35rem → 4.25rem) | homepage H1 |
-| `.t-h1` | clamp(2.1rem → 3.4rem) | page H1 |
-| `.t-h2` | clamp(1.75rem → 2.6rem) | section titles |
-| `.t-h3` | 1.125rem / 600 | card titles |
-| `.t-lead` | clamp(1.05rem → 1.25rem), muted | intro paragraphs |
-| `.t-eyebrow` | 0.75rem, uppercase, tracked, cyan | section labels |
+* All three faces are loaded with `next/font` (self-hosted, Latin + Cyrillic).
+* Manrope's Bulgarian localized glyphs (`locl`) are switched off for every Manrope usage so
+  headings match Inter's standard Cyrillic forms; Manrope is used only at display sizes, small
+  headings use Inter (better Cyrillic spacing at 16–20 px).
+* No body-like text below 13.5 px; captions at 12 px only for metadata.
 
-## Spacing & layout
+## Spacing, radius, elevation
 
-Container `max-w-7xl` with 16 / 24 / 32 px gutters; sections `py-16 sm:py-24`; card padding 20–32 px;
-radius 0.8 rem (fields), 1.25 rem (cards), 1.75 rem (feature panels). Alternating sections use `Section alt`.
+* Container `max-w-[76rem]` with 16/24/32 px gutters.
+* Section density: `compact` (48/64 px), `default` (64/96 px), `spacious` (80/112/128 px).
+* Radius: `sm 6px` badges, `md 10px` buttons/inputs/icon wells, `lg 14px` cards, `xl 20px` panels.
+* Elevation: hairline borders first; `--shadow-panel` only for floating panels (hero workflow, menus,
+  CTA); `--shadow-lift` on hover for interactive cards.
 
 ## Components
 
-| Component | Classes / API | States |
+| Component | File | Notes |
 | --- | --- | --- |
-| Button | `Button`, `ButtonLink`, `buttonClass(variant, size)`; variants `primary`, `secondary`, `ghost`, `danger`, `dangerOutline`; sizes `sm`, `md`, `lg` | hover, active (1px press), focus-visible ring, disabled, `loading` (spinner + `aria-busy`, disabled) |
-| Card | `.card`, `.card-interactive` (hover lift + glow, focus ring via `:has(:focus-visible)`), `.card-accent` (gradient hairline border) | hover, keyboard focus |
-| Field | `.field` (input/select/textarea), `.checkbox` | hover, focus (cyan ring), invalid (`aria-invalid`), disabled |
-| Badge | `Badge`, `.badge`, `.badge-accent` | — |
-| Alert | `Alert tone="info|success|warning|error"` | used for form, page and admin errors |
-| Skeleton | `Skeleton`, `.skeleton` (shimmer) | admin `LoadingState`, `StatsSkeleton` |
-| Empty state | `EmptyState` (admin) | icon, title, description, optional action |
-| Accordion | `Faq` (native `<details>`) | animated open/close where `::details-content` is supported |
-| Process diagram | `ProcessTimeline` | horizontal on desktop, vertical on mobile |
-| Navigation | `Header` | services mega menu (Escape / outside click / focus return), full-height mobile panel with scroll lock and focus management |
+| `Section` | `ui/primitives.tsx` | `tone`: `default` / `raised` / `light`; `density` |
+| `Eyebrow`, `SectionHeading`, `PageHero` | `ui/primitives.tsx` | mono eyebrow with a square marker |
+| Buttons (`btn-primary/secondary/ghost/danger`) | `globals.css` | solid teal primary, 10 px radius, ≥ 44 px tall (md/lg) |
+| `FeatureIndex` | `ui/primitives.tsx` | rows with hairlines (instead of card grids) |
+| `FeatureMatrix` | `ui/primitives.tsx` | hairline matrix for light sections |
+| `ServiceShowcase` | `sections/ServiceShowcase.tsx` | curated service hierarchy: *AI & automation* (custom AI, automation, AI Managed Services) as large panels with a motif header, *core operations* as compact rows; groups derived from service keys (no hard-coded count) |
+| `ServiceMotif` | `sections/ServiceMotif.tsx` | small per-discipline line drawing (decorative) |
+| `ServiceConcept` | `sections/ServiceConcept.tsx` | service-page hero schema: cycle / tree / stack / flow / funnel / hub / checklist from the service's own workflow |
+| `HeroWorkflow` | `home/HeroWorkflow.tsx` | product-style demo of a controlled automation (labelled demo data) |
+| `AiPipeline` | `home/AiPipeline.tsx` | 5 stages + "AI may" / "requires approval" lanes |
+| `ProcessSteps` | `home/ProcessSteps.tsx` | `vertical` (service pages, mono numerals on a rail) or `horizontal` (homepage timeline from `lg`) |
+| `CredibilityStrip` | `home/CredibilityStrip.tsx` | compact capability strip under the hero (no logos, no numbers) |
+| `ManagedFeature` | `home/ManagedFeature.tsx` | AI Managed Services feature: positioning, plans by audience with "custom quote", lifecycle diagram |
+| `AdvisorShowcase` | `home/AdvisorShowcase.tsx` | product showcase on the light surface: how it works, sample input → structured output excerpt (labelled), link to the real tool |
+| `ProblemIndex`, `CapabilityMatrix` | `home/*` | light editorial sections |
+| `ArticleCard` | `editorial/ArticleCard.tsx` | `card` / `featured` / `row` variants |
+| `AiOpsDiagram` | `sections/AiOpsDiagram.tsx` | horizontal or `vertical` (AI Managed hero) |
+| `CtaBand` | `sections/CtaBand.tsx` | panel variant (inner pages) or `emphasis` (full-bleed display statement, homepage close) |
+| `Footer` | `layout/Footer.tsx` | statement + CTA row, services (2 columns) / company / legal, meta row |
+| Contact `FormGroup` | `contact/ContactForm.tsx` | numbered visual dividers: request → about you → project (fields keep their labels) |
+| AI Managed sub-navigation | `uslugi/ai-managed-services/page.tsx` | sticky in-page nav under the header with a compact CTA; examples behind a `<details>` disclosure |
+
+Colour semantics in diagrams: teal = system/integration, periwinkle = AI suggestion, amber = human
+approval, green = completed outcome.
 
 ## Motion
 
-All animations use `transform`, `opacity` or `stroke-dashoffset` (hero data packets) — no layout
-animation, no JavaScript animation loop. `prefers-reduced-motion: reduce` shortens every animation and
-transition to ~0 and hides purely decorative motion (`.motion-decorative`, e.g. moving data packets);
-skeleton shimmer becomes static.
+Only where it explains: hover lift on interactive cards, the nav underline, the "flowing" dashed
+connector in the hero workflow, accordion height. All motion is disabled under
+`prefers-reduced-motion: reduce`; every diagram is complete and readable when static.
 
-## Accessibility checklist
+## Accessibility rules
 
-- Skip link to `#main`; landmarks (`header`, `nav` with labels, `main`, `footer`); breadcrumbs `aria-current`
-- Visible `:focus-visible` ring (cyan, 2px, offset) on all interactive elements, including stretched-link cards
-- Menus: `aria-expanded` / `aria-controls`, Escape closes and returns focus, mobile menu moves focus into the panel
-- Forms: labels for every field, required markers with screen-reader text, `aria-invalid` + `aria-describedby`
-  error messages, error summary with focus management, `aria-busy` while submitting, success announced via `role="status"`
-- Decorative SVG/graphics are `aria-hidden`; icons are `focusable="false"`
+* Text contrast ≥ 4.5:1 (values above); non-text UI ≥ 3:1 (`line-strong` for fields).
+* Visible 2 px focus ring (`brand`, `brand-ink` on light surfaces).
+* Touch targets ≥ 40 px (language links 36 × 40 px inside a 44 px group; buttons ≥ 44 px).
+* Stretched-link cards keep the heading as the accessible name; decorative SVGs are `aria-hidden`.
+
+## Composition rules (editorial redesign)
+
+* No two consecutive sections share the same composition. The homepage sequence is: hero (split) →
+  capability strip → curated services (panels + rows) → problem index (light) → full-width editorial
+  headline with pipeline → AI Managed feature (raised, split) → horizontal timeline → product
+  showcase (light) → editorial insights → FAQ (raised) → full-bleed closing statement.
+* Light sections are used where contrast carries meaning (client problems, the product showcase,
+  technical checks, principles), not alternated mechanically.
+* Cards are reserved for things that are clickable or comparable (services, plans, articles);
+  lists of facts use rows with hairlines (`FeatureIndex`) or matrices (`FeatureMatrix`).
+* Uppercase is limited to tiny metadata; labels are sentence case.

@@ -1,7 +1,7 @@
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
-import { ServiceBento } from "@/components/sections/ServiceBento";
+import { ServiceShowcase } from "@/components/sections/ServiceShowcase";
 import { ServiceMotif } from "@/components/sections/ServiceMotif";
 import { ButtonLink, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
@@ -47,11 +47,12 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
       <PageHero eyebrow={servicesPage.eyebrow} title={servicesPage.title} lead={servicesPage.lead} />
 
       <Section>
-        <ServiceBento
+        <ServiceShowcase
           services={coreServices}
           hrefFor={(service) => href(routes.service(service.slug))}
           cta={dict.common.learnMore}
-          headingLevel={2}
+          groups={home.servicesIntro.groups}
+          groupHeadingLevel={2}
         />
 
         <div className="mt-10 grid gap-6 rounded-[var(--radius-lg)] border border-dashed border-line-strong p-7 sm:p-9 lg:grid-cols-[auto_1fr_auto] lg:items-center">

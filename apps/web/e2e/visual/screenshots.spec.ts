@@ -34,8 +34,10 @@ const PAGES: [string, string][] = [
 // Optional filters for quick iterations: SHOT_ONLY=home-bg,home-en  SHOT_WIDTHS=1440,390
 const ONLY = (process.env.SHOT_ONLY ?? "").split(",").filter(Boolean);
 const WIDTHS = (process.env.SHOT_WIDTHS ?? "").split(",").filter(Boolean).map(Number);
-const FULL = [1440, 390].filter((w) => !WIDTHS.length || WIDTHS.includes(w));
-const CHECK_ONLY = [1024, 768, 360].filter((w) => !WIDTHS.length || WIDTHS.includes(w));
+// SHOT_FULL=all also saves full-page screenshots at 1024 / 768 / 360 (default: overflow check only).
+const FULL_ALL = process.env.SHOT_FULL === "all";
+const FULL = (FULL_ALL ? [1440, 1024, 768, 390, 360] : [1440, 390]).filter((w) => !WIDTHS.length || WIDTHS.includes(w));
+const CHECK_ONLY = (FULL_ALL ? [] : [1024, 768, 360]).filter((w) => !WIDTHS.length || WIDTHS.includes(w));
 const SELECTED = ONLY.length ? PAGES.filter(([name]) => ONLY.includes(name)) : PAGES;
 
 test.describe.configure({ mode: "serial" });

@@ -27,29 +27,33 @@ export function Footer({ locale, dict, services }: { locale: Locale; dict: Dicti
   ];
 
   return (
-    <footer className="relative mt-auto border-t border-white/[0.06] bg-ink-950">
-      <div className="divider-glow" aria-hidden="true" />
-      <Container className="grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer className="relative mt-auto border-t border-line-subtle bg-ink-950">
+      {/* statement + primary action */}
+      <Container className="grid gap-8 border-b border-line-subtle py-12 lg:grid-cols-[1.4fr_1fr] lg:items-end lg:py-16">
         <div>
           <Logo href={href(routes.home)} />
-          <p className="mt-4 max-w-sm leading-relaxed text-slate-400">{dict.footer.tagline}</p>
-          <ButtonLink href={href(routes.contact)} variant="secondary" icon="arrowRight" className="mt-6">
+          <p className="mt-6 max-w-2xl font-display text-[clamp(1.35rem,1.1rem+0.8vw,1.75rem)] font-bold leading-snug tracking-[-0.02em] text-fg">
+            {dict.footer.tagline}
+          </p>
+        </div>
+        <div className="flex flex-col gap-4 lg:items-end">
+          <ButtonLink href={href(routes.contact)} variant="secondary" icon="arrowRight">
             {dict.nav.cta}
           </ButtonLink>
           {(site.contactEmail || site.contactPhone) && (
-            <ul className="mt-5 grid gap-2 text-sm">
+            <ul className="grid gap-2 text-sm lg:text-right">
               {site.contactEmail && (
                 <li>
-                  <a href={`mailto:${site.contactEmail}`} className="inline-flex items-center gap-2 text-slate-300 hover:text-white">
-                    <Icon name="mail" className="h-4 w-4 text-cyan-300" />
+                  <a href={`mailto:${site.contactEmail}`} className="inline-flex items-center gap-2 text-fg-secondary hover:text-fg">
+                    <Icon name="mail" className="h-4 w-4 text-brand" />
                     {site.contactEmail}
                   </a>
                 </li>
               )}
               {site.contactPhone && (
                 <li>
-                  <a href={`tel:${site.contactPhone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-slate-300 hover:text-white">
-                    <Icon name="phone" className="h-4 w-4 text-cyan-300" />
+                  <a href={`tel:${site.contactPhone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-fg-secondary hover:text-fg">
+                    <Icon name="phone" className="h-4 w-4 text-brand" />
                     {site.contactPhone}
                   </a>
                 </li>
@@ -57,17 +61,23 @@ export function Footer({ locale, dict, services }: { locale: Locale; dict: Dicti
             </ul>
           )}
         </div>
+      </Container>
+
+      {/* link groups */}
+      <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr] lg:gap-16">
         <FooterColumn
           title={dict.footer.services}
           links={services.map((s) => ({ href: href(routes.service(s.slug)), label: s.shortTitle }))}
+          columns={2}
         />
         <FooterColumn title={dict.footer.company} links={company} />
         <div>
           <FooterColumn title={dict.footer.legal} links={legal} />
-          <p className="mt-4 text-xs leading-relaxed text-slate-400">{dict.footer.draftNote}</p>
+          <p className="mt-5 max-w-xs text-xs leading-relaxed text-fg-subtle">{dict.footer.draftNote}</p>
         </div>
       </Container>
-      <Container className="flex flex-col gap-2 border-t border-white/[0.06] py-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+
+      <Container className="flex flex-col gap-2 border-t border-line-subtle py-6 text-xs text-fg-subtle sm:flex-row sm:items-center sm:justify-between">
         <p>
           © {new Date().getFullYear()} {site.name}. {dict.footer.rights}
         </p>
@@ -77,14 +87,22 @@ export function Footer({ locale, dict, services }: { locale: Locale; dict: Dicti
   );
 }
 
-function FooterColumn({ title, links }: { title: string; links: { href: string; label: string }[] }) {
+function FooterColumn({
+  title,
+  links,
+  columns = 1,
+}: {
+  title: string;
+  links: { href: string; label: string }[];
+  columns?: 1 | 2;
+}) {
   return (
     <div>
-      <h2 className="text-sm font-semibold text-white">{title}</h2>
-      <ul className="mt-4 grid gap-2.5">
+      <h2 className="text-[13px] font-semibold text-fg-muted">{title}</h2>
+      <ul className={`mt-4 grid gap-x-8 gap-y-2.5 ${columns === 2 ? "sm:grid-cols-2" : ""}`}>
         {links.map((link) => (
           <li key={link.href}>
-            <Link href={link.href} className="text-sm text-slate-300 transition-colors hover:text-cyan-200">
+            <Link href={link.href} className="text-[15px] text-fg-secondary transition-colors hover:text-brand">
               {link.label}
             </Link>
           </li>
