@@ -36,6 +36,11 @@ Compatibility: Tailwind's `slate`, `cyan`, `blue` and `violet` scales are re-tun
 brand neutrals/accents, so older utility classes follow the new identity. New code uses the semantic
 names above. No component should hard-code hex values (the logo SVG is the documented exception).
 
+Logo: the V1 monogram (`layout/Logo.tsx`) — an "A" in a cyan → blue → violet gradient-outlined tile
+with a node at the top right, the same drawing as the favicon (`app/icon.svg`). The wordmark is
+"A.I. Commerce" in Manrope 600 with "Studio" in the same gradient (`.logo-gradient-text`, plain
+`CanvasText` in forced-colours mode). These gradient stops are the only place the violet appears.
+
 ## Typography
 
 | Role | Face | Size / weight | Class |
