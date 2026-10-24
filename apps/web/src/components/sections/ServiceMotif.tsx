@@ -93,7 +93,7 @@ export function ServiceMotif({ service, className }: { service: ServiceKey; clas
         <rect x="36" y="10" width="48" height="60" rx="5" stroke={muted} {...common} />
         {[24, 38, 52].map((y, i) => (
           <g key={y}>
-            <path d={`m44 ${y}3 3 5-6`} stroke={i < 2 ? stroke : muted} {...common} />
+            <path d={`m44 ${y} 3 3 5-6`} stroke={i < 2 ? stroke : muted} {...common} />
             <path d={`M58 ${y + 1}h18`} stroke={muted} {...common} />
           </g>
         ))}

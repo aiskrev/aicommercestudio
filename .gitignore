@@ -38,3 +38,6 @@ backups/
 
 # Visual review screenshots (local artefacts)
 apps/web/e2e/screenshots/
+
+# Lighthouse lab results (summaries are copied into docs/)
+apps/web/e2e/perf-results/

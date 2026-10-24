@@ -1,0 +1,72 @@
+# Mirrors scripts/test.ps1: every suite runs in the same Docker images as locally.
+# Secrets are generated per run by scripts/setup.ps1 (throwaway values, never printed).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  api:
+    name: API (pytest + ruff)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate local .env
+        run: ./scripts/setup.ps1 6>$null | Out-Null
+      - name: Run API suite
+        run: ./scripts/test.ps1 -Suite api
+      - name: Stop containers
+        if: always()
+        run: docker compose --profile test down --volumes
+
+  web:
+    name: Web (typecheck + lint + unit)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate local .env
+        run: ./scripts/setup.ps1 6>$null | Out-Null
+      - name: Run web suite
+        run: ./scripts/test.ps1 -Suite web
+      - name: Production build
+        run: docker compose build web
+
+  e2e:
+    name: End-to-end (Playwright)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate local .env
+        run: ./scripts/setup.ps1 6>$null | Out-Null
+      - name: Run e2e suite
+        run: ./scripts/test.ps1 -Suite e2e
+      - name: Service logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail 200 api web
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: apps/web/e2e/playwright-report
+          retention-days: 7
+      - name: Stop containers
+        if: always()
+        run: docker compose --profile test down --volumes
