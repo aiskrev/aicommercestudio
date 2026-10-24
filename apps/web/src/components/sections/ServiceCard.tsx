@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/Icon";
 import { cx } from "@/components/ui/primitives";
 import type { Service } from "@/content/types";
 
-/** Compact service tile used for related-service lists (the main directories use ServiceBento). */
+/** Compact service tile used for related-service lists (the main directories use ServiceShowcase). */
 export function ServiceCard({
   service,
   href,

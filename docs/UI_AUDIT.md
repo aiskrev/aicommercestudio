@@ -46,3 +46,24 @@ differentiator.
 ## Responsiveness baseline (horizontal overflow in px, `overflow.json`)
 
 All 16 routes: 0 px at 1440 / 1024 / 768 / 390. At 360: `services-bg` 7 px, `services-en` 3 px.
+
+---
+
+## Round 2 — editorial redesign brief (2026-10-24)
+
+Base: branch `redesign/premium-ui` @ `42173f5` (the first redesign; `main` still has the original
+design). Work continues on `design/premium-editorial-redesign`. Baseline: 10 key pages × 5 widths
+(1440 / 1024 / 768 / 390 / 360) in `apps/web/e2e/screenshots/baseline2/`.
+
+| # | Severity | Files | Finding | Impact | Planned solution |
+| --- | --- | --- | --- | --- | --- |
+| R1 | **High** | `sections/ServiceBento.tsx`, home, `/uslugi` | Featured tiles are maintenance and AI Managed Services; AI development and automation look like supporting services. | The offering's lead proposition (AI + automation) is not visually leading. | Two curated groups: *AI & automation* (three large panels: custom AI, automation, AI Managed Services) and *core operations* (four compact rows); groups derived from service keys, nothing hard-coded by count. |
+| R2 | **High** | home, `advisor/AdvisorPromo.tsx` | The AI Automation Advisor appears only as a promo banner. | No tangible proof of engineering competence. | Product showcase: example input → structured output preview (labelled sample), what it does, link to the real tool. |
+| R3 | **High** | home | No homepage feature for AI Managed Services and no compact credibility strip after the hero. | The newest service is only one tile; first scroll lacks trust signals. | Dedicated AI Managed Services feature (lifecycle + plans, no prices/SLA) and a concise capability strip (platforms, practices — no logos, no numbers). |
+| R4 | Medium | `home/HeroWorkflow.tsx` | On phones the full workflow panel (~800 px) follows the CTA. | Long first scroll on mobile. | Compact mobile variant (key steps only, details from `sm`). |
+| R5 | Medium | `uslugi/ai-managed-services/page.tsx` | 13 dense sections; navigation chips only in the hero; long lists of equal weight. | Hard to scan; key information buried. | Sticky in-page navigation, grouped capability chapters with progressive disclosure, clearer plan comparison, CTAs between chapters. |
+| R6 | Medium | `layout/Footer.tsx` | Four equal link columns. | Generic, no editorial hierarchy. | Statement + CTA row, grouped service/company/legal columns, quiet meta row. |
+| R7 | Medium | `contact/ContactForm.tsx`, `kontakti/page.tsx` | One long list of fields. | Form feels heavier than it is. | Visual grouping (inquiry type, about you, project), calmer surfaces; schema/API unchanged. |
+| R8 | Low | `ProcessSteps` on home | Vertical sequence repeats the rhythm of the problem index. | Less variety. | Horizontal timeline on desktop (vertical on mobile). |
+| R9 | Low | `sections/HeroVisual.tsx`, dictionaries `ui.heroVisual` | Orbital hero component no longer used. | Dead code. | Remove after checking references. |
+| R10 | Low | `globals.css` `.t-label` | Uppercase mono labels used often. | Visual noise, harder Cyrillic reading. | Sentence-case labels; uppercase only for tiny metadata. |

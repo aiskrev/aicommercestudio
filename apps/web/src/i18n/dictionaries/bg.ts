@@ -148,6 +148,9 @@ export const bg = {
     budgetNote: "Бюджетът е ориентир за обхвата и не е обвързваща цена.",
   },
   form: {
+    groupRequest: "Запитване",
+    groupAbout: "За вас",
+    groupProject: "Проектът",
     formTitle: "Запитване за проект",
     requiredNote: "Полетата, отбелязани със *, са задължителни.",
     secureNote: "Използваме данните само за отговор на запитването.",
@@ -259,20 +262,6 @@ export const bg = {
     firstStepBadge: "Препоръчителна първа стъпка",
     processResult: "Резултат",
     articleTypes: { guide: "Ръководство", checklist: "Чеклист", comparison: "Сравнение", explainer: "Обяснение" },
-    heroVisual: {
-      core: "AI оркестрация",
-      coreSub: "с човешко одобрение",
-      actionLabel: "Действие на AI агент",
-      actionText: "Промяна на цена → чака одобрение",
-      nodes: [
-        { label: "Онлайн магазин", sub: "Shopify · WooCommerce" },
-        { label: "CRM и ERP", sub: "API · webhooks" },
-        { label: "SEO", sub: "индексиране · CWV" },
-        { label: "Анализи", sub: "GA4 · табла" },
-        { label: "Автоматизации", sub: "планирани задачи" },
-        { label: "Сигурност", sub: "достъп · журнал" },
-      ],
-    },
     caseStudies: {
       eyebrow: "Проекти",
       title: "Реализирани проекти",

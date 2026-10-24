@@ -12,13 +12,47 @@ export function CtaBand({
   primary,
   secondary,
   points,
+  emphasis = false,
 }: {
   title: string;
   lead: string;
   primary: { href: string; label: string };
   secondary?: { href: string; label: string };
   points?: string[];
+  /** Full-bleed closing statement with display-size type (homepage). */
+  emphasis?: boolean;
 }) {
+  if (emphasis) {
+    return (
+      <section className="relative overflow-hidden border-t border-line-subtle" aria-labelledby="cta-title">
+        <div className="grid-backdrop pointer-events-none absolute inset-0 opacity-80" aria-hidden="true" />
+        <span className="absolute inset-x-0 top-0 h-px bg-brand/70" aria-hidden="true" />
+        <Container className="relative py-20 sm:py-28 lg:py-32">
+          <h2 id="cta-title" className="t-display max-w-4xl">
+            {title}
+          </h2>
+          <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+            <p className="t-lead max-w-2xl">{lead}</p>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <ButtonLink href={primary.href} size="lg" icon="arrowRight" className="w-full sm:w-auto">
+                {primary.label}
+              </ButtonLink>
+              {secondary && (
+                <Link
+                  href={secondary.href}
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-fg-secondary underline decoration-line-strong underline-offset-4 hover:text-fg hover:decoration-brand"
+                >
+                  {secondary.label}
+                  <Icon name="arrowRight" className="h-4 w-4" />
+                </Link>
+              )}
+            </div>
+          </div>
+        </Container>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 sm:py-24" aria-labelledby="cta-title">
       <Container>

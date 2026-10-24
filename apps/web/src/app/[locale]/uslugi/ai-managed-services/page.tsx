@@ -12,7 +12,6 @@ import {
   CheckList,
   Container,
   Eyebrow,
-  FeatureCard,
   FeatureIndex,
   Section,
   SectionHeading,
@@ -113,36 +112,44 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
           <blockquote className="mt-10 max-w-3xl border-l-2 border-brand pl-5 text-lg leading-relaxed text-fg-secondary">
             {page.hero.positioning}
           </blockquote>
-          <nav aria-label={dict.common.onThisPage} className="mt-10">
-            <ul className="flex flex-wrap gap-2">
-              {page.sectionNav.map((item) => (
-                <li key={item.id}>
-                  <a href={`#${item.id}`} className="badge transition-colors hover:border-brand/50 hover:text-fg">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
           </div>
           <AiOpsDiagram title={page.diagram.title} caption={page.diagram.caption} steps={page.diagram.steps} vertical />
         </Container>
       </div>
 
+      {/* in-page navigation: stays under the header while reading the long page */}
+      <nav aria-label={dict.common.onThisPage} className="sticky top-16 z-30 border-b border-line-subtle bg-ink-950/92 backdrop-blur-md">
+        <Container>
+          <ul className="-mx-1 flex gap-1 overflow-x-auto py-2.5 [scrollbar-width:none]">
+            {page.sectionNav.map((item) => (
+              <li key={item.id} className="shrink-0">
+                <a
+                  href={`#${item.id}`}
+                  className="inline-flex h-9 items-center rounded-[var(--radius-sm)] px-3 text-sm font-medium text-fg-muted transition-colors hover:bg-surface-2 hover:text-fg"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+            <li className="ml-auto shrink-0 pl-2">
+              <a href="#ams-inquiry" className="btn btn-primary btn-sm">
+                {page.hero.primaryCta}
+              </a>
+            </li>
+          </ul>
+        </Container>
+      </nav>
+
       {/* 2. value proposition */}
       <Section labelledBy="ams-value">
         <SectionHeading id="ams-value" title={page.value.title} lead={page.value.lead} />
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {page.value.items.map((item) => (
-            <FeatureCard key={item.title} {...item} />
-          ))}
-        </div>
+        <FeatureIndex items={page.value.items} className="mt-10" />
         <h3 className="t-h3 mt-14 text-xl">{page.value.differentiationTitle}</h3>
-        <dl className="mt-6 grid gap-4 md:grid-cols-2">
+        <dl className="mt-6 border-t border-line-subtle">
           {page.value.differentiation.map((row) => (
-            <div key={row.other} className="card p-5">
-              <dt className="text-sm font-semibold text-cyan-200">{row.other}</dt>
-              <dd className="mt-2 leading-relaxed text-slate-300">{row.difference}</dd>
+            <div key={row.other} className="grid gap-2 border-b border-line-subtle py-5 md:grid-cols-[16rem_1fr] md:gap-8">
+              <dt className="font-semibold text-fg">{row.other}</dt>
+              <dd className="leading-relaxed text-fg-muted">{row.difference}</dd>
             </div>
           ))}
         </dl>
@@ -175,29 +182,35 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
       {/* 5. what we monitor */}
       <Section labelledBy="ams-monitoring" alt>
         <SectionHeading id="ams-monitoring" title={page.monitoring.title} lead={page.monitoring.lead} />
-        <div className="mt-10 grid gap-5 lg:grid-cols-2">
-          <div className="card p-6 sm:p-7">
-            <h3 className="t-h3 text-lg">{page.monitoring.availableTitle}</h3>
+        <div className="mt-10 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line-subtle bg-line-subtle lg:grid-cols-2">
+          <div className="bg-surface-1 p-6 sm:p-8">
+            <p className="inline-flex items-center gap-2 text-sm font-semibold text-success">
+              <span className="h-2 w-2 rounded-full bg-success" aria-hidden="true" />
+              {page.monitoring.availableTitle}
+            </p>
             <CheckList items={page.monitoring.available} className="mt-5" />
           </div>
-          <div className="card p-6 sm:p-7">
-            <h3 className="t-h3 text-lg">{page.monitoring.integrationsTitle}</h3>
+          <div className="bg-surface-1 p-6 sm:p-8">
+            <p className="inline-flex items-center gap-2 text-sm font-semibold text-warning">
+              <span className="h-2 w-2 rounded-full bg-warning" aria-hidden="true" />
+              {page.monitoring.integrationsTitle}
+            </p>
             <CheckList items={page.monitoring.integrations} className="mt-5" />
           </div>
         </div>
-        <p className="mt-6 flex max-w-3xl gap-2 text-sm text-slate-400">
+        <p className="mt-5 flex max-w-3xl gap-2 text-sm text-fg-muted">
           <Icon name="info" className="mt-0.5 h-4 w-4 shrink-0" />
           {page.monitoring.note}
         </p>
-        <div className="mt-12 grid gap-5 lg:grid-cols-2">
-          <div className="card p-6 sm:p-7">
-            <h3 className="t-h3 text-lg">{page.maintenance.title}</h3>
-            <p className="mt-2 text-slate-400">{page.maintenance.lead}</p>
+        <div className="mt-16 grid gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <h3 className="t-h3-lg">{page.maintenance.title}</h3>
+            <p className="mt-2 text-fg-muted">{page.maintenance.lead}</p>
             <CheckList items={page.maintenance.items} className="mt-5" />
-            <p className="mt-5 text-sm text-slate-400">{page.maintenance.boundary}</p>
+            <p className="mt-5 border-l-2 border-warning/60 pl-4 text-sm text-fg-muted">{page.maintenance.boundary}</p>
           </div>
-          <div className="card p-6 sm:p-7">
-            <h3 className="t-h3 text-lg">{page.improvement.title}</h3>
+          <div>
+            <h3 className="t-h3-lg">{page.improvement.title}</h3>
             <CheckList items={page.improvement.items} className="mt-5" />
           </div>
         </div>
@@ -206,27 +219,34 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
       {/* 6. quality and reliability */}
       <Section labelledBy="ams-quality">
         <SectionHeading id="ams-quality" title={page.quality.title} lead={page.quality.lead} />
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-10 grid gap-x-12 md:grid-cols-2">
           {page.quality.items.map((item) => (
-            <li key={item.title} className="card p-5">
-              <p className="font-semibold text-white">{item.title}</p>
-              <p className="mt-1 text-sm text-slate-400">{item.description}</p>
+            <li key={item.title} className="border-t border-line-subtle py-5">
+              <p className="font-semibold text-fg">{item.title}</p>
+              <p className="mt-1 text-[15px] leading-relaxed text-fg-muted">{item.description}</p>
             </li>
           ))}
         </ul>
-        <p className="mt-6 max-w-3xl text-sm text-slate-400">{page.quality.disclaimer}</p>
-        <h3 className="t-h3 mt-12 text-xl">{page.quality.examplesTitle}</h3>
-        <p className="mt-2 inline-flex rounded-full border border-amber-300/30 bg-amber-300/[0.07] px-3 py-1 text-xs font-semibold text-amber-100">
-          {page.quality.examplesNote}
-        </p>
-        <div className="mt-6 grid gap-5 md:grid-cols-2">
-          {page.quality.examples.map((example) => (
-            <div key={example.system} className="card p-6" data-testid="evaluation-example">
-              <p className="font-semibold text-white">{example.system}</p>
-              <CheckList items={example.criteria} className="mt-4 text-sm" />
-            </div>
-          ))}
-        </div>
+        <p className="mt-4 max-w-3xl text-sm text-fg-muted">{page.quality.disclaimer}</p>
+        <details className="accordion group mt-10 rounded-[var(--radius-lg)] border border-line-default bg-surface-1">
+          <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-3 px-6 py-5 [&::-webkit-details-marker]:hidden">
+            <span>
+              <span className="block font-semibold text-fg">{page.quality.examplesTitle}</span>
+              <span className="mt-1 inline-flex rounded-[5px] border border-warning/35 bg-warning/[0.08] px-2 py-0.5 text-xs font-semibold text-warning">
+                {page.quality.examplesNote}
+              </span>
+            </span>
+            <Icon name="chevronDown" className="h-5 w-5 text-brand transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="grid gap-px border-t border-line-subtle bg-line-subtle md:grid-cols-2">
+            {page.quality.examples.map((example) => (
+              <div key={example.system} className="bg-surface-1 p-6" data-testid="evaluation-example">
+                <p className="font-semibold text-fg">{example.system}</p>
+                <CheckList items={example.criteria} className="mt-4 text-sm" />
+              </div>
+            ))}
+          </div>
+        </details>
       </Section>
 
       {/* 7. security and governance */}
@@ -234,7 +254,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
         <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
           <div>
             <SectionHeading id="ams-security" title={page.security.title} lead={page.security.lead} />
-            <p className="mt-8 rounded-2xl border border-cyan-400/25 bg-cyan-400/[0.06] p-5 leading-relaxed text-cyan-50">
+            <p className="mt-8 border-l-2 border-brand pl-5 text-lg font-semibold leading-relaxed text-fg">
               {page.security.principle}
             </p>
           </div>
@@ -248,24 +268,31 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
           <SectionHeading id="ams-cost" title={page.cost.title} lead={page.cost.lead} />
           <div>
             <CheckList items={page.cost.items} />
-            <p className="mt-6 text-sm text-slate-400">{page.cost.note}</p>
+            <p className="mt-6 text-sm text-fg-muted">{page.cost.note}</p>
           </div>
+        </div>
+        {/* mid-page conversion point */}
+        <div className="mt-16 flex flex-col gap-5 rounded-[var(--radius-lg)] border border-brand/35 bg-brand/[0.05] p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <p className="max-w-2xl text-lg font-semibold text-fg">{page.cta.title}</p>
+          <ButtonLink href={inquiryHref} icon="arrowRight" className="shrink-0">
+            {page.hero.primaryCta}
+          </ButtonLink>
         </div>
       </Section>
 
       {/* incident response */}
       <Section labelledBy="ams-incidents" alt>
         <SectionHeading id="ams-incidents" title={page.incidents.title} lead={page.incidents.lead} />
-        <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-10 grid gap-x-10 sm:grid-cols-2 lg:grid-cols-4">
           {page.incidents.steps.map((step, index) => (
-            <li key={step.title} className="card p-5">
-              <span className="font-display text-sm font-semibold text-cyan-300">{String(index + 1).padStart(2, "0")}</span>
-              <p className="mt-2 font-semibold text-white">{step.title}</p>
-              <p className="mt-1 text-sm text-slate-400">{step.description}</p>
+            <li key={step.title} className="border-t border-line-subtle py-5">
+              <span className="font-mono text-sm text-brand">{String(index + 1).padStart(2, "0")}</span>
+              <p className="mt-2 font-semibold text-fg">{step.title}</p>
+              <p className="mt-1 text-[14.5px] leading-relaxed text-fg-muted">{step.description}</p>
             </li>
           ))}
         </ol>
-        <p className="mt-6 max-w-3xl text-sm text-slate-400">{page.incidents.note}</p>
+        <p className="mt-4 max-w-3xl text-sm text-fg-muted">{page.incidents.note}</p>
       </Section>
 
       {/* 9. onboarding */}
@@ -284,10 +311,10 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
               className={cx("card flex flex-col p-6 sm:p-7", index === 1 && "card-accent")}
               data-testid={`package-${pkg.key}`}
             >
-              <p className="font-display text-2xl font-semibold text-white">{pkg.name}</p>
-              <p className="mt-2 text-sm text-slate-400">{pkg.audience}</p>
-              <p className="mt-4 text-slate-300">{pkg.summary}</p>
-              <p className="mt-5 text-lg font-semibold text-cyan-200">{page.packages.priceLabel}</p>
+              <p className="font-display text-[1.7rem] font-bold tracking-[-0.02em] text-fg">{pkg.name}</p>
+              <p className="mt-2 text-[14.5px] text-fg-muted">{pkg.audience}</p>
+              <p className="mt-4 text-fg-secondary">{pkg.summary}</p>
+              <p className="mt-5 border-y border-line-subtle py-3 font-mono text-sm text-brand">{page.packages.priceLabel}</p>
               <CheckList items={pkg.includes} className="mt-5 flex-1 text-sm" />
               <ButtonLink href={inquiryHref} variant={index === 1 ? "primary" : "secondary"} className="mt-6 w-full">
                 {page.packages.cta}
@@ -296,10 +323,10 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
           ))}
         </ul>
 
-        <div className="card mt-10 overflow-x-auto rounded-2xl">
+        <div className="card mt-10 overflow-x-auto">
           <table className="w-full min-w-[36rem] text-left text-sm">
-            <caption className="px-5 pt-5 text-left text-lg font-semibold text-white">{page.packages.comparisonTitle}</caption>
-            <thead className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-400">
+            <caption className="px-5 pt-5 text-left text-lg font-semibold text-fg">{page.packages.comparisonTitle}</caption>
+            <thead className="border-b border-line-default text-[13px] text-fg-muted">
               <tr>
                 <th scope="col" className="px-5 py-4 font-medium">
                   {page.packages.comparisonFeature}
@@ -311,10 +338,10 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-line-subtle">
               {page.packages.comparison.map((row) => (
                 <tr key={row.feature}>
-                  <th scope="row" className="px-5 py-3.5 font-medium text-white">
+                  <th scope="row" className="px-5 py-3.5 font-medium text-fg">
                     {row.feature}
                   </th>
                   {row.values.map((value, index) => (
@@ -327,7 +354,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
             </tbody>
           </table>
         </div>
-        <div className="mt-6 grid gap-3 text-sm text-slate-400 md:grid-cols-2">
+        <div className="mt-6 grid gap-3 text-sm text-fg-muted md:grid-cols-2">
           <p className="flex gap-2">
             <Icon name="info" className="mt-0.5 h-4 w-4 shrink-0" />
             {page.packages.thirdPartyNote}
@@ -342,17 +369,17 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
       {/* 11. scope and exclusions */}
       <Section labelledBy="ams-scope">
         <SectionHeading id="ams-scope" title={page.scope.title} />
-        <div className="mt-10 grid gap-5 lg:grid-cols-2">
-          <div className="card p-6 sm:p-7">
-            <h3 className="t-h3 text-lg">{page.scope.includedTitle}</h3>
+        <div className="mt-10 grid gap-12 lg:grid-cols-2 lg:gap-16">
+          <div>
+            <h3 className="t-h3-lg">{page.scope.includedTitle}</h3>
             <CheckList items={page.scope.included} className="mt-5" />
           </div>
-          <div className="card p-6 sm:p-7">
-            <h3 className="t-h3 text-lg">{page.scope.excludedTitle}</h3>
+          <div>
+            <h3 className="t-h3-lg">{page.scope.excludedTitle}</h3>
             <ul className="mt-5 grid gap-3">
               {page.scope.excluded.map((item) => (
-                <li key={item} className="flex gap-3 text-slate-300">
-                  <Icon name="close" className="mt-1 h-4 w-4 shrink-0 text-rose-300" />
+                <li key={item} className="flex gap-3 text-fg-secondary">
+                  <Icon name="close" className="mt-1 h-4 w-4 shrink-0 text-danger" />
                   {item}
                 </li>
               ))}
@@ -370,16 +397,16 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
       </Section>
 
       {/* 13. consultation request */}
-      <section id="ams-inquiry" aria-labelledby="ams-inquiry-title" className="scroll-mt-20 py-16 sm:py-20">
+      <section id="ams-inquiry" aria-labelledby="ams-inquiry-title" className="scroll-mt-28 border-t border-line-subtle bg-surface-1 py-16 sm:py-24">
         <Container className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <h2 id="ams-inquiry-title" className="t-h2">
               {page.cta.title}
             </h2>
             <p className="t-lead mt-4">{page.cta.lead}</p>
-            <div className="card mt-8 p-6">
-              <p className="font-semibold text-white">{page.form.title}</p>
-              <p className="mt-2 text-sm text-slate-400">{page.form.lead}</p>
+            <div className="mt-8 border-l-2 border-brand pl-5">
+              <p className="font-semibold text-fg">{page.form.title}</p>
+              <p className="mt-2 text-[15px] text-fg-muted">{page.form.lead}</p>
             </div>
             <ButtonLink href={href(routes.contact)} variant="ghost" className="mt-6">
               {page.cta.secondary}

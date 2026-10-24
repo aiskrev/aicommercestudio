@@ -151,6 +151,9 @@ export const en: Dictionary = {
     budgetNote: "The budget helps us size the scope; it is not a binding price.",
   },
   form: {
+    groupRequest: "Your request",
+    groupAbout: "About you",
+    groupProject: "The project",
     formTitle: "Project inquiry",
     requiredNote: "Fields marked with * are required.",
     secureNote: "We use your details only to respond to this inquiry.",
@@ -261,20 +264,6 @@ export const en: Dictionary = {
     firstStepBadge: "Recommended first step",
     processResult: "Outcome",
     articleTypes: { guide: "Guide", checklist: "Checklist", comparison: "Comparison", explainer: "Explainer" },
-    heroVisual: {
-      core: "AI orchestration",
-      coreSub: "with human approval",
-      actionLabel: "AI agent action",
-      actionText: "Price change → awaiting approval",
-      nodes: [
-        { label: "Online store", sub: "Shopify · WooCommerce" },
-        { label: "CRM and ERP", sub: "APIs · webhooks" },
-        { label: "SEO", sub: "indexing · CWV" },
-        { label: "Analytics", sub: "GA4 · dashboards" },
-        { label: "Automation", sub: "scheduled tasks" },
-        { label: "Security", sub: "access · audit log" },
-      ],
-    },
     caseStudies: {
       eyebrow: "Case studies",
       title: "Client projects",

@@ -32,6 +32,16 @@ export const home: typeof bgHome = {
     eyebrow: "Services",
     title: "Seven disciplines, one technical partner",
     lead: "From day-to-day maintenance to custom AI tools and AI operations — use each service on its own or as part of a complete plan.",
+    groups: {
+      ai: {
+        title: "AI & automation",
+        lead: "Solutions that add intelligence to your processes — and keep them reliable after launch.",
+      },
+      core: {
+        title: "Core operations",
+        lead: "The technical foundation of an online business: stability, visibility, data and integrations.",
+      },
+    },
   },
   problems: {
     eyebrow: "Problems we solve",
@@ -83,12 +93,6 @@ export const home: typeof bgHome = {
       },
     ],
   },
-  industriesIntro: {
-    eyebrow: "Who we work with",
-    title: "For businesses that sell online and want technology to work for them",
-    lead: "Small and mid-sized merchants without an in-house technical team — or with a need for extra expertise in SEO, data and AI.",
-    cta: "See all profiles",
-  },
   aiControl: {
     eyebrow: "AI with human control",
     title: "AI suggests. People decide.",
@@ -114,74 +118,6 @@ export const home: typeof bgHome = {
       { title: "Architecture & planning", description: "We propose the solution, priorities, scope and timeline in a written quote.", outputs: ["Technical outline", "Written quote"] },
       { title: "Development & validation", description: "We work in short iterations, test with real examples and measure the result.", outputs: ["Working solution", "Tests and documentation"] },
       { title: "Support & optimization", description: "We watch how the solution performs and plan the next improvements.", outputs: ["Monthly review", "Improvement plan"] },
-    ],
-  },
-  advantages: {
-    eyebrow: "Why an integrated approach",
-    title: "Engineering and AI expertise in one team",
-    items: [
-      {
-        icon: "layers",
-        title: "One partner for the store, data and AI",
-        description: "No hand-offs of responsibility between a web agency, an SEO consultant and an AI vendor.",
-      },
-      {
-        icon: "workflow",
-        title: "Solutions built into real processes",
-        description: "AI is not a separate gadget but part of the systems and workflows you already use.",
-      },
-      {
-        icon: "shield",
-        title: "Security and control by default",
-        description: "Human approval for sensitive actions, an operations log and minimal data collection.",
-      },
-      {
-        icon: "target",
-        title: "Measurable goals",
-        description: "Before we start, we define what we will measure and how we will know the solution works.",
-      },
-      {
-        icon: "eye",
-        title: "Transparency",
-        description: "Documentation, access lists and clear reporting for every piece of work.",
-      },
-    ],
-  },
-  engagement: {
-    eyebrow: "Engagement models",
-    title: "Choose the format that fits your needs",
-    lead: "Pricing is set once the scope is clear and is provided in a written quote.",
-    items: [
-      {
-        icon: "wrench",
-        title: "Monthly maintenance",
-        description: "A subscription with an agreed amount of work, monitoring and response times.",
-      },
-      {
-        icon: "trending",
-        title: "SEO retainer",
-        description: "A monthly program of technical tasks, content and reporting.",
-      },
-      {
-        icon: "sparkles",
-        title: "Fixed-price AI project",
-        description: "Development of an AI tool with a clear specification and acceptance criteria.",
-      },
-      {
-        icon: "workflow",
-        title: "Automation project",
-        description: "Analysis, implementation and testing of a specific automated process.",
-      },
-      {
-        icon: "clipboard",
-        title: "Paid technical audit",
-        description: "A structured assessment with a prioritized action plan.",
-      },
-      {
-        icon: "refresh",
-        title: "AI Managed Services",
-        description: "Monitoring, maintenance, quality evaluation and cost control for AI agents after launch.",
-      },
     ],
   },
   faq: {
