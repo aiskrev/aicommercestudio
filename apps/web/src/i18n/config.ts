@@ -39,6 +39,7 @@ const EN_SEGMENTS: Record<string, string> = {
   kontakti: "contact",
   statii: "insights",
   proekti: "case-studies",
+  instrumenti: "tools",
   poveritelnost: "privacy",
   biskvitki: "cookies",
   "obshti-usloviya": "terms",

@@ -1,8 +1,81 @@
 import type { ServiceDepth } from "@/content/bg/services-depth";
+import type { ServiceTemplate } from "@/content/bg/services-template";
+import { serviceTemplate } from "@/content/en/services-template";
 import { serviceDepth } from "@/content/en/services-depth";
 import type { Service } from "@/content/types";
 
-const baseServices: Omit<Service, keyof ServiceDepth>[] = [
+const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] = [
+  {
+    key: "ai_agents",
+    slug: "ai-agent-development",
+    icon: "bot",
+    title: "AI agent development for customer service, operations and internal work",
+    shortTitle: "AI agent development",
+    summary:
+      "Agents that carry out multi-step tasks through your systems — with clear limits, defined tools and human approval for actions that matter.",
+    metaTitle: "AI agent development with human oversight",
+    metaDescription:
+      "AI agent development for small and mid-sized companies: customer service, order handling and internal tasks — with rules, audit logs and human approval built in.",
+    intro:
+      "An AI agent is more than a chatbot: it reads data, plans the next step and uses tools such as your CRM, store or inbox. We design agents with a narrow, clearly described job, minimal permissions and human approval points — so they help without taking on uncontrolled risk.",
+    signals: [
+      "Your team repeats the same multi-step tasks across several systems.",
+      "Your chatbot answers questions but cannot do anything about the order or request itself.",
+      "You want AI to take on routine work, but not decisions with financial impact.",
+      "You tried an agent that behaved unpredictably or left no trace of what it did.",
+    ],
+    capabilities: [
+      {
+        title: "Customer service agents",
+        description: "Check order status, draft replies and hand over to a person when they are not sure.",
+      },
+      {
+        title: "Operations agents",
+        description: "Handle returns, stock mismatches and recurring requests according to defined rules.",
+      },
+      {
+        title: "Internal knowledge agents",
+        description: "Answer your team's questions from documents and policies, citing the sources.",
+      },
+      {
+        title: "Tools and integrations",
+        description: "Access to your CRM, store, inbox or ERP through narrow API functions — only the actions that are needed.",
+      },
+      {
+        title: "Rules and human approval",
+        description: "Actions that affect customers, money or data pass deterministic checks and an approval step.",
+      },
+      {
+        title: "Evaluation and monitoring",
+        description: "Test scenarios before release, a log of every step and alerts when behaviour drifts.",
+      },
+    ],
+    deliverables: [
+      "A description of the task, its limits and the approval points",
+      "A working agent in a test environment, checked with real examples",
+      "A test set and quality criteria",
+      "Logs, documentation and a monitoring plan",
+    ],
+    engagement: ["Fixed-scope project", "Ongoing operation through AI Managed Services"],
+    faqs: [
+      {
+        question: "What is the difference between an AI agent and a chatbot?",
+        answer:
+          "A chatbot answers questions. An agent carries out a multi-step task — for example checking an order, drafting a reply and proposing a refund — using only the tools it has been explicitly allowed to use.",
+      },
+      {
+        question: "Can the agent act on its own?",
+        answer:
+          "Only within the limits you set. Reading, classifying and drafting are usually autonomous; messages to customers, changes to orders and payments require approval.",
+      },
+      {
+        question: "What happens if the agent makes a mistake?",
+        answer:
+          "Every step is logged, actions with impact require approval, and when the agent is unsure it escalates to a person. Quality is checked against test scenarios before release.",
+      },
+    ],
+    related: ["automation", "integrations", "ai_managed"],
+  },
   {
     key: "maintenance",
     slug: "ecommerce-maintenance",
@@ -172,8 +245,8 @@ const baseServices: Omit<Service, keyof ServiceDepth>[] = [
     key: "ai_tools",
     slug: "custom-ai-tools",
     icon: "sparkles",
-    title: "Custom AI tools for small and mid-sized businesses",
-    shortTitle: "Custom AI tools",
+    title: "Custom AI engineering: assistants, RAG and AI tools for your business",
+    shortTitle: "Custom AI engineering",
     summary:
       "AI assistants, product description generation, internal knowledge bases and RAG solutions built into your workflows.",
     metaTitle: "Custom AI tools: assistants, RAG and document analysis",
@@ -249,7 +322,7 @@ const baseServices: Omit<Service, keyof ServiceDepth>[] = [
     slug: "business-process-automation",
     icon: "workflow",
     title: "AI business process automation — with human oversight where it matters",
-    shortTitle: "Process automation",
+    shortTitle: "AI workflow automation",
     summary:
       "Inquiry classification, CRM workflows, document processing and system integrations — with human approval where needed.",
     metaTitle: "AI business process automation with human oversight",
@@ -405,8 +478,8 @@ const baseServices: Omit<Service, keyof ServiceDepth>[] = [
     key: "integrations",
     slug: "api-integrations-cloud-security",
     icon: "plug",
-    title: "API integrations, cloud infrastructure and security",
-    shortTitle: "Integrations, cloud and security",
+    title: "AI integrations, data systems and cloud infrastructure",
+    shortTitle: "AI integrations & data systems",
     summary:
       "REST API and webhook integrations, connecting Shopify and WooCommerce with CRM and ERP, cloud deployment, monitoring and protection.",
     metaTitle: "API integrations for online stores, CRM and ERP",
@@ -484,7 +557,7 @@ const baseServices: Omit<Service, keyof ServiceDepth>[] = [
     slug: "ai-managed-services",
     icon: "activity",
     title: "AI Managed Services — AI Agent Operations & Optimization",
-    shortTitle: "AI Managed Services",
+    shortTitle: "AI Managed Services & optimisation",
     summary:
       "Monitoring, maintenance, quality evaluation, security and cost optimization for AI agents and automations that are already in production.",
     metaTitle: "AI Agent Monitoring & Managed Services",
@@ -555,8 +628,8 @@ const baseServices: Omit<Service, keyof ServiceDepth>[] = [
     key: "audit",
     slug: "technical-audit",
     icon: "clipboard",
-    title: "Technical audit of your online store and AI readiness",
-    shortTitle: "AI and e-commerce technical audit",
+    title: "AI strategy & readiness: a technical audit of your processes, data and store",
+    shortTitle: "AI strategy & readiness",
     summary: "A structured assessment of your store, data and processes that ends with a prioritized improvement plan.",
     metaTitle: "Technical audit of an online store and AI readiness",
     metaDescription:
@@ -622,6 +695,10 @@ const baseServices: Omit<Service, keyof ServiceDepth>[] = [
   },
 ];
 
-export const services: Service[] = baseServices.map((service) => ({ ...service, ...serviceDepth[service.key] }));
+export const services: Service[] = baseServices.map((service) => ({
+  ...service,
+  ...serviceDepth[service.key],
+  ...serviceTemplate[service.key],
+}));
 
 export const coreServices = services.filter((s) => !s.isOffering);

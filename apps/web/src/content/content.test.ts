@@ -5,6 +5,7 @@ import { locales } from "@/i18n/config";
 
 // Must stay in sync with ServiceKey in apps/api/app/models.py (minus "other").
 const API_SERVICE_KEYS = [
+  "ai_agents",
   "maintenance",
   "seo",
   "ai_tools",
@@ -18,8 +19,8 @@ const API_SERVICE_KEYS = [
 describe.each(locales)("content integrity (%s)", (locale) => {
   const content = getContent(locale);
 
-  it("has seven core services plus the audit offering", () => {
-    expect(content.coreServices).toHaveLength(7);
+  it("has eight core services plus the audit offering", () => {
+    expect(content.coreServices).toHaveLength(8);
     expect(content.services.map((s) => s.key).sort()).toEqual([...API_SERVICE_KEYS].sort());
     expect(content.services.find((s) => s.key === "audit")?.isOffering).toBe(true);
   });

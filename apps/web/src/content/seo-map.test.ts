@@ -24,6 +24,7 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
     [routes.services]: withBrand(content.servicesPage.metaTitle),
     [routes.aiSolutions]: withBrand(content.aiSolutions.metaTitle),
     [routes.advisor]: withBrand(content.advisor.metaTitle),
+    [routes.tools]: withBrand(content.toolsPage.metaTitle),
     [routes.industries]: withBrand(content.industries.metaTitle),
     [routes.process]: withBrand(content.processPage.metaTitle),
     [routes.about]: withBrand(content.about.metaTitle),

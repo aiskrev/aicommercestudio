@@ -19,11 +19,23 @@ vi.mock("next/link", () => ({
 const props = {
   homeHref: "/",
   servicesHref: "/uslugi",
-  services: [
-    { href: "/uslugi/seo-optimizatsiya", label: "SEO и органичен растеж", description: "SEO описание", icon: "trending" as const },
-    { href: "/uslugi/tehnicheski-odit", label: "Технически одит", description: "Одит описание", icon: "clipboard" as const },
+  serviceGroups: [
+    {
+      title: "AI услуги",
+      items: [
+        { href: "/uslugi/seo-optimizatsiya", label: "SEO и органичен растеж", description: "SEO описание", icon: "trending" as const },
+        { href: "/uslugi/tehnicheski-odit", label: "Технически одит", description: "Одит описание", icon: "clipboard" as const },
+      ],
+    },
   ],
-  items: [{ href: "/proces", label: "Процес" }],
+  items: [{ href: "/instrumenti", label: "Инструменти" }],
+  aboutMenu: {
+    label: "За нас",
+    items: [
+      { href: "/za-nas", label: "Кои сме" },
+      { href: "/proces", label: "Как работим" },
+    ],
+  },
   cta: { href: "/kontakti", label: "Заяви консултация" },
   labels: {
     nav: "Основна навигация",
@@ -82,5 +94,30 @@ describe("Header", () => {
     await user.keyboard("{Escape}");
     expect(screen.getByRole("button", { name: "Отвори менюто" })).toHaveAttribute("aria-expanded", "false");
     expect(document.body.style.overflow).toBe("");
+  });
+
+  it("opens the About menu and closes the other menu", async () => {
+    const user = userEvent.setup();
+    render(<Header {...props} />);
+    const services = screen.getByRole("button", { name: "Услуги" });
+    const about = screen.getByRole("button", { name: "За нас" });
+    await user.click(services);
+    await user.click(about);
+    expect(services).toHaveAttribute("aria-expanded", "false");
+    expect(about).toHaveAttribute("aria-expanded", "true");
+    const panel = document.getElementById(about.getAttribute("aria-controls")!)!;
+    expect(panel.querySelector("a[href='/proces']")).toHaveTextContent("Как работим");
+  });
+
+  it("makes the page behind the open mobile menu inert and restores it on close", async () => {
+    const user = userEvent.setup();
+    const main = document.createElement("main");
+    document.body.appendChild(main);
+    render(<Header {...props} />);
+    await user.click(screen.getByRole("button", { name: "Отвори менюто" }));
+    expect(main.inert).toBe(true);
+    await user.keyboard("{Escape}");
+    expect(main.inert).toBe(false);
+    main.remove();
   });
 });

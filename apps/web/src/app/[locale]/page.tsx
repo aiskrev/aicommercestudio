@@ -1,26 +1,26 @@
 import Link from "next/link";
 
-import { ArticleCard } from "@/components/editorial/ArticleCard";
-import { AdvisorShowcase } from "@/components/home/AdvisorShowcase";
-import { AiPipeline } from "@/components/home/AiPipeline";
+import { BuildBento } from "@/components/home/BuildBento";
+import { ControlLanes } from "@/components/home/ControlLanes";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { HeroWorkflow } from "@/components/home/HeroWorkflow";
-import { ManagedFeature } from "@/components/home/ManagedFeature";
-import { ProblemIndex } from "@/components/home/ProblemIndex";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
+import { SystemMap } from "@/components/home/SystemMap";
+import { ToolsPreview } from "@/components/home/ToolsPreview";
+import { UseCaseLedger } from "@/components/home/UseCaseLedger";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Faq } from "@/components/sections/Faq";
-import { ServiceMotif } from "@/components/sections/ServiceMotif";
-import { ServiceShowcase } from "@/components/sections/ServiceShowcase";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
 import { EditorialSplit } from "@/components/ui/patterns";
 import { ButtonLink, Container, Eyebrow, Section, SectionHeading } from "@/components/ui/primitives";
-import { categoryByKey, getContent, serviceByKey, sortedArticles } from "@/content";
+import type { HomeLink } from "@/content/bg/home";
+import { getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
+import { toolHrefs } from "@/lib/tools";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">) {
@@ -35,16 +35,18 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">) {
   });
 }
 
+/**
+ * Homepage. Section order: hero (system map) → capabilities → what we build → how we work →
+ * interactive tools → solution architecture → use cases by function → FAQ → final CTA.
+ * Everything is a server component; motion comes from the shared interaction system (CSS).
+ */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
-  const { home, coreServices, advisor, aiManaged } = getContent(locale);
+  const { home, advisor, tools } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
-  const audit = serviceByKey(locale, "audit");
-  const managed = serviceByKey(locale, "ai_managed");
-  const managedHref = href(routes.service(managed.slug));
-  const [featuredArticle, ...moreArticles] = sortedArticles(locale).slice(0, 4);
-  const articleLabels = { minutesRead: dict.common.minutesRead, readArticle: dict.common.readArticle };
+  const linkFor = (link: HomeLink) =>
+    "service" in link ? href(routes.service(serviceByKey(locale, link.service).slug)) : href(routes[link.route]);
 
   return (
     <>
@@ -54,18 +56,18 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <div className="relative overflow-hidden">
         <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
-        <Container className="relative grid items-center gap-10 pb-14 pt-10 sm:gap-12 sm:pt-16 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:gap-14 lg:pb-24 lg:pt-20">
-          <div>
+        <Container className="relative grid items-center gap-10 pb-14 pt-10 sm:gap-12 sm:pt-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14 lg:pb-24 lg:pt-20">
+          <div className="min-w-0">
             <Eyebrow>{home.hero.eyebrow}</Eyebrow>
             <h1 className="t-display mt-6">
               {home.hero.title} <span className="text-brand">{home.hero.titleHighlight}</span>
             </h1>
             <p className="t-lead mt-6 max-w-xl">{home.hero.lead}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={href(routes.contact)} size="lg" icon="arrowRight">
+              <ButtonLink href={href(routes.aiSolutions)} size="lg" icon="arrowRight">
                 {home.hero.primaryCta}
               </ButtonLink>
-              <ButtonLink href={href(routes.services)} size="lg" variant="secondary">
+              <ButtonLink href={href(routes.advisor)} size="lg" variant="secondary">
                 {home.hero.secondaryCta}
               </ButtonLink>
             </div>
@@ -78,111 +80,50 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               ))}
             </ul>
           </div>
-          <HeroWorkflow content={home.hero.workflow} />
+          <SystemMap content={home.hero.systemMap} />
         </Container>
       </div>
 
-      {/* 2 ---------------------------------------------------------------- credibility */}
+      {/* 2 ---------------------------------------------------------------- credibility and capabilities */}
       <CredibilityStrip label={home.capabilities.eyebrow} groups={home.capabilities.groups} />
 
-      {/* 3 ---------------------------------------------------------------- curated services */}
-      <Section labelledBy="services-title" density="spacious">
+      {/* 3 ---------------------------------------------------------------- what we build (bento) */}
+      <Section labelledBy="build-title" density="spacious">
         <SectionHeading
-          id="services-title"
-          eyebrow={home.servicesIntro.eyebrow}
-          title={home.servicesIntro.title}
-          lead={home.servicesIntro.lead}
+          id="build-title"
+          eyebrow={home.build.eyebrow}
+          title={home.build.title}
+          lead={home.build.lead}
           action={
             <ButtonLink href={href(routes.services)} variant="secondary" icon="arrowRight">
               {dict.common.allServices}
             </ButtonLink>
           }
         />
-        <div className="mt-14">
-          <ServiceShowcase
-            services={coreServices}
-            hrefFor={(service) => href(routes.service(service.slug))}
-            cta={dict.common.learnMore}
-            groups={home.servicesIntro.groups}
-          />
+        <div className="mt-12">
+          <BuildBento items={home.build.items.map((item) => ({ ...item, href: linkFor(item.link) }))} />
         </div>
-        <Link
-          href={href(routes.service(audit.slug))}
-          className="group mt-10 flex flex-col gap-4 rounded-[var(--radius-lg)] border border-dashed border-line-strong px-6 py-5 transition-colors hover:border-brand/60 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <span className="flex items-center gap-4">
-            <ServiceMotif service="audit" className="hidden h-12 w-16 shrink-0 sm:block" />
-            <span>
-              <span className="block text-[13px] font-semibold text-brand">{dict.ui.firstStepBadge}</span>
-              <span className="mt-1 block text-lg font-semibold text-fg">{audit.shortTitle}</span>
-              <span className="mt-0.5 block max-w-2xl text-[15px] text-fg-muted">{audit.summary}</span>
-            </span>
-          </span>
-          <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-brand">
-            {dict.common.learnMore}
-            <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
-          </span>
-        </Link>
-      </Section>
-
-      {/* 4 ---------------------------------------------------------------- problems → solutions (light) */}
-      <Section labelledBy="problems-title" tone="light" density="spacious">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:items-end">
-          <SectionHeading id="problems-title" eyebrow={home.problems.eyebrow} title={home.problems.title} />
-          <p className="t-lead lg:pb-1">{home.problems.lead}</p>
+        <div className="mt-10 flex flex-col gap-3 border-t border-line-subtle pt-6 lg:flex-row lg:items-baseline lg:gap-8">
+          <p className="shrink-0 text-[15px] font-semibold text-fg">{home.build.foundation.title}</p>
+          <p className="text-[15px] text-fg-muted">
+            {home.build.foundation.lead}{" "}
+            {home.build.foundation.services.map((key, index) => {
+              const service = serviceByKey(locale, key);
+              return (
+                <span key={key}>
+                  {index > 0 && <span aria-hidden="true"> · </span>}
+                  <Link href={href(routes.service(service.slug))} className="link font-medium">
+                    {service.shortTitle}
+                  </Link>
+                </span>
+              );
+            })}
+          </p>
         </div>
-        <ProblemIndex
-          solutionLabel={home.problems.solutionLabel}
-          rows={home.problems.items.map((item) => {
-            const service = serviceByKey(locale, item.service);
-            return {
-              title: item.title,
-              description: item.description,
-              icon: item.icon,
-              service: { title: service.shortTitle, href: href(routes.service(service.slug)) },
-            };
-          })}
-        />
       </Section>
 
-      {/* 5 ---------------------------------------------------------------- controlled AI workflow (full-width editorial headline) */}
-      <Section labelledBy="ai-control-title" density="spacious">
-        <div className="max-w-4xl">
-          <Eyebrow>{home.aiControl.eyebrow}</Eyebrow>
-          <h2 id="ai-control-title" className="t-display mt-5 text-[clamp(2.1rem,1.4rem+2.6vw,3.6rem)]">
-            {home.aiControl.title}
-          </h2>
-          <p className="t-lead mt-6 max-w-3xl">{home.aiControl.lead}</p>
-        </div>
-        <AiPipeline
-          stages={home.aiControl.stages}
-          allowedTitle={home.aiControl.allowedTitle}
-          allowed={home.aiControl.allowed}
-          approvalTitle={home.aiControl.approvalTitle}
-          approval={home.aiControl.approval}
-        />
-        <ButtonLink href={href(routes.aiSolutions)} variant="ghost" icon="arrowRight" className="mt-6">
-          {dict.nav.aiSolutions}
-        </ButtonLink>
-      </Section>
-
-      {/* 6 ---------------------------------------------------------------- AI Managed Services feature */}
-      <Section labelledBy="managed-title" tone="raised" density="spacious">
-        <ManagedFeature
-          id="managed-title"
-          eyebrow={aiManaged.hero.eyebrow}
-          title={aiManaged.hero.title}
-          lead={aiManaged.hero.positioning}
-          diagram={aiManaged.diagram}
-          plans={aiManaged.packages.items.map((plan) => ({ key: plan.key, name: plan.name, audience: plan.audience }))}
-          priceLabel={aiManaged.packages.priceLabel}
-          primary={{ href: `${managedHref}#ams-inquiry`, label: aiManaged.hero.primaryCta }}
-          secondary={{ href: managedHref, label: dict.common.learnMore }}
-        />
-      </Section>
-
-      {/* 7 ---------------------------------------------------------------- process (horizontal timeline) */}
-      <Section labelledBy="process-title">
+      {/* 4 ---------------------------------------------------------------- how we work */}
+      <Section labelledBy="process-title" tone="raised">
         <SectionHeading
           id="process-title"
           eyebrow={home.process.eyebrow}
@@ -190,7 +131,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           lead={home.process.lead}
           action={
             <ButtonLink href={href(routes.process)} variant="ghost" icon="arrowRight">
-              {dict.common.learnMore}
+              {home.process.linkLabel}
             </ButtonLink>
           }
         />
@@ -199,60 +140,62 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
       </Section>
 
-      {/* 8 ---------------------------------------------------------------- advisor product showcase (light) */}
-      <Section labelledBy="advisor-showcase-title" tone="light" density="spacious">
-        <AdvisorShowcase
-          id="advisor-showcase-title"
-          content={advisor.showcase}
-          steps={advisor.steps}
-          stepsTitle={advisor.stepsTitle}
-          href={href(routes.advisor)}
-        />
-      </Section>
-
-      {/* 9 ---------------------------------------------------------------- insights */}
-      <Section labelledBy="latest-articles-title">
+      {/* 5 ---------------------------------------------------------------- interactive tools */}
+      <Section labelledBy="tools-title" density="spacious">
         <SectionHeading
-          id="latest-articles-title"
-          eyebrow={dict.nav.insights}
-          title={dict.editorial.latestTitle}
-          lead={dict.editorial.latestLead}
+          id="tools-title"
+          eyebrow={home.tools.eyebrow}
+          title={home.tools.title}
+          lead={home.tools.lead}
           action={
-            <ButtonLink href={href(routes.insights)} variant="secondary" icon="arrowRight">
-              {dict.common.allArticles}
+            <ButtonLink href={href(routes.tools)} variant="secondary" icon="arrowRight">
+              {home.tools.allTools}
             </ButtonLink>
           }
         />
-        <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14">
-          {featuredArticle && (
-            <ArticleCard
-              article={featuredArticle}
-              href={href(routes.article(featuredArticle.slug))}
-              categoryName={categoryByKey(locale, featuredArticle.category)?.name}
-              locale={locale}
-              labels={articleLabels}
-              headingLevel={3}
-              variant="featured"
+        <div className="mt-12">
+          <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} showcase={advisor.showcase} />
+        </div>
+      </Section>
+
+      {/* 6 ---------------------------------------------------------------- solution architecture / orchestration */}
+      <Section labelledBy="orchestration-title" tone="deep" density="spacious">
+        <div className="max-w-4xl">
+          <Eyebrow>{home.orchestration.eyebrow}</Eyebrow>
+          <h2 id="orchestration-title" className="t-display reveal mt-5 text-[clamp(2.1rem,1.4rem+2.6vw,3.6rem)]">
+            {home.orchestration.title}
+          </h2>
+          <p className="t-lead mt-6 max-w-3xl">{home.orchestration.lead}</p>
+        </div>
+        <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-10">
+          <HeroWorkflow content={home.orchestration.workflow} />
+          <div className="min-w-0">
+            <ControlLanes
+              lanes={[
+                { tone: "ai", title: home.orchestration.allowedTitle, items: home.orchestration.allowed },
+                { tone: "approval", title: home.orchestration.approvalTitle, items: home.orchestration.approval },
+                { tone: "record", title: home.orchestration.auditTitle, items: home.orchestration.audit },
+              ]}
             />
-          )}
-          <div className="-mt-6 divide-y divide-line-subtle">
-            {moreArticles.map((article) => (
-              <ArticleCard
-                key={article.slug}
-                article={article}
-                href={href(routes.article(article.slug))}
-                categoryName={categoryByKey(locale, article.category)?.name}
-                locale={locale}
-                labels={articleLabels}
-                headingLevel={3}
-                variant="row"
-              />
-            ))}
+            <ButtonLink href={href(routes.aiSolutions)} variant="ghost" icon="arrowRight" className="mt-6">
+              {home.orchestration.linkLabel}
+            </ButtonLink>
           </div>
         </div>
       </Section>
 
-      {/* 10 --------------------------------------------------------------- FAQ */}
+      {/* 7 ---------------------------------------------------------------- use cases by business function (light) */}
+      <Section labelledBy="use-cases-title" tone="light" density="spacious">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:items-end">
+          <SectionHeading id="use-cases-title" eyebrow={home.useCases.eyebrow} title={home.useCases.title} />
+          <p className="t-lead lg:pb-1">{home.useCases.lead}</p>
+        </div>
+        <div className="mt-12">
+          <UseCaseLedger items={home.useCases.items} labels={home.useCases.labels} />
+        </div>
+      </Section>
+
+      {/* 8 ---------------------------------------------------------------- FAQ */}
       <Section labelledBy="faq-title" tone="raised">
         <EditorialSplit
           sticky
@@ -272,12 +215,12 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </EditorialSplit>
       </Section>
 
-      {/* 11 --------------------------------------------------------------- conversion */}
+      {/* 9 ---------------------------------------------------------------- final CTA */}
       <CtaBand
         title={home.finalCta.title}
         lead={home.finalCta.lead}
         primary={{ href: href(routes.contact), label: home.finalCta.primary }}
-        secondary={{ href: href(routes.service(audit.slug)), label: home.finalCta.secondary }}
+        secondary={{ href: href(routes.advisor), label: home.finalCta.secondary }}
         emphasis
       />
     </>

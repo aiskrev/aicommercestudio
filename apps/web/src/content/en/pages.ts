@@ -4,19 +4,40 @@ import type {
   industries as bgIndustries,
   processPage as bgProcessPage,
   servicesPage as bgServicesPage,
+  toolsPage as bgToolsPage,
 } from "@/content/bg/pages";
+
+export const toolsPage: typeof bgToolsPage = {
+  metaTitle: "Interactive AI tools to assess your processes",
+  metaDescription:
+    "Interactive AI tools with no sign-up: the AI Automation Advisor that assesses a manual process, plus tools in preparation for readiness, AI teams and impact.",
+  eyebrow: "Tools",
+  title: "Interactive tools for a first assessment",
+  lead:
+    "Assess for yourself where AI and automation can help — no sign-up and no personal data. We only show tools that already work and clearly mark what is coming.",
+};
 
 export const servicesPage: typeof bgServicesPage = {
   metaTitle: "Services for online stores: maintenance, SEO and AI",
   metaDescription:
-    "All A.I. Commerce Studio services: e-commerce maintenance, SEO, custom AI tools, automation, analytics, integrations, AI managed services and technical audits.",
+    "A.I. Commerce Studio services: AI strategy, AI agent development, workflow automation, custom AI engineering, integrations, managed AI, maintenance, SEO, analytics.",
   eyebrow: "Services",
   title: "Engineering services for online commerce and AI",
   lead:
-    "Seven disciplines and a technical audit that cover the whole lifecycle of an online business — from a stable store to AI tools and their operation after launch.",
+    "AI services from strategy and agent development to operation after launch — and the engineering foundation of an online business: maintenance, SEO and analytics.",
   offeringTitle: "Not sure where to start?",
   offeringLead:
     "The technical audit is a structured, paid assessment of your store, data and processes. It ends with a prioritized plan that you can carry out with us or on your own.",
+  groups: {
+    ai: {
+      title: "AI services",
+      lead: "Agents, automation, custom engineering, integrations and the operation of AI systems in production.",
+    },
+    core: {
+      title: "E-commerce foundation",
+      lead: "The technical base AI runs on: a stable store, visibility in search and correct data.",
+    },
+  },
 };
 
 export const industries: typeof bgIndustries = {

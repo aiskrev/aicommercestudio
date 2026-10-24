@@ -128,6 +128,62 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
     ],
     relatedArticles: ["tehnicheski-seo-odit-na-online-magazin", "tehnicheski-problemi-pri-online-magazinite"],
   },
+  ai_agents: {
+    headings: {
+      problems: "When an AI agent makes sense for your business",
+      capabilities: "The AI agents we build",
+      checks: "What we check before building an agent",
+      workflow: "How we develop an AI agent",
+      deliverables: "What you receive from an AI agent project",
+    },
+    checks: [
+      {
+        title: "Repetition and volume",
+        description: "How often the task runs and how many steps it has — agents make sense for repeatable work with clear rules.",
+      },
+      {
+        title: "Available systems and APIs",
+        description: "Which systems the agent needs to reach and whether they offer APIs with narrow enough permissions.",
+      },
+      {
+        title: "Actions that need a person",
+        description: "Which steps affect customers, money or data and must therefore pass an approval step.",
+      },
+      {
+        title: "Cost of mistakes and escalation",
+        description: "What happens after a wrong answer or action, and when the agent must hand over to a person.",
+      },
+      {
+        title: "How it is evaluated",
+        description: "Test scenarios from real cases and the criteria for accepting the agent into service.",
+      },
+    ],
+    workflow: [
+      {
+        title: "Task and limits",
+        description: "We describe the agent's job, its tools, the rules and the approval points.",
+      },
+      {
+        title: "Prototype in a test environment",
+        description: "The agent works on real but safe examples, with no access to live actions.",
+      },
+      {
+        title: "Evaluation and tuning",
+        description: "Checks against the test scenarios; tuning instructions, tools and rules.",
+      },
+      {
+        title: "Release with monitoring",
+        description: "A limited release, a log of every step, alerts and a rollback plan.",
+      },
+    ],
+    inputs: [
+      "A description of the task and examples from real work",
+      "Access to test environments or copies of the systems",
+      "A team member who approves and assesses the results",
+      "Requirements for privacy and data retention",
+    ],
+    relatedArticles: ["ai-asistent-za-klienti", "ai-avtomatizatsiya-v-malkiya-biznes"],
+  },
   ai_tools: {
     headings: {
       problems: "When a custom AI tool makes sense",

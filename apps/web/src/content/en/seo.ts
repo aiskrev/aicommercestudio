@@ -43,6 +43,14 @@ export const keywordMap: KeywordTarget[] = [
     volumeStatus: "unverified",
   },
   {
+    path: "/uslugi/ai-agent-development",
+    primaryKeyword: "AI agent development",
+    secondaryKeywords: ["customer service AI agent", "AI agent for online stores", "agents with human approval"],
+    intent: "transactional",
+    rationale: "The searcher wants a builder for an agent with a specific job; general AI interest belongs to /ai-solutions.",
+    volumeStatus: "unverified",
+  },
+  {
     path: "/uslugi/custom-ai-tools",
     primaryKeyword: "custom AI tools",
     secondaryKeywords: ["AI assistant for online store", "custom RAG solution", "AI product descriptions"],
@@ -96,6 +104,14 @@ export const keywordMap: KeywordTarget[] = [
     secondaryKeywords: ["AI solutions for business", "human-in-the-loop AI", "safe AI adoption"],
     intent: "commercial",
     rationale: "Approach and principles; separate from the custom AI tools service.",
+    volumeStatus: "unverified",
+  },
+  {
+    path: "/instrumenti",
+    primaryKeyword: "interactive AI tools",
+    secondaryKeywords: ["free AI assessment tools", "AI automation calculator"],
+    intent: "informational",
+    rationale: "Hub for the tools; assessing a specific process belongs to the AI Automation Advisor page.",
     volumeStatus: "unverified",
   },
   {

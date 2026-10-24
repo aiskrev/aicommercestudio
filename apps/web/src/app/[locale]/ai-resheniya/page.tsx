@@ -1,14 +1,18 @@
+import Link from "next/link";
+
 import { AdvisorPromo } from "@/components/advisor/AdvisorPromo";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { ServiceMotif } from "@/components/sections/ServiceMotif";
+import { Icon } from "@/components/ui/Icon";
 import { EditorialSplit } from "@/components/ui/patterns";
 import { ButtonLink, CheckList, cx, FeatureIndex, FeatureMatrix, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
+import { AI_SERVICE_NAV } from "@/lib/navigation";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
 
@@ -31,11 +35,12 @@ const riskTone: Record<string, string> = {
 
 export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/ai-resheniya">) {
   const locale = await resolveLocale(params);
-  const { aiSolutions: page, advisor } = getContent(locale);
+  const { aiSolutions: page, advisor, servicesPage } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const aiTools = serviceByKey(locale, "ai_tools");
   const managedService = serviceByKey(locale, "ai_managed");
+  const aiServices = AI_SERVICE_NAV.map((key) => serviceByKey(locale, key));
 
   return (
     <>
@@ -94,7 +99,30 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
         <ProcessTimeline steps={page.lifecycle} className="mt-14" />
       </Section>
 
-      <Section labelledBy="ai-managed-title">
+      <Section labelledBy="ai-services-title">
+        <SectionHeading id="ai-services-title" eyebrow={dict.nav.servicesAi} title={servicesPage.groups.ai.lead} size="sm" />
+        <ul className="mt-8 grid border-t border-line-subtle md:grid-cols-2 md:gap-x-10">
+          {aiServices.map((service) => (
+            <li key={service.key} className="min-w-0 border-b border-line-subtle">
+              <Link
+                href={href(routes.service(service.slug))}
+                className="group grid grid-cols-[2.75rem_minmax(0,1fr)_auto] items-start gap-4 py-5"
+              >
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand" aria-hidden="true">
+                  <Icon name={service.icon} className="h-5 w-5" />
+                </span>
+                <span className="min-w-0">
+                  <span className="t-h3 block transition-colors group-hover:text-brand">{service.shortTitle}</span>
+                  <span className="mt-1 block text-[15px] leading-relaxed text-fg-muted">{service.summary}</span>
+                </span>
+                <Icon name="arrowRight" className="arrow-nudge mt-1 h-5 w-5 text-fg-subtle group-hover:text-brand group-focus-visible:text-brand" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section labelledBy="ai-managed-title" tone="deep">
         <div className="card card-accent grid gap-6 p-8 sm:p-10 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center">
           <ServiceMotif service="ai_managed" className="h-20 w-28" />
           <div>

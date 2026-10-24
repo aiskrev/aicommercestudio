@@ -172,10 +172,14 @@ Usage example:
 | `ServiceShowcase` | `sections/ServiceShowcase.tsx` | *AI & automation* as large panels, *core operations* as compact rows (rows use `.focus-frame`) |
 | `ServiceMotif` | `sections/ServiceMotif.tsx` | small per-discipline line drawing (decorative) |
 | `ServiceConcept` | `sections/ServiceConcept.tsx` | service hero schema (cycle / tree / stack / flow / funnel / hub / checklist) in a `DiagramFrame` |
-| `HeroWorkflow` | `home/HeroWorkflow.tsx` | product-style demo of a controlled automation (labelled demo data) |
-| `AiPipeline` | `home/AiPipeline.tsx` | 5 stages + "AI may" / "requires approval" lanes |
+| `SystemMap` | `home/SystemMap.tsx` | homepage hero: layers of an AI system (data → intelligence → agents → human approval gate → actions) with an operations rail; server-rendered HTML in a `DiagramFrame`, captioned as illustrative |
+| `HeroWorkflow` | `home/HeroWorkflow.tsx` | product-style demo of a controlled automation (labelled demo data); used in the homepage solution-architecture section |
+| `ControlLanes` | `home/ControlLanes.tsx` | "AI may do alone" (periwinkle) / "requires approval" (amber) / "always recorded" (green) next to the workflow |
+| `BuildBento` | `home/BuildBento.tsx` | "What we build": six offerings on a 12-column bento (one featured, one full width), each card one link named by its title |
+| `ToolsPreview` | `home/ToolsPreview.tsx` | live tool (AI Automation Advisor + `AdvisorPreview` product window) and planned tools labelled "in preparation" — never linked |
+| `UseCaseLedger` | `home/UseCaseLedger.tsx` | use cases by business function on paper: function / what AI does / where a person decides (`<dl>` per row) |
 | `ProcessSteps` | `home/ProcessSteps.tsx` | `vertical` or `horizontal` timeline |
-| `CredibilityStrip`, `ManagedFeature`, `AdvisorShowcase`, `ProblemIndex` | `home/*` | homepage sections |
+| `CredibilityStrip`, `AdvisorPreview` | `home/*` | capability strip; Advisor sample input → output window |
 | `ArticleCard` | `editorial/ArticleCard.tsx` | `card` / `featured` / `row` (row uses `.focus-frame`) |
 | `AiOpsDiagram` | `sections/AiOpsDiagram.tsx` | horizontal or `vertical`, in a `DiagramFrame` |
 | `CtaBand` | `sections/CtaBand.tsx` | panel or `emphasis` |
@@ -229,6 +233,26 @@ Rules:
 * New interactive pieces reuse `.arrow-nudge`, `.link`, `.btn-*`, `.card-interactive`,
   `.focus-frame`, `.menu-enter` and `.reveal` instead of page-level `transition-*`/`hover:translate`
   utilities.
+
+## Homepage composition
+
+`app/[locale]/page.tsx`, content in `content/{bg,en}/home.ts` (EN typed against BG):
+
+| # | Section | Tone | Composition |
+| --- | --- | --- | --- |
+| 1 | Hero — positioning, CTAs (AI solutions; readiness → AI Automation Advisor), `SystemMap` | default + grid | asymmetric split |
+| 2 | Capabilities (`CredibilityStrip`) | raised strip | label + 3 × 2 index |
+| 3 | What we build (`BuildBento`) + engineering-foundation links | default, spacious | bento |
+| 4 | How we work — 5 stages (`ProcessSteps` horizontal) | raised | timeline |
+| 5 | Interactive tools (`ToolsPreview`) | default, spacious | product window + upcoming row |
+| 6 | Solution architecture — "AI suggests. People decide." (`HeroWorkflow` + `ControlLanes`) | deep, spacious | statement + diagram split |
+| 7 | Use cases by function (`UseCaseLedger`) | paper, spacious | editorial ledger |
+| 8 | FAQ | raised | sticky `EditorialSplit` |
+| 9 | Final CTA (`CtaBand emphasis`) | — | full-bleed statement |
+
+Honesty rules for the homepage: no client logos, testimonials or metrics; diagrams are captioned as
+illustrative; planned tools are shown as "in preparation" without links until their routes exist
+(see `docs/PLATFORM_EXPANSION_PLAN.md`).
 
 ## Composition rules
 

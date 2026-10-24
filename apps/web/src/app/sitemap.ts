@@ -15,6 +15,7 @@ const STATIC_PATHS: { path: string; priority: number; changeFrequency: Freq; leg
   { path: routes.home, priority: 1, changeFrequency: "weekly" },
   { path: routes.services, priority: 0.9, changeFrequency: "monthly" },
   { path: routes.aiSolutions, priority: 0.8, changeFrequency: "monthly" },
+  { path: routes.tools, priority: 0.7, changeFrequency: "monthly" },
   { path: routes.advisor, priority: 0.8, changeFrequency: "monthly" },
   { path: routes.industries, priority: 0.6, changeFrequency: "monthly" },
   { path: routes.process, priority: 0.5, changeFrequency: "monthly" },

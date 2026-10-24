@@ -7,10 +7,12 @@ import { Footer } from "@/components/layout/Footer";
 import { StickyQuoteBar } from "@/components/editorial/StickyQuoteBar";
 import { Header } from "@/components/layout/Header";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { buildSlugMap, getContent } from "@/content";
+import { buildSlugMap, serviceByKey } from "@/content";
+import type { ServiceKey } from "@/content/types";
 import { localeMeta, localizePath, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
+import { AI_SERVICE_NAV, FOUNDATION_SERVICE_NAV } from "@/lib/navigation";
 import { routes } from "@/lib/routes";
 import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -38,22 +40,29 @@ export const viewport: Viewport = {
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
   const locale = await resolveLocale(params);
   const dict = getDictionary(locale);
-  const { services } = getContent(locale);
   const href = (path: string) => localizePath(locale, path);
 
-  const navServices = services.map((service) => ({
-    href: href(routes.service(service.slug)),
-    label: service.shortTitle,
-    description: service.summary,
-    icon: service.icon,
-  }));
+  const navService = (key: ServiceKey) => {
+    const service = serviceByKey(locale, key);
+    return { href: href(routes.service(service.slug)), label: service.shortTitle, description: service.summary, icon: service.icon };
+  };
+  const serviceGroups = [
+    { title: dict.nav.servicesAi, items: AI_SERVICE_NAV.map(navService) },
+    { title: dict.nav.servicesFoundation, items: FOUNDATION_SERVICE_NAV.map(navService) },
+  ];
   const navItems = [
     { href: href(routes.aiSolutions), label: dict.nav.aiSolutions },
+    { href: href(routes.tools), label: dict.nav.tools },
     { href: href(routes.industries), label: dict.nav.industries },
-    { href: href(routes.process), label: dict.nav.process },
     { href: href(routes.insights), label: dict.nav.insights },
-    { href: href(routes.about), label: dict.nav.about },
   ];
+  const aboutMenu = {
+    label: dict.nav.about,
+    items: [
+      { href: href(routes.about), label: dict.nav.aboutUs },
+      { href: href(routes.process), label: dict.nav.approach },
+    ],
+  };
 
   return (
     <html lang={localeMeta[locale].htmlLang} className={`${inter.variable} ${manrope.variable} ${mono.variable}`}>
@@ -67,8 +76,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <Header
           homeHref={href(routes.home)}
           servicesHref={href(routes.services)}
-          services={navServices}
+          serviceGroups={serviceGroups}
           items={navItems}
+          aboutMenu={aboutMenu}
           cta={{ href: href(routes.contact), label: dict.nav.cta }}
           locale={locale}
           slugs={buildSlugMap()}
@@ -84,7 +94,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <main id="main" className="flex-1">
           {children}
         </main>
-        <Footer locale={locale} dict={dict} services={services} />
+        <Footer locale={locale} dict={dict} />
         <StickyQuoteBar
           href={href(`${routes.contact}?tip=oferta`)}
           label={dict.quoteBar.label}

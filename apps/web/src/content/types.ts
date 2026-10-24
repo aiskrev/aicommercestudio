@@ -7,6 +7,7 @@ export type ServiceKey =
   | "automation"
   | "analytics"
   | "integrations"
+  | "ai_agents"
   | "audit"
   | "ai_managed";
 
@@ -58,6 +59,10 @@ export interface Service {
   inputs: string[];
   /** Keys of articles that deepen the topic (internal linking). */
   relatedArticles: string[];
+  /** How we solve the problem: the approach in three steps or principles (service-page template). */
+  approach: Capability[];
+  /** Realistic use cases for this service — scenarios, never results or client names. */
+  useCases: Capability[];
 }
 
 export interface InlineLink {
