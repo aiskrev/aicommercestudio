@@ -5,7 +5,8 @@
 **Reviewer roles:** quality engineering, accessibility, performance and release management.
 
 **Code reviewed:** branch `release/final-review`. That is `feature/ai-operations-portal` (`c3ad89d`)
-plus the fixes listed in §3. It is built on `main` (`b40975e`).
+plus the fixes listed in §3. It is built on `main` (`b40975e`). Main has since merged the AI operations
+work as `170efd1`, with an identical tree; this branch now contains it.
 
 **Environment:** Windows 11, Docker Desktop. Every suite runs in the repository's own containers
 (`scripts/test.ps1`, `scripts/lighthouse.ps1`).
@@ -72,7 +73,6 @@ plus the fixes listed in §3. It is built on `main` (`b40975e`).
 - **AI operations scaffold (by design):**
   - It is staff-only.
   - PostgreSQL row-level security is designed but not enabled; it needs a non-owner database role.
-  - The pull request for `feature/ai-operations-portal` has not been created yet.
 
 ## 5. Security and privacy review
 
@@ -127,7 +127,7 @@ upgrade/downgrade round trip and `alembic check` are tested.
 | 0005 | `ai_agents` lead service | yes |
 | 0006 | `leads.marketing_consent_version` (nullable) | yes |
 | 0007 | `team_configurations` table | yes |
-| 0008 | `ops_*` tables (scaffold) | no, only on `feature/ai-operations-portal` |
+| 0008 | `ops_*` tables (scaffold) | yes (`170efd1`) |
 
 **Important:** the API container runs `alembic upgrade head` on start
 (`RUN_MIGRATIONS_ON_START=true` in `docker-compose.yml`). **Starting a new API image applies every
@@ -156,8 +156,7 @@ pending migration.** In production that needs a database backup first and explic
    `docker compose -f docker-compose.yml -f infra/docker-compose.prod.yml build`, with
    `SITE_URL=https://<domain>`.
 4. Start with `... up -d`. The API applies the pending migrations.
-5. Check that `docker compose exec api alembic current` shows `0008` (or `0007` without the ops
-   branch).
+5. Check that `docker compose exec api alembic current` shows `0008`.
 6. Run the manual checks below.
 
 **Rollback:**
@@ -190,7 +189,7 @@ pending migration.** In production that needs a database backup first and explic
 
 - [x] Every automated gate passes (API, web, build, e2e, audit).
 - [x] The defects found in this review are fixed and covered by tests.
-- [ ] The PR for `feature/ai-operations-portal` is created and merged, or the branch is explicitly excluded from the release.
+- [x] The AI operations work is merged into `main` (`170efd1`).
 - [ ] The fixes from this review (`release/final-review`) are reviewed and merged.
 - [ ] Production `SITE_URL`, secrets and the DPA with the AI provider are confirmed **(owner)**.
 - [ ] The legal texts are finalised (currently drafts, `noindex`) and the company details are published **(owner)**.
@@ -204,7 +203,7 @@ critical or high-severity defects remain open.
 
 **Conditions** before a public production release:
 
-1. Merge the open branches with CI green.
+1. Merge this branch (`release/final-review`) with CI green.
 2. Configure the production `SITE_URL` and secrets, take a backup, and explicitly approve the
    migrations that run on start.
 3. Finalise the legal texts and company details (owner).
