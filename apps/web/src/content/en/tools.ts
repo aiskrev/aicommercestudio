@@ -66,6 +66,7 @@ export const tools: typeof bgTools = {
       title: "Build your AI team",
       description: "Choose agents, the tools they may use and the approvals they need — and see the system as a diagram.",
       audience: "Teams planning AI agents",
+      cta: "Build your team",
     },
     {
       key: "roi",

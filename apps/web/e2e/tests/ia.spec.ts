@@ -27,9 +27,13 @@ for (const [locale, path, heading, upcoming] of [
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
     const live = page.locator("section[aria-labelledby='tools-live-title']");
     const links = await live.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
-    expect(links).toEqual([`/${locale}/ai-automation-advisor`, locale === "bg" ? "/bg/instrumenti/ai-gotovnost" : "/en/tools/ai-readiness"]);
+    expect(links).toEqual(
+      locale === "bg"
+        ? ["/bg/ai-automation-advisor", "/bg/instrumenti/ai-gotovnost", "/bg/instrumenti/ai-ekip"]
+        : ["/en/ai-automation-advisor", "/en/tools/ai-readiness", "/en/tools/ai-team"],
+    );
     const planned = page.locator("section[aria-labelledby='tools-upcoming-title']");
-    await expect(planned.locator("article[data-status='planned']")).toHaveCount(4);
+    await expect(planned.locator("article[data-status='planned']")).toHaveCount(3);
     await expect(planned.getByText(upcoming, { exact: true }).first()).toBeVisible();
     await expect(planned.getByRole("link")).toHaveCount(0);
   });
@@ -50,10 +54,11 @@ test("the AI agents service page follows the service template and preselects the
   for (const id of ["problems-title", "approach-title", "capabilities-title", "use-cases-title", "service-process-title", "service-tools-title", "service-faq-title"]) {
     await expect(page.locator(`[id="${id}"]`), id).toBeVisible();
   }
-  await expect(page.locator("section[aria-labelledby='service-tools-title']").getByRole("link")).toHaveAttribute(
-    "href",
-    "/en/ai-automation-advisor",
-  );
+  const toolLinks = await page
+    .locator("section[aria-labelledby='service-tools-title']")
+    .getByRole("link")
+    .evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+  expect(toolLinks).toEqual(["/en/ai-automation-advisor", "/en/tools/ai-team"]);
   await page.locator("main").getByRole("link", { name: "Request a quote" }).first().click();
   await expect(page).toHaveURL(/\/en\/contact\?service=ai_agents&type=quote$/);
   await expect(page.getByLabel(/^Service/)).toHaveValue("ai_agents");

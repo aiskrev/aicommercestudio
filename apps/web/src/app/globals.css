@@ -731,6 +731,13 @@
   .menu-enter { animation: menu-enter var(--duration-base) var(--ease-out-soft); }
   .menu-sheet-enter { animation: menu-sheet-enter var(--duration-slow) var(--ease-out-soft); }
 
+  /* Multi-step tools: each newly shown step eases in (skipped when reduced motion is requested). */
+  @media (prefers-reduced-motion: no-preference) {
+    .step-enter { animation: menu-sheet-enter var(--duration-slow) var(--ease-out-soft); }
+  }
+  /* Architecture diagram: nodes and edges fade when another element is selected. */
+  .arch-dim { transition: opacity var(--duration-base) var(--ease-standard); }
+
   /* Arrow/icon nudge inside a hovered or keyboard-focused link group (cards, rows, text links). */
   .arrow-nudge { flex-shrink: 0; transition: transform var(--duration-base) var(--ease-out-soft), color var(--duration-fast) var(--ease-standard); }
   .group:focus-visible .arrow-nudge,

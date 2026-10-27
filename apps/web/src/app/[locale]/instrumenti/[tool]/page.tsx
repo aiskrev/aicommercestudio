@@ -3,12 +3,13 @@ import { Suspense } from "react";
 
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ReadinessAssessment } from "@/components/tools/ReadinessAssessment";
+import { AiTeamBuilder } from "@/components/tools/team/AiTeamBuilder";
 import { ToolState } from "@/components/tools/ToolUi";
 import { Icon } from "@/components/ui/Icon";
 import { PageHero, Section } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
 import type { ServiceKey } from "@/content/types";
-import { isLocale, localizePath } from "@/i18n/config";
+import { type Locale, isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { ACTION_SERVICE } from "@/lib/readiness";
@@ -18,8 +19,16 @@ import { isToolAvailable, TOOL_SLUGS, toolByKey, toolHrefs } from "@/lib/tools";
 
 export const dynamicParams = false;
 
+type HostedTool = "readiness" | "team";
+
 /** Tools hosted under /instrumenti/<slug>. Only available tools (implemented + flag on) get a page. */
-const HOSTED: Record<string, "readiness"> = { [TOOL_SLUGS.readiness]: "readiness" };
+const HOSTED: Record<string, HostedTool> = { [TOOL_SLUGS.readiness]: "readiness", [TOOL_SLUGS.team]: "team" };
+
+/** Services each hosted tool can link to from its result. */
+const TOOL_SERVICES: Record<HostedTool, ServiceKey[]> = {
+  readiness: [...new Set(Object.values(ACTION_SERVICE))],
+  team: ["ai_agents", "integrations", "ai_managed"],
+};
 
 export function generateStaticParams({ params }: { params: { locale: string } }) {
   if (!isLocale(params.locale)) return [];
@@ -28,21 +37,27 @@ export function generateStaticParams({ params }: { params: { locale: string } })
     .map(([tool]) => ({ tool }));
 }
 
-function resolveTool(slug: string) {
+function resolveTool(slug: string): HostedTool | null {
   const key = HOSTED[slug];
   if (!key || !isToolAvailable(toolByKey(key))) return null;
   return key;
 }
 
+function toolContent(locale: Locale, key: HostedTool) {
+  const content = getContent(locale);
+  return key === "team" ? content.teamTool : content.readinessTool;
+}
+
 export async function generateMetadata({ params }: PageProps<"/[locale]/instrumenti/[tool]">) {
   const locale = await resolveLocale(params);
   const { tool } = await params;
-  if (!resolveTool(tool)) return {};
-  const { readinessTool } = getContent(locale);
+  const key = resolveTool(tool);
+  if (!key) return {};
+  const content = toolContent(locale, key);
   return buildMetadata({
     locale,
-    title: readinessTool.metaTitle,
-    description: readinessTool.metaDescription,
+    title: content.metaTitle,
+    description: content.metaDescription,
     path: routes.tool(tool),
   });
 }
@@ -50,18 +65,20 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/instrume
 export default async function ToolPage({ params }: PageProps<"/[locale]/instrumenti/[tool]">) {
   const locale = await resolveLocale(params);
   const { tool } = await params;
-  if (!resolveTool(tool)) notFound();
+  const key = resolveTool(tool);
+  if (!key) notFound();
 
-  const { readinessTool, tools } = getContent(locale);
+  const { readinessTool, teamTool, tools } = getContent(locale);
+  const page = toolContent(locale, key);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
-  const serviceKeys = [...new Set(Object.values(ACTION_SERVICE))] as ServiceKey[];
   const services = Object.fromEntries(
-    serviceKeys.map((key) => {
-      const service = serviceByKey(locale, key);
-      return [key, { href: href(routes.service(service.slug)), label: service.shortTitle }];
+    TOOL_SERVICES[key].map((service) => {
+      const entry = serviceByKey(locale, service);
+      return [service, { href: href(routes.service(entry.slug)), label: entry.shortTitle }];
     }),
   );
+  const loading = <ToolState kind="loading" title={tools.ui.loadingTitle} />;
 
   return (
     <>
@@ -69,12 +86,12 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
         items={[
           { name: dict.common.home, path: href(routes.home) },
           { name: dict.nav.tools, path: href(routes.tools) },
-          { name: readinessTool.title, path: href(routes.tool(tool)) },
+          { name: page.title, path: href(routes.tool(tool)) },
         ]}
       />
-      <PageHero eyebrow={readinessTool.eyebrow} title={readinessTool.title} lead={readinessTool.lead}>
+      <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead}>
         <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-fg-secondary">
-          {readinessTool.facts.map((fact) => (
+          {page.facts.map((fact) => (
             <li key={fact} className="inline-flex items-center gap-2">
               <Icon name="check" className="h-4 w-4 text-brand" />
               {fact}
@@ -82,19 +99,34 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
           ))}
         </ul>
       </PageHero>
-      <Section size="narrow">
-        <Suspense fallback={<ToolState kind="loading" title={tools.ui.loadingTitle} />}>
-          <ReadinessAssessment
-            content={readinessTool}
-            ui={tools.ui}
-            services={services}
-            contactHref={href(contactWithService("audit"))}
-            advisorHref={toolHrefs(locale).advisor}
-            privacyHref={href(routes.privacy)}
-            locale={locale}
-          />
-        </Suspense>
-      </Section>
+      {key === "readiness" ? (
+        <Section size="narrow">
+          <Suspense fallback={loading}>
+            <ReadinessAssessment
+              content={readinessTool}
+              ui={tools.ui}
+              services={services}
+              contactHref={href(contactWithService("audit"))}
+              advisorHref={toolHrefs(locale).advisor}
+              privacyHref={href(routes.privacy)}
+              locale={locale}
+            />
+          </Suspense>
+        </Section>
+      ) : (
+        <Section size="wide">
+          <Suspense fallback={loading}>
+            <AiTeamBuilder
+              content={teamTool}
+              ui={tools.ui}
+              services={services}
+              contactHref={href(contactWithService("ai_agents"))}
+              advisorHref={toolHrefs(locale).advisor}
+              locale={locale}
+            />
+          </Suspense>
+        </Section>
+      )}
     </>
   );
 }
