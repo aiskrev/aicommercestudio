@@ -1,5 +1,13 @@
 # UI redesign report — premium editorial redesign
 
+> **Historical (status 2026-10-27).** This redesign is in `main`: the commit `68436d0` was merged
+> with an identical tree as `831fe81`. It was then evolved by design system v2 (`efb4759`), the
+> interaction system (`4871b05`) and homepage v3 (`29c06e1`). Statements below such as "not
+> committed" or "main still has the original design" describe 2026-10-24. The branch
+> `design/premium-editorial-redesign` is superseded and must not be merged
+> ([PLATFORM_BASELINE_AUDIT.md](PLATFORM_BASELINE_AUDIT.md) §2). The current design rules are in
+> [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
+
 Date: 2026-10-24. Branch `design/premium-editorial-redesign`, created from `redesign/premium-ui`
 @ `42173f5` (the first redesign, pushed but not merged; `main` still has the original design with the
 orbital `HeroVisual` and uniform card grids). Frontend-only: no backend, database, API, routing or

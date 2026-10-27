@@ -55,20 +55,61 @@ inputs, articles), `services-template.ts` (approach, use cases). EN is typed aga
 
 ## Interactive tools
 
-`lib/tools.ts` is the registry: `TOOL_ROUTES` lists tools that exist (today only the AI
-Automation Advisor at `/ai-automation-advisor`); every other catalog entry (readiness assessment,
-Build your AI team, ROI calculator) is rendered as "in preparation" and never linked.
-`SERVICE_TOOLS` maps each service to its relevant tools. Texts: `content/{bg,en}/tools.ts`.
-Planned tool routes are in `docs/PLATFORM_EXPANSION_PLAN.md` (e.g. `/instrumenti/ai-gotovnost`).
+`src/lib/tools.ts` is the registry (`TOOLS`, `TOOL_SLUGS`). A tool is linked and routed only when
+`isToolAvailable` holds: status `live`, a path, and its flag on (`src/lib/feature-flags.ts`,
+overridable with `TOOL_FLAGS`). Hosted tools under `/instrumenti/[tool]` use `dynamicParams = false`,
+so unbuilt slugs return 404. Texts: `content/{bg,en}/tools.ts` and `content/{bg,en}/tool-*.ts`.
+Details: [TOOLS_PLATFORM.md](TOOLS_PLATFORM.md).
+
+| Tool | BG | EN |
+| --- | --- | --- |
+| AI Automation Advisor | `/bg/ai-automation-advisor` | `/en/ai-automation-advisor` |
+| AI readiness assessment | `/bg/instrumenti/ai-gotovnost` | `/en/tools/ai-readiness` |
+| Build your AI team | `/bg/instrumenti/ai-ekip` | `/en/tools/ai-team` |
+| AI ROI calculator | `/bg/instrumenti/roi-kalkulator` | `/en/tools/roi-calculator` |
+| Automation Opportunity Finder | `/bg/instrumenti/avtomatizatsii` | `/en/tools/automation-finder` |
+| AI Solution Builder | `/bg/instrumenti/ai-reshenie` | `/en/tools/solution-builder` |
+| AI Agent Library (index + 10 agent pages) | `/bg/ai-agenti[/slug]` | `/en/ai-agents[/slug]` |
+
+All seven are live, so the hub's "in preparation" section is not rendered.
+
+`SERVICE_TOOLS` lists the tools offered on each service page, most relevant first:
+
+* `ai_agents`: advisor, team, solution, agents
+* `automation`: finder, roi, advisor
+* `ai_tools`: advisor, readiness
+* `integrations`: advisor, solution
+* `ai_managed`: readiness
+* `audit`: readiness, finder, advisor
+* `analytics`: roi
+* `maintenance`, `seo`: none
 
 ## Conversion flows
 
 * Header/footer CTA → contact (consultation).
 * Service pages → `contactWithService` / `quoteWithService` (service preselected, quote mode).
-* Tools → the Advisor (assessment → consultation hand-off, unchanged).
+* Tools → consultation:
+  * the Advisor (assessment → consultation hand-off);
+  * readiness and AI team (optional submission → lead);
+  * ROI, Finder and Solution Builder (contact CTA; the visitor's inputs are not sent).
+* Tool → tool:
+  * Finder → ROI (process name through `sessionStorage`) and → AI team;
+  * AI team → ROI (cost fields only);
+  * Agent Library → Solution Builder (`?w=<workflow>`) and → AI team.
 * AI Managed Services page → its own inquiry form (unchanged).
 
-## Route changes (this revision)
+## Route changes
+
+Routes added after the revision below (2026-10-24 → 2026-10-27), with no renames or removals:
+
+* `/instrumenti/{ai-gotovnost,ai-ekip,roi-kalkulator,avtomatizatsii,ai-reshenie}` ↔
+  `/tools/{ai-readiness,ai-team,roi-calculator,automation-finder,solution-builder}`;
+* `/ai-agenti[/slug]` ↔ `/ai-agents[/slug]`;
+* the staff-only `/admin/operations`.
+
+All of them are in the sitemap with reciprocal hreflang, except the admin page.
+
+### Revision 2026-10-24
 
 | Change | BG | EN | Notes |
 | --- | --- | --- | --- |

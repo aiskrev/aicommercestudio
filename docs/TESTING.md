@@ -4,12 +4,26 @@ All suites run in Docker; no local Node or Python is needed.
 
 ```powershell
 .\scripts\test.ps1                 # api + web + e2e
-.\scripts\test.ps1 -Suite api      # docker compose --profile test run --rm --build api-tests  (+ ruff)
+.\scripts\test.ps1 -Suite api      # docker compose --profile test run --rm --build api-tests  (+ ruff, docs sync)
 .\scripts\test.ps1 -Suite web      # docker compose --profile test run --rm --build web-tests
 .\scripts\test.ps1 -Suite e2e      # docker compose up -d --build; docker compose --profile test run --rm --build e2e
 .\scripts\test.ps1 -Suite audit    # pip-audit + npm audit --omit=dev
 .\scripts\lighthouse.ps1           # Lighthouse lab baseline (not a test; see PERFORMANCE_BASELINE.md)
 ```
+
+Checks that run before the API suite (`-Suite api` / `web` / `all`):
+
+* the readiness and AI team golden vectors and texts are identical in `apps/api` and `apps/web`;
+* **docs sync** (`apps/api/scripts/docs_sync.py`, part of `-Suite api`):
+  * `docs/openapi.json` equals the spec generated from the code;
+  * `docs/API_REFERENCE.md` names every route (method + path);
+  * `README.md` links every document in `docs/`.
+
+  Regenerate the spec with:
+
+  ```powershell
+  docker compose --profile test run --rm --no-deps -v "${PWD}:/repo" api-tests python scripts/docs_sync.py --write
+  ```
 
 ## Continuous integration (GitHub Actions)
 
@@ -39,7 +53,7 @@ migrated with Alembic (the same path production uses). Tables are truncated betw
 | --- | --- |
 | `test_health.py` | liveness, readiness (DB), request IDs, OpenAPI availability |
 | `test_public_leads.py` | valid lead persisted with consents & IP hash; 11 invalid-input cases; Bulgarian messages; honeypot; form-token missing/forged/too fast/expired; link spam; per-IP and global rate limits; SQL-injection payload stored as plain text; no public lead listing |
-| `test_admin_auth.py` | all 14 admin endpoints return 401 anonymously; cookie flags (HttpOnly, SameSite); token stored hashed; generic login errors + audit; login rate limit; CSRF missing/forged; logout revocation; expired session; deactivated user; forged cookie |
+| `test_admin_auth.py` | 18 admin endpoints return 401 anonymously (the two report downloads are covered in `test_readiness.py` / `test_team.py`); cookie flags (HttpOnly, SameSite); token stored hashed; generic login errors + audit; login rate limit; CSRF missing/forged; logout revocation; expired session; deactivated user; forged cookie |
 | `test_admin_leads.py` | pagination, sorting, filters, LIKE-wildcard escaping, invalid filters, details, status updates (all 6 statuses) with audit trail, notes, GDPR deletion without PII in audit, 404/422 ids, dashboard stats from real data, system status, audit endpoint |
 | `test_security.py` | origin check, CORS preflight, 413 body limit, security headers, no-store caching, malformed JSON, production config refusal (placeholder secret, wildcard CORS, insecure cookies, non-https SITE_URL/CORS), DB errors without bound parameters, docs hidden + HSTS in production, Argon2id, password policy |
 | `test_ai.py` | mock triage classification, urgency, PII redaction, provider fallback without key, approval policy for every action type, unknown actions fail closed, proposal/approval/rejection workflow + 409 |
@@ -48,6 +62,10 @@ migrated with Alembic (the same path production uses). Tables are truncated betw
 | `test_production_features.py` | CLI `set-password` (lockout cleared, sessions revoked, audited), quote requests (persistence, 9 invalid cases, required fields, honeypot, shared rate limit), error envelope codes + request id, persistent lockout (persistence across limiter reset, unknown-account parity, counter reset), idle-session revocation, logout-all + session list, service re-categorisation, optimistic concurrency (409), throttled `lead.viewed` audit, inquiry-type filter/stats, audit search (filters, pagination, wildcard escaping), retention preview + confirmed run, purge-synthetic, **full lifecycle visitor → admin → audit verified with raw SQL** |
 | `test_ai_managed_and_locale.py` | AI Managed inquiry persisted with details + language + audit; default `bg`; invalid locale 422; details only for `ai_managed`; 5 malformed-detail cases (empty lists, unknown enum, unknown field `api_key`); secrets rejected in message/notes/provider with English message; `Accept-Language` selects error language (fallback `bg`); flat nested field names; admin filter by language/service, detail with `ai_managed`, `by_locale` stats; no public exposure; re-categorisation to `ai_managed`; bilingual mock triage; customer acknowledgement templates; **migration 0004** backfill (`locale = bg`) and downgrade re-categorisation |
 | `test_advisor_english.py` | English templates cover every pattern with the same structure/approval flags; English demo output without Cyrillic and without financial claims; English description matched on both pages; English API response, disclaimer, notices and write-approval; unsupported locale 422; English claim/side-effect scrubbing; system prompt language and English option labels sent to the provider |
+| `test_readiness.py` | readiness scoring = shared golden vectors; meta; anonymous PDF report (BG/EN, nothing stored); submissions with consent → lead (`service_details`), validation, rate limits; admin report download (401 anonymously, 404 for other leads); retention |
+| `test_team.py` | AI team model = shared vectors and texts; estimate (three cost scenarios, overrides); PDF plan; saved configurations (hashed token, POST lookup, expiry, link to lead); consultation submissions; validation and rate limits; admin team report (401/404); retention |
+| `test_ai_agents_service.py` | `ai_agents` lead service accepted and stored (migration 0005) |
+| `test_ops_portal.py` | AI operations scaffold. Every route requires a session; writes require CSRF. Members see only their organisations. A foreign organisation is indistinguishable from a missing one (404). Foreign ids through the caller's own organisation return 404. The composite FK rejects a cross-tenant workspace. The audit view is scoped per organisation. RBAC matrix per role (5 roles); owner, rank and last-owner rules. Secret-like text and invalid identifiers rejected. Suspended organisations are read-only. The overview reports no telemetry. Demo data is refused in production. |
 | `test_advisor.py` | AI advisor: demo mode labelling, all 11 output sections, determinism, no financial claims in demo output, storage opt-out, PII/link removal before storage, 11 invalid-input cases, form token, rate limit (invalid requests count), prompt-injection flagging and delimiter neutralising, invalid model output → 502 (6 cases), truncation of over-long output, removal of financial promises and links, forced human approval, provider error mapping (5 kinds), logs without description/output, structured-output schema compatibility, consultation link + admin view + audit flag, unknown/reused/expired ids ignored, cascade delete with the lead, retention; Anthropic adapter with a fake SDK client (request shape, no tools, refusal, truncation, invalid JSON, timeout/connection errors) |
 
 Lint: `ruff check` (pyflakes, pycodestyle, isort, bugbear, pyupgrade, bandit-style `S` rules, simplify).
@@ -62,6 +80,14 @@ Lint: `ruff check` (pyflakes, pycodestyle, isort, bugbear, pyupgrade, bandit-sty
 | `lib/routing-and-seo.test.ts` | root redirect (default / cookie / invalid cookie, query kept), legacy 308 to `/bg`, `/en` rewrites and Bulgarian-segment redirects with query translation, admin guard, open-redirect protection, `localizePath` / `toPublicPath` / round trips, language-switcher mapping (services, articles, topics, query, fallbacks), canonical + hreflang + OG locale, sitemap completeness for both languages with reciprocal alternates, robots rules |
 | `lib/i18n.test.ts` | identical key sets for site and admin dictionaries, no empty translations, **no Cyrillic in English UI/admin/content**, no raw keys, admin labels for every AI Managed option, placeholder filling; AI Managed form validation in both languages, credential detection, payload with `locale` and `ai_managed` only for that service |
 | `components/advisor/AdvisorTool.test.tsx` | advisor validation helpers (required fields, links, exclusive "none", no personal-data fields in the payload, only `locale` added); demo notice before submit; errors without sending; full result with demo disclaimer and focus; consultation form pre-filled and sending `advisor_assessment_id`; timeout message |
+| `lib/readiness.test.ts`, `lib/readiness.parity.test.ts` | readiness scoring rules and boundaries; parity with the API's golden vectors |
+| `lib/ai-team.test.ts`, `lib/team.parity.test.ts`, `lib/team-texts.test.ts` | AI team rules (recommendations, dependencies, approvals, architecture, rollout); parity with API vectors and texts |
+| `lib/roi.test.ts`, `lib/finder.test.ts` | ROI formulas and validation; finder scoring and ranking |
+| `lib/solution.test.ts`, `lib/agent-library.test.ts` | Solution Builder rules (approval floor, agents, architecture, complexity bands, roadmap, share code); agent library derivation, filters, slugs |
+| `lib/analytics.test.ts` | analytics allow-list, feature flags, tool registry and localized tool URLs |
+| `components/tools/tools.test.tsx`, `components/tools/roi-finder.test.tsx`, `components/tools/team/team.test.tsx`, `components/tools/team/team-costs.test.tsx`, `components/tools/solution/solution.test.tsx` | tool flows: validation, keyboard use, results, share links, no personal or secret fields, analytics events |
+| `components/home/home.test.tsx`, `components/layout/Header.test.tsx`, `components/ui/primitives.test.tsx`, `components/ui/patterns.test.tsx` | homepage sections, navigation menu behaviour, UI primitives and patterns |
+| `components/admin/operations.test.tsx` | operations page: membership-only empty state, no telemetry, demo label, members only with permission, requests only for the selected organisation |
 | `content/seo-map.test.ts` | for **each locale**: keyword map: one page per primary keyword, no cross-page overlap, keyword in title, mapped paths in sitemap, unverified volume unless evidence; editorial integrity (categories, related services/articles, inline links, tables, unique service H2s, every article reachable); case-study publish guard; draft legal + thin topic pages excluded from sitemap |
 
 The `web-tests` container also runs `next typegen && tsc --noEmit` and `eslint .` (Next core-web-vitals + TypeScript rules).
@@ -77,9 +103,16 @@ and Pixel 7 emulation. Admin credentials come from `.env`.
 | `links.spec.ts` | crawls every sitemap URL and every internal link found — none may fail |
 | `contact.spec.ts` | invalid form shows errors and sends nothing; server rejects invalid payloads; **quote request** (`?tip=oferta`) with structured fields; valid submission (with `?usluga=` pre-selection) returns a reference |
 | `admin.spec.ts` | anonymous redirect to login; admin API 401 with `code` (GET, PATCH, retention run); wrong credentials; full flow: login → dashboard → search lead → change status → add note → reload persists → AI triage → **audit log shows the status change by the admin and the `lead.viewed` access** → logout → protected again |
-| `mobile.spec.ts` | no horizontal overflow on 19 pages (BG and EN) at phone width; mobile menu; sticky quote bar (appears after scrolling, hides at the footer, absent on `/kontakti`, dismiss persists for the session); contact form usable |
+| `mobile.spec.ts` | no horizontal overflow on 31 pages (BG and EN) at phone width; mobile menu; sticky quote bar (appears after scrolling, hides at the footer, absent on `/kontakti`, dismiss persists for the session); contact form usable |
 | `seo.spec.ts` | crawls **every sitemap URL**: status 200, exactly one H1, unique title, description ≥ 70 chars, self-canonical, `og:title`, not `noindex`, valid JSON-LD; draft legal + thin topic pages are `noindex`; article features (key points, table, inline CTA, related services, `Article` JSON-LD); `/proekti` 404; quote CTA pre-fills the form; message helper + blur validation; nav `aria-current` |
 | `i18n.spec.ts` | `/` → `/bg` by default and `/en` with the preference cookie; legacy 308 and `/en/<bg-segment>` 308 with query translation; English pages: `lang="en"`, no Cyrillic, no raw keys, self-canonical, reciprocal hreflang + `x-default`, `og:locale`; desktop switcher to the equivalent page + cookie; query preservation; mobile-menu switcher; English validation messages; API language by `Accept-Language`; English advisor demo output; AI Managed page in both languages (3 packages with custom-quote label, no prices/24-7/unlimited, no-SLA note, secrets warning, Service JSON-LD); **English AI Managed inquiry → admin (switched to English) shows language and AI details → admin switched back to Bulgarian**; credentials rejected client-side before sending |
+| `ia.spec.ts` | pre-existing routes still 200; tools hub links every live tool; language switcher; AI agents service page and tools; keyboard menus |
+| `tools.spec.ts` | readiness assessment end to end (BG), shared result link, unbuilt tool slugs 404, localized slug switch, blockers shown |
+| `readiness-reports.spec.ts` | PDF download without personal data; report API validation; submission with consent → reference |
+| `team.spec.ts`, `team-costs.spec.ts` | AI team journey (BG), shared plan (EN), invalid link fallback, language switch; transparent costs, PDF and saved link, consultation consent, API validation |
+| `roi-finder.spec.ts` | ROI from the visitor's own numbers, keyboard-readable chart and share link, finder → ROI hand-off, team costs → ROI, localized slugs |
+| `solution.spec.ts` | agent library (filters, detail, builder link), localized agent slugs and sitemap, Solution Builder end to end, shared design, phone overflow |
+| `operations.spec.ts` | AI Managed Services operating areas and planned portal (BG/EN); `/admin/operations` behind login; `/api/ops` 401 anonymously |
 | `advisor.spec.ts` | demo-mode journey: fill the advisor form → structured result with demo disclaimer and approval flags, no money/percentage figures → consultation linked to the assessment → admin sees `AI оценка #<ref>` on the lead; API rejects invalid input and personal-data fields; promo link from `/ai-resheniya` |
 
 Lighthouse is not part of `test.ps1`; the method used for the lab measurements is described in

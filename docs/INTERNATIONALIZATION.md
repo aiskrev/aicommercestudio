@@ -17,6 +17,9 @@ URLs are rewritten to them by `src/proxy.ts` (decision logic in `src/lib/locale-
 | AI Managed Services | `/bg/uslugi/ai-managed-services` | `/en/services/ai-managed-services` |
 | AI solutions | `/bg/ai-resheniya` | `/en/ai-solutions` |
 | AI advisor | `/bg/ai-automation-advisor` | `/en/ai-automation-advisor` |
+| Tools hub | `/bg/instrumenti` | `/en/tools` |
+| Tool | `/bg/instrumenti/ai-gotovnost`, `ai-ekip`, `roi-kalkulator`, `avtomatizatsii`, `ai-reshenie` | `/en/tools/ai-readiness`, `ai-team`, `roi-calculator`, `automation-finder`, `solution-builder` |
+| AI Agent Library | `/bg/ai-agenti`, `/bg/ai-agenti/<slug>` | `/en/ai-agents`, `/en/ai-agents/<slug>` (slugs in `src/lib/agent-slugs.ts`) |
 | Industries | `/bg/za-kogo` | `/en/industries` |
 | Process | `/bg/proces` | `/en/process` |
 | About | `/bg/za-nas` | `/en/about` |
@@ -26,7 +29,8 @@ URLs are rewritten to them by `src/proxy.ts` (decision logic in `src/lib/locale-
 | Legal | `/bg/poveritelnost`, `/bg/biskvitki`, `/bg/obshti-usloviya` | `/en/privacy`, `/en/cookies`, `/en/terms` |
 | Admin | `/admin` (no locale in the URL, see below) | |
 
-Segment mapping: `EN_SEGMENTS` / `EN_SUBSEGMENTS` in `src/i18n/config.ts`. Service, article and
+Segment mapping: `EN_SEGMENTS` / `EN_SUBSEGMENTS` in `src/i18n/config.ts`. Tool slugs are under
+`EN_SUBSEGMENTS.instrumenti`, agent slugs under `EN_SUBSEGMENTS["ai-agenti"]`. Service, article and
 topic slugs are translated per locale in the content files; cross-locale identity uses a stable
 `key` (`Service.key`, `Article.key`, `EditorialCategory.key` = the Bulgarian slug).
 

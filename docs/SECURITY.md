@@ -1,6 +1,8 @@
 # Security & privacy
 
-## Threat model (V1)
+## Threat model
+
+Updated 2026-10-27 to cover the interactive tools and the AI operations scaffold.
 
 | Asset | Threats | Main controls |
 | --- | --- | --- |
@@ -11,6 +13,8 @@
 | Browser | XSS, clickjacking, mixed content | React escaping; JSON-LD `<` escaped; CSP (`default-src 'self'`, `frame-ancestors 'none'`, `object-src 'none'`); `X-Frame-Options: DENY`; `nosniff`; HSTS at the proxy/API in production |
 | Secrets | leakage via Git or frontend | `.env` git-ignored; no secrets in `NEXT_PUBLIC_*`; random generation by `setup.ps1`; production refuses placeholder secrets |
 | AI agents (future) | unintended side effects, prompt injection, data exfiltration | approval policy (fail closed), audited decisions, PII redaction before any external call, read-only V1 feature |
+| Interactive tools and their data | personal data or secrets in tool payloads, enumeration of saved links, abuse of PDF generation | ROI, Finder, Solution Builder and Agent Library run in the browser and send nothing. Readiness and team payloads are enumerated values (strict schemas). Saved team links store only a SHA-256 token hash, sent in a POST body, never in a URL. Every public POST is rate-limited. Share codes are versioned and strictly decoded. |
+| Tenant data (AI operations scaffold) | cross-tenant read/write, tenant enumeration, privilege escalation | membership resolved per request; foreign organisation → 404 (same as missing); queries only through `scoped()`; composite FK workspace ↔ organisation; RBAC matrix with rank rules and last-owner protection; audited writes. **RLS not yet enabled** (the runtime DB role is the schema owner). |
 
 ## Implemented controls
 
@@ -20,8 +24,11 @@ for names, enum/CHECK constraints in the database, mirrored client-side validati
 **Authentication** — see [ARCHITECTURE.md](ARCHITECTURE.md#authentication). Admins are created only via
 CLI/bootstrap; there is no public registration. Password policy: ≥12 chars, mixed case and digits.
 
-**Authorisation** — every `/api/admin/*` route depends on `require_admin`; covered by a parametrised test
-listing all 14 admin endpoints.
+**Authorisation** — every `/api/admin/*` route depends on `require_admin`. A parametrised test lists 18
+of them (`tests/test_admin_auth.py::PROTECTED`). The two report downloads have their own 401 tests
+(`test_readiness.py`, `test_team.py`). Every `/api/ops/*` route additionally requires membership in
+the organisation and a permission from `app/ops/rbac.py`, and is covered by authorisation and
+tenant-isolation tests (`tests/test_ops_portal.py`).
 
 **CORS** — explicit allow-list (`CORS_ORIGINS`), credentials only for listed origins; `*` refused in production.
 
@@ -52,7 +59,28 @@ credentials or confidential documents; the client (`looksLikeSecret`) and the AP
 provider and notes fields. Details are validated by a strict model (`extra="forbid"`), stored as
 JSONB, re-validated when read and never exposed publicly. The public flow never connects to a
 client's AI system. Principle for future operations work: model output must never bypass
-deterministic authorisation or business rules ([AI_OPERATIONS_ARCHITECTURE.md](AI_OPERATIONS_ARCHITECTURE.md)).
+deterministic authorisation or business rules ([AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md)).
+
+**Interactive tools** — details in [TOOLS_PLATFORM.md](TOOLS_PLATFORM.md),
+[READINESS_REPORTS.md](READINESS_REPORTS.md), [TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md),
+[ROI_AND_FINDER.md](ROI_AND_FINDER.md) and [SOLUTION_BUILDER.md](SOLUTION_BUILDER.md).
+
+* No tool has a field for keys, tokens or passwords. The Solution Builder test asserts this.
+* Analytics emits only allow-listed, non-personal fields, and no sink is attached.
+* Optional submissions require consent.
+* Readiness and team leads follow the lead retention policy; unlinked saved configurations expire.
+* **Open:** the draft privacy policy (`content/{bg,en}/legal.ts`) mentions only the advisor. It
+  must also describe readiness submissions and saved team configurations before launch.
+
+**AI operations scaffold (staff only)**
+
+* Organisation-scoped API under `/api/ops` behind the admin session and CSRF, with roles owner,
+  admin, operator, reviewer and viewer.
+* Secret-like text and unknown fields are rejected in the registry.
+* Demo data is refused in production.
+* Design, isolation layers and the RBAC matrix: [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md).
+* Requirements before any client login (RLS with a restricted DB role, client accounts with MFA,
+  DPA): [IMPLEMENTATION_DEPENDENCIES_V2.md](IMPLEMENTATION_DEPENDENCIES_V2.md).
 
 **Locale handling** — the language is an allow-list (`bg`, `en`); unknown values in payloads are
 rejected (422), in `Accept-Language` they fall back to `bg`. The `acs_locale` preference cookie
@@ -69,7 +97,7 @@ build paths from fixed segment maps (no open redirect).
 | Data minimisation | only fields needed to answer an inquiry; phone optional; no tracking; IP hashed; the AI advisor asks for no personal data and strips e-mails/phones from the description; AI Managed inquiries collect descriptive system information only, never credentials or customer records |
 | Transparency | privacy policy draft; acknowledgement required, timestamped, notice version stored |
 | Separate marketing consent | optional checkbox, stored separately with timestamp; never required |
-| Retention | `LEAD_RETENTION_DAYS` (730), `AUDIT_RETENTION_DAYS` (1095), `ADVISOR_RETENTION_DAYS` (30, unlinked assessments); `app.cli maintenance` |
+| Retention | `LEAD_RETENTION_DAYS` (730), `AUDIT_RETENTION_DAYS` (1095), `ADVISOR_RETENTION_DAYS` (30, unlinked assessments), `READINESS_RETENTION_DAYS` (365, readiness leads), `TEAM_LEAD_RETENTION_DAYS` (365, team consultation leads), `TEAM_CONFIGURATION_RETENTION_DAYS` (90, unlinked saved team links); `app.cli maintenance`. Ops tenancy data follows the contract lifecycle (no automatic purge). |
 | Erasure | admin "Изтрий запитването" deletes lead + notes; audit keeps no personal data |
 | Access control | individual admin accounts, sessions, audit trail |
 | Cookies | strictly necessary admin cookies plus the functional `acs_locale` language preference (set only on an explicit switch); no consent banner needed; documented on `/bg/biskvitki` and `/en/cookies` |
