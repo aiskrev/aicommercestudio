@@ -13,6 +13,7 @@ const PAGES = [
   "/bg/statii",
   "/bg/instrumenti",
   "/bg/instrumenti/ai-gotovnost",
+  "/bg/instrumenti/ai-ekip",
   "/bg/uslugi/razrabotka-na-ai-agenti",
   "/en",
   "/en/services",
@@ -88,4 +89,39 @@ test("contact form is usable on mobile", async ({ page }) => {
   const box = await page.getByLabel(/Описание на проекта/).boundingBox();
   const viewport = page.viewportSize();
   expect(box && viewport && box.width <= viewport.width).toBeTruthy();
+});
+
+test("AI team configurator works on a phone: one-column agents, vertical diagram, no overflow", async ({ page }) => {
+  await page.goto("/en/tools/ai-team");
+  const form = page.getByTestId("team-form");
+  await form.getByRole("radio", { name: "E-commerce" }).check();
+  await form.getByRole("radio", { name: "11–50 people" }).check();
+  await form.getByRole("group", { name: "Department leading the initiative" }).getByRole("radio", { name: "Sales" }).check();
+  await form.getByRole("radio", { name: "Inquiries are not followed up in time" }).check();
+  await form.getByRole("radio", { name: "100–1,000" }).check();
+  await form.getByRole("button", { name: "Next" }).click();
+  await form.getByRole("button", { name: "Next" }).click();
+
+  const cards = form.locator("[data-agent]");
+  const first = await cards.nth(0).boundingBox();
+  const second = await cards.nth(1).boundingBox();
+  expect(first && second && second.y > first.y + first.height - 1).toBeTruthy(); // stacked, not side by side
+  await form.getByRole("checkbox", { name: "Lead Qualification Agent" }).check();
+  await form.getByRole("checkbox", { name: "Scheduling Agent" }).check();
+  await form.getByRole("button", { name: "Next" }).click();
+  await form.getByRole("radio", { name: /^Managed cloud environment/ }).check();
+  await form.getByRole("radio", { name: /^We do/ }).check();
+  await form.getByRole("button", { name: "Next" }).click();
+
+  await expect(form.locator("svg[data-orientation='vertical']")).toBeVisible();
+  await expect(form.locator("svg[data-orientation='horizontal']")).toBeHidden();
+  await form.locator("svg[data-orientation='vertical'] [data-node='agent:scheduling']").tap();
+  await expect(page.getByTestId("architecture-details")).toContainText("Scheduling Agent");
+  let overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+
+  await form.getByRole("button", { name: "See the result" }).click();
+  await expect(page.getByTestId("team-result")).toBeVisible();
+  overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
 });

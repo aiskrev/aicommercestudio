@@ -31,7 +31,8 @@ test("AI readiness assessment runs end to end in Bulgarian", async ({ page }) =>
   await expect(result.getByRole("heading", { name: "План за първите 90 дни" })).toBeVisible();
   await expect(result.getByText("Как се изчислява оценката")).toBeVisible();
   await expect(result.getByRole("link", { name: "Заяви консултация" })).toHaveAttribute("href", "/bg/kontakti?usluga=audit");
-  await expect(result.getByRole("button", { name: "Изтегли обобщение (.txt)" })).toBeVisible();
+  await expect(result.getByRole("button", { name: "Изтегли PDF отчета" })).toBeVisible();
+  await expect(result.getByRole("button", { name: "Изтегли обобщение (.txt)" })).toHaveCount(0);
 });
 
 test("a shared readiness link restores the result without a form", async ({ page }) => {
@@ -45,7 +46,7 @@ test("a shared readiness link restores the result without a form", async ({ page
 });
 
 test("tools that are not built have no page", async ({ request }) => {
-  for (const path of ["/bg/instrumenti/ai-ekip", "/en/tools/roi-calculator", "/bg/instrumenti/nesashtestvuva"]) {
+  for (const path of ["/bg/instrumenti/ai-biblioteka", "/en/tools/roi-calculator", "/bg/instrumenti/nesashtestvuva"]) {
     const response = await request.get(path);
     expect(response.status(), path).toBe(404);
   }

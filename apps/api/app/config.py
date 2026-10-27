@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     lead_retention_days: int = Field(default=730, ge=30)
     audit_retention_days: int = Field(default=1095, ge=30)
     privacy_notice_version: str = "2026-10-draft"
+    # Version of the marketing-consent wording shown next to the opt-in checkbox (recorded with consent).
+    marketing_consent_version: str = "2026-10-v1"
 
     admin_bootstrap_email: str | None = None
     admin_bootstrap_password: str | None = None
@@ -67,6 +69,14 @@ class Settings(BaseSettings):
     advisor_timeout_seconds: float = Field(default=45.0, ge=5, le=120)
     # Unlinked assessments are deleted after this many days; linked ones follow the lead.
     advisor_retention_days: int = Field(default=30, ge=1, le=365)
+
+    # AI Readiness Assessment: anonymous PDF reports (CPU-bound, so rate-limited) and submissions.
+    readiness_report_rate_limit: int = Field(default=10, ge=1)
+    readiness_report_rate_window_seconds: int = Field(default=600, ge=1)
+    readiness_report_global_rate_limit: int = Field(default=300, ge=1)
+    # Leads created from the assessment are deleted after this many days without activity
+    # (shorter than LEAD_RETENTION_DAYS; whichever applies first wins).
+    readiness_retention_days: int = Field(default=365, ge=30, le=3650)
 
     smtp_host: str | None = None
     smtp_port: int = 587

@@ -48,6 +48,10 @@ ERROR_MESSAGES: dict[str, dict[Locale, str]] = {
         "en": "The request was rejected (invalid origin).",
     },
     "payload_too_large": {"bg": "Заявката е твърде голяма.", "en": "The request is too large."},
+    "report_unavailable": {
+        "bg": "Отчетът временно не може да бъде създаден. Моля, опитайте отново по-късно.",
+        "en": "The report cannot be created right now. Please try again later.",
+    },
     "not_found": {"bg": "Ресурсът не е намерен.", "en": "The resource was not found."},
     "method_not_allowed": {"bg": "Методът не е позволен.", "en": "Method not allowed."},
     "internal_error": {
@@ -151,6 +155,14 @@ VALIDATION_MESSAGES: dict[str, dict[Locale, str]] = {
     "nothing_to_change": {
         "bg": "Посочете статус или услуга за промяна.",
         "en": "Specify a status or service to change.",
+    },
+    "readiness_model": {
+        "bg": "Оценката е направена с по-стара версия. Моля, презаредете страницата.",
+        "en": "The assessment was made with an older version. Please reload the page.",
+    },
+    "readiness_answers": {
+        "bg": "Отговорите на оценката са непълни или невалидни.",
+        "en": "The assessment answers are incomplete or invalid.",
     },
     "too_many_links": {
         "bg": "Описанието съдържа твърде много връзки. Опишете процеса с думи.",

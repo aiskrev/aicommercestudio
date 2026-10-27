@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
+import { ReadinessReport } from "@/components/tools/ReadinessReport";
 import { ToolActions } from "@/components/tools/ToolActions";
 import {
   ChoiceQuestion,
@@ -31,7 +32,6 @@ import {
   READINESS_QUESTIONS,
   type ReadinessAnswers,
   type ReadinessQuestionId,
-  type ReadinessResult,
   type RoadmapItem,
   decodeAnswers,
   encodeAnswers,
@@ -51,43 +51,13 @@ function roadmapText(item: RoadmapItem, content: Content): string {
     : content.result.actions[item as keyof Content["result"]["actions"]].title;
 }
 
-/** Plain-text summary for download (no personal data: only scores, levels and recommendations). */
-export function readinessSummaryText(result: ReadinessResult, content: Content, services: ServiceLinks): string {
-  const r = content.result;
-  const dimension = (key: keyof Content["steps"]) => content.steps[key].title;
-  const section = (title: string, lines: string[]) => (lines.length ? ["", `${title}:`, ...lines] : []);
-  return [
-    r.summaryHeading,
-    "",
-    `${r.overallLabel}: ${result.overall}/100 — ${r.bandLabel}: ${r.bands[result.band].title}`,
-    r.bands[result.band].description,
-    ...section(r.dimensionsTitle, result.dimensions.map((d) => `- ${dimension(d.dimension)}: ${d.score}/100`)),
-    ...section(r.blockersTitle, result.blockers.map((b) => `- ${r.blockers[b].title}: ${r.blockers[b].text}`)),
-    ...section(r.strengthsTitle, result.strengths.map((d) => `- ${dimension(d)}`)),
-    ...section(r.gapsTitle, result.gaps.map((d) => `- ${dimension(d)}`)),
-    ...section(
-      r.actionsTitle,
-      result.actions.map((a, i) => `${i + 1}. ${r.actions[a].title} — ${r.actions[a].text} (${r.serviceLabel}: ${services[ACTION_SERVICE[a]]?.label ?? ""})`),
-    ),
-    ...section(r.useCasesTitle, result.useCases.map((u) => `- ${r.useCases[u].title}: ${r.useCases[u].text}`)),
-    ...section(
-      r.roadmapTitle,
-      (["d30", "d60", "d90"] as const).flatMap((phase) => [
-        `${r.roadmapPhases[phase]}:`,
-        ...result.roadmap[phase].map((item) => `  - ${roadmapText(item, content)}`),
-      ]),
-    ),
-    "",
-    r.methodology.disclaimer,
-  ].join("\n");
-}
-
 export function ReadinessAssessment({
   content,
   ui,
   services,
   contactHref,
   advisorHref,
+  privacyHref,
   locale,
 }: {
   content: Content;
@@ -96,6 +66,7 @@ export function ReadinessAssessment({
   services: ServiceLinks;
   contactHref: string;
   advisorHref?: string;
+  privacyHref: string;
   locale: Locale;
 }) {
   // A shared result (?r=<code>) is read during render; the page wraps this tool in <Suspense>.
@@ -238,11 +209,17 @@ export function ReadinessAssessment({
           paragraphs={[r.methodology.scale, r.methodology.weights, r.methodology.bands, r.methodology.blockers, r.methodology.disclaimer]}
         />
 
+        <ReadinessReport
+          content={content}
+          answers={answers}
+          overall={result.overall}
+          locale={locale}
+          privacyHref={privacyHref}
+          onExport={() => track("export_requested", { format: "pdf" })}
+        />
         <ToolActions
           title={ui.actionsTitle}
           labels={ui}
-          fileName="ai-readiness.txt"
-          summaryText={() => readinessSummaryText(result, content, services)}
           shareUrl={() => `${window.location.origin}${window.location.pathname}?r=${encodeAnswers(answers)}`}
           onExport={(format) => track("export_requested", { format })}
         />
