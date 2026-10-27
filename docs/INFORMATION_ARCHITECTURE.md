@@ -1,5 +1,9 @@
 # Information architecture
 
+> Describes the **current** IA (implemented). The next IA for the ten service domains — mega-menu, new page types,
+> indexability rules and a route-by-route matrix — is designed in [INFORMATION_ARCHITECTURE_V2.md](INFORMATION_ARCHITECTURE_V2.md)
+> (not implemented yet).
+
 Routes live under `apps/web/src/app/[locale]/`; Bulgarian path segments are canonical and English
 URLs are produced by `EN_SEGMENTS` in `src/i18n/config.ts` (`localizePath`). Navigation data is
 assembled in `app/[locale]/layout.tsx`; the service grouping is shared in `src/lib/navigation.ts`.
