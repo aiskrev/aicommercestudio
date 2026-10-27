@@ -52,8 +52,9 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
       />
       <PageHero eyebrow={page.eyebrow} title={page.title} lead={page.lead} />
 
-      <Section>
-        <FeatureIndex items={page.types} />
+      <Section labelledBy="ai-types">
+        <SectionHeading id="ai-types" title={page.typesTitle} size="sm" />
+        <FeatureIndex items={page.types} className="mt-8" />
         <AdvisorPromo promo={advisor.promo} href={href(routes.advisor)} className="mt-10" />
       </Section>
 

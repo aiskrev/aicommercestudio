@@ -303,7 +303,8 @@ export function RoiCalculator({
                 {ROI_FIELDS.filter((f) => errors[f]).length} / {ROI_FIELDS.length}
               </p>
               <div>
-                <Button variant="secondary" onClick={revealErrors}>
+                {/* Long sentence on a narrow sticky panel: let it wrap instead of overflowing. */}
+                <Button variant="secondary" onClick={revealErrors} className="h-auto whitespace-normal py-2.5 text-left">
                   {content.errors.summary}
                 </Button>
               </div>

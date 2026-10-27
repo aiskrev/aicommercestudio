@@ -33,6 +33,17 @@ interface PageMetaInput {
  * Page metadata with a self-referencing canonical, reciprocal hreflang alternates for every locale the
  * page exists in, and x-default pointing to the Bulgarian (default-locale) version.
  */
+/**
+ * Site-wide social image (app/opengraph-image.tsx, 1200×630). Referenced explicitly: a page-level
+ * `openGraph` object replaces the inherited one, so the file-based image would otherwise be dropped.
+ */
+export const OG_IMAGE = {
+  url: "/opengraph-image",
+  width: 1200,
+  height: 630,
+  alt: "A.I. Commerce Studio — AI, automation and e-commerce engineering",
+};
+
 export function buildMetadata({
   locale,
   title,
@@ -68,9 +79,10 @@ export function buildMetadata({
       ...(publishedTime ? { publishedTime } : {}),
       ...(modifiedTime ? { modifiedTime } : {}),
       ...(section ? { section } : {}),
+      images: [OG_IMAGE],
     },
     ...(noindex ? { robots: { index: false, follow: true } } : {}),
-    twitter: { card: "summary_large_image", title: fullTitle, description },
+    twitter: { card: "summary_large_image", title: fullTitle, description, images: [OG_IMAGE.url] },
   };
 }
 

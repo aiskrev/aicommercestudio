@@ -155,6 +155,12 @@ describe("SEO helpers", () => {
     expect(meta.openGraph?.locale).toBe("en_US");
   });
 
+  it("always includes the social image (a page-level openGraph would otherwise drop it)", () => {
+    const meta = buildMetadata({ locale: "bg", title: "T", description: "D", path: "/" });
+    expect(meta.openGraph?.images).toEqual([expect.objectContaining({ url: "/opengraph-image", width: 1200, height: 630 })]);
+    expect(meta.twitter?.images).toEqual(["/opengraph-image"]);
+  });
+
   it("produces a valid FAQPage structure", () => {
     const data = faqJsonLd([{ question: "Q?", answer: "A." }]);
     expect(data["@type"]).toBe("FAQPage");

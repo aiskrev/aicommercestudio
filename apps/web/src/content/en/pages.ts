@@ -259,6 +259,7 @@ export const aiSolutions: typeof bgAiSolutions = {
   title: "AI that works with your data and your rules",
   lead:
     "We design AI solutions as part of your business processes — with a clear task, verifiable quality, data protection and human oversight wherever decisions have consequences.",
+  typesTitle: "What we build",
   types: [
     {
       icon: "message",
