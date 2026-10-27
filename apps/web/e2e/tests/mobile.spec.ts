@@ -11,6 +11,9 @@ const PAGES = [
   "/bg/proces",
   "/bg/kontakti",
   "/bg/statii",
+  "/bg/instrumenti",
+  "/bg/instrumenti/ai-gotovnost",
+  "/bg/uslugi/razrabotka-na-ai-agenti",
   "/en",
   "/en/services",
   "/en/services/ai-managed-services",
@@ -19,6 +22,9 @@ const PAGES = [
   "/en/industries",
   "/en/contact",
   "/en/insights",
+  "/en/tools",
+  "/en/tools/ai-readiness",
+  "/en/services/ai-agent-development",
   "/admin/login",
 ];
 
@@ -42,7 +48,7 @@ test("mobile menu opens, navigates and closes", async ({ page }) => {
   await expect(panel).toBeVisible();
   const box = await panel.boundingBox();
   expect(box && box.height > 300).toBeTruthy();
-  const link = panel.getByRole("link", { name: "Процес", exact: true });
+  const link = panel.getByRole("link", { name: "Как работим", exact: true });
   await expect(link).toBeVisible();
   await link.click();
   await expect(page).toHaveURL(/\/proces$/);

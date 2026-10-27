@@ -3,6 +3,7 @@ import type { MetadataRoute } from "next";
 import { articleRoutePaths, getContent, isIndexableCategory, serviceRoutePaths, topicRoutePaths } from "@/content";
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
 import { routes } from "@/lib/routes";
+import { isToolAvailable, TOOLS } from "@/lib/tools";
 import { type LocalizedPaths, samePathEverywhere } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/site";
 
@@ -15,6 +16,7 @@ const STATIC_PATHS: { path: string; priority: number; changeFrequency: Freq; leg
   { path: routes.home, priority: 1, changeFrequency: "weekly" },
   { path: routes.services, priority: 0.9, changeFrequency: "monthly" },
   { path: routes.aiSolutions, priority: 0.8, changeFrequency: "monthly" },
+  { path: routes.tools, priority: 0.7, changeFrequency: "monthly" },
   { path: routes.advisor, priority: 0.8, changeFrequency: "monthly" },
   { path: routes.industries, priority: 0.6, changeFrequency: "monthly" },
   { path: routes.process, priority: 0.5, changeFrequency: "monthly" },
@@ -50,6 +52,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: entry.priority,
         alternates: alternates(samePathEverywhere(entry.path)),
       })),
+      // Tool pages under /instrumenti that are available (implemented + flag on).
+      ...TOOLS.filter(isToolAvailable)
+        .filter((tool) => tool.path.startsWith(`${routes.tools}/`))
+        .map((tool) => ({
+          url: url(tool.path),
+          lastModified: CONTENT_REVISED,
+          changeFrequency: "monthly" as const,
+          priority: 0.7,
+          alternates: alternates(samePathEverywhere(tool.path)),
+        })),
       ...services.map((service) => ({
         url: url(routes.service(service.slug)),
         lastModified: CONTENT_REVISED,

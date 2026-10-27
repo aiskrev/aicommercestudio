@@ -33,9 +33,9 @@ export function InlineCta({
         <ButtonLink href={quoteHref} size="sm" icon="arrowRight">
           {labels.quote}
         </ButtonLink>
-        <a href={serviceHref} className="inline-flex items-center justify-center gap-1 text-xs font-semibold text-cyan-300 hover:text-cyan-200">
+        <a href={serviceHref} className="link group inline-flex items-center justify-center gap-1 text-xs">
           {labels.learnMore}
-          <Icon name="chevronRight" className="h-3.5 w-3.5" />
+          <Icon name="chevronRight" className="arrow-nudge h-3.5 w-3.5" />
         </a>
       </div>
     </aside>

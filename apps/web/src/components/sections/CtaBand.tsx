@@ -31,7 +31,7 @@ export function CtaBand({
           <h2 id="cta-title" className="t-display max-w-4xl">
             {title}
           </h2>
-          <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
             <p className="t-lead max-w-2xl">{lead}</p>
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <ButtonLink href={primary.href} size="lg" icon="arrowRight" className="w-full sm:w-auto">
@@ -58,7 +58,7 @@ export function CtaBand({
       <Container>
         <div className="panel relative overflow-hidden px-6 py-12 sm:px-12 sm:py-16">
           <div className="grid-backdrop pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" />
-          <div className="relative grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+          <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end">
             <div>
               <h2 id="cta-title" className="t-h2 max-w-2xl">
                 {title}

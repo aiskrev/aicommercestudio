@@ -51,11 +51,11 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
           services={coreServices}
           hrefFor={(service) => href(routes.service(service.slug))}
           cta={dict.common.learnMore}
-          groups={home.servicesIntro.groups}
+          groups={servicesPage.groups}
           groupHeadingLevel={2}
         />
 
-        <div className="mt-10 grid gap-6 rounded-[var(--radius-lg)] border border-dashed border-line-strong p-7 sm:p-9 lg:grid-cols-[auto_1fr_auto] lg:items-center">
+        <div className="mt-10 grid gap-6 rounded-[var(--radius-lg)] border border-dashed border-line-strong p-7 sm:p-9 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center">
           <ServiceMotif service="audit" className="h-16 w-24" />
           <div>
             <p className="t-label text-brand">{dict.ui.firstStepBadge}</p>

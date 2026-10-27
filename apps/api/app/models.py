@@ -49,6 +49,7 @@ class ServiceKey(enum.StrEnum):
     INTEGRATIONS = "integrations"
     AUDIT = "audit"
     AI_MANAGED = "ai_managed"
+    AI_AGENTS = "ai_agents"
     OTHER = "other"
 
 

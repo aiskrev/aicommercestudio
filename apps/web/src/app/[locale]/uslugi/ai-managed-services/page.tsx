@@ -7,6 +7,7 @@ import { Faq } from "@/components/sections/Faq";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
+import { EditorialSplit } from "@/components/ui/patterns";
 import {
   ButtonLink,
   CheckList,
@@ -96,7 +97,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
       {/* 1. hero */}
       <div className="relative overflow-hidden border-b border-line-subtle">
         <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
-        <Container className="relative grid gap-12 pb-14 pt-10 sm:pb-20 sm:pt-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+        <Container className="relative grid gap-12 pb-14 pt-10 sm:pb-20 sm:pt-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center">
           <div>
           <Eyebrow>{page.hero.eyebrow}</Eyebrow>
           <h1 className="t-h1 mt-5 max-w-4xl">{page.hero.title}</h1>
@@ -147,7 +148,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
         <h3 className="t-h3 mt-14 text-xl">{page.value.differentiationTitle}</h3>
         <dl className="mt-6 border-t border-line-subtle">
           {page.value.differentiation.map((row) => (
-            <div key={row.other} className="grid gap-2 border-b border-line-subtle py-5 md:grid-cols-[16rem_1fr] md:gap-8">
+            <div key={row.other} className="grid gap-2 border-b border-line-subtle py-5 md:grid-cols-[16rem_minmax(0,1fr)] md:gap-8">
               <dt className="font-semibold text-fg">{row.other}</dt>
               <dd className="leading-relaxed text-fg-muted">{row.difference}</dd>
             </div>
@@ -163,7 +164,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
 
       {/* 4. problems we solve */}
       <Section labelledBy="ams-problems" tone="light">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-end">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:items-end">
           <SectionHeading id="ams-problems" title={page.problems.title} />
           <p className="border-l-2 border-brand-ink pl-5 text-lg font-semibold leading-relaxed text-ink">{page.problems.keyMessage}</p>
         </div>
@@ -251,7 +252,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
 
       {/* 7. security and governance */}
       <Section labelledBy="ams-security" alt>
-        <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div>
             <SectionHeading id="ams-security" title={page.security.title} lead={page.security.lead} />
             <p className="mt-8 border-l-2 border-brand pl-5 text-lg font-semibold leading-relaxed text-fg">
@@ -264,7 +265,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
 
       {/* 8. cost optimization */}
       <Section labelledBy="ams-cost">
-        <div className="grid gap-10 lg:grid-cols-[1fr_1fr]">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <SectionHeading id="ams-cost" title={page.cost.title} lead={page.cost.lead} />
           <div>
             <CheckList items={page.cost.items} />
@@ -390,15 +391,14 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
 
       {/* 12. FAQ */}
       <Section labelledBy="ams-faq" alt>
-        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-          <SectionHeading id="ams-faq" title={dict.service.faq} />
+        <EditorialSplit aside={<SectionHeading id="ams-faq" title={dict.service.faq} />}>
           <Faq items={page.faq} />
-        </div>
+        </EditorialSplit>
       </Section>
 
       {/* 13. consultation request */}
       <section id="ams-inquiry" aria-labelledby="ams-inquiry-title" className="scroll-mt-28 border-t border-line-subtle bg-surface-1 py-16 sm:py-24">
-        <Container className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+        <Container className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
           <div>
             <h2 id="ams-inquiry-title" className="t-h2">
               {page.cta.title}

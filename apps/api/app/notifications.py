@@ -20,6 +20,7 @@ SERVICE_LABELS = {
     "integrations": "API интеграции, облак и сигурност",
     "audit": "Технически одит",
     "ai_managed": "AI Managed Services",
+    "ai_agents": "Разработка на AI агенти",
     "other": "Друго",
 }
 

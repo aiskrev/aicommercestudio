@@ -29,6 +29,7 @@ import {
   toggleTool,
   validateAdvisor,
 } from "@/lib/advisor";
+import { trackToolEvent } from "@/lib/analytics";
 import { fetchFormToken } from "@/lib/public-api";
 
 interface Props {
@@ -63,6 +64,10 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   const consultRef = useRef<HTMLDivElement>(null);
   const days = status?.retention_days ?? retentionDays;
+
+  useEffect(() => {
+    trackToolEvent({ name: "tool_opened", tool: "advisor", locale });
+  }, [locale]);
 
   useEffect(() => {
     let active = true;
@@ -113,12 +118,14 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
     }
 
     setSubmitting(true);
+    trackToolEvent({ name: "tool_started", tool: "advisor", locale });
     const response = await requestAssessment(toAdvisorPayload(values, token, locale), locale);
     setSubmitting(false);
     fetchFormToken().then(setToken);
 
     if (response.ok) {
       setResult(response.data);
+      trackToolEvent({ name: "tool_completed", tool: "advisor", locale });
       return;
     }
     if (response.kind === "validation") showErrors(response.fieldErrors, response.message || f.errorSummary);
@@ -188,7 +195,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
     <form
       onSubmit={onSubmit}
       noValidate
-      className="card-accent grid gap-7 rounded-[1.5rem] p-6 sm:p-8"
+      className="tool-frame grid gap-7 p-6 sm:p-8"
       aria-label={f.title}
       aria-busy={submitting || undefined}
       data-testid="advisor-form"
@@ -257,7 +264,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
           {!values.process_description.trim() && (
             <button
               type="button"
-              className="font-semibold text-cyan-300 hover:text-cyan-200"
+              className="link"
               onClick={() => {
                 update("process_description", f.example);
                 document.getElementById("advisor-process_description")?.focus();
@@ -305,11 +312,11 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
         aria-describedby={describedBy("tools", "advisor-tools-hint")}
         aria-invalid={Boolean(errors.tools) || undefined}
       >
-        <legend className="block text-sm font-medium text-slate-200">
-          {f.tools} <span className="text-rose-300" aria-hidden="true">*</span>
+        <legend className="field-label mb-0">
+          {f.tools} <span className="field-required" aria-hidden="true">*</span>
           <span className="sr-only"> ({f.required})</span>
         </legend>
-        <p id="advisor-tools-hint" className="mt-1 text-xs text-slate-400">
+        <p id="advisor-tools-hint" className="field-hint mt-1">
           {f.toolsHint}
         </p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -337,7 +344,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
           })}
         </div>
         {errors.tools && (
-          <p id="advisor-tools-error" className="mt-2 text-sm text-rose-300">
+          <p id="advisor-tools-error" className="field-error">
             {errors.tools}
           </p>
         )}
@@ -404,24 +411,24 @@ function Field({
 }) {
   return (
     <div>
-      <label htmlFor={`advisor-${id}`} className="mb-2 block text-sm font-medium text-slate-200">
+      <label htmlFor={`advisor-${id}`} className="field-label">
         {label}
         {required && (
           <>
             {" "}
-            <span className="text-rose-300" aria-hidden="true">*</span>
+            <span className="field-required" aria-hidden="true">*</span>
             <span className="sr-only"> ({required})</span>
           </>
         )}
       </label>
       {hint && (
-        <p id={`advisor-${id}-hint`} className="-mt-1 mb-2 text-xs text-slate-400">
+        <p id={`advisor-${id}-hint`} className="field-hint -mt-1 mb-2">
           {hint}
         </p>
       )}
       {children}
       {error && (
-        <p id={`advisor-${id}-error`} className="mt-2 text-sm text-rose-300">
+        <p id={`advisor-${id}-error`} className="field-error">
           {error}
         </p>
       )}

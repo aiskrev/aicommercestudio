@@ -65,7 +65,7 @@ export default async function InsightsPage({ params }: PageProps<"/[locale]/stat
         {articles.length === 0 ? (
           <p className="card p-8 text-center text-slate-400">{page.empty}</p>
         ) : (
-          <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14">
             <ArticleCard
               article={articles[0]}
               href={href(routes.article(articles[0].slug))}

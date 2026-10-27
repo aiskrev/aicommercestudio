@@ -22,10 +22,10 @@ export function Field({
 }) {
   return (
     <div>
-      <label htmlFor={`contact-${id}`} className="mb-2 block text-sm font-medium text-slate-200">
+      <label htmlFor={`contact-${id}`} className="field-label">
         {label}
         {required && (
-          <span className="text-rose-300" aria-hidden="true">
+          <span className="field-required" aria-hidden="true">
             {" "}
             *
           </span>
@@ -34,12 +34,12 @@ export function Field({
       </label>
       {children}
       {hint && !error && (
-        <p id={`contact-${id}-hint`} className="mt-2 text-xs text-slate-400">
+        <p id={`contact-${id}-hint`} className="field-hint">
           {hint}
         </p>
       )}
       {error && (
-        <p id={`contact-${id}-error`} className="mt-2 text-sm text-rose-300">
+        <p id={`contact-${id}-error`} className="field-error">
           {error}
         </p>
       )}

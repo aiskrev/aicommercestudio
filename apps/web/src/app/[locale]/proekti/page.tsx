@@ -48,14 +48,17 @@ export default async function CaseStudiesPage({ params }: PageProps<"/[locale]/p
       <Section>
         <ul className="grid gap-5 md:grid-cols-2">
           {caseStudies.map((study) => (
-            <li key={study.slug} className="card card-interactive relative p-6">
-              <p className="text-sm text-slate-400">{study.client.industry}</p>
-              <h2 className="t-h3 mt-2 text-xl">
-                <Link href={href(routes.caseStudy(study.slug))} className="after:absolute after:inset-0">
+            <li key={study.slug} className="card card-interactive relative p-6 sm:p-7">
+              <p className="t-label">{study.client.industry}</p>
+              <h2 className="t-h3-lg mt-3">
+                <Link
+                  href={href(routes.caseStudy(study.slug))}
+                  className="after:absolute after:inset-0 after:rounded-[inherit] focus-visible:outline-none"
+                >
                   {study.title}
                 </Link>
               </h2>
-              <p className="mt-2 text-slate-400">{study.description}</p>
+              <p className="mt-3 leading-relaxed text-fg-muted">{study.description}</p>
             </li>
           ))}
         </ul>

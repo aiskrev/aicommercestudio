@@ -41,10 +41,10 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
       />
       <div className="relative overflow-hidden">
         <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
-        <Container className="relative grid gap-12 py-14 sm:py-20 lg:grid-cols-[0.85fr_1.15fr]">
+        <Container className="relative grid gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div>
             <Eyebrow>{dict.contact.eyebrow}</Eyebrow>
-            <h1 className="mt-5 text-4xl font-semibold leading-[1.1] sm:text-5xl">{dict.contact.title}</h1>
+            <h1 className="t-h1 mt-5">{dict.contact.title}</h1>
             <p className="mt-6 text-lg leading-relaxed text-slate-400">{dict.contact.lead}</p>
 
             <div className="mt-10 grid gap-5">

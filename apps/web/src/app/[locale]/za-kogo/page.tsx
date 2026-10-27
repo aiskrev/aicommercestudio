@@ -44,7 +44,7 @@ export default async function IndustriesPage({ params }: PageProps<"/[locale]/za
               <div className="flex items-start gap-4">
                 {segment.icon && <IconBadge name={segment.icon} />}
                 <div>
-                  <h2 className="text-xl font-semibold">{segment.title}</h2>
+                  <h2 className="t-h3-lg">{segment.title}</h2>
                   <p className="mt-2 leading-relaxed text-slate-400">{segment.description}</p>
                 </div>
               </div>

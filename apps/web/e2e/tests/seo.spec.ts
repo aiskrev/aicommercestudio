@@ -82,6 +82,10 @@ test("message outline helper and inline validation", async ({ page }) => {
 });
 
 test("navigation marks the current page", async ({ page }) => {
+  await page.goto("/bg/instrumenti");
+  const nav = page.locator("header nav").first();
+  await expect(nav.getByRole("link", { name: "Инструменти" })).toHaveAttribute("aria-current", "page");
   await page.goto("/bg/proces");
-  await expect(page.locator("header nav").first().getByRole("link", { name: "Процес" })).toHaveAttribute("aria-current", "page");
+  await nav.getByRole("button", { name: "За нас" }).click();
+  await expect(nav.getByRole("link", { name: "Как работим" })).toHaveAttribute("aria-current", "page");
 });

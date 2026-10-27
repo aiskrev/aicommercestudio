@@ -19,8 +19,8 @@ export function LegalPage({
   return (
     <>
       <Breadcrumbs items={breadcrumbs} />
-      <Container className="max-w-3xl py-12 sm:py-16">
-        <h1 className="text-3xl font-semibold sm:text-5xl">{document.title}</h1>
+      <Container size="reading" className="py-12 sm:py-16">
+        <h1 className="t-h1">{document.title}</h1>
         <p className="mt-4 text-sm text-slate-400">
           {updatedLabel}:{" "}
           <time dateTime={document.updated}>
@@ -38,7 +38,7 @@ export function LegalPage({
         <div className="prose-content text-slate-300">
           {document.sections.map((section) => (
             <section key={section.heading} className="mt-10">
-              <h2 className="text-xl font-semibold">{section.heading}</h2>
+              <h2 className="t-h3-lg">{section.heading}</h2>
               {section.paragraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}

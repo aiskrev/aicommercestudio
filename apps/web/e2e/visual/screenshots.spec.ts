@@ -28,6 +28,10 @@ const PAGES: [string, string][] = [
   ["advisor-en", "/en/ai-automation-advisor"],
   ["insights-bg", "/bg/statii"],
   ["article-en", "/en/insights/shopify-vs-woocommerce"],
+  ["about-bg", "/bg/za-nas"],
+  ["process-bg", "/bg/proces"],
+  ["industries-en", "/en/industries"],
+  ["privacy-bg", "/bg/poveritelnost"],
   ["admin-login", "/admin/login"],
 ];
 

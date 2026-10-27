@@ -58,7 +58,7 @@ export function HeroWorkflow({ content }: { content: WorkflowContent }) {
             const isAi = step.kind === "ai";
             const isApproval = step.kind === "approval";
             return (
-              <li key={step.label} className="relative grid grid-cols-[2.25rem_1fr] gap-3 pb-2 last:pb-0 sm:pb-3.5">
+              <li key={step.label} className="relative grid grid-cols-[2.25rem_minmax(0,1fr)] gap-3 pb-2 last:pb-0 sm:pb-3.5">
                 {!last && <span className="flow-line absolute bottom-0 left-[1.1rem] top-9 w-px" aria-hidden="true" />}
                 <span
                   className={cx(
@@ -100,7 +100,7 @@ export function HeroWorkflow({ content }: { content: WorkflowContent }) {
                     </p>
                   )}
                   {step.output && (
-                    <dl className="mt-2 hidden grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 rounded-[5px] bg-surface-page px-2.5 py-1.5 font-mono text-[11.5px] sm:grid">
+                    <dl className="mt-2 hidden grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 rounded-[5px] bg-surface-page px-2.5 py-1.5 font-mono text-[11.5px] sm:grid">
                       {step.output.map(([key, value]) => (
                         <div key={key} className="contents">
                           <dt className="text-fg-subtle">{key}</dt>

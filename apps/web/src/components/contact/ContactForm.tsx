@@ -253,7 +253,7 @@ export function ContactForm({
 
       <FormGroup index={1} label={labels.groupRequest} />
       <fieldset>
-        <legend className="mb-2 block text-sm font-medium text-slate-200">{inquiry.legend}</legend>
+        <legend className="field-label">{inquiry.legend}</legend>
         <div className="grid gap-3 sm:grid-cols-2">
           {(["contact", "quote"] as const).map((kind) => (
             <label
@@ -473,7 +473,7 @@ export function ContactForm({
           {!values.message.trim() && !aiManaged && (
             <button
               type="button"
-              className="font-semibold text-cyan-300 hover:text-cyan-200"
+              className="link"
               onClick={() => {
                 update("message", labels.messageTemplate);
                 document.getElementById("contact-message")?.focus();
@@ -516,11 +516,11 @@ export function ContactForm({
               <Link href={privacyHref} className="font-medium text-cyan-300 underline underline-offset-4" target="_blank">
                 {labels.privacyLink}
               </Link>{" "}
-              {labels.privacySuffix} <span className="text-rose-300">*</span>
+              {labels.privacySuffix} <span className="field-required">*</span>
             </span>
           </label>
           {errors.privacy_acknowledged && (
-            <p id="contact-privacy_acknowledged-error" className="mt-2 text-sm text-rose-300">
+            <p id="contact-privacy_acknowledged-error" className="field-error">
               {errors.privacy_acknowledged}
             </p>
           )}

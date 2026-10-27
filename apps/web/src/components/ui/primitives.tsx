@@ -9,28 +9,51 @@ export function cx(...classes: (string | false | null | undefined)[]): string {
 
 /* ------------------------------------------------------------------ layout */
 
-export function Container({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cx("mx-auto w-full max-w-[76rem] px-4 sm:px-6 lg:px-8", className)}>{children}</div>;
+export type ContainerSize = "reading" | "narrow" | "content" | "wide";
+
+const containerClass: Record<ContainerSize, string> = {
+  reading: "max-w-reading",
+  narrow: "max-w-narrow",
+  content: "max-w-content",
+  wide: "max-w-wide",
+};
+
+/**
+ * Horizontal frame with the site gutters (16 / 24 / 32 px). `content` (76rem) is the default page
+ * width; `reading` (44rem) suits long-form text, `narrow` (60rem) forms and focused flows.
+ */
+export function Container({
+  children,
+  className,
+  size = "content",
+}: {
+  children: ReactNode;
+  className?: string;
+  size?: ContainerSize;
+}) {
+  return <div className={cx("mx-auto w-full px-4 sm:px-6 lg:px-8", containerClass[size], className)}>{children}</div>;
 }
 
-export type SectionTone = "default" | "raised" | "light";
+export type SectionTone = "default" | "raised" | "deep" | "light";
 export type SectionDensity = "compact" | "default" | "spacious";
 
 const toneClass: Record<SectionTone, string> = {
   default: "",
   raised: "section-alt",
+  deep: "surface-deep",
   light: "surface-light",
 };
 
+/** Fluid vertical rhythm (tokens --spacing-section*, 360 → 1440 px). */
 const densityClass: Record<SectionDensity, string> = {
-  compact: "py-12 sm:py-16",
-  default: "py-16 sm:py-24",
-  spacious: "py-20 sm:py-28 lg:py-32",
+  compact: "py-section-compact",
+  default: "py-section",
+  spacious: "py-section-spacious",
 };
 
 /**
- * Page section. `tone` changes the surface (dark page, raised dark, light editorial) and
- * `density` the vertical rhythm, so consecutive sections do not all look the same.
+ * Page section. `tone` changes the surface (dark page, raised dark, near-black deep, warm paper)
+ * and `density` the vertical rhythm, so consecutive sections do not all look the same.
  */
 export function Section({
   children,
@@ -40,6 +63,7 @@ export function Section({
   alt = false,
   tone,
   density = "default",
+  size,
 }: {
   children: ReactNode;
   className?: string;
@@ -49,6 +73,7 @@ export function Section({
   alt?: boolean;
   tone?: SectionTone;
   density?: SectionDensity;
+  size?: ContainerSize;
 }) {
   return (
     <section
@@ -56,7 +81,7 @@ export function Section({
       aria-labelledby={labelledBy}
       className={cx(densityClass[density], toneClass[tone ?? (alt ? "raised" : "default")], className)}
     >
-      <Container>{children}</Container>
+      <Container size={size}>{children}</Container>
     </section>
   );
 }
@@ -65,6 +90,10 @@ export function Eyebrow({ children, className }: { children: ReactNode; classNam
   return <p className={cx("t-eyebrow", className)}>{children}</p>;
 }
 
+/**
+ * Section header: eyebrow, heading and lead. `action` (a link or button) sits to the right of the
+ * text from `lg` and below it on smaller screens; `size="sm"` is for sub-sections.
+ */
 export function SectionHeading({
   id,
   eyebrow,
@@ -72,21 +101,42 @@ export function SectionHeading({
   lead,
   align = "left",
   as: Heading = "h2",
+  size = "lg",
+  action,
+  className,
 }: {
   id?: string;
   eyebrow?: string;
   title: string;
   lead?: string;
   align?: "left" | "center";
-  as?: "h1" | "h2";
+  as?: "h1" | "h2" | "h3";
+  size?: "lg" | "sm";
+  action?: ReactNode;
+  className?: string;
 }) {
-  return (
-    <div className={cx("max-w-3xl", align === "center" && "mx-auto text-center")}>
+  const headingClass = Heading === "h1" ? "t-h1" : size === "sm" || Heading === "h3" ? "t-h3-lg" : "t-h2";
+  const text = (
+    <div
+      className={cx(
+        "max-w-3xl min-w-0",
+        Heading !== "h1" && "reveal",
+        align === "center" && "mx-auto text-center",
+        !action && className,
+      )}
+    >
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <Heading id={id} className={cx(Heading === "h1" ? "t-h1" : "t-h2", eyebrow && "mt-4")}>
+      <Heading id={id} className={cx(headingClass, eyebrow && (size === "sm" ? "mt-3" : "mt-4"))}>
         {title}
       </Heading>
-      {lead && <p className="t-lead mt-4">{lead}</p>}
+      {lead && <p className={cx("t-lead", size === "sm" ? "mt-3" : "mt-4")}>{lead}</p>}
+    </div>
+  );
+  if (!action) return text;
+  return (
+    <div className={cx("grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end", className)}>
+      {text}
+      <div className="self-start lg:self-auto">{action}</div>
     </div>
   );
 }
@@ -138,8 +188,8 @@ export function Button({
       className={cx(buttonClass(variant, size), className)}
     >
       {loading && <Spinner />}
-      {loading && loadingLabel ? loadingLabel : children}
-      {!loading && icon && <Icon name={icon} className="h-4 w-4" />}
+      <span className="btn-label">{loading && loadingLabel ? loadingLabel : children}</span>
+      {!loading && icon && <Icon name={icon} className="btn-icon h-4 w-4" />}
     </button>
   );
 }
@@ -160,9 +210,9 @@ export function ButtonLink({
   className?: string;
 }) {
   return (
-    <Link href={href} className={cx(buttonClass(variant, size), "group", className)}>
-      {children}
-      {icon && <Icon name={icon} className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />}
+    <Link href={href} className={cx(buttonClass(variant, size), className)}>
+      <span className="btn-label">{children}</span>
+      {icon && <Icon name={icon} className="btn-icon h-4 w-4" />}
     </Link>
   );
 }
@@ -200,7 +250,7 @@ export function FeatureCard({
     <div className={cx("card p-6", className)}>
       {icon && <IconBadge name={icon} />}
       <Heading className={cx("t-h3", icon && "mt-5")}>{title}</Heading>
-      <p className="mt-2 leading-relaxed text-slate-400">{description}</p>
+      <p className="mt-2 leading-relaxed text-fg-muted">{description}</p>
     </div>
   );
 }
@@ -213,15 +263,36 @@ export function CheckList({ items, className }: { items: string[]; className?: s
           <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-[5px] bg-brand/12 text-brand">
             <Icon name="check" className="h-3.5 w-3.5" />
           </span>
-          <span className="leading-relaxed text-slate-300">{item}</span>
+          <span className="leading-relaxed text-fg-secondary">{item}</span>
         </li>
       ))}
     </ul>
   );
 }
 
-export function Badge({ children, accent = false, className }: { children: ReactNode; accent?: boolean; className?: string }) {
-  return <span className={cx("badge", accent && "badge-accent", className)}>{children}</span>;
+export type BadgeTone = "neutral" | "accent" | "success" | "warning" | "outline";
+
+/** Short status or category label. `dot` adds a decorative status dot; the text carries the meaning. */
+export function Badge({
+  children,
+  tone,
+  accent = false,
+  dot = false,
+  className,
+}: {
+  children: ReactNode;
+  tone?: BadgeTone;
+  /** Legacy alias for `tone="accent"`. */
+  accent?: boolean;
+  dot?: boolean;
+  className?: string;
+}) {
+  const resolved = tone ?? (accent ? "accent" : "neutral");
+  return (
+    <span className={cx("badge", resolved !== "neutral" && `badge-${resolved}`, dot && "badge-dot", className)}>
+      {children}
+    </span>
+  );
 }
 
 const alertIcon: Record<"error" | "success" | "warning" | "info", IconName> = {

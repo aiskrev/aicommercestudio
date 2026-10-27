@@ -41,7 +41,7 @@ export default async function AdvisorPage({ params }: PageProps<"/[locale]/ai-au
       <Breadcrumbs
         items={[
           { name: dict.common.home, path: href(routes.home) },
-          { name: dict.nav.aiSolutions, path: href(routes.aiSolutions) },
+          { name: dict.nav.tools, path: href(routes.tools) },
           { name: advisor.eyebrow, path: href(routes.advisor) },
         ]}
       />
@@ -57,7 +57,7 @@ export default async function AdvisorPage({ params }: PageProps<"/[locale]/ai-au
       </PageHero>
 
       <section aria-label={advisor.form.title} className="py-12 sm:py-16">
-        <Container className="grid gap-10 lg:grid-cols-[1fr_20rem]">
+        <Container className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="min-w-0">
             <AdvisorTool content={advisor} contact={contact} retentionDays={DEFAULT_RETENTION_DAYS} locale={locale} />
           </div>

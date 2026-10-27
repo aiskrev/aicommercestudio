@@ -76,6 +76,22 @@ export function ServiceMotif({ service, className }: { service: ServiceKey; clas
         <circle cx="60" cy="40" r="3" fill={stroke} />
       </>
     ),
+    // agent node wired to three tools, output through an approval gate
+    ai_agents: (
+      <>
+        {[18, 40, 62].map((y) => (
+          <g key={y}>
+            <path d={`M48 40L78 ${y}`} stroke={muted} {...common} />
+            <rect x="78" y={y - 6} width="14" height="12" rx="3" fill="var(--color-surface-2)" stroke={muted} strokeWidth="1.5" />
+          </g>
+        ))}
+        <path d="M22 40h14" stroke={stroke} {...common} />
+        <circle cx="40" cy="40" r="9" fill="var(--color-surface-2)" stroke={accent} strokeWidth="1.5" />
+        <circle cx="40" cy="40" r="2.5" fill={accent} />
+        <path d="M100 40h8" stroke="var(--color-warning)" {...common} />
+        <path d="M104 33v14" stroke="var(--color-warning)" {...common} />
+      </>
+    ),
     // operations loop: monitor → evaluate → improve
     ai_managed: (
       <>

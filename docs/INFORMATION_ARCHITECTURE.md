@@ -1,0 +1,82 @@
+# Information architecture
+
+Routes live under `apps/web/src/app/[locale]/`; Bulgarian path segments are canonical and English
+URLs are produced by `EN_SEGMENTS` in `src/i18n/config.ts` (`localizePath`). Navigation data is
+assembled in `app/[locale]/layout.tsx`; the service grouping is shared in `src/lib/navigation.ts`.
+
+## Main navigation
+
+Every destination appears once per navigation area (header, mobile sheet, footer).
+
+| Entry | BG | EN | Destination |
+| --- | --- | --- | --- |
+| Services ▾ | Услуги | Services | panel: **AI services** · **E-commerce foundation** · "All services" (`/uslugi` ↔ `/en/services`) |
+| Solutions | AI решения | AI solutions | `/bg/ai-resheniya` ↔ `/en/ai-solutions` — how we design AI systems (agents, control, lifecycle) and the AI services index |
+| Tools | Инструменти | Tools | **new** hub `/bg/instrumenti` ↔ `/en/tools` |
+| Industries | За кого | Industries | `/bg/za-kogo` ↔ `/en/industries` — kept: segments include businesses already running an AI agent |
+| Insights | Статии | Insights | `/bg/statii` ↔ `/en/insights` |
+| About ▾ | За нас | About | panel: Who we are (`/za-nas`), How we work (`/proces`) |
+| CTA | Заяви консултация | Book a consultation | `/bg/kontakti` ↔ `/en/contact` |
+
+Mobile: one sheet with the same groups (AI services, E-commerce foundation, All services, the
+links, About), language switch and the CTA. While open: page scroll locked, the rest of the page is
+`inert`, focus starts on the first link, Escape closes and returns focus to the toggle; every link
+is ≥ 44 px tall. Desktop panels: one open at a time, outside click and Escape close, Escape
+returns focus to the trigger.
+
+Footer: AI services · E-commerce foundation (+ all services) · Company (AI solutions, Tools,
+Industries, How we work, About, Insights, Contact) · Legal.
+
+## Services
+
+| Service (nav label BG / EN) | Key | BG slug | EN slug | Status |
+| --- | --- | --- | --- | --- |
+| AI стратегия и готовност / AI strategy & readiness | `audit` | `tehnicheski-odit` | `technical-audit` | existing page, retitled (offering: "recommended first step") |
+| Разработка на AI агенти / AI agent development | `ai_agents` | `razrabotka-na-ai-agenti` | `ai-agent-development` | **new** service page |
+| AI автоматизация на процеси / AI workflow automation | `automation` | `avtomatizatsiya-na-procesi` | unchanged | existing page, retitled |
+| AI разработка по поръчка / Custom AI engineering | `ai_tools` | `ai-instrumenti-za-biznesa` | unchanged | existing page, retitled |
+| AI интеграции и данни / AI integrations & data systems | `integrations` | `api-integratsii-oblak-i-sigurnost` | unchanged | existing page, retitled |
+| AI Managed Services и оптимизация / AI Managed Services & optimisation | `ai_managed` | `ai-managed-services` | `ai-managed-services` | existing dedicated page |
+| Поддръжка, SEO, анализи / Maintenance, SEO, analytics | `maintenance`, `seo`, `analytics` | unchanged | unchanged | e-commerce foundation group |
+
+Only titles changed for existing services; every SEO primary keyword stays in its `metaTitle`
+(enforced by `content/seo-map.test.ts`).
+
+### Service-page template (`uslugi/[slug]/page.tsx`)
+
+Hero (title, intro, quote CTA, concept diagram, summary strip) → **business problem** (`signals`) →
+**solution approach** (`approach`, 3 steps) → **technical capabilities** (`capabilities`) →
+**use cases** (`useCases`, scenarios only) → technical checks (`checks`) → deliverables and
+engagement → **delivery process** (`workflow`, inputs) → FAQ + **related tools** (`SERVICE_TOOLS`) →
+related articles → related services → **CTA** (contact with the service preselected).
+
+Content: `content/{bg,en}/services.ts` (base), `services-depth.ts` (headings, checks, workflow,
+inputs, articles), `services-template.ts` (approach, use cases). EN is typed against BG.
+
+## Interactive tools
+
+`lib/tools.ts` is the registry: `TOOL_ROUTES` lists tools that exist (today only the AI
+Automation Advisor at `/ai-automation-advisor`); every other catalog entry (readiness assessment,
+Build your AI team, ROI calculator) is rendered as "in preparation" and never linked.
+`SERVICE_TOOLS` maps each service to its relevant tools. Texts: `content/{bg,en}/tools.ts`.
+Planned tool routes are in `docs/PLATFORM_EXPANSION_PLAN.md` (e.g. `/instrumenti/ai-gotovnost`).
+
+## Conversion flows
+
+* Header/footer CTA → contact (consultation).
+* Service pages → `contactWithService` / `quoteWithService` (service preselected, quote mode).
+* Tools → the Advisor (assessment → consultation hand-off, unchanged).
+* AI Managed Services page → its own inquiry form (unchanged).
+
+## Route changes (this revision)
+
+| Change | BG | EN | Notes |
+| --- | --- | --- | --- |
+| Added | `/bg/instrumenti` | `/en/tools` | tools hub; `EN_SEGMENTS.instrumenti = "tools"`; in sitemap and keyword map |
+| Added | `/bg/uslugi/razrabotka-na-ai-agenti` | `/en/services/ai-agent-development` | new service; generated by `uslugi/[slug]` |
+| Changed | — | — | none: no existing URL was renamed or removed, so no redirects are needed |
+
+The Advisor's breadcrumb parent moved from "AI solutions" to "Tools" (URL unchanged).
+
+API: lead service `ai_agents` added (`ServiceKey`, Alembic migration `0005`, notification label,
+mock next step), so inquiries from the new service page are stored with the right category.

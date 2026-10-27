@@ -11,7 +11,7 @@ export function CredibilityStrip({
 }) {
   return (
     <section aria-label={label} className="border-b border-line-subtle bg-surface-1">
-      <Container className="grid gap-5 py-8 lg:grid-cols-[13rem_1fr] lg:gap-10">
+      <Container className="grid gap-5 py-8 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
         <p className="t-eyebrow self-start">{label}</p>
         <ul className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
           {groups.map((group) => (

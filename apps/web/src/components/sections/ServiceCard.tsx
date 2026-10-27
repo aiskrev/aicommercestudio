@@ -47,7 +47,7 @@ export function ServiceCard({
       )}
       <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-semibold text-brand" aria-hidden="true">
         {cta}
-        <Icon name="arrowRight" className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+        <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
       </span>
     </article>
   );
