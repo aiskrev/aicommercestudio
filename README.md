@@ -86,6 +86,8 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [PLATFORM_VISION.md](docs/PLATFORM_VISION.md) | Next-generation positioning, product architecture, principles, outstanding decisions |
 | [SERVICE_TAXONOMY.md](docs/SERVICE_TAXONOMY.md) | Ten service domains: names, slugs, families, deliverables, engagement models, status, SEO texts |
 | [CONTENT_STRATEGY_BG_EN.md](docs/CONTENT_STRATEGY_BG_EN.md) | Voice, claims policy, keywords, page templates, navigation, roll-out phases (BG/EN) |
+| [INFORMATION_ARCHITECTURE_V2.md](docs/INFORMATION_ARCHITECTURE_V2.md) | Next IA: site map, mega-menu, mobile nav, breadcrumbs, recommendations, canonical/hreflang/indexability rules, route-by-route matrix, migration risks |
+| [PRODUCT_MODULES.md](docs/PRODUCT_MODULES.md) | Product modules (foundation, public, staff, client portal): routes, code, API, status, relations |
 
 **Setup, architecture and operations**
 
@@ -105,7 +107,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 
 | Document | Contents |
 | --- | --- |
-| [INFORMATION_ARCHITECTURE.md](docs/INFORMATION_ARCHITECTURE.md) | Navigation, services, tools, conversion flows |
+| [INFORMATION_ARCHITECTURE.md](docs/INFORMATION_ARCHITECTURE.md) | Current navigation, services, tools, conversion flows (v2 design: INFORMATION_ARCHITECTURE_V2.md) |
 | [INTERNATIONALIZATION.md](docs/INTERNATIONALIZATION.md) | BG/EN URLs, switcher, cookie, translations, SEO, API and admin languages |
 | [SEO_IMPLEMENTATION.md](docs/SEO_IMPLEMENTATION.md) | SEO checklist, keyword map (unverified), indexation rules, editorial guidelines |
 | [AI_ADVISOR.md](docs/AI_ADVISOR.md) | AI Business Automation Advisor: flow, architecture, safety controls, retention, demo |
