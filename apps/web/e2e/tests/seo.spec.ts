@@ -25,6 +25,8 @@ test("every sitemap page has one H1, a unique title, description, canonical and 
     const canonical = await page.locator("link[rel='canonical']").getAttribute("href");
     expect(new URL(canonical!).pathname, `${path} canonical`).toBe(path);
     expect(await page.locator("meta[property='og:title']").count(), `${path} og:title`).toBe(1);
+    const ogImage = await page.locator("meta[property='og:image']").getAttribute("content");
+    expect(new URL(ogImage!).pathname, `${path} og:image`).toBe("/opengraph-image");
 
     const robots = await page.evaluate(() => document.querySelector("meta[name='robots']")?.getAttribute("content") ?? null);
     expect(robots ?? "", `${path} must be indexable`).not.toContain("noindex");

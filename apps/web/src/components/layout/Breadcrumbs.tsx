@@ -25,7 +25,7 @@ export function Breadcrumbs({ items }: { items: { name: string; path: string }[]
                   </span>
                 ) : (
                   <>
-                    <Link href={item.path} className="hover:text-fg">
+                    <Link href={item.path} className="inline-flex min-h-6 items-center hover:text-fg">
                       {item.name}
                     </Link>
                     <Icon name="chevronRight" className="h-3.5 w-3.5" />

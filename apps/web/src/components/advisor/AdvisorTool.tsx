@@ -83,7 +83,9 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
   }, [result]);
 
   useEffect(() => {
-    if (consulting) consultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Respect reduced motion: CSS `scroll-behavior` does not apply to an explicit smooth scroll.
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (consulting) consultRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   }, [consulting]);
 
   function update<K extends AdvisorField>(field: K, value: AdvisorValues[K]) {
@@ -264,7 +266,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
           {!values.process_description.trim() && (
             <button
               type="button"
-              className="link"
+              className="link inline-flex min-h-6 items-center"
               onClick={() => {
                 update("process_description", f.example);
                 document.getElementById("advisor-process_description")?.focus();

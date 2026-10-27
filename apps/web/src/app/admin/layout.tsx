@@ -6,6 +6,7 @@ import { Inter, JetBrains_Mono, Manrope } from "next/font/google";
 import { AdminI18nProvider } from "@/components/admin/AdminI18n";
 import { localeMeta } from "@/i18n/config";
 import { getAdminDictionary, getAdminLocale } from "@/lib/admin-locale";
+import { site } from "@/lib/site";
 
 const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter", display: "swap" });
 const manrope = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-manrope", display: "swap" });
@@ -14,6 +15,8 @@ const mono = JetBrains_Mono({ subsets: ["latin", "cyrillic"], variable: "--font-
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getAdminDictionary();
   return {
+    // Absolute URLs for the site-wide Open Graph image (this is a separate root layout).
+    metadataBase: new URL(site.url),
     title: { default: t.meta.title, template: `%s | ${t.meta.title}` },
     robots: { index: false, follow: false, nocache: true },
   };
