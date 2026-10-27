@@ -33,6 +33,7 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
     [routes.contact]: withBrand(dict.contact.metaTitle),
     [routes.insights]: withBrand(content.insightsPage.metaTitle),
     ...Object.fromEntries(content.services.map((s) => [routes.service(s.slug), withBrand(s.metaTitle)])),
+    ...Object.fromEntries(content.domains.map((d) => [routes.service(d.slug), withBrand(d.metaTitle)])),
     ...Object.fromEntries(content.articles.map((a) => [routes.article(a.slug), withBrand(a.metaTitle ?? a.title)])),
   };
 
@@ -69,9 +70,10 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
       for (const entry of map) expect(sitemapPaths, entry.path).toContain(url(entry.path));
     });
 
-    it("covers every service and every article", () => {
+    it("covers every service, domain hub and article", () => {
       const mapped = new Set(map.map((e) => e.path));
       for (const service of content.services) expect(mapped).toContain(routes.service(service.slug));
+      for (const domain of content.domains) expect(mapped).toContain(routes.service(domain.slug));
       for (const article of content.articles) expect(mapped).toContain(routes.article(article.slug));
     });
 
@@ -90,6 +92,7 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
     const knownPaths = new Set([
       ...Object.values(routes).filter((r) => typeof r === "string"),
       ...content.services.map((s) => routes.service(s.slug)),
+      ...content.domains.map((d) => routes.service(d.slug)),
       ...content.articles.map((a) => routes.article(a.slug)),
       ...content.editorialCategories.map((c) => routes.insightsCategory(c.slug)),
     ]);

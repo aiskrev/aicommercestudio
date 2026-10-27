@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArticleCard } from "@/components/editorial/ArticleCard";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { DomainHub } from "@/components/sections/DomainHub";
 import { Faq } from "@/components/sections/Faq";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
 import { RelatedTools } from "@/components/home/ToolsPreview";
@@ -20,9 +21,20 @@ import {
   Section,
   SectionHeading,
 } from "@/components/ui/primitives";
-import { articleByKey, findService, getContent, serviceByKey, serviceRoutePaths } from "@/content";
+import {
+  articleByKey,
+  domainByKey,
+  domainRoutePaths,
+  findDomain,
+  findService,
+  getContent,
+  serviceByKey,
+  serviceRoutePaths,
+} from "@/content";
+import type { DomainContent } from "@/content/types";
 import { isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
+import { domainDefinition, isDomainPublished, primaryDomainOf } from "@/lib/domains";
 import { resolveLocale } from "@/lib/params";
 import { contactWithService, quoteWithService, routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
@@ -30,18 +42,36 @@ import { SERVICE_TOOLS, toolHrefs, toolMinutes } from "@/lib/tools";
 
 export const dynamicParams = false;
 
+/** Published domain hub for this slug; domain and service slugs share the `/uslugi` namespace. */
+function publishedDomain(locale: Parameters<typeof findDomain>[0], slug: string): DomainContent | undefined {
+  const domain = findDomain(locale, slug);
+  return domain && isDomainPublished(domain.key) ? domain : undefined;
+}
+
 // Services with a dedicated route (e.g. uslugi/ai-managed-services) are not rendered by this template.
+// Published domain hubs (docs/SERVICE_TAXONOMY.md) are rendered here as well.
 export function generateStaticParams({ params }: { params: { locale: string } }) {
   const { locale } = params;
   if (!isLocale(locale)) return [];
-  return getContent(locale)
-    .services.filter((service) => !service.customPage)
-    .map((service) => ({ slug: service.slug }));
+  const { services, domains } = getContent(locale);
+  return [
+    ...services.filter((service) => !service.customPage).map((service) => ({ slug: service.slug })),
+    ...domains.filter((domain) => isDomainPublished(domain.key)).map((domain) => ({ slug: domain.slug })),
+  ];
 }
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/uslugi/[slug]">) {
   const locale = await resolveLocale(params);
   const { slug } = await params;
+  const domain = publishedDomain(locale, slug);
+  if (domain) {
+    return buildMetadata({
+      locale,
+      title: domain.metaTitle,
+      description: domain.metaDescription,
+      path: domainRoutePaths(domain.key),
+    });
+  }
   const service = findService(locale, slug);
   if (!service || service.customPage) return {};
   return buildMetadata({
@@ -55,10 +85,13 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/uslugi/[
 export default async function ServicePage({ params }: PageProps<"/[locale]/uslugi/[slug]">) {
   const locale = await resolveLocale(params);
   const { slug } = await params;
+  const dict = getDictionary(locale);
+  const domain = publishedDomain(locale, slug);
+  if (domain) return <DomainPage locale={locale} domain={domain} dict={dict} />;
+
   const service = findService(locale, slug);
   if (!service || service.customPage) notFound();
 
-  const dict = getDictionary(locale);
   const { home, tools } = getContent(locale);
   const href = (path: string) => localizePath(locale, path);
   const path = href(routes.service(service.slug));
@@ -68,6 +101,8 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
     .filter((a): a is NonNullable<typeof a> => Boolean(a));
   const contactHref = href(contactWithService(service.key));
   const quoteHref = href(quoteWithService(service.key));
+  const parentDomain = primaryDomainOf(service.key);
+  const parent = parentDomain?.published ? domainByKey(locale, parentDomain.key) : undefined;
 
   return (
     <>
@@ -84,6 +119,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         items={[
           { name: dict.common.home, path: href(routes.home) },
           { name: dict.nav.services, path: href(routes.services) },
+          ...(parent ? [{ name: parent.name, path: href(routes.service(parent.slug)) }] : []),
           { name: service.shortTitle, path },
         ]}
       />
@@ -332,6 +368,34 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         primary={{ href: contactHref, label: dict.nav.cta }}
         points={dict.cta.points}
       />
+    </>
+  );
+}
+
+function DomainPage({
+  locale,
+  domain,
+  dict,
+}: {
+  locale: Parameters<typeof findDomain>[0];
+  domain: DomainContent;
+  dict: ReturnType<typeof getDictionary>;
+}) {
+  const href = (path: string) => localizePath(locale, path);
+  const path = href(routes.service(domain.slug));
+  return (
+    <>
+      <JsonLd
+        data={serviceJsonLd({ title: domain.name, metaDescription: domain.metaDescription, path, type: domain.name }, locale)}
+      />
+      <Breadcrumbs
+        items={[
+          { name: dict.common.home, path: href(routes.home) },
+          { name: dict.nav.services, path: href(routes.services) },
+          { name: domain.name, path },
+        ]}
+      />
+      <DomainHub locale={locale} domain={domain} definition={domainDefinition(domain.key)} dict={dict} />
     </>
   );
 }

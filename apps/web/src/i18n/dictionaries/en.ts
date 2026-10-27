@@ -105,6 +105,60 @@ export const en: Dictionary = {
     useCasesTitle: "Where it helps in practice",
     useCasesNote: "Typical scenarios — every project starts from your own process and data.",
   },
+  domain: {
+    eyebrow: "Domain",
+    bands: {
+      ai: { title: "AI systems", lead: "Strategy, agents, applications on your own data, and the controls around them." },
+      engineering: {
+        title: "Engineering and platforms",
+        lead: "Online stores, cloud infrastructure, software delivery, data and integrations.",
+      },
+      operations: {
+        title: "Operations and advisory",
+        lead: "Ongoing operation of what has been built, audits, reviews and team enablement.",
+      },
+    },
+    status: { available: "Available", custom: "Custom engagement", planned: "Planned" },
+    statusHint: {
+      available: "There is a service page, an intake path and a documented way of delivering it.",
+      custom: "Taken on as a scoped project after an assessment; every engagement is quoted individually.",
+      planned: "Not offered yet.",
+    },
+    statusLabel: "Status",
+    prerequisiteLabel: "Prerequisite",
+    whoTitle: "Who it is for",
+    problemsTitle: "Problems it addresses",
+    familiesTitle: "Service families and capabilities",
+    familiesLead: "The status shows what we offer today. Pricing is set once the scope is clear, in a written quote.",
+    serviceLink: "Service page",
+    viaLabel: "Through",
+    deliverablesTitle: "What you receive and keep",
+    engagementTitle: "How we engage",
+    engagementModels: {
+      assessment: { title: "Assessment", description: "A fixed-scope review with written findings, risks and a prioritised plan." },
+      workshop: { title: "Workshop", description: "Half a day to two days with your team; decisions and a written summary." },
+      architecture: {
+        title: "Architecture",
+        description: "Target design, decision records, interfaces, security model and an estimate of the work.",
+      },
+      implementation: {
+        title: "Implementation",
+        description: "Built and tested increments with acceptance criteria and handover documentation.",
+      },
+      managed: {
+        title: "Managed service",
+        description: "Ongoing operation under a written scope. No published SLA — response times are agreed per contract.",
+      },
+    },
+    prerequisitesTitle: "What we need from you",
+    limitationsTitle: "What we do not do or promise",
+    relatedTitle: "Related domains",
+    servicesTitle: "Services in this domain",
+    domainsTitle: "Ten service domains",
+    domainsLead:
+      "Each domain groups related services and states plainly what is offered today and what is taken on as a custom engagement after an assessment.",
+    ctaLead: "Describe your task. We will clarify the scope and the engagement model and send a written quote.",
+  },
   contact: {
     metaTitle: "Contact us and request a quote",
     metaDescription:

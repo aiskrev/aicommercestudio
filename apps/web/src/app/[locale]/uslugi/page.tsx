@@ -1,5 +1,6 @@
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { DomainBands } from "@/components/sections/DomainBands";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { ServiceShowcase } from "@/components/sections/ServiceShowcase";
 import { ServiceMotif } from "@/components/sections/ServiceMotif";
@@ -46,7 +47,14 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
       />
       <PageHero eyebrow={servicesPage.eyebrow} title={servicesPage.title} lead={servicesPage.lead} />
 
-      <Section>
+      <Section labelledBy="services-domains-title">
+        <SectionHeading id="services-domains-title" title={dict.domain.domainsTitle} lead={dict.domain.domainsLead} />
+        <div className="mt-12">
+          <DomainBands locale={locale} labels={dict.domain} />
+        </div>
+      </Section>
+
+      <Section alt>
         <ServiceShowcase
           services={coreServices}
           hrefFor={(service) => href(routes.service(service.slug))}
@@ -68,7 +76,7 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
         </div>
       </Section>
 
-      <Section labelledBy="services-process-title" alt>
+      <Section labelledBy="services-process-title">
         <SectionHeading id="services-process-title" eyebrow={home.process.eyebrow} title={home.process.title} />
         <ProcessTimeline steps={home.process.steps} className="mt-14" />
       </Section>

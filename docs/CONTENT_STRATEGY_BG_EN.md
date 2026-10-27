@@ -1,6 +1,7 @@
 # Content strategy (BG / EN)
 
-**Status:** specification for a later implementation phase. No website content has changed yet.
+**Status:** specification. Phases C2 and most of C3 are implemented (2026-10-27, branch
+`feature/domain-hubs`); see the progress note under §8.
 
 **Inputs:**
 
@@ -228,6 +229,21 @@ registry (keys, ids, bands, statuses, related, tools, primaryService) lives once
 | C5 Homepage repositioning (D7) | homepage copy and keyword re-map | keyword map updated; no orphaned keyword; e2e homepage tests updated |
 
 Phases C1–C3 need no database change and can ship independently of the platform phases (P1–P7).
+
+**Progress (2026-10-27).**
+
+* **Done:**
+  * C2: model and tests.
+  * C3: hub template, services index in three bands, the primary domain in service-page
+    breadcrumbs, sitemap with reciprocal hreflang, keyword map, e2e checks.
+  * C1, partly: BG and EN texts taken from SERVICE_TAXONOMY §5, with no FAQ.
+* **Open:**
+  * Header, mobile and footer navigation by band (IA-1).
+  * FAQ per hub (4–6 questions per locale) and its `FAQPage` JSON-LD.
+  * Native-speaker review of the BG texts.
+  * Claims review sign-off.
+  * Lighthouse sample of hubs.
+  * The decisions in §10.
 
 ## 9. Review checklist (every page, both locales)
 

@@ -1,7 +1,10 @@
 # Service taxonomy: ten service domains
 
-**Status:** specification. Nothing on the website has changed yet. Baseline: `main` @ `c7fa4d6`
-([PLATFORM_BASELINE_AUDIT.md](PLATFORM_BASELINE_AUDIT.md)).
+**Status:** specification, implemented as domain hubs on 2026-10-27 (branch `feature/domain-hubs`).
+The registry is `apps/web/src/lib/domains.ts` and the texts are `content/{bg,en}/domains.ts`; the
+rules in §7 are tests in `lib/domains.test.ts` and `content/seo-map.test.ts`. The header, mobile and
+footer navigation still use the two service groups (see INFORMATION_ARCHITECTURE.md). Baseline of
+the specification: `main` @ `c7fa4d6` ([PLATFORM_BASELINE_AUDIT.md](PLATFORM_BASELINE_AUDIT.md)).
 
 **Companion documents:**
 

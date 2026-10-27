@@ -1,16 +1,24 @@
 import type { MetadataRoute } from "next";
 
-import { articleRoutePaths, getContent, isIndexableCategory, serviceRoutePaths, topicRoutePaths } from "@/content";
+import {
+  articleRoutePaths,
+  domainRoutePaths,
+  getContent,
+  isIndexableCategory,
+  serviceRoutePaths,
+  topicRoutePaths,
+} from "@/content";
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
 import { AGENT_KEYS } from "@/lib/ai-team";
 import { AGENT_SLUGS } from "@/lib/agent-library";
+import { isDomainPublished } from "@/lib/domains";
 import { routes } from "@/lib/routes";
 import { isToolAvailable, toolByKey, TOOLS } from "@/lib/tools";
 import { type LocalizedPaths, samePathEverywhere } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/site";
 
 /** Date of the last substantive content revision of the static pages. */
-export const CONTENT_REVISED = "2026-10-25";
+export const CONTENT_REVISED = "2026-10-27";
 
 type Freq = "weekly" | "monthly" | "yearly";
 
@@ -44,7 +52,7 @@ function alternates(paths: LocalizedPaths, availableIn: readonly Locale[] = loca
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   return locales.flatMap((locale) => {
-    const { services, articles, editorialCategories, caseStudies, legal } = getContent(locale);
+    const { services, domains, articles, editorialCategories, caseStudies, legal } = getContent(locale);
     const url = (path: string) => absoluteUrl(localizePath(locale, path));
     return [
       ...STATIC_PATHS.filter((entry) => !(entry.legal && legal.isDraft)).map((entry) => ({
@@ -81,6 +89,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.9,
         alternates: alternates(serviceRoutePaths(service.key)),
       })),
+      // Domain hubs share the /uslugi namespace; only published hubs are listed.
+      ...domains
+        .filter((domain) => isDomainPublished(domain.key))
+        .map((domain) => ({
+          url: url(routes.service(domain.slug)),
+          lastModified: CONTENT_REVISED,
+          changeFrequency: "monthly" as const,
+          priority: 0.8,
+          alternates: alternates(domainRoutePaths(domain.key)),
+        })),
       ...articles.map((article) => {
         const { paths, availableIn } = articleRoutePaths(article.key);
         return {

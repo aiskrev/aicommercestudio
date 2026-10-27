@@ -16,6 +16,17 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/domain-hubs` (from `main` @ `52bf6e1`, not merged, 2026-10-27): the ten domain
+hubs of SERVICE_TAXONOMY.md (`/uslugi/<domain>` ↔ `/services/<domain>`), the services index in
+three bands, the primary domain in service breadcrumbs, sitemap entries and the keyword map
+(INFORMATION_ARCHITECTURE.md → "Service domains"). It makes no API or database change.
+
+| Check | Result on the branch |
+| --- | --- |
+| `.\scripts	est.ps1 -Suite web` | **483 passed** (28 files), tsc and ESLint clean |
+| e2e (production build, no-host-ports override) | **92 passed** (8 new in `domains.spec.ts`; `seo.spec.ts` and `links.spec.ts` crawl the hubs through the sitemap) |
+| `.\scripts	est.ps1 -Suite api` | not re-run (no API change) |
+
 Shipped since the seventh iteration:
 
 | Area | Where it is described |
