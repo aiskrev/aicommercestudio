@@ -2,8 +2,10 @@ import type { MetadataRoute } from "next";
 
 import { articleRoutePaths, getContent, isIndexableCategory, serviceRoutePaths, topicRoutePaths } from "@/content";
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
+import { AGENT_KEYS } from "@/lib/ai-team";
+import { AGENT_SLUGS } from "@/lib/agent-library";
 import { routes } from "@/lib/routes";
-import { isToolAvailable, TOOLS } from "@/lib/tools";
+import { isToolAvailable, toolByKey, TOOLS } from "@/lib/tools";
 import { type LocalizedPaths, samePathEverywhere } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/site";
 
@@ -62,6 +64,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
           priority: 0.7,
           alternates: alternates(samePathEverywhere(tool.path)),
         })),
+      // Agent library: index and one static page per agent role.
+      ...(isToolAvailable(toolByKey("agents"))
+        ? [routes.agentLibrary, ...AGENT_KEYS.map((key) => routes.agent(AGENT_SLUGS[key].bg))].map((path) => ({
+            url: url(path),
+            lastModified: CONTENT_REVISED,
+            changeFrequency: "monthly" as const,
+            priority: path === routes.agentLibrary ? 0.7 : 0.6,
+            alternates: alternates(samePathEverywhere(path)),
+          }))
+        : []),
       ...services.map((service) => ({
         url: url(routes.service(service.slug)),
         lastModified: CONTENT_REVISED,

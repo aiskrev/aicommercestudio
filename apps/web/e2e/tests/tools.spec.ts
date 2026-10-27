@@ -46,7 +46,7 @@ test("a shared readiness link restores the result without a form", async ({ page
 });
 
 test("tools that are not built have no page", async ({ request }) => {
-  for (const path of ["/bg/instrumenti/ai-biblioteka", "/en/tools/solution-builder", "/bg/instrumenti/nesashtestvuva"]) {
+  for (const path of ["/bg/instrumenti/ai-biblioteka", "/en/tools/agent-marketplace", "/bg/instrumenti/nesashtestvuva", "/bg/ai-agenti/nesashtestvuva", "/en/ai-agents/unknown-agent"]) {
     const response = await request.get(path);
     expect(response.status(), path).toBe(404);
   }

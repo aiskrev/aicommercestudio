@@ -577,7 +577,8 @@ export function prerequisites(config: TeamConfig): PrerequisiteKey[] {
 export type WorkflowKey = "lead_to_meeting" | "support_resolution" | "document_intake" | "content_pipeline" | "insight_reporting" | "knowledge_answers";
 export type WorkflowStep = { kind: "trigger" } | { kind: "agent"; agent: AgentKey } | { kind: "human"; checkpoint: Checkpoint } | { kind: "outcome" };
 
-const WORKFLOWS: { key: WorkflowKey; core: AgentKey; chain: AgentKey[] }[] = [
+/** Workflow templates: the agent that anchors each and the chain it runs (also used by the solution builder). */
+export const WORKFLOWS: { key: WorkflowKey; core: AgentKey; chain: AgentKey[] }[] = [
   { key: "lead_to_meeting", core: "lead_qualification", chain: ["lead_qualification", "sales_research", "scheduling"] },
   { key: "support_resolution", core: "customer_support", chain: ["knowledge_assistant", "customer_support"] },
   { key: "document_intake", core: "document_processing", chain: ["document_processing", "reporting_insights"] },
@@ -619,7 +620,7 @@ export interface RolloutPhase {
   weeks: [number, number];
 }
 
-const PHASE_WEEKS: Record<Complexity, [number, number]> = { low: [3, 5], medium: [5, 8], high: [8, 12] };
+export const PHASE_WEEKS: Record<Complexity, [number, number]> = { low: [3, 5], medium: [5, 8], high: [8, 12] };
 
 /**
  * Pilot: the most relevant task agent with the lowest complexity, plus what it requires.

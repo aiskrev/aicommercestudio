@@ -9,6 +9,9 @@
  * Code builds links from canonical (Bulgarian-segment) route paths in `lib/routes.ts` and passes them
  * through `localizePath(locale, path)`. See docs/INTERNATIONALIZATION.md.
  */
+
+import { AGENT_SLUGS } from "@/lib/agent-slugs";
+
 export const locales = ["bg", "en"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "bg";
@@ -43,12 +46,15 @@ const EN_SEGMENTS: Record<string, string> = {
   poveritelnost: "privacy",
   biskvitki: "cookies",
   "obshti-usloviya": "terms",
+  "ai-agenti": "ai-agents",
 };
 /** Second-level segments (e.g. `/statii/tema/<topic>`). */
 const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
   statii: { tema: "topic" },
   // Tool slugs (lib/tools.ts → TOOL_SLUGS). Only implemented tools have pages.
-  instrumenti: { "ai-gotovnost": "ai-readiness", "ai-ekip": "ai-team", "roi-kalkulator": "roi-calculator", "avtomatizatsii": "automation-finder" },
+  instrumenti: { "ai-gotovnost": "ai-readiness", "ai-ekip": "ai-team", "roi-kalkulator": "roi-calculator", "avtomatizatsii": "automation-finder", "ai-reshenie": "solution-builder" },
+  // Agent library pages (lib/agent-library.ts → AGENT_SLUGS).
+  "ai-agenti": Object.fromEntries(Object.values(AGENT_SLUGS).map(({ bg, en }) => [bg, en])),
 };
 
 const BG_SEGMENTS = Object.fromEntries(Object.entries(EN_SEGMENTS).map(([bg, en]) => [en, bg]));

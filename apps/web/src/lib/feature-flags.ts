@@ -22,8 +22,8 @@ export const FLAG_DEFAULTS: Record<FeatureFlag, boolean> = {
   tool_team: true,
   tool_roi: true,
   tool_finder: true,
-  tool_solution: false,
-  tool_agents: false,
+  tool_solution: true,
+  tool_agents: true,
 };
 
 /** Parses `name=on|off` pairs; unknown names and malformed parts are ignored. */

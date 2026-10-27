@@ -7,6 +7,8 @@ export const routes = {
   advisor: "/ai-automation-advisor",
   tools: "/instrumenti",
   tool: (slug: string) => `/instrumenti/${slug}`,
+  agentLibrary: "/ai-agenti",
+  agent: (slug: string) => `/ai-agenti/${slug}`,
   industries: "/za-kogo",
   about: "/za-nas",
   process: "/proces",

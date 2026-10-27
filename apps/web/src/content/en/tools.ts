@@ -93,6 +93,7 @@ export const tools: typeof bgTools = {
       title: "AI solution builder",
       description: "Compose a solution from agents, integrations and approval points and get an architecture diagram to discuss.",
       audience: "Technical leads and product teams",
+      cta: "Design a solution",
     },
     {
       key: "agents",
@@ -101,6 +102,7 @@ export const tools: typeof bgTools = {
       title: "AI agent library",
       description: "Browse typical agents by business function — tasks, tools and limits — and configure them for your case.",
       audience: "Teams looking for ideas for their first agent",
+      cta: "Browse the agents",
     },
   ],
 };
