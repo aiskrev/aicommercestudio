@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -71,7 +71,8 @@ describe("AI team configurator", () => {
     expect(screen.getByRole("group", { name: t.context.industry.label })).toHaveAttribute("aria-invalid", "true");
 
     await completeContext(user);
-    expect(screen.getByRole("heading", { level: 2, name: t.steps.departments.title })).toHaveFocus();
+    // Focus moves to the new step's heading on the next animation frame.
+    await waitFor(() => expect(screen.getByRole("heading", { level: 2, name: t.steps.departments.title })).toHaveFocus());
     // The lead department is in scope and cannot be removed.
     const lead = screen.getByRole("checkbox", { name: new RegExp(`^${t.departments.options.support.title}`) });
     expect(lead).toBeChecked();
