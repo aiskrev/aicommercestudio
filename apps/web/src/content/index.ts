@@ -1,6 +1,7 @@
 import { advisor } from "@/content/bg/advisor";
 import { aiManaged } from "@/content/bg/ai-managed";
 import { articles, insightsPage } from "@/content/bg/articles";
+import { domains } from "@/content/bg/domains";
 import { editorialCategories, publishableCaseStudies } from "@/content/bg/editorial";
 import { home } from "@/content/bg/home";
 import {
@@ -23,6 +24,7 @@ import { tools } from "@/content/bg/tools";
 import { advisor as enAdvisor } from "@/content/en/advisor";
 import { aiManaged as enAiManaged } from "@/content/en/ai-managed";
 import { articles as enArticles, insightsPage as enInsightsPage } from "@/content/en/articles";
+import { domains as enDomains } from "@/content/en/domains";
 import { editorialCategories as enEditorialCategories } from "@/content/en/editorial";
 import { home as enHome } from "@/content/en/home";
 import {
@@ -50,6 +52,7 @@ import { teamTool as enTeamTool } from "@/content/en/tool-team";
 import { tools as enTools } from "@/content/en/tools";
 import type { ServiceKey } from "@/content/types";
 import type { Locale, SlugMap } from "@/i18n/config";
+import type { DomainKey } from "@/lib/domains";
 import { routes } from "@/lib/routes";
 import type { LocalizedPaths } from "@/lib/seo";
 
@@ -57,6 +60,7 @@ const bg = {
   home,
   services,
   coreServices,
+  domains,
   servicesPage,
   industries,
   about,
@@ -87,6 +91,7 @@ const en: SiteContent = {
   home: enHome,
   services: enServices,
   coreServices: enCoreServices,
+  domains: enDomains,
   servicesPage: enServicesPage,
   industries: enIndustries,
   about: enAbout,
@@ -131,6 +136,17 @@ export function serviceByKey(locale: Locale, key: ServiceKey) {
   const service = getContent(locale).services.find((s) => s.key === key);
   if (!service) throw new Error(`Unknown service key: ${key}`);
   return service;
+}
+
+/** Domain hub by its URL slug in this locale (domain and service slugs share the `/uslugi` namespace). */
+export function findDomain(locale: Locale, slug: string) {
+  return getContent(locale).domains.find((d) => d.slug === slug);
+}
+
+export function domainByKey(locale: Locale, key: DomainKey) {
+  const domain = getContent(locale).domains.find((d) => d.key === key);
+  if (!domain) throw new Error(`Unknown domain key: ${key}`);
+  return domain;
 }
 
 /** Article by its URL slug in this locale (routing). */
@@ -181,6 +197,7 @@ export function translatedServiceSlug(from: Locale, to: Locale, slug: string): s
 export function buildSlugMap(): SlugMap {
   const map: SlugMap = { services: {}, articles: {}, topics: {} };
   for (const service of getContent("bg").services) map.services[service.slug] = serviceByKey("en", service.key).slug;
+  for (const domain of getContent("bg").domains) map.services[domain.slug] = domainByKey("en", domain.key).slug;
   for (const article of getContent("bg").articles) {
     const translated = articleByKey("en", article.key);
     if (translated) map.articles[article.slug] = translated.slug;
@@ -195,6 +212,11 @@ export function buildSlugMap(): SlugMap {
 /** Per-locale canonical route paths of a service page (hreflang alternates). */
 export function serviceRoutePaths(key: ServiceKey): LocalizedPaths {
   return { bg: routes.service(serviceByKey("bg", key).slug), en: routes.service(serviceByKey("en", key).slug) };
+}
+
+/** Per-locale canonical route paths of a domain hub. */
+export function domainRoutePaths(key: DomainKey): LocalizedPaths {
+  return { bg: routes.service(domainByKey("bg", key).slug), en: routes.service(domainByKey("en", key).slug) };
 }
 
 /** Per-locale canonical route paths of an article, for the locales in which it exists. */

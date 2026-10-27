@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/ui/Icon";
+import type { DomainKey } from "@/lib/domains";
 
 export type ServiceKey =
   | "maintenance"
@@ -63,6 +64,35 @@ export interface Service {
   approach: Capability[];
   /** Realistic use cases for this service — scenarios, never results or client names. */
   useCases: Capability[];
+}
+
+/** Texts of one service family inside a domain hub; status and links live in `lib/domains.ts`. */
+export interface DomainFamilyContent {
+  title: string;
+  capabilities: string;
+  /** Required when the family is "planned": what has to exist first. */
+  prerequisite?: string;
+}
+
+/** Texts of a domain hub (docs/SERVICE_TAXONOMY.md §5). Keyed by `DomainKey`; no prices or outcome claims. */
+export interface DomainContent {
+  key: DomainKey;
+  /** Shares the `/uslugi` namespace with the service slugs and must not collide with them. */
+  slug: string;
+  name: string;
+  /** One line for index and related-domain cards. */
+  summary: string;
+  positioning: string;
+  idealCustomers: string[];
+  problems: string[];
+  /** Keyed by the family keys of the registry. */
+  families: Record<string, DomainFamilyContent>;
+  deliverables: string[];
+  prerequisites: string[];
+  limitations: string[];
+  cta: string;
+  metaTitle: string;
+  metaDescription: string;
 }
 
 export interface InlineLink {

@@ -18,11 +18,12 @@ import {
   SectionHeading,
   cx,
 } from "@/components/ui/primitives";
-import { getContent, serviceByKey, serviceRoutePaths } from "@/content";
+import { domainByKey, getContent, serviceByKey, serviceRoutePaths } from "@/content";
 import type { OperationsKey, PackageCell } from "@/content/bg/ai-managed";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { contactFormProps } from "@/lib/contact-form-props";
+import { isDomainPublished } from "@/lib/domains";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
@@ -83,6 +84,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
   const service = serviceByKey(locale, "ai_managed");
   const href = (path: string) => localizePath(locale, path);
   const path = href(routes.service(service.slug));
+  const domain = domainByKey(locale, "managed_operations");
   const formProps = contactFormProps(locale);
   const inquiryHref = `${path}#ams-inquiry`;
 
@@ -101,6 +103,9 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
         items={[
           { name: dict.common.home, path: href(routes.home) },
           { name: dict.nav.services, path: href(routes.services) },
+          ...(isDomainPublished("managed_operations")
+            ? [{ name: domain.name, path: href(routes.service(domain.slug)) }]
+            : []),
           { name: service.shortTitle, path },
         ]}
       />
