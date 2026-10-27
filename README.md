@@ -79,6 +79,14 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [RELEASE_REPORT.md](docs/RELEASE_REPORT.md) | Release review: gates, fixes, performance, migration/deployment, verdict |
 | [ROADMAP.md](docs/ROADMAP.md) | Next versions |
 
+**Strategy and positioning**
+
+| Document | Contents |
+| --- | --- |
+| [PLATFORM_VISION.md](docs/PLATFORM_VISION.md) | Next-generation positioning, product architecture, principles, outstanding decisions |
+| [SERVICE_TAXONOMY.md](docs/SERVICE_TAXONOMY.md) | Ten service domains: names, slugs, families, deliverables, engagement models, status, SEO texts |
+| [CONTENT_STRATEGY_BG_EN.md](docs/CONTENT_STRATEGY_BG_EN.md) | Voice, claims policy, keywords, page templates, navigation, roll-out phases (BG/EN) |
+
 **Setup, architecture and operations**
 
 | Document | Contents |
