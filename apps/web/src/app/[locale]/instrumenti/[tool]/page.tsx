@@ -90,6 +90,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
             services={services}
             contactHref={href(contactWithService("audit"))}
             advisorHref={toolHrefs(locale).advisor}
+            privacyHref={href(routes.privacy)}
             locale={locale}
           />
         </Suspense>

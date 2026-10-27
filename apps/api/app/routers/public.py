@@ -115,7 +115,13 @@ def _accept_submission(
             "spam_suspected",
         )
 
-    lead = leads.create_lead(db, payload, privacy_notice_version=settings.privacy_notice_version, ip_hash=ip_hash)
+    lead = leads.create_lead(
+        db,
+        payload,
+        privacy_notice_version=settings.privacy_notice_version,
+        ip_hash=ip_hash,
+        marketing_consent_version=settings.marketing_consent_version,
+    )
     logger.info(
         "lead_created",
         extra={"lead": lead.reference, "service": lead.service, "inquiry_type": lead.inquiry_type},

@@ -208,6 +208,13 @@ instructed to answer in English).
 Errors: `422 validation_error`, `400 form_token_invalid`, `429 rate_limited`, `504 advisor_timeout`,
 `503 advisor_busy`, `503 advisor_unavailable`, `422 advisor_declined`, `502 advisor_invalid_output`.
 
+## Public: AI readiness assessment
+
+`GET /api/public/readiness/meta`, `POST /api/public/readiness/report` (anonymous PDF, nothing
+stored) and `POST /api/public/readiness/submissions` (optional hand-off to the team, creates a
+lead); admins download a submission's PDF from `GET /api/admin/leads/{id}/readiness-report`.
+Fields, limits and errors: [READINESS_REPORTS.md](READINESS_REPORTS.md#api).
+
 ## Admin authentication
 
 | Method | Path | Notes |

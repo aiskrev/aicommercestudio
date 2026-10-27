@@ -11,7 +11,7 @@ import type { ToolKey } from "@/lib/tools";
  */
 export type ToolEventName = "tool_opened" | "tool_started" | "step_completed" | "tool_completed" | "export_requested";
 
-export type ExportFormat = "print" | "text" | "link";
+export type ExportFormat = "print" | "text" | "link" | "pdf";
 
 export interface ToolEvent {
   name: ToolEventName;
@@ -29,7 +29,7 @@ type Sink = (event: ToolEvent) => void;
 
 const sinks = new Set<Sink>();
 const RESULT_PATTERN = /^[a-z_]{1,32}$/;
-const FORMATS: ReadonlySet<string> = new Set(["print", "text", "link"]);
+const FORMATS: ReadonlySet<string> = new Set(["print", "text", "link", "pdf"]);
 
 /** Builds the event from allow-listed fields only; anything else is dropped. */
 export function sanitizeToolEvent(input: ToolEvent & Record<string, unknown>): ToolEvent {

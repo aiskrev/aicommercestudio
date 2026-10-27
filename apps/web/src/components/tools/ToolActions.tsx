@@ -7,8 +7,8 @@ import type { ExportFormat } from "@/lib/analytics";
 
 /**
  * Save / share / export actions for a tool result: print (or save as PDF from the print dialog),
- * download a plain-text summary, copy a share link. Nothing is uploaded; the link carries only the
- * non-personal answer code the tool provides.
+ * optionally download a plain-text summary, copy a share link. Nothing is uploaded; the link carries
+ * only the non-personal answer code the tool provides.
  */
 export function ToolActions({
   title,
@@ -20,14 +20,16 @@ export function ToolActions({
 }: {
   title: string;
   labels: { print: string; download: string; copyLink: string; copied: string; copyFailed: string };
-  summaryText: () => string;
-  fileName: string;
+  /** Plain-text summary; without it there is no download button (e.g. a tool with its own report). */
+  summaryText?: () => string;
+  fileName?: string;
   shareUrl: () => string;
   onExport?: (format: ExportFormat) => void;
 }) {
   const [message, setMessage] = useState("");
 
   function download() {
+    if (!summaryText || !fileName) return;
     onExport?.("text");
     const blob = new Blob([summaryText()], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -64,9 +66,11 @@ export function ToolActions({
         >
           {labels.print}
         </Button>
-        <Button variant="secondary" size="sm" onClick={download}>
-          {labels.download}
-        </Button>
+        {summaryText && fileName && (
+          <Button variant="secondary" size="sm" onClick={download}>
+            {labels.download}
+          </Button>
+        )}
         <Button variant="secondary" size="sm" onClick={copy}>
           {labels.copyLink}
         </Button>

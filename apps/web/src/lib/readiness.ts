@@ -9,7 +9,16 @@ import type { ServiceKey } from "@/content/types";
  *   overall score   = Σ dimension score × normalised weight      → clamped to 0–100, rounded
  *   band            = from the rounded overall score (0–24 / 25–49 / 50–74 / 75–100)
  * The result is a self-assessment, never a certification.
+ *
+ * The API scores the same answers again (apps/api/app/readiness/scoring.py) for the PDF report and
+ * submissions. Both are tested against the same golden vectors (readiness.vectors.json); change the
+ * model in both places, regenerate the vectors and bump READINESS_MODEL_VERSION together.
  */
+
+/** Must equal MODEL_VERSION in the API; the API rejects answers made with another model version. */
+export const READINESS_MODEL_VERSION = "2026-10.2";
+/** Version of the request shape sent to /api/public/readiness/*. */
+export const READINESS_SCHEMA_VERSION = "1";
 
 export const READINESS_DIMENSIONS = ["strategy", "data", "process", "technology", "people", "governance"] as const;
 export type ReadinessDimension = (typeof READINESS_DIMENSIONS)[number];
@@ -298,4 +307,19 @@ export function encodeAnswers(answers: ReadinessAnswers): string {
 export function decodeAnswers(code: string | null | undefined): ReadinessAnswers | null {
   if (!code || code.length !== READINESS_QUESTION_ORDER.length || !/^[0-4]+$/.test(code)) return null;
   return Object.fromEntries(READINESS_QUESTION_ORDER.map((id, i) => [id, Number(code[i]) as AnswerScore])) as ReadinessAnswers;
+}
+
+/** The result in the API's JSON shape (`ReadinessResult.summary()`), used for the parity vectors. */
+export function toApiSummary(result: ReadinessResult) {
+  return {
+    overall: result.overall,
+    band: result.band,
+    dimensions: Object.fromEntries(result.dimensions.map((d) => [d.dimension, d.score])),
+    blockers: result.blockers,
+    strengths: result.strengths,
+    gaps: result.gaps,
+    actions: result.actions,
+    use_cases: result.useCases,
+    roadmap: result.roadmap,
+  };
 }

@@ -43,16 +43,23 @@ React state plus `useStepFlow`.
 
 Names: `tool_opened`, `tool_started`, `step_completed`, `tool_completed`, `export_requested`.
 Fields (allow-list): `name`, `tool`, `locale`, `step`, `totalSteps`, `result` (enumerated bucket,
-e.g. `developing`), `format` (`print` | `text` | `link`). Anything else — answers, free text, names,
+e.g. `developing`), `format` (`print` | `text` | `link` | `pdf`). Anything else — answers, free text, names,
 e-mails — is dropped by `sanitizeToolEvent`. Nothing is sent over the network today: events are
 dispatched as a DOM `acs:analytics` CustomEvent; a consent-aware provider can be attached with
 `registerAnalyticsSink` later.
 
 ## Privacy
 
-The readiness assessment runs entirely in the browser; answers are neither sent nor stored. The
-share link contains a 12-digit answer code (`?r=`), never personal data. The lead-capture card
-links to the contact form with the service preselected and does not attach the answers.
+The readiness result on the page is calculated entirely in the browser. Answers leave the browser
+only on an explicit action, and the server re-scores them every time:
+
+* **Download the PDF report** — answer levels (0–4), locale and model version go to
+  `POST /api/public/readiness/report`; the PDF is rendered in memory and nothing is stored.
+* **Send the result to the team** (optional form) — creates an inquiry with contact details, answer
+  levels and the server-computed result, kept for `READINESS_RETENTION_DAYS`.
+
+The share link contains a 12-digit answer code (`?r=`), never personal data. Details, API and
+privacy assumptions: [READINESS_REPORTS.md](READINESS_REPORTS.md).
 
 ## States
 
