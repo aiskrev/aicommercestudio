@@ -5,6 +5,9 @@
     python -m app.cli set-password --email x@y  # reset a password, clear lockout, revoke sessions
     python -m app.cli maintenance [--dry-run]   # GDPR retention + expired session cleanup
     python -m app.cli purge-synthetic           # remove synthetic development data
+    python -m app.cli ops-create-org --slug s --name n --owner-email x@y  # AI operations tenant + owner
+    python -m app.cli ops-seed-demo --owner-email x@y   # labelled sample registry (not in production)
+    python -m app.cli ops-purge-demo            # remove demo organisations
 """
 
 from __future__ import annotations
@@ -23,6 +26,7 @@ from app.advisor import service as advisor
 from app.config import get_settings
 from app.db import get_sessionmaker
 from app.models import AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
+from app.ops import service as ops
 from app.security import hash_password, validate_password_strength
 from app.services import ai_actions, leads
 from app.team import service as team
@@ -244,6 +248,36 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_ops_create_org(args: argparse.Namespace) -> int:
+    with get_sessionmaker()() as db:
+        try:
+            org = ops.create_organization(db, slug=args.slug, name=args.name, owner_email=args.owner_email)
+        except ops.OpsSetupError as exc:
+            _print(f"[ops-create-org] {exc}")
+            return 1
+    _print(f"[ops-create-org] Created organisation {org.slug} ({org.id})")
+    return 0
+
+
+def cmd_ops_seed_demo(args: argparse.Namespace) -> int:
+    settings = get_settings()
+    with get_sessionmaker()() as db:
+        try:
+            org = ops.seed_demo(db, owner_email=args.owner_email, app_env=settings.app_env)
+        except ops.OpsSetupError as exc:
+            _print(f"[ops-seed-demo] {exc}")
+            return 1
+    _print(f"[ops-seed-demo] Demo organisation (sample data): {org.slug}")
+    return 0
+
+
+def cmd_ops_purge_demo(_: argparse.Namespace) -> int:
+    with get_sessionmaker()() as db:
+        removed = ops.purge_demo(db)
+    _print(f"[ops-purge-demo] Removed demo organisations: {removed}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -261,6 +295,15 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser(
         "purge-synthetic", help="Delete all synthetic development leads (source=synthetic_seed)"
     ).set_defaults(func=cmd_purge_synthetic)
+    org = sub.add_parser("ops-create-org", help="Create an AI operations organisation with its first owner")
+    org.add_argument("--slug", required=True)
+    org.add_argument("--name", required=True)
+    org.add_argument("--owner-email", required=True)
+    org.set_defaults(func=cmd_ops_create_org)
+    demo = sub.add_parser("ops-seed-demo", help="Create a labelled demo organisation with sample registry data")
+    demo.add_argument("--owner-email", required=True)
+    demo.set_defaults(func=cmd_ops_seed_demo)
+    sub.add_parser("ops-purge-demo", help="Delete demo organisations").set_defaults(func=cmd_ops_purge_demo)
     args = parser.parse_args(argv)
     return args.func(args)
 

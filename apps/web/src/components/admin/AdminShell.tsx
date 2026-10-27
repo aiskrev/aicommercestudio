@@ -12,12 +12,13 @@ import { cx } from "@/components/ui/primitives";
 import { adminFetch } from "@/lib/admin-api";
 import { routes } from "@/lib/routes";
 
-type NavKey = "dashboard" | "leads" | "ai" | "activity" | "account";
+type NavKey = "dashboard" | "leads" | "ai" | "operations" | "activity" | "account";
 
 const NAV: { href: string; key: NavKey; icon: IconName; exact?: boolean }[] = [
   { href: routes.admin, key: "dashboard", icon: "dashboard", exact: true },
   { href: routes.adminLeads, key: "leads", icon: "inbox" },
   { href: routes.adminAiActions, key: "ai", icon: "bot" },
+  { href: routes.adminOperations, key: "operations", icon: "layers" },
   { href: routes.adminActivity, key: "activity", icon: "activity" },
   { href: routes.adminAccount, key: "account", icon: "lock" },
 ];

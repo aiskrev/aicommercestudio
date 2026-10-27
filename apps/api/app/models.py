@@ -14,10 +14,12 @@ from sqlalchemy import (
     CheckConstraint,
     DateTime,
     ForeignKey,
+    ForeignKeyConstraint,
     Index,
     Integer,
     String,
     Text,
+    UniqueConstraint,
     Uuid,
     text,
 )
@@ -343,3 +345,127 @@ class TeamConfiguration(Base):
     @property
     def reference(self) -> str:
         return self.id.hex[:8].upper()
+
+
+# --------------------------------------------------------------------------- AI operations (scaffold)
+# Tenancy foundation for the future AI Operations Portal (docs/AI_OPERATIONS_PORTAL.md). It holds
+# registry metadata only — no telemetry, no client credentials. Every tenant-owned row carries
+# organization_id; access goes through app/ops/tenancy.py, which scopes each query by membership.
+
+
+class OpsRole(enum.StrEnum):
+    OWNER = "owner"
+    ADMIN = "admin"
+    OPERATOR = "operator"
+    REVIEWER = "reviewer"
+    VIEWER = "viewer"
+
+
+class OpsOrganizationStatus(enum.StrEnum):
+    ACTIVE = "active"
+    SUSPENDED = "suspended"
+
+
+class OpsEnvironment(enum.StrEnum):
+    PRODUCTION = "production"
+    STAGING = "staging"
+    DEVELOPMENT = "development"
+
+
+class OpsAgentStatus(enum.StrEnum):
+    PLANNED = "planned"
+    ACTIVE = "active"
+    PAUSED = "paused"
+    RETIRED = "retired"
+
+
+class OpsOrganization(Base):
+    """A client organisation (tenant). `is_demo` marks sample data created by `ops-seed-demo`."""
+
+    __tablename__ = "ops_organizations"
+    __table_args__ = (CheckConstraint(_in_check("status", OpsOrganizationStatus), name="status"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    slug: Mapped[str] = mapped_column(String(60), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, server_default="active")
+    data_region: Mapped[str] = mapped_column(String(8), nullable=False, server_default="eu")
+    is_demo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=text("false"))
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+
+
+class OpsWorkspace(Base):
+    """An environment or business unit inside an organisation."""
+
+    __tablename__ = "ops_workspaces"
+    __table_args__ = (
+        UniqueConstraint("organization_id", "slug", name="uq_ops_workspaces_org_slug"),
+        # Target of the composite foreign key that keeps an agent inside its workspace's tenant.
+        UniqueConstraint("id", "organization_id", name="uq_ops_workspaces_id_org"),
+        CheckConstraint(_in_check("environment", OpsEnvironment), name="environment"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("ops_organizations.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    slug: Mapped[str] = mapped_column(String(60), nullable=False)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    environment: Mapped[str] = mapped_column(String(16), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+
+
+class OpsMembership(Base):
+    """Grants a user a role in one organisation. No membership — no access (not even to know it exists)."""
+
+    __tablename__ = "ops_memberships"
+    __table_args__ = (
+        UniqueConstraint("organization_id", "user_id", name="uq_ops_memberships_org_user"),
+        CheckConstraint(_in_check("role", OpsRole), name="role"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("ops_organizations.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("admin_users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    role: Mapped[str] = mapped_column(String(16), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+
+    user: Mapped[AdminUser] = relationship(lazy="joined")
+    organization: Mapped[OpsOrganization] = relationship(lazy="joined")
+
+
+class OpsAgent(Base):
+    """Agent registry entry: deployment/version metadata entered by staff. No runs or telemetry yet."""
+
+    __tablename__ = "ops_agents"
+    __table_args__ = (
+        # The workspace must belong to the same organisation (enforced by the database).
+        ForeignKeyConstraint(
+            ["workspace_id", "organization_id"],
+            ["ops_workspaces.id", "ops_workspaces.organization_id"],
+            ondelete="CASCADE",
+            name="fk_ops_agents_workspace_org",
+        ),
+        UniqueConstraint("workspace_id", "key", name="uq_ops_agents_workspace_key"),
+        CheckConstraint(_in_check("status", OpsAgentStatus), name="status"),
+        Index("ix_ops_agents_workspace_id", "workspace_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("ops_organizations.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    workspace_id: Mapped[uuid.UUID] = mapped_column(Uuid, nullable=False)
+    key: Mapped[str] = mapped_column(String(60), nullable=False)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False)
+    provider: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    model: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    version: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    purpose: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow, onupdate=utcnow)

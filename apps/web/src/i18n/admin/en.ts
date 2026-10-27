@@ -1,11 +1,11 @@
 import type { AdminDictionary } from "@/i18n/admin/bg";
 
 export const adminEn: AdminDictionary = {
-  meta: { title: "Administration", login: "Log in", dashboard: "Dashboard", leads: "Inquiries", lead: "Inquiry", ai: "AI approvals", activity: "Activity", account: "Account and sessions" },
+  meta: { title: "Administration", login: "Log in", dashboard: "Dashboard", leads: "Inquiries", lead: "Inquiry", ai: "AI approvals", activity: "Activity", account: "Account and sessions", operations: "AI operations" },
   shell: {
     brand: "Administration",
     navLabel: "Administration",
-    nav: { dashboard: "Dashboard", leads: "Inquiries", ai: "AI approvals", activity: "Activity", account: "Account and sessions" },
+    nav: { dashboard: "Dashboard", leads: "Inquiries", ai: "AI approvals", operations: "AI operations", activity: "Activity", account: "Account and sessions" },
     logout: "Log out",
     loggingOut: "Logging out…",
     toSite: "← Back to the website",
@@ -301,6 +301,32 @@ export const adminEn: AdminDictionary = {
     failed: "The policy could not be applied.",
     schedule: "Automatic run:",
     scheduleSuffix: "on a schedule.",
+  },
+  operations: {
+    title: "AI operations",
+    description: "Internal scaffold of the future AI Operations Portal: organisations, workspaces, agent registry and roles.",
+    scaffoldNotice:
+      "No telemetry is connected. Runs, cost, latency and incidents are not collected — only metadata entered by the team is shown.",
+    demoNotice: "Demo mode: sample data, not real client systems.",
+    organization: "Organisation",
+    role: "Your role",
+    region: "Data region",
+    noOrganizations: "You are not a member of any organisation",
+    noOrganizationsText: "Organisations are created by the team with the ops-create-org command. Access is by membership only.",
+    workspaces: "Workspaces",
+    agents: "Agents",
+    telemetry: "Telemetry",
+    telemetryOff: "Not connected",
+    agentsTitle: "Agent registry",
+    noAgents: "No agents registered",
+    columns: { name: "Agent", workspace: "Workspace", status: "Status", model: "Model", version: "Version" },
+    membersTitle: "Members",
+    plannedTitle: "Planned modules",
+    plannedText: "They will be enabled once a real telemetry source is connected (see docs/AI_OPERATIONS_PORTAL.md).",
+    planned: ["Run overview", "Traces and tool calls", "Tokens and cost", "Evaluations and human review", "Alerts and reports"],
+    status: { planned: "Planned", active: "Active", paused: "Paused", retired: "Retired" },
+    roles: { owner: "Owner", admin: "Administrator", operator: "Operator", reviewer: "Reviewer", viewer: "Viewer" },
+    environments: { production: "Production", staging: "Staging", development: "Development" },
   },
   account: {
     title: "Account and sessions",

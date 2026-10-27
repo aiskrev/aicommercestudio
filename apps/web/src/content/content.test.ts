@@ -89,4 +89,15 @@ describe.each(locales)("content integrity (%s)", (locale) => {
     expect(packages.noSlaNote).toMatch(/SLA/);
     expect(packages.priceLabel).toBe(locale === "bg" ? "По индивидуална оферта" : "Custom quote");
   });
+
+  it("AI Managed Services explains eight operating areas and presents the portal as planned, without data", () => {
+    const { operations, portal } = content.aiManaged;
+    expect(operations.items.map((i) => i.key)).toEqual(["reliability", "execution", "cost", "quality", "review", "incidents", "optimization", "governance"]);
+    for (const item of operations.items) expect(item.deliverable && item.requires).toBeTruthy();
+    expect(portal.modules.map((m) => m.key)).toEqual(["overview", "agents", "observability", "quality", "governance", "alerts"]);
+    expect(portal.badge).toBe(locale === "bg" ? "Планирано" : "Planned");
+    // No figures, guarantees or live-status claims in the new sections.
+    const text = JSON.stringify([operations, portal]);
+    expect(text).not.toMatch(/\d+\s?%|\d+\s?(ms|сек|sec)\b|24\/7|\bSLA\b|uptime|гарантира|guarantee/i);
+  });
 });

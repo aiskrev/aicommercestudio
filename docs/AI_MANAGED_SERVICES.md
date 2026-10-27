@@ -9,7 +9,11 @@ security and governance, continuous improvement and incident handling.
 
 > Status: the public service page, the intake form, lead storage and admin display are implemented.
 > No monitoring, evaluation or alerting runs against client systems yet — that is the future
-> AI Operations Console ([AI_OPERATIONS_ARCHITECTURE.md](AI_OPERATIONS_ARCHITECTURE.md)).
+> AI Operations Portal ([AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md)); a staff-only tenancy/RBAC scaffold exists.
+>
+> The page also has two sections added on 2026-10-27: **what operating your AI systems covers** (`#ams-operations`,
+> eight areas, each with what the client receives and what their system must provide) and **AI Operations Portal — in
+> development** (`#ams-portal`, six planned modules shown as *Planned*, no data).
 
 ## Where it lives
 

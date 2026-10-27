@@ -78,6 +78,18 @@ ERROR_MESSAGES: dict[str, dict[Locale, str]] = {
     },
     "lead_not_found": {"bg": "Запитването не е намерено.", "en": "Inquiry not found."},
     "action_not_found": {"bg": "Действието не е намерено.", "en": "Action not found."},
+    "ops_not_found": {"bg": "Не е намерено.", "en": "Not found."},
+    "ops_forbidden": {"bg": "Нямате права за това действие.", "en": "You do not have permission for this action."},
+    "ops_suspended": {"bg": "Организацията е спряна.", "en": "The organisation is suspended."},
+    "ops_conflict": {"bg": "Вече съществува такъв запис.", "en": "Such a record already exists."},
+    "ops_last_owner": {
+        "bg": "Организацията трябва да има поне един собственик.",
+        "en": "The organisation must keep at least one owner.",
+    },
+    "ops_user_unknown": {
+        "bg": "Няма активен потребител с този имейл.",
+        "en": "There is no active user with this e-mail.",
+    },
     "status_conflict": {
         "bg": "Запитването е променено от друг администратор. Презаредете страницата и опитайте отново.",
         "en": "The inquiry was changed by another administrator. Please reload the page and try again.",
@@ -159,6 +171,14 @@ VALIDATION_MESSAGES: dict[str, dict[Locale, str]] = {
     "ai_details_service": {
         "bg": "Информацията за AI система се приема само за услугата AI Managed Services.",
         "en": "AI system details are only accepted for the AI Managed Services service.",
+    },
+    "ops_slug": {
+        "bg": "Използвайте малки латински букви, цифри и тирета.",
+        "en": "Use lowercase Latin letters, digits and hyphens.",
+    },
+    "ops_label": {
+        "bg": "Използвайте латински букви, цифри и . _ : / -",
+        "en": "Use Latin letters, digits and . _ : / -",
     },
     "nothing_to_change": {
         "bg": "Посочете статус или услуга за промяна.",

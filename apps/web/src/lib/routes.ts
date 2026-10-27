@@ -28,6 +28,7 @@ export const routes = {
   adminActivity: "/admin/activity",
   adminAiActions: "/admin/ai",
   adminAccount: "/admin/account",
+  adminOperations: "/admin/operations",
 } as const;
 
 export function contactWithService(serviceKey: string): string {

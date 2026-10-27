@@ -3,11 +3,11 @@
  * en.ts must have exactly the same shape (`AdminDictionary`).
  */
 export const adminBg = {
-  meta: { title: "Администрация", login: "Вход", dashboard: "Табло", leads: "Запитвания", lead: "Запитване", ai: "AI одобрения", activity: "Активност", account: "Акаунт и сесии" },
+  meta: { title: "Администрация", login: "Вход", dashboard: "Табло", leads: "Запитвания", lead: "Запитване", ai: "AI одобрения", activity: "Активност", account: "Акаунт и сесии", operations: "AI операции" },
   shell: {
     brand: "Администрация",
     navLabel: "Администрация",
-    nav: { dashboard: "Табло", leads: "Запитвания", ai: "AI одобрения", activity: "Активност", account: "Акаунт и сесии" },
+    nav: { dashboard: "Табло", leads: "Запитвания", ai: "AI одобрения", operations: "AI операции", activity: "Активност", account: "Акаунт и сесии" },
     logout: "Изход",
     loggingOut: "Изход…",
     toSite: "← Към сайта",
@@ -303,6 +303,32 @@ export const adminBg = {
     failed: "Политиката не можа да бъде приложена.",
     schedule: "Автоматично изпълнение:",
     scheduleSuffix: "по график.",
+  },
+  operations: {
+    title: "AI операции",
+    description: "Вътрешен скелет на бъдещия AI Operations Portal: организации, работни пространства, регистър на агентите и роли.",
+    scaffoldNotice:
+      "Няма свързана телеметрия. Изпълнения, разходи, забавяне и инциденти не се събират — показваме само въведени от екипа метаданни.",
+    demoNotice: "Демо режим: примерни данни, не са реални клиентски системи.",
+    organization: "Организация",
+    role: "Вашата роля",
+    region: "Регион на данните",
+    noOrganizations: "Нямате членство в организация",
+    noOrganizationsText: "Организациите се създават от екипа с командата ops-create-org. Достъпът е само чрез членство.",
+    workspaces: "Работни пространства",
+    agents: "Агенти",
+    telemetry: "Телеметрия",
+    telemetryOff: "Не е свързана",
+    agentsTitle: "Регистър на агентите",
+    noAgents: "Няма регистрирани агенти",
+    columns: { name: "Агент", workspace: "Пространство", status: "Статус", model: "Модел", version: "Версия" },
+    membersTitle: "Членове",
+    plannedTitle: "Планирани модули",
+    plannedText: "Ще се включат след като бъде свързан реален източник на телеметрия (виж docs/AI_OPERATIONS_PORTAL.md).",
+    planned: ["Обзор на изпълненията", "Трасирания и инструменти", "Токени и разходи", "Оценки и човешки преглед", "Известия и отчети"],
+    status: { planned: "Планиран", active: "Активен", paused: "Спрян", retired: "Изведен" },
+    roles: { owner: "Собственик", admin: "Администратор", operator: "Оператор", reviewer: "Рецензент", viewer: "Наблюдател" },
+    environments: { production: "Продукция", staging: "Тестова", development: "Разработка" },
   },
   account: {
     title: "Акаунт и сесии",

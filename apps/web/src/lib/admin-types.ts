@@ -214,3 +214,59 @@ export interface LinkedAssessment {
   tools: string[];
   assessment: AutomationAssessment;
 }
+
+// ----------------------------------------------------------------------------- AI operations (scaffold)
+
+export type OpsRole = "owner" | "admin" | "operator" | "reviewer" | "viewer";
+export type OpsAgentStatus = "planned" | "active" | "paused" | "retired";
+export type OpsEnvironment = "production" | "staging" | "development";
+
+export interface OpsOrganization {
+  id: string;
+  slug: string;
+  name: string;
+  status: "active" | "suspended";
+  data_region: string;
+  is_demo: boolean;
+  role: OpsRole;
+}
+
+export interface OpsOverview {
+  organization: Omit<OpsOrganization, "role">;
+  role: OpsRole;
+  permissions: string[];
+  workspaces: number;
+  agents_by_status: Partial<Record<OpsAgentStatus, number>>;
+  telemetry: { connected: boolean; note: string };
+}
+
+export interface OpsWorkspace {
+  id: string;
+  slug: string;
+  name: string;
+  environment: OpsEnvironment;
+  created_at: string;
+}
+
+export interface OpsAgent {
+  id: string;
+  workspace_id: string;
+  key: string;
+  name: string;
+  status: OpsAgentStatus;
+  provider: string | null;
+  model: string | null;
+  version: string | null;
+  purpose: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OpsMember {
+  id: string;
+  user_id: string;
+  email: string;
+  full_name: string;
+  role: OpsRole;
+  created_at: string;
+}
