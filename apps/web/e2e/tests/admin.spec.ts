@@ -53,6 +53,39 @@ async function createReadinessSubmission(request: APIRequestContext, company: st
   return (await response.json()).reference;
 }
 
+/** An AI team consultation (customer support team, managed cloud), from its own client address. */
+async function createTeamSubmission(request: APIRequestContext, company: string): Promise<string> {
+  const { token } = await (await request.get("/api/public/form-token")).json();
+  await new Promise((resolve) => setTimeout(resolve, 3500));
+  const response = await request.post("/api/public/team/submissions", {
+    headers: { "X-Forwarded-For": `10.93.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}` },
+    data: {
+      schema_version: "1",
+      model_version: "2026-10.1",
+      locale: "bg",
+      config: {
+        context: { industry: "ecommerce", size: "s11_50", lead_department: "support", challenge: "slow_response", volume: "v100_1k" },
+        departments: ["support"],
+        chosen: ["customer_support"],
+        agents: {},
+        deployment: "managed_cloud",
+        operations: "shared",
+      },
+      name: "E2E Екип",
+      email: "e2e.team@example.com",
+      company,
+      role: "Управител",
+      message: "",
+      privacy_acknowledged: true,
+      marketing_consent: false,
+      website: "",
+      form_token: token,
+    },
+  });
+  expect(response.status()).toBe(201);
+  return (await response.json()).reference;
+}
+
 test.describe("admin access control", () => {
   test("unauthenticated visitors are redirected to login", async ({ page }) => {
     await page.goto("/admin/leads");
@@ -88,6 +121,8 @@ test.describe("admin lead management", () => {
     await createLead(request, company);
     const readinessCompany = `E2E Готовност ${Date.now()}`;
     const readinessReference = await createReadinessSubmission(request, readinessCompany);
+    const teamCompany = `E2E Екип ${Date.now()}`;
+    const teamReference = await createTeamSubmission(request, teamCompany);
 
     await page.goto("/admin/login");
     await page.getByLabel("Имейл").fill(email);
@@ -152,6 +187,20 @@ test.describe("admin lead management", () => {
     expect(pdf.headers()["content-type"]).toBe("application/pdf");
     expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
     expect((await request.get(reportHref)).status()).toBe(401);
+
+    // An AI team consultation shows the configuration, its estimate and an admin-only PDF plan.
+    await page.goto(`/admin/leads?q=${encodeURIComponent(teamCompany)}`);
+    await page.getByRole("link", { name: "E2E Екип" }).first().click();
+    await expect(page.getByText(`#${teamReference}`)).toBeVisible();
+    const team = page.getByTestId("team-details");
+    await expect(team).toContainText("Средна");
+    await expect(team).toContainText("customer_support, knowledge_assistant");
+    await expect(team).toContainText("€");
+    const teamHref = (await team.getByTestId("team-report-download").getAttribute("href"))!;
+    const plan = await page.request.get(teamHref);
+    expect(plan.status()).toBe(200);
+    expect((await plan.body()).subarray(0, 5).toString()).toBe("%PDF-");
+    expect((await request.get(teamHref)).status()).toBe(401);
 
     await page.getByRole("button", { name: "Изход" }).last().click();
     await expect(page).toHaveURL(/\/admin\/login/);

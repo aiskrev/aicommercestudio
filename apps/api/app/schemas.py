@@ -327,6 +327,24 @@ class ReadinessDetailsOut(BaseModel):
     actions: list[str]
 
 
+class TeamDetailsOut(BaseModel):
+    """AI team configurator consultation as shown to admins (enumerated configuration and estimate)."""
+
+    reference: str | None = None
+    model_version: str
+    assumptions_version: str
+    role: str
+    agents: list[str]
+    complexity: str
+    deployment: str | None = None
+    operations: str | None = None
+    currency: str
+    one_time_range: list[int]
+    monthly_range: list[int]
+    expected_one_time: int
+    expected_monthly: int
+
+
 class LeadDetailOut(LeadSummaryOut):
     phone: str | None
     message: str
@@ -347,6 +365,8 @@ class LeadDetailOut(LeadSummaryOut):
     ai_managed: AiManagedDetails | None = None
     # AI readiness assessment submission (source readiness_assessment); None otherwise.
     readiness: ReadinessDetailsOut | None = None
+    # AI team configurator consultation (source team_configurator); None otherwise.
+    team: TeamDetailsOut | None = None
 
 
 class LeadPage(BaseModel):
@@ -430,6 +450,8 @@ class RetentionPreview(BaseModel):
     audit_cutoff: datetime
     advisor_retention_days: int = 0
     advisor_assessments_due: int = 0
+    team_configuration_retention_days: int = 0
+    team_configurations_due: int = 0
 
 
 class RetentionRunIn(StrictModel):
@@ -440,6 +462,7 @@ class RetentionRunOut(BaseModel):
     leads_deleted: int
     audit_entries_deleted: int
     advisor_assessments_deleted: int = 0
+    team_configurations_deleted: int = 0
 
 
 class IntegrationStatus(BaseModel):

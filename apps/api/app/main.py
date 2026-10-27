@@ -16,7 +16,7 @@ from app.errors import error_body
 from app.i18n import Locale, error_message, request_locale, validation_message
 from app.logging_config import configure_logging
 from app.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
-from app.routers import admin, admin_auth, advisor, health, public, readiness
+from app.routers import admin, admin_auth, advisor, health, public, readiness, team
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +100,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(public.router)
     app.include_router(advisor.router)
     app.include_router(readiness.router)
+    app.include_router(team.router)
     app.include_router(admin_auth.router)
     app.include_router(admin.router)
     return app

@@ -30,7 +30,7 @@ type User = ReturnType<typeof userEvent.setup>;
 function renderBuilder(locale: "en" | "bg" = "en") {
   const content = getContent(locale);
   render(
-    <AiTeamBuilder content={content.teamTool} ui={content.tools.ui} services={services} contactHref={`/${locale}/contact`} locale={locale} />,
+    <AiTeamBuilder content={content.teamTool} ui={content.tools.ui} services={services} contactHref={`/${locale}/contact`} privacyHref={`/${locale}/privacy`} locale={locale} />,
   );
 }
 

@@ -25,6 +25,16 @@ if ($Suite -in @("api", "web", "all")) {
         if ($api -ne $web) { Write-Host "readiness vectors differ between apps/api and apps/web" -ForegroundColor Red }
         $global:LASTEXITCODE = [int]($api -ne $web)
     }
+    # The AI team model and its PDF texts are shared the same way (vectors + texts snapshot).
+    Invoke-Suite "AI team vectors and texts (API = web copy)" {
+        $pairs = @(
+            @("apps/api/tests/fixtures/team_vectors.json", "apps/web/src/lib/team.vectors.json"),
+            @("apps/api/app/team/texts.json", "apps/web/src/lib/team-texts.json")
+        )
+        $diff = $pairs | Where-Object { (Get-FileHash $_[0]).Hash -ne (Get-FileHash $_[1]).Hash }
+        foreach ($pair in $diff) { Write-Host "$($pair[0]) differs from $($pair[1])" -ForegroundColor Red }
+        $global:LASTEXITCODE = [int]([bool]$diff)
+    }
 }
 if ($Suite -in @("api", "all")) {
     Invoke-Suite "API tests (pytest)" { docker compose --profile test run --rm --build api-tests }

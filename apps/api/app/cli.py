@@ -25,6 +25,7 @@ from app.db import get_sessionmaker
 from app.models import AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
 from app.security import hash_password, validate_password_strength
 from app.services import ai_actions, leads
+from app.team import service as team
 
 SYNTHETIC_SOURCE = "synthetic_seed"
 
@@ -220,8 +221,10 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
             settings.audit_retention_days,
             dry_run=args.dry_run,
             readiness_retention_days=settings.readiness_retention_days,
+            team_retention_days=settings.team_lead_retention_days,
         )
         assessments = advisor.purge_expired(db, dry_run=args.dry_run)
+        configurations = team.purge_expired(db, dry_run=args.dry_run)
         sessions_removed = 0
         if not args.dry_run:
             cutoff = utcnow() - timedelta(days=1)
@@ -235,6 +238,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
     _print(
         f"{prefix}: leads={result.leads_deleted} audit_entries={result.audit_entries_deleted} "
         f"advisor_assessments={assessments.due if args.dry_run else assessments.deleted} "
+        f"team_configurations={configurations.due if args.dry_run else configurations.deleted} "
         f"sessions={sessions_removed}"
     )
     return 0

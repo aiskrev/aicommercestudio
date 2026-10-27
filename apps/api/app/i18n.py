@@ -48,6 +48,14 @@ ERROR_MESSAGES: dict[str, dict[Locale, str]] = {
         "en": "The request was rejected (invalid origin).",
     },
     "payload_too_large": {"bg": "Заявката е твърде голяма.", "en": "The request is too large."},
+    "estimate_unavailable": {
+        "bg": "Разходите временно не могат да бъдат изчислени. Моля, опитайте отново по-късно.",
+        "en": "Costs cannot be calculated right now. Please try again later.",
+    },
+    "team_configuration_not_found": {
+        "bg": "Запазената конфигурация не е намерена или е изтекла.",
+        "en": "The saved configuration was not found or has expired.",
+    },
     "report_unavailable": {
         "bg": "Отчетът временно не може да бъде създаден. Моля, опитайте отново по-късно.",
         "en": "The report cannot be created right now. Please try again later.",
@@ -155,6 +163,18 @@ VALIDATION_MESSAGES: dict[str, dict[Locale, str]] = {
     "nothing_to_change": {
         "bg": "Посочете статус или услуга за промяна.",
         "en": "Specify a status or service to change.",
+    },
+    "team_model": {
+        "bg": "Конфигурацията е направена с по-стара версия. Моля, презаредете страницата.",
+        "en": "The configuration was made with an older version. Please reload the page.",
+    },
+    "team_selection": {
+        "bg": "Екипът трябва да има поне един агент със задачи (координаторът — поне два).",
+        "en": "The team needs at least one task agent (two for a coordinator).",
+    },
+    "team_duplicates": {
+        "bg": "Стойностите не трябва да се повтарят.",
+        "en": "Values must not repeat.",
     },
     "readiness_model": {
         "bg": "Оценката е направена с по-стара версия. Моля, презаредете страницата.",

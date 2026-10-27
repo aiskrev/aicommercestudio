@@ -1,3 +1,81 @@
+#1 [internal] load local bake definitions
+#1 reading from stdin 568B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.37kB done
+#2 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#3 ...
+
+#4 [auth] docker/dockerfile:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1
+#3 DONE 1.0s
+
+#5 docker-image://docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e
+#5 resolve docker.io/docker/dockerfile:1@sha256:4edf897a3ffa55b89f906fc8cc78afdb3f1834cc9c7083565e611a8a7d5fe99e 0.0s done
+#5 CACHED
+
+#6 [internal] load metadata for docker.io/library/python:3.13-slim
+#6 ...
+
+#7 [auth] library/python:pull token for registry-1.docker.io
+#7 DONE 0.0s
+
+#6 [internal] load metadata for docker.io/library/python:3.13-slim
+#6 DONE 0.6s
+
+#8 [internal] load .dockerignore
+#8 transferring context: 112B done
+#8 DONE 0.0s
+
+#9 [internal] load build context
+#9 transferring context: 4.33kB 0.0s done
+#9 DONE 0.0s
+
+#10 [base 1/6] FROM docker.io/library/python:3.13-slim@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2
+#10 resolve docker.io/library/python:3.13-slim@sha256:b3575dcf816cdacc5292df77a6e3e59b8941631078373a045efa2ac1e9c5c3b2 0.0s done
+#10 DONE 0.0s
+
+#11 [base 2/6] WORKDIR /app
+#11 CACHED
+
+#12 [base 3/6] RUN apt-get update && apt-get install -y --no-install-recommends fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
+#12 CACHED
+
+#13 [base 4/6] RUN groupadd --system app && useradd --system --gid app --home-dir /app app && chown app:app /app
+#13 CACHED
+
+#14 [dev 1/3] COPY requirements-dev.txt ./
+#14 CACHED
+
+#15 [base 5/6] COPY requirements.txt ./
+#15 CACHED
+
+#16 [base 6/6] RUN pip install -r requirements.txt
+#16 CACHED
+
+#17 [dev 2/3] RUN pip install -r requirements-dev.txt
+#17 CACHED
+
+#18 [dev 3/3] COPY --chown=app:app . .
+#18 DONE 0.1s
+
+#19 exporting to image
+#19 exporting layers 0.1s done
+#19 exporting manifest sha256:8bd2d8c99c9ef5ff753ba43813e7c016861c339f1f867bad5d2f9ab02c4cec6c 0.0s done
+#19 exporting config sha256:295dd2c4305cbf5c28d933495dece94e837ae92d817d2c28ccc4b726a667d7f0 0.0s done
+#19 exporting attestation manifest sha256:4c1548be774dbcf0e66150673fb4901d1cc3a5a7e3c5a4e19146f3d2d4e7bcda 0.0s done
+#19 exporting manifest list sha256:d4f7b54584b401c82ae4888c570f5b17dc05ac7d2635741a6dc0f8755308b716 0.0s done
+#19 naming to docker.io/library/ai-commerce-studio-api-tests:latest done
+#19 unpacking to docker.io/library/ai-commerce-studio-api-tests:latest 0.0s done
+#19 DONE 0.3s
+
+#20 resolving provenance for metadata file
+#20 DONE 0.0s
 {
   "openapi": "3.1.0",
   "info": {
@@ -298,6 +376,228 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ReadinessSubmitted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/team/meta": {
+      "get": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Team Meta",
+        "operationId": "team_meta_api_public_team_meta_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamMeta"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/team/estimate": {
+      "post": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Plan and cost estimate for a configuration (anonymous; nothing is stored)",
+        "operationId": "team_estimate_api_public_team_estimate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamEstimateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamPlanOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/team/report": {
+      "post": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Render the PDF plan for a configuration (anonymous; nothing is stored)",
+        "operationId": "team_report_api_public_team_report_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamReportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The PDF plan",
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/team/configurations": {
+      "post": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Save a configuration (enumerated values only) and get a secret link token",
+        "operationId": "save_configuration_api_public_team_configurations_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamSaveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamSavedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/team/configurations/lookup": {
+      "post": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Load a saved configuration by its secret token (sent in the body, never in the URL)",
+        "operationId": "lookup_configuration_api_public_team_configurations_lookup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationLookup"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamConfigurationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/team/submissions": {
+      "post": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Request a consultation about a configuration (creates a lead)",
+        "operationId": "submit_team_api_public_team_submissions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamSubmissionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamSubmitted"
                 }
               }
             }
@@ -1133,6 +1433,45 @@
         }
       }
     },
+    "/api/admin/leads/{lead_id}/team-report": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "PDF plan of a lead's AI team configuration (admins only)",
+        "operationId": "lead_team_report_api_admin_leads__lead_id__team_report_get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/leads/{lead_id}/audit": {
       "get": {
         "tags": [
@@ -1797,6 +2136,60 @@
         ],
         "title": "AdvisorStatus"
       },
+      "AgentConfigIn": {
+        "properties": {
+          "volume": {
+            "type": "string",
+            "enum": [
+              "v_lt100",
+              "v100_1k",
+              "v1k_10k",
+              "v_gt10k"
+            ],
+            "title": "Volume"
+          },
+          "integrations": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "crm",
+                "email",
+                "helpdesk",
+                "chat",
+                "calendar",
+                "cms",
+                "ecommerce_platform",
+                "erp",
+                "accounting",
+                "hris",
+                "knowledge_base",
+                "document_storage",
+                "analytics_warehouse"
+              ]
+            },
+            "type": "array",
+            "maxItems": 13,
+            "title": "Integrations"
+          },
+          "checkpoint": {
+            "type": "string",
+            "enum": [
+              "none",
+              "sample_review",
+              "before_external",
+              "every_action"
+            ],
+            "title": "Checkpoint"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "volume",
+          "checkpoint"
+        ],
+        "title": "AgentConfigIn"
+      },
       "AiAgentsCount": {
         "type": "string",
         "enum": [
@@ -1925,6 +2318,66 @@
           "other"
         ],
         "title": "AiSystemType"
+      },
+      "AssumptionOverrides": {
+        "properties": {
+          "day_rate": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 2500.0,
+                "minimum": 200.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Day Rate"
+          },
+          "internal_hourly_rate": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 250.0,
+                "minimum": 5.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Internal Hourly Rate"
+          },
+          "price_per_million_input": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Per Million Input"
+          },
+          "price_per_million_output": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 300.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Per Million Output"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AssumptionOverrides",
+        "description": "Visitor-editable rates (bounds: app/team/costs.py OVERRIDE_BOUNDS)."
       },
       "AuditLogOut": {
         "properties": {
@@ -2171,6 +2624,22 @@
         ],
         "title": "Complexity"
       },
+      "ConfigurationLookup": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 20,
+            "title": "Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "ConfigurationLookup"
+      },
       "DashboardStats": {
         "properties": {
           "total_leads": {
@@ -2259,6 +2728,59 @@
         ],
         "title": "DashboardStats"
       },
+      "EstimateOut": {
+        "properties": {
+          "assumptions_version": {
+            "type": "string",
+            "title": "Assumptions Version"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "rates": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Rates"
+          },
+          "overrides": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Overrides"
+          },
+          "scenarios": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ScenarioOut"
+            },
+            "type": "object",
+            "title": "Scenarios"
+          },
+          "ranges": {
+            "additionalProperties": {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Ranges"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assumptions_version",
+          "currency",
+          "rates",
+          "overrides",
+          "scenarios",
+          "ranges"
+        ],
+        "title": "EstimateOut"
+      },
       "FormTokenOut": {
         "properties": {
           "token": {
@@ -2344,6 +2866,29 @@
           "access"
         ],
         "title": "IntegrationCandidate"
+      },
+      "IntegrationEffort": {
+        "properties": {
+          "integration": {
+            "type": "string",
+            "title": "Integration"
+          },
+          "complexity": {
+            "type": "string",
+            "title": "Complexity"
+          },
+          "days": {
+            "type": "number",
+            "title": "Days"
+          }
+        },
+        "type": "object",
+        "required": [
+          "integration",
+          "complexity",
+          "days"
+        ],
+        "title": "IntegrationEffort"
       },
       "IntegrationStatus": {
         "properties": {
@@ -2697,6 +3242,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/ReadinessDetailsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "team": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TeamDetailsOut"
               },
               {
                 "type": "null"
@@ -3610,6 +4165,16 @@
             "type": "integer",
             "title": "Advisor Assessments Due",
             "default": 0
+          },
+          "team_configuration_retention_days": {
+            "type": "integer",
+            "title": "Team Configuration Retention Days",
+            "default": 0
+          },
+          "team_configurations_due": {
+            "type": "integer",
+            "title": "Team Configurations Due",
+            "default": 0
           }
         },
         "type": "object",
@@ -3652,6 +4217,11 @@
             "type": "integer",
             "title": "Advisor Assessments Deleted",
             "default": 0
+          },
+          "team_configurations_deleted": {
+            "type": "integer",
+            "title": "Team Configurations Deleted",
+            "default": 0
           }
         },
         "type": "object",
@@ -3681,6 +4251,70 @@
           "mitigation"
         ],
         "title": "Risk"
+      },
+      "ScenarioOut": {
+        "properties": {
+          "one_time": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "One Time"
+          },
+          "one_time_days": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "One Time Days"
+          },
+          "integrations": {
+            "items": {
+              "$ref": "#/components/schemas/IntegrationEffort"
+            },
+            "type": "array",
+            "title": "Integrations"
+          },
+          "monthly": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Monthly"
+          },
+          "usage": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Usage"
+          },
+          "oversight": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Oversight"
+          },
+          "monitoring_hours": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Monitoring Hours"
+          }
+        },
+        "type": "object",
+        "required": [
+          "one_time",
+          "one_time_days",
+          "integrations",
+          "monthly",
+          "usage",
+          "oversight",
+          "monitoring_hours"
+        ],
+        "title": "ScenarioOut"
       },
       "ServiceKey": {
         "type": "string",
@@ -3752,6 +4386,596 @@
         ],
         "title": "SystemStatus"
       },
+      "TeamConfigIn": {
+        "properties": {
+          "context": {
+            "$ref": "#/components/schemas/TeamContextIn"
+          },
+          "departments": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "sales",
+                "marketing",
+                "support",
+                "operations",
+                "finance",
+                "hr",
+                "it_knowledge",
+                "custom"
+              ]
+            },
+            "type": "array",
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "Departments"
+          },
+          "chosen": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "lead_qualification",
+                "sales_research",
+                "customer_support",
+                "content_operations",
+                "document_processing",
+                "knowledge_assistant",
+                "scheduling",
+                "reporting_insights",
+                "workflow_coordinator",
+                "approval_supervisor"
+              ]
+            },
+            "type": "array",
+            "maxItems": 10,
+            "minItems": 1,
+            "title": "Chosen"
+          },
+          "agents": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/AgentConfigIn"
+            },
+            "propertyNames": {
+              "enum": [
+                "lead_qualification",
+                "sales_research",
+                "customer_support",
+                "content_operations",
+                "document_processing",
+                "knowledge_assistant",
+                "scheduling",
+                "reporting_insights",
+                "workflow_coordinator",
+                "approval_supervisor"
+              ]
+            },
+            "type": "object",
+            "title": "Agents"
+          },
+          "deployment": {
+            "type": "string",
+            "enum": [
+              "managed_cloud",
+              "customer_cloud",
+              "on_premise"
+            ],
+            "title": "Deployment"
+          },
+          "operations": {
+            "type": "string",
+            "enum": [
+              "studio_managed",
+              "shared",
+              "internal"
+            ],
+            "title": "Operations"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "context",
+          "departments",
+          "chosen",
+          "deployment",
+          "operations"
+        ],
+        "title": "TeamConfigIn"
+      },
+      "TeamConfigurationOut": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "assumptions_version": {
+            "type": "string",
+            "title": "Assumptions Version"
+          },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
+          "config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config"
+          },
+          "overrides": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Overrides"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "created_at",
+          "expires_at",
+          "schema_version",
+          "model_version",
+          "assumptions_version",
+          "locale",
+          "config",
+          "overrides"
+        ],
+        "title": "TeamConfigurationOut"
+      },
+      "TeamContextIn": {
+        "properties": {
+          "industry": {
+            "type": "string",
+            "enum": [
+              "ecommerce",
+              "professional_services",
+              "manufacturing",
+              "logistics",
+              "saas",
+              "financial_services",
+              "healthcare",
+              "other"
+            ],
+            "title": "Industry"
+          },
+          "size": {
+            "type": "string",
+            "enum": [
+              "s1_10",
+              "s11_50",
+              "s51_250",
+              "s251_1000",
+              "s1000_plus"
+            ],
+            "title": "Size"
+          },
+          "lead_department": {
+            "type": "string",
+            "enum": [
+              "sales",
+              "marketing",
+              "support",
+              "operations",
+              "finance",
+              "hr",
+              "it_knowledge",
+              "custom"
+            ],
+            "title": "Lead Department"
+          },
+          "challenge": {
+            "type": "string",
+            "enum": [
+              "slow_response",
+              "lead_followup",
+              "manual_documents",
+              "scattered_knowledge",
+              "content_volume",
+              "reporting_effort",
+              "scheduling_overhead",
+              "handoffs"
+            ],
+            "title": "Challenge"
+          },
+          "volume": {
+            "type": "string",
+            "enum": [
+              "v_lt100",
+              "v100_1k",
+              "v1k_10k",
+              "v_gt10k"
+            ],
+            "title": "Volume"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "industry",
+          "size",
+          "lead_department",
+          "challenge",
+          "volume"
+        ],
+        "title": "TeamContextIn"
+      },
+      "TeamDetailsOut": {
+        "properties": {
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "assumptions_version": {
+            "type": "string",
+            "title": "Assumptions Version"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "agents": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Agents"
+          },
+          "complexity": {
+            "type": "string",
+            "title": "Complexity"
+          },
+          "deployment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deployment"
+          },
+          "operations": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operations"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "one_time_range": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "One Time Range"
+          },
+          "monthly_range": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Monthly Range"
+          },
+          "expected_one_time": {
+            "type": "integer",
+            "title": "Expected One Time"
+          },
+          "expected_monthly": {
+            "type": "integer",
+            "title": "Expected Monthly"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_version",
+          "assumptions_version",
+          "role",
+          "agents",
+          "complexity",
+          "currency",
+          "one_time_range",
+          "monthly_range",
+          "expected_one_time",
+          "expected_monthly"
+        ],
+        "title": "TeamDetailsOut",
+        "description": "AI team configurator consultation as shown to admins (enumerated configuration and estimate)."
+      },
+      "TeamEstimateRequest": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version"
+          },
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "config": {
+            "$ref": "#/components/schemas/TeamConfigIn"
+          },
+          "overrides": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AssumptionOverrides"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "model_version",
+          "config"
+        ],
+        "title": "TeamEstimateRequest",
+        "description": "Stateless estimate: nothing is stored."
+      },
+      "TeamMeta": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version",
+            "default": "1"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version",
+            "default": "2026-10.1"
+          },
+          "privacy_notice_version": {
+            "type": "string",
+            "title": "Privacy Notice Version"
+          },
+          "marketing_consent_version": {
+            "type": "string",
+            "title": "Marketing Consent Version"
+          },
+          "retention_days": {
+            "type": "integer",
+            "title": "Retention Days"
+          },
+          "submission_retention_days": {
+            "type": "integer",
+            "title": "Submission Retention Days"
+          },
+          "assumptions": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Assumptions"
+          },
+          "email_delivery": {
+            "type": "boolean",
+            "const": false,
+            "title": "Email Delivery",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "privacy_notice_version",
+          "marketing_consent_version",
+          "retention_days",
+          "submission_retention_days",
+          "assumptions"
+        ],
+        "title": "TeamMeta"
+      },
+      "TeamPlanOut": {
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "summary": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Summary"
+          },
+          "security": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Security"
+          },
+          "data_flows": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Data Flows"
+          },
+          "estimate": {
+            "$ref": "#/components/schemas/EstimateOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_version",
+          "summary",
+          "security",
+          "data_flows",
+          "estimate"
+        ],
+        "title": "TeamPlanOut",
+        "description": "Everything derived on the server from the configuration (enumerated keys; texts are client-side)."
+      },
+      "TeamReportRequest": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version"
+          },
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "config": {
+            "$ref": "#/components/schemas/TeamConfigIn"
+          },
+          "overrides": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AssumptionOverrides"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "model_version",
+          "config"
+        ],
+        "title": "TeamReportRequest"
+      },
+      "TeamSaveRequest": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version"
+          },
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "config": {
+            "$ref": "#/components/schemas/TeamConfigIn"
+          },
+          "overrides": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AssumptionOverrides"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "model_version",
+          "config"
+        ],
+        "title": "TeamSaveRequest"
+      },
+      "TeamSavedOut": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "token",
+          "expires_at"
+        ],
+        "title": "TeamSavedOut"
+      },
       "TeamSize": {
         "type": "string",
         "enum": [
@@ -3762,6 +4986,120 @@
           "over_50"
         ],
         "title": "TeamSize"
+      },
+      "TeamSubmissionCreate": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version"
+          },
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "config": {
+            "$ref": "#/components/schemas/TeamConfigIn"
+          },
+          "overrides": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AssumptionOverrides"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email",
+            "title": "Email"
+          },
+          "company": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Company"
+          },
+          "role": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 2,
+            "title": "Role"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Message",
+            "default": ""
+          },
+          "privacy_acknowledged": {
+            "type": "boolean",
+            "title": "Privacy Acknowledged"
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "default": false
+          },
+          "website": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Website",
+            "default": ""
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "model_version",
+          "config",
+          "name",
+          "email",
+          "company",
+          "role",
+          "privacy_acknowledged"
+        ],
+        "title": "TeamSubmissionCreate",
+        "description": "Optional consultation request: configuration plus contact details. Creates a lead."
+      },
+      "TeamSubmitted": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "message"
+        ],
+        "title": "TeamSubmitted"
       },
       "Timeline": {
         "type": "string",

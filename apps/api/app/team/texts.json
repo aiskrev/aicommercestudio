@@ -1,0 +1,1084 @@
+{
+ "bg": {
+  "title": "Съберете своя AI екип",
+  "context": {
+   "industry": {
+    "label": "Отрасъл",
+    "options": {
+     "ecommerce": "Онлайн търговия",
+     "professional_services": "Професионални услуги",
+     "manufacturing": "Производство",
+     "logistics": "Логистика и дистрибуция",
+     "saas": "Софтуер и SaaS",
+     "financial_services": "Финансови услуги",
+     "healthcare": "Здравеопазване",
+     "other": "Друго"
+    }
+   },
+   "size": {
+    "label": "Размер на компанията",
+    "options": {
+     "s1_10": "1–10 души",
+     "s11_50": "11–50 души",
+     "s51_250": "51–250 души",
+     "s251_1000": "251–1000 души",
+     "s1000_plus": "Над 1000 души"
+    }
+   },
+   "leadDepartment": {
+    "label": "Отдел, който води инициативата"
+   },
+   "challenge": {
+    "label": "Основно предизвикателство",
+    "options": {
+     "slow_response": "Бавни отговори на клиенти",
+     "lead_followup": "Запитванията не се обработват навреме",
+     "manual_documents": "Ръчна обработка на документи",
+     "scattered_knowledge": "Знанията са разпилени и трудни за намиране",
+     "content_volume": "Голям обем съдържание за подготовка",
+     "reporting_effort": "Отчетите отнемат много време",
+     "scheduling_overhead": "Много координация на срещи и графици",
+     "handoffs": "Работата се губи между екипи и системи"
+    }
+   },
+   "volume": {
+    "label": "Приблизителен обем задачи на месец",
+    "options": {
+     "v_lt100": "До 100",
+     "v100_1k": "100–1 000",
+     "v1k_10k": "1 000–10 000",
+     "v_gt10k": "Над 10 000"
+    }
+   }
+  },
+  "departments": {
+   "label": "Отдели в обхвата",
+   "options": {
+    "sales": {
+     "title": "Продажби",
+     "text": "Запитвания, квалификация, проучване и срещи."
+    },
+    "marketing": {
+     "title": "Маркетинг",
+     "text": "Съдържание, кампании и входящи запитвания."
+    },
+    "support": {
+     "title": "Обслужване на клиенти",
+     "text": "Тикети, имейли, чат и чести въпроси."
+    },
+    "operations": {
+     "title": "Операции",
+     "text": "Поръчки, документи, процеси и отчети."
+    },
+    "finance": {
+     "title": "Финанси",
+     "text": "Фактури, разходи, съгласуване и отчетност."
+    },
+    "hr": {
+     "title": "Човешки ресурси",
+     "text": "Политики, въпроси на служители, графици и документи."
+    },
+    "it_knowledge": {
+     "title": "ИТ и вътрешни знания",
+     "text": "Документация, процедури и вътрешна помощ."
+    },
+    "custom": {
+     "title": "Друг отдел",
+     "text": "Отдел, който не е в списъка."
+    }
+   }
+  },
+  "agents": {
+   "lead_qualification": {
+    "name": "Агент за квалификация на запитвания",
+    "short": "Оценява входящите запитвания и ги насочва.",
+    "purpose": "Чете новите запитвания, оценява ги по вашите критерии и ги насочва към правилния търговец с кратко обобщение.",
+    "oversight": "Търговец преглежда извадка от оценките; правилата се коригират при отклонения."
+   },
+   "sales_research": {
+    "name": "Агент за проучване на клиенти",
+    "short": "Подготвя кратко досие преди разговор.",
+    "purpose": "Събира публична информация и данните от CRM за компанията и подготвя кратко досие преди среща.",
+    "oversight": "Търговецът проверява досието преди срещата; агентът не се свързва с клиента."
+   },
+   "customer_support": {
+    "name": "Агент за обслужване на клиенти",
+    "short": "Подготвя отговори на клиенти от одобрени знания.",
+    "purpose": "Класифицира тикетите, отговаря на чести въпроси от одобрената база знания и предава сложните случаи на човек с контекст.",
+    "oversight": "Отговорите към клиенти се одобряват от служител, докато качеството не бъде потвърдено."
+   },
+   "content_operations": {
+    "name": "Агент за съдържание",
+    "short": "Подготвя продуктови и маркетингови текстове.",
+    "purpose": "Подготвя продуктови описания, публикации и варианти на текстове по вашите насоки и ги поставя за преглед в CMS.",
+    "oversight": "Всичко публично се одобрява от човек преди публикуване."
+   },
+   "document_processing": {
+    "name": "Агент за обработка на документи",
+    "short": "Извлича данни от фактури, поръчки и договори.",
+    "purpose": "Разпознава типа документ, извлича полетата и ги подготвя за въвеждане в системите, с маркиране на несигурните стойности.",
+    "oversight": "Служител проверява извадка и всички маркирани полета; праговете се коригират с времето."
+   },
+   "knowledge_assistant": {
+    "name": "Асистент за вътрешни знания",
+    "short": "Отговаря от документацията ви с източници.",
+    "purpose": "Отговаря на въпроси на служители (и на другите агенти) само от одобрени документи, като посочва източника.",
+    "oversight": "Собственик на знанията преглежда извадка от отговорите и поддържа документите актуални."
+   },
+   "scheduling": {
+    "name": "Агент за срещи и графици",
+    "short": "Предлага часове и насрочва срещи.",
+    "purpose": "Предлага свободни часове, насрочва и пренасрочва срещи и изпраща напомняния по вашите правила.",
+    "oversight": "Изключенията (VIP клиенти, извън работно време) се насочват към човек."
+   },
+   "reporting_insights": {
+    "name": "Агент за отчети и анализи",
+    "short": "Подготвя редовни обобщения от данните.",
+    "purpose": "Обобщава данните от отчетните ви системи в редовни отчети на ясен език, с връзки към изходните числа.",
+    "oversight": "Собственикът на отчета проверява числата преди разпространение; агентът не променя данни."
+   },
+   "workflow_coordinator": {
+    "name": "Координатор на работните процеси",
+    "short": "Разпределя работа между агентите и хората.",
+    "purpose": "Приема задачите, решава кой агент или човек ги поема, следи статуса и ескалира забавените.",
+    "oversight": "Правилата за маршрутизиране се одобряват и променят от собственика на процеса."
+   },
+   "approval_supervisor": {
+    "name": "Контролер на одобренията",
+    "short": "Изпраща решенията с ефект към правилния човек.",
+    "purpose": "Събира всички действия, които изискват одобрение, изпраща ги на правилния човек с контекст и записва решението.",
+    "oversight": "Всяко решение се взема от човек — контролерът само го организира и записва."
+   }
+  },
+  "integrations": {
+   "crm": "CRM",
+   "email": "Имейл",
+   "helpdesk": "Helpdesk / тикети",
+   "chat": "Чат и съобщения",
+   "calendar": "Календар",
+   "cms": "CMS",
+   "ecommerce_platform": "Платформа за онлайн магазин",
+   "erp": "ERP",
+   "accounting": "Счетоводство",
+   "hris": "HR система",
+   "knowledge_base": "База знания",
+   "document_storage": "Хранилище за документи",
+   "analytics_warehouse": "Склад за данни / BI"
+  },
+  "checkpoints": {
+   "none": {
+    "title": "Без одобрение",
+    "text": "Агентът действа сам; преглеждате журнала."
+   },
+   "sample_review": {
+    "title": "Преглед на извадка",
+    "text": "Човек проверява извадка от резултатите след това."
+   },
+   "before_external": {
+    "title": "Одобрение преди външно действие",
+    "text": "Нищо не стига до клиент или система без одобрение."
+   },
+   "every_action": {
+    "title": "Одобрение на всяко действие",
+    "text": "Всяка стъпка с ефект се одобрява от човек."
+   }
+  },
+  "complexity": {
+   "low": "Ниска",
+   "medium": "Средна",
+   "high": "Висока"
+  },
+  "deployment": {
+   "label": "Къде да работи екипът",
+   "options": {
+    "managed_cloud": {
+     "title": "Управлявана облачна среда",
+     "text": "Ние поддържаме средата и инфраструктурата."
+    },
+    "customer_cloud": {
+     "title": "Във вашия облак",
+     "text": "Във вашия AWS, Azure или Google Cloud акаунт."
+    },
+    "on_premise": {
+     "title": "Във ваша инфраструктура",
+     "text": "На ваши сървъри — най-много работа по настройка."
+    }
+   }
+  },
+  "operations": {
+   "label": "Кой управлява агентите след пускането",
+   "options": {
+    "studio_managed": {
+     "title": "Ние",
+     "text": "Наблюдение, обновяване и отстраняване на проблеми."
+    },
+    "shared": {
+     "title": "Съвместно",
+     "text": "Ние поддържаме техническата част, вие — правилата и знанията."
+    },
+    "internal": {
+     "title": "Вашият екип",
+     "text": "Предаваме документация и обучение."
+    }
+   }
+  },
+  "architecture": {
+   "title": "Архитектура на екипа",
+   "lanes": {
+    "users": "Потребители",
+    "orchestration": "Оркестрация",
+    "agents": "Агенти",
+    "approvals": "Човешко одобрение",
+    "data": "Споделени знания и данни",
+    "systems": "Външни системи"
+   },
+   "nodes": {
+    "team": "Вашият екип",
+    "customers": "Клиенти",
+    "coordinator": "Координатор на процесите",
+    "router": "Тригери и маршрутизиране",
+    "supervisor": "Контролер на одобренията",
+    "approval": "Одобрение: {agent}"
+   }
+  },
+  "result": {
+   "title": "Вашият препоръчан AI екип",
+   "lead": "Изчислено по правилата, описани по-долу. Това е план за обсъждане — нищо не е внедрено.",
+   "rolesTitle": "Роли в екипа",
+   "checkpointLabel": "Одобрение",
+   "volumeLabel": "Обем",
+   "workflowsTitle": "Предложени работни процеси",
+   "workflows": {
+    "lead_to_meeting": {
+     "title": "От запитване до среща",
+     "trigger": "Ново запитване",
+     "outcome": "Насрочена среща със запис в CRM"
+    },
+    "support_resolution": {
+     "title": "Разрешаване на клиентски въпрос",
+     "trigger": "Нов тикет или съобщение",
+     "outcome": "Отговор или предаване към човек"
+    },
+    "document_intake": {
+     "title": "Приемане на документи",
+     "trigger": "Нов документ",
+     "outcome": "Проверени данни в системата"
+    },
+    "content_pipeline": {
+     "title": "Подготовка на съдържание",
+     "trigger": "Задача от календара",
+     "outcome": "Одобрено и публикувано съдържание"
+    },
+    "insight_reporting": {
+     "title": "Редовен отчет",
+     "trigger": "Край на периода",
+     "outcome": "Проверен отчет за екипа"
+    },
+    "knowledge_answers": {
+     "title": "Отговори от вътрешните знания",
+     "trigger": "Въпрос на служител",
+     "outcome": "Отговор с източник"
+    }
+   },
+   "humanStep": "Човек: {checkpoint}",
+   "integrationsTitle": "Нужни интеграции",
+   "dataSources": "Знания и данни",
+   "systems": "Системи, в които агентите действат",
+   "usedBy": "Използва се от: {agents}",
+   "complexityTitle": "Сложност на внедряването",
+   "complexityLabel": "Ориентировъчна сложност",
+   "pointsLabel": "{points} точки",
+   "factors": {
+    "agents": "{count} агента според ролята им",
+    "integrations": "{count} системи за свързване",
+    "volume": "Обем: {volume} задачи на месец",
+    "sensitive_data": "Чувствителни данни",
+    "external_actions": "Действия към клиенти или външни системи",
+    "coordination": "Координация между агенти",
+    "deployment": "Среда: {deployment}"
+   },
+   "bandsNote": "Скала: под 7 точки — ниска, 7–13 — средна, от 14 — висока.",
+   "risksTitle": "Рискове",
+   "risks": {
+    "personal_data": {
+     "title": "Лични и финансови данни",
+     "text": "Нужни са договор за обработка с доставчиците, минимизиране на данните и ограничен достъп."
+    },
+    "customer_facing_errors": {
+     "title": "Грешки пред клиенти",
+     "text": "Грешен отговор или действие е видимо навън. Започнете с одобрение и тестове с реални примери."
+    },
+    "integration_fragility": {
+     "title": "Много интеграции",
+     "text": "Четири или повече системи означават повече точки на отказ. Нужни са наблюдение и резервен ръчен процес."
+    },
+    "approval_bottleneck": {
+     "title": "Тясно място при одобрението",
+     "text": "Одобрение на всяко действие при голям обем бързо претоварва хората. Планирайте капацитет или преминете към извадка."
+    },
+    "coordination_gap": {
+     "title": "Няма координация",
+     "text": "При три или повече агента без координатор работата може да се губи между тях."
+    },
+    "ownership_capacity": {
+     "title": "Капацитет за поддръжка",
+     "text": "Малък екип с много агенти — помислете за управлявана поддръжка или по-малък първи обхват."
+    },
+    "knowledge_quality": {
+     "title": "Качество на знанията",
+     "text": "Асистентът е толкова добър, колкото са документите. Нужен е собственик, който ги поддържа."
+    },
+    "regulated_department": {
+     "title": "Финансови или HR данни",
+     "text": "Изискват по-строги права, журнал и срокове за съхранение."
+    },
+    "infrastructure_effort": {
+     "title": "Собствена инфраструктура",
+     "text": "Изисква настройка на сървъри, наблюдение и обновявания от ваша страна."
+    }
+   },
+   "prerequisitesTitle": "Предпоставки",
+   "prerequisites": {
+    "process_owner": {
+     "title": "Собственик на процеса",
+     "text": "Човек, който познава процеса и решава кога агентът е готов."
+    },
+    "system_access": {
+     "title": "Достъп до системите",
+     "text": "API достъп с минимални права до всяка система, в която агентите действат."
+    },
+    "knowledge_curation": {
+     "title": "Подредена база знания",
+     "text": "Актуални, одобрени документи с ясен собственик."
+    },
+    "approval_owners": {
+     "title": "Кой какво одобрява",
+     "text": "Матрица с хората, които одобряват всеки тип действие, и заместници."
+    },
+    "test_cases": {
+     "title": "Тестови примери",
+     "text": "Реални примери с очакван резултат, по които се проверява качеството."
+    },
+    "data_processing_terms": {
+     "title": "Условия за обработка на данни",
+     "text": "Договор с AI доставчика и описание на обработката в политиката за поверителност."
+    },
+    "infrastructure": {
+     "title": "Подготвена среда",
+     "text": "Акаунт или сървъри, мрежов достъп и наблюдение във вашата инфраструктура."
+    }
+   },
+   "rolloutTitle": "Поетапно внедряване",
+   "phases": {
+    "pilot": {
+     "title": "Пилот",
+     "goal": "Един процес с ограничен обхват, одобрение от човек и измерване на качеството.",
+     "exit": "Продължете, когато качеството отговаря на критериите по тестовите примери."
+    },
+    "expand": {
+     "title": "Разширяване",
+     "goal": "Следващите агенти, по същите правила и тестове.",
+     "exit": "Продължете, когато предаването между агентите и хората работи надеждно."
+    },
+    "scale": {
+     "title": "Мащабиране",
+     "goal": "Координация, контрол и останалите роли за целия екип.",
+     "exit": "Редовен преглед на качеството, разходите и инцидентите."
+    }
+   },
+   "weeks": "Ориентировъчно: {min}–{max} седмици",
+   "phaseComplexity": "Сложност на етапа: {complexity}",
+   "effortNote": "Седмиците са ориентировъчна оценка за изграждане и тестване на един етап от малък екип (един инженер и вашият собственик на процеса), при наличен достъп до системите от началото. Не включват вътрешни одобрения и доставки и не са оферта.",
+   "servicesTitle": "Свързани услуги",
+   "methodologyTitle": "Как се изчислява резултатът",
+   "methodology": [
+    "Препоръчаните агенти идват от основното предизвикателство (най-силна причина) и избраните отдели. Всяка препоръка показва причината си.",
+    "Зависимостите са фиксирани: агентът за обслужване на клиенти изисква асистент за вътрешни знания, за да отговаря от одобрени източници. Координаторът има смисъл при поне два агента със задачи.",
+    "Минималното одобрение зависи от ролята: агентите, които действат навън, започват с одобрение преди външно действие; при чувствителни данни минимумът е преглед на извадка.",
+    "Сложността е сума от точки: роли на агентите (1–3), всяка система (1), обем (0–3), чувствителни данни (2), действия навън (1), координация (2) и среда (0–3).",
+    "Пилотът започва с най-подходящия агент с най-ниска сложност и неговите зависимости; координацията и контролът идват накрая."
+   ],
+   "disclaimer": "Това е ориентировъчен план, а не оферта или гаранция. Не съдържа прогнози за спестявания или производителност; реалният обхват се уточнява след разговор и преглед на системите.",
+   "noteLocal": "Конфигурацията се пази само в този браузър и във връзката за споделяне. Нищо не се изпраща."
+  },
+  "costs": {
+   "title": "Ориентировъчни разходи",
+   "lead": "Сметнато от сървъра по публикувани допускания. Това не е оферта — реалните разходи се уточняват след преглед на процесите и системите.",
+   "scenarioLabel": "Сценарий",
+   "scenarios": {
+    "conservative": {
+     "title": "Консервативен",
+     "text": "По-малък обем и по-тесен обхват"
+    },
+    "expected": {
+     "title": "Очакван",
+     "text": "Средни стойности на допусканията"
+    },
+    "higher": {
+     "title": "По-голямо използване",
+     "text": "Горната граница на обема и по-широк обхват"
+    }
+   },
+   "oneTimeTitle": "Еднократно: проучване и внедряване",
+   "monthlyTitle": "Месечно",
+   "oneTime": {
+    "discovery": "Проучване и дизайн",
+    "agents": "Изграждане на агентите",
+    "integrations": "Интеграции",
+    "approvals": "Точки за одобрение",
+    "deployment": "Среда и пускане",
+    "testing": "Тестване и оценка на качеството",
+    "total": "Общо еднократно"
+   },
+   "monthly": {
+    "infrastructure": "Инфраструктура",
+    "model_usage": "Използване на AI модели (API)",
+    "monitoring": "Наблюдение и поддръжка",
+    "oversight": "Човешки контрол (време на вашия екип)",
+    "total": "Общо месечно"
+   },
+   "notes": {
+    "model_usage": "{tasks} задачи/месец · {input} млн. входящи и {output} млн. изходящи токена",
+    "oversight": "{reviews} прегледа/месец · {hours} ч.",
+    "monitoring": "{studio} ч. от нас и {internal} ч. от вашия екип месечно",
+    "days": "{days} човекодни"
+   },
+   "rangeOneTime": "Еднократно: {min} – {max}",
+   "rangeMonthly": "Месечно: {min} – {max}",
+   "perMonth": "на месец",
+   "integrationEffortTitle": "Сложност на интеграциите",
+   "integrationRow": "{complexity} сложност · {days} дни",
+   "assumptionsTitle": "Допускания",
+   "assumptionsVersion": "Версия на допусканията: {version}",
+   "assumptionsText": "Можете да промените основните ставки. Останалите допускания (обеми по диапазон, дни по сложност, токени на задача) са публикувани и се прилагат еднакво за всички.",
+   "editable": {
+    "day_rate": {
+     "label": "Дневна ставка за внедряване (€)",
+     "hint": "Цена на човекоден за проучване, разработка и поддръжка."
+    },
+    "internal_hourly_rate": {
+     "label": "Цена на час от вашия екип (€)",
+     "hint": "За прегледи и одобрения от ваши служители."
+    },
+    "price_per_million_input": {
+     "label": "Цена за 1 млн. входящи токена (€)",
+     "hint": "Ориентировъчна. Проверете актуалния ценоразпис на доставчика."
+    },
+    "price_per_million_output": {
+     "label": "Цена за 1 млн. изходящи токена (€)",
+     "hint": "Ориентировъчна. Проверете актуалния ценоразпис на доставчика."
+    }
+   },
+   "apply": "Преизчисли",
+   "reset": "Върни стойностите по подразбиране",
+   "loading": "Изчисляваме разходите…",
+   "error": "Разходите не могат да бъдат изчислени в момента. Опитайте отново.",
+   "stale": "Страницата е заредена с по-стара версия. Презаредете я — конфигурацията се пази във връзката.",
+   "outOfRange": "Въведете стойност между {min} и {max}.",
+   "customised": "С ваши ставки",
+   "formulas": [
+    "Еднократно = (проучване + изграждане по сложност на агента + интеграции по сложност на системата + точки за одобрение + среда + тестване) × дневна ставка.",
+    "Модели = задачи на месец × токени на задача × цена за 1 млн. токена × коефициент за повторения и оценка.",
+    "Човешки контрол = прегледи (според точката за одобрение) × минути на преглед × цена на час от вашия екип.",
+    "Наблюдение = часове за поддръжка според модела на управление; инфраструктура = база + сума на агент според средата."
+   ],
+   "disclaimer": "Ориентировъчни стойности в евро, закръглени до 10 €. Не са оферта и не включват ДДС, лицензи за вашите системи и хардуер. Цените на AI моделите са примерни и се променят — проверете актуалния ценоразпис на доставчика. Конфигураторът не създава и не пуска работещи агенти."
+  },
+  "security": {
+   "title": "Сигурност",
+   "items": {
+    "least_privilege": {
+     "title": "Минимални права",
+     "text": "Отделен достъп за всяка система, само до нужните данни и действия; четене, където е възможно."
+    },
+    "secrets": {
+     "title": "Тайни и ключове",
+     "text": "Ключовете се пазят в хранилище за тайни, никога в кода или в текста към модела."
+    },
+    "audit_log": {
+     "title": "Журнал",
+     "text": "Всяко действие на агент и всяко одобрение се записва с време, вход и резултат."
+    },
+    "provider_terms": {
+     "title": "Условия на AI доставчика",
+     "text": "Договор за обработка на данни и условие данните да не се използват за обучение."
+    },
+    "personal_data": {
+     "title": "Лични данни",
+     "text": "Минимизиране и маскиране на личните данни, срокове за съхранение и ограничен достъп."
+    },
+    "untrusted_input": {
+     "title": "Входящо съдържание",
+     "text": "Имейли, форми и документи се третират като ненадеждни — съдържанието им не може да задейства действия без проверка."
+    },
+    "external_actions": {
+     "title": "Действия навън",
+     "text": "Одобрение преди изпращане към клиенти, ограничения на честотата и ясен път за ескалация."
+    },
+    "document_permissions": {
+     "title": "Права до документите",
+     "text": "Асистентът отговаря само от документи, до които потребителят има достъп."
+    },
+    "regulated_data": {
+     "title": "Финансови и HR данни",
+     "text": "По-строги права, периодичен преглед на достъпа и журнал за одит."
+    },
+    "data_location": {
+     "title": "Местоположение на данните",
+     "text": "Договорете къде се съхраняват и обработват данните и в коя юрисдикция."
+    }
+   }
+  },
+  "dataFlows": {
+   "title": "Потоци на данни",
+   "read": "{agent} чете от {integration}",
+   "act": "{agent} действа в {integration}",
+   "actApproved": "{agent} действа в {integration} след одобрение ({checkpoint})",
+   "actOrchestration": "Координаторът известява чрез {integration}",
+   "actSupervisor": "Контролерът на одобренията известява чрез {integration}"
+  },
+  "hitlTitle": "Точки за човешко одобрение",
+  "hitlNone": "Няма агенти с одобрение преди действие; качеството се проверява с извадка."
+ },
+ "en": {
+  "title": "Build your AI team",
+  "context": {
+   "industry": {
+    "label": "Industry",
+    "options": {
+     "ecommerce": "E-commerce",
+     "professional_services": "Professional services",
+     "manufacturing": "Manufacturing",
+     "logistics": "Logistics and distribution",
+     "saas": "Software and SaaS",
+     "financial_services": "Financial services",
+     "healthcare": "Healthcare",
+     "other": "Other"
+    }
+   },
+   "size": {
+    "label": "Company size",
+    "options": {
+     "s1_10": "1–10 people",
+     "s11_50": "11–50 people",
+     "s51_250": "51–250 people",
+     "s251_1000": "251–1,000 people",
+     "s1000_plus": "More than 1,000 people"
+    }
+   },
+   "leadDepartment": {
+    "label": "Department leading the initiative"
+   },
+   "challenge": {
+    "label": "Main business challenge",
+    "options": {
+     "slow_response": "Slow responses to customers",
+     "lead_followup": "Inquiries are not followed up in time",
+     "manual_documents": "Manual document processing",
+     "scattered_knowledge": "Knowledge is scattered and hard to find",
+     "content_volume": "A large volume of content to prepare",
+     "reporting_effort": "Reporting takes a lot of time",
+     "scheduling_overhead": "A lot of coordination of meetings and schedules",
+     "handoffs": "Work gets lost between teams and systems"
+    }
+   },
+   "volume": {
+    "label": "Approximate tasks per month",
+    "options": {
+     "v_lt100": "Up to 100",
+     "v100_1k": "100–1,000",
+     "v1k_10k": "1,000–10,000",
+     "v_gt10k": "More than 10,000"
+    }
+   }
+  },
+  "departments": {
+   "label": "Departments in scope",
+   "options": {
+    "sales": {
+     "title": "Sales",
+     "text": "Inquiries, qualification, research and meetings."
+    },
+    "marketing": {
+     "title": "Marketing",
+     "text": "Content, campaigns and inbound inquiries."
+    },
+    "support": {
+     "title": "Customer support",
+     "text": "Tickets, e-mail, chat and common questions."
+    },
+    "operations": {
+     "title": "Operations",
+     "text": "Orders, documents, processes and reports."
+    },
+    "finance": {
+     "title": "Finance",
+     "text": "Invoices, expenses, reconciliation and reporting."
+    },
+    "hr": {
+     "title": "HR",
+     "text": "Policies, employee questions, schedules and documents."
+    },
+    "it_knowledge": {
+     "title": "IT and internal knowledge",
+     "text": "Documentation, procedures and internal help."
+    },
+    "custom": {
+     "title": "Other department",
+     "text": "A department that is not listed."
+    }
+   }
+  },
+  "agents": {
+   "lead_qualification": {
+    "name": "Lead Qualification Agent",
+    "short": "Scores incoming inquiries and routes them.",
+    "purpose": "Reads new inquiries, scores them against your criteria and routes them to the right salesperson with a short summary.",
+    "oversight": "A salesperson reviews a sample of the scores; the rules are adjusted when they drift."
+   },
+   "sales_research": {
+    "name": "Sales Research Agent",
+    "short": "Prepares a short brief before a call.",
+    "purpose": "Collects public information and CRM data about a company and prepares a short brief before a meeting.",
+    "oversight": "The salesperson checks the brief before the meeting; the agent never contacts the customer."
+   },
+   "customer_support": {
+    "name": "Customer Support Agent",
+    "short": "Prepares customer replies from approved knowledge.",
+    "purpose": "Classifies tickets, answers common questions from the approved knowledge base and hands complex cases to a person with context.",
+    "oversight": "Replies to customers are approved by a team member until quality has been confirmed."
+   },
+   "content_operations": {
+    "name": "Content Operations Agent",
+    "short": "Prepares product and marketing copy.",
+    "purpose": "Prepares product descriptions, posts and copy variants following your guidelines and places them in the CMS for review.",
+    "oversight": "Anything public is approved by a person before publishing."
+   },
+   "document_processing": {
+    "name": "Document Processing Agent",
+    "short": "Extracts data from invoices, orders and contracts.",
+    "purpose": "Recognises the document type, extracts the fields and prepares them for entry into your systems, flagging uncertain values.",
+    "oversight": "A team member reviews a sample and every flagged field; thresholds are tuned over time."
+   },
+   "knowledge_assistant": {
+    "name": "Knowledge Assistant",
+    "short": "Answers from your documentation, with sources.",
+    "purpose": "Answers questions from employees (and from the other agents) only from approved documents, citing the source.",
+    "oversight": "A knowledge owner reviews a sample of answers and keeps the documents up to date."
+   },
+   "scheduling": {
+    "name": "Scheduling Agent",
+    "short": "Proposes times and books meetings.",
+    "purpose": "Proposes available times, books and reschedules meetings and sends reminders following your rules.",
+    "oversight": "Exceptions (key accounts, outside working hours) are routed to a person."
+   },
+   "reporting_insights": {
+    "name": "Reporting and Insights Agent",
+    "short": "Prepares regular summaries from your data.",
+    "purpose": "Summarises data from your reporting systems into regular reports in plain language, linked to the source figures.",
+    "oversight": "The report owner checks the figures before distribution; the agent never changes data."
+   },
+   "workflow_coordinator": {
+    "name": "Workflow Coordinator",
+    "short": "Distributes work between agents and people.",
+    "purpose": "Receives tasks, decides which agent or person takes them, tracks status and escalates delays.",
+    "oversight": "Routing rules are approved and changed by the process owner."
+   },
+   "approval_supervisor": {
+    "name": "Human Approval Supervisor",
+    "short": "Sends actions with an effect to the right person.",
+    "purpose": "Collects every action that needs approval, sends it to the right person with context and records the decision.",
+    "oversight": "Every decision is made by a person — the supervisor only organises and records it."
+   }
+  },
+  "integrations": {
+   "crm": "CRM",
+   "email": "E-mail",
+   "helpdesk": "Helpdesk / tickets",
+   "chat": "Chat and messaging",
+   "calendar": "Calendar",
+   "cms": "CMS",
+   "ecommerce_platform": "E-commerce platform",
+   "erp": "ERP",
+   "accounting": "Accounting",
+   "hris": "HR system",
+   "knowledge_base": "Knowledge base",
+   "document_storage": "Document storage",
+   "analytics_warehouse": "Data warehouse / BI"
+  },
+  "checkpoints": {
+   "none": {
+    "title": "No approval",
+    "text": "The agent acts on its own; you review the log."
+   },
+   "sample_review": {
+    "title": "Sample review",
+    "text": "A person checks a sample of the results afterwards."
+   },
+   "before_external": {
+    "title": "Approval before external actions",
+    "text": "Nothing reaches a customer or system without approval."
+   },
+   "every_action": {
+    "title": "Approval of every action",
+    "text": "Every step with an effect is approved by a person."
+   }
+  },
+  "complexity": {
+   "low": "Low",
+   "medium": "Medium",
+   "high": "High"
+  },
+  "deployment": {
+   "label": "Where the team should run",
+   "options": {
+    "managed_cloud": {
+     "title": "Managed cloud environment",
+     "text": "We maintain the environment and infrastructure."
+    },
+    "customer_cloud": {
+     "title": "In your cloud",
+     "text": "In your AWS, Azure or Google Cloud account."
+    },
+    "on_premise": {
+     "title": "On your infrastructure",
+     "text": "On your servers — the most setup work."
+    }
+   }
+  },
+  "operations": {
+   "label": "Who manages the agents after launch",
+   "options": {
+    "studio_managed": {
+     "title": "We do",
+     "text": "Monitoring, updates and troubleshooting."
+    },
+    "shared": {
+     "title": "Shared",
+     "text": "We maintain the technical side, you own the rules and knowledge."
+    },
+    "internal": {
+     "title": "Your team",
+     "text": "We hand over documentation and training."
+    }
+   }
+  },
+  "architecture": {
+   "title": "Team architecture",
+   "lanes": {
+    "users": "Users",
+    "orchestration": "Orchestration",
+    "agents": "Agents",
+    "approvals": "Human approval",
+    "data": "Shared knowledge and data",
+    "systems": "External systems"
+   },
+   "nodes": {
+    "team": "Your team",
+    "customers": "Customers",
+    "coordinator": "Workflow Coordinator",
+    "router": "Triggers and routing",
+    "supervisor": "Approval Supervisor",
+    "approval": "Approval: {agent}"
+   }
+  },
+  "result": {
+   "title": "Your recommended AI team",
+   "lead": "Calculated by the rules described below. This is a plan to discuss — nothing has been deployed.",
+   "rolesTitle": "Roles in the team",
+   "checkpointLabel": "Approval",
+   "volumeLabel": "Volume",
+   "workflowsTitle": "Suggested workflows",
+   "workflows": {
+    "lead_to_meeting": {
+     "title": "From inquiry to meeting",
+     "trigger": "New inquiry",
+     "outcome": "Booked meeting recorded in the CRM"
+    },
+    "support_resolution": {
+     "title": "Resolving a customer question",
+     "trigger": "New ticket or message",
+     "outcome": "Reply or hand-off to a person"
+    },
+    "document_intake": {
+     "title": "Document intake",
+     "trigger": "New document",
+     "outcome": "Checked data in the system"
+    },
+    "content_pipeline": {
+     "title": "Content preparation",
+     "trigger": "Task from the calendar",
+     "outcome": "Approved and published content"
+    },
+    "insight_reporting": {
+     "title": "Regular report",
+     "trigger": "End of the period",
+     "outcome": "Checked report for the team"
+    },
+    "knowledge_answers": {
+     "title": "Answers from internal knowledge",
+     "trigger": "Employee question",
+     "outcome": "Answer with a source"
+    }
+   },
+   "humanStep": "Person: {checkpoint}",
+   "integrationsTitle": "Integration requirements",
+   "dataSources": "Knowledge and data",
+   "systems": "Systems the agents act in",
+   "usedBy": "Used by: {agents}",
+   "complexityTitle": "Implementation complexity",
+   "complexityLabel": "Indicative complexity",
+   "pointsLabel": "{points} points",
+   "factors": {
+    "agents": "{count} agents by role",
+    "integrations": "{count} systems to connect",
+    "volume": "Volume: {volume} tasks per month",
+    "sensitive_data": "Sensitive data",
+    "external_actions": "Actions towards customers or external systems",
+    "coordination": "Coordination between agents",
+    "deployment": "Environment: {deployment}"
+   },
+   "bandsNote": "Scale: below 7 points — low, 7–13 — medium, 14 and above — high.",
+   "risksTitle": "Risks",
+   "risks": {
+    "personal_data": {
+     "title": "Personal and financial data",
+     "text": "Requires processing agreements with providers, data minimisation and restricted access."
+    },
+    "customer_facing_errors": {
+     "title": "Errors in front of customers",
+     "text": "A wrong reply or action is visible externally. Start with approval and tests on real examples."
+    },
+    "integration_fragility": {
+     "title": "Many integrations",
+     "text": "Four or more systems mean more points of failure. Monitoring and a manual fallback are needed."
+    },
+    "approval_bottleneck": {
+     "title": "Approval bottleneck",
+     "text": "Approving every action at high volume quickly overloads people. Plan capacity or move to sample review."
+    },
+    "coordination_gap": {
+     "title": "No coordination",
+     "text": "With three or more agents and no coordinator, work can get lost between them."
+    },
+    "ownership_capacity": {
+     "title": "Capacity to maintain",
+     "text": "A small team with many agents — consider managed support or a smaller first scope."
+    },
+    "knowledge_quality": {
+     "title": "Knowledge quality",
+     "text": "The assistant is only as good as the documents. An owner who maintains them is needed."
+    },
+    "regulated_department": {
+     "title": "Finance or HR data",
+     "text": "Requires stricter permissions, audit logs and retention periods."
+    },
+    "infrastructure_effort": {
+     "title": "Own infrastructure",
+     "text": "Requires server setup, monitoring and updates on your side."
+    }
+   },
+   "prerequisitesTitle": "Prerequisites",
+   "prerequisites": {
+    "process_owner": {
+     "title": "Process owner",
+     "text": "A person who knows the process and decides when the agent is ready."
+    },
+    "system_access": {
+     "title": "System access",
+     "text": "API access with minimal permissions to every system the agents act in."
+    },
+    "knowledge_curation": {
+     "title": "Curated knowledge base",
+     "text": "Up-to-date, approved documents with a clear owner."
+    },
+    "approval_owners": {
+     "title": "Who approves what",
+     "text": "A matrix of the people who approve each type of action, with deputies."
+    },
+    "test_cases": {
+     "title": "Test examples",
+     "text": "Real examples with an expected result to check quality against."
+    },
+    "data_processing_terms": {
+     "title": "Data processing terms",
+     "text": "An agreement with the AI provider and the processing described in your privacy policy."
+    },
+    "infrastructure": {
+     "title": "Prepared environment",
+     "text": "Account or servers, network access and monitoring in your infrastructure."
+    }
+   },
+   "rolloutTitle": "Phased rollout",
+   "phases": {
+    "pilot": {
+     "title": "Pilot",
+     "goal": "One process with a limited scope, human approval and quality measurement.",
+     "exit": "Continue when quality meets the criteria on the test examples."
+    },
+    "expand": {
+     "title": "Expand",
+     "goal": "The next agents, under the same rules and tests.",
+     "exit": "Continue when hand-offs between agents and people work reliably."
+    },
+    "scale": {
+     "title": "Scale",
+     "goal": "Coordination, oversight and the remaining roles for the whole team.",
+     "exit": "Regular review of quality, cost and incidents."
+    }
+   },
+   "weeks": "Indicative: {min}–{max} weeks",
+   "phaseComplexity": "Phase complexity: {complexity}",
+   "effortNote": "Weeks are an indicative estimate to build and test one phase with a small team (one engineer plus your process owner), with system access available from the start. They exclude internal approvals and procurement and are not a quote.",
+   "servicesTitle": "Related services",
+   "methodologyTitle": "How the result is calculated",
+   "methodology": [
+    "Recommended agents come from the main challenge (strongest reason) and the selected departments. Every recommendation shows its reason.",
+    "Dependencies are fixed: the Customer Support Agent requires the Knowledge Assistant so it answers from approved sources. A coordinator makes sense with at least two task agents.",
+    "The minimum approval depends on the role: agents that act externally start with approval before external actions; with sensitive data the minimum is a sample review.",
+    "Complexity is a sum of points: agent roles (1–3), each system (1), volume (0–3), sensitive data (2), external actions (1), coordination (2) and environment (0–3).",
+    "The pilot starts with the most relevant agent of the lowest complexity and its dependencies; coordination and oversight come last."
+   ],
+   "disclaimer": "This is an indicative plan, not a quote or a guarantee. It contains no forecasts of savings or productivity; the real scope is agreed after a conversation and a review of your systems.",
+   "noteLocal": "The configuration is kept only in this browser and in the share link. Nothing is sent."
+  },
+  "costs": {
+   "title": "Indicative costs",
+   "lead": "Calculated by the server from published assumptions. This is not a quote — real costs are agreed after a review of your processes and systems.",
+   "scenarioLabel": "Scenario",
+   "scenarios": {
+    "conservative": {
+     "title": "Conservative",
+     "text": "Lower volume and a lean scope"
+    },
+    "expected": {
+     "title": "Expected",
+     "text": "Mid values of the assumptions"
+    },
+    "higher": {
+     "title": "Higher usage",
+     "text": "Top of the volume range and a wider scope"
+    }
+   },
+   "oneTimeTitle": "One-time: discovery and implementation",
+   "monthlyTitle": "Monthly",
+   "oneTime": {
+    "discovery": "Discovery and design",
+    "agents": "Building the agents",
+    "integrations": "Integrations",
+    "approvals": "Approval points",
+    "deployment": "Environment and launch",
+    "testing": "Testing and quality evaluation",
+    "total": "Total one-time"
+   },
+   "monthly": {
+    "infrastructure": "Infrastructure",
+    "model_usage": "AI model usage (API)",
+    "monitoring": "Monitoring and maintenance",
+    "oversight": "Human oversight (your team's time)",
+    "total": "Total monthly"
+   },
+   "notes": {
+    "model_usage": "{tasks} tasks/month · {input}M input and {output}M output tokens",
+    "oversight": "{reviews} reviews/month · {hours} h",
+    "monitoring": "{studio} h from us and {internal} h from your team per month",
+    "days": "{days} person-days"
+   },
+   "rangeOneTime": "One-time: {min} – {max}",
+   "rangeMonthly": "Monthly: {min} – {max}",
+   "perMonth": "per month",
+   "integrationEffortTitle": "Integration complexity",
+   "integrationRow": "{complexity} complexity · {days} days",
+   "assumptionsTitle": "Assumptions",
+   "assumptionsVersion": "Assumptions version: {version}",
+   "assumptionsText": "You can change the main rates. The other assumptions (volumes per band, days per complexity, tokens per task) are published and apply equally to everyone.",
+   "editable": {
+    "day_rate": {
+     "label": "Implementation day rate (EUR)",
+     "hint": "Price of a person-day for discovery, development and maintenance."
+    },
+    "internal_hourly_rate": {
+     "label": "Cost of an hour of your team's time (EUR)",
+     "hint": "For reviews and approvals by your staff."
+    },
+    "price_per_million_input": {
+     "label": "Price per 1M input tokens (EUR)",
+     "hint": "Illustrative. Check your provider's current price list."
+    },
+    "price_per_million_output": {
+     "label": "Price per 1M output tokens (EUR)",
+     "hint": "Illustrative. Check your provider's current price list."
+    }
+   },
+   "apply": "Recalculate",
+   "reset": "Restore the defaults",
+   "loading": "Calculating costs…",
+   "error": "Costs cannot be calculated right now. Please try again.",
+   "stale": "This page was loaded with an older version. Reload it — your configuration is kept in the link.",
+   "outOfRange": "Enter a value between {min} and {max}.",
+   "customised": "With your rates",
+   "formulas": [
+    "One-time = (discovery + build by agent complexity + integrations by system complexity + approval points + environment + testing) × day rate.",
+    "Models = tasks per month × tokens per task × price per 1M tokens × a factor for retries and evaluation.",
+    "Human oversight = reviews (by approval checkpoint) × minutes per review × your team's hourly cost.",
+    "Monitoring = maintenance hours by management model; infrastructure = base + an amount per agent by environment."
+   ],
+   "disclaimer": "Indicative amounts in EUR, rounded to EUR 10. Not a quote; excludes VAT, licences for your systems and hardware. AI model prices are examples and change — check your provider's current price list. The configurator does not create or run working agents."
+  },
+  "security": {
+   "title": "Security",
+   "items": {
+    "least_privilege": {
+     "title": "Least privilege",
+     "text": "Separate access per system, limited to the data and actions needed; read-only where possible."
+    },
+    "secrets": {
+     "title": "Secrets and keys",
+     "text": "Keys live in a secrets vault, never in code or in text sent to the model."
+    },
+    "audit_log": {
+     "title": "Audit log",
+     "text": "Every agent action and every approval is recorded with time, input and result."
+    },
+    "provider_terms": {
+     "title": "AI provider terms",
+     "text": "A data processing agreement and a commitment not to train on your data."
+    },
+    "personal_data": {
+     "title": "Personal data",
+     "text": "Minimise and mask personal data, set retention periods and restrict access."
+    },
+    "untrusted_input": {
+     "title": "Inbound content",
+     "text": "E-mails, forms and documents are treated as untrusted — their content cannot trigger actions without checks."
+    },
+    "external_actions": {
+     "title": "External actions",
+     "text": "Approval before anything reaches customers, rate limits and a clear escalation path."
+    },
+    "document_permissions": {
+     "title": "Document permissions",
+     "text": "The assistant answers only from documents the user is allowed to see."
+    },
+    "regulated_data": {
+     "title": "Finance and HR data",
+     "text": "Stricter permissions, periodic access reviews and an audit trail."
+    },
+    "data_location": {
+     "title": "Data location",
+     "text": "Agree where data is stored and processed, and under which jurisdiction."
+    }
+   }
+  },
+  "dataFlows": {
+   "title": "Data flows",
+   "read": "{agent} reads from {integration}",
+   "act": "{agent} acts in {integration}",
+   "actApproved": "{agent} acts in {integration} after approval ({checkpoint})",
+   "actOrchestration": "The coordinator notifies through {integration}",
+   "actSupervisor": "The approval supervisor notifies through {integration}"
+  },
+  "hitlTitle": "Human approval points",
+  "hitlNone": "No agent needs approval before acting; quality is checked by sampling."
+ }
+}

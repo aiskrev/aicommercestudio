@@ -78,6 +78,21 @@ class Settings(BaseSettings):
     # (shorter than LEAD_RETENTION_DAYS; whichever applies first wins).
     readiness_retention_days: int = Field(default=365, ge=30, le=3650)
 
+    # AI team configurator: cost estimates, PDF reports, saved configurations and consultations.
+    # Optional path to an alternative cost assumptions document (default: app/team/pricing/2026-10.1.json).
+    team_cost_assumptions_file: str | None = None
+    team_estimate_rate_limit: int = Field(default=60, ge=1)
+    team_report_rate_limit: int = Field(default=10, ge=1)
+    team_save_rate_limit: int = Field(default=10, ge=1)
+    team_lookup_rate_limit: int = Field(default=30, ge=1)
+    team_rate_window_seconds: int = Field(default=600, ge=1)
+    team_global_rate_limit: int = Field(default=600, ge=1)
+    # Saved configurations without a consultation request are deleted after this many days;
+    # those attached to a lead follow the lead (and READINESS-style shorter retention below).
+    team_configuration_retention_days: int = Field(default=90, ge=1, le=730)
+    # Leads created from the configurator are deleted after this many days without activity.
+    team_lead_retention_days: int = Field(default=365, ge=30, le=3650)
+
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None

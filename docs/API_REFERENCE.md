@@ -215,6 +215,15 @@ stored) and `POST /api/public/readiness/submissions` (optional hand-off to the t
 lead); admins download a submission's PDF from `GET /api/admin/leads/{id}/readiness-report`.
 Fields, limits and errors: [READINESS_REPORTS.md](READINESS_REPORTS.md#api).
 
+## Public: AI team configurator
+
+`GET /api/public/team/meta`, `POST /api/public/team/estimate` (plan, security, data flows and costs
+for three scenarios; nothing stored), `POST /api/public/team/report` (PDF plan),
+`POST /api/public/team/configurations` + `/configurations/lookup` (private saved links; the token is
+sent in the body) and `POST /api/public/team/submissions` (optional consultation, creates a lead);
+admins download a consultation's plan from `GET /api/admin/leads/{id}/team-report`. Fields, limits,
+cost model and errors: [TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md#api).
+
 ## Admin authentication
 
 | Method | Path | Notes |

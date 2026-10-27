@@ -6,6 +6,9 @@ import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } fro
 import { AgentCard } from "@/components/tools/team/AgentCard";
 import { TeamArchitecture } from "@/components/tools/team/TeamArchitecture";
 import { PillGroup, SelectCard, fill } from "@/components/tools/team/TeamControls";
+import { TeamCosts } from "@/components/tools/team/TeamCosts";
+import { TeamExport } from "@/components/tools/team/TeamExport";
+import { TeamPlanDetails } from "@/components/tools/team/TeamPlanDetails";
 import { TeamResult, type TeamResultData } from "@/components/tools/team/TeamResult";
 import { ToolActions } from "@/components/tools/ToolActions";
 import { ChoiceQuestion, StepNav, StepProgress, ToolLeadCapture, ToolState } from "@/components/tools/ToolUi";
@@ -57,6 +60,7 @@ import {
   teamIntegrations,
   teamSuggestions,
 } from "@/lib/ai-team";
+import { type ApiFailure, type Overrides, type TeamMeta, type TeamPlan, estimateTeam, fetchTeamMeta } from "@/lib/team-api";
 import { useStepFlow } from "@/lib/use-step-flow";
 
 type Content = typeof teamTool;
@@ -74,19 +78,34 @@ export function AiTeamBuilder({
   services,
   contactHref,
   advisorHref,
+  privacyHref,
   locale,
+  initialConfig,
+  initialOverrides,
+  initialNotice,
 }: {
   content: Content;
   ui: Ui;
   services: ServiceLinks;
   contactHref: string;
   advisorHref?: string;
+  privacyHref: string;
   locale: Locale;
+  /** A configuration loaded from a saved link (?c=); takes precedence over a share code (?t=). */
+  initialConfig?: TeamConfig | null;
+  initialOverrides?: Overrides;
+  initialNotice?: string;
 }) {
   // A shared configuration (?t=<code>) is read during render; the page wraps this tool in <Suspense>.
-  const shared = decodeTeam(useSearchParams().get("t"));
+  const code = useSearchParams().get("t");
+  const shared = initialConfig ?? decodeTeam(code);
   const [config, setConfig] = useState<TeamConfig>(() => shared ?? EMPTY);
   const [restored, setRestored] = useState(() => shared !== null);
+  const [overrides, setOverrides] = useState<Overrides>(() => initialOverrides ?? {});
+  const [meta, setMeta] = useState<TeamMeta | null>(null);
+  const [retry, setRetry] = useState(0);
+  const [planState, setPlanState] = useState<{ key: string; plan?: TeamPlan; failure?: ApiFailure } | null>(null);
+  const [lastPlan, setLastPlan] = useState<TeamPlan | null>(null);
   const [customName, setCustomName] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
   const stepHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -139,6 +158,31 @@ export function AiTeamBuilder({
       architecture: buildArchitecture(config),
     };
   }, [flow.complete, selected, configs, complexityNow, config]);
+
+  // The plan (security, data flows, costs) comes from the API once the result is shown.
+  const planKey = JSON.stringify([flow.complete, config, overrides, locale, retry]);
+  useEffect(() => {
+    if (!flow.complete) return;
+    let active = true;
+    estimateTeam(config, locale, overrides).then((response) => {
+      if (!active) return;
+      setPlanState(response.ok ? { key: planKey, plan: response.data } : { key: planKey, failure: response });
+      if (response.ok) setLastPlan(response.data);
+    });
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- planKey covers config, overrides, locale and retries
+  }, [planKey]);
+
+  useEffect(() => {
+    if (!flow.complete || meta) return;
+    let active = true;
+    fetchTeamMeta().then((value) => active && setMeta(value));
+    return () => {
+      active = false;
+    };
+  }, [flow.complete, meta]);
 
   useEffect(() => {
     track("tool_opened");
@@ -210,6 +254,9 @@ export function AiTeamBuilder({
 
   function restart() {
     setConfig(EMPTY);
+    setOverrides({});
+    setPlanState(null);
+    setLastPlan(null);
     setCustomName("");
     setRestored(false);
     flow.restart();
@@ -260,9 +307,11 @@ export function AiTeamBuilder({
   // ------------------------------------------------------------------------------- results
 
   if (result) {
+    const currentPlan = planState?.key === planKey ? planState.plan : undefined;
+    const planStatus = planState?.key !== planKey ? "loading" : planState.plan ? "ready" : "error";
     return (
       <div className="grid gap-12">
-        {restored && <ToolState kind="success" title={ui.linkRestored} />}
+        {restored && <ToolState kind="success" title={initialNotice ?? ui.linkRestored} />}
         <TeamResult
           content={content}
           data={result}
@@ -271,6 +320,29 @@ export function AiTeamBuilder({
           describe={describe}
           volumeLabel={volumeLabel}
           deploymentLabel={config.deployment ? content.teamStep.deployment.options[config.deployment].title : ""}
+        />
+        <TeamPlanDetails content={content} plan={currentPlan ?? null} agents={selected} configs={configs} />
+        <TeamCosts
+          content={content}
+          locale={locale}
+          estimate={lastPlan?.estimate ?? null}
+          status={planStatus}
+          failure={planState?.failure}
+          meta={meta}
+          overrides={overrides}
+          integrationName={(key) => content.integrations[key as keyof Content["integrations"]] ?? key}
+          complexityName={(key) => content.complexity[key]}
+          onApply={setOverrides}
+          onRetry={() => setRetry((n) => n + 1)}
+        />
+        <TeamExport
+          content={content}
+          config={config}
+          overrides={overrides}
+          locale={locale}
+          meta={meta}
+          privacyHref={privacyHref}
+          onExport={(format) => track("export_requested", { format })}
         />
         <ToolActions
           title={ui.actionsTitle}
