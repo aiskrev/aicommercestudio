@@ -1,9 +1,19 @@
-# A.I. Commerce Studio — website & lead management (V1)
+# A.I. Commerce Studio — website, interactive tools and lead management
 
 Bilingual (Bulgarian / English) marketing website and administration panel for an AI-powered
-e-commerce engineering studio, including the AI Business Automation Advisor and the
-AI Managed Services offering (AI agent operations & optimization). Runs fully on `localhost` with Docker — no domain,
-hosting, paid AI model or Shopify credentials are required.
+e-commerce engineering studio. It includes:
+
+* the AI Business Automation Advisor;
+* seven interactive tools (AI readiness assessment, Build your AI team, ROI calculator, Automation
+  Opportunity Finder, AI Solution Builder, AI Agent Library, plus the advisor);
+* the AI Managed Services offering;
+* a staff-only scaffold for the future AI Operations Portal (organisations, roles, agent registry).
+
+Runs fully on `localhost` with Docker — no domain, hosting, paid AI model or Shopify credentials are
+required.
+
+Current verified state (code, branches, migrations, capability inventory):
+[docs/PLATFORM_BASELINE_AUDIT.md](docs/PLATFORM_BASELINE_AUDIT.md).
 
 | Part | Technology |
 | --- | --- |
@@ -45,8 +55,10 @@ The latest executed results are recorded in [docs/IMPLEMENTATION_STATUS.md](docs
 ## Repository layout
 
 ```
-apps/api/        FastAPI backend, Alembic migrations, CLI (seed, create-admin, set-password, maintenance), tests
-apps/web/        Next.js site + admin UI, unit tests; apps/web/e2e = Playwright suite
+apps/api/        FastAPI backend, Alembic migrations (0001–0008), tests; CLI: seed, create-admin, set-password,
+                 maintenance, purge-synthetic, ops-create-org, ops-seed-demo, ops-purge-demo
+apps/api/scripts docs_sync.py (API docs check / openapi.json export), gen_team_vectors.py
+apps/web/        Next.js site, tools and admin UI, unit tests; apps/web/e2e = Playwright suite + Lighthouse harness
 infra/           production compose override, Caddy example, Linux backup script
 scripts/         PowerShell helpers: setup, start, stop, test, backup-db, restore-db, demos
 docs/            architecture, schema, API, security, testing, roadmap, business plan, status
@@ -55,27 +67,67 @@ docker-compose.yml, docker-compose.dev.yml, .env.example
 
 ## Documentation
 
+Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missing.
+
+**Start here**
+
+| Document | Contents |
+| --- | --- |
+| [PLATFORM_BASELINE_AUDIT.md](docs/PLATFORM_BASELINE_AUDIT.md) | Verified state: branches, migrations, capability inventory, risks, doc contradictions |
+| [IMPLEMENTATION_DEPENDENCIES_V2.md](docs/IMPLEMENTATION_DEPENDENCIES_V2.md) | Next-generation phases, dependencies and acceptance criteria |
+| [IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) | What is done, latest executed test results, known limitations |
+| [RELEASE_REPORT.md](docs/RELEASE_REPORT.md) | Release review: gates, fixes, performance, migration/deployment, verdict |
+| [ROADMAP.md](docs/ROADMAP.md) | Next versions |
+
+**Setup, architecture and operations**
+
 | Document | Contents |
 | --- | --- |
 | [INSTALL_WINDOWS.md](docs/INSTALL_WINDOWS.md) | Prerequisites, setup, daily commands, troubleshooting |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Components, request flow, i18n, AI layer, decisions |
 | [DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md) | Tables, constraints, migrations, retention |
-| [API_REFERENCE.md](docs/API_REFERENCE.md) | All endpoints with examples |
+| [API_REFERENCE.md](docs/API_REFERENCE.md) | All endpoints (checked against the code); [`openapi.json`](docs/openapi.json) |
 | [TESTING.md](docs/TESTING.md) | Test strategy and how to run every suite |
 | [SECURITY.md](docs/SECURITY.md) | Threat model, controls, GDPR, production checklist |
-| [ROADMAP.md](docs/ROADMAP.md) | Next versions |
-| [BUSINESS_PLAN.md](docs/BUSINESS_PLAN.md) | Positioning, offer, commercial model (no invented figures) |
-| [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Tokens, contrast, typography, components, motion, accessibility |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production deployment (prepared, not executed): proxy, DNS, secrets, backups, monitoring, rollback |
+| [PERFORMANCE_BASELINE.md](docs/PERFORMANCE_BASELINE.md) | Lighthouse lab baseline and method |
+| [VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md) | Independent QA/security/DevOps review (2026-10-23) |
+
+**Product areas**
+
+| Document | Contents |
+| --- | --- |
+| [INFORMATION_ARCHITECTURE.md](docs/INFORMATION_ARCHITECTURE.md) | Navigation, services, tools, conversion flows |
+| [INTERNATIONALIZATION.md](docs/INTERNATIONALIZATION.md) | BG/EN URLs, switcher, cookie, translations, SEO, API and admin languages |
+| [SEO_IMPLEMENTATION.md](docs/SEO_IMPLEMENTATION.md) | SEO checklist, keyword map (unverified), indexation rules, editorial guidelines |
 | [AI_ADVISOR.md](docs/AI_ADVISOR.md) | AI Business Automation Advisor: flow, architecture, safety controls, retention, demo |
+| [TOOLS_PLATFORM.md](docs/TOOLS_PLATFORM.md) | Tool registry, flags, shared UI, analytics, AI team model |
+| [READINESS_REPORTS.md](docs/READINESS_REPORTS.md) | AI readiness: PDF report, submissions, admin view |
+| [TEAM_CONFIGURATOR.md](docs/TEAM_CONFIGURATOR.md) | Build your AI team: costs, saved links, PDF plan, consultations |
+| [ROI_AND_FINDER.md](docs/ROI_AND_FINDER.md) | ROI calculator and Automation Opportunity Finder: formulas and policy |
+| [SOLUTION_BUILDER.md](docs/SOLUTION_BUILDER.md) | AI Solution Builder and AI Agent Library |
 | [AI_MANAGED_SERVICES.md](docs/AI_MANAGED_SERVICES.md) | AI Managed Services: page, packages, intake form, storage, admin, limits |
 | [AI_MANAGED_SERVICES_PRICING.md](docs/AI_MANAGED_SERVICES_PRICING.md) | Internal, hypothetical pricing guidance (not published) |
-| [AI_OPERATIONS_ARCHITECTURE.md](docs/AI_OPERATIONS_ARCHITECTURE.md) | Target architecture of the future AI Operations Console (not implemented) |
-| [INTERNATIONALIZATION.md](docs/INTERNATIONALIZATION.md) | BG/EN URLs, switcher, cookie, translations, SEO, API and admin languages |
-| [IMPLEMENTATION_REPORT.md](docs/IMPLEMENTATION_REPORT.md) | AI Managed Services + bilingual platform: changes, migration, endpoints, test evidence |
-| [SEO_IMPLEMENTATION.md](docs/SEO_IMPLEMENTATION.md) | SEO checklist, keyword map (unverified), indexation rules, editorial guidelines, lab performance |
-| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Production deployment (prepared, not executed): proxy, DNS, secrets, backups, monitoring, checklist, rollback |
-| [VERIFICATION_REPORT.md](docs/VERIFICATION_REPORT.md) | Independent QA/security/DevOps review: what was verified, issues by severity |
-| [IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) | What is done, what was tested, known limitations |
+| [AI_OPERATIONS_PORTAL.md](docs/AI_OPERATIONS_PORTAL.md) | Portal architecture (data model, API, tenancy, RBAC, telemetry, roadmap) and the staff-only scaffold |
+| [AI_OPERATIONS_ARCHITECTURE.md](docs/AI_OPERATIONS_ARCHITECTURE.md) | Earlier console concept (superseded by AI_OPERATIONS_PORTAL.md) |
+| [BUSINESS_PLAN.md](docs/BUSINESS_PLAN.md) | Positioning, offer, commercial model (no invented figures) |
+
+**Design**
+
+| Document | Contents |
+| --- | --- |
+| [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Tokens, contrast, typography, components, motion, accessibility (current) |
+| [VISUAL_DIRECTION_V3.md](docs/VISUAL_DIRECTION_V3.md) | Visual direction "Signal" (partly implemented) |
+| [UI_AUDIT.md](docs/UI_AUDIT.md) | UI audit before the redesign (historical) |
+| [UI_IMPLEMENTATION_REPORT.md](docs/UI_IMPLEMENTATION_REPORT.md) | First premium UI redesign (historical) |
+| [UI_REDESIGN_REPORT.md](docs/UI_REDESIGN_REPORT.md) | Premium-editorial redesign (historical; merged as `831fe81`) |
+
+**History and plans**
+
+| Document | Contents |
+| --- | --- |
+| [PLATFORM_EXPANSION_PLAN.md](docs/PLATFORM_EXPANSION_PLAN.md) | Tools and portal expansion plan with phase checklist |
+| [IMPLEMENTATION_REPORT.md](docs/IMPLEMENTATION_REPORT.md) | AI Managed Services + bilingual platform iteration (historical) |
 
 ## Important notes
 

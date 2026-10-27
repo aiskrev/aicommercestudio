@@ -1,5 +1,8 @@
 # UI audit — A.I. Commerce Studio (before the premium redesign)
 
+> **Historical (status 2026-10-27).** This is the audit of the design before the premium redesign
+> (base `40b03e0`). The issues it lists were addressed by the redesigns now in `main`.
+
 Date: 2026-10-24. Branch `redesign/premium-ui`, base commit `40b03e0` (clean working tree).
 Method: real browser screenshots with Playwright (Chromium) of 16 routes at 1440 px and 390 px
 (full page + viewport slices), overflow measured at 1440 / 1024 / 768 / 390 / 360 px, plus code

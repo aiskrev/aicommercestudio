@@ -1,5 +1,9 @@
 # UI implementation report — premium redesign
 
+> **Historical (status 2026-10-27).** The first premium redesign was merged into `main` (PR #1,
+> `aa07df9`), then superseded by the editorial redesign and later design work. Statements such as
+> "nothing committed" describe 2026-10-24. Current design: [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
+
 Date: 2026-10-24. Branch `redesign/premium-ui` (from `main` @ `40b03e0`). Frontend-only change: no
 backend, database, API, routing or SEO-logic changes. Nothing committed, pushed or deployed yet.
 

@@ -1,9 +1,45 @@
 # Implementation status
 
-Last updated: 2026-10-24. Environment: Windows 11 Pro, Docker Desktop 29.3.1 (Compose v5.1.1),
-images `python:3.13-slim`, `node:24-alpine`, `postgres:17-alpine`, `mcr.microsoft.com/playwright:v1.64.1-noble`.
+Last updated: 2026-10-27. Environment: Windows 11 Pro, Docker Desktop, images `python:3.13-slim`,
+`node:24-alpine`, `postgres:17-alpine`, `mcr.microsoft.com/playwright:v1.64.1-noble`.
 
-## AI Managed Services & bilingual platform (seventh iteration, 2026-10-24)
+## Current state: `main` @ `565d0b1` (2026-10-27)
+
+Executed during the platform baseline audit, against this commit
+([PLATFORM_BASELINE_AUDIT.md](PLATFORM_BASELINE_AUDIT.md)):
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Backend tests | `.\scripts\test.ps1 -Suite api` | **369 passed**, ruff clean |
+| Web typecheck / lint / unit and UI | `.\scripts\test.ps1 -Suite web` | **461 passed** (27 files), tsc and ESLint clean |
+| End-to-end (desktop Chromium + mobile) | `.\scripts\test.ps1 -Suite e2e` (production build) | **84 passed** |
+| pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
+| Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
+
+Shipped since the seventh iteration:
+
+| Area | Where it is described |
+| --- | --- |
+| Design system v2, interaction system, homepage v3, information architecture | `DESIGN_SYSTEM.md`, `VISUAL_DIRECTION_V3.md` (partly implemented), `INFORMATION_ARCHITECTURE.md` |
+| Tools hub, tool registry and flags, AI readiness assessment v2 + PDF reports and submissions | `TOOLS_PLATFORM.md`, `READINESS_REPORTS.md` |
+| Build your AI team: configurator, costs, saved links (`team_configurations`, migration 0007), PDF plan, consultations | `TOOLS_PLATFORM.md`, `TEAM_CONFIGURATOR.md` |
+| AI ROI calculator, Automation Opportunity Finder (client-only) | `ROI_AND_FINDER.md` |
+| AI Solution Builder, AI Agent Library (client-only / static) | `SOLUTION_BUILDER.md` |
+| AI Managed Services: operating areas and planned portal; staff-only AI operations scaffold (migration 0008) | `AI_MANAGED_SERVICES.md`, `AI_OPERATIONS_PORTAL.md` |
+| Release review fixes (OG image, layout, accessibility) | `RELEASE_REPORT.md` |
+
+Known limitations (the full list is in the audit §3 and §5):
+
+* No production deployment.
+* Legal texts are drafts.
+* Company details are placeholders.
+* Admins have no roles or MFA.
+* The rate limiter is in memory, so only one API instance can run.
+* The AI action approval queue has no producer or executor.
+* The AI operations scaffold is for staff only; RLS is not enabled yet.
+* The draft privacy policy does not yet cover readiness submissions or saved AI team configurations.
+
+## AI Managed Services & bilingual platform (seventh iteration, 2026-10-24, historical)
 
 Details: [IMPLEMENTATION_REPORT.md](IMPLEMENTATION_REPORT.md). Executed results of this iteration:
 

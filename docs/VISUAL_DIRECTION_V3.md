@@ -1,6 +1,9 @@
 # Visual direction v3 — "Signal"
 
-Status: proposal (no code changed). Builds on design system v2 (`docs/DESIGN_SYSTEM.md`,
+Status: **partly implemented** (updated 2026-10-27). Written as a proposal on 2026-10-24. Since then the interaction system
+(`4871b05`) and homepage v3 (`29c06e1`: `HeroWorkflow`, `SystemMap`, `ControlLanes`, `BuildBento`,
+`UseCaseLedger`) shipped. The operational-status and metric tiles were not built, because there is no telemetry and
+the site must not show invented data. Builds on design system v2 (`docs/DESIGN_SYSTEM.md`,
 branch `design/system-v2`). **The logo is out of scope and must not change**: the V1 monogram and the
 gradient "Studio" wordmark (`components/layout/Logo.tsx`, `app/icon.svg`) stay exactly as they are.
 The implementation prompt for Claude Code is in `docs/prompts/VISUAL_V3_CLAUDE_PROMPT.md`.

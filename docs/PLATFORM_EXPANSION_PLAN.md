@@ -6,6 +6,17 @@ changes were made). Evidence: the checked-out repository at `68436d0`
 (`git diff 68436d0 origin/main` is empty). No production URL exists, so no live-site observations are
 included.
 
+> **Status (2026-10-27): this is a historical plan.** Phases 2–6 shipped, but the code differs
+> from this design in three places:
+>
+> * There is no `tool_results` table or migration `0005_tool_results`.
+> * There is no `ToolShell`.
+> * There is no `content/*/agents.ts`.
+>
+> The phase checklist at the end records what was built instead. For the current state, see
+> [PLATFORM_BASELINE_AUDIT.md](PLATFORM_BASELINE_AUDIT.md). For the next phases, see
+> [IMPLEMENTATION_DEPENDENCIES_V2.md](IMPLEMENTATION_DEPENDENCIES_V2.md).
+
 ---
 
 ## 1. Current-state architecture
@@ -263,14 +274,35 @@ container; when iterating against the dev server, pass both compose files
 - [x] **P0** `git switch main && git pull --ff-only`; branch per phase from `main` (done 2026-10-24: `main` = `831fe81`, branch `ci/phase-0-foundations`).
 - [x] **P0** Add GitHub Actions mirroring `scripts/test.ps1` (`.github/workflows/ci.yml`, weekly `audit.yml`; actionlint clean; first GitHub run pending a push).
 - [x] **P0** Record a Lighthouse baseline for `/bg`, `/en`, `/bg/uslugi`, AI Managed, contact, advisor ([PERFORMANCE_BASELINE.md](PERFORMANCE_BASELINE.md); found and fixed an SVG console error).
-- [ ] **P0** Owner decisions: ROI calculator policy (implemented as specified in issue #2 — user-entered values only, formulas shown, no default savings; see ROI_AND_FINDER.md); logo scope; tool-data storage/retention; legal data.
-- [ ] Fix stale UI report statements; remove unused `CapabilityMatrix`.
-- [ ] Phase 1: logo system + favicon + per-locale OG; button interaction variants; update `DESIGN_SYSTEM.md`.
-- [ ] Phase 2: mobile homepage condensation; H1 alignment; advisor page layout; tools entry points.
-- [ ] Phase 3: `EN_SEGMENTS`/slug-map extension; tool registry; hub; ToolShell; Readiness; ROI (client-only).
-- [ ] Phase 4: migration `0005_tool_results`; tools API; lead linking; admin view; privacy policy update.
-- [ ] Phase 5: Opportunity Finder; Build Your AI Team.
+- [ ] **P0** Owner decisions:
+  * ROI policy: implemented as specified (user-entered values only; see ROI_AND_FINDER.md).
+  * Logo: the V1 logo stays unchanged (owner).
+  * Tool-data storage: decided in code. Readiness submissions go to `leads.service_details`; saved
+    team links go to `team_configurations`.
+  * Still open: legal data.
+- [x] Fix stale UI report statements; remove unused `CapabilityMatrix`. The component no longer
+  exists, and the UI reports are marked historical (2026-10-27 doc sync).
+- [ ] Phase 1 (**partly**): button interaction variants and the `DESIGN_SYSTEM.md` update shipped
+  (`4871b05`, `efb4759`). The favicon exists (`app/icon.svg`). Not done: a per-locale OG image (one
+  Latin-only image, `app/opengraph-image.tsx`). The logo system is out of scope by owner decision.
+- [x] Phase 2: mobile homepage, H1 alignment, advisor layout and tools entry points shipped with
+  homepage v3 and the information architecture (`29c06e1`). The commit was not re-verified item by
+  item.
+- [x] Phase 3: `EN_SEGMENTS`/`EN_SUBSEGMENTS` extension, tool registry, hub, Readiness, ROI
+  (client-only). There is **no `ToolShell`**: the shared step UI is `components/tools/ToolUi.tsx` +
+  `lib/use-step-flow.ts`.
+- [x] Phase 4 (**implemented differently**): there is **no `tool_results` table / `0005_tool_results`**
+  (migration 0005 is the `ai_agents` service).
+  * Tools API: `/api/public/readiness/*`, `/api/public/team/*`.
+  * Lead linking: readiness → lead with `service_details`; team → `team_configurations` (0007) +
+    lead.
+  * Admin view: readiness and team report downloads.
+  * **Open:** the privacy policy draft does not yet mention readiness submissions or saved team
+    configurations (`content/{bg,en}/legal.ts` covers only the advisor).
+- [x] Phase 5: Opportunity Finder; Build Your AI Team (incl. costs, saved links, PDF, consultations).
 - [x] Phase 6: agent library (SSG + SEO); Solution Builder — rule-based, client-only ([SOLUTION_BUILDER.md](SOLUTION_BUILDER.md)). Agent data reuses `lib/ai-team.ts` and team content instead of a separate `content/*/agents.ts`.
 - [ ] Phase 6b: optional AI step for the Solution Builder via the advisor safety pipeline.
-- [ ] Phase 7: client portal (after 2FA, Redis, DPA, hosting).
+- [ ] Phase 7: client portal (after 2FA, Redis, DPA, hosting). Superseded by the phased plan in
+  [IMPLEMENTATION_DEPENDENCIES_V2.md](IMPLEMENTATION_DEPENDENCIES_V2.md) (P1–P4). A staff-only scaffold exists
+  ([AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md)).
 - [ ] Every phase: unit + component + e2e (BG/EN, mobile) + screenshots at 5 widths + `.\scripts\test.ps1`.

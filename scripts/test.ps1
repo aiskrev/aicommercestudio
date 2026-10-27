@@ -39,6 +39,8 @@ if ($Suite -in @("api", "web", "all")) {
 if ($Suite -in @("api", "all")) {
     Invoke-Suite "API tests (pytest)" { docker compose --profile test run --rm --build api-tests }
     Invoke-Suite "API lint (ruff)" { docker compose --profile test run --rm api-tests ruff check --no-cache . }
+    # docs/openapi.json, the route list in docs/API_REFERENCE.md and the README's document index must match the code.
+    Invoke-Suite "API docs in sync" { docker compose --profile test run --rm --no-deps -v "${root}:/repo:ro" api-tests python scripts/docs_sync.py }
 }
 if ($Suite -in @("web", "all")) {
     Invoke-Suite "Web typecheck + lint + unit tests" { docker compose --profile test run --rm --build web-tests }

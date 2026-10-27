@@ -1,5 +1,10 @@
 # Implementation report — AI Managed Services & bilingual platform (BG/EN)
 
+> **Historical (status 2026-10-27).** This report covers the AI Managed Services and bilingual
+> iteration of 2026-10-24. The current state and test results are in
+> [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) and
+> [PLATFORM_BASELINE_AUDIT.md](PLATFORM_BASELINE_AUDIT.md).
+
 Date: 2026-10-24. Environment: Windows 11 Pro, Docker Desktop, local stack only (nothing deployed).
 
 ## 1. Summary

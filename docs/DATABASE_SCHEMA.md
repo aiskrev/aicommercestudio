@@ -119,6 +119,9 @@ Append-only activity log. `details` must never contain raw personal data.
 | `retention.run` | an admin applied the retention policy (counts) |
 | `ai.lead_triage`, `ai_action.proposed/approved/rejected` | AI suggestion and approval workflow |
 | `admin.created`, `admin.password_reset`, `seed.synthetic_data`, `seed.synthetic_purged` | CLI operations |
+| `ops.organization_created` | CLI `ops-create-org` / `ops-seed-demo` (actor `cli`) |
+| `ops.workspace_created`, `ops.agent_created`, `ops.agent_updated` | AI operations registry writes (`details.organization_id`; agent updates list changed field names) |
+| `ops.member_added`, `ops.member_role_changed`, `ops.member_removed` | organisation membership changes (`user_id`, roles) |
 
 ## ai_action_requests
 
@@ -170,6 +173,68 @@ no personal data and no free text.
 | config | jsonb | context, departments, chosen agents, per-agent settings (team members only), deployment, operations |
 | overrides | jsonb | visitor rate overrides (bounded by the API) |
 | lead_id | uuid FK → leads.id **ON DELETE CASCADE**, nullable | the consultation lead; index `ix_team_configurations_lead_id` |
+
+## AI operations scaffold (`ops_*`, migration 0008)
+
+Staff-only tenancy foundation ([AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md)). Every
+tenant-owned row carries `organization_id`, and the API reads it only through
+`app/ops/tenancy.py::scoped`. The tables hold no telemetry and no credentials. RLS is not enabled
+(see `IMPLEMENTATION_DEPENDENCIES_V2.md`, P1).
+
+### ops_organizations
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| id | uuid PK | |
+| slug | varchar(60) UNIQUE | `uq_ops_organizations_slug` |
+| name | varchar(120) | |
+| status | varchar(16), default `active` | CHECK `ck_ops_organizations_status` (`active`, `suspended`). Writes to a suspended organisation are refused. |
+| data_region | varchar(8), default `eu` | |
+| is_demo | boolean, default false | sample data from `ops-seed-demo` (refused in production) |
+| created_at | timestamptz | |
+
+### ops_workspaces
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| id | uuid PK | |
+| organization_id | uuid FK → ops_organizations.id **ON DELETE CASCADE** | index `ix_ops_workspaces_organization_id` |
+| slug, name | varchar(60), varchar(120) | UNIQUE `(organization_id, slug)` = `uq_ops_workspaces_org_slug` |
+| environment | varchar(16) | CHECK `ck_ops_workspaces_environment` (`production`, `staging`, `development`) |
+| created_at | timestamptz | |
+
+UNIQUE `(id, organization_id)` (`uq_ops_workspaces_id_org`) is the target of the composite tenant
+foreign key on `ops_agents`.
+
+### ops_memberships
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| id | uuid PK | |
+| organization_id | uuid FK → ops_organizations.id **ON DELETE CASCADE** | index `ix_ops_memberships_organization_id` |
+| user_id | uuid FK → admin_users.id **ON DELETE CASCADE** | index `ix_ops_memberships_user_id`; staff principals only today |
+| role | varchar(16) | CHECK `ck_ops_memberships_role` (`owner`, `admin`, `operator`, `reviewer`, `viewer`) |
+| created_at | timestamptz | |
+
+UNIQUE `(organization_id, user_id)` = `uq_ops_memberships_org_user`.
+
+### ops_agents
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| id | uuid PK | |
+| organization_id | uuid FK → ops_organizations.id **ON DELETE CASCADE** | index `ix_ops_agents_organization_id` |
+| workspace_id | uuid | **composite FK** `(workspace_id, organization_id)` → `ops_workspaces (id, organization_id)` ON DELETE CASCADE (`fk_ops_agents_workspace_org`). The database rejects an agent placed in another tenant's workspace. Index `ix_ops_agents_workspace_id`. |
+| key | varchar(60) | UNIQUE `(workspace_id, key)` = `uq_ops_agents_workspace_key` |
+| name | varchar(120) | |
+| status | varchar(16) | CHECK `ck_ops_agents_status` (`planned`, `active`, `paused`, `retired`) |
+| provider, model, version | varchar(40/80/40) null | identifiers only; the API rejects secret-like text |
+| purpose | varchar(300) null | |
+| created_at, updated_at | timestamptz | |
+
+Ops writes are audited in `audit_logs` (`ops.*` actions) with `details.organization_id`.
+Retention: contract lifecycle; there is no automatic purge, and `ops-purge-demo` removes demo
+organisations.
 
 ## Retention & erasure
 

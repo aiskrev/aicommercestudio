@@ -4,8 +4,11 @@ Base path `/api`. From the browser use the website origin `http://localhost:3000
 proxy); directly: `http://localhost:8000/api/...`.
 
 * Interactive docs (development only): `http://localhost:8000/api/docs`
-* Machine-readable spec: [`docs/openapi.json`](openapi.json) (OpenAPI 3.1, generated from the code with
-  `docker compose --profile test run --rm -T api-tests python -c "import json; from app.main import app; print(json.dumps(app.openapi(), ensure_ascii=False, indent=2))" > docs/openapi.json`)
+* Machine-readable spec: [`docs/openapi.json`](openapi.json) (OpenAPI 3.1, generated from the code).
+  Regenerate it with
+  `docker compose --profile test run --rm --no-deps -v "${PWD}:/repo" api-tests python scripts/docs_sync.py --write`.
+* `scripts/test.ps1 -Suite api` fails when the spec differs from the code or when a route below is
+  missing from this document (`apps/api/scripts/docs_sync.py`).
 
 ## Error envelope
 
@@ -210,18 +213,27 @@ Errors: `422 validation_error`, `400 form_token_invalid`, `429 rate_limited`, `5
 
 ## Public: AI readiness assessment
 
-`GET /api/public/readiness/meta`, `POST /api/public/readiness/report` (anonymous PDF, nothing
-stored) and `POST /api/public/readiness/submissions` (optional hand-off to the team, creates a
-lead); admins download a submission's PDF from `GET /api/admin/leads/{id}/readiness-report`.
-Fields, limits and errors: [READINESS_REPORTS.md](READINESS_REPORTS.md#api).
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/public/readiness/meta` | rubric and model versions, whether e-mail delivery is available |
+| POST | `/api/public/readiness/report` | anonymous PDF report; nothing stored; form token and rate limit |
+| POST | `/api/public/readiness/submissions` | optional hand-off to the team with consent → lead (`service=audit`, details in `service_details`) |
+
+Admins download a submission's PDF from `GET /api/admin/leads/{id}/readiness-report`. Fields,
+limits and errors: [READINESS_REPORTS.md](READINESS_REPORTS.md#api).
 
 ## Public: AI team configurator
 
-`GET /api/public/team/meta`, `POST /api/public/team/estimate` (plan, security, data flows and costs
-for three scenarios; nothing stored), `POST /api/public/team/report` (PDF plan),
-`POST /api/public/team/configurations` + `/configurations/lookup` (private saved links; the token is
-sent in the body) and `POST /api/public/team/submissions` (optional consultation, creates a lead);
-admins download a consultation's plan from `GET /api/admin/leads/{id}/team-report`. Fields, limits,
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/public/team/meta` | model and assumption versions, published cost assumptions |
+| POST | `/api/public/team/estimate` | plan, security, data flows and costs for three scenarios; nothing stored |
+| POST | `/api/public/team/report` | PDF plan; nothing stored |
+| POST | `/api/public/team/configurations` | save a configuration privately → secret link token (only its SHA-256 hash is stored; expires) |
+| POST | `/api/public/team/configurations/lookup` | load a saved configuration; the token is sent in the body, never in a URL |
+| POST | `/api/public/team/submissions` | optional consultation with consent → lead with the linked configuration |
+
+Admins download a consultation's plan from `GET /api/admin/leads/{id}/team-report`. Fields, limits,
 cost model and errors: [TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md#api).
 
 ## Admin authentication
@@ -246,8 +258,8 @@ Admin responses are `Cache-Control: no-store`.
 | GET | `/api/admin/dashboard/stats` | totals, new, last 7/30 days, open pipeline, won/lost, `by_status`, `by_service`, `by_inquiry_type`, `by_locale`, pending AI actions, recent activity |
 | GET | `/api/admin/audit` | Paginated audit search → `{items,total,page,page_size}`. Query: `action`, `action_prefix` (e.g. `lead.`), `entity_type`, `entity_id`, `actor` (substring), `created_from`, `created_to`, `page`, `page_size` ≤ 200 |
 | GET | `/api/admin/system/status` | environment, AI provider, e-mail enabled, retention, integration flags (never secrets) |
-| GET | `/api/admin/retention` | Preview: `lead_retention_days`, `audit_retention_days`, `leads_due`, `audit_entries_due`, cut-off dates, `advisor_retention_days`, `advisor_assessments_due`. Changes nothing. |
-| POST | `/api/admin/retention/run` | Body must be `{"confirm": true}` (else 422). Deletes expired leads/notes, old audit entries and expired unlinked advisor assessments; audited as `retention.run` → `{"leads_deleted","audit_entries_deleted","advisor_assessments_deleted"}` |
+| GET | `/api/admin/retention` | Preview: `lead_retention_days`, `audit_retention_days`, `leads_due`, `audit_entries_due`, `lead_cutoff`, `audit_cutoff`, `advisor_retention_days`, `advisor_assessments_due`, `team_configuration_retention_days`, `team_configurations_due`. Changes nothing. |
+| POST | `/api/admin/retention/run` | Body must be `{"confirm": true}` (else 422). Deletes expired leads/notes (readiness and team leads use their own retention), old audit entries, expired unlinked advisor assessments and saved team configurations; audited as `retention.run` → `{"leads_deleted","audit_entries_deleted","advisor_assessments_deleted","team_configurations_deleted"}` |
 
 ## Admin: leads
 
@@ -260,6 +272,8 @@ Admin responses are `Cache-Control: no-store`.
 | DELETE | `/api/admin/leads/{id}` | GDPR erasure (lead + notes) → 204; audit keeps only id + reason |
 | GET | `/api/admin/leads/{id}/audit` | Lead history |
 | POST | `/api/admin/leads/{id}/ai/triage` | Read-only AI suggestion (mock provider by default); audited |
+| GET | `/api/admin/leads/{id}/readiness-report` | PDF of a readiness submission (404 for other leads) |
+| GET | `/api/admin/leads/{id}/team-report` | PDF plan of an AI team consultation (404 for other leads) |
 
 ## Admin: AI action approvals
 
@@ -267,6 +281,33 @@ Admin responses are `Cache-Control: no-store`.
 | --- | --- | --- |
 | GET | `/api/admin/ai/actions?status=PENDING` | Proposed agent actions |
 | POST | `/api/admin/ai/actions/{id}/decision` | `{"decision": "approve" \| "reject", "comment"?}`; 409 `already_decided` |
+
+## AI operations (staff-only scaffold)
+
+Design, isolation and RBAC: [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md).
+
+* **Authentication:** every route requires the admin session (401). Writes also require
+  `X-CSRF-Token` (403 `csrf_failed`).
+* **Membership:** routes under `/organizations/{org}` resolve the caller's membership. With no
+  membership, the answer is 404 `ops_not_found`, the same as for a missing organisation.
+* **Permissions:** a member without the permission gets 403 `ops_forbidden`. Writes to a suspended
+  organisation get 403 `ops_suspended`.
+* **Responses** are `no-store`.
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | `/api/ops/organizations` | session | the caller's organisations with their role |
+| GET | `/api/ops/organizations/{organization_id}` | `org.read` | overview: organisation, role, permissions, workspace count, agents by status, `telemetry.connected=false` |
+| GET | `/api/ops/organizations/{organization_id}/workspaces` | `workspaces.read` | workspaces |
+| POST | `/api/ops/organizations/{organization_id}/workspaces` | `workspaces.write` | create a workspace → 201; 409 `ops_conflict` |
+| GET | `/api/ops/organizations/{organization_id}/agents` | `agents.read` | agent registry; query `workspace_id`, `status` |
+| POST | `/api/ops/organizations/{organization_id}/agents` | `agents.write` | register an agent → 201. 404 if the workspace belongs to another organisation; 422 for secret-like text or invalid identifiers; 409 duplicate key |
+| PATCH | `/api/ops/organizations/{organization_id}/agents/{agent_id}` | `agents.write` | update name, status, provider, model, version, purpose; audited |
+| GET | `/api/ops/organizations/{organization_id}/members` | `members.read` | members with role |
+| POST | `/api/ops/organizations/{organization_id}/members` | `members.write` + rank rule | add an existing staff user by e-mail → 201. 404 `ops_user_unknown`; 409 when already a member |
+| PATCH | `/api/ops/organizations/{organization_id}/members/{membership_id}` | `members.write` + rank rule | change a role. 409 `ops_last_owner` |
+| DELETE | `/api/ops/organizations/{organization_id}/members/{membership_id}` | `members.write` + rank rule | remove a member → 204. 409 `ops_last_owner` |
+| GET | `/api/ops/organizations/{organization_id}/audit` | `audit.read` | this organisation's `ops.*` audit entries (`limit` ≤ 200) |
 
 ## Executed example
 
