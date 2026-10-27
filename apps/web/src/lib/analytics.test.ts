@@ -58,15 +58,20 @@ describe("feature flags and tool registry", () => {
 
   it("never makes a planned tool available, even with its flag on", () => {
     const previous = process.env.TOOL_FLAGS;
-    process.env.TOOL_FLAGS = "tool_team=on,tool_roi=on,tool_solution=on,tool_agents=on";
+    process.env.TOOL_FLAGS = "tool_roi=on,tool_solution=on,tool_agents=on";
     expect(TOOLS.filter((t) => t.status === "planned").some(isToolAvailable)).toBe(false);
-    process.env.TOOL_FLAGS = "tool_readiness=off";
+    process.env.TOOL_FLAGS = "tool_readiness=off,tool_team=off";
     expect(Object.keys(toolHrefs("en"))).toEqual(["advisor"]);
     process.env.TOOL_FLAGS = previous;
   });
 
   it("links available tools with localized URLs", () => {
-    expect(toolHrefs("en")).toEqual({ advisor: "/en/ai-automation-advisor", readiness: "/en/tools/ai-readiness" });
+    expect(toolHrefs("en")).toEqual({
+      advisor: "/en/ai-automation-advisor",
+      readiness: "/en/tools/ai-readiness",
+      team: "/en/tools/ai-team",
+    });
     expect(toolHrefs("bg").readiness).toBe("/bg/instrumenti/ai-gotovnost");
+    expect(toolHrefs("bg").team).toBe("/bg/instrumenti/ai-ekip");
   });
 });

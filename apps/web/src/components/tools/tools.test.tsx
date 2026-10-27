@@ -41,17 +41,17 @@ describe("shared tool UI", () => {
   });
 
   it("links an available tool and never links a tool in preparation", () => {
-    const [advisor, , team] = tools.items;
+    const [advisor, , , roi] = tools.items;
     render(
       <>
         <ToolCard tool={advisor} href="/en/ai-automation-advisor" minutes={3} labels={labels} />
-        <ToolCard tool={team} labels={labels} />
+        <ToolCard tool={roi} labels={labels} />
       </>,
     );
     expect(screen.getAllByRole("link")).toHaveLength(1);
     expect(screen.getByRole("link", { name: advisor.title })).toHaveAttribute("href", "/en/ai-automation-advisor");
     expect(screen.getByText("about 3 min")).toBeInTheDocument();
-    const planned = screen.getByRole("heading", { name: team.title }).closest("article")!;
+    const planned = screen.getByRole("heading", { name: roi.title }).closest("article")!;
     expect(planned).toHaveAttribute("data-status", "planned");
     expect(within(planned).getByText(tools.upcomingBadge)).toBeInTheDocument();
   });

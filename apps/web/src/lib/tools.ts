@@ -26,6 +26,7 @@ export interface ToolDefinition {
 /** Bulgarian slugs of tools hosted under /instrumenti (English slugs: EN_SUBSEGMENTS in i18n/config). */
 export const TOOL_SLUGS = {
   readiness: "ai-gotovnost",
+  team: "ai-ekip",
 } as const;
 
 export const TOOLS: readonly ToolDefinition[] = [
@@ -47,7 +48,15 @@ export const TOOLS: readonly ToolDefinition[] = [
     minutes: 5,
     services: ["audit", "ai_tools", "ai_managed"],
   },
-  { key: "team", status: "planned", flag: "tool_team", icon: "users", services: ["ai_agents"] },
+  {
+    key: "team",
+    status: "live",
+    flag: "tool_team",
+    icon: "users",
+    path: routes.tool(TOOL_SLUGS.team),
+    minutes: 6,
+    services: ["ai_agents", "integrations", "ai_managed"],
+  },
   { key: "roi", status: "planned", flag: "tool_roi", icon: "chart", services: ["automation", "analytics"] },
   { key: "solution", status: "planned", flag: "tool_solution", icon: "layers", services: ["ai_agents", "integrations"] },
   { key: "agents", status: "planned", flag: "tool_agents", icon: "bot", services: ["ai_agents"] },

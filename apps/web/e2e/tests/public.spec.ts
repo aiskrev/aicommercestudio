@@ -30,9 +30,9 @@ test.describe("public website", () => {
     await page.goto("/en");
     const tools = page.locator("section[aria-labelledby='tools-title']");
     const links = await tools.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
-    expect(new Set(links)).toEqual(new Set(["/en/tools", "/en/ai-automation-advisor", "/en/tools/ai-readiness"]));
+    expect(new Set(links)).toEqual(new Set(["/en/tools", "/en/ai-automation-advisor", "/en/tools/ai-readiness", "/en/tools/ai-team"]));
     const planned = tools.locator("article[data-status='planned']");
-    await expect(planned).toHaveCount(2);
+    await expect(planned).toHaveCount(1);
     await expect(planned.getByRole("link")).toHaveCount(0);
   });
 
