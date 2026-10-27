@@ -86,9 +86,9 @@ describe("AI readiness assessment", () => {
     expect(screen.getByRole("alert")).toHaveTextContent(tools.ui.errorSummary);
     expect(screen.getAllByText(tools.ui.required)).toHaveLength(2);
 
-    for (let step = 0; step < 5; step++) {
+    for (let step = 0; step < 6; step++) {
       for (const group of screen.getAllByRole("group")) await user.click(within(group).getAllByRole("radio")[step % 2 === 0 ? 3 : 2]);
-      await user.click(screen.getByRole("button", { name: step === 4 ? tools.ui.finish : tools.ui.next }));
+      await user.click(screen.getByRole("button", { name: step === 5 ? tools.ui.finish : tools.ui.next }));
     }
 
     const result = await screen.findByTestId("readiness-result");
@@ -104,13 +104,14 @@ describe("AI readiness assessment", () => {
       "step_completed",
       "step_completed",
       "step_completed",
+      "step_completed",
       "tool_completed",
     ]);
     for (const event of events) expect(Object.keys(event).every((k) => ["name", "tool", "locale", "step", "totalSteps", "result", "format"].includes(k))).toBe(true);
   });
 
   it("restores a complete shared result from the link", async () => {
-    window.history.replaceState(null, "", "/en/tools/ai-readiness?r=3333333333");
+    window.history.replaceState(null, "", "/en/tools/ai-readiness?r=444444444444");
     render(<ReadinessAssessment content={readinessTool} ui={tools.ui} services={services} contactHref="/en/contact" locale="en" />);
     expect(await screen.findByTestId("tool-score")).toHaveTextContent("100");
     expect(screen.getByText(tools.ui.linkRestored)).toBeInTheDocument();

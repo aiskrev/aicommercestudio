@@ -44,7 +44,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     flag: "tool_readiness",
     icon: "gauge",
     path: routes.tool(TOOL_SLUGS.readiness),
-    minutes: 4,
+    minutes: 5,
     services: ["audit", "ai_tools", "ai_managed"],
   },
   { key: "team", status: "planned", flag: "tool_team", icon: "users", services: ["ai_agents"] },

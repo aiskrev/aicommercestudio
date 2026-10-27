@@ -11,6 +11,7 @@ import type { ServiceKey } from "@/content/types";
 import { isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
+import { ACTION_SERVICE } from "@/lib/readiness";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
 import { isToolAvailable, TOOL_SLUGS, toolByKey, toolHrefs } from "@/lib/tools";
@@ -54,7 +55,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
   const { readinessTool, tools } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
-  const serviceKeys: ServiceKey[] = ["integrations", "audit", "ai_managed", "ai_agents"];
+  const serviceKeys = [...new Set(Object.values(ACTION_SERVICE))] as ServiceKey[];
   const services = Object.fromEntries(
     serviceKeys.map((key) => {
       const service = serviceByKey(locale, key);

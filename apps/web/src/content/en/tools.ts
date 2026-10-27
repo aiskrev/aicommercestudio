@@ -55,7 +55,7 @@ export const tools: typeof bgTools = {
       category: "Strategy",
       title: "AI readiness assessment",
       description:
-        "Ten questions on data, processes, systems, people and governance. You get a score across five dimensions and prioritised next steps.",
+        "Twelve questions across six dimensions, from strategy to governance. You get a score, blockers, three priority actions and a 90-day plan.",
       audience: "Companies considering their first AI project",
       cta: "Start the assessment",
     },
