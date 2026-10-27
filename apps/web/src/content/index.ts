@@ -14,6 +14,8 @@ import { about, aiSolutions, industries, processPage, servicesPage, toolsPage } 
 import { keywordMap } from "@/content/bg/seo";
 import { coreServices, services } from "@/content/bg/services";
 import { readinessTool } from "@/content/bg/tool-readiness";
+import { finderTool } from "@/content/bg/tool-finder";
+import { roiTool } from "@/content/bg/tool-roi";
 import { teamTool } from "@/content/bg/tool-team";
 import { tools } from "@/content/bg/tools";
 import { advisor as enAdvisor } from "@/content/en/advisor";
@@ -38,6 +40,8 @@ import {
 import { keywordMap as enKeywordMap } from "@/content/en/seo";
 import { coreServices as enCoreServices, services as enServices } from "@/content/en/services";
 import { readinessTool as enReadinessTool } from "@/content/en/tool-readiness";
+import { finderTool as enFinderTool } from "@/content/en/tool-finder";
+import { roiTool as enRoiTool } from "@/content/en/tool-roi";
 import { teamTool as enTeamTool } from "@/content/en/tool-team";
 import { tools as enTools } from "@/content/en/tools";
 import type { ServiceKey } from "@/content/types";
@@ -60,6 +64,8 @@ const bg = {
   toolsPage,
   readinessTool,
   teamTool,
+  roiTool,
+  finderTool,
   articles,
   insightsPage,
   editorialCategories,
@@ -86,6 +92,8 @@ const en: SiteContent = {
   toolsPage: enToolsPage,
   readinessTool: enReadinessTool,
   teamTool: enTeamTool,
+  roiTool: enRoiTool,
+  finderTool: enFinderTool,
   articles: enArticles,
   insightsPage: enInsightsPage,
   editorialCategories: enEditorialCategories,

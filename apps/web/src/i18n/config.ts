@@ -48,7 +48,7 @@ const EN_SEGMENTS: Record<string, string> = {
 const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
   statii: { tema: "topic" },
   // Tool slugs (lib/tools.ts → TOOL_SLUGS). Only implemented tools have pages.
-  instrumenti: { "ai-gotovnost": "ai-readiness", "ai-ekip": "ai-team" },
+  instrumenti: { "ai-gotovnost": "ai-readiness", "ai-ekip": "ai-team", "roi-kalkulator": "roi-calculator", "avtomatizatsii": "automation-finder" },
 };
 
 const BG_SEGMENTS = Object.fromEntries(Object.entries(EN_SEGMENTS).map(([bg, en]) => [en, bg]));

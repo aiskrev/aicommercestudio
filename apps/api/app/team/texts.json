@@ -476,6 +476,7 @@
    "stale": "Страницата е заредена с по-стара версия. Презаредете я — конфигурацията се пази във връзката.",
    "outOfRange": "Въведете стойност между {min} и {max}.",
    "customised": "С ваши ставки",
+   "roiLink": "Изчислете ефекта (ROI) с тези разходи",
    "formulas": [
     "Еднократно = (проучване + изграждане по сложност на агента + интеграции по сложност на системата + точки за одобрение + среда + тестване) × дневна ставка.",
     "Модели = задачи на месец × токени на задача × цена за 1 млн. токена × коефициент за повторения и оценка.",
@@ -1017,6 +1018,7 @@
    "stale": "This page was loaded with an older version. Reload it — your configuration is kept in the link.",
    "outOfRange": "Enter a value between {min} and {max}.",
    "customised": "With your rates",
+   "roiLink": "Calculate the ROI with these costs",
    "formulas": [
     "One-time = (discovery + build by agent complexity + integrations by system complexity + approval points + environment + testing) × day rate.",
     "Models = tasks per month × tokens per task × price per 1M tokens × a factor for retries and evaluation.",

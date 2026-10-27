@@ -12,6 +12,7 @@ export type FeatureFlag =
   | "tool_readiness"
   | "tool_team"
   | "tool_roi"
+  | "tool_finder"
   | "tool_solution"
   | "tool_agents";
 
@@ -19,7 +20,8 @@ export const FLAG_DEFAULTS: Record<FeatureFlag, boolean> = {
   tool_advisor: true,
   tool_readiness: true,
   tool_team: true,
-  tool_roi: false,
+  tool_roi: true,
+  tool_finder: true,
   tool_solution: false,
   tool_agents: false,
 };

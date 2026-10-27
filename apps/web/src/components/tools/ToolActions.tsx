@@ -23,7 +23,8 @@ export function ToolActions({
   /** Plain-text summary; without it there is no download button (e.g. a tool with its own report). */
   summaryText?: () => string;
   fileName?: string;
-  shareUrl: () => string;
+  /** Omitted when the result cannot be shared without personal or free text. */
+  shareUrl?: () => string;
   onExport?: (format: ExportFormat) => void;
 }) {
   const [message, setMessage] = useState("");
@@ -41,6 +42,7 @@ export function ToolActions({
   }
 
   async function copy() {
+    if (!shareUrl) return;
     onExport?.("link");
     try {
       await navigator.clipboard.writeText(shareUrl());
@@ -71,9 +73,11 @@ export function ToolActions({
             {labels.download}
           </Button>
         )}
-        <Button variant="secondary" size="sm" onClick={copy}>
-          {labels.copyLink}
-        </Button>
+        {shareUrl && (
+          <Button variant="secondary" size="sm" onClick={copy}>
+            {labels.copyLink}
+          </Button>
+        )}
       </div>
       <p role="status" aria-live="polite" className="mt-2 min-h-5 text-sm text-fg-muted">
         {message}
