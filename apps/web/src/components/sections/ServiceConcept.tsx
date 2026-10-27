@@ -18,6 +18,7 @@ const LAYOUT: Record<ServiceKey, Layout> = {
   analytics: "funnel",
   integrations: "hub",
   ai_managed: "cycle",
+  ai_agents: "hub",
   audit: "checklist",
 };
 

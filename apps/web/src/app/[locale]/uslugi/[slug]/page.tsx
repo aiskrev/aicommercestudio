@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 
-import { AdvisorPromo } from "@/components/advisor/AdvisorPromo";
 import { ArticleCard } from "@/components/editorial/ArticleCard";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Faq } from "@/components/sections/Faq";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
+import { RelatedTools } from "@/components/home/ToolsPreview";
 import { ServiceCard } from "@/components/sections/ServiceCard";
 import { ServiceConcept } from "@/components/sections/ServiceConcept";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -26,11 +26,9 @@ import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { contactWithService, quoteWithService, routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
+import { SERVICE_TOOLS, toolHrefs, toolMinutes } from "@/lib/tools";
 
 export const dynamicParams = false;
-
-/** Services whose visitors are offered the AI automation advisor. */
-const ADVISOR_SERVICES = new Set(["automation", "ai_tools"]);
 
 // Services with a dedicated route (e.g. uslugi/ai-managed-services) are not rendered by this template.
 export function generateStaticParams({ params }: { params: { locale: string } }) {
@@ -61,7 +59,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   if (!service || service.customPage) notFound();
 
   const dict = getDictionary(locale);
-  const { home, advisor } = getContent(locale);
+  const { home, tools } = getContent(locale);
   const href = (path: string) => localizePath(locale, path);
   const path = href(routes.service(service.slug));
   const related = service.related.map((key) => serviceByKey(locale, key));
@@ -157,8 +155,24 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         </EditorialSplit>
       </Section>
 
+      {/* ------------------------------------------------------------ solution approach */}
+      <Section labelledBy="approach-title" tone="raised">
+        <SectionHeading id="approach-title" eyebrow={dict.service.approachEyebrow} title={dict.service.approachTitle} />
+        <ol className="mt-12 grid gap-6 md:grid-cols-3">
+          {service.approach.map((step, index) => (
+            <li key={step.title} className="min-w-0 border-t border-brand/40 pt-6">
+              <span className="t-index" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <h3 className="t-h3 mt-3">{step.title}</h3>
+              <p className="mt-2 leading-relaxed text-fg-muted">{step.description}</p>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
       {/* ------------------------------------------------------------ capabilities (two-column index) */}
-      <Section labelledBy="capabilities-title" tone="raised">
+      <Section labelledBy="capabilities-title">
         <SectionHeading id="capabilities-title" eyebrow={service.shortTitle} title={service.headings.capabilities} />
         <ol className="mt-12 grid gap-x-12 md:grid-cols-2">
           {service.capabilities.map((capability, index) => (
@@ -173,6 +187,27 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
             </li>
           ))}
         </ol>
+      </Section>
+
+      {/* ------------------------------------------------------------ use cases */}
+      <Section labelledBy="use-cases-title" tone="deep">
+        <SectionHeading
+          id="use-cases-title"
+          eyebrow={dict.service.useCasesEyebrow}
+          title={dict.service.useCasesTitle}
+          lead={dict.service.useCasesNote}
+        />
+        <ul className="mt-12 grid gap-4 md:grid-cols-3">
+          {service.useCases.map((useCase) => (
+            <li key={useCase.title} className="card flex flex-col p-6">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-brand-2/40 text-brand-2" aria-hidden="true">
+                <Icon name="target" className="h-4.5 w-4.5" />
+              </span>
+              <h3 className="t-h3 mt-4">{useCase.title}</h3>
+              <p className="mt-2 leading-relaxed text-fg-muted">{useCase.description}</p>
+            </li>
+          ))}
+        </ul>
       </Section>
 
       {/* ------------------------------------------------------------ technical checks (light) */}
@@ -246,9 +281,15 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         <EditorialSplit aside={<SectionHeading id="service-faq-title" eyebrow={service.shortTitle} title={dict.service.faq} />}>
           <Faq items={service.faqs} />
         </EditorialSplit>
-        {ADVISOR_SERVICES.has(service.key) && (
-          <AdvisorPromo promo={advisor.promo} href={href(routes.advisor)} className="mt-12" />
-        )}
+        <div className="mt-14 border-t border-line-subtle pt-12 empty:hidden">
+          <RelatedTools
+            catalog={tools}
+            hrefs={toolHrefs(locale)}
+            minutes={toolMinutes()}
+            keys={SERVICE_TOOLS[service.key]}
+            id="service-tools-title"
+          />
+        </div>
       </Section>
 
       {/* ------------------------------------------------------------ related articles */}

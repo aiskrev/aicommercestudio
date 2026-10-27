@@ -19,6 +19,8 @@ from app.deps import Admin, AppSettings, DbSession
 from app.errors import ApiError
 from app.integrations import integration_status
 from app.models import AIActionStatus, InquiryType, Lead, LeadLocale, LeadNote, LeadStatus, ServiceKey
+from app.readiness.report import ReportUnavailable, build_report
+from app.readiness.scoring import ReadinessResult
 from app.schemas import (
     AIActionDecision,
     AIActionOut,
@@ -34,6 +36,7 @@ from app.schemas import (
     LeadSummaryOut,
     LeadTriageOut,
     LeadUpdate,
+    ReadinessDetailsOut,
     RetentionPreview,
     RetentionRunIn,
     RetentionRunOut,
@@ -68,6 +71,28 @@ def _ai_managed_details(lead: Lead) -> AiManagedDetails | None:
         return None
 
 
+def _readiness_details(lead: Lead) -> ReadinessDetailsOut | None:
+    """Validated readiness submission details, or None (other leads, unexpected data)."""
+    details = lead.service_details or {}
+    if details.get("kind") != "readiness":
+        return None
+    result = details.get("result") or {}
+    try:
+        return ReadinessDetailsOut(
+            model_version=details.get("model_version", ""),
+            role=details.get("role", ""),
+            consultation_requested=bool(details.get("consultation_requested")),
+            overall=result.get("overall"),
+            band=result.get("band"),
+            dimensions=result.get("dimensions"),
+            blockers=result.get("blockers"),
+            actions=result.get("actions"),
+        )
+    except ValidationError:
+        logger.warning("lead_service_details_invalid", extra={"lead": lead.reference})
+        return None
+
+
 def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
     base = LeadSummaryOut.model_validate(lead).model_dump()
     return LeadDetailOut(
@@ -78,6 +103,7 @@ def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
         privacy_notice_version=lead.privacy_notice_version,
         marketing_consent=lead.marketing_consent,
         marketing_consent_at=lead.marketing_consent_at,
+        marketing_consent_version=lead.marketing_consent_version,
         status_changed_at=lead.status_changed_at,
         submitted_service=lead.submitted_service,
         platform=lead.platform,
@@ -87,6 +113,7 @@ def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
         notes=[_note_out(n) for n in lead.notes],
         advisor_assessment=advisor.summary_for_lead(db, lead.id),
         ai_managed=_ai_managed_details(lead),
+        readiness=_readiness_details(lead),
     )
 
 
@@ -157,7 +184,12 @@ def system_status(ctx: Admin, settings: AppSettings) -> SystemStatus:
 def retention_preview(ctx: Admin, db: DbSession, settings: AppSettings, response: Response) -> RetentionPreview:
     """What the retention policy would delete right now (nothing is changed)."""
     _no_store(response)
-    preview = leads.retention_preview(db, settings.lead_retention_days, settings.audit_retention_days)
+    preview = leads.retention_preview(
+        db,
+        settings.lead_retention_days,
+        settings.audit_retention_days,
+        readiness_retention_days=settings.readiness_retention_days,
+    )
     return RetentionPreview(
         lead_retention_days=settings.lead_retention_days,
         audit_retention_days=settings.audit_retention_days,
@@ -173,7 +205,12 @@ def retention_preview(ctx: Admin, db: DbSession, settings: AppSettings, response
 @router.post("/retention/run", response_model=RetentionRunOut)
 def retention_run(payload: RetentionRunIn, ctx: Admin, db: DbSession, settings: AppSettings) -> RetentionRunOut:
     """Apply the retention policy now. Requires `{"confirm": true}`; the run itself is audited."""
-    result = leads.purge_expired(db, settings.lead_retention_days, settings.audit_retention_days)
+    result = leads.purge_expired(
+        db,
+        settings.lead_retention_days,
+        settings.audit_retention_days,
+        readiness_retention_days=settings.readiness_retention_days,
+    )
     assessments = advisor.purge_expired(db)
     audit.record(
         db, "retention.run", actor=ctx.user, entity_type="system",
@@ -266,6 +303,42 @@ def delete_lead(lead_id: uuid.UUID, ctx: Admin, db: DbSession) -> Response:
     lead = _get_lead_or_404(db, lead_id)
     leads.delete_lead(db, lead, ctx.user, ctx.ip_hash, reason="admin_erasure_request")
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get(
+    "/leads/{lead_id}/readiness-report",
+    response_class=Response,
+    responses={200: {"content": {"application/pdf": {}}}},
+    summary="PDF report of a lead's AI readiness submission (admins only)",
+)
+def lead_readiness_report(lead_id: uuid.UUID, ctx: Admin, db: DbSession) -> Response:
+    lead = _get_lead_or_404(db, lead_id)
+    details = lead.service_details or {}
+    stored = details.get("result")
+    if details.get("kind") != "readiness" or not isinstance(stored, dict):
+        raise ApiError(status.HTTP_404_NOT_FOUND, NOT_FOUND, "readiness_not_found")
+    # Rebuilt from the stored result, so the report matches what the visitor saw even after a model change.
+    try:
+        result = ReadinessResult(**stored)
+        pdf = build_report(result, lead.locale, lead.company)
+    except (TypeError, KeyError, ValueError, ReportUnavailable) as exc:
+        logger.warning("readiness_report_failed", extra={"lead": lead.reference, "error": type(exc).__name__})
+        raise ApiError(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "Отчетът не може да бъде създаден.", "report_unavailable"
+        ) from exc
+    audit.record(
+        db, "lead.readiness_report_downloaded", actor=ctx.user, entity_type="lead", entity_id=str(lead.id),
+        ip_hash=ctx.ip_hash,
+    )
+    db.commit()
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="readiness-{lead.reference}.pdf"',
+            "Cache-Control": "no-store",
+        },
+    )
 
 
 @router.get("/leads/{lead_id}/audit", response_model=list[AuditLogOut])

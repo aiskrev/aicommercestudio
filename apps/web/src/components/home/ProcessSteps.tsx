@@ -13,7 +13,7 @@ export interface ProcessStep {
 export function ProcessSteps({ steps, layout = "vertical" }: { steps: ProcessStep[]; layout?: "vertical" | "horizontal" }) {
   if (layout === "horizontal") {
     return (
-      <ol className={cx("grid gap-8 lg:gap-6", steps.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3")}>
+      <ol className={cx("grid gap-8 lg:gap-6", steps.length === 5 ? "lg:grid-cols-5" : steps.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3")}>
         {steps.map((step, index) => (
           <li key={step.title} className="relative grid grid-cols-[3rem_minmax(0,1fr)] gap-4 lg:block">
             {/* rail: vertical on mobile, horizontal from lg */}

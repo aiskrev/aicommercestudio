@@ -1,0 +1,104 @@
+import { expect, test } from "@playwright/test";
+
+/** Information architecture: navigation, tools hub, service template and legacy routes. */
+
+test("every pre-existing public route still answers 200", async ({ request }) => {
+  const legacy = [
+    "/bg", "/bg/uslugi", "/bg/ai-resheniya", "/bg/ai-automation-advisor", "/bg/za-kogo", "/bg/proces", "/bg/za-nas",
+    "/bg/kontakti", "/bg/statii", "/bg/uslugi/poddrazhka-na-online-magazini", "/bg/uslugi/seo-optimizatsiya",
+    "/bg/uslugi/ai-instrumenti-za-biznesa", "/bg/uslugi/avtomatizatsiya-na-procesi", "/bg/uslugi/analizi-i-konversii",
+    "/bg/uslugi/api-integratsii-oblak-i-sigurnost", "/bg/uslugi/ai-managed-services", "/bg/uslugi/tehnicheski-odit",
+    "/en", "/en/services", "/en/ai-solutions", "/en/ai-automation-advisor", "/en/industries", "/en/process", "/en/about",
+    "/en/contact", "/en/insights", "/en/services/ai-managed-services",
+  ];
+  for (const path of legacy) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(200);
+  }
+});
+
+for (const [locale, path, heading, upcoming] of [
+  ["bg", "/bg/instrumenti", "Интерактивни инструменти за първа оценка", "В подготовка"],
+  ["en", "/en/tools", "Interactive tools for a first assessment", "In preparation"],
+] as const) {
+  test(`tools hub (${locale}) links only live tools and labels the rest`, async ({ page }) => {
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(200);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
+    const live = page.locator("section[aria-labelledby='tools-live-title']");
+    const links = await live.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+    expect(links).toEqual(
+      locale === "bg"
+        ? ["/bg/ai-automation-advisor", "/bg/instrumenti/ai-gotovnost", "/bg/instrumenti/ai-ekip"]
+        : ["/en/ai-automation-advisor", "/en/tools/ai-readiness", "/en/tools/ai-team"],
+    );
+    const planned = page.locator("section[aria-labelledby='tools-upcoming-title']");
+    await expect(planned.locator("article[data-status='planned']")).toHaveCount(3);
+    await expect(planned.getByText(upcoming, { exact: true }).first()).toBeVisible();
+    await expect(planned.getByRole("link")).toHaveCount(0);
+  });
+}
+
+test("language switcher maps the tools hub and the AI agents page", async ({ page }) => {
+  await page.goto("/bg/instrumenti");
+  await page.locator("header").getByRole("link", { name: "Switch to English" }).first().click();
+  await expect(page).toHaveURL(/\/en\/tools$/);
+  await page.goto("/en/services/ai-agent-development");
+  await page.locator("header").getByRole("link", { name: "Превключи на български" }).first().click();
+  await expect(page).toHaveURL(/\/bg\/uslugi\/razrabotka-na-ai-agenti$/);
+});
+
+test("the AI agents service page follows the service template and preselects the service in contact", async ({ page }) => {
+  await page.goto("/en/services/ai-agent-development");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("AI agent development");
+  for (const id of ["problems-title", "approach-title", "capabilities-title", "use-cases-title", "service-process-title", "service-tools-title", "service-faq-title"]) {
+    await expect(page.locator(`[id="${id}"]`), id).toBeVisible();
+  }
+  const toolLinks = await page
+    .locator("section[aria-labelledby='service-tools-title']")
+    .getByRole("link")
+    .evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+  expect(toolLinks).toEqual(["/en/ai-automation-advisor", "/en/tools/ai-team"]);
+  await page.locator("main").getByRole("link", { name: "Request a quote" }).first().click();
+  await expect(page).toHaveURL(/\/en\/contact\?service=ai_agents&type=quote$/);
+  await expect(page.getByLabel(/^Service/)).toHaveValue("ai_agents");
+});
+
+test("desktop About menu works with the keyboard", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/en");
+  const about = page.locator("header nav").first().getByRole("button", { name: "About" });
+  await about.focus();
+  await page.keyboard.press("Enter");
+  await expect(about).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Tab");
+  await expect(page.locator(":focus")).toHaveText("Who we are");
+  await page.keyboard.press("Escape");
+  await expect(about).toHaveAttribute("aria-expanded", "false");
+  await expect(about).toBeFocused();
+});
+
+test("mobile menu at 360px groups services and keeps keyboard focus inside", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto("/bg");
+  const toggle = page.getByRole("button", { name: "Отвори менюто" });
+  await toggle.click();
+  const close = page.getByRole("button", { name: "Затвори менюто" });
+  const panel = page.locator(`[id="${await close.getAttribute("aria-controls")}"]`);
+  await expect(panel.getByText("AI услуги", { exact: true })).toBeVisible();
+  await expect(panel.getByText("E-commerce основа", { exact: true })).toBeVisible();
+  await expect(panel.getByRole("link", { name: "Разработка на AI агенти" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+
+  // The page behind the sheet is inert: tabbing never leaves the header and the sheet.
+  for (let i = 0; i < 40; i++) {
+    await page.keyboard.press("Tab");
+    const inside = await page.evaluate(
+      (id) => Boolean(document.activeElement?.closest(`header, [id="${id}"]`)) || document.activeElement === document.body,
+      await close.getAttribute("aria-controls"),
+    );
+    expect(inside, `tab ${i}`).toBe(true);
+  }
+  await page.keyboard.press("Escape");
+  await expect(toggle).toBeFocused();
+});

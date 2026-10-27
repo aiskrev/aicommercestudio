@@ -3,19 +3,26 @@ import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
 import { ButtonLink, Container } from "@/components/ui/primitives";
-import type { Service } from "@/content/types";
+import { serviceByKey } from "@/content";
+import type { ServiceKey } from "@/content/types";
 import { type Locale, localizePath } from "@/i18n/config";
 import type { Dictionary } from "@/i18n";
+import { AI_SERVICE_NAV, FOUNDATION_SERVICE_NAV } from "@/lib/navigation";
 import { routes } from "@/lib/routes";
 import { site } from "@/lib/site";
 
-export function Footer({ locale, dict, services }: { locale: Locale; dict: Dictionary; services: Service[] }) {
+export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   const href = (path: string) => localizePath(locale, path);
+  const serviceLinks = (keys: ServiceKey[]) =>
+    keys.map((key) => {
+      const service = serviceByKey(locale, key);
+      return { href: href(routes.service(service.slug)), label: service.shortTitle };
+    });
   const company = [
     { href: href(routes.aiSolutions), label: dict.nav.aiSolutions },
-    { href: href(routes.advisor), label: dict.nav.advisor },
+    { href: href(routes.tools), label: dict.nav.tools },
     { href: href(routes.industries), label: dict.nav.industries },
-    { href: href(routes.process), label: dict.nav.process },
+    { href: href(routes.process), label: dict.nav.approach },
     { href: href(routes.about), label: dict.nav.about },
     { href: href(routes.insights), label: dict.nav.insights },
     { href: href(routes.contact), label: dict.nav.contact },
@@ -64,12 +71,9 @@ export function Footer({ locale, dict, services }: { locale: Locale; dict: Dicti
       </Container>
 
       {/* link groups */}
-      <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
-        <FooterColumn
-          title={dict.footer.services}
-          links={services.map((s) => ({ href: href(routes.service(s.slug)), label: s.shortTitle }))}
-          columns={2}
-        />
+      <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+        <FooterColumn title={dict.nav.servicesAi} links={serviceLinks(AI_SERVICE_NAV)} />
+        <FooterColumn title={dict.nav.servicesFoundation} links={[...serviceLinks(FOUNDATION_SERVICE_NAV), { href: href(routes.services), label: dict.common.allServices }]} />
         <FooterColumn title={dict.footer.company} links={company} />
         <div>
           <FooterColumn title={dict.footer.legal} links={legal} />

@@ -51,7 +51,7 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
           services={coreServices}
           hrefFor={(service) => href(routes.service(service.slug))}
           cta={dict.common.learnMore}
-          groups={home.servicesIntro.groups}
+          groups={servicesPage.groups}
           groupHeadingLevel={2}
         />
 

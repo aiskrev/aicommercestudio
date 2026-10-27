@@ -5,6 +5,8 @@ export const routes = {
   service: (slug: string) => `/uslugi/${slug}`,
   aiSolutions: "/ai-resheniya",
   advisor: "/ai-automation-advisor",
+  tools: "/instrumenti",
+  tool: (slug: string) => `/instrumenti/${slug}`,
   industries: "/za-kogo",
   about: "/za-nas",
   process: "/proces",

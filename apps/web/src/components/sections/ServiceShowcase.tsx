@@ -6,7 +6,7 @@ import { cx } from "@/components/ui/primitives";
 import type { Service, ServiceKey } from "@/content/types";
 
 /** Services presented as the lead proposition; every other service is a core operation. */
-const AI_GROUP: ReadonlySet<ServiceKey> = new Set(["ai_tools", "automation", "ai_managed"]);
+const AI_GROUP: ReadonlySet<ServiceKey> = new Set(["ai_agents", "automation", "ai_tools", "integrations", "ai_managed"]);
 
 interface GroupCopy {
   title: string;

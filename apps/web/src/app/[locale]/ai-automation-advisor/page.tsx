@@ -41,7 +41,7 @@ export default async function AdvisorPage({ params }: PageProps<"/[locale]/ai-au
       <Breadcrumbs
         items={[
           { name: dict.common.home, path: href(routes.home) },
-          { name: dict.nav.aiSolutions, path: href(routes.aiSolutions) },
+          { name: dict.nav.tools, path: href(routes.tools) },
           { name: advisor.eyebrow, path: href(routes.advisor) },
         ]}
       />

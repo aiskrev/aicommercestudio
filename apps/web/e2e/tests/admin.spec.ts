@@ -22,6 +22,37 @@ async function createLead(request: APIRequestContext, company: string) {
   expect(response.status()).toBe(201);
 }
 
+/** An AI readiness submission (every answer at level 1 → 25/100), from its own client address. */
+async function createReadinessSubmission(request: APIRequestContext, company: string): Promise<string> {
+  const { token } = await (await request.get("/api/public/form-token")).json();
+  await new Promise((resolve) => setTimeout(resolve, 3500));
+  const ids = [
+    "strategy_goals", "strategy_use_cases", "data_access", "data_quality", "process_definition", "process_repeatability",
+    "tech_environment", "tech_integration", "people_ownership", "people_change", "gov_data_protection", "gov_oversight",
+  ];
+  const response = await request.post("/api/public/readiness/submissions", {
+    headers: { "X-Forwarded-For": `10.95.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}` },
+    data: {
+      schema_version: "1",
+      model_version: "2026-10.2",
+      locale: "bg",
+      answers: Object.fromEntries(ids.map((id) => [id, 1])),
+      name: "E2E Готовност",
+      email: "e2e.readiness@example.com",
+      company,
+      role: "Управител",
+      message: "",
+      consultation_requested: true,
+      privacy_acknowledged: true,
+      marketing_consent: true,
+      website: "",
+      form_token: token,
+    },
+  });
+  expect(response.status()).toBe(201);
+  return (await response.json()).reference;
+}
+
 test.describe("admin access control", () => {
   test("unauthenticated visitors are redirected to login", async ({ page }) => {
     await page.goto("/admin/leads");
@@ -55,6 +86,8 @@ test.describe("admin lead management", () => {
   test("login, view leads, update status, add note, logout", async ({ page, request }) => {
     const company = `E2E Админ ${Date.now()}`;
     await createLead(request, company);
+    const readinessCompany = `E2E Готовност ${Date.now()}`;
+    const readinessReference = await createReadinessSubmission(request, readinessCompany);
 
     await page.goto("/admin/login");
     await page.getByLabel("Имейл").fill(email);
@@ -102,6 +135,23 @@ test.describe("admin lead management", () => {
     // Viewing the lead's personal data was audited as well.
     await page.goto(`/admin/activity?action=lead.viewed&entity=${leadId}`);
     await expect(page.getByTestId("activity-list")).toContainText("Преглед на лични данни");
+
+    // An AI readiness submission shows its server-computed result and a PDF only admins can download.
+    await page.goto(`/admin/leads?q=${encodeURIComponent(readinessCompany)}`);
+    await page.getByRole("link", { name: "E2E Готовност" }).first().click();
+    await expect(page.getByText(`#${readinessReference}`)).toBeVisible();
+    const readiness = page.getByTestId("readiness-details");
+    await expect(readiness).toContainText("25 / 100");
+    await expect(readiness).toContainText("Изграждане на основи");
+    await expect(readiness).toContainText("Заявена консултацияДа");
+    await expect(readiness.getByRole("listitem").first()).toContainText("Стратегия");
+    await expect(page.getByText(/Дадено на .* \(версия /)).toBeVisible();
+    const reportHref = (await readiness.getByTestId("readiness-report-download").getAttribute("href"))!;
+    const pdf = await page.request.get(reportHref);
+    expect(pdf.status()).toBe(200);
+    expect(pdf.headers()["content-type"]).toBe("application/pdf");
+    expect((await pdf.body()).subarray(0, 5).toString()).toBe("%PDF-");
+    expect((await request.get(reportHref)).status()).toBe(401);
 
     await page.getByRole("button", { name: "Изход" }).last().click();
     await expect(page).toHaveURL(/\/admin\/login/);

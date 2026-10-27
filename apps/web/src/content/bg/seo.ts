@@ -65,6 +65,14 @@ export const keywordMap: KeywordTarget[] = [
     volumeStatus: "unverified",
   },
   {
+    path: "/uslugi/razrabotka-na-ai-agenti",
+    primaryKeyword: "разработка на AI агенти",
+    secondaryKeywords: ["AI агент за обслужване на клиенти", "AI агент за онлайн магазин", "агенти с човешко одобрение"],
+    intent: "transactional",
+    rationale: "Търсещият иска изпълнител за агент с конкретна задача; общият интерес към AI е на /ai-resheniya.",
+    volumeStatus: "unverified",
+  },
+  {
     path: "/uslugi/ai-instrumenti-za-biznesa",
     primaryKeyword: "AI инструменти по поръчка",
     secondaryKeywords: ["AI асистент за онлайн магазин", "чатбот за сайт", "RAG решение", "AI за продуктови описания"],
@@ -118,6 +126,22 @@ export const keywordMap: KeywordTarget[] = [
     secondaryKeywords: ["AI решения за бизнеса", "AI с човешко одобрение", "безопасно внедряване на AI"],
     intent: "commercial",
     rationale: "Подход и принципи за AI; разграничена от конкретната услуга за AI инструменти.",
+    volumeStatus: "unverified",
+  },
+  {
+    path: "/instrumenti",
+    primaryKeyword: "интерактивни AI инструменти",
+    secondaryKeywords: ["безплатни инструменти за AI оценка", "калкулатор за AI автоматизация"],
+    intent: "informational",
+    rationale: "Хъб на инструментите; конкретната оценка на процес е на страницата на AI съветника.",
+    volumeStatus: "unverified",
+  },
+  {
+    path: "/instrumenti/ai-gotovnost",
+    primaryKeyword: "оценка на AI готовността",
+    secondaryKeywords: ["тест за AI готовност", "готова ли е фирмата за AI"],
+    intent: "informational",
+    rationale: "Самостоятелна оценка; платената техническа оценка е на страницата на AI стратегията и готовността.",
     volumeStatus: "unverified",
   },
   {

@@ -29,6 +29,7 @@ import {
   toggleTool,
   validateAdvisor,
 } from "@/lib/advisor";
+import { trackToolEvent } from "@/lib/analytics";
 import { fetchFormToken } from "@/lib/public-api";
 
 interface Props {
@@ -63,6 +64,10 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   const consultRef = useRef<HTMLDivElement>(null);
   const days = status?.retention_days ?? retentionDays;
+
+  useEffect(() => {
+    trackToolEvent({ name: "tool_opened", tool: "advisor", locale });
+  }, [locale]);
 
   useEffect(() => {
     let active = true;
@@ -113,12 +118,14 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
     }
 
     setSubmitting(true);
+    trackToolEvent({ name: "tool_started", tool: "advisor", locale });
     const response = await requestAssessment(toAdvisorPayload(values, token, locale), locale);
     setSubmitting(false);
     fetchFormToken().then(setToken);
 
     if (response.ok) {
       setResult(response.data);
+      trackToolEvent({ name: "tool_completed", tool: "advisor", locale });
       return;
     }
     if (response.kind === "validation") showErrors(response.fieldErrors, response.message || f.errorSummary);

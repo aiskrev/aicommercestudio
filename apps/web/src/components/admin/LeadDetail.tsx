@@ -21,6 +21,7 @@ import {
   type LeadStatus,
   type LeadTriage,
   type LinkedAssessment,
+  type ReadinessDetails,
 } from "@/lib/admin-types";
 import { formatDateTime } from "@/lib/format";
 import { routes } from "@/lib/routes";
@@ -108,7 +109,13 @@ export function LeadDetail({ id }: { id: string }) {
                 </>
               )}
               <Info label={t.received}>{date(data.created_at)}</Info>
-              <Info label={t.source}>{data.source === "synthetic_seed" ? t.sourceSynthetic : t.sourceForm}</Info>
+              <Info label={t.source}>
+                {data.source === "synthetic_seed"
+                  ? t.sourceSynthetic
+                  : data.source === "readiness_assessment"
+                    ? t.sourceReadiness
+                    : t.sourceForm}
+              </Info>
               <Info label={t.statusChanged}>{data.status_changed_at ? date(data.status_changed_at) : "—"}</Info>
             </dl>
             <div className="mt-6">
@@ -120,6 +127,7 @@ export function LeadDetail({ id }: { id: string }) {
           </Panel>
 
           {data.ai_managed && <AiManagedPanel details={data.ai_managed} />}
+          {data.readiness && <ReadinessPanel leadId={data.id} details={data.readiness} />}
           {data.advisor_assessment && <LinkedAssessmentPanel linked={data.advisor_assessment} />}
 
           <Notes lead={data} onAdded={(note) => refresh({ ...data, notes: [note, ...data.notes] })} />
@@ -137,7 +145,9 @@ export function LeadDetail({ id }: { id: string }) {
               </Info>
               <Info label={t.marketing}>
                 {data.marketing_consent && data.marketing_consent_at
-                  ? fmt(t.marketingGiven, { date: date(data.marketing_consent_at) })
+                  ? data.marketing_consent_version
+                    ? fmt(t.marketingVersion, { date: date(data.marketing_consent_at), version: data.marketing_consent_version })
+                    : fmt(t.marketingGiven, { date: date(data.marketing_consent_at) })
                   : t.marketingNone}
               </Info>
             </dl>
@@ -195,6 +205,63 @@ function AiManagedPanel({ details }: { details: AiManagedDetails }) {
             </p>
           </div>
         )}
+      </div>
+    </Panel>
+  );
+}
+
+const READINESS_DIMENSION_ORDER = ["strategy", "data", "process", "technology", "people", "governance"];
+const dimensionRank = (key: string) => {
+  const index = READINESS_DIMENSION_ORDER.indexOf(key);
+  return index === -1 ? READINESS_DIMENSION_ORDER.length : index;
+};
+
+/** AI readiness submission: the server-computed result, plus the PDF report rebuilt from it. */
+function ReadinessPanel({ leadId, details }: { leadId: string; details: ReadinessDetails }) {
+  const { t: dict } = useAdminI18n();
+  const t = dict.readiness;
+  return (
+    <Panel title={t.title}>
+      <div className="grid gap-4 text-sm" data-testid="readiness-details">
+        <p className="text-xs text-slate-400">{t.note}</p>
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <Info label={t.overall}>
+            <span className="font-mono text-lg text-white">{details.overall}</span>
+            <span className="text-slate-400"> / 100</span>
+          </Info>
+          <Info label={t.band}>{t.bands[details.band] ?? details.band}</Info>
+          <Info label={t.role}>{details.role || "—"}</Info>
+          <Info label={t.consultation}>{details.consultation_requested ? t.yes : t.no}</Info>
+        </dl>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t.dimensions}</p>
+          <ul className="mt-2 grid gap-1.5 sm:grid-cols-2">
+            {/* Model order (JSONB does not keep key order); unknown keys from other model versions last. */}
+            {Object.entries(details.dimensions)
+              .sort(([a], [b]) => dimensionRank(a) - dimensionRank(b))
+              .map(([key, score]) => (
+                <li key={key} className="flex justify-between gap-3 rounded-lg border border-white/[0.06] px-3 py-2">
+                  <span className="text-slate-300">{t.dimensionNames[key] ?? key}</span>
+                  <span className="font-mono text-white">{score}</span>
+                </li>
+              ))}
+          </ul>
+        </div>
+        <Info label={t.blockers}>
+          {details.blockers.length ? details.blockers.map((b) => t.blockerNames[b] ?? b).join(", ") : t.noBlockers}
+        </Info>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <a
+            href={`/api/admin/leads/${leadId}/readiness-report`}
+            download
+            className={cx(buttonClass("secondary", "sm"), "inline-flex")}
+            data-testid="readiness-report-download"
+          >
+            <Icon name="fileText" className="h-4 w-4" />
+            {t.download}
+          </a>
+          <span className="text-xs text-slate-400">{fmt(t.model, { version: details.model_version })}</span>
+        </div>
       </div>
     </Panel>
   );

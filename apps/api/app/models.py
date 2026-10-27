@@ -49,6 +49,7 @@ class ServiceKey(enum.StrEnum):
     INTEGRATIONS = "integrations"
     AUDIT = "audit"
     AI_MANAGED = "ai_managed"
+    AI_AGENTS = "ai_agents"
     OTHER = "other"
 
 
@@ -186,6 +187,8 @@ class Lead(Base):
     privacy_notice_version: Mapped[str] = mapped_column(String(32), nullable=False)
     marketing_consent: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     marketing_consent_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    # Version of the marketing-consent wording the visitor agreed to (set only with consent).
+    marketing_consent_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
     ip_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow, onupdate=utcnow)

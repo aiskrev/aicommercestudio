@@ -215,7 +215,11 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
     settings = get_settings()
     with get_sessionmaker()() as db:
         result = leads.purge_expired(
-            db, settings.lead_retention_days, settings.audit_retention_days, dry_run=args.dry_run
+            db,
+            settings.lead_retention_days,
+            settings.audit_retention_days,
+            dry_run=args.dry_run,
+            readiness_retention_days=settings.readiness_retention_days,
         )
         assessments = advisor.purge_expired(db, dry_run=args.dry_run)
         sessions_removed = 0

@@ -10,9 +10,12 @@ import {
   privacyPolicy,
   termsOfUse,
 } from "@/content/bg/legal";
-import { about, aiSolutions, industries, processPage, servicesPage } from "@/content/bg/pages";
+import { about, aiSolutions, industries, processPage, servicesPage, toolsPage } from "@/content/bg/pages";
 import { keywordMap } from "@/content/bg/seo";
 import { coreServices, services } from "@/content/bg/services";
+import { readinessTool } from "@/content/bg/tool-readiness";
+import { teamTool } from "@/content/bg/tool-team";
+import { tools } from "@/content/bg/tools";
 import { advisor as enAdvisor } from "@/content/en/advisor";
 import { aiManaged as enAiManaged } from "@/content/en/ai-managed";
 import { articles as enArticles, insightsPage as enInsightsPage } from "@/content/en/articles";
@@ -30,9 +33,13 @@ import {
   industries as enIndustries,
   processPage as enProcessPage,
   servicesPage as enServicesPage,
+  toolsPage as enToolsPage,
 } from "@/content/en/pages";
 import { keywordMap as enKeywordMap } from "@/content/en/seo";
 import { coreServices as enCoreServices, services as enServices } from "@/content/en/services";
+import { readinessTool as enReadinessTool } from "@/content/en/tool-readiness";
+import { teamTool as enTeamTool } from "@/content/en/tool-team";
+import { tools as enTools } from "@/content/en/tools";
 import type { ServiceKey } from "@/content/types";
 import type { Locale, SlugMap } from "@/i18n/config";
 import { routes } from "@/lib/routes";
@@ -49,6 +56,10 @@ const bg = {
   aiSolutions,
   aiManaged,
   advisor,
+  tools,
+  toolsPage,
+  readinessTool,
+  teamTool,
   articles,
   insightsPage,
   editorialCategories,
@@ -71,6 +82,10 @@ const en: SiteContent = {
   aiSolutions: enAiSolutions,
   aiManaged: enAiManaged,
   advisor: enAdvisor,
+  tools: enTools,
+  toolsPage: enToolsPage,
+  readinessTool: enReadinessTool,
+  teamTool: enTeamTool,
   articles: enArticles,
   insightsPage: enInsightsPage,
   editorialCategories: enEditorialCategories,
