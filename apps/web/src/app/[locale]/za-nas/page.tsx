@@ -48,12 +48,12 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/za-nas"
 
       <Section labelledBy="company-title">
         <div className="card flex gap-5 rounded-2xl p-6 sm:p-8">
-          <Icon name="info" className="mt-1 h-6 w-6 shrink-0 text-cyan-300" />
+          <Icon name="info" className="mt-1 h-6 w-6 shrink-0 text-brand" />
           <div>
             <h2 id="company-title" className="t-h3-lg">
               {page.companyTitle}
             </h2>
-            <p className="mt-2 leading-relaxed text-slate-400">{page.companyNote}</p>
+            <p className="mt-2 leading-relaxed text-fg-muted">{page.companyNote}</p>
           </div>
         </div>
       </Section>

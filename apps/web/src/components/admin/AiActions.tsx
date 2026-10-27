@@ -6,7 +6,8 @@ import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { AdminPageHeader } from "@/components/admin/AdminShell";
 import { EmptyState, ErrorState, LoadingState, Panel, Pill } from "@/components/admin/ui";
 import { Icon } from "@/components/ui/Icon";
-import { buttonClass, cx } from "@/components/ui/primitives";
+import { buttonClass } from "@/components/ui/primitives";
+import { Tabs } from "@/components/ui/Tabs";
 import { adminFetch, ApiError } from "@/lib/admin-api";
 import { fmt } from "@/i18n/admin";
 import { riskTone } from "@/lib/admin-labels";
@@ -27,50 +28,39 @@ export function AiActions() {
         title={t.title}
         description={t.description}
       />
-      <div className="mb-6 flex gap-2" role="tablist" aria-label={t.filter}>
-        {(
-          [
-            ["PENDING", t.pending],
-            ["", t.all],
-          ] as const
-        ).map(([value, label]) => (
-          <button
-            key={label}
-            type="button"
-            role="tab"
-            aria-selected={filter === value}
-            onClick={() => setFilter(value)}
-            className={cx(
-              "rounded-full px-4 py-2 text-sm font-medium",
-              filter === value ? "bg-white/[0.08] text-white" : "text-slate-400 hover:text-white",
-            )}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        id="ai-actions"
+        label={t.filter}
+        items={[
+          { value: "PENDING", label: t.pending },
+          { value: "", label: t.all },
+        ]}
+        value={filter}
+        onChange={setFilter}
+        className="mb-6"
+      >
+        <p className="mb-6 flex gap-2 rounded-xl border border-line-subtle bg-surface-1 p-4 text-sm text-fg-muted">
+          <Icon name="info" className="h-5 w-5 shrink-0 text-brand" />
+          {t.v1Note}
+        </p>
 
-      <p className="mb-6 flex gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-sm text-slate-400">
-        <Icon name="info" className="h-5 w-5 shrink-0 text-cyan-300" />
-        {t.v1Note}
-      </p>
-
-      {error && <ErrorState message={error} onRetry={reload} />}
-      {loading && !data && <LoadingState />}
-      {data && data.length === 0 && (
-        <Panel>
-          <EmptyState icon="bot" title={filter ? t.noPending : t.noActions} />
-        </Panel>
-      )}
-      {data && data.length > 0 && (
-        <ul className="grid gap-4">
-          {data.map((action) => (
-            <li key={action.id}>
-              <ActionCard action={action} onDecided={reload} />
-            </li>
-          ))}
-        </ul>
-      )}
+        {error && <ErrorState message={error} onRetry={reload} />}
+        {loading && !data && <LoadingState />}
+        {data && data.length === 0 && (
+          <Panel>
+            <EmptyState icon="bot" title={filter ? t.noPending : t.noActions} />
+          </Panel>
+        )}
+        {data && data.length > 0 && (
+          <ul className="grid gap-4">
+            {data.map((action) => (
+              <li key={action.id}>
+                <ActionCard action={action} onDecided={reload} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </Tabs>
     </>
   );
 }

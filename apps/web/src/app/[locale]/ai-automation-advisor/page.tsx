@@ -46,10 +46,10 @@ export default async function AdvisorPage({ params }: PageProps<"/[locale]/ai-au
         ]}
       />
       <PageHero eyebrow={advisor.eyebrow} title={advisor.title} lead={advisor.lead}>
-        <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-slate-300">
+        <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-sm text-fg-secondary">
           {advisor.facts.map((fact) => (
             <li key={fact} className="inline-flex items-center gap-2">
-              <Icon name="check" className="h-4 w-4 text-cyan-300" />
+              <Icon name="check" className="h-4 w-4 text-brand" />
               {fact}
             </li>
           ))}
@@ -64,10 +64,10 @@ export default async function AdvisorPage({ params }: PageProps<"/[locale]/ai-au
           <aside className="grid content-start gap-5 print:hidden">
             <section className="card rounded-2xl p-6" aria-labelledby="advisor-privacy-title">
               <h2 id="advisor-privacy-title" className="flex items-center gap-2 text-lg font-semibold">
-                <Icon name="lock" className="h-5 w-5 text-cyan-300" />
+                <Icon name="lock" className="h-5 w-5 text-brand" />
                 {advisor.privacyTitle}
               </h2>
-              <ul className="mt-4 grid gap-3 text-sm leading-relaxed text-slate-300">
+              <ul className="mt-4 grid gap-3 text-sm leading-relaxed text-fg-secondary">
                 {advisor.privacy.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -75,7 +75,7 @@ export default async function AdvisorPage({ params }: PageProps<"/[locale]/ai-au
             </section>
             <section className="card rounded-2xl p-6" aria-labelledby="advisor-limits-title">
               <h2 id="advisor-limits-title" className="flex items-center gap-2 text-lg font-semibold">
-                <Icon name="info" className="h-5 w-5 text-cyan-300" />
+                <Icon name="info" className="h-5 w-5 text-brand" />
                 {advisor.limitsTitle}
               </h2>
               <CheckList items={advisor.limits} className="mt-4 text-sm" />

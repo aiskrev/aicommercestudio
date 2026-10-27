@@ -22,7 +22,7 @@ export default function PublicError({ error, reset }: { error: Error & { digest?
       <h1 className="t-h1 mt-6">{t.title}</h1>
       <p className="t-lead mt-4 max-w-md">{t.lead}</p>
       {error.digest && (
-        <p className="mt-3 font-mono text-xs text-slate-400">
+        <p className="mt-3 font-mono text-xs text-fg-muted">
           {t.code}: {error.digest}
         </p>
       )}

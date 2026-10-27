@@ -398,7 +398,7 @@ function SendToTeam({
                 />
                 <span>
                   {content.privacy}{" "}
-                  <Link href={privacyHref} className="font-medium text-cyan-300 underline underline-offset-4" target="_blank">
+                  <Link href={privacyHref} className="font-medium text-brand underline underline-offset-4" target="_blank">
                     {content.privacyLink}
                   </Link>{" "}
                   {content.privacySuffix} <span className="field-required">*</span>

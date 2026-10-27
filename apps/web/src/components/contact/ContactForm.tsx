@@ -200,14 +200,14 @@ export function ContactForm({
           <Icon name="check" className="h-7 w-7" />
         </span>
         <h2 className="t-h2 mt-6 text-2xl sm:text-3xl">{labels.successTitle}</h2>
-        <p className="mt-3 text-slate-300">{labels.successLead}</p>
+        <p className="mt-3 text-fg-secondary">{labels.successLead}</p>
         <p className="mt-5 inline-flex flex-wrap items-center gap-2 rounded-[var(--radius-md)] border border-line-default bg-surface-page px-4 py-3 text-fg-secondary">
-          {labels.successReference}: <strong className="font-mono text-lg tracking-wider text-white">{reference}</strong>
+          {labels.successReference}: <strong className="font-mono text-lg tracking-wider text-fg">{reference}</strong>
         </p>
         {nextSteps && nextSteps.length > 0 && (
           <ol className="mt-6 grid gap-3">
             {nextSteps.map((step, index) => (
-              <li key={step} className="flex gap-3 text-slate-300">
+              <li key={step} className="flex gap-3 text-fg-secondary">
                 <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[5px] border border-brand/40 font-mono text-xs text-brand">
                   {index + 1}
                 </span>
@@ -236,7 +236,7 @@ export function ContactForm({
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="t-h3 text-xl">{labels.formTitle}</h2>
-        <p className="text-xs text-slate-400">{labels.requiredNote}</p>
+        <p className="text-xs text-fg-muted">{labels.requiredNote}</p>
       </div>
       <div ref={summaryRef} tabIndex={-1} aria-live="assertive" className="outline-none empty:hidden">
         {formError && (
@@ -261,8 +261,8 @@ export function ContactForm({
               className={cx(
                 "flex cursor-pointer gap-3 rounded-xl border p-4 transition-colors",
                 values.inquiry_type === kind
-                  ? "border-cyan-400/60 bg-cyan-400/[0.07]"
-                  : "border-white/[0.12] hover:border-white/25",
+                  ? "border-brand-strong/60 bg-brand-strong/[0.07]"
+                  : "border-line-default hover:border-line-strong",
               )}
             >
               <input
@@ -274,8 +274,8 @@ export function ContactForm({
                 className="checkbox mt-0.5"
               />
               <span>
-                <span className="block text-sm font-semibold text-white">{inquiry.types[kind].label}</span>
-                <span className="block text-xs text-slate-400">{inquiry.types[kind].hint}</span>
+                <span className="block text-sm font-semibold text-fg">{inquiry.types[kind].label}</span>
+                <span className="block text-xs text-fg-muted">{inquiry.types[kind].hint}</span>
               </span>
             </label>
           ))}
@@ -302,7 +302,7 @@ export function ContactForm({
           </select>
           <Icon
             name="chevronDown"
-            className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-muted"
           />
         </div>
       </Field>
@@ -405,7 +405,7 @@ export function ContactForm({
                   </select>
                   <Icon
                     name="chevronDown"
-                    className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                    className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-muted"
                   />
                 </div>
               </Field>
@@ -427,7 +427,7 @@ export function ContactForm({
               onBlur={() => validateOnBlur("website_url")}
             />
           </Field>
-          <p className="text-xs text-slate-400">{inquiry.budgetNote}</p>
+          <p className="text-xs text-fg-muted">{inquiry.budgetNote}</p>
         </div>
       )}
 
@@ -464,7 +464,7 @@ export function ContactForm({
           onChange={(e) => update("message", e.target.value)}
           onBlur={() => validateOnBlur("message")}
         />
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-fg-muted">
           <span id="contact-message-counter">
             {labels.messageCounter
               .replace("{n}", String(values.message.trim().length))
@@ -500,7 +500,7 @@ export function ContactForm({
 
       <div className="grid gap-4 rounded-[var(--radius-md)] border border-line-subtle bg-surface-page/60 p-4 sm:p-5">
         <div>
-          <label className="flex cursor-pointer gap-3 text-sm leading-relaxed text-slate-300">
+          <label className="flex cursor-pointer gap-3 text-sm leading-relaxed text-fg-secondary">
             <input
               id="contact-privacy_acknowledged"
               name="privacy_acknowledged"
@@ -513,7 +513,7 @@ export function ContactForm({
             />
             <span>
               {labels.privacy}{" "}
-              <Link href={privacyHref} className="font-medium text-cyan-300 underline underline-offset-4" target="_blank">
+              <Link href={privacyHref} className="font-medium text-brand underline underline-offset-4" target="_blank">
                 {labels.privacyLink}
               </Link>{" "}
               {labels.privacySuffix} <span className="field-required">*</span>
@@ -525,7 +525,7 @@ export function ContactForm({
             </p>
           )}
         </div>
-        <label className="flex cursor-pointer gap-3 text-sm leading-relaxed text-slate-400">
+        <label className="flex cursor-pointer gap-3 text-sm leading-relaxed text-fg-muted">
           <input
             id="contact-marketing_consent"
             name="marketing_consent"
@@ -538,7 +538,7 @@ export function ContactForm({
         </label>
       </div>
 
-      <div className="flex flex-col gap-4 border-t border-white/[0.07] pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-t border-line-subtle pt-6 sm:flex-row sm:items-center sm:justify-between">
         <Button
           type="submit"
           size="lg"
@@ -549,8 +549,8 @@ export function ContactForm({
         >
           {aiManaged ? aiLabels.submit : labels.submit}
         </Button>
-        <p className="flex items-center gap-2 text-xs text-slate-400">
-          <Icon name="lock" className="h-4 w-4 text-cyan-300" />
+        <p className="flex items-center gap-2 text-xs text-fg-muted">
+          <Icon name="lock" className="h-4 w-4 text-brand" />
           {labels.secureNote}
         </p>
       </div>

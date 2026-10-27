@@ -242,12 +242,12 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
             <ul className="mt-6 grid gap-3">
               {service.engagement.map((model) => (
                 <li key={model} className="flex items-center gap-3 rounded-[var(--radius-md)] border border-line-subtle bg-surface-page px-4 py-3.5 text-fg-secondary">
-                  <Icon name="layers" className="h-5 w-5 shrink-0 text-cyan-300" />
+                  <Icon name="layers" className="h-5 w-5 shrink-0 text-brand" />
                   {model}
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-sm text-slate-400">{dict.service.pricingNote}</p>
+            <p className="mt-4 text-sm text-fg-muted">{dict.service.pricingNote}</p>
             <ButtonLink href={quoteHref} icon="arrowRight" className="mt-6 w-full sm:w-auto">
               {dict.common.requestQuote}
             </ButtonLink>

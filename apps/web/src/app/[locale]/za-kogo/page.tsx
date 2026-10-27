@@ -45,18 +45,18 @@ export default async function IndustriesPage({ params }: PageProps<"/[locale]/za
                 {segment.icon && <IconBadge name={segment.icon} />}
                 <div>
                   <h2 className="t-h3-lg">{segment.title}</h2>
-                  <p className="mt-2 leading-relaxed text-slate-400">{segment.description}</p>
+                  <p className="mt-2 leading-relaxed text-fg-muted">{segment.description}</p>
                 </div>
               </div>
               <CheckList items={segment.needs} className="mt-6" />
-              <div className="mt-6 flex flex-wrap gap-2 border-t border-white/[0.06] pt-5">
+              <div className="mt-6 flex flex-wrap gap-2 border-t border-line-subtle pt-5">
                 {segment.services.map((key) => {
                   const service = serviceByKey(locale, key);
                   return (
                     <Link
                       key={key}
                       href={href(routes.service(service.slug))}
-                      className="rounded-full border border-cyan-400/20 bg-cyan-400/[0.06] px-3 py-1.5 text-xs font-medium text-cyan-200 hover:border-cyan-300/50"
+                      className="rounded-full border border-brand-strong/20 bg-brand-strong/[0.06] px-3 py-1.5 text-xs font-medium text-brand-soft hover:border-brand/50"
                     >
                       {service.shortTitle}
                     </Link>
@@ -72,7 +72,7 @@ export default async function IndustriesPage({ params }: PageProps<"/[locale]/za
         <SectionHeading id="sectors-title" title={page.sectorsTitle} lead={page.sectorsLead} />
         <ul className="mt-8 flex flex-wrap gap-3">
           {page.sectors.map((sector) => (
-            <li key={sector} className="card rounded-full px-4 py-2 text-sm text-slate-200">
+            <li key={sector} className="card rounded-full px-4 py-2 text-sm text-fg-secondary">
               {sector}
             </li>
           ))}

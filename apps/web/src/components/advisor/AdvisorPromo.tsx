@@ -11,8 +11,8 @@ export function AdvisorPromo({ promo, href, className }: { promo: AdvisorContent
       <IconBadge name="sparkles" className="h-12 w-12" />
       <div className="min-w-0 flex-1">
         <Badge accent>{promo.eyebrow}</Badge>
-        <p className="mt-3 text-xl font-semibold text-white">{promo.title}</p>
-        <p className="mt-2 max-w-2xl leading-relaxed text-slate-400">{promo.lead}</p>
+        <p className="mt-3 text-xl font-semibold text-fg">{promo.title}</p>
+        <p className="mt-2 max-w-2xl leading-relaxed text-fg-muted">{promo.lead}</p>
       </div>
       <ButtonLink href={href} icon="arrowRight" className="shrink-0">
         {promo.cta}

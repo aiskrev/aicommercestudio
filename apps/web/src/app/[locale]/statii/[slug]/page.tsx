@@ -99,7 +99,7 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
             </div>
             <h1 className="t-h1 mt-5">{article.title}</h1>
             <p className="t-lead mt-5">{article.description}</p>
-            <p className="mt-6 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-400">
+            <p className="mt-6 flex flex-wrap gap-x-5 gap-y-1 text-sm text-fg-muted">
               <time dateTime={article.publishedAt}>
                 {dict.common.published}: {formatDate(article.publishedAt, locale)}
               </time>
@@ -115,27 +115,27 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
           </header>
 
           <section className="card-accent mt-10 rounded-2xl p-6" aria-labelledby="key-points">
-            <h2 id="key-points" className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan-300">
+            <h2 id="key-points" className="text-xs font-semibold uppercase tracking-[0.16em] text-brand">
               {dict.editorial.keyPoints}
             </h2>
             <ul className="mt-4 grid gap-3">
               {article.keyPoints.map((point) => (
-                <li key={point} className="flex gap-3 text-slate-200">
-                  <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-cyan-300" />
+                <li key={point} className="flex gap-3 text-fg-secondary">
+                  <Icon name="check" className="mt-1 h-4 w-4 shrink-0 text-brand" />
                   {point}
                 </li>
               ))}
             </ul>
           </section>
 
-          <nav aria-labelledby="toc-title" className="mt-8 rounded-2xl border border-white/[0.07] p-5">
-            <h2 id="toc-title" className="text-sm font-semibold text-white">
+          <nav aria-labelledby="toc-title" className="mt-8 rounded-2xl border border-line-subtle p-5">
+            <h2 id="toc-title" className="text-sm font-semibold text-fg">
               {dict.editorial.contents}
             </h2>
             <ol className="mt-3 grid gap-1.5 text-sm">
               {article.sections.map((section, index) => (
                 <li key={section.heading}>
-                  <a href={`#section-${index}`} className="text-slate-300 hover:text-cyan-200">
+                  <a href={`#section-${index}`} className="text-fg-secondary hover:text-brand-soft">
                     {section.heading}
                   </a>
                 </li>
@@ -199,7 +199,7 @@ export default async function ArticlePage({ params }: PageProps<"/[locale]/stati
                 </li>
               ))}
             </ul>
-            <Link href={href(routes.insights)} className="mt-8 inline-flex items-center gap-2 text-sm text-cyan-300">
+            <Link href={href(routes.insights)} className="mt-8 inline-flex items-center gap-2 text-sm text-brand">
               ← {dict.common.allArticles}
             </Link>
           </Container>

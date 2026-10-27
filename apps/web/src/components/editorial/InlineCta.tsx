@@ -26,8 +26,8 @@ export function InlineCta({
     >
       <IconBadge name={service.icon} className="h-12 w-12" />
       <div className="flex-1">
-        <p className="font-display text-lg font-semibold text-white">{title}</p>
-        <p className="mt-1 text-sm leading-relaxed text-slate-300">{lead}</p>
+        <p className="font-display text-lg font-semibold text-fg">{title}</p>
+        <p className="mt-1 text-sm leading-relaxed text-fg-secondary">{lead}</p>
       </div>
       <div className="flex shrink-0 flex-col gap-2">
         <ButtonLink href={quoteHref} size="sm" icon="arrowRight">

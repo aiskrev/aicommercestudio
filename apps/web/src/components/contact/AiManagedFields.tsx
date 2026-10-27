@@ -37,10 +37,10 @@ export function AiManagedFields({
   describedBy: (field: ContactField, hint?: string) => string | undefined;
 }) {
   return (
-    <div className="grid gap-6 rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.03] p-4 sm:p-5" data-testid="ai-managed-fields">
+    <div className="grid gap-6 rounded-2xl border border-brand-strong/20 bg-brand-strong/[0.03] p-4 sm:p-5" data-testid="ai-managed-fields">
       <div>
-        <h3 className="text-base font-semibold text-white">{labels.title}</h3>
-        <p className="mt-1 text-sm text-slate-400">{labels.intro}</p>
+        <h3 className="text-base font-semibold text-fg">{labels.title}</h3>
+        <p className="mt-1 text-sm text-fg-muted">{labels.intro}</p>
       </div>
       <Alert tone="warning" role="note">
         <span data-testid="secrets-warning">{labels.secretsWarning}</span>
@@ -143,8 +143,8 @@ export function AiManagedFields({
               className={cx(
                 "flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2.5 text-sm",
                 values.ai_communication_language === language
-                  ? "border-cyan-400/60 bg-cyan-400/[0.07] text-white"
-                  : "border-white/[0.12] text-slate-300 hover:border-white/25",
+                  ? "border-brand-strong/60 bg-brand-strong/[0.07] text-fg"
+                  : "border-line-default text-fg-secondary hover:border-line-strong",
               )}
             >
               <input
@@ -217,7 +217,7 @@ function Select({
           </option>
         ))}
       </select>
-      <Icon name="chevronDown" className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <Icon name="chevronDown" className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-muted" />
     </div>
   );
 }
@@ -268,7 +268,7 @@ function CheckboxGroup({
               key={value}
               className={cx(
                 "flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors",
-                checked ? "border-cyan-400/60 bg-cyan-400/[0.07] text-white" : "border-white/[0.12] text-slate-300 hover:border-white/25",
+                checked ? "border-brand-strong/60 bg-brand-strong/[0.07] text-fg" : "border-line-default text-fg-secondary hover:border-line-strong",
               )}
             >
               <input type="checkbox" name={id} value={value} className="checkbox" checked={checked} onChange={() => onToggle(value)} />

@@ -58,7 +58,7 @@ function Cell({ value, labels }: { value: PackageCell; labels: { included: strin
   if (value === "yes") {
     return (
       <>
-        <Icon name="check" className="mx-auto h-5 w-5 text-cyan-300" />
+        <Icon name="check" className="mx-auto h-5 w-5 text-brand" />
         <span className="sr-only">{labels.included}</span>
       </>
     );
@@ -66,14 +66,14 @@ function Cell({ value, labels }: { value: PackageCell; labels: { included: strin
   if (value === "no") {
     return (
       <>
-        <span aria-hidden="true" className="text-slate-500">
+        <span aria-hidden="true" className="text-fg-subtle">
           —
         </span>
         <span className="sr-only">{labels.notIncluded}</span>
       </>
     );
   }
-  return <span className="text-slate-300">{value}</span>;
+  return <span className="text-fg-secondary">{value}</span>;
 }
 
 export default async function AiManagedServicesPage({ params }: PageProps<"/[locale]/uslugi/ai-managed-services">) {

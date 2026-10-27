@@ -1,4 +1,10 @@
-# UI design system v2 — "Engineering editorial"
+# UI design system v2.1 — "Engineering editorial"
+
+> **v2.1 (2026-10-27): consolidation, no redesign.** It moves the remaining hard-coded colours to
+> semantic tokens and makes token use enforceable by tests. It also adds a `Tabs` primitive, fixes
+> danger-button contrast, aligns paired form fields, and documents state coverage. Routes, i18n,
+> SEO, admin, the forms, the Advisor and Managed Services are unchanged. See
+> [Changes in v2.1](#changes-in-v21).
 
 Source of truth: `apps/web/src/app/globals.css` (tokens + component classes),
 `apps/web/src/components/ui/primitives.tsx` (layout and content primitives) and
@@ -47,17 +53,44 @@ A product-minded AI engineering company, not an "AI agency" template:
 | `ink` / `ink-muted` / `brand-ink` | `#14232d` / `#45606e` / `#0c6670` | text on paper | 14.2 / 5.9 / 5.9:1 (≥ 5.4:1 on `surface-light-2`) |
 | `ink-line` | `#7a8a93` | field borders on paper | 3.2:1 (non-text) |
 | `line-subtle` / `line-default` / `line-strong` | 12 % / 20 % / `#5a6e85` | hairlines, borders, field borders | `line-strong` 3.4:1 on `surface-1` |
+| `line-hover` | `#71859c` | field border on hover | 4.8:1 on `surface-1` (non-text) |
+| `on-brand` | `#06121c` | text on the primary button | 11.3:1 on `brand`, ≥ 10.5:1 on both hover stops |
+| `brand-glow-a` / `brand-glow-b` | `#8fe5ea` / `#93c5fd` | primary-button hover gradient stops | — |
+| `on-success` / `on-warning` / `on-danger` / `on-info` | `#c9f2df` / `#fbe8c2` / `#ffd4da` / `#d2f5f6` | text on status tints (badges, alerts, status chips) | ≥ 11.9:1 on their tint over `surface-1` |
+| `danger-fill` / `danger-fill-hover` / `on-danger-fill` | `#c4384f` / `#b02f45` / `#fff` | destructive button | 5.2:1 / 6.3:1 (was 4.3:1 / 3.5:1); fill 3.7:1 against the page |
+| `surface-paper-field` | `#fff` | fields, badges and secondary buttons on paper | — |
+| `window-chrome` | `#3c4d60` | decorative window-control dots in product previews | decorative |
 
 Compatibility: Tailwind's `slate`, `cyan`, `blue` and `violet` scales are re-tuned in `@theme` to the
-brand neutrals/accents (`slate-500` now equals `fg-subtle`), so older utility classes follow the
-identity. New code uses the semantic names. No component hard-codes hex values (the logo SVG and the
-primary-button text colour are the documented exceptions).
+brand neutrals and accents (for example, `slate-500` equals `fg-subtle`). The re-tuning exists only
+for the admin area, which still uses them.
+
+### Token discipline (enforced)
+
+`components/ui/design-tokens.test.ts` fails when any of these rules breaks:
+
+* **Public components and pages** (`components/**`, `app/**` except `components/admin` and
+  `app/admin`) use semantic colour utilities only. No raw `slate-*`, `cyan-*`, `amber-*`,
+  `emerald-*`, `rose-*`, `white` and so on.
+* **No hard-coded hex values in public TSX.** The exceptions are the logo drawing (`Logo.tsx`,
+  frozen), the generated OG image, and the `themeColor` metadata.
+* **The component layer of `globals.css`** takes every colour from a token. The only literals are
+  the frozen logo wordmark gradient and the `@property` initial values, which CSS requires to be
+  literal.
+* **The listed text pairs** stay ≥ 4.5:1 and the listed non-text pairs ≥ 3:1. The ratios are
+  computed from the token values in the test.
+
+The admin area still uses the legacy scale names (≈ 230 utilities). Migrating it is a follow-up; the
+guard will then be extended to it.
 
 Logo: the V1 monogram (`layout/Logo.tsx`) — an "A" in a cyan → blue → violet gradient-outlined tile
 with a node at the top right, the same drawing as the favicon (`app/icon.svg`). The wordmark is
 "A.I. Commerce" in Manrope 600 with "Studio" in the same gradient (`.logo-gradient-text`, plain
 `CanvasText` in forced-colours mode). These gradient stops are the only place the violet appears;
 `LogoMark` takes a `gradientId`, unique per page (the footer uses `logo-gradient-footer`).
+
+The **favicon is SVG** (`app/icon.svg`), and the **compact mark** is `LogoMark`, the same drawing.
+The logo, wordmark and favicon are frozen by owner decision. v2.1 did not change them.
 
 ### Typography
 
@@ -124,6 +157,7 @@ Fluid sizes are CSS variables on `:root` (`--type-*`), consumed by the `t-*` cla
 | `Button`, `ButtonLink`, `buttonClass` | `variant`: primary / secondary / ghost / danger / dangerOutline; `size` | ≥ 44 px tall (md/lg) |
 | `Badge` | `tone`: neutral / accent / success / warning / outline; `dot` | `accent` remains as a legacy flag |
 | `Alert` | `tone`: error / success / warning / info | |
+| `Tabs` (`ui/Tabs.tsx`, client) | `id`, `label`, `items` (`value`, `label`, `count?`), `value`, `onChange`, `children` (panel) | WAI-ARIA tabs with automatic activation: one tab stop, ← → Home End move and select (wrapping), `aria-controls` / `aria-labelledby`, focusable panel. Styles `.tabs`, `.tab`, `.tab-count`, `.tab-panel`, with a paper variant. Used by Admin → AI approvals. |
 | `FeatureCard`, `FeatureIndex`, `FeatureMatrix`, `CheckList`, `IconBadge`, `Skeleton` | — | unchanged APIs |
 
 ### Form fields (`globals.css`)
@@ -176,7 +210,7 @@ Usage example:
 | `HeroWorkflow` | `home/HeroWorkflow.tsx` | product-style demo of a controlled automation (labelled demo data); used in the homepage solution-architecture section |
 | `ControlLanes` | `home/ControlLanes.tsx` | "AI may do alone" (periwinkle) / "requires approval" (amber) / "always recorded" (green) next to the workflow |
 | `BuildBento` | `home/BuildBento.tsx` | "What we build": six offerings on a 12-column bento (one featured, one full width), each card one link named by its title |
-| `ToolsPreview` | `home/ToolsPreview.tsx` | live tool (AI Automation Advisor + `AdvisorPreview` product window) and planned tools labelled "in preparation" — never linked |
+| `ToolsPreview` | `home/ToolsPreview.tsx` | the AI Automation Advisor with the `AdvisorPreview` product window, plus up to three further live tools. All seven tools are live; a planned tool would be shown as "in preparation" and never linked. |
 | `UseCaseLedger` | `home/UseCaseLedger.tsx` | use cases by business function on paper: function / what AI does / where a person decides (`<dl>` per row) |
 | `ProcessSteps` | `home/ProcessSteps.tsx` | `vertical` or `horizontal` timeline |
 | `CredibilityStrip`, `AdvisorPreview` | `home/*` | capability strip; Advisor sample input → output window |
@@ -217,6 +251,7 @@ class names. No animation library and no extra client JavaScript (the scroll rev
 | Nav link `.nav-link` | underline grows at 45 % | underline at 45 % + ring | — | current page / open menu: underline 100 % |
 | Services dropdown / mobile sheet | — | Escape closes, focus returns | — | `.menu-enter` / `.menu-sheet-enter` on open (fade + 6–8 px drop); closing is instant |
 | Section headings, diagram frames | — | — | — | `.reveal`: fade + 16 px rise driven by `animation-timeline: view()` |
+| Tab `.tab` | colour → `fg`, `surface-2` wash | inset 2 px ring | — | selected: `fg` + 2 px brand underline that scales in (`--duration-base`); paper: `brand-ink` underline |
 
 Rules:
 * Every hover rule written in CSS sits in `@media (hover: hover) and (pointer: fine)`; Tailwind
@@ -234,6 +269,21 @@ Rules:
   `.focus-frame`, `.menu-enter` and `.reveal` instead of page-level `transition-*`/`hover:translate`
   utilities.
 
+### State coverage
+
+| Component | Active / selected | Loading | Disabled | Error / invalid |
+| --- | --- | --- | --- | --- |
+| `Button` / `ButtonLink` | pressed scale 0.985 | spinner + `aria-busy`, label swap, no icon | 50 % opacity, `not-allowed`, no motion | `danger` / `dangerOutline` variants for destructive actions |
+| `.field`, `.checkbox`, `Select` | brand border + 3 px focus halo | — | 60 % opacity, `not-allowed` | `aria-invalid` → danger border and halo, `.field-error` linked with `aria-describedby` |
+| `Tabs` | `aria-selected` + underline | the panel content shows its own loading state | — | — |
+| Cards (`.card-interactive`) | lift + brand border; card-wide focus ring | `Skeleton` / tool `ToolState kind="loading"` | — | `ToolState kind="error"` with retry |
+| Forms (contact, Advisor, tools) | — | submit button `loading` | — | error summary `Alert role="alert"` + focus to the first invalid field |
+| Admin data views | — | `LoadingState` (skeleton rows + status text) | — | `ErrorState` with request id and retry |
+
+Form layout rule: in a two-column field row, each field is a flex column whose control sits at the
+bottom (`mt-auto`). The controls line up even when only one field has a hint (Advisor volume / team
+size).
+
 ## Homepage composition
 
 `app/[locale]/page.tsx`, content in `content/{bg,en}/home.ts` (EN typed against BG):
@@ -244,15 +294,18 @@ Rules:
 | 2 | Capabilities (`CredibilityStrip`) | raised strip | label + 3 × 2 index |
 | 3 | What we build (`BuildBento`) + engineering-foundation links | default, spacious | bento |
 | 4 | How we work — 5 stages (`ProcessSteps` horizontal) | raised | timeline |
-| 5 | Interactive tools (`ToolsPreview`) | default, spacious | product window + upcoming row |
+| 5 | Interactive tools (`ToolsPreview`) | default, spacious | product window + live tool cards |
 | 6 | Solution architecture — "AI suggests. People decide." (`HeroWorkflow` + `ControlLanes`) | deep, spacious | statement + diagram split |
 | 7 | Use cases by function (`UseCaseLedger`) | paper, spacious | editorial ledger |
 | 8 | FAQ | raised | sticky `EditorialSplit` |
 | 9 | Final CTA (`CtaBand emphasis`) | — | full-bleed statement |
 
-Honesty rules for the homepage: no client logos, testimonials or metrics; diagrams are captioned as
-illustrative; planned tools are shown as "in preparation" without links until their routes exist
-(see `docs/PLATFORM_EXPANSION_PLAN.md`).
+Honesty rules for the homepage:
+
+* No client logos, testimonials or metrics.
+* Diagrams are captioned as illustrative.
+* Product previews use labelled demo data. There are no fabricated analytics.
+* A tool that is not live is shown as "in preparation", without a link (registry: `lib/tools.ts`).
 
 ## Composition rules
 
@@ -290,3 +343,30 @@ illustrative; planned tools are shown as "in preparation" without links until th
   `Badge tone/dot`, field classes; new patterns file.
 * Pages moved onto the shared scale: About, Process, For whom, Contact, Legal, 404 headings; process
   step cards; case study pages; overflow-safe `minmax(0, …)` grid tracks on all public pages.
+
+## Changes in v2.1
+
+* **Tokens:**
+  * New: `on-brand`, `on-success`, `on-warning`, `on-danger`, `on-info`, `danger-fill`,
+    `danger-fill-hover`, `on-danger-fill`, `brand-glow-a/b`, `line-hover`, `surface-paper-field`,
+    `window-chrome`.
+  * The component layer of `globals.css` no longer contains hard-coded colours, apart from the
+    frozen logo gradient and the `@property` initial values.
+* **Semantic utilities:** 201 raw palette utilities in 27 public files (Advisor, contact forms,
+  article body, legal page, AI solutions, contact, industries, header, product previews and others)
+  were replaced by semantic tokens.
+  * Exact equivalents render identically: `slate-200/400/500`, `cyan-200/300/400`.
+  * Near equivalents: `slate-300` → `fg-secondary` (body text), `white` → `fg`, white overlays →
+    `line-*` and `surface-*`.
+  * Status colours: amber, emerald and rose → `warning`, `success` and `danger` (+ `on-*`).
+* **Danger button contrast:** white on `#d6455a` was 4.3:1, and the hover `#e45a6e` was 3.5:1, both
+  below AA for a 15 px label. They are now `#c4384f` (5.2:1) and a darker hover `#b02f45` (6.3:1).
+* **`Tabs` primitive:** WAI-ARIA keyboard pattern. It replaces the admin AI-approvals filter, which
+  had `role="tab"` without a tab panel and without arrow-key navigation.
+* **Advisor form:** paired fields align their controls.
+* **Enforcement:** `components/ui/design-tokens.test.ts` (palette, hex and contrast guards) and
+  `components/ui/Tabs.test.tsx`.
+* **Unchanged, by decision or because they were already in place:**
+  * the logo, wordmark and favicon (owner decision);
+  * typography scale, spacing, motion tokens, the interaction system and reduced-motion handling;
+  * all routes, translations, SEO metadata and the admin, Advisor and Managed Services behaviour.
