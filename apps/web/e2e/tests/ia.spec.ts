@@ -17,11 +17,11 @@ test("every pre-existing public route still answers 200", async ({ request }) =>
   }
 });
 
-for (const [locale, path, heading, upcoming] of [
-  ["bg", "/bg/instrumenti", "Интерактивни инструменти за първа оценка", "В подготовка"],
-  ["en", "/en/tools", "Interactive tools for a first assessment", "In preparation"],
+for (const [locale, path, heading] of [
+  ["bg", "/bg/instrumenti", "Интерактивни инструменти за първа оценка"],
+  ["en", "/en/tools", "Interactive tools for a first assessment"],
 ] as const) {
-  test(`tools hub (${locale}) links only live tools and labels the rest`, async ({ page }) => {
+  test(`tools hub (${locale}) links every live tool and lists no unfinished one`, async ({ page }) => {
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
@@ -29,13 +29,28 @@ for (const [locale, path, heading, upcoming] of [
     const links = await live.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
     expect(links).toEqual(
       locale === "bg"
-        ? ["/bg/ai-automation-advisor", "/bg/instrumenti/ai-gotovnost", "/bg/instrumenti/ai-ekip", "/bg/instrumenti/roi-kalkulator", "/bg/instrumenti/avtomatizatsii"]
-        : ["/en/ai-automation-advisor", "/en/tools/ai-readiness", "/en/tools/ai-team", "/en/tools/roi-calculator", "/en/tools/automation-finder"],
+        ? [
+            "/bg/ai-automation-advisor",
+            "/bg/instrumenti/ai-gotovnost",
+            "/bg/instrumenti/ai-ekip",
+            "/bg/instrumenti/roi-kalkulator",
+            "/bg/instrumenti/avtomatizatsii",
+            "/bg/instrumenti/ai-reshenie",
+            "/bg/ai-agenti",
+          ]
+        : [
+            "/en/ai-automation-advisor",
+            "/en/tools/ai-readiness",
+            "/en/tools/ai-team",
+            "/en/tools/roi-calculator",
+            "/en/tools/automation-finder",
+            "/en/tools/solution-builder",
+            "/en/ai-agents",
+          ],
     );
-    const planned = page.locator("section[aria-labelledby='tools-upcoming-title']");
-    await expect(planned.locator("article[data-status='planned']")).toHaveCount(2);
-    await expect(planned.getByText(upcoming, { exact: true }).first()).toBeVisible();
-    await expect(planned.getByRole("link")).toHaveCount(0);
+    // Every registered tool is live, so the "in preparation" section is not rendered.
+    await expect(page.locator("section[aria-labelledby='tools-upcoming-title']")).toHaveCount(0);
+    await expect(page.locator("article[data-status='planned']")).toHaveCount(0);
   });
 }
 
@@ -58,7 +73,7 @@ test("the AI agents service page follows the service template and preselects the
     .locator("section[aria-labelledby='service-tools-title']")
     .getByRole("link")
     .evaluateAll((els) => els.map((el) => el.getAttribute("href")));
-  expect(toolLinks).toEqual(["/en/ai-automation-advisor", "/en/tools/ai-team"]);
+  expect(toolLinks).toEqual(["/en/ai-automation-advisor", "/en/tools/ai-team", "/en/tools/solution-builder", "/en/ai-agents"]);
   await page.locator("main").getByRole("link", { name: "Request a quote" }).first().click();
   await expect(page).toHaveURL(/\/en\/contact\?service=ai_agents&type=quote$/);
   await expect(page.getByLabel(/^Service/)).toHaveValue("ai_agents");

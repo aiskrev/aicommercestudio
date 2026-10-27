@@ -270,6 +270,7 @@ container; when iterating against the dev server, pass both compose files
 - [ ] Phase 3: `EN_SEGMENTS`/slug-map extension; tool registry; hub; ToolShell; Readiness; ROI (client-only).
 - [ ] Phase 4: migration `0005_tool_results`; tools API; lead linking; admin view; privacy policy update.
 - [ ] Phase 5: Opportunity Finder; Build Your AI Team.
-- [ ] Phase 6: agent library (SSG + SEO); Solution Builder; optional AI step via the advisor safety pipeline.
+- [x] Phase 6: agent library (SSG + SEO); Solution Builder — rule-based, client-only ([SOLUTION_BUILDER.md](SOLUTION_BUILDER.md)). Agent data reuses `lib/ai-team.ts` and team content instead of a separate `content/*/agents.ts`.
+- [ ] Phase 6b: optional AI step for the Solution Builder via the advisor safety pipeline.
 - [ ] Phase 7: client portal (after 2FA, Redis, DPA, hosting).
 - [ ] Every phase: unit + component + e2e (BG/EN, mobile) + screenshots at 5 widths + `.\scripts\test.ps1`.

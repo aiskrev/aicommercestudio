@@ -14,8 +14,10 @@ import { about, aiSolutions, industries, processPage, servicesPage, toolsPage } 
 import { keywordMap } from "@/content/bg/seo";
 import { coreServices, services } from "@/content/bg/services";
 import { readinessTool } from "@/content/bg/tool-readiness";
+import { agentLibrary } from "@/content/bg/agent-library";
 import { finderTool } from "@/content/bg/tool-finder";
 import { roiTool } from "@/content/bg/tool-roi";
+import { solutionTool } from "@/content/bg/tool-solution";
 import { teamTool } from "@/content/bg/tool-team";
 import { tools } from "@/content/bg/tools";
 import { advisor as enAdvisor } from "@/content/en/advisor";
@@ -40,8 +42,10 @@ import {
 import { keywordMap as enKeywordMap } from "@/content/en/seo";
 import { coreServices as enCoreServices, services as enServices } from "@/content/en/services";
 import { readinessTool as enReadinessTool } from "@/content/en/tool-readiness";
+import { agentLibrary as enAgentLibrary } from "@/content/en/agent-library";
 import { finderTool as enFinderTool } from "@/content/en/tool-finder";
 import { roiTool as enRoiTool } from "@/content/en/tool-roi";
+import { solutionTool as enSolutionTool } from "@/content/en/tool-solution";
 import { teamTool as enTeamTool } from "@/content/en/tool-team";
 import { tools as enTools } from "@/content/en/tools";
 import type { ServiceKey } from "@/content/types";
@@ -66,6 +70,8 @@ const bg = {
   teamTool,
   roiTool,
   finderTool,
+  solutionTool,
+  agentLibrary,
   articles,
   insightsPage,
   editorialCategories,
@@ -94,6 +100,8 @@ const en: SiteContent = {
   teamTool: enTeamTool,
   roiTool: enRoiTool,
   finderTool: enFinderTool,
+  solutionTool: enSolutionTool,
+  agentLibrary: enAgentLibrary,
   articles: enArticles,
   insightsPage: enInsightsPage,
   editorialCategories: enEditorialCategories,

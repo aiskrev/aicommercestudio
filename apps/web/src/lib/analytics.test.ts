@@ -56,13 +56,16 @@ describe("feature flags and tool registry", () => {
     expect(isFlagEnabled("tool_readiness", { tool_readiness: false })).toBe(false);
   });
 
-  it("never makes a planned tool available, even with its flag on", () => {
+  it("never makes a planned tool available, and a flag turned off hides a live tool", () => {
     const previous = process.env.TOOL_FLAGS;
-    process.env.TOOL_FLAGS = "tool_solution=on,tool_agents=on";
-    expect(TOOLS.filter((t) => t.status === "planned").some(isToolAvailable)).toBe(false);
-    process.env.TOOL_FLAGS = "tool_readiness=off,tool_team=off,tool_roi=off,tool_finder=off";
-    expect(Object.keys(toolHrefs("en"))).toEqual(["advisor"]);
-    process.env.TOOL_FLAGS = previous;
+    try {
+      process.env.TOOL_FLAGS = TOOLS.map((t) => `${t.flag}=on`).join(",");
+      expect(TOOLS.filter((t) => t.status === "planned").some(isToolAvailable)).toBe(false);
+      process.env.TOOL_FLAGS = "tool_readiness=off,tool_team=off,tool_roi=off,tool_finder=off,tool_solution=off,tool_agents=off";
+      expect(Object.keys(toolHrefs("en"))).toEqual(["advisor"]);
+    } finally {
+      process.env.TOOL_FLAGS = previous;
+    }
   });
 
   it("links available tools with localized URLs", () => {
@@ -72,10 +75,14 @@ describe("feature flags and tool registry", () => {
       team: "/en/tools/ai-team",
       roi: "/en/tools/roi-calculator",
       finder: "/en/tools/automation-finder",
+      solution: "/en/tools/solution-builder",
+      agents: "/en/ai-agents",
     });
     expect(toolHrefs("bg").roi).toBe("/bg/instrumenti/roi-kalkulator");
     expect(toolHrefs("bg").finder).toBe("/bg/instrumenti/avtomatizatsii");
     expect(toolHrefs("bg").readiness).toBe("/bg/instrumenti/ai-gotovnost");
     expect(toolHrefs("bg").team).toBe("/bg/instrumenti/ai-ekip");
+    expect(toolHrefs("bg").solution).toBe("/bg/instrumenti/ai-reshenie");
+    expect(toolHrefs("bg").agents).toBe("/bg/ai-agenti");
   });
 });

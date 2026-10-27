@@ -29,6 +29,7 @@ export const TOOL_SLUGS = {
   team: "ai-ekip",
   roi: "roi-kalkulator",
   finder: "avtomatizatsii",
+  solution: "ai-reshenie",
 } as const;
 
 export const TOOLS: readonly ToolDefinition[] = [
@@ -77,8 +78,16 @@ export const TOOLS: readonly ToolDefinition[] = [
     minutes: 8,
     services: ["automation", "ai_agents", "audit"],
   },
-  { key: "solution", status: "planned", flag: "tool_solution", icon: "layers", services: ["ai_agents", "integrations"] },
-  { key: "agents", status: "planned", flag: "tool_agents", icon: "bot", services: ["ai_agents"] },
+  {
+    key: "solution",
+    status: "live",
+    flag: "tool_solution",
+    icon: "layers",
+    path: routes.tool(TOOL_SLUGS.solution),
+    minutes: 5,
+    services: ["ai_agents", "integrations"],
+  },
+  { key: "agents", status: "live", flag: "tool_agents", icon: "bot", path: routes.agentLibrary, services: ["ai_agents"] },
 ];
 
 export function toolByKey(key: ToolKey): ToolDefinition {
@@ -106,7 +115,7 @@ export function toolMinutes(): Partial<Record<ToolKey, number>> {
 
 /** Tools offered on each service page, most relevant first (derived from the registry). */
 export const SERVICE_TOOLS: Record<ServiceKey, ToolKey[]> = {
-  ai_agents: ["advisor", "team", "agents"],
+  ai_agents: ["advisor", "team", "solution", "agents"],
   automation: ["finder", "roi", "advisor"],
   ai_tools: ["advisor", "readiness"],
   integrations: ["advisor", "solution"],

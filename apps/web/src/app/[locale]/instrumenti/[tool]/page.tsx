@@ -5,6 +5,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ReadinessAssessment } from "@/components/tools/ReadinessAssessment";
 import { OpportunityFinder } from "@/components/tools/finder/OpportunityFinder";
 import { RoiCalculator } from "@/components/tools/roi/RoiCalculator";
+import { SolutionBuilder } from "@/components/tools/solution/SolutionBuilder";
 import { AiTeamTool } from "@/components/tools/team/AiTeamTool";
 import { ToolState } from "@/components/tools/ToolUi";
 import { Icon } from "@/components/ui/Icon";
@@ -14,6 +15,8 @@ import type { ServiceKey } from "@/content/types";
 import { type Locale, isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
+import { AGENT_KEYS } from "@/lib/ai-team";
+import { AGENT_SLUGS } from "@/lib/agent-library";
 import { ACTION_SERVICE } from "@/lib/readiness";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
@@ -21,7 +24,7 @@ import { isToolAvailable, TOOL_SLUGS, toolByKey, toolHrefs } from "@/lib/tools";
 
 export const dynamicParams = false;
 
-type HostedTool = "readiness" | "team" | "roi" | "finder";
+type HostedTool = "readiness" | "team" | "roi" | "finder" | "solution";
 
 /** Tools hosted under /instrumenti/<slug>. Only available tools (implemented + flag on) get a page. */
 const HOSTED: Record<string, HostedTool> = {
@@ -29,6 +32,7 @@ const HOSTED: Record<string, HostedTool> = {
   [TOOL_SLUGS.team]: "team",
   [TOOL_SLUGS.roi]: "roi",
   [TOOL_SLUGS.finder]: "finder",
+  [TOOL_SLUGS.solution]: "solution",
 };
 
 /** Services each hosted tool can link to from its result. */
@@ -37,6 +41,7 @@ const TOOL_SERVICES: Record<HostedTool, ServiceKey[]> = {
   team: ["ai_agents", "integrations", "ai_managed"],
   roi: [],
   finder: [],
+  solution: ["ai_agents", "integrations", "automation", "ai_tools", "ai_managed", "audit"],
 };
 
 export function generateStaticParams({ params }: { params: { locale: string } }) {
@@ -54,7 +59,13 @@ function resolveTool(slug: string): HostedTool | null {
 
 function toolContent(locale: Locale, key: HostedTool) {
   const content = getContent(locale);
-  const pages = { readiness: content.readinessTool, team: content.teamTool, roi: content.roiTool, finder: content.finderTool };
+  const pages = {
+    readiness: content.readinessTool,
+    team: content.teamTool,
+    roi: content.roiTool,
+    finder: content.finderTool,
+    solution: content.solutionTool,
+  };
   return pages[key];
 }
 
@@ -78,7 +89,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
   const key = resolveTool(tool);
   if (!key) notFound();
 
-  const { readinessTool, teamTool, roiTool, finderTool, tools } = getContent(locale);
+  const { readinessTool, teamTool, roiTool, finderTool, solutionTool, agentLibrary, tools } = getContent(locale);
   const hrefs = toolHrefs(locale);
   const page = toolContent(locale, key);
   const dict = getDictionary(locale);
@@ -137,6 +148,23 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
             teamHref={hrefs.team}
             advisorHref={hrefs.advisor}
           />
+        </Section>
+      )}
+      {key === "solution" && (
+        <Section size="wide">
+          <Suspense fallback={loading}>
+            <SolutionBuilder
+              content={solutionTool}
+              team={teamTool}
+              library={agentLibrary}
+              ui={tools.ui}
+              services={services}
+              contactHref={href(contactWithService("ai_agents"))}
+              libraryHref={hrefs.agents}
+              agentHrefs={hrefs.agents ? Object.fromEntries(AGENT_KEYS.map((a) => [a, href(routes.agent(AGENT_SLUGS[a].bg))])) : undefined}
+              locale={locale}
+            />
+          </Suspense>
         </Section>
       )}
       {key === "readiness" && (

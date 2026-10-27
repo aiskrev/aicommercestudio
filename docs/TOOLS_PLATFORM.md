@@ -12,8 +12,10 @@ Foundations for the business assessment and solution-design tools. Hub: `/bg/ins
 | Build your AI team (agent configurator with architecture diagram) | `team` | live | `/bg/instrumenti/ai-ekip` ↔ `/en/tools/ai-team` | `tool_team` (on) |
 | AI ROI calculator | `roi` | live | `/bg/instrumenti/roi-kalkulator` ↔ `/en/tools/roi-calculator` | `tool_roi` (on) |
 | Automation Opportunity Finder (questionnaire) | `finder` | live | `/bg/instrumenti/avtomatizatsii` ↔ `/en/tools/automation-finder` | `tool_finder` (on) |
-| AI solution builder | `solution` | planned | — | `tool_solution` (off) |
-| AI agent library / configurator | `agents` | planned | — | `tool_agents` (off) |
+| AI solution builder (architecture + roadmap) | `solution` | live | `/bg/instrumenti/ai-reshenie` ↔ `/en/tools/solution-builder` | `tool_solution` (on) |
+| AI agent library (10 static agent pages) | `agents` | live | `/bg/ai-agenti` ↔ `/en/ai-agents` | `tool_agents` (on) |
+
+Solution builder and agent library: see [SOLUTION_BUILDER.md](SOLUTION_BUILDER.md).
 
 **Safeguard:** a tool is linked and routed only when `status === "live"`, it has a path and its
 flag is on (`isToolAvailable` in `lib/tools.ts`). Planned tools are shown as "in preparation"
