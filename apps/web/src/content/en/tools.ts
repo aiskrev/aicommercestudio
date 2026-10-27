@@ -42,7 +42,7 @@ export const tools: typeof bgTools = {
     {
       key: "advisor",
       icon: "sparkles",
-      category: "Automation opportunity finder",
+      category: "AI process analysis",
       title: "AI Automation Advisor",
       description:
         "Describe a manual process and get a structured first assessment: automation opportunities, workflow, integrations, risks and the points that need human approval.",
@@ -75,6 +75,16 @@ export const tools: typeof bgTools = {
       title: "AI ROI calculator",
       description: "Calculated only from your own numbers, with the formula shown and no assumed values.",
       audience: "Finance and operations managers",
+      cta: "Calculate the effect",
+    },
+    {
+      key: "finder",
+      icon: "search",
+      category: "Opportunity discovery",
+      title: "Automation opportunity finder",
+      description: "Rate up to five processes on nine criteria and see which are quick wins, which are complex projects and which automation pattern fits.",
+      audience: "Managers choosing which process to automate first",
+      cta: "Assess your processes",
     },
     {
       key: "solution",

@@ -263,7 +263,7 @@ container; when iterating against the dev server, pass both compose files
 - [x] **P0** `git switch main && git pull --ff-only`; branch per phase from `main` (done 2026-10-24: `main` = `831fe81`, branch `ci/phase-0-foundations`).
 - [x] **P0** Add GitHub Actions mirroring `scripts/test.ps1` (`.github/workflows/ci.yml`, weekly `audit.yml`; actionlint clean; first GitHub run pending a push).
 - [x] **P0** Record a Lighthouse baseline for `/bg`, `/en`, `/bg/uslugi`, AI Managed, contact, advisor ([PERFORMANCE_BASELINE.md](PERFORMANCE_BASELINE.md); found and fixed an SVG console error).
-- [ ] **P0** Owner decisions: ROI calculator policy; logo scope; tool-data storage/retention; legal data.
+- [ ] **P0** Owner decisions: ROI calculator policy (implemented as specified in issue #2 — user-entered values only, formulas shown, no default savings; see ROI_AND_FINDER.md); logo scope; tool-data storage/retention; legal data.
 - [ ] Fix stale UI report statements; remove unused `CapabilityMatrix`.
 - [ ] Phase 1: logo system + favicon + per-locale OG; button interaction variants; update `DESIGN_SYSTEM.md`.
 - [ ] Phase 2: mobile homepage condensation; H1 alignment; advisor page layout; tools entry points.

@@ -435,6 +435,7 @@ export const teamTool: typeof bgTeamTool = {
     stale: "This page was loaded with an older version. Reload it — your configuration is kept in the link.",
     outOfRange: "Enter a value between {min} and {max}.",
     customised: "With your rates",
+    roiLink: "Calculate the ROI with these costs",
     formulas: [
       "One-time = (discovery + build by agent complexity + integrations by system complexity + approval points + environment + testing) × day rate.",
       "Models = tasks per month × tokens per task × price per 1M tokens × a factor for retries and evaluation.",

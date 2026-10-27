@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { type FormEvent, useState } from "react";
 
 import { PillGroup, fill } from "@/components/tools/team/TeamControls";
@@ -35,6 +36,7 @@ export function TeamCosts({
   complexityName,
   onApply,
   onRetry,
+  roiHref,
 }: {
   content: Content;
   locale: Locale;
@@ -47,6 +49,8 @@ export function TeamCosts({
   complexityName: (key: "low" | "medium" | "high") => string;
   onApply: (overrides: Overrides) => void;
   onRetry: () => void;
+  /** ROI calculator; the link carries the expected scenario's costs (never savings). */
+  roiHref?: string;
 }) {
   const c = content.costs;
   const [scenario, setScenario] = useState<CostScenario>("expected");
@@ -129,6 +133,17 @@ export function TeamCosts({
               ))}
             </ul>
           </details>
+          {roiHref && (
+            <p>
+              <Link
+                className="link"
+                data-testid="team-roi-link"
+                href={`${roiHref}?impl=${estimate.scenarios.expected.one_time.total}&run=${estimate.scenarios.expected.monthly.infrastructure + estimate.scenarios.expected.monthly.model_usage}&maint=${estimate.scenarios.expected.monthly.monitoring}`}
+              >
+                {c.roiLink}
+              </Link>
+            </p>
+          )}
           <p className="text-sm leading-relaxed text-fg-subtle" data-testid="team-cost-disclaimer">
             {c.disclaimer}
           </p>

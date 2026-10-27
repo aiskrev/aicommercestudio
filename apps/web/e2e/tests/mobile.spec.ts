@@ -14,6 +14,8 @@ const PAGES = [
   "/bg/instrumenti",
   "/bg/instrumenti/ai-gotovnost",
   "/bg/instrumenti/ai-ekip",
+  "/bg/instrumenti/roi-kalkulator",
+  "/en/tools/automation-finder",
   "/bg/uslugi/razrabotka-na-ai-agenti",
   "/en",
   "/en/services",
@@ -123,5 +125,27 @@ test("AI team configurator works on a phone: one-column agents, vertical diagram
   await form.getByRole("button", { name: "See the result" }).click();
   await expect(page.getByTestId("team-result")).toBeVisible();
   overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});
+
+test("ROI calculator works on a phone: live result and no horizontal scrolling", async ({ page }) => {
+  await page.goto("/en/tools/roi-calculator");
+  for (const [label, value] of [
+    ["Tasks per month", "2000"],
+    ["Average time per task", "12"],
+    ["Fully loaded hourly labour cost", "25"],
+    ["Share of tasks automated", "60"],
+    ["Time reduction per automated task", "70"],
+    ["Human review time", "2"],
+    ["One-time implementation cost", "15000"],
+    ["Monthly AI, API and infrastructure cost", "300"],
+    ["Monthly maintenance cost", "200"],
+  ] as const) {
+    await page.getByLabel(label).fill(value);
+  }
+  await page.getByRole("radio", { name: "12 months" }).check();
+  await page.getByRole("radio", { name: "75%" }).check();
+  await expect(page.getByTestId("roi-net-monthly")).toHaveText("€1,900");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });

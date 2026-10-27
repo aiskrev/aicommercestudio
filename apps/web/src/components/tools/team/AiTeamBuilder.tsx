@@ -83,6 +83,7 @@ export function AiTeamBuilder({
   initialConfig,
   initialOverrides,
   initialNotice,
+  roiHref,
 }: {
   content: Content;
   ui: Ui;
@@ -95,6 +96,7 @@ export function AiTeamBuilder({
   initialConfig?: TeamConfig | null;
   initialOverrides?: Overrides;
   initialNotice?: string;
+  roiHref?: string;
 }) {
   // A shared configuration (?t=<code>) is read during render; the page wraps this tool in <Suspense>.
   const code = useSearchParams().get("t");
@@ -334,6 +336,7 @@ export function AiTeamBuilder({
           complexityName={(key) => content.complexity[key]}
           onApply={setOverrides}
           onRetry={() => setRetry((n) => n + 1)}
+          roiHref={roiHref}
         />
         <TeamExport
           content={content}

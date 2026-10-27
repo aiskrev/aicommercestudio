@@ -29,11 +29,11 @@ for (const [locale, path, heading, upcoming] of [
     const links = await live.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
     expect(links).toEqual(
       locale === "bg"
-        ? ["/bg/ai-automation-advisor", "/bg/instrumenti/ai-gotovnost", "/bg/instrumenti/ai-ekip"]
-        : ["/en/ai-automation-advisor", "/en/tools/ai-readiness", "/en/tools/ai-team"],
+        ? ["/bg/ai-automation-advisor", "/bg/instrumenti/ai-gotovnost", "/bg/instrumenti/ai-ekip", "/bg/instrumenti/roi-kalkulator", "/bg/instrumenti/avtomatizatsii"]
+        : ["/en/ai-automation-advisor", "/en/tools/ai-readiness", "/en/tools/ai-team", "/en/tools/roi-calculator", "/en/tools/automation-finder"],
     );
     const planned = page.locator("section[aria-labelledby='tools-upcoming-title']");
-    await expect(planned.locator("article[data-status='planned']")).toHaveCount(3);
+    await expect(planned.locator("article[data-status='planned']")).toHaveCount(2);
     await expect(planned.getByText(upcoming, { exact: true }).first()).toBeVisible();
     await expect(planned.getByRole("link")).toHaveCount(0);
   });

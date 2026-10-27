@@ -60,6 +60,11 @@
   --color-success: #5fd4a0;
   --color-warning: #f2c46d;
   --color-danger: #f47a8a;
+  /* Chart series (categorical, fixed order): dark steps validated on surface-1 #0d1724 with the
+     dataviz validator, all pairs — lightness band, chroma, CVD ΔE ≥ 9.4, normal-vision ΔE ≥ 20.9, ≥ 3:1. */
+  --color-viz-1: #3987e5;
+  --color-viz-2: #d95926;
+  --color-viz-3: #199e70;
 
   /* Brand-tuned Tailwind scales (see header comment) */
   --color-slate-50: #f4f7fb;

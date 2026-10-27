@@ -7,10 +7,11 @@ Foundations for the business assessment and solution-design tools. Hub: `/bg/ins
 
 | Tool | Key | Status | Route (BG ↔ EN) | Flag |
 | --- | --- | --- | --- | --- |
-| Automation opportunity finder (AI Automation Advisor) | `advisor` | live | `/bg/ai-automation-advisor` ↔ `/en/ai-automation-advisor` | `tool_advisor` (on) |
+| AI Automation Advisor (AI process analysis) | `advisor` | live | `/bg/ai-automation-advisor` ↔ `/en/ai-automation-advisor` | `tool_advisor` (on) |
 | AI readiness assessment (12 questions, 6 weighted dimensions) | `readiness` | live | `/bg/instrumenti/ai-gotovnost` ↔ `/en/tools/ai-readiness` | `tool_readiness` (on) |
 | Build your AI team (agent configurator with architecture diagram) | `team` | live | `/bg/instrumenti/ai-ekip` ↔ `/en/tools/ai-team` | `tool_team` (on) |
-| AI ROI calculator | `roi` | planned | — (needs the owner's ROI policy decision, see PLATFORM_EXPANSION_PLAN.md) | `tool_roi` (off) |
+| AI ROI calculator | `roi` | live | `/bg/instrumenti/roi-kalkulator` ↔ `/en/tools/roi-calculator` | `tool_roi` (on) |
+| Automation Opportunity Finder (questionnaire) | `finder` | live | `/bg/instrumenti/avtomatizatsii` ↔ `/en/tools/automation-finder` | `tool_finder` (on) |
 | AI solution builder | `solution` | planned | — | `tool_solution` (off) |
 | AI agent library / configurator | `agents` | planned | — | `tool_agents` (off) |
 
@@ -43,7 +44,7 @@ React state plus `useStepFlow`.
 
 Names: `tool_opened`, `tool_started`, `step_completed`, `tool_completed`, `export_requested`.
 Fields (allow-list): `name`, `tool`, `locale`, `step`, `totalSteps`, `result` (enumerated bucket,
-e.g. `developing` or a team complexity band), `format` (`print` | `text` | `link` | `pdf`). Anything else — answers, free text, names,
+e.g. `developing` or a team complexity band), `format` (`print` | `text` | `link` | `pdf`). Tool keys include `roi` and `finder`. Anything else — answers, free text, names,
 e-mails — is dropped by `sanitizeToolEvent`. Nothing is sent over the network today: events are
 dispatched as a DOM `acs:analytics` CustomEvent; a consent-aware provider can be attached with
 `registerAnalyticsSink` later.
@@ -160,6 +161,8 @@ Rules:
 
 Costs, saved configurations, the PDF plan and consultations (API, cost model, privacy, migration
 0007): [TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md).
+
+ROI calculator and Opportunity Finder (formulas, rubric, policy, charts): [ROI_AND_FINDER.md](ROI_AND_FINDER.md).
 
 ## Adding a tool
 
