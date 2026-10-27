@@ -314,6 +314,19 @@ class LeadSummaryOut(BaseModel):
     updated_at: datetime
 
 
+class ReadinessDetailsOut(BaseModel):
+    """Stored AI readiness submission as shown to admins (levels and computed result only)."""
+
+    model_version: str
+    role: str
+    consultation_requested: bool
+    overall: int = Field(ge=0, le=100)
+    band: str
+    dimensions: dict[str, int]
+    blockers: list[str]
+    actions: list[str]
+
+
 class LeadDetailOut(LeadSummaryOut):
     phone: str | None
     message: str
@@ -321,6 +334,7 @@ class LeadDetailOut(LeadSummaryOut):
     privacy_notice_version: str
     marketing_consent: bool
     marketing_consent_at: datetime | None
+    marketing_consent_version: str | None = None
     status_changed_at: datetime | None
     submitted_service: str
     platform: str | None
@@ -331,6 +345,8 @@ class LeadDetailOut(LeadSummaryOut):
     advisor_assessment: AdvisorAssessmentSummary | None = None
     # AI Managed Services inquiry details (validated on input; None for other services and older leads).
     ai_managed: AiManagedDetails | None = None
+    # AI readiness assessment submission (source readiness_assessment); None otherwise.
+    readiness: ReadinessDetailsOut | None = None
 
 
 class LeadPage(BaseModel):

@@ -61,6 +61,8 @@ export interface LeadDetail extends LeadSummary {
   privacy_notice_version: string;
   marketing_consent: boolean;
   marketing_consent_at: string | null;
+  /** Wording version of the marketing consent; null when not given (or for older inquiries). */
+  marketing_consent_version?: string | null;
   status_changed_at: string | null;
   submitted_service: string;
   platform: string | null;
@@ -70,6 +72,21 @@ export interface LeadDetail extends LeadSummary {
   notes: LeadNote[];
   advisor_assessment?: LinkedAssessment | null;
   ai_managed?: AiManagedDetails | null;
+  /** AI readiness assessment submission (source readiness_assessment). */
+  readiness?: ReadinessDetails | null;
+}
+
+export type ReadinessBandKey = "exploration" | "foundation" | "pilot_ready" | "scaling";
+
+export interface ReadinessDetails {
+  model_version: string;
+  role: string;
+  consultation_requested: boolean;
+  overall: number;
+  band: ReadinessBandKey;
+  dimensions: Record<string, number>;
+  blockers: string[];
+  actions: string[];
 }
 
 export interface LeadPage {

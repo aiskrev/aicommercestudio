@@ -216,6 +216,105 @@
         }
       }
     },
+    "/api/public/readiness/meta": {
+      "get": {
+        "tags": [
+          "readiness"
+        ],
+        "summary": "Readiness Meta",
+        "operationId": "readiness_meta_api_public_readiness_meta_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessMeta"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/readiness/report": {
+      "post": {
+        "tags": [
+          "readiness"
+        ],
+        "summary": "Render the PDF report for a set of answers (anonymous; nothing is stored)",
+        "operationId": "readiness_report_api_public_readiness_report_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadinessReportRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The PDF report",
+            "content": {
+              "application/pdf": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/readiness/submissions": {
+      "post": {
+        "tags": [
+          "readiness"
+        ],
+        "summary": "Send assessment results and contact details to the team (creates a lead)",
+        "operationId": "submit_readiness_api_public_readiness_submissions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadinessSubmissionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessSubmitted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/auth/login": {
       "post": {
         "tags": [
@@ -980,6 +1079,45 @@
                   "$ref": "#/components/schemas/LeadNoteOut"
                 }
               }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/leads/{lead_id}/readiness-report": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "PDF report of a lead's AI readiness submission (admins only)",
+        "operationId": "lead_readiness_report_api_admin_leads__lead_id__readiness_report_get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/pdf": {}
             }
           },
           "422": {
@@ -2457,6 +2595,17 @@
             ],
             "title": "Marketing Consent At"
           },
+          "marketing_consent_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marketing Consent Version"
+          },
           "status_changed_at": {
             "anyOf": [
               {
@@ -2538,6 +2687,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/AiManagedDetails"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "readiness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReadinessDetailsOut"
               },
               {
                 "type": "null"
@@ -3107,6 +3266,313 @@
         "title": "QuoteRequestCreate",
         "description": "Request for a written quote: the contact fields plus structured project information."
       },
+      "ReadinessDetailsOut": {
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          },
+          "consultation_requested": {
+            "type": "boolean",
+            "title": "Consultation Requested"
+          },
+          "overall": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Overall"
+          },
+          "band": {
+            "type": "string",
+            "title": "Band"
+          },
+          "dimensions": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Dimensions"
+          },
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Blockers"
+          },
+          "actions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Actions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_version",
+          "role",
+          "consultation_requested",
+          "overall",
+          "band",
+          "dimensions",
+          "blockers",
+          "actions"
+        ],
+        "title": "ReadinessDetailsOut",
+        "description": "Stored AI readiness submission as shown to admins (levels and computed result only)."
+      },
+      "ReadinessMeta": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version",
+            "default": "1"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version",
+            "default": "2026-10.2"
+          },
+          "privacy_notice_version": {
+            "type": "string",
+            "title": "Privacy Notice Version"
+          },
+          "marketing_consent_version": {
+            "type": "string",
+            "title": "Marketing Consent Version"
+          },
+          "retention_days": {
+            "type": "integer",
+            "title": "Retention Days"
+          },
+          "email_delivery": {
+            "type": "boolean",
+            "const": false,
+            "title": "Email Delivery",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "privacy_notice_version",
+          "marketing_consent_version",
+          "retention_days"
+        ],
+        "title": "ReadinessMeta",
+        "description": "What the browser needs to describe the save/report options honestly."
+      },
+      "ReadinessReportRequest": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version"
+          },
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "answers": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Answers"
+          },
+          "client_overall": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Overall"
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "model_version",
+          "answers"
+        ],
+        "title": "ReadinessReportRequest",
+        "description": "Anonymous PDF report. `company` is printed on the cover only and never stored or logged."
+      },
+      "ReadinessSubmissionCreate": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version"
+          },
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "answers": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Answers"
+          },
+          "client_overall": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 100.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Overall"
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email",
+            "title": "Email"
+          },
+          "company": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Company"
+          },
+          "role": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 2,
+            "title": "Role"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Message",
+            "default": ""
+          },
+          "consultation_requested": {
+            "type": "boolean",
+            "title": "Consultation Requested",
+            "default": false
+          },
+          "privacy_acknowledged": {
+            "type": "boolean",
+            "title": "Privacy Acknowledged"
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "default": false
+          },
+          "website": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Website",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "model_version",
+          "answers",
+          "name",
+          "email",
+          "company",
+          "role",
+          "privacy_acknowledged"
+        ],
+        "title": "ReadinessSubmissionCreate",
+        "description": "Optional hand-off to the team: results plus contact details. Creates a lead."
+      },
+      "ReadinessSubmitted": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "received",
+            "title": "Status",
+            "default": "received"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "overall": {
+            "type": "integer",
+            "title": "Overall"
+          },
+          "band": {
+            "type": "string",
+            "title": "Band"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "message",
+          "overall",
+          "band"
+        ],
+        "title": "ReadinessSubmitted"
+      },
       "RetentionPreview": {
         "properties": {
           "lead_retention_days": {
@@ -3227,6 +3693,7 @@
           "integrations",
           "audit",
           "ai_managed",
+          "ai_agents",
           "other"
         ],
         "title": "ServiceKey"

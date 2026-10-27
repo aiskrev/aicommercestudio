@@ -12,6 +12,8 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0002` | quote requests (`inquiry_type`, `platform`, `budget_range`, `timeline`, `website_url`), service re-categorisation (`submitted_service`, backfilled from `service`), persistent login lockout (`failed_login_count`, `locked_until`), indexes on `leads.service`, `leads.inquiry_type`, `audit_logs.action`, `audit_logs.actor_id` |
 | `0003` | `advisor_assessments` (anonymous AI advisor assessments with expiry and optional lead link, FK `ON DELETE CASCADE`) |
 | `0004` | AI Managed Services and lead language: `ai_managed` added to the `service` / `submitted_service` CHECKs; `leads.locale` (`bg`/`en`, NOT NULL, server default `bg` — existing rows become `bg`, CHECK `ck_leads_locale`, index `ix_leads_locale`); `leads.service_details` JSONB null. Downgrade re-categorises `ai_managed` leads as `other` (details are dropped with the column) instead of deleting them. |
+| `0005` | AI agent development: `ai_agents` added to the `service` / `submitted_service` CHECKs. No existing row changes. |
+| `0006` | `leads.marketing_consent_version` varchar(32) null — wording version of a given marketing consent (contact form and AI readiness submissions). Nullable, no default; downgrade drops the column. |
 
 Apply: automatic on container start (`RUN_MIGRATIONS_ON_START=true`), or manually
 `docker compose exec api alembic upgrade head`. Inspect: `docker compose exec api alembic current`.
@@ -63,11 +65,12 @@ All timestamps are `timestamptz` in UTC.
 | phone | varchar(40) null | optional |
 | message | text | ≤ 5000 chars (validated) |
 | status | varchar(20) | CHECK in (`NEW`, `CONTACTED`, `QUALIFIED`, `PROPOSAL`, `WON`, `LOST`); indexed |
-| source | varchar(40) | `website_contact_form` or `synthetic_seed` |
+| source | varchar(40) | `website_contact_form`, `readiness_assessment` (AI readiness submission, `service_details.kind = "readiness"`) or `synthetic_seed` |
 | privacy_acknowledged_at | timestamptz | when the visitor confirmed the privacy information |
 | privacy_notice_version | varchar(32) | `PRIVACY_NOTICE_VERSION` at submission time |
 | marketing_consent | boolean | separate, optional consent |
 | marketing_consent_at | timestamptz null | |
+| marketing_consent_version | varchar(32) null | `MARKETING_CONSENT_VERSION` when consent was given; null otherwise and for consents before `0006` |
 | ip_hash | varchar(64) null | abuse correlation without storing the IP |
 | locale | varchar(2), default `bg` | website language of the inquiry; CHECK in (`bg`, `en`); indexed (admin filter) |
 | service_details | jsonb null | service-specific, validated data. AI Managed Services: `{"kind": "ai_managed", "sector", "system_types"[], "agents_count", "ai_provider", "hosting", "support_interests"[], "communication_language", "additional_notes"}` — descriptive only, never credentials (free text is screened for secrets) |
@@ -102,7 +105,8 @@ Append-only activity log. `details` must never contain raw personal data.
 
 | Action | Recorded when |
 | --- | --- |
-| `lead.created` | a contact or quote request is stored (`details.inquiry_type`) |
+| `lead.created` | a contact or quote request is stored (`details.inquiry_type`); AI readiness submissions add `source`, `band`, `consultation_requested` |
+| `lead.readiness_report_downloaded` | an admin downloaded the PDF report of a readiness submission |
 | `lead.viewed` | an admin opens a lead (personal-data access; at most once per admin / lead / 15 min) |
 | `lead.status_changed`, `lead.service_changed` | pipeline or categorisation change (`from`, `to`) |
 | `lead.note_added`, `lead.deleted` | note added; GDPR erasure or retention deletion (`reason`) |

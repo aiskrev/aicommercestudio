@@ -1,98 +1,325 @@
 import type { ServiceKey } from "@/content/types";
 
 /**
- * AI Readiness Assessment — pure, deterministic logic (no network, no personal data).
- * Five dimensions, two questions each, every answer scored 0–3. Texts: content/{bg,en}/tool-readiness.ts.
+ * AI Readiness Assessment — scoring model (pure, deterministic, no network, no personal data).
+ * Texts: content/{bg,en}/tool-readiness.ts. Method: docs/TOOLS_PLATFORM.md → "Readiness model".
+ *
+ * Six weighted dimensions, two questions each, every answer scored 0–4.
+ *   dimension score = (sum of its answers / 8) × 100            → 0–100
+ *   overall score   = Σ dimension score × normalised weight      → clamped to 0–100, rounded
+ *   band            = from the rounded overall score (0–24 / 25–49 / 50–74 / 75–100)
+ * The result is a self-assessment, never a certification.
+ *
+ * The API scores the same answers again (apps/api/app/readiness/scoring.py) for the PDF report and
+ * submissions. Both are tested against the same golden vectors (readiness.vectors.json); change the
+ * model in both places, regenerate the vectors and bump READINESS_MODEL_VERSION together.
  */
-export const READINESS_DIMENSIONS = ["data", "processes", "systems", "people", "governance"] as const;
+
+/** Must equal MODEL_VERSION in the API; the API rejects answers made with another model version. */
+export const READINESS_MODEL_VERSION = "2026-10.2";
+/** Version of the request shape sent to /api/public/readiness/*. */
+export const READINESS_SCHEMA_VERSION = "1";
+
+export const READINESS_DIMENSIONS = ["strategy", "data", "process", "technology", "people", "governance"] as const;
 export type ReadinessDimension = (typeof READINESS_DIMENSIONS)[number];
 
-export const READINESS_QUESTIONS: Record<ReadinessDimension, readonly [string, string]> = {
-  data: ["data_location", "data_quality"],
-  processes: ["process_definition", "process_volume"],
-  systems: ["systems_access", "systems_landscape"],
-  people: ["people_owner", "people_time"],
-  governance: ["governance_privacy", "governance_approval"],
+/** Relative weights (percent). Normalised at run time, so they always sum to 1. */
+export const DIMENSION_WEIGHTS: Record<ReadinessDimension, number> = {
+  strategy: 15,
+  data: 20,
+  process: 15,
+  technology: 15,
+  people: 15,
+  governance: 20,
 };
 
-/** Question ids in a fixed order (used for validation and the share code). */
-export const READINESS_QUESTION_ORDER: string[] = READINESS_DIMENSIONS.flatMap((d) => [...READINESS_QUESTIONS[d]]);
+export const READINESS_QUESTIONS = {
+  strategy: ["strategy_goals", "strategy_use_cases"],
+  data: ["data_access", "data_quality"],
+  process: ["process_definition", "process_repeatability"],
+  technology: ["tech_integration", "tech_environment"],
+  people: ["people_ownership", "people_change"],
+  governance: ["gov_data_protection", "gov_oversight"],
+} as const satisfies Record<ReadinessDimension, readonly [string, string]>;
 
-export const ANSWER_SCORES = [0, 1, 2, 3] as const;
-export type AnswerScore = (typeof ANSWER_SCORES)[number];
-export type ReadinessAnswers = Partial<Record<string, AnswerScore>>;
+export type ReadinessQuestionId = (typeof READINESS_QUESTIONS)[ReadinessDimension][number];
 
-export type ReadinessLevel = "early" | "developing" | "ready";
+/** Question ids in a fixed order (validation, share code). */
+export const READINESS_QUESTION_ORDER: ReadinessQuestionId[] = READINESS_DIMENSIONS.flatMap((d) => [...READINESS_QUESTIONS[d]]);
+
+export const MAX_ANSWER = 4;
+export type AnswerScore = 0 | 1 | 2 | 3 | 4;
+export type ReadinessAnswers = Partial<Record<ReadinessQuestionId, AnswerScore>>;
+
+export type ReadinessBand = "exploration" | "foundation" | "pilot_ready" | "scaling";
+
+/** Lower bound (inclusive) of each band on the rounded overall score. */
+export const BAND_THRESHOLDS: { band: ReadinessBand; min: number }[] = [
+  { band: "scaling", min: 75 },
+  { band: "pilot_ready", min: 50 },
+  { band: "foundation", min: 25 },
+  { band: "exploration", min: 0 },
+];
+
+export type ReadinessBlocker = "governance" | "data_quality" | "integration" | "organisation";
+
+export type ReadinessAction =
+  | "governance_first"
+  | "data_quality_first"
+  | "integration_path"
+  | "ownership_first"
+  | "strategy_definition"
+  | "data_foundation"
+  | "process_mapping"
+  | "tech_foundation"
+  | "people_enablement"
+  | "governance_framework"
+  | "discovery_workshop"
+  | "foundation_plan"
+  | "scoped_pilot"
+  | "scale_operations";
+
+export type ReadinessUseCase =
+  | "knowledge_assistant"
+  | "document_extraction"
+  | "inquiry_triage"
+  | "reply_drafting"
+  | "reporting_summary"
+  | "process_discovery";
+
+export type RoadmapItem = ReadinessAction | `${ReadinessBand}_${"d30" | "d60" | "d90"}`;
 
 export interface DimensionScore {
   dimension: ReadinessDimension;
-  /** 0–100 */
+  /** 0–100, rounded */
   score: number;
-}
-
-export interface Recommendation {
-  dimension: ReadinessDimension | "pilot";
-  service: ServiceKey;
+  weight: number;
 }
 
 export interface ReadinessResult {
+  complete: true;
   overall: number;
-  level: ReadinessLevel;
+  band: ReadinessBand;
   dimensions: DimensionScore[];
-  /** Weakest dimensions first; a pilot recommendation when nothing is weak. */
-  recommendations: Recommendation[];
+  blockers: ReadinessBlocker[];
+  /** Dimensions scoring ≥ 75 (or the best one ≥ 50 when none reaches 75). */
+  strengths: ReadinessDimension[];
+  /** Dimensions scoring < 50, weakest first. */
+  gaps: ReadinessDimension[];
+  /** Exactly three actions, highest priority first. */
+  actions: ReadinessAction[];
+  useCases: ReadinessUseCase[];
+  roadmap: { d30: RoadmapItem[]; d60: RoadmapItem[]; d90: RoadmapItem[] };
 }
 
-/** Below this a dimension gets a recommendation. */
-export const WEAK_THRESHOLD = 60;
+export interface IncompleteResult {
+  complete: false;
+  /** Unanswered question ids, in questionnaire order. */
+  missing: ReadinessQuestionId[];
+}
 
-const RECOMMENDED_SERVICE: Record<ReadinessDimension, ServiceKey> = {
-  data: "integrations",
-  processes: "audit",
-  systems: "integrations",
-  people: "audit",
-  governance: "ai_managed",
+/** Service each action points to. */
+export const ACTION_SERVICE: Record<ReadinessAction, ServiceKey> = {
+  governance_first: "audit",
+  data_quality_first: "integrations",
+  integration_path: "integrations",
+  ownership_first: "audit",
+  strategy_definition: "audit",
+  data_foundation: "integrations",
+  process_mapping: "automation",
+  tech_foundation: "integrations",
+  people_enablement: "audit",
+  governance_framework: "audit",
+  discovery_workshop: "audit",
+  foundation_plan: "audit",
+  scoped_pilot: "ai_agents",
+  scale_operations: "ai_managed",
 };
 
-/** Ids of unanswered questions in one dimension (step validation). */
-export function missingAnswers(dimension: ReadinessDimension, answers: ReadinessAnswers): string[] {
-  return READINESS_QUESTIONS[dimension].filter((id) => answers[id] === undefined);
+const BLOCKER_ACTION: Record<ReadinessBlocker, { action: ReadinessAction; dimension: ReadinessDimension }> = {
+  governance: { action: "governance_first", dimension: "governance" },
+  data_quality: { action: "data_quality_first", dimension: "data" },
+  integration: { action: "integration_path", dimension: "technology" },
+  organisation: { action: "ownership_first", dimension: "people" },
+};
+
+const GAP_ACTION: Record<ReadinessDimension, ReadinessAction> = {
+  strategy: "strategy_definition",
+  data: "data_foundation",
+  process: "process_mapping",
+  technology: "tech_foundation",
+  people: "people_enablement",
+  governance: "governance_framework",
+};
+
+const BAND_ACTION: Record<ReadinessBand, ReadinessAction> = {
+  exploration: "discovery_workshop",
+  foundation: "foundation_plan",
+  pilot_ready: "scoped_pilot",
+  scaling: "scale_operations",
+};
+
+/** Use cases in priority order with the minimum dimension scores they need. */
+const USE_CASE_RULES: { useCase: ReadinessUseCase; requires: Partial<Record<ReadinessDimension, number>> }[] = [
+  { useCase: "inquiry_triage", requires: { process: 50, technology: 50 } },
+  { useCase: "document_extraction", requires: { data: 25, process: 50 } },
+  { useCase: "knowledge_assistant", requires: { data: 50, governance: 50 } },
+  { useCase: "reply_drafting", requires: { process: 50, governance: 50 } },
+  { useCase: "reporting_summary", requires: { data: 50 } },
+];
+
+/** Normalised weights (sum = 1), independent of how DIMENSION_WEIGHTS is expressed. */
+export function normalisedWeights(weights: Record<ReadinessDimension, number> = DIMENSION_WEIGHTS): Record<ReadinessDimension, number> {
+  const total = READINESS_DIMENSIONS.reduce((sum, d) => sum + Math.max(0, weights[d]), 0);
+  if (total <= 0) throw new Error("Dimension weights must have a positive sum");
+  return Object.fromEntries(READINESS_DIMENSIONS.map((d) => [d, Math.max(0, weights[d]) / total])) as Record<ReadinessDimension, number>;
 }
 
-export function isComplete(answers: ReadinessAnswers): boolean {
-  return READINESS_QUESTION_ORDER.every((id) => answers[id] !== undefined);
+export function isAnswerScore(value: unknown): value is AnswerScore {
+  return Number.isInteger(value) && (value as number) >= 0 && (value as number) <= MAX_ANSWER;
 }
 
-export function levelFor(overall: number): ReadinessLevel {
-  if (overall >= 70) return "ready";
-  if (overall >= 40) return "developing";
-  return "early";
+/** Unanswered (or invalid) question ids, optionally limited to one dimension (step validation). */
+export function missingAnswers(answers: ReadinessAnswers, dimension?: ReadinessDimension): ReadinessQuestionId[] {
+  const ids = dimension ? [...READINESS_QUESTIONS[dimension]] : READINESS_QUESTION_ORDER;
+  return ids.filter((id) => !isAnswerScore(answers[id]));
 }
 
-export function scoreReadiness(answers: ReadinessAnswers): ReadinessResult {
-  if (!isComplete(answers)) throw new Error("Readiness assessment is incomplete");
-  const dimensions = READINESS_DIMENSIONS.map((dimension) => {
-    const total = READINESS_QUESTIONS[dimension].reduce((sum, id) => sum + (answers[id] ?? 0), 0);
-    return { dimension, score: Math.round((total / 6) * 100) };
+export function bandFor(score: number): ReadinessBand {
+  const rounded = Math.round(clamp(score));
+  return BAND_THRESHOLDS.find((t) => rounded >= t.min)!.band;
+}
+
+function clamp(value: number): number {
+  return Math.min(100, Math.max(0, value));
+}
+
+export function dimensionScores(answers: Required<ReadinessAnswers>, weights = normalisedWeights()): DimensionScore[] {
+  return READINESS_DIMENSIONS.map((dimension) => {
+    const total = READINESS_QUESTIONS[dimension].reduce((sum, id) => sum + answers[id], 0);
+    return { dimension, score: Math.round((total / (READINESS_QUESTIONS[dimension].length * MAX_ANSWER)) * 100), weight: weights[dimension] };
   });
-  const overall = Math.round(dimensions.reduce((sum, d) => sum + d.score, 0) / dimensions.length);
-  const weak = dimensions
-    .filter((d) => d.score < WEAK_THRESHOLD)
-    .sort((a, b) => a.score - b.score || READINESS_DIMENSIONS.indexOf(a.dimension) - READINESS_DIMENSIONS.indexOf(b.dimension));
-  const recommendations: Recommendation[] =
-    weak.length > 0
-      ? weak.slice(0, 3).map((d) => ({ dimension: d.dimension, service: RECOMMENDED_SERVICE[d.dimension] }))
-      : [{ dimension: "pilot", service: "ai_agents" }];
-  return { overall, level: levelFor(overall), dimensions, recommendations };
 }
 
-/** Compact, non-personal share code: one digit per question in READINESS_QUESTION_ORDER. */
+/** Overall 0–100 from exact (unrounded) dimension ratios, so rounding never accumulates. */
+export function overallScore(answers: Required<ReadinessAnswers>, weights = normalisedWeights()): number {
+  const exact = READINESS_DIMENSIONS.reduce((sum, dimension) => {
+    const total = READINESS_QUESTIONS[dimension].reduce((s, id) => s + answers[id], 0);
+    return sum + (total / (READINESS_QUESTIONS[dimension].length * MAX_ANSWER)) * 100 * weights[dimension];
+  }, 0);
+  return Math.round(clamp(exact));
+}
+
+/**
+ * Blocking conditions, in priority order — raised from specific answers regardless of the overall score:
+ *   governance:   personal data not documented (≤ 1) or no decision on AI oversight (0)
+ *   data_quality: data quality unknown or poor (≤ 1)
+ *   integration:  systems cannot be connected or it is unknown (≤ 1)
+ *   organisation: no real owner (≤ 1) or undiscussed resistance to change (0)
+ */
+export function findBlockers(answers: Required<ReadinessAnswers>): ReadinessBlocker[] {
+  const blockers: ReadinessBlocker[] = [];
+  if (answers.gov_data_protection <= 1 || answers.gov_oversight === 0) blockers.push("governance");
+  if (answers.data_quality <= 1) blockers.push("data_quality");
+  if (answers.tech_integration <= 1) blockers.push("integration");
+  if (answers.people_ownership <= 1 || answers.people_change === 0) blockers.push("organisation");
+  return blockers;
+}
+
+/**
+ * Top three actions. Positions 1–2: the most urgent items — blockers in priority order
+ * (governance → data quality → integration → organisation), then gaps weakest-first, skipping
+ * dimensions a blocker already covers; when fewer than two exist, the remaining dimensions fill in,
+ * lowest score first. Position 3: always the band's next step.
+ */
+export function rankActions(
+  band: ReadinessBand,
+  blockers: ReadinessBlocker[],
+  gaps: ReadinessDimension[],
+  dimensionsByScore: ReadinessDimension[] = [...READINESS_DIMENSIONS],
+): ReadinessAction[] {
+  const covered = new Set<ReadinessDimension>();
+  const urgent: ReadinessAction[] = [];
+  for (const blocker of blockers) {
+    urgent.push(BLOCKER_ACTION[blocker].action);
+    covered.add(BLOCKER_ACTION[blocker].dimension);
+  }
+  for (const gap of gaps) if (!covered.has(gap)) urgent.push(GAP_ACTION[gap]);
+  for (const dimension of dimensionsByScore) if (!covered.has(dimension)) urgent.push(GAP_ACTION[dimension]);
+  const bandAction = BAND_ACTION[band];
+  const top = urgent.filter((action, i) => action !== bandAction && urgent.indexOf(action) === i).slice(0, 2);
+  return [...top, bandAction];
+}
+
+export function suitableUseCases(scores: Record<ReadinessDimension, number>): ReadinessUseCase[] {
+  const eligible = USE_CASE_RULES.filter((rule) =>
+    Object.entries(rule.requires).every(([dimension, min]) => scores[dimension as ReadinessDimension] >= (min ?? 0)),
+  ).map((rule) => rule.useCase);
+  return eligible.length > 0 ? eligible.slice(0, 3) : ["process_discovery"];
+}
+
+export function buildRoadmap(band: ReadinessBand, blockers: ReadinessBlocker[]): ReadinessResult["roadmap"] {
+  const blockerItems = blockers.map((b) => BLOCKER_ACTION[b].action);
+  return {
+    d30: [...blockerItems.slice(0, 2), `${band}_d30`],
+    d60: [...blockerItems.slice(2), `${band}_d60`],
+    d90: [`${band}_d90`],
+  };
+}
+
+export function scoreReadiness(answers: ReadinessAnswers): ReadinessResult | IncompleteResult {
+  const missing = missingAnswers(answers);
+  if (missing.length > 0) return { complete: false, missing };
+  const full = answers as Required<ReadinessAnswers>;
+  const weights = normalisedWeights();
+  const dimensions = dimensionScores(full, weights);
+  const scores = Object.fromEntries(dimensions.map((d) => [d.dimension, d.score])) as Record<ReadinessDimension, number>;
+  const overall = overallScore(full, weights);
+  const band = bandFor(overall);
+  const blockers = findBlockers(full);
+  const byScore = [...dimensions].sort(
+    (a, b) => a.score - b.score || READINESS_DIMENSIONS.indexOf(a.dimension) - READINESS_DIMENSIONS.indexOf(b.dimension),
+  );
+  const gaps = byScore.filter((d) => d.score < 50).map((d) => d.dimension);
+  const strong = [...byScore].reverse().filter((d) => d.score >= 75).map((d) => d.dimension);
+  const best = byScore.at(-1)!;
+  const strengths = strong.length > 0 ? strong : best.score >= 50 ? [best.dimension] : [];
+  return {
+    complete: true,
+    overall,
+    band,
+    dimensions,
+    blockers,
+    strengths,
+    gaps,
+    actions: rankActions(band, blockers, gaps, byScore.map((d) => d.dimension)),
+    useCases: suitableUseCases(scores),
+    roadmap: buildRoadmap(band, blockers),
+  };
+}
+
+/** Non-personal share code: one digit (0–4) per question in READINESS_QUESTION_ORDER. */
 export function encodeAnswers(answers: ReadinessAnswers): string {
   return READINESS_QUESTION_ORDER.map((id) => answers[id] ?? "x").join("");
 }
 
-/** Inverse of `encodeAnswers`; returns null for anything that is not a complete, valid code. */
+/** Inverse of `encodeAnswers`; null for anything that is not a complete, valid code. */
 export function decodeAnswers(code: string | null | undefined): ReadinessAnswers | null {
-  if (!code || code.length !== READINESS_QUESTION_ORDER.length || !/^[0-3]+$/.test(code)) return null;
-  return Object.fromEntries(READINESS_QUESTION_ORDER.map((id, i) => [id, Number(code[i]) as AnswerScore]));
+  if (!code || code.length !== READINESS_QUESTION_ORDER.length || !/^[0-4]+$/.test(code)) return null;
+  return Object.fromEntries(READINESS_QUESTION_ORDER.map((id, i) => [id, Number(code[i]) as AnswerScore])) as ReadinessAnswers;
+}
+
+/** The result in the API's JSON shape (`ReadinessResult.summary()`), used for the parity vectors. */
+export function toApiSummary(result: ReadinessResult) {
+  return {
+    overall: result.overall,
+    band: result.band,
+    dimensions: Object.fromEntries(result.dimensions.map((d) => [d.dimension, d.score])),
+    blockers: result.blockers,
+    strengths: result.strengths,
+    gaps: result.gaps,
+    actions: result.actions,
+    use_cases: result.useCases,
+    roadmap: result.roadmap,
+  };
 }
