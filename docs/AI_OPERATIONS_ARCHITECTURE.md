@@ -1,5 +1,8 @@
 # AI Operations Console — target architecture (not implemented)
 
+> **Superseded for data model, API, RBAC and phasing by [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md)**,
+> which also documents the staff-only scaffold now in the codebase.
+
 > This document describes a **future** multi-tenant console for AI Managed Services. Nothing here
 > exists in the codebase yet. The public website must not show live telemetry or imply that this
 > console runs; any demonstration must use clearly labelled synthetic data.

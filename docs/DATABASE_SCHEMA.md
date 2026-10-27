@@ -15,6 +15,7 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0005` | AI agent development: `ai_agents` added to the `service` / `submitted_service` CHECKs. No existing row changes. |
 | `0006` | `leads.marketing_consent_version` varchar(32) null — wording version of a given marketing consent (contact form and AI readiness submissions). Nullable, no default; downgrade drops the column. |
 | `0007` | `team_configurations`: saved AI team configurations (enumerated JSONB, schema/model/assumptions versions, visitor rate overrides, SHA-256 `token_hash` unique, `locale` CHECK, `expires_at` index, `lead_id` FK `ON DELETE CASCADE`). New table only; downgrade drops it. |
+| `0008` | AI operations scaffold: `ops_organizations` (slug unique, status/region, `is_demo`), `ops_workspaces` (unique `(organization_id, slug)` and `(id, organization_id)`), `ops_memberships` (user × organisation × role CHECK, unique pair), `ops_agents` (registry metadata; composite FK `(workspace_id, organization_id)` → workspaces so an agent cannot sit in another tenant's workspace). New tables only; downgrade drops them. See AI_OPERATIONS_PORTAL.md. |
 
 Apply: automatic on container start (`RUN_MIGRATIONS_ON_START=true`), or manually
 `docker compose exec api alembic upgrade head`. Inspect: `docker compose exec api alembic current`.

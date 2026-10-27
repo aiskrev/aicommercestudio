@@ -6,7 +6,7 @@ import { AiOpsDiagram } from "@/components/sections/AiOpsDiagram";
 import { Faq } from "@/components/sections/Faq";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { Icon } from "@/components/ui/Icon";
+import { Icon, type IconName } from "@/components/ui/Icon";
 import { EditorialSplit } from "@/components/ui/patterns";
 import {
   ButtonLink,
@@ -19,13 +19,24 @@ import {
   cx,
 } from "@/components/ui/primitives";
 import { getContent, serviceByKey, serviceRoutePaths } from "@/content";
-import type { PackageCell } from "@/content/bg/ai-managed";
+import type { OperationsKey, PackageCell } from "@/content/bg/ai-managed";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { contactFormProps } from "@/lib/contact-form-props";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
+
+const OPERATION_ICONS: Record<OperationsKey, IconName> = {
+  reliability: "activity",
+  execution: "workflow",
+  cost: "chart",
+  quality: "target",
+  review: "users",
+  incidents: "alert",
+  optimization: "refresh",
+  governance: "shield",
+};
 
 /**
  * AI Managed Services landing page (dedicated route; the generic service template skips this service).
@@ -180,6 +191,40 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
         <p className="mt-6 max-w-3xl text-sm text-ink-muted">{page.problems.disclaimer}</p>
       </Section>
 
+      {/* operating areas: what we do, what you receive, what your system needs */}
+      <Section labelledBy="ams-operations">
+        <SectionHeading id="ams-operations" title={page.operations.title} lead={page.operations.lead} />
+        <ol className="mt-10 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line-subtle bg-line-subtle" data-testid="ams-operations">
+          {page.operations.items.map((item) => (
+            <li key={item.key} className="grid gap-4 bg-surface-1 p-5 sm:p-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-8" data-area={item.key}>
+              <div className="flex gap-4">
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default text-brand" aria-hidden="true">
+                  <Icon name={OPERATION_ICONS[item.key]} className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-fg">{item.title}</h3>
+                  <p className="mt-1 text-[15px] leading-relaxed text-fg-muted">{item.description}</p>
+                </div>
+              </div>
+              <dl className="contents">
+                <div className="border-t border-line-subtle pt-3 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+                  <dt className="t-label">{page.operations.deliverableLabel}</dt>
+                  <dd className="mt-1.5 text-[15px] leading-relaxed text-fg-secondary">{item.deliverable}</dd>
+                </div>
+                <div className="border-t border-line-subtle pt-3 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+                  <dt className="t-label">{page.operations.requiresLabel}</dt>
+                  <dd className="mt-1.5 text-[15px] leading-relaxed text-fg-secondary">{item.requires}</dd>
+                </div>
+              </dl>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-5 flex max-w-3xl gap-2 text-sm text-fg-muted">
+          <Icon name="info" className="mt-0.5 h-4 w-4 shrink-0" />
+          {page.operations.note}
+        </p>
+      </Section>
+
       {/* 5. what we monitor */}
       <Section labelledBy="ams-monitoring" alt>
         <SectionHeading id="ams-monitoring" title={page.monitoring.title} lead={page.monitoring.lead} />
@@ -294,6 +339,36 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
           ))}
         </ol>
         <p className="mt-4 max-w-3xl text-sm text-fg-muted">{page.incidents.note}</p>
+      </Section>
+
+      {/* planned AI Operations Portal: modules only, no data (docs/AI_OPERATIONS_PORTAL.md) */}
+      <Section labelledBy="ams-portal" alt>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <SectionHeading id="ams-portal" title={page.portal.title} lead={page.portal.lead} />
+          <span className="badge badge-warning" data-testid="portal-status">
+            {page.portal.badge}
+          </span>
+        </div>
+        <ul className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-testid="portal-modules">
+          {page.portal.modules.map((module) => (
+            <li key={module.key} className="rounded-[var(--radius-lg)] border border-dashed border-line-strong p-5">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-semibold text-fg">{module.title}</h3>
+                <span className="text-xs font-medium text-fg-subtle">{page.portal.badge}</span>
+              </div>
+              <ul className="mt-3 grid gap-1.5 text-sm text-fg-muted">
+                {module.items.map((entry) => (
+                  <li key={entry} className="flex items-start gap-2">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-fg-subtle" aria-hidden="true" />
+                    {entry}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+        <h3 className="t-h3 mt-12">{page.portal.principlesTitle}</h3>
+        <CheckList items={page.portal.principles} className="mt-5 max-w-3xl" />
       </Section>
 
       {/* 9. onboarding */}
