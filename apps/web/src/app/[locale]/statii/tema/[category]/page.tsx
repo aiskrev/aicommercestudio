@@ -73,7 +73,7 @@ export default async function CategoryPage({ params }: PageProps<"/[locale]/stat
       <PageHero eyebrow={dict.editorial.category} title={category.title} lead={category.description} />
       <Section>
         {articles.length === 0 ? (
-          <p className="card p-8 text-center text-slate-400">{dict.editorial.categoryEmpty}</p>
+          <p className="card p-8 text-center text-fg-muted">{dict.editorial.categoryEmpty}</p>
         ) : (
           <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {articles.map((article) => (
@@ -95,11 +95,11 @@ export default async function CategoryPage({ params }: PageProps<"/[locale]/stat
         >
           <IconBadge name={service.icon} />
           <span>
-            <span className="block text-sm text-slate-400">{dict.editorial.relatedServices}</span>
+            <span className="block text-sm text-fg-muted">{dict.editorial.relatedServices}</span>
             <span className="t-h3">{service.shortTitle}</span>
           </span>
         </Link>
-        <Link href={href(routes.insights)} className="mt-6 inline-flex text-sm text-cyan-300">
+        <Link href={href(routes.insights)} className="mt-6 inline-flex text-sm text-brand">
           ← {dict.common.allArticles}
         </Link>
       </Section>

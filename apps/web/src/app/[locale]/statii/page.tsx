@@ -54,7 +54,7 @@ export default async function InsightsPage({ params }: PageProps<"/[locale]/stat
                   className="badge transition-colors hover:border-brand/50 hover:text-fg"
                 >
                   {category.name}
-                  <span className="text-slate-400">{articlesInCategory(locale, category.key).length}</span>
+                  <span className="text-fg-muted">{articlesInCategory(locale, category.key).length}</span>
                 </Link>
               </li>
             ))}
@@ -63,7 +63,7 @@ export default async function InsightsPage({ params }: PageProps<"/[locale]/stat
       </PageHero>
       <Section>
         {articles.length === 0 ? (
-          <p className="card p-8 text-center text-slate-400">{page.empty}</p>
+          <p className="card p-8 text-center text-fg-muted">{page.empty}</p>
         ) : (
           <div className="grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14">
             <ArticleCard

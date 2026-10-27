@@ -28,9 +28,9 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/ai-reshe
 }
 
 const riskTone: Record<string, string> = {
-  low: "bg-emerald-400/10 text-emerald-300 ring-emerald-400/30",
-  high: "bg-amber-400/10 text-amber-300 ring-amber-400/30",
-  critical: "bg-rose-400/10 text-rose-300 ring-rose-400/30",
+  low: "bg-success/10 text-success ring-success/30",
+  high: "bg-warning/10 text-warning ring-warning/30",
+  critical: "bg-danger/10 text-danger ring-danger/30",
 };
 
 export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/ai-resheniya">) {
@@ -68,26 +68,26 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
         <div className="card mt-10 overflow-hidden rounded-2xl">
           <table className="w-full text-left text-sm">
             <caption className="sr-only">{page.approvalTitle}</caption>
-            <thead className="border-b border-white/10 text-xs uppercase tracking-wider text-slate-400">
+            <thead className="border-b border-line-default text-xs uppercase tracking-wider text-fg-muted">
               <tr>
                 <th scope="col" className="px-5 py-4 font-medium">{page.approvalHeaders.action}</th>
                 <th scope="col" className="px-5 py-4 font-medium">{page.approvalHeaders.risk}</th>
                 <th scope="col" className="hidden px-5 py-4 font-medium sm:table-cell">{page.approvalHeaders.control}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06]">
+            <tbody className="divide-y divide-line-subtle">
               {page.approvalRows.map((row) => (
                 <tr key={row.action}>
-                  <th scope="row" className="px-5 py-4 font-medium text-white">
+                  <th scope="row" className="px-5 py-4 font-medium text-fg">
                     {row.action}
-                    <span className="mt-1 block text-xs font-normal text-slate-400 sm:hidden">{row.control}</span>
+                    <span className="mt-1 block text-xs font-normal text-fg-muted sm:hidden">{row.control}</span>
                   </th>
                   <td className="px-5 py-4">
                     <span className={cx("inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ring-1", riskTone[row.level])}>
                       {row.risk}
                     </span>
                   </td>
-                  <td className="hidden px-5 py-4 text-slate-300 sm:table-cell">{row.control}</td>
+                  <td className="hidden px-5 py-4 text-fg-secondary sm:table-cell">{row.control}</td>
                 </tr>
               ))}
             </tbody>

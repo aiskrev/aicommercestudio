@@ -83,7 +83,7 @@ export function StickyQuoteBar({
       inert={!show}
     >
       <div className="card-accent flex items-center gap-3 rounded-2xl p-2.5 pl-4 shadow-[0_20px_50px_-15px_rgb(0_0_0_/_0.9)]">
-        <p className="flex-1 text-xs leading-snug text-slate-300">{hint}</p>
+        <p className="flex-1 text-xs leading-snug text-fg-secondary">{hint}</p>
         <Link href={href} className={buttonClass("primary", "sm")}>
           {label}
         </Link>
@@ -91,7 +91,7 @@ export function StickyQuoteBar({
           type="button"
           onClick={dismiss}
           aria-label={dismissLabel}
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-400 hover:text-white"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-fg-muted hover:text-fg"
         >
           <Icon name="close" className="h-4 w-4" />
         </button>

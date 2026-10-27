@@ -169,7 +169,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
           <div ref={consultRef} className="grid scroll-mt-28 gap-4 print:hidden" data-testid="advisor-consultation">
             <div>
               <h2 className="t-h2 text-2xl">{content.result.consultTitle}</h2>
-              <p className="mt-2 max-w-2xl text-slate-400">{content.result.consultLead}</p>
+              <p className="mt-2 max-w-2xl text-fg-muted">{content.result.consultLead}</p>
             </div>
             {!result.stored && (
               <Alert tone="info" role="note">
@@ -204,7 +204,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
     >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="t-h3 text-xl">{f.title}</h2>
-        <p className="text-xs text-slate-400">{f.requiredNote}</p>
+        <p className="text-xs text-fg-muted">{f.requiredNote}</p>
       </div>
 
       {status?.mode === "demo" && (
@@ -257,7 +257,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
           onChange={(e) => update("process_description", e.target.value)}
           onBlur={() => validateOnBlur("process_description")}
         />
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-fg-muted">
           <span id="advisor-description-counter">
             {f.descriptionCounter
               .replace("{n}", String(descriptionLength))
@@ -276,7 +276,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
             </button>
           )}
         </div>
-        <p id="advisor-pii-warning" className="mt-2 flex items-start gap-2 text-xs text-amber-200/90">
+        <p id="advisor-pii-warning" className="mt-2 flex items-start gap-2 text-xs text-on-warning/90">
           <Icon name="lock" className="mt-0.5 h-3.5 w-3.5 shrink-0" />
           {f.personalDataWarning}
         </p>
@@ -329,7 +329,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
                 key={tool}
                 className={cx(
                   "flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors",
-                  checked ? "border-cyan-400/60 bg-cyan-400/[0.07] text-white" : "border-white/[0.12] text-slate-300 hover:border-white/25",
+                  checked ? "border-brand-strong/60 bg-brand-strong/[0.07] text-fg" : "border-line-default text-fg-secondary hover:border-line-strong",
                 )}
               >
                 <input
@@ -366,7 +366,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
         />
       </Field>
 
-      <label className="flex cursor-pointer gap-3 text-sm leading-relaxed text-slate-300">
+      <label className="flex cursor-pointer gap-3 text-sm leading-relaxed text-fg-secondary">
         <input
           id="advisor-save_assessment"
           type="checkbox"
@@ -377,7 +377,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
         <span>{f.save.replace("{days}", String(days))}</span>
       </label>
 
-      <div className="flex flex-col gap-4 border-t border-white/[0.07] pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-t border-line-subtle pt-6 sm:flex-row sm:items-center sm:justify-between">
         <Button
           type="submit"
           size="lg"
@@ -388,7 +388,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
         >
           {f.submit}
         </Button>
-        <p className="flex items-center gap-2 text-xs text-slate-400" role="status" aria-live="polite">
+        <p className="flex items-center gap-2 text-xs text-fg-muted" role="status" aria-live="polite">
           {submitting ? f.submitting : null}
         </p>
       </div>
@@ -411,8 +411,9 @@ function Field({
   hint?: string;
   children: ReactNode;
 }) {
+  // Column layout: in a two-column row the controls line up even when only one field has a hint.
   return (
-    <div>
+    <div className="flex flex-col">
       <label htmlFor={`advisor-${id}`} className="field-label">
         {label}
         {required && (
@@ -428,7 +429,7 @@ function Field({
           {hint}
         </p>
       )}
-      {children}
+      <div className="mt-auto">{children}</div>
       {error && (
         <p id={`advisor-${id}-error`} className="field-error">
           {error}
@@ -475,7 +476,7 @@ function Select({
       </select>
       <Icon
         name="chevronDown"
-        className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+        className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-muted"
       />
     </div>
   );

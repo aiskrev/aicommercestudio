@@ -69,7 +69,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"
-          className="sr-only z-[100] rounded-full bg-cyan-300 px-5 py-2.5 font-semibold text-ink-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-3"
+          className="sr-only z-[100] rounded-full bg-brand px-5 py-2.5 font-semibold text-ink-950 focus:not-sr-only focus:fixed focus:left-4 focus:top-3"
         >
           {dict.skipToContent}
         </a>

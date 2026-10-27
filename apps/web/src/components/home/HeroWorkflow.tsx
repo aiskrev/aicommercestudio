@@ -37,9 +37,9 @@ export function HeroWorkflow({ content }: { content: WorkflowContent }) {
       {/* window bar */}
       <div className="flex items-center justify-between gap-3 border-b border-line-subtle px-4 py-3">
         <div className="flex items-center gap-1.5" aria-hidden="true">
-          <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-          <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-          <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
+          <span className="h-2.5 w-2.5 rounded-full bg-window-chrome" />
+          <span className="h-2.5 w-2.5 rounded-full bg-window-chrome" />
+          <span className="h-2.5 w-2.5 rounded-full bg-window-chrome" />
         </div>
         <p className="t-label min-w-0 truncate">{content.label}</p>
         <span className="shrink-0 whitespace-nowrap rounded-[5px] border border-warning/40 bg-warning/10 px-2 py-0.5 font-mono text-[11px] font-medium text-warning">

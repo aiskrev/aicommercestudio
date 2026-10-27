@@ -8,16 +8,16 @@ import type { AdvisorResponse, Level } from "@/lib/advisor";
 import { formatDate } from "@/lib/format";
 
 const levelTone: Record<Level, string> = {
-  low: "bg-emerald-400/10 text-emerald-200 ring-emerald-400/30",
-  medium: "bg-amber-400/10 text-amber-200 ring-amber-400/30",
-  high: "bg-rose-400/10 text-rose-200 ring-rose-400/30",
+  low: "bg-success/10 text-on-success ring-success/30",
+  medium: "bg-warning/10 text-on-warning ring-warning/30",
+  high: "bg-danger/10 text-on-danger ring-danger/30",
 };
 
 function Block({ id, icon, title, children }: { id: string; icon: IconName; title: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="card p-6 sm:p-7">
-      <h3 id={id} className="flex items-center gap-3 text-lg font-semibold text-white">
-        <Icon name={icon} className="h-5 w-5 shrink-0 text-cyan-300" />
+      <h3 id={id} className="flex items-center gap-3 text-lg font-semibold text-fg">
+        <Icon name={icon} className="h-5 w-5 shrink-0 text-brand" />
         {title}
       </h3>
       <div className="mt-5">{children}</div>
@@ -54,7 +54,7 @@ export function AdvisorResult({
         <h2 ref={headingRef} tabIndex={-1} className="t-h2 text-2xl outline-none sm:text-3xl">
           {demo ? t.demoTitle : t.title}
         </h2>
-        <Badge accent={!demo} className={demo ? "border-amber-300/40 text-amber-200" : undefined}>
+        <Badge accent={!demo} className={demo ? "border-warning/40 text-on-warning" : undefined}>
           {content.modeBadge[result.mode]}
         </Badge>
       </div>
@@ -73,10 +73,10 @@ export function AdvisorResult({
         </Alert>
       )}
 
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-fg-muted">
         {result.stored && result.reference ? (
           <>
-            {t.reference}: <strong className="font-mono text-white">{result.reference}</strong>
+            {t.reference}: <strong className="font-mono text-fg">{result.reference}</strong>
             {expires && (
               <>
                 {" · "}
@@ -90,17 +90,17 @@ export function AdvisorResult({
       </p>
 
       <Block id="advisor-summary" icon="clipboard" title={t.summary}>
-        <p className="leading-relaxed text-slate-300">{a.problem_summary}</p>
+        <p className="leading-relaxed text-fg-secondary">{a.problem_summary}</p>
       </Block>
 
       <Block id="advisor-opportunities" icon="sparkles" title={t.opportunities}>
         <ul className="grid gap-4 md:grid-cols-2">
           {a.opportunities.map((item) => (
-            <li key={item.title} className="rounded-xl border border-white/[0.08] bg-ink-950/40 p-4">
-              <p className="font-semibold text-white">{item.title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-400">{item.description}</p>
+            <li key={item.title} className="rounded-xl border border-line-subtle bg-ink-950/40 p-4">
+              <p className="font-semibold text-fg">{item.title}</p>
+              <p className="mt-2 text-sm leading-relaxed text-fg-muted">{item.description}</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Pill className="bg-cyan-400/10 text-cyan-200 ring-cyan-400/30">{l.approach[item.approach]}</Pill>
+                <Pill className="bg-brand-strong/10 text-brand-soft ring-brand-strong/30">{l.approach[item.approach]}</Pill>
                 <Pill className={levelTone[item.priority]}>{l.priority[item.priority]}</Pill>
               </div>
             </li>
@@ -112,18 +112,18 @@ export function AdvisorResult({
         <ol className="grid gap-3">
           {a.proposed_workflow.map((step, index) => (
             <li key={`${index}-${step.title}`} className="flex gap-4">
-              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-cyan-400/15 text-sm font-semibold text-cyan-200">
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-strong/15 text-sm font-semibold text-brand-soft">
                 {index + 1}
               </span>
               <div className="min-w-0">
-                <p className="flex flex-wrap items-center gap-2 font-medium text-white">
+                <p className="flex flex-wrap items-center gap-2 font-medium text-fg">
                   {step.title}
-                  <Pill className="bg-white/5 text-slate-300 ring-white/15">{l.actor[step.actor]}</Pill>
+                  <Pill className="bg-surface-2 text-fg-secondary ring-line-default">{l.actor[step.actor]}</Pill>
                   {step.requires_human_approval && (
-                    <Pill className="bg-amber-400/10 text-amber-200 ring-amber-400/30">{t.approvalRequired}</Pill>
+                    <Pill className="bg-warning/10 text-on-warning ring-warning/30">{t.approvalRequired}</Pill>
                   )}
                 </p>
-                <p className="mt-1 text-sm leading-relaxed text-slate-400">{step.description}</p>
+                <p className="mt-1 text-sm leading-relaxed text-fg-muted">{step.description}</p>
               </div>
             </li>
           ))}
@@ -135,11 +135,11 @@ export function AdvisorResult({
           <ul className="grid gap-3">
             {a.integrations.map((item) => (
               <li key={item.system}>
-                <p className="flex flex-wrap items-center gap-2 font-medium text-white">
+                <p className="flex flex-wrap items-center gap-2 font-medium text-fg">
                   {item.system}
-                  <Pill className="bg-white/5 text-slate-300 ring-white/15">{l.access[item.access]}</Pill>
+                  <Pill className="bg-surface-2 text-fg-secondary ring-line-default">{l.access[item.access]}</Pill>
                 </p>
-                <p className="mt-1 text-sm text-slate-400">{item.purpose}</p>
+                <p className="mt-1 text-sm text-fg-muted">{item.purpose}</p>
               </li>
             ))}
           </ul>
@@ -149,8 +149,8 @@ export function AdvisorResult({
           <ul className="grid gap-3">
             {a.human_approvals.map((item) => (
               <li key={item.decision}>
-                <p className="font-medium text-white">{item.decision}</p>
-                <p className="mt-1 text-sm text-slate-400">{item.reason}</p>
+                <p className="font-medium text-fg">{item.decision}</p>
+                <p className="mt-1 text-sm text-fg-muted">{item.reason}</p>
               </li>
             ))}
           </ul>
@@ -165,9 +165,9 @@ export function AdvisorResult({
           <ul className="grid gap-3">
             {a.risks.map((item) => (
               <li key={item.risk}>
-                <p className="font-medium text-white">{item.risk}</p>
-                <p className="mt-1 text-sm text-slate-400">
-                  <span className="text-slate-300">{t.mitigation}:</span> {item.mitigation}
+                <p className="font-medium text-fg">{item.risk}</p>
+                <p className="mt-1 text-sm text-fg-muted">
+                  <span className="text-fg-secondary">{t.mitigation}:</span> {item.mitigation}
                 </p>
               </li>
             ))}
@@ -179,20 +179,20 @@ export function AdvisorResult({
         <p className="flex flex-wrap items-center gap-3">
           <Pill className={cx("text-sm", levelTone[a.complexity.level])}>{l.complexity[a.complexity.level]}</Pill>
         </p>
-        <p className="mt-3 leading-relaxed text-slate-300">{a.complexity.rationale}</p>
+        <p className="mt-3 leading-relaxed text-fg-secondary">{a.complexity.rationale}</p>
       </Block>
 
       <Block id="advisor-phases" icon="layers" title={t.phases}>
         <ol className="grid gap-4 md:grid-cols-2">
           {a.phases.map((phase, index) => (
-            <li key={phase.name} className="rounded-xl border border-white/[0.08] bg-ink-950/40 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-cyan-300">
+            <li key={phase.name} className="rounded-xl border border-line-subtle bg-ink-950/40 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-brand">
                 {index + 1}. {phase.indicative_duration}
               </p>
-              <p className="mt-2 font-semibold text-white">{phase.name}</p>
-              <p className="mt-1 text-sm text-slate-400">{phase.description}</p>
-              <p className="mt-3 text-xs font-medium text-slate-300">{t.deliverables}:</p>
-              <ul className="mt-1 list-disc pl-5 text-sm text-slate-400">
+              <p className="mt-2 font-semibold text-fg">{phase.name}</p>
+              <p className="mt-1 text-sm text-fg-muted">{phase.description}</p>
+              <p className="mt-3 text-xs font-medium text-fg-secondary">{t.deliverables}:</p>
+              <ul className="mt-1 list-disc pl-5 text-sm text-fg-muted">
                 {phase.deliverables.map((d) => (
                   <li key={d}>{d}</li>
                 ))}
@@ -200,19 +200,19 @@ export function AdvisorResult({
             </li>
           ))}
         </ol>
-        <p className="mt-4 text-xs text-slate-400">{t.phasesNote}</p>
+        <p className="mt-4 text-xs text-fg-muted">{t.phasesNote}</p>
       </Block>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Block id="advisor-questions" icon="message" title={t.questions}>
-          <ul className="grid list-disc gap-2 pl-5 text-slate-300">
+          <ul className="grid list-disc gap-2 pl-5 text-fg-secondary">
             {a.clarification_questions.map((q) => (
               <li key={q}>{q}</li>
             ))}
           </ul>
         </Block>
         <Block id="advisor-next" icon="target" title={t.nextSteps}>
-          <ol className="grid list-decimal gap-2 pl-5 text-slate-300">
+          <ol className="grid list-decimal gap-2 pl-5 text-fg-secondary">
             {a.next_steps.map((step) => (
               <li key={step}>{step}</li>
             ))}

@@ -25,9 +25,9 @@ export function AdvisorPreview({ content }: { content: Showcase }) {
     <figure className="overflow-hidden rounded-[var(--radius-xl)] bg-ink-950 text-fg-secondary shadow-[0_40px_80px_-40px_rgb(20_35_45_/_0.55)]" aria-label={content.sampleLabel}>
       <div className="flex items-center justify-between gap-3 border-b border-line-subtle px-5 py-3">
         <div className="flex items-center gap-1.5" aria-hidden="true">
-          <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-          <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
-          <span className="h-2.5 w-2.5 rounded-full bg-slate-700" />
+          <span className="h-2.5 w-2.5 rounded-full bg-window-chrome" />
+          <span className="h-2.5 w-2.5 rounded-full bg-window-chrome" />
+          <span className="h-2.5 w-2.5 rounded-full bg-window-chrome" />
         </div>
         <span className="rounded-[5px] border border-warning/40 bg-warning/10 px-2 py-0.5 font-mono text-[11px] text-warning">
           {content.sampleLabel}

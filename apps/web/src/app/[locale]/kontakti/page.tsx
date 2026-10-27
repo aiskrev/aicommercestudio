@@ -45,7 +45,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
           <div>
             <Eyebrow>{dict.contact.eyebrow}</Eyebrow>
             <h1 className="t-h1 mt-5">{dict.contact.title}</h1>
-            <p className="mt-6 text-lg leading-relaxed text-slate-400">{dict.contact.lead}</p>
+            <p className="mt-6 text-lg leading-relaxed text-fg-muted">{dict.contact.lead}</p>
 
             <div className="mt-10 grid gap-5">
               <section className="card rounded-2xl p-6" aria-labelledby="next-steps-title">
@@ -54,8 +54,8 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
                 </h2>
                 <ol className="mt-4 grid gap-3">
                   {dict.contact.nextSteps.map((step, index) => (
-                    <li key={step} className="flex gap-3 text-slate-300">
-                      <span className="font-display text-sm font-semibold text-cyan-300">{index + 1}.</span>
+                    <li key={step} className="flex gap-3 text-fg-secondary">
+                      <span className="font-display text-sm font-semibold text-brand">{index + 1}.</span>
                       {step}
                     </li>
                   ))}
@@ -70,7 +70,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
                   <ul className="mt-4 grid gap-2">
                     {site.contactEmail && (
                       <li>
-                        <a href={`mailto:${site.contactEmail}`} className="inline-flex items-center gap-2 text-cyan-300">
+                        <a href={`mailto:${site.contactEmail}`} className="inline-flex items-center gap-2 text-brand">
                           <Icon name="mail" className="h-4 w-4" />
                           {site.contactEmail}
                         </a>
@@ -78,7 +78,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
                     )}
                     {site.contactPhone && (
                       <li>
-                        <a href={`tel:${site.contactPhone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-cyan-300">
+                        <a href={`tel:${site.contactPhone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-brand">
                           <Icon name="phone" className="h-4 w-4" />
                           {site.contactPhone}
                         </a>
@@ -86,17 +86,17 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
                     )}
                   </ul>
                 ) : (
-                  <p className="mt-3 text-slate-400">{dict.contact.directPending}</p>
+                  <p className="mt-3 text-fg-muted">{dict.contact.directPending}</p>
                 )}
               </section>
 
-              <section className="flex gap-3 rounded-2xl border border-white/[0.07] p-5" aria-labelledby="privacy-note-title">
-                <Icon name="lock" className="mt-0.5 h-5 w-5 shrink-0 text-cyan-300" />
+              <section className="flex gap-3 rounded-2xl border border-line-subtle p-5" aria-labelledby="privacy-note-title">
+                <Icon name="lock" className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
                 <div>
                   <h2 id="privacy-note-title" className="font-semibold">
                     {dict.contact.privacyTitle}
                   </h2>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-400">{dict.contact.privacyText}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-fg-muted">{dict.contact.privacyText}</p>
                 </div>
               </section>
             </div>

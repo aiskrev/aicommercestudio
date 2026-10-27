@@ -308,7 +308,7 @@ export function Header({
                       <Link
                         href={service.href}
                         aria-current={isActive(service.href) ? "page" : undefined}
-                        className="flex min-h-11 items-center gap-3 rounded-xl px-4 py-2.5 text-[15px] text-fg-secondary hover:bg-white/[0.04] aria-[current=page]:bg-white/[0.06] aria-[current=page]:text-fg"
+                        className="flex min-h-11 items-center gap-3 rounded-xl px-4 py-2.5 text-[15px] text-fg-secondary hover:bg-surface-2 aria-[current=page]:bg-surface-3 aria-[current=page]:text-fg"
                       >
                         <Icon name={service.icon} className="h-4 w-4 shrink-0 text-brand" />
                         {service.label}
@@ -321,7 +321,7 @@ export function Header({
             <Link
               href={servicesHref}
               aria-current={pathname === servicesHref ? "page" : undefined}
-              className="flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-[15px] font-semibold text-brand hover:bg-white/[0.04]"
+              className="flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-[15px] font-semibold text-brand hover:bg-surface-2"
             >
               {labels.allServices}
               <Icon name="arrowRight" className="h-4 w-4" />
@@ -362,7 +362,7 @@ function MobileLink({ item, active }: { item: NavItem; active: boolean }) {
       aria-current={active ? "page" : undefined}
       className={cx(
         "flex min-h-11 items-center justify-between rounded-xl px-4 py-3 text-base font-medium",
-        active ? "bg-white/[0.06] text-fg" : "text-fg-secondary hover:bg-white/[0.04]",
+        active ? "bg-surface-3 text-fg" : "text-fg-secondary hover:bg-surface-2",
       )}
     >
       {item.label}
