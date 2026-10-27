@@ -22,6 +22,7 @@ import {
   type LeadTriage,
   type LinkedAssessment,
   type ReadinessDetails,
+  type TeamDetails,
 } from "@/lib/admin-types";
 import { formatDateTime } from "@/lib/format";
 import { routes } from "@/lib/routes";
@@ -114,7 +115,9 @@ export function LeadDetail({ id }: { id: string }) {
                   ? t.sourceSynthetic
                   : data.source === "readiness_assessment"
                     ? t.sourceReadiness
-                    : t.sourceForm}
+                    : data.source === "team_configurator"
+                      ? t.sourceTeam
+                      : t.sourceForm}
               </Info>
               <Info label={t.statusChanged}>{data.status_changed_at ? date(data.status_changed_at) : "—"}</Info>
             </dl>
@@ -128,6 +131,7 @@ export function LeadDetail({ id }: { id: string }) {
 
           {data.ai_managed && <AiManagedPanel details={data.ai_managed} />}
           {data.readiness && <ReadinessPanel leadId={data.id} details={data.readiness} />}
+          {data.team && <TeamPanel leadId={data.id} details={data.team} />}
           {data.advisor_assessment && <LinkedAssessmentPanel linked={data.advisor_assessment} />}
 
           <Notes lead={data} onAdded={(note) => refresh({ ...data, notes: [note, ...data.notes] })} />
@@ -205,6 +209,53 @@ function AiManagedPanel({ details }: { details: AiManagedDetails }) {
             </p>
           </div>
         )}
+      </div>
+    </Panel>
+  );
+}
+
+/** AI team configurator consultation: enumerated configuration, estimate ranges and the PDF plan. */
+function TeamPanel({ leadId, details }: { leadId: string; details: TeamDetails }) {
+  const { t: dict, locale } = useAdminI18n();
+  const t = dict.team;
+  const money = (value: number) =>
+    new Intl.NumberFormat(locale === "en" ? "en-IE" : "bg-BG", { style: "currency", currency: details.currency, maximumFractionDigits: 0 }).format(value);
+  return (
+    <Panel title={t.title}>
+      <div className="grid gap-4 text-sm" data-testid="team-details">
+        <p className="text-xs text-slate-400">{t.note}</p>
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <Info label={t.agents}>{details.agents.length}</Info>
+          <Info label={t.complexity}>{t.complexityNames[details.complexity] ?? details.complexity}</Info>
+          <Info label={t.role}>{details.role || "—"}</Info>
+          <Info label={t.deployment}>{[details.deployment, details.operations].filter(Boolean).join(" · ") || "—"}</Info>
+          <Info label={t.expected}>
+            {fmt(t.expectedValue, { oneTime: money(details.expected_one_time), monthly: money(details.expected_monthly) })}
+          </Info>
+          <Info label={t.ranges}>
+            {fmt(t.rangesValue, {
+              oneTimeMin: money(details.one_time_range[0]),
+              oneTimeMax: money(details.one_time_range[1]),
+              monthlyMin: money(details.monthly_range[0]),
+              monthlyMax: money(details.monthly_range[1]),
+            })}
+          </Info>
+        </dl>
+        <p className="font-mono text-xs text-slate-400">{details.agents.join(", ")}</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <a
+            href={`/api/admin/leads/${leadId}/team-report`}
+            download
+            className={cx(buttonClass("secondary", "sm"), "inline-flex")}
+            data-testid="team-report-download"
+          >
+            <Icon name="fileText" className="h-4 w-4" />
+            {t.download}
+          </a>
+          <span className="text-xs text-slate-400">
+            {fmt(t.versions, { model: details.model_version, assumptions: details.assumptions_version })}
+          </span>
+        </div>
       </div>
     </Panel>
   );

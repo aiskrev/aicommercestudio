@@ -74,6 +74,24 @@ export interface LeadDetail extends LeadSummary {
   ai_managed?: AiManagedDetails | null;
   /** AI readiness assessment submission (source readiness_assessment). */
   readiness?: ReadinessDetails | null;
+  /** AI team configurator consultation (source team_configurator). */
+  team?: TeamDetails | null;
+}
+
+export interface TeamDetails {
+  reference: string | null;
+  model_version: string;
+  assumptions_version: string;
+  role: string;
+  agents: string[];
+  complexity: "low" | "medium" | "high";
+  deployment: string | null;
+  operations: string | null;
+  currency: string;
+  one_time_range: [number, number];
+  monthly_range: [number, number];
+  expected_one_time: number;
+  expected_monthly: number;
 }
 
 export type ReadinessBandKey = "exploration" | "foundation" | "pilot_ready" | "scaling";
@@ -171,6 +189,8 @@ export interface RetentionPreview {
   audit_cutoff: string;
   advisor_retention_days?: number;
   advisor_assessments_due?: number;
+  team_configuration_retention_days?: number;
+  team_configurations_due?: number;
 }
 
 export interface AdminSessionInfo {

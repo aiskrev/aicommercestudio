@@ -41,8 +41,11 @@ from app.schemas import (
     RetentionRunIn,
     RetentionRunOut,
     SystemStatus,
+    TeamDetailsOut,
 )
 from app.services import ai_actions, leads
+from app.team import service as team_service
+from app.team.report import build_team_report
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -93,6 +96,35 @@ def _readiness_details(lead: Lead) -> ReadinessDetailsOut | None:
         return None
 
 
+def _team_details(db: DbSession, lead: Lead) -> TeamDetailsOut | None:
+    """Validated configurator consultation details, or None (other leads, unexpected data)."""
+    details = lead.service_details or {}
+    if details.get("kind") != "team":
+        return None
+    row = team_service.configuration_for_lead(db, lead.id)
+    ranges = details.get("ranges") or {}
+    expected = details.get("expected") or {}
+    try:
+        return TeamDetailsOut(
+            reference=row.reference if row else None,
+            model_version=details.get("model_version", ""),
+            assumptions_version=details.get("assumptions_version", ""),
+            role=details.get("role", ""),
+            agents=details.get("agents"),
+            complexity=(details.get("complexity") or {}).get("band"),
+            deployment=details.get("deployment"),
+            operations=details.get("operations"),
+            currency=details.get("currency", "EUR"),
+            one_time_range=ranges.get("one_time"),
+            monthly_range=ranges.get("monthly"),
+            expected_one_time=expected.get("one_time"),
+            expected_monthly=expected.get("monthly"),
+        )
+    except ValidationError:
+        logger.warning("lead_service_details_invalid", extra={"lead": lead.reference})
+        return None
+
+
 def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
     base = LeadSummaryOut.model_validate(lead).model_dump()
     return LeadDetailOut(
@@ -114,6 +146,7 @@ def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
         advisor_assessment=advisor.summary_for_lead(db, lead.id),
         ai_managed=_ai_managed_details(lead),
         readiness=_readiness_details(lead),
+        team=_team_details(db, lead),
     )
 
 
@@ -189,6 +222,7 @@ def retention_preview(ctx: Admin, db: DbSession, settings: AppSettings, response
         settings.lead_retention_days,
         settings.audit_retention_days,
         readiness_retention_days=settings.readiness_retention_days,
+        team_retention_days=settings.team_lead_retention_days,
     )
     return RetentionPreview(
         lead_retention_days=settings.lead_retention_days,
@@ -199,6 +233,8 @@ def retention_preview(ctx: Admin, db: DbSession, settings: AppSettings, response
         audit_cutoff=preview.audit_cutoff,
         advisor_retention_days=settings.advisor_retention_days,
         advisor_assessments_due=advisor.count_expired(db),
+        team_configuration_retention_days=settings.team_configuration_retention_days,
+        team_configurations_due=team_service.count_expired(db),
     )
 
 
@@ -210,14 +246,17 @@ def retention_run(payload: RetentionRunIn, ctx: Admin, db: DbSession, settings: 
         settings.lead_retention_days,
         settings.audit_retention_days,
         readiness_retention_days=settings.readiness_retention_days,
+        team_retention_days=settings.team_lead_retention_days,
     )
     assessments = advisor.purge_expired(db)
+    configurations = team_service.purge_expired(db)
     audit.record(
         db, "retention.run", actor=ctx.user, entity_type="system",
         details={
             "leads_deleted": result.leads_deleted,
             "audit_entries_deleted": result.audit_entries_deleted,
             "advisor_assessments_deleted": assessments.deleted,
+            "team_configurations_deleted": configurations.deleted,
         },
         ip_hash=ctx.ip_hash,
     )
@@ -226,6 +265,7 @@ def retention_run(payload: RetentionRunIn, ctx: Admin, db: DbSession, settings: 
         leads_deleted=result.leads_deleted,
         audit_entries_deleted=result.audit_entries_deleted,
         advisor_assessments_deleted=assessments.deleted,
+        team_configurations_deleted=configurations.deleted,
     )
 
 
@@ -336,6 +376,44 @@ def lead_readiness_report(lead_id: uuid.UUID, ctx: Admin, db: DbSession) -> Resp
         media_type="application/pdf",
         headers={
             "Content-Disposition": f'attachment; filename="readiness-{lead.reference}.pdf"',
+            "Cache-Control": "no-store",
+        },
+    )
+
+
+@router.get(
+    "/leads/{lead_id}/team-report",
+    response_class=Response,
+    responses={200: {"content": {"application/pdf": {}}}},
+    summary="PDF plan of a lead's AI team configuration (admins only)",
+)
+def lead_team_report(lead_id: uuid.UUID, ctx: Admin, db: DbSession, settings: AppSettings) -> Response:
+    lead = _get_lead_or_404(db, lead_id)
+    is_team = (lead.service_details or {}).get("kind") == "team"
+    row = team_service.configuration_for_lead(db, lead.id) if is_team else None
+    if row is None:
+        raise ApiError(status.HTTP_404_NOT_FOUND, NOT_FOUND, "team_configuration_not_found")
+    # Priced with the assumptions version stored with the configuration while that file is available.
+    try:
+        config = team_service.config_from_row(row)
+        doc = team_service.assumptions_for_version(settings, row.assumptions_version)
+        plan = team_service.build_plan(config, doc, row.overrides or {})
+        pdf = build_team_report(config, plan, lead.locale, lead.company)
+    except (TypeError, KeyError, ValueError, ReportUnavailable) as exc:
+        logger.warning("team_report_failed", extra={"lead": lead.reference, "error": type(exc).__name__})
+        raise ApiError(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "Отчетът не може да бъде създаден.", "report_unavailable"
+        ) from exc
+    audit.record(
+        db, "lead.team_report_downloaded", actor=ctx.user, entity_type="lead", entity_id=str(lead.id),
+        ip_hash=ctx.ip_hash,
+    )
+    db.commit()
+    return Response(
+        content=pdf,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="ai-team-{lead.reference}.pdf"',
             "Cache-Control": "no-store",
         },
     )

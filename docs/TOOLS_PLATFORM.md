@@ -158,6 +158,9 @@ Rules:
 * **Share link** `?t=`: base64url JSON of enumerated values only (never the custom department name);
   decoding drops unknown values, re-applies the rules and restores only complete configurations.
 
+Costs, saved configurations, the PDF plan and consultations (API, cost model, privacy, migration
+0007): [TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md).
+
 ## Adding a tool
 
 1. Add the key to `ToolKey`, a definition to `TOOLS` (status `planned`) and a flag (default off).

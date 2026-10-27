@@ -29,6 +29,7 @@ export function RetentionPanel() {
         leads_deleted: number;
         audit_entries_deleted: number;
         advisor_assessments_deleted?: number;
+        team_configurations_deleted?: number;
       }>(
         "/api/admin/retention/run",
         { method: "POST", body: JSON.stringify({ confirm: true }) },
@@ -39,6 +40,7 @@ export function RetentionPanel() {
           leads: out.leads_deleted,
           audit: out.audit_entries_deleted,
           advisor: out.advisor_assessments_deleted ?? 0,
+          team: out.team_configurations_deleted ?? 0,
         }),
       });
       preview.reload();
@@ -51,7 +53,9 @@ export function RetentionPanel() {
   }
 
   const data = preview.data;
-  const due = data ? data.leads_due + data.audit_entries_due + (data.advisor_assessments_due ?? 0) : 0;
+  const due = data
+    ? data.leads_due + data.audit_entries_due + (data.advisor_assessments_due ?? 0) + (data.team_configurations_due ?? 0)
+    : 0;
 
   return (
     <Panel title={t.title}>

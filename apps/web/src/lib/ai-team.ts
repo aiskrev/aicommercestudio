@@ -12,7 +12,35 @@ import type { ServiceKey } from "@/content/types";
  *   risks / prereqs    ← conditions over the configuration
  *   rollout            ← pilot with the simplest relevant agent, then the rest, coordination last
  * Nothing here is deployed or measured; effort ranges are labelled estimates with stated assumptions.
+ *
+ * The API ports these rules (apps/api/app/team/model.py) for cost estimates, saved configurations and
+ * the PDF plan; both are tested against the same golden vectors (team.vectors.json). Change the rules
+ * in both places, regenerate the vectors and bump TEAM_MODEL_VERSION together.
  */
+
+/** Must equal MODEL_VERSION in apps/api/app/team/model.py. */
+export const TEAM_MODEL_VERSION = "2026-10.1";
+/** Version of the request shape sent to /api/public/team/*. */
+export const TEAM_SCHEMA_VERSION = "1";
+
+/** Security considerations the API derives for a team (texts: content tool-team.ts → security). */
+export const SECURITY_KEYS = [
+  "least_privilege",
+  "secrets",
+  "audit_log",
+  "provider_terms",
+  "personal_data",
+  "untrusted_input",
+  "external_actions",
+  "document_permissions",
+  "regulated_data",
+  "data_location",
+] as const;
+export type SecurityKey = (typeof SECURITY_KEYS)[number];
+
+/** Cost scenarios: conservative = lower usage and a lean scope. */
+export const COST_SCENARIOS = ["conservative", "expected", "higher"] as const;
+export type CostScenario = (typeof COST_SCENARIOS)[number];
 
 // ---------------------------------------------------------------------------------------- context
 
@@ -802,4 +830,70 @@ export function isComplete(config: TeamConfig): boolean {
       config.deployment &&
       config.operations,
   );
+}
+
+// ------------------------------------------------------------------------------------ API shape
+
+/** The configuration as the API expects it (snake_case context, settings only for selected agents). */
+export function toApiConfig(config: TeamConfig) {
+  const configs = agentConfigs(config);
+  const { industry, size, leadDepartment, challenge, volume } = config.context;
+  return {
+    context: { industry, size, lead_department: leadDepartment, challenge, volume },
+    departments: config.departments,
+    chosen: config.chosen,
+    agents: configs,
+    deployment: config.deployment,
+    operations: config.operations,
+  };
+}
+
+/** Inverse of toApiConfig for a configuration loaded from the API; null when it is not complete. */
+export function fromApiConfig(data: unknown): TeamConfig | null {
+  if (!data || typeof data !== "object") return null;
+  const raw = data as Record<string, unknown>;
+  const context = (raw.context ?? {}) as Record<string, unknown>;
+  const pick = <T extends string>(list: readonly T[], value: unknown) =>
+    typeof value === "string" && (list as readonly string[]).includes(value) ? (value as T) : undefined;
+  const agents: Partial<Record<AgentKey, AgentConfig>> = {};
+  const rawAgents = (raw.agents ?? {}) as Record<string, Record<string, unknown>>;
+  for (const agent of AGENT_KEYS) {
+    const entry = rawAgents[agent];
+    if (!entry) continue;
+    agents[agent] = normaliseAgentConfig(agent, {
+      volume: pick(VOLUMES, entry.volume) ?? "v100_1k",
+      checkpoint: pick(CHECKPOINTS, entry.checkpoint) ?? "none",
+      integrations: INTEGRATIONS.filter((i) => Array.isArray(entry.integrations) && entry.integrations.includes(i)),
+    });
+  }
+  const config: TeamConfig = {
+    context: {
+      industry: pick(INDUSTRIES, context.industry),
+      size: pick(COMPANY_SIZES, context.size),
+      leadDepartment: pick(DEPARTMENTS, context.lead_department),
+      challenge: pick(CHALLENGES, context.challenge),
+      volume: pick(VOLUMES, context.volume),
+    },
+    departments: DEPARTMENTS.filter((d) => Array.isArray(raw.departments) && raw.departments.includes(d)),
+    chosen: AGENT_KEYS.filter((a) => Array.isArray(raw.chosen) && raw.chosen.includes(a)),
+    agents,
+    deployment: pick(DEPLOYMENTS, raw.deployment),
+    operations: pick(OPERATIONS, raw.operations),
+  };
+  return isComplete(config) ? config : null;
+}
+
+/** Everything derived from a configuration, in the API's shape (team.vectors.json parity). */
+export function toApiTeamSummary(config: TeamConfig) {
+  return {
+    selected: selectedAgents(config),
+    configs: agentConfigs(config),
+    complexity: complexity(config),
+    risks: risks(config),
+    prerequisites: prerequisites(config),
+    workflows: suggestedWorkflows(config),
+    rollout: rolloutPlan(config).map((phase) => ({ ...phase, weeks: [...phase.weeks] })),
+    services: relatedServices(config),
+    architecture: buildArchitecture(config),
+  };
 }

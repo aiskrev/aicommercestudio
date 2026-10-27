@@ -14,6 +14,7 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0004` | AI Managed Services and lead language: `ai_managed` added to the `service` / `submitted_service` CHECKs; `leads.locale` (`bg`/`en`, NOT NULL, server default `bg` — existing rows become `bg`, CHECK `ck_leads_locale`, index `ix_leads_locale`); `leads.service_details` JSONB null. Downgrade re-categorises `ai_managed` leads as `other` (details are dropped with the column) instead of deleting them. |
 | `0005` | AI agent development: `ai_agents` added to the `service` / `submitted_service` CHECKs. No existing row changes. |
 | `0006` | `leads.marketing_consent_version` varchar(32) null — wording version of a given marketing consent (contact form and AI readiness submissions). Nullable, no default; downgrade drops the column. |
+| `0007` | `team_configurations`: saved AI team configurations (enumerated JSONB, schema/model/assumptions versions, visitor rate overrides, SHA-256 `token_hash` unique, `locale` CHECK, `expires_at` index, `lead_id` FK `ON DELETE CASCADE`). New table only; downgrade drops it. |
 
 Apply: automatic on container start (`RUN_MIGRATIONS_ON_START=true`), or manually
 `docker compose exec api alembic upgrade head`. Inspect: `docker compose exec api alembic current`.
@@ -65,7 +66,7 @@ All timestamps are `timestamptz` in UTC.
 | phone | varchar(40) null | optional |
 | message | text | ≤ 5000 chars (validated) |
 | status | varchar(20) | CHECK in (`NEW`, `CONTACTED`, `QUALIFIED`, `PROPOSAL`, `WON`, `LOST`); indexed |
-| source | varchar(40) | `website_contact_form`, `readiness_assessment` (AI readiness submission, `service_details.kind = "readiness"`) or `synthetic_seed` |
+| source | varchar(40) | `website_contact_form`, `readiness_assessment` (AI readiness submission, `service_details.kind = "readiness"`), `team_configurator` (AI team consultation, `service_details.kind = "team"`, configuration in `team_configurations`) or `synthetic_seed` |
 | privacy_acknowledged_at | timestamptz | when the visitor confirmed the privacy information |
 | privacy_notice_version | varchar(32) | `PRIVACY_NOTICE_VERSION` at submission time |
 | marketing_consent | boolean | separate, optional consent |
@@ -107,6 +108,7 @@ Append-only activity log. `details` must never contain raw personal data.
 | --- | --- |
 | `lead.created` | a contact or quote request is stored (`details.inquiry_type`); AI readiness submissions add `source`, `band`, `consultation_requested` |
 | `lead.readiness_report_downloaded` | an admin downloaded the PDF report of a readiness submission |
+| `lead.team_report_downloaded` | an admin downloaded the PDF plan of an AI team consultation |
 | `lead.viewed` | an admin opens a lead (personal-data access; at most once per admin / lead / 15 min) |
 | `lead.status_changed`, `lead.service_changed` | pipeline or categorisation change (`from`, `to`) |
 | `lead.note_added`, `lead.deleted` | note added; GDPR erasure or retention deletion (`reason`) |
@@ -152,6 +154,22 @@ description is stored after e-mails, phone numbers and links were removed.
 | lead_id | uuid FK → leads.id **ON DELETE CASCADE**, nullable | set when the visitor requests a consultation; index `ix_advisor_assessments_lead_id` |
 | linked_at | timestamptz | when it was linked |
 
+## team_configurations
+
+Saved AI team configurations ([TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md)). Enumerated values only —
+no personal data and no free text.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| id | uuid PK | reference = first 8 hex chars, upper case |
+| created_at, expires_at | timestamptz | unlinked: `+ TEAM_CONFIGURATION_RETENTION_DAYS`; index `ix_team_configurations_expires_at` |
+| token_hash | varchar(64) null, UNIQUE | SHA-256 of the secret link token; null for configurations attached to a consultation (not retrievable by link) |
+| schema_version, model_version, assumptions_version | varchar | request shape, team model and cost assumptions the row was saved/priced with |
+| locale | varchar(2), default `bg` | CHECK `ck_team_configurations_locale` |
+| config | jsonb | context, departments, chosen agents, per-agent settings (team members only), deployment, operations |
+| overrides | jsonb | visitor rate overrides (bounded by the API) |
+| lead_id | uuid FK → leads.id **ON DELETE CASCADE**, nullable | the consultation lead; index `ix_team_configurations_lead_id` |
+
 ## Retention & erasure
 
 | Data | Rule | Mechanism |
@@ -160,6 +178,7 @@ description is stored after e-mails, phone numbers and links were removed.
 | Audit log | deleted after `AUDIT_RETENTION_DAYS` (default 1095) | same command |
 | Sessions | removed after expiry / 1 day after revocation | same command |
 | Advisor assessments | unlinked rows deleted after `expires_at` (`ADVISOR_RETENTION_DAYS`, default 30); linked rows are deleted with their lead | same command and admin retention panel |
+| AI team configurations | unlinked rows deleted after `expires_at` (`TEAM_CONFIGURATION_RETENTION_DAYS`, default 90); linked rows are deleted with their lead; configurator leads also expire after `TEAM_LEAD_RETENTION_DAYS` (default 365) | same command and admin retention panel |
 | Individual erasure request | admin deletes the lead in the UI (`DELETE /api/admin/leads/{id}`); a linked advisor assessment is deleted with it | audit keeps only id + reason |
 
 ## Seed data

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ReadinessAssessment } from "@/components/tools/ReadinessAssessment";
-import { AiTeamBuilder } from "@/components/tools/team/AiTeamBuilder";
+import { AiTeamTool } from "@/components/tools/team/AiTeamTool";
 import { ToolState } from "@/components/tools/ToolUi";
 import { Icon } from "@/components/ui/Icon";
 import { PageHero, Section } from "@/components/ui/primitives";
@@ -116,12 +116,13 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
       ) : (
         <Section size="wide">
           <Suspense fallback={loading}>
-            <AiTeamBuilder
+            <AiTeamTool
               content={teamTool}
               ui={tools.ui}
               services={services}
               contactHref={href(contactWithService("ai_agents"))}
               advisorHref={toolHrefs(locale).advisor}
+              privacyHref={href(routes.privacy)}
               locale={locale}
             />
           </Suspense>

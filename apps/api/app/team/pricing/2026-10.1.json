@@ -1,0 +1,84 @@
+{
+  "version": "2026-10.1",
+  "currency": "EUR",
+  "note": "Illustrative planning assumptions for an early conversation. Not a quote and not current list prices of any provider. Every value can be changed in this file (or a copy referenced by TEAM_COST_ASSUMPTIONS_FILE); bump `version` when you do.",
+  "scenarios": ["conservative", "expected", "higher"],
+  "rates": {
+    "day_rate": 600,
+    "internal_hourly_rate": 30
+  },
+  "volume_tasks": {
+    "v_lt100": [30, 60, 100],
+    "v100_1k": [150, 500, 1000],
+    "v1k_10k": [1500, 5000, 10000],
+    "v_gt10k": [12000, 20000, 40000]
+  },
+  "one_time": {
+    "discovery_days": [3, 5, 8],
+    "agent_build_days": {
+      "low": [4, 6, 9],
+      "medium": [7, 10, 15],
+      "high": [12, 18, 26]
+    },
+    "integration_days": {
+      "low": [1, 2, 3],
+      "medium": [2, 4, 6],
+      "high": [5, 8, 12]
+    },
+    "approval_setup_days": [1, 1.5, 2.5],
+    "deployment_days": {
+      "managed_cloud": [1, 2, 3],
+      "customer_cloud": [3, 5, 8],
+      "on_premise": [6, 10, 15]
+    },
+    "testing_share": [0.15, 0.2, 0.3]
+  },
+  "integration_complexity": {
+    "crm": "medium",
+    "email": "low",
+    "helpdesk": "medium",
+    "chat": "low",
+    "calendar": "low",
+    "cms": "low",
+    "ecommerce_platform": "medium",
+    "erp": "high",
+    "accounting": "high",
+    "hris": "high",
+    "knowledge_base": "medium",
+    "document_storage": "low",
+    "analytics_warehouse": "medium"
+  },
+  "model_usage": {
+    "price_per_million_input": 3.0,
+    "price_per_million_output": 15.0,
+    "price_note": "Illustrative mid-range prices per million tokens. Model prices change often; check your provider's current price list.",
+    "tokens_per_task": {
+      "lead_qualification": [3000, 500],
+      "sales_research": [10000, 1500],
+      "customer_support": [6000, 800],
+      "content_operations": [4000, 1500],
+      "document_processing": [8000, 1200],
+      "knowledge_assistant": [5000, 600],
+      "scheduling": [1500, 300],
+      "reporting_insights": [12000, 2000],
+      "workflow_coordinator": [1500, 200],
+      "approval_supervisor": [1000, 150]
+    },
+    "overhead": [1.1, 1.25, 1.5]
+  },
+  "infrastructure_monthly": {
+    "managed_cloud": { "base": [120, 200, 350], "per_agent": [20, 35, 60] },
+    "customer_cloud": { "base": [80, 150, 280], "per_agent": [15, 30, 50] },
+    "on_premise": { "base": [40, 80, 150], "per_agent": [10, 20, 35] }
+  },
+  "monitoring_monthly": {
+    "studio_managed": { "studio_base_hours": [4, 6, 10], "studio_hours_per_agent": [1.5, 2.5, 4], "internal_hours_per_agent": [0.5, 1, 1.5] },
+    "shared": { "studio_base_hours": [2, 3, 5], "studio_hours_per_agent": [1, 1.5, 2.5], "internal_hours_per_agent": [1, 2, 3] },
+    "internal": { "studio_base_hours": [0, 0, 0], "studio_hours_per_agent": [0, 0, 0], "internal_hours_per_agent": [3, 5, 8] }
+  },
+  "oversight": {
+    "minutes_per_review": [1.5, 2, 3],
+    "sample_share": [0.03, 0.05, 0.1],
+    "external_action_share": [0.4, 0.6, 0.8]
+  }
+}

@@ -311,3 +311,35 @@ class AdvisorAssessment(Base):
     @property
     def reference(self) -> str:
         return self.id.hex[:8].upper()
+
+
+class TeamConfiguration(Base):
+    """A saved AI team configuration: enumerated values only (no free text, no personal data).
+
+    Retrieved with a secret link token; only its SHA-256 hash is stored. Unlinked rows expire after
+    TEAM_CONFIGURATION_RETENTION_DAYS; a row linked to a consultation lead is deleted with that lead.
+    """
+
+    __tablename__ = "team_configurations"
+    __table_args__ = (
+        CheckConstraint(_in_check("locale", LeadLocale), name="locale"),
+        Index("ix_team_configurations_expires_at", "expires_at"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, unique=True)
+    schema_version: Mapped[str] = mapped_column(String(8), nullable=False)
+    model_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    assumptions_version: Mapped[str] = mapped_column(String(32), nullable=False)
+    locale: Mapped[str] = mapped_column(String(2), nullable=False, server_default="bg")
+    config: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    overrides: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    lead_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("leads.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+
+    @property
+    def reference(self) -> str:
+        return self.id.hex[:8].upper()

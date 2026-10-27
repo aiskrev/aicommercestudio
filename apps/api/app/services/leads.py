@@ -329,25 +329,31 @@ class RetentionResult:
 
 
 READINESS_SOURCE = "readiness_assessment"
+TEAM_SOURCE = "team_configurator"
 
 
-def _expired_leads(now: datetime, lead_retention_days: int, readiness_retention_days: int | None):
-    """Leads past the general retention, or readiness leads past their (shorter) own retention."""
+def _expired_leads(
+    now: datetime,
+    lead_retention_days: int,
+    readiness_retention_days: int | None,
+    team_retention_days: int | None = None,
+):
+    """Leads past the general retention, or tool leads past their (shorter) own retention."""
     condition = Lead.updated_at < now - timedelta(days=lead_retention_days)
-    if readiness_retention_days is not None:
-        readiness_cutoff = now - timedelta(days=readiness_retention_days)
-        condition = or_(condition, (Lead.source == READINESS_SOURCE) & (Lead.updated_at < readiness_cutoff))
+    for source, days in ((READINESS_SOURCE, readiness_retention_days), (TEAM_SOURCE, team_retention_days)):
+        if days is not None:
+            condition = or_(condition, (Lead.source == source) & (Lead.updated_at < now - timedelta(days=days)))
     return condition
 
 
 def purge_expired(
     db: Session, lead_retention_days: int, audit_retention_days: int, *, dry_run: bool = False,
-    now: datetime | None = None, readiness_retention_days: int | None = None,
+    now: datetime | None = None, readiness_retention_days: int | None = None, team_retention_days: int | None = None,
 ) -> RetentionResult:
     """Delete leads not updated within the retention period and audit entries older than theirs."""
     now = now or utcnow()
     audit_cutoff = now - timedelta(days=audit_retention_days)
-    due = _expired_leads(now, lead_retention_days, readiness_retention_days)
+    due = _expired_leads(now, lead_retention_days, readiness_retention_days, team_retention_days)
     expired = list(db.scalars(select(Lead).where(due)).all())
     old_audit = db.scalar(select(func.count()).select_from(AuditLog).where(AuditLog.created_at < audit_cutoff)) or 0
     if dry_run:
@@ -369,7 +375,7 @@ class RetentionPreview:
 
 def retention_preview(
     db: Session, lead_retention_days: int, audit_retention_days: int, now: datetime | None = None,
-    readiness_retention_days: int | None = None,
+    readiness_retention_days: int | None = None, team_retention_days: int | None = None,
 ) -> RetentionPreview:
     now = now or utcnow()
     lead_cutoff = now - timedelta(days=lead_retention_days)
@@ -378,7 +384,7 @@ def retention_preview(
         db.scalar(
             select(func.count())
             .select_from(Lead)
-            .where(_expired_leads(now, lead_retention_days, readiness_retention_days))
+            .where(_expired_leads(now, lead_retention_days, readiness_retention_days, team_retention_days))
         )
         or 0
     )
