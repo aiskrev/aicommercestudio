@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Generate local .env
         run: ./scripts/setup.ps1 6>$null | Out-Null
       - name: Run API suite
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Generate local .env
         run: ./scripts/setup.ps1 6>$null | Out-Null
       - name: Run web suite
@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Generate local .env
         run: ./scripts/setup.ps1 6>$null | Out-Null
       - name: Run e2e suite
@@ -62,7 +62,7 @@ jobs:
         run: docker compose logs --no-color --tail 200 api web
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: apps/web/e2e/playwright-report
