@@ -3,8 +3,10 @@
 **Status:** the V1 slice is implemented in migration `0009`: `catalogue_entities`,
 `service_domains`, `service_families`, `services` (services only), `family_services`,
 `entity_translations` and `entity_relations` (three relation kinds). See
-[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md#service-catalogue-migration-0009). The rest of this
-document is still a design, including the additive column in §3.15. The rationale, conflicts and roll-out are in
+[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md#service-catalogue-migration-0009). Migration `0010` adds
+§3.15 (`admin_users.role`), §3.8/§3.9 (content items for capabilities and deliverables),
+assessments and workshops with a duration band (§3.4), and per-entry publication snapshots instead
+of the releases of §3.14. The rest of this document is still a design. The rationale, conflicts and roll-out are in
 [SERVICE_CATALOGUE_ARCHITECTURE.md](SERVICE_CATALOGUE_ARCHITECTURE.md). The API is in
 [API_ARCHITECTURE_V2.md](API_ARCHITECTURE_V2.md).
 

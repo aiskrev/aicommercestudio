@@ -87,6 +87,10 @@ class Settings(BaseSettings):
     team_lookup_rate_limit: int = Field(default=30, ge=1)
     team_rate_window_seconds: int = Field(default=600, ge=1)
     team_global_rate_limit: int = Field(default=600, ge=1)
+    # Public service catalogue (read-only, cacheable): per client address and across all clients.
+    catalogue_rate_limit: int = Field(default=120, ge=1)
+    catalogue_global_rate_limit: int = Field(default=3000, ge=1)
+    catalogue_rate_window_seconds: int = Field(default=60, ge=1)
     # Saved configurations without a consultation request are deleted after this many days;
     # those attached to a lead follow the lead (and READINESS-style shorter retention below).
     team_configuration_retention_days: int = Field(default=90, ge=1, le=730)

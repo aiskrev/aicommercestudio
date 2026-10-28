@@ -1,5 +1,5 @@
 {
- "schema_version": 1,
+ "schema_version": 2,
  "locales": [
   "bg",
   "en"
@@ -28,7 +28,14 @@
      "cta_label": "Заявете оценка на AI готовността",
      "seo_title": "AI стратегия и план за внедряване на изкуствен интелект",
      "seo_description": "Оценка на готовността, приоритизиране на случаи на употреба и поетапен план за внедряване на AI — с ясни критерии за приемане и човешки контрол.",
-     "primary_keyword": "AI стратегия"
+     "primary_keyword": "AI стратегия",
+     "deliverables": [
+      "Доклад за готовността с блокиращите фактори.",
+      "Приоритизиран регистър на случаите на употреба.",
+      "Скица на целевата архитектура за всеки случай — с потоците от данни и точките за одобрение.",
+      "Поетапна пътна карта с критерии за приемане.",
+      "Критерии за избор на модел и доставчик."
+     ]
     },
     "en": {
      "slug": "ai-strategy-and-transformation",
@@ -38,7 +45,14 @@
      "cta_label": "Request an AI readiness assessment",
      "seo_title": "AI strategy and an implementation roadmap for your business",
      "seo_description": "Readiness assessment, use-case prioritisation and a phased AI roadmap with acceptance criteria and human approval points — before you invest in implementation.",
-     "primary_keyword": "AI strategy"
+     "primary_keyword": "AI strategy",
+     "deliverables": [
+      "A readiness report with blockers.",
+      "A prioritised use-case register.",
+      "A target architecture sketch per use case, with data flows and approval points.",
+      "A phased roadmap with acceptance criteria.",
+      "Model and provider selection criteria."
+     ]
     }
    }
   },
@@ -65,7 +79,14 @@
      "cta_label": "Опишете процеса за автоматизация",
      "seo_title": "AI агенти и бизнес автоматизация с човешки контрол",
      "seo_description": "Проектиране и внедряване на AI агенти и автоматизирани работни процеси в CRM, имейл, helpdesk и ERP — с одобрение на действията и журнал.",
-     "primary_keyword": "AI агенти и бизнес автоматизация"
+     "primary_keyword": "AI агенти и бизнес автоматизация",
+     "deliverables": [
+      "Спецификация на агентите и процесите: роли, входове и изходи, матрица на одобренията.",
+      "Внедрени агенти и процеси с тестови случаи за оценка.",
+      "Служебни акаунти с минимално необходимите права.",
+      "Журнал на всяко действие.",
+      "Наръчник за работа и процедура за връщане назад."
+     ]
     },
     "en": {
      "slug": "ai-agents-and-business-automation",
@@ -75,7 +96,14 @@
      "cta_label": "Describe the process you want to automate",
      "seo_title": "AI agents and business automation with human approval",
      "seo_description": "Design and delivery of AI agents and automated workflows across CRM, e-mail, helpdesk and ERP — with permission checks, approval points and an audit trail.",
-     "primary_keyword": "AI agents and business automation"
+     "primary_keyword": "AI agents and business automation",
+     "deliverables": [
+      "An agent and workflow specification: roles, inputs and outputs, approval matrix.",
+      "Implemented agents and workflows with evaluation cases.",
+      "Least-privilege service accounts.",
+      "An audit log of every action.",
+      "A runbook and a rollback procedure."
+     ]
     }
    }
   },
@@ -102,7 +130,15 @@
      "cta_label": "Обсъдете AI приложение за вашите данни",
      "seo_title": "AI приложения и асистенти върху вашите документи (RAG)",
      "seo_description": "Вътрешни AI асистенти, анализ на документи и AI функции в продукти — с отговори с източник, контрол на достъпа и измерено качество.",
-     "primary_keyword": "AI приложения"
+     "primary_keyword": "AI приложения",
+     "deliverables": [
+      "Процес за зареждане на документите.",
+      "Дизайн на индекса с филтриране по права за достъп.",
+      "Приложение или API.",
+      "Набор за оценка с базови резултати.",
+      "Наблюдение на разходите и времето за отговор.",
+      "Документация за обработката на данните."
+     ]
     },
     "en": {
      "slug": "ai-applications-and-knowledge-systems",
@@ -112,7 +148,15 @@
      "cta_label": "Discuss an AI application for your data",
      "seo_title": "AI applications and knowledge assistants on your documents",
      "seo_description": "Internal AI assistants, document analysis and AI product features built on your own data — with cited sources, access control and measured quality.",
-     "primary_keyword": "AI applications"
+     "primary_keyword": "AI applications",
+     "deliverables": [
+      "An ingestion pipeline.",
+      "Index design with permission filtering.",
+      "An application or API.",
+      "An evaluation set with baseline results.",
+      "Monitoring of cost and latency.",
+      "Data-handling documentation."
+     ]
     }
    }
   },
@@ -139,7 +183,16 @@
      "cta_label": "Заявете преглед на риска на AI система",
      "seo_title": "Управление и сигурност на AI системи: риск, данни, контрол",
      "seo_description": "Преглед на риска, одобрения и права, защита на данните, защита от инжектиране на инструкции и оценка на качеството на AI системи — без правни обещания.",
-     "primary_keyword": "сигурност на AI системи"
+     "primary_keyword": "сигурност на AI системи",
+     "deliverables": [
+      "Регистър на рисковете за всяка AI система.",
+      "Матрица на одобренията.",
+      "Опис на потоците и обработката на данни.",
+      "Модел на заплахите.",
+      "Доклад от оценката.",
+      "Проекти на политики за преглед от юрист.",
+      "Внедрени контроли: скриване на данни, проверки на правата, одитен журнал."
+     ]
     },
     "en": {
      "slug": "ai-governance-security-and-assurance",
@@ -149,7 +202,16 @@
      "cta_label": "Request an AI system risk review",
      "seo_title": "AI governance and security: risk, data protection, controls",
      "seo_description": "Risk review, approval and permission design, data protection, prompt-injection defences and evaluation for AI systems — engineering controls, not legal advice.",
-     "primary_keyword": "AI governance"
+     "primary_keyword": "AI governance",
+     "deliverables": [
+      "A risk register per AI system.",
+      "An approval matrix.",
+      "A data-flow and processing inventory.",
+      "A threat model.",
+      "An evaluation report.",
+      "Policy drafts for legal review.",
+      "Implemented controls: redaction, permission checks, audit log."
+     ]
     }
    }
   },
@@ -176,7 +238,15 @@
      "cta_label": "Заявете технически одит на магазина",
      "seo_title": "Инженеринг за онлайн магазини: стабилност, скорост и растеж",
      "seo_description": "Поддръжка, производителност, техническо SEO, анализи и интеграции за Shopify и WooCommerce — един технически партньор за магазина и данните.",
-     "primary_keyword": "инженеринг за онлайн магазини"
+     "primary_keyword": "инженеринг за онлайн магазини",
+     "deliverables": [
+      "Технически одит с приоритизиран списък задачи.",
+      "Дневник на поддръжката.",
+      "Бюджети и отчети за производителността.",
+      "Внедрени структурирани данни.",
+      "План за проследяване и спецификация на събитията.",
+      "План за миграция с карта на пренасочванията."
+     ]
     },
     "en": {
      "slug": "commerce-engineering",
@@ -186,7 +256,15 @@
      "cta_label": "Request a technical store audit",
      "seo_title": "Commerce engineering for Shopify and WooCommerce stores",
      "seo_description": "Maintenance, performance, technical SEO, analytics and integrations for online stores — one technical partner for the store, its data and its AI features.",
-     "primary_keyword": "commerce engineering"
+     "primary_keyword": "commerce engineering",
+     "deliverables": [
+      "A technical audit with a prioritised backlog.",
+      "A maintenance log.",
+      "Performance budgets and reports.",
+      "A structured-data implementation.",
+      "A tracking plan and an event specification.",
+      "A migration plan with a redirect map."
+     ]
     }
    }
   },
@@ -213,7 +291,16 @@
      "cta_label": "Обсъдете облачна среда за вашето приложение",
      "seo_title": "Облачна инфраструктура и платформен инженеринг (IaC)",
      "seo_description": "Проектиране и изграждане на облачни среди: инфраструктура като код, контейнери, управлявани бази данни, тайни, архиви и контрол на разходите в ЕС.",
-     "primary_keyword": "облачна инфраструктура"
+     "primary_keyword": "облачна инфраструктура",
+     "deliverables": [
+      "Архитектура и записи на решенията.",
+      "Хранилище с инфраструктура като код.",
+      "Диаграми на средите и мрежата.",
+      "Наръчници за архивиране и възстановяване с проведен тест за възстановяване.",
+      "Модел на достъпа.",
+      "Табла и бюджети за разходите.",
+      "Среща за предаване на работата."
+     ]
     },
     "en": {
      "slug": "cloud-and-platform-engineering",
@@ -223,7 +310,16 @@
      "cta_label": "Discuss a cloud platform for your application",
      "seo_title": "Cloud and platform engineering with infrastructure as code",
      "seo_description": "Design and build of cloud environments: infrastructure as code, containers, managed databases, secrets, tested backups and cost control, EU-hosted by default.",
-     "primary_keyword": "cloud and platform engineering"
+     "primary_keyword": "cloud and platform engineering",
+     "deliverables": [
+      "An architecture and decision records.",
+      "An IaC repository.",
+      "Environment and network diagrams.",
+      "Backup and restore runbooks with an executed restore test.",
+      "An access model.",
+      "Cost dashboards and budgets.",
+      "A handover session."
+     ]
     }
    }
   },
@@ -250,7 +346,15 @@
      "cta_label": "Заявете преглед на доставката и наблюдаемостта",
      "seo_title": "DevOps, SRE и наблюдаемост: CI/CD, мониторинг и надеждност",
      "seo_description": "CI/CD конвейери, безопасни версии, логове, метрики и трасиране с OpenTelemetry, SLO и процедура при инциденти — приложени в мащаба на вашия екип.",
-     "primary_keyword": "DevOps, SRE и наблюдаемост"
+     "primary_keyword": "DevOps, SRE и наблюдаемост",
+     "deliverables": [
+      "Дефиниции на конвейерите във вашето хранилище с код.",
+      "Наръчник за пускане на версии и връщане назад.",
+      "Табла и правила за известия, описани като код.",
+      "Документирани SLO.",
+      "Процедура при инциденти и шаблон за преглед след инцидент.",
+      "Инструментиране за трасиране със скриване на чувствителни данни."
+     ]
     },
     "en": {
      "slug": "devops-sre-and-observability",
@@ -260,7 +364,15 @@
      "cta_label": "Request a delivery and observability review",
      "seo_title": "DevOps, SRE and observability: CI/CD and monitoring",
      "seo_description": "CI/CD pipelines, safe releases, logs, metrics, OpenTelemetry tracing, SLOs and an incident practice — sized for your team and documented in your repository.",
-     "primary_keyword": "DevOps, SRE and observability"
+     "primary_keyword": "DevOps, SRE and observability",
+     "deliverables": [
+      "Pipeline definitions in your repository.",
+      "A release and rollback runbook.",
+      "Dashboards and alert rules as code.",
+      "Documented SLOs.",
+      "An incident procedure and review template.",
+      "Tracing instrumentation with redaction."
+     ]
     }
    }
   },
@@ -287,7 +399,15 @@
      "cta_label": "Опишете системите, които трябва да се свържат",
      "seo_title": "Инженеринг на данни и системни интеграции за бизнеса",
      "seo_description": "Свързване на онлайн магазин, CRM, ERP и счетоводство, синхронизация на данни, конвейери и модели на данни за отчети и AI — с обработка на грешки.",
-     "primary_keyword": "инженеринг на данни"
+     "primary_keyword": "инженеринг на данни",
+     "deliverables": [
+      "Спецификация на интеграцията със съответствията на полетата.",
+      "Внедрени конектори с наблюдение и опашка за грешки.",
+      "Диаграми на потоците от данни.",
+      "Речник на данните.",
+      "Проверки на качеството на данните.",
+      "Наръчник за работа."
+     ]
     },
     "en": {
      "slug": "data-and-integration-engineering",
@@ -297,7 +417,15 @@
      "cta_label": "Describe the systems you need connected",
      "seo_title": "Data and integration engineering for business systems",
      "seo_description": "Connecting store, CRM, ERP and accounting, data synchronisation, pipelines and data models for reporting and AI — with retries, error queues and monitoring.",
-     "primary_keyword": "data and integration engineering"
+     "primary_keyword": "data and integration engineering",
+     "deliverables": [
+      "An integration specification with field mappings.",
+      "Implemented connectors with monitoring and an error queue.",
+      "Data-flow diagrams.",
+      "A data dictionary.",
+      "Data-quality checks.",
+      "A runbook."
+     ]
     }
    }
   },
@@ -324,7 +452,16 @@
      "cta_label": "Заявете AI оценка",
      "seo_title": "Управлявани AI системи и платформени операции",
      "seo_description": "Текуща работа на AI агенти, приложения, магазини и облачни среди: наблюдение, оценка, разходи, инциденти и подобрения — по договорен обхват.",
-     "primary_keyword": "управлявани AI системи"
+     "primary_keyword": "управлявани AI системи",
+     "deliverables": [
+      "Оценка при поемане и описание на базовото състояние.",
+      "Конфигурация на наблюдението и известията.",
+      "Цикли на оценка на качеството.",
+      "Дневник на промените.",
+      "Доклади за инциденти.",
+      "Месечни отчети.",
+      "Списък с подобрения."
+     ]
     },
     "en": {
      "slug": "managed-ai-and-platform-operations",
@@ -334,7 +471,16 @@
      "cta_label": "Request an AI assessment",
      "seo_title": "Managed AI systems and platform operations",
      "seo_description": "Ongoing operation of AI agents, applications, stores and cloud environments: monitoring, evaluation, cost, incidents and improvements — under an agreed scope.",
-     "primary_keyword": "managed AI systems"
+     "primary_keyword": "managed AI systems",
+     "deliverables": [
+      "An onboarding assessment and baseline.",
+      "A monitoring and alerting configuration.",
+      "Evaluation runs.",
+      "A change log.",
+      "Incident reports.",
+      "Monthly reports.",
+      "An improvement backlog."
+     ]
     }
    }
   },
@@ -361,7 +507,13 @@
      "cta_label": "Заявете технически одит",
      "seo_title": "Технически консултации, одити и обучение за AI и DevOps",
      "seo_description": "Технически одити, преглед на архитектура и код, работни срещи и практическо обучение на екипи за AI, интеграции и DevOps — като първа стъпка преди внедряване.",
-     "primary_keyword": "технически консултации"
+     "primary_keyword": "технически консултации",
+     "deliverables": [
+      "Доклади от одити с приоритизиран списък задачи.",
+      "Записки от прегледи.",
+      "Обобщения от работните срещи с взетите решения.",
+      "Учебни материали и упражнения, адаптирани към вашите технологии."
+     ]
     },
     "en": {
      "slug": "advisory-assessments-and-enablement",
@@ -371,7 +523,13 @@
      "cta_label": "Request a technical audit",
      "seo_title": "Technical advisory, audits and enablement for AI and DevOps",
      "seo_description": "Technical audits, architecture and code reviews, workshops and hands-on team enablement for AI, integrations and DevOps — the first step before implementation.",
-     "primary_keyword": "technical advisory"
+     "primary_keyword": "technical advisory",
+     "deliverables": [
+      "Audit reports with a prioritised backlog.",
+      "Review memos.",
+      "Workshop summaries with decisions.",
+      "Training material and exercises adapted to your stack."
+     ]
     }
    }
   }
@@ -1714,7 +1872,39 @@
      "body": "AI агентът не е просто чатбот: той чете данни, планира следващата стъпка и използва инструменти като CRM, магазина или пощата. Проектираме агенти с тясна, ясно описана задача, минимални права и точки за човешко одобрение — така помагат, без да поемат неконтролиран риск.",
      "seo_title": "Разработка на AI агенти с човешки контрол",
      "seo_description": "Разработка на AI агенти за малки и средни фирми: обслужване на клиенти, обработка на поръчки и вътрешни задачи — с правила, журнали и човешко одобрение.",
-     "primary_keyword": "разработка на AI агенти"
+     "primary_keyword": "разработка на AI агенти",
+     "capabilities": [
+      {
+       "title": "Агенти за обслужване на клиенти",
+       "body": "Проверяват статуса на поръчки, подготвят отговори и ескалират към служител, когато не са сигурни."
+      },
+      {
+       "title": "Оперативни агенти",
+       "body": "Обработват връщания, разминавания в наличностите и повтарящи се заявки по зададени правила."
+      },
+      {
+       "title": "Агенти за вътрешни знания",
+       "body": "Отговарят на въпроси на екипа по документи и политики, с посочени източници."
+      },
+      {
+       "title": "Инструменти и интеграции",
+       "body": "Достъп до CRM, магазина, пощата или ERP през ограничени API функции — само необходимите действия."
+      },
+      {
+       "title": "Правила и човешко одобрение",
+       "body": "Действията с ефект върху клиенти, пари или данни минават през детерминистични проверки и одобрение."
+      },
+      {
+       "title": "Оценка и наблюдение",
+       "body": "Тестови сценарии преди пускане, журнал на всяка стъпка и известия при отклонения."
+      }
+     ],
+     "deliverables": [
+      "Описание на задачата, границите и точките за одобрение",
+      "Работещ агент в тестова среда, проверен с реални примери",
+      "Тестов набор и критерии за качество",
+      "Журнали, документация и план за наблюдение"
+     ]
     },
     "en": {
      "slug": "ai-agent-development",
@@ -1724,7 +1914,39 @@
      "body": "An AI agent is more than a chatbot: it reads data, plans the next step and uses tools such as your CRM, store or inbox. We design agents with a narrow, clearly described job, minimal permissions and human approval points — so they help without taking on uncontrolled risk.",
      "seo_title": "AI agent development with human oversight",
      "seo_description": "AI agent development for small and mid-sized companies: customer service, order handling and internal tasks — with rules, audit logs and human approval built in.",
-     "primary_keyword": "AI agent development"
+     "primary_keyword": "AI agent development",
+     "capabilities": [
+      {
+       "title": "Customer service agents",
+       "body": "Check order status, draft replies and hand over to a person when they are not sure."
+      },
+      {
+       "title": "Operations agents",
+       "body": "Handle returns, stock mismatches and recurring requests according to defined rules."
+      },
+      {
+       "title": "Internal knowledge agents",
+       "body": "Answer your team's questions from documents and policies, citing the sources."
+      },
+      {
+       "title": "Tools and integrations",
+       "body": "Access to your CRM, store, inbox or ERP through narrow API functions — only the actions that are needed."
+      },
+      {
+       "title": "Rules and human approval",
+       "body": "Actions that affect customers, money or data pass deterministic checks and an approval step."
+      },
+      {
+       "title": "Evaluation and monitoring",
+       "body": "Test scenarios before release, a log of every step and alerts when behaviour drifts."
+      }
+     ],
+     "deliverables": [
+      "A description of the task, its limits and the approval points",
+      "A working agent in a test environment, checked with real examples",
+      "A test set and quality criteria",
+      "Logs, documentation and a monitoring plan"
+     ]
     }
    }
   },
@@ -1753,7 +1975,47 @@
      "body": "Много малки и средни бизнеси губят часове всяка седмица в копиране на данни, сортиране на имейли и ръчни отчети. Автоматизираме повтарящите се стъпки и оставяме решенията с по-висок риск на хората.",
      "seo_title": "Автоматизация на бизнес процеси с AI и човешки контрол",
      "seo_description": "Автоматизация на бизнес процеси с AI: класификация на запитвания, обработка на документи, CRM процеси и отчети — с одобрение от човек за чувствителните стъпки.",
-     "primary_keyword": "автоматизация на бизнес процеси"
+     "primary_keyword": "автоматизация на бизнес процеси",
+     "capabilities": [
+      {
+       "title": "Автоматична класификация на запитвания",
+       "body": "Разпределяне на имейли и форми по тема, спешност и отговорен служител."
+      },
+      {
+       "title": "Автоматизация на CRM процеси",
+       "body": "Създаване и обновяване на контакти, сделки и задачи при определени събития."
+      },
+      {
+       "title": "Обработка на фактури и документи",
+       "body": "Извличане на данни от документи с проверка от служител преди запис в системите."
+      },
+      {
+       "title": "Оркестрация на имейли и работни потоци",
+       "body": "Последователности от стъпки с условия, срокове и известия."
+      },
+      {
+       "title": "Автоматизация на отчети",
+       "body": "Периодични отчети, генерирани от реалните данни и изпратени до правилните хора."
+      },
+      {
+       "title": "Работни потоци с човешко одобрение",
+       "body": "Чувствителните действия чакат одобрение, а всяко решение се записва в журнал."
+      },
+      {
+       "title": "Планирани бизнес задачи",
+       "body": "Нощни синхронизации, проверки на данни и напомняния по график."
+      },
+      {
+       "title": "Интеграции между системи",
+       "body": "Свързване на магазина, CRM, ERP, склада и комуникационните канали."
+      }
+     ],
+     "deliverables": [
+      "Карта на текущия процес и възможностите за автоматизация",
+      "Дефинирани точки за човешко одобрение",
+      "Внедрена и тествана автоматизация",
+      "Журнал на действията и документация"
+     ]
     },
     "en": {
      "slug": "business-process-automation",
@@ -1763,7 +2025,47 @@
      "body": "Many small and mid-sized businesses lose hours every week copying data, sorting emails and building reports by hand. We automate the repetitive steps and leave higher-risk decisions to people.",
      "seo_title": "AI business process automation with human oversight",
      "seo_description": "AI business process automation: inquiry classification, document processing, CRM workflows and reporting — with human approval for the sensitive steps.",
-     "primary_keyword": "business process automation"
+     "primary_keyword": "business process automation",
+     "capabilities": [
+      {
+       "title": "Automatic inquiry classification",
+       "body": "Routing emails and forms by topic, urgency and responsible person."
+      },
+      {
+       "title": "CRM workflow automation",
+       "body": "Creating and updating contacts, deals and tasks when specific events occur."
+      },
+      {
+       "title": "Invoice and document processing",
+       "body": "Extracting data from documents, checked by a person before it is written to your systems."
+      },
+      {
+       "title": "Email and workflow orchestration",
+       "body": "Sequences of steps with conditions, deadlines and notifications."
+      },
+      {
+       "title": "Report automation",
+       "body": "Periodic reports generated from real data and sent to the right people."
+      },
+      {
+       "title": "Human-in-the-loop workflows",
+       "body": "Sensitive actions wait for approval, and every decision is recorded in a log."
+      },
+      {
+       "title": "Scheduled business tasks",
+       "body": "Nightly syncs, data checks and reminders on a schedule."
+      },
+      {
+       "title": "System integrations",
+       "body": "Connecting the store, CRM, ERP, warehouse and communication channels."
+      }
+     ],
+     "deliverables": [
+      "A map of the current process and automation opportunities",
+      "Defined human approval points",
+      "An implemented and tested automation",
+      "An action log and documentation"
+     ]
     }
    }
   },
@@ -1792,7 +2094,43 @@
      "body": "Езиковите модели могат да спестят много часове работа, но само когато са свързани с вашите данни, процеси и правила. Разработваме практични AI инструменти с ясно дефинирана задача, контрол на качеството и защита на данните.",
      "seo_title": "AI инструменти по поръчка: асистенти, RAG и анализ",
      "seo_description": "AI инструменти по поръчка за малки и средни бизнеси: асистенти за клиенти, RAG върху вашите документи, продуктови описания и анализ на документи с контрол на качеството.",
-     "primary_keyword": "AI инструменти по поръчка"
+     "primary_keyword": "AI инструменти по поръчка",
+     "capabilities": [
+      {
+       "title": "AI асистенти за обслужване на клиенти",
+       "body": "Отговори на въпроси за продукти, доставка и политики въз основа на вашите данни, с прехвърляне към служител при нужда."
+      },
+      {
+       "title": "Генериране на продуктови описания",
+       "body": "Чернови на описания в тона на марката, които редактор преглежда и одобрява преди публикуване."
+      },
+      {
+       "title": "Вътрешни асистенти за база знания",
+       "body": "Бърз достъп до процедури, условия и техническа документация за екипа."
+      },
+      {
+       "title": "Анализ на документи",
+       "body": "Извличане на ключова информация от договори, оферти, спецификации и фактури."
+      },
+      {
+       "title": "RAG решения по поръчка",
+       "body": "Търсене и отговори върху вашите документи с посочване на източника."
+      },
+      {
+       "title": "AI асистенти за отчети",
+       "body": "Обобщения и обяснения на данни за продажби, кампании и операции."
+      },
+      {
+       "title": "Интеграция със съществуващите ви системи",
+       "body": "Вграждане на AI функции в съществуващ магазин, CRM или вътрешно приложение чрез API."
+      }
+     ],
+     "deliverables": [
+      "Описание на случая на употреба и критерии за успех",
+      "Работещ прототип за ранна обратна връзка",
+      "Тестов набор за оценка на качеството на отговорите",
+      "Документация и предаване на решението"
+     ]
     },
     "en": {
      "slug": "custom-ai-tools",
@@ -1802,7 +2140,43 @@
      "body": "Language models can save many hours of work — but only when they are connected to your data, processes and rules. We build practical AI tools with a clearly defined task, quality control and data protection.",
      "seo_title": "Custom AI tools: assistants, RAG and document analysis",
      "seo_description": "Custom AI tools for small and mid-sized businesses: customer assistants, RAG over your documents, product descriptions and document analysis with quality control.",
-     "primary_keyword": "custom AI tools"
+     "primary_keyword": "custom AI tools",
+     "capabilities": [
+      {
+       "title": "Customer service AI assistants",
+       "body": "Answers about products, delivery and policies based on your data, with hand-over to a person when needed."
+      },
+      {
+       "title": "Product description generation",
+       "body": "Drafts in your brand voice that an editor reviews and approves before publishing."
+      },
+      {
+       "title": "Internal knowledge assistants",
+       "body": "Fast access to procedures, terms and technical documentation for the team."
+      },
+      {
+       "title": "Document analysis",
+       "body": "Extracting key information from contracts, offers, specifications and invoices."
+      },
+      {
+       "title": "Custom RAG solutions",
+       "body": "Search and answers over your documents, with the source cited."
+      },
+      {
+       "title": "Reporting AI assistants",
+       "body": "Summaries and explanations of sales, campaign and operations data."
+      },
+      {
+       "title": "Integration with your existing systems",
+       "body": "Embedding AI features into an existing store, CRM or internal application via APIs."
+      }
+     ],
+     "deliverables": [
+      "A use-case description and success criteria",
+      "A working prototype for early feedback",
+      "A test set for evaluating answer quality",
+      "Documentation and handover of the solution"
+     ]
     }
    }
   },
@@ -1831,7 +2205,51 @@
      "body": "Онлайн магазинът е жива система: обновления на платформата, нови приложения и плъгини, интеграции и промени в каталога постоянно създават риск от грешки. Поемаме техническата грижа, за да може екипът ви да се фокусира върху продажбите.",
      "seo_title": "Поддръжка на онлайн магазин — Shopify и WooCommerce",
      "seo_description": "Поддръжка на онлайн магазин на Shopify или WooCommerce: безопасни обновления, мониторинг, скорост, сигурност и архиви. Месечен пакет или еднократна помощ.",
-     "primary_keyword": "поддръжка на онлайн магазин"
+     "primary_keyword": "поддръжка на онлайн магазин",
+     "capabilities": [
+      {
+       "title": "Поддръжка на Shopify и WooCommerce",
+       "body": "Обновления на теми, приложения и плъгини, проверка на съвместимостта и контролирано внедряване на промени."
+      },
+      {
+       "title": "Отстраняване на технически проблеми",
+       "body": "Диагностика на грешки в количката, плащанията, формите и шаблоните с ясно описание на причината и решението."
+      },
+      {
+       "title": "Мониторинг на сайта",
+       "body": "Наблюдение на достъпността, времето за отговор и критичните страници с известяване при отклонения."
+      },
+      {
+       "title": "Оптимизация на производителността",
+       "body": "Анализ на скоростта на зареждане, оптимизация на изображения, скриптове и кеширане."
+      },
+      {
+       "title": "Поддръжка на продуктовия каталог",
+       "body": "Масови корекции на продукти, атрибути и категории, импорт и експорт на данни."
+      },
+      {
+       "title": "Поддръжка на интеграции",
+       "body": "Наблюдение и корекции на връзките с платежни системи, куриери, ERP и маркетингови инструменти."
+      },
+      {
+       "title": "Прегледи на сигурността",
+       "body": "Проверка на достъпи, роли, остарели компоненти и рискови настройки."
+      },
+      {
+       "title": "Архивиране и план за възстановяване",
+       "body": "Проверка на архивите, тестово възстановяване и документирана процедура при инцидент."
+      },
+      {
+       "title": "Месечни пакети за поддръжка",
+       "body": "Предварително договорен обем работа, приоритети и време за реакция."
+      }
+     ],
+     "deliverables": [
+      "Първоначален технически преглед на магазина",
+      "Списък с открити рискове и приоритети",
+      "Месечен отчет за извършената работа",
+      "Документирани процедури за архивиране и възстановяване"
+     ]
     },
     "en": {
      "slug": "ecommerce-maintenance",
@@ -1841,7 +2259,51 @@
      "body": "An online store is a living system: platform updates, new apps and plugins, integrations and catalog changes constantly create the risk of errors. We take care of the technical side so your team can focus on selling.",
      "seo_title": "Online store maintenance for Shopify and WooCommerce",
      "seo_description": "Online store maintenance for Shopify and WooCommerce: safe updates, monitoring, speed, security and backups. A monthly plan or one-off help.",
-     "primary_keyword": "online store maintenance"
+     "primary_keyword": "online store maintenance",
+     "capabilities": [
+      {
+       "title": "Shopify and WooCommerce maintenance",
+       "body": "Theme, app and plugin updates, compatibility checks and controlled rollout of changes."
+      },
+      {
+       "title": "Technical troubleshooting",
+       "body": "Diagnosing cart, payment, form and template errors with a clear explanation of cause and fix."
+      },
+      {
+       "title": "Website monitoring",
+       "body": "Monitoring availability, response times and critical pages, with alerts when something deviates."
+      },
+      {
+       "title": "Performance optimization",
+       "body": "Page-speed analysis and optimization of images, scripts and caching."
+      },
+      {
+       "title": "Product catalog upkeep",
+       "body": "Bulk corrections to products, attributes and categories; data import and export."
+      },
+      {
+       "title": "Integration maintenance",
+       "body": "Monitoring and fixing connections to payment providers, couriers, ERP and marketing tools."
+      },
+      {
+       "title": "Security reviews",
+       "body": "Checking access, roles, outdated components and risky settings."
+      },
+      {
+       "title": "Backups and a recovery plan",
+       "body": "Verifying backups, test restores and a documented incident procedure."
+      },
+      {
+       "title": "Monthly maintenance plans",
+       "body": "An agreed amount of work, priorities and response times."
+      }
+     ],
+     "deliverables": [
+      "An initial technical review of the store",
+      "A list of identified risks and priorities",
+      "A monthly report of the work done",
+      "Documented backup and recovery procedures"
+     ]
     }
    }
   },
@@ -1870,7 +2332,51 @@
      "body": "Органичният трафик е един от най-устойчивите канали за продажби, но в онлайн магазините лесно се губи — заради дублирано съдържание, бавни страници, слаби категории или технически грешки. Подхождаме към SEO като инженерна задача с ясни приоритети и измерване.",
      "seo_title": "SEO оптимизация на онлайн магазин и техническо SEO",
      "seo_description": "SEO оптимизация на онлайн магазин: индексиране, канонични адреси, SEO на категории и продукти, Core Web Vitals и месечни отчети без обещания за позиции.",
-     "primary_keyword": "SEO оптимизация на онлайн магазин"
+     "primary_keyword": "SEO оптимизация на онлайн магазин",
+     "capabilities": [
+      {
+       "title": "Технически SEO одит",
+       "body": "Индексиране, обхождане, канонични адреси, пренасочвания, дублирано съдържание и вътрешни връзки."
+      },
+      {
+       "title": "On-page оптимизация",
+       "body": "Заглавия, мета описания, структура на заглавията и съдържание, което отговаря на намерението на търсещия."
+      },
+      {
+       "title": "SEO на категории и продукти",
+       "body": "Структура на каталога, филтри, описания и вътрешно свързване, ориентирани към търсения с търговско намерение."
+      },
+      {
+       "title": "Стратегия за съдържание",
+       "body": "План за статии и ръководства, които подкрепят ключовите категории — без изкуствено натрупване на ключови думи."
+      },
+      {
+       "title": "Структурирани данни",
+       "body": "Маркировки Product, BreadcrumbList, Organization и други от schema.org, съобразени с реалното съдържание."
+      },
+      {
+       "title": "Оптимизация на Core Web Vitals",
+       "body": "Подобряване на LCP, INP и CLS чрез конкретни технически промени."
+      },
+      {
+       "title": "Search Console и анализи",
+       "body": "Настройка и проверка на Google Search Console и GA4, за да се измерва органичният канал коректно."
+      },
+      {
+       "title": "SEO мониторинг и отчети",
+       "body": "Проследяване на индексирането, позициите и трафика с разбираеми месечни отчети."
+      },
+      {
+       "title": "Месечни SEO кампании",
+       "body": "Приоритизиран месечен план с технически задачи, съдържание и измерване на ефекта."
+      }
+     ],
+     "deliverables": [
+      "Технически SEO одит с приоритизиран план",
+      "Препоръки за структура на категориите",
+      "Месечен отчет с ключови показатели",
+      "Списък с изпълнени и предстоящи задачи"
+     ]
     },
     "en": {
      "slug": "seo-optimization",
@@ -1880,7 +2386,51 @@
      "body": "Organic traffic is one of the most durable sales channels, but online stores lose it easily — through duplicate content, slow pages, weak categories or technical errors. We treat SEO as an engineering task with clear priorities and measurement.",
      "seo_title": "E-commerce SEO and technical SEO for online stores",
      "seo_description": "E-commerce SEO for online stores: indexing, canonical URLs, category and product SEO, Core Web Vitals and monthly reporting — without ranking promises.",
-     "primary_keyword": "e-commerce SEO"
+     "primary_keyword": "e-commerce SEO",
+     "capabilities": [
+      {
+       "title": "Technical SEO audit",
+       "body": "Indexing, crawling, canonical URLs, redirects, duplicate content and internal links."
+      },
+      {
+       "title": "On-page optimization",
+       "body": "Titles, meta descriptions, heading structure and content that matches search intent."
+      },
+      {
+       "title": "Category and product SEO",
+       "body": "Catalog structure, filters, descriptions and internal linking aimed at commercial-intent searches."
+      },
+      {
+       "title": "Content strategy",
+       "body": "A plan for articles and guides that support key categories — without keyword stuffing."
+      },
+      {
+       "title": "Structured data",
+       "body": "Product, BreadcrumbList, Organization and other schema.org markup that reflects the real content."
+      },
+      {
+       "title": "Core Web Vitals optimization",
+       "body": "Improving LCP, INP and CLS through specific technical changes."
+      },
+      {
+       "title": "Search Console and analytics",
+       "body": "Setting up and checking Google Search Console and GA4 so the organic channel is measured correctly."
+      },
+      {
+       "title": "SEO monitoring and reporting",
+       "body": "Tracking indexing, rankings and traffic with clear monthly reports."
+      },
+      {
+       "title": "Monthly SEO programs",
+       "body": "A prioritized monthly plan of technical tasks, content and impact measurement."
+      }
+     ],
+     "deliverables": [
+      "A technical SEO audit with a prioritized plan",
+      "Recommendations for the category structure",
+      "A monthly report with key metrics",
+      "A list of completed and upcoming tasks"
+     ]
     }
    }
   },
@@ -1909,7 +2459,47 @@
      "body": "Повечето онлайн магазини събират много данни, но малко от тях се превръщат в решения. Изграждаме ясни отчети и анализи, които показват къде губите клиенти и кои промени имат най-голям потенциал.",
      "seo_title": "Оптимизация на конверсиите и e-commerce анализи с GA4",
      "seo_description": "Оптимизация на конверсиите за онлайн магазини: коректно измерване в GA4, анализ на фунията и изоставените колички, табла за продажби и приоритизирани тестове.",
-     "primary_keyword": "оптимизация на конверсиите"
+     "primary_keyword": "оптимизация на конверсиите",
+     "capabilities": [
+      {
+       "title": "Табла за продажби",
+       "body": "Ключови показатели за приходи, поръчки, средна стойност на поръчката и маржове на едно място."
+      },
+      {
+       "title": "Анализ на фунията на конверсия",
+       "body": "Проследяване на пътя от посещение до поръчка и откриване на най-големите загуби."
+      },
+      {
+       "title": "Анализ на изоставените колички",
+       "body": "Причини, модели и конкретни мерки за намаляване на изоставянето."
+      },
+      {
+       "title": "Отчети за представянето на продуктите",
+       "body": "Кои продукти продават, кои се разглеждат без покупка и кои заемат склад."
+      },
+      {
+       "title": "Анализи на наличностите",
+       "body": "Сигнали за изчерпване, бавнооборотни артикули и сезонност."
+      },
+      {
+       "title": "Интеграция с GA4",
+       "body": "Коректна настройка на e-commerce събития и конверсии и проверка на данните."
+      },
+      {
+       "title": "Препоръки за A/B тестове",
+       "body": "Приоритизирани хипотези с очакван ефект и начин на измерване."
+      },
+      {
+       "title": "Подобрения на клиентския път",
+       "body": "Конкретни промени в навигацията, продуктовите страници и количката."
+      }
+     ],
+     "deliverables": [
+      "Одит на измерването и качеството на данните",
+      "Табло с ключовите показатели",
+      "Анализ на фунията с приоритизирани препоръки",
+      "План за тестове и измерване"
+     ]
     },
     "en": {
      "slug": "analytics-and-conversion",
@@ -1919,7 +2509,47 @@
      "body": "Most online stores collect plenty of data, but little of it turns into decisions. We build clear reports and analyses that show where you lose customers and which changes have the greatest potential.",
      "seo_title": "Conversion rate optimization and e-commerce analytics with GA4",
      "seo_description": "Conversion rate optimization for online stores: accurate GA4 measurement, funnel and abandoned-cart analysis, sales dashboards and prioritized tests.",
-     "primary_keyword": "conversion rate optimization"
+     "primary_keyword": "conversion rate optimization",
+     "capabilities": [
+      {
+       "title": "Sales dashboards",
+       "body": "Key metrics for revenue, orders, average order value and margins in one place."
+      },
+      {
+       "title": "Conversion funnel analysis",
+       "body": "Tracking the path from visit to order and finding the largest losses."
+      },
+      {
+       "title": "Abandoned cart analysis",
+       "body": "Causes, patterns and specific measures to reduce abandonment."
+      },
+      {
+       "title": "Product performance reports",
+       "body": "Which products sell, which are viewed without being bought and which tie up stock."
+      },
+      {
+       "title": "Inventory analytics",
+       "body": "Signals for stock-outs, slow-moving items and seasonality."
+      },
+      {
+       "title": "GA4 integration",
+       "body": "Correct setup of e-commerce events and conversions, and verification of the data."
+      },
+      {
+       "title": "A/B test recommendations",
+       "body": "Prioritized hypotheses with the expected effect and how it will be measured."
+      },
+      {
+       "title": "Customer journey improvements",
+       "body": "Specific changes to navigation, product pages and the cart."
+      }
+     ],
+     "deliverables": [
+      "An audit of measurement and data quality",
+      "A dashboard with the key metrics",
+      "A funnel analysis with prioritized recommendations",
+      "A testing and measurement plan"
+     ]
     }
    }
   },
@@ -1948,7 +2578,47 @@
      "body": "Когато системите не обменят данни надеждно, екипът компенсира с ръчна работа, а клиентите усещат грешките. Проектираме и изграждаме интеграции и инфраструктура, които са наблюдаеми, сигурни и лесни за поддръжка.",
      "seo_title": "API интеграции за онлайн магазини, CRM и ERP",
      "seo_description": "API интеграции между онлайн магазин, CRM, ERP и склад: синхронизация на продукти, наличности и поръчки, webhooks, мониторинг и защитено управление на достъпа.",
-     "primary_keyword": "API интеграции"
+     "primary_keyword": "API интеграции",
+     "capabilities": [
+      {
+       "title": "REST API интеграции",
+       "body": "Надеждна връзка между системи с обработка на грешки, повторни опити и журнал."
+      },
+      {
+       "title": "Интеграции със Shopify и WooCommerce",
+       "body": "Синхронизация на продукти, наличности, поръчки и клиенти."
+      },
+      {
+       "title": "Интеграция с CRM и ERP",
+       "body": "Обмен на данни между магазина и бизнес системите без ръчно въвеждане."
+      },
+      {
+       "title": "Webhooks и събитийно ориентирани процеси",
+       "body": "Реакция в реално време на събития като нова поръчка, плащане или промяна на наличност."
+      },
+      {
+       "title": "Облачно внедряване",
+       "body": "Контейнеризирани приложения, възпроизводими среди и автоматизирано внедряване."
+      },
+      {
+       "title": "Мониторинг и наблюдаемост",
+       "body": "Логове, метрики и известявания, които показват проблемите преди клиентите да ги усетят."
+      },
+      {
+       "title": "Управление на идентичности и достъп",
+       "body": "Роли, принцип на минималните привилегии и защитено съхранение на ключове."
+      },
+      {
+       "title": "Подсилване на сигурността",
+       "body": "Преглед на конфигурации, зависимости и настройки с конкретен план за корекции."
+      }
+     ],
+     "deliverables": [
+      "Схема на интеграциите и потоците от данни",
+      "Внедрени и тествани интеграции",
+      "Мониторинг и известяване",
+      "Документация за поддръжка и достъпи"
+     ]
     },
     "en": {
      "slug": "api-integrations-cloud-security",
@@ -1958,7 +2628,47 @@
      "body": "When systems do not exchange data reliably, the team compensates with manual work and customers feel the errors. We design and build integrations and infrastructure that are observable, secure and easy to maintain.",
      "seo_title": "API integrations for online stores, CRM and ERP",
      "seo_description": "API integrations between your online store, CRM, ERP and warehouse: product, stock and order sync, webhooks, monitoring and secure access management.",
-     "primary_keyword": "API integrations"
+     "primary_keyword": "API integrations",
+     "capabilities": [
+      {
+       "title": "REST API integrations",
+       "body": "Reliable connections between systems with error handling, retries and logging."
+      },
+      {
+       "title": "Shopify and WooCommerce integrations",
+       "body": "Syncing products, stock, orders and customers."
+      },
+      {
+       "title": "CRM and ERP integration",
+       "body": "Data exchange between the store and business systems without manual entry."
+      },
+      {
+       "title": "Webhooks and event-driven processes",
+       "body": "Real-time reactions to events such as a new order, a payment or a stock change."
+      },
+      {
+       "title": "Cloud deployment",
+       "body": "Containerized applications, reproducible environments and automated deployment."
+      },
+      {
+       "title": "Monitoring and observability",
+       "body": "Logs, metrics and alerts that surface problems before customers feel them."
+      },
+      {
+       "title": "Identity and access management",
+       "body": "Roles, least privilege and secure key storage."
+      },
+      {
+       "title": "Security hardening",
+       "body": "Reviewing configurations, dependencies and settings with a concrete remediation plan."
+      }
+     ],
+     "deliverables": [
+      "A diagram of integrations and data flows",
+      "Implemented and tested integrations",
+      "Monitoring and alerting",
+      "Maintenance and access documentation"
+     ]
     }
    }
   },
@@ -1987,7 +2697,39 @@
      "body": "Изграждането на AI агент е само началото. Ние се грижим той да работи надеждно, сигурно и ефективно всеки ден — с наблюдение, контролирани промени, оценка на качеството и ясни отчети.",
      "seo_title": "Поддръжка и мониторинг на AI агенти",
      "seo_description": "AI Managed Services: наблюдение, поддръжка, оценка на качеството, сигурност и контрол на разходите за AI агенти, RAG асистенти и AI автоматизации — по индивидуална оферта.",
-     "primary_keyword": "поддръжка и мониторинг на AI агенти"
+     "primary_keyword": "поддръжка и мониторинг на AI агенти",
+     "capabilities": [
+      {
+       "title": "Наблюдение на AI агенти",
+       "body": "Достъпност, грешки, забавяне, неуспешни работни потоци, потребление на токени и разходи — според наличната инструментация."
+      },
+      {
+       "title": "Поддръжка и контролирани промени",
+       "body": "Инструкции, конфигурация, интеграции с модела и с външни API, версии, регресионни тестове и план за връщане."
+      },
+      {
+       "title": "Оценка на качеството",
+       "body": "Тестови набори, еталонни случаи, проверка на източниците при RAG и тенденции на качеството между версиите."
+      },
+      {
+       "title": "Оптимизация на разходите",
+       "body": "Избор на модел, дължина на инструкциите, кеширане, бюджетни известия и месечен отчет за разходите."
+      },
+      {
+       "title": "Сигурност и управление",
+       "body": "Смяна на ключове, минимални права, оценка на риска от prompt injection, журнал и точки за човешко одобрение."
+      },
+      {
+       "title": "Инциденти и възстановяване",
+       "body": "Класифициране, анализ, отстраняване, връщане към предишна версия, когато е възможно, и преглед след инцидент."
+      }
+     ],
+     "deliverables": [
+      "Първоначална техническа оценка на AI системата",
+      "Договорено наблюдение според наличните интеграции",
+      "Месечно обобщение: състояние, инциденти, качество и разходи",
+      "Списък с препоръки и контролирани промени"
+     ]
     },
     "en": {
      "slug": "ai-managed-services",
@@ -1997,7 +2739,39 @@
      "body": "Building an AI agent is only the beginning. We help keep your AI systems reliable, secure, observable and effective — with monitoring, controlled changes, quality evaluation and clear reporting.",
      "seo_title": "AI Agent Monitoring & Managed Services",
      "seo_description": "AI Managed Services: monitoring, maintenance, quality evaluation, security and cost control for AI agents, RAG assistants and AI-driven automations — custom quotes.",
-     "primary_keyword": "AI agent monitoring"
+     "primary_keyword": "AI agent monitoring",
+     "capabilities": [
+      {
+       "title": "AI agent monitoring",
+       "body": "Availability, errors, latency, failed workflows, token consumption and costs — based on available instrumentation."
+      },
+      {
+       "title": "Maintenance and controlled change",
+       "body": "Prompts, configuration, model and API integrations, versioning, regression tests and rollback plans."
+      },
+      {
+       "title": "Quality evaluation",
+       "body": "Test sets, golden cases, groundedness checks for RAG and quality trends across releases."
+      },
+      {
+       "title": "Cost optimization",
+       "body": "Model selection, prompt length, caching, budget alerts and a monthly cost report."
+      },
+      {
+       "title": "Security and governance",
+       "body": "Key rotation, least privilege, prompt-injection risk assessment, audit logging and human approval gates."
+      },
+      {
+       "title": "Incident response and recovery",
+       "body": "Classification, investigation, remediation, rollback where available and post-incident reviews."
+      }
+     ],
+     "deliverables": [
+      "An initial technical assessment of the AI system",
+      "Agreed monitoring based on the integrations available",
+      "A monthly summary: health, incidents, quality and costs",
+      "A list of recommendations and controlled changes"
+     ]
     }
    }
   },
@@ -2026,7 +2800,39 @@
      "body": "Одитът е добра първа стъпка, когато не е ясно откъде да започнете. В рамките на предварително договорен обхват преглеждаме магазина, интеграциите, данните и процесите ви, а вие получавате конкретен, приоритизиран план за действие.",
      "seo_title": "Технически одит на онлайн магазин и AI готовност",
      "seo_description": "Технически одит на онлайн магазин: производителност, SEO основи, сигурност, интеграции, данни и възможности за AI — с приоритизиран план и оценка на усилието.",
-     "primary_keyword": "технически одит на онлайн магазин"
+     "primary_keyword": "технически одит на онлайн магазин",
+     "capabilities": [
+      {
+       "title": "Производителност и стабилност",
+       "body": "Скорост на зареждане, грешки, зависимости и рискове при обновления."
+      },
+      {
+       "title": "SEO основи",
+       "body": "Индексиране, структура, метаданни и технически проблеми, които ограничават органичния трафик."
+      },
+      {
+       "title": "Сигурност и достъпи",
+       "body": "Роли, пароли, остарели компоненти и защита на данните."
+      },
+      {
+       "title": "Интеграции и потоци от данни",
+       "body": "Как системите обменят данни и къде възникват разминавания."
+      },
+      {
+       "title": "Аналитика и измерване",
+       "body": "Качество на данните в GA4 и в платформата на магазина."
+      },
+      {
+       "title": "Възможности за AI и автоматизация",
+       "body": "Процеси, при които AI или автоматизацията могат да спестят време при приемлив риск."
+      }
+     ],
+     "deliverables": [
+      "Писмен доклад с констатации",
+      "Приоритизиран план за действие — бързи подобрения и дългосрочни мерки",
+      "Оценка на усилието за всяка препоръка",
+      "Среща за представяне и обсъждане на резултатите"
+     ]
     },
     "en": {
      "slug": "technical-audit",
@@ -2036,7 +2842,39 @@
      "body": "An audit is a good first step when it is unclear where to start. Within an agreed scope we review your store, integrations, data and processes, and you receive a concrete, prioritized action plan.",
      "seo_title": "Technical audit of an online store and AI readiness",
      "seo_description": "A technical audit of your online store: performance, SEO basics, security, integrations, data and AI opportunities — with a prioritized plan and effort estimates.",
-     "primary_keyword": "technical audit of an online store"
+     "primary_keyword": "technical audit of an online store",
+     "capabilities": [
+      {
+       "title": "Performance and stability",
+       "body": "Page speed, errors, dependencies and update risks."
+      },
+      {
+       "title": "SEO basics",
+       "body": "Indexing, structure, metadata and technical issues that limit organic traffic."
+      },
+      {
+       "title": "Security and access",
+       "body": "Roles, passwords, outdated components and data protection."
+      },
+      {
+       "title": "Integrations and data flows",
+       "body": "How systems exchange data and where discrepancies arise."
+      },
+      {
+       "title": "Analytics and measurement",
+       "body": "Data quality in GA4 and in the store platform."
+      },
+      {
+       "title": "AI and automation opportunities",
+       "body": "Processes where AI or automation can save time at an acceptable level of risk."
+      }
+     ],
+     "deliverables": [
+      "A written report of findings",
+      "A prioritized action plan — quick wins and longer-term measures",
+      "An effort estimate for each recommendation",
+      "A meeting to present and discuss the results"
+     ]
     }
    }
   }

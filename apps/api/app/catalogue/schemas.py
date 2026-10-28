@@ -12,7 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from app.models import CATALOGUE_KEY_PATTERN, SLUG_PATTERN, ServiceKey
 
-SEED_SCHEMA_VERSION = 1
+SEED_SCHEMA_VERSION = 2
 
 Key = Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_]*$", max_length=80)]
 QualifiedKey = Annotated[str, StringConstraints(pattern=CATALOGUE_KEY_PATTERN, max_length=80)]
@@ -33,6 +33,8 @@ Prerequisite = Annotated[str, _text(400)]
 SeoTitle = Annotated[str, _text(70)]
 SeoDescription = Annotated[str, _text(175)]
 Keyword = Annotated[str, _text(100)]
+ItemTitle = Annotated[str, _text(200)]
+ItemBody = Annotated[str, _text(1000)]
 
 
 class SeedModel(BaseModel):
@@ -46,6 +48,11 @@ class PerLocale[T: SeedModel](SeedModel):
     en: T
 
 
+class CapabilityText(SeedModel):
+    title: ItemTitle
+    body: ItemBody
+
+
 class DomainText(SeedModel):
     slug: Slug
     name: Name
@@ -55,6 +62,7 @@ class DomainText(SeedModel):
     seo_title: SeoTitle
     seo_description: SeoDescription
     primary_keyword: Keyword | None
+    deliverables: list[ItemBody] = Field(max_length=20)
 
 
 class FamilyText(SeedModel):
@@ -72,6 +80,8 @@ class ServiceText(SeedModel):
     seo_title: SeoTitle
     seo_description: SeoDescription
     primary_keyword: Keyword | None
+    capabilities: list[CapabilityText] = Field(max_length=20)
+    deliverables: list[ItemBody] = Field(max_length=20)
 
 
 Status = Literal["draft", "published", "archived"]
@@ -117,7 +127,7 @@ class ServiceSeed(SeedModel):
 
 
 class SeedDocument(SeedModel):
-    schema_version: Literal[1]
+    schema_version: Literal[2]
     locales: list[Literal["bg", "en"]]
     domains: list[DomainSeed]
     families: list[FamilySeed]

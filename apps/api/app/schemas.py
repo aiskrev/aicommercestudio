@@ -265,6 +265,7 @@ class AdminUserOut(BaseModel):
     email: str
     full_name: str
     last_login_at: datetime | None
+    role: Literal["admin", "editor", "viewer"]
 
 
 class SessionOut(BaseModel):

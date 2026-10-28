@@ -29,6 +29,9 @@ export const routes = {
   adminAiActions: "/admin/ai",
   adminAccount: "/admin/account",
   adminOperations: "/admin/operations",
+  adminCatalogue: "/admin/catalogue",
+  adminCatalogueNew: "/admin/catalogue/new",
+  adminCatalogueEntry: (id: string) => `/admin/catalogue/${id}`,
 } as const;
 
 export function contactWithService(serviceKey: string): string {

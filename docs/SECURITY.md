@@ -24,7 +24,14 @@ for names, enum/CHECK constraints in the database, mirrored client-side validati
 **Authentication** — see [ARCHITECTURE.md](ARCHITECTURE.md#authentication). Admins are created only via
 CLI/bootstrap; there is no public registration. Password policy: ≥12 chars, mixed case and digits.
 
-**Authorisation** — every `/api/admin/*` route depends on `require_admin`. A parametrised test lists 18
+**Authorisation** — staff have a role (`admin_users.role`): `admin`, `editor` or `viewer`. Every
+`/api/admin/*` route outside the catalogue depends on `require_admin`, which requires the `admin` role
+(403 `forbidden_role` otherwise). The session endpoints accept every role. The catalogue
+(`/api/admin/catalogue/*`) is open by role: `viewer` reads, `editor` also writes drafts, `admin` also
+publishes, archives and restores (`tests/test_catalogue_api.py`). Catalogue texts are plain text:
+markup, HTML entities, Markdown links, script URLs and invisible control or bidi characters are
+rejected, not escaped (`app/catalogue/text.py`). The public catalogue API serves publication
+snapshots only, never working copies. In addition, every `/api/admin/*` route depends on the staff session. A parametrised test lists 18
 of them (`tests/test_admin_auth.py::PROTECTED`). The two report downloads have their own 401 tests
 (`test_readiness.py`, `test_team.py`). Every `/api/ops/*` route additionally requires membership in
 the organisation and a permission from `app/ops/rbac.py`, and is covered by authorisation and

@@ -77,6 +77,36 @@ ERROR_MESSAGES: dict[str, dict[Locale, str]] = {
         "en": "Invalid CSRF token. Please reload the page.",
     },
     "lead_not_found": {"bg": "Запитването не е намерено.", "en": "Inquiry not found."},
+    "domain_not_found": {"bg": "Направлението не е намерено.", "en": "Service domain not found."},
+    "service_not_found": {"bg": "Услугата не е намерена.", "en": "Service not found."},
+    "catalogue_entity_not_found": {"bg": "Записът не е намерен.", "en": "Catalogue entry not found."},
+    "invalid_filter": {"bg": "Невалиден филтър.", "en": "Invalid filter."},
+    "forbidden_role": {
+        "bg": "Ролята ви не позволява това действие.",
+        "en": "Your role does not allow this action.",
+    },
+    "precondition_required": {
+        "bg": "Липсва версия на записа (If-Match). Презаредете страницата.",
+        "en": "The entry version (If-Match) is missing. Please reload the page.",
+    },
+    "revision_conflict": {
+        "bg": "Записът е променен от друг потребител. Презаредете страницата и повторете промените.",
+        "en": "The entry was changed by someone else. Reload the page and apply your changes again.",
+    },
+    "catalogue_incomplete": {
+        "bg": "Записът не може да бъде публикуван, докато не попълните маркираните полета.",
+        "en": "The entry cannot be published until the highlighted fields are complete.",
+    },
+    "key_taken": {"bg": "Този ключ вече се използва.", "en": "This key is already in use."},
+    "slug_taken": {"bg": "Този адрес вече се използва.", "en": "This URL slug is already in use."},
+    "invalid_transition": {
+        "bg": "Това действие не е възможно в текущото състояние на записа.",
+        "en": "This action is not possible in the entry's current state.",
+    },
+    "domain_archive_not_allowed": {
+        "bg": "Направленията са фиксирани от таксономията и не се архивират.",
+        "en": "Service domains are fixed by the taxonomy and cannot be archived.",
+    },
     "action_not_found": {"bg": "Действието не е намерено.", "en": "Action not found."},
     "ops_not_found": {"bg": "Не е намерено.", "en": "Not found."},
     "ops_forbidden": {"bg": "Нямате права за това действие.", "en": "You do not have permission for this action."},
@@ -148,6 +178,57 @@ VALIDATION_MESSAGES: dict[str, dict[Locale, str]] = {
     "value_error": {"bg": "Невалидна стойност.", "en": "Invalid value."},
     # custom validator types
     "control_chars": {"bg": "Текстът съдържа непозволени символи.", "en": "The text contains invalid characters."},
+    "markup": {
+        "bg": "Използвайте само обикновен текст, без HTML или Markdown.",
+        "en": "Use plain text only, without HTML or Markdown.",
+    },
+    "catalogue_slug": {
+        "bg": "Използвайте малки латински букви, цифри и единични тирета.",
+        "en": "Use lowercase Latin letters, digits and single hyphens.",
+    },
+    "catalogue_key": {
+        "bg": "Използвайте малки латински букви, цифри и долна черта; започнете с буква.",
+        "en": "Use lowercase Latin letters, digits and underscores; start with a letter.",
+    },
+    "required_to_publish": {
+        "bg": "Полето е задължително за публикуване.",
+        "en": "This field is required for publishing.",
+    },
+    "seo_title_length": {
+        "bg": "SEO заглавието трябва да е до {max} символа.",
+        "en": "The SEO title must be at most {max} characters.",
+    },
+    "seo_description_length": {
+        "bg": "SEO описанието трябва да е между {min} и {max} символа.",
+        "en": "The SEO description must be between {min} and {max} characters.",
+    },
+    "slug_taken": {"bg": "Този адрес вече се използва.", "en": "This URL slug is already in use."},
+    "unknown_reference": {"bg": "Непознат запис.", "en": "Unknown entry."},
+    "archived_reference": {
+        "bg": "Свързаният запис е архивиран.",
+        "en": "The linked entry is archived.",
+    },
+    "lead_category_taken": {
+        "bg": "Тази категория вече се използва от друга услуга.",
+        "en": "This category is already used by another service.",
+    },
+    "items_not_allowed": {
+        "bg": "Направленията нямат списък с възможности.",
+        "en": "Service domains have no capability list.",
+    },
+    "self_reference": {"bg": "Записът не може да сочи към себе си.", "en": "An entry cannot link to itself."},
+    "duration": {
+        "bg": "Продължителността е от 0,5 до 99 дни, а максимумът не е по-малък от минимума.",
+        "en": "The duration is 0.5 to 99 days, and the maximum is not below the minimum.",
+    },
+    "duration_offering": {
+        "bg": "Продължителност се задава само за оценки и работни срещи.",
+        "en": "A duration applies only to assessments and workshops.",
+    },
+    "primary_domain_required": {
+        "bg": "Услугата трябва да има основно направление.",
+        "en": "A service needs a primary domain.",
+    },
     "no_links": {"bg": "Полето не може да съдържа връзки или HTML.", "en": "This field cannot contain links or HTML."},
     "phone": {"bg": "Невалиден телефонен номер.", "en": "Invalid phone number."},
     "privacy_required": {

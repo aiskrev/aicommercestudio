@@ -16,6 +16,19 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/catalogue-api-admin` (on top of `docs/service-catalogue-architecture`, not merged,
+2026-10-28): migration **`0010`** (staff roles, per-entry publication snapshots, assessments and
+workshops, capabilities and deliverables), the read-only public catalogue API
+(`/api/public/catalogue/*`), and the admin catalogue with draft, preview, publish, archive and
+restore (`/api/admin/catalogue/*`, `/admin/catalogue`).
+
+| Check | Result |
+| --- | --- |
+| `.\scripts	est.ps1 -Suite api` | **431 passed**, Ruff clean, docs and OpenAPI in sync, seed copies identical |
+| `.\scripts	est.ps1 -Suite web` | passed (typecheck, lint, **509** unit tests). One run outside the suite had one intermittent failure that could not be reproduced in 6 further runs. |
+| e2e (production build, no-host-ports override) | **94 passed** (2 new in `catalogue.spec.ts`) |
+| Local dev database (0009 → 0010) | the bootstrap seed published the 19 entries on start. The first e2e run showed that they lacked the new capabilities: the backfill now completes such entries from the seed, which is covered by a test. The dev database was repaired once with `catalogue-seed --reconcile`. |
+
 Branch `docs/service-catalogue-architecture` (PR #22, up to date with `main` @ `c49fdc7`,
 2026-10-28): service catalogue V1 persistence. It adds Alembic migration **`0009`** (seven new
 tables, no change to existing tables), the models, the seed schema, the idempotent

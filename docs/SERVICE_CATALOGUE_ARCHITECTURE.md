@@ -2,8 +2,16 @@
 
 **Status:** design, with the first slice implemented. Step S1 (the web export,
 `lib/catalogue-seed.ts`) is done. Step S2/S3 is done for V1: migration `0009` (seven tables) and
-the idempotent `catalogue-seed`. No endpoint or page uses the catalogue yet, and no release or role
-exists. Baseline: branch
+the idempotent `catalogue-seed`. Then, on branch `feature/catalogue-api-admin`:
+
+* migration `0010`: staff roles, per-entry publication snapshots, assessments and workshops,
+  capabilities and deliverables;
+* the read-only public API (`/api/public/catalogue/*`);
+* the admin editor with draft, preview, publish and archive (`/admin/catalogue`).
+
+**Deviation from §6:** publishing is per entry, through a snapshot on the entity, instead of
+catalogue-wide releases (DATABASE_SCHEMA.md → "Publishing model"). The website pages still render
+from the TypeScript content (phase S5 is open). Baseline: branch
 `feature/domain-hubs` @ `2a6866a` (the ten domain hubs, built on `main` @ `52bf6e1`; Alembic head
 `0008`).
 

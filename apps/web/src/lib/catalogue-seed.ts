@@ -10,7 +10,7 @@ import { routes } from "@/lib/routes";
  * structure the API seeds from. The snapshot is committed twice (web + API copy) and compared by hash
  * in scripts/test.ps1, like the readiness and AI team vectors.
  */
-export const CATALOGUE_SEED_SCHEMA_VERSION = 1;
+export const CATALOGUE_SEED_SCHEMA_VERSION = 2;
 
 type PerLocale<T> = Record<Locale, T>;
 
@@ -44,6 +44,7 @@ export function catalogueSeedSnapshot() {
           seo_title: domain.metaTitle,
           seo_description: domain.metaDescription,
           primary_keyword: primaryKeyword(locale, routes.service(domain.slug)),
+          deliverables: [...domain.deliverables],
         };
       }),
     })),
@@ -94,6 +95,8 @@ export function catalogueSeedSnapshot() {
           seo_title: service.metaTitle,
           seo_description: service.metaDescription,
           primary_keyword: primaryKeyword(locale, routes.service(service.slug)),
+          capabilities: service.capabilities.map((capability) => ({ title: capability.title, body: capability.description })),
+          deliverables: [...service.deliverables],
         };
       }),
     };

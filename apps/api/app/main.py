@@ -16,9 +16,12 @@ from app.errors import error_body
 from app.i18n import Locale, error_message, request_locale, validation_message
 from app.logging_config import configure_logging
 from app.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
-from app.routers import admin, admin_auth, advisor, health, ops, public, readiness, team
+from app.routers import admin, admin_auth, admin_catalogue, advisor, catalogue, health, ops, public, readiness, team
 
 logger = logging.getLogger(__name__)
+
+CATALOGUE_EDITOR_FIELDS = frozenset({"translations", "capabilities", "deliverables", "service"})
+
 
 def _error_field(loc: tuple[Any, ...]) -> str | None:
     """Form field name for an error location. Nested AI Managed Services fields map to the form's
@@ -28,6 +31,10 @@ def _error_field(loc: tuple[Any, ...]) -> str | None:
     names = [str(part) for part in loc[1:] if isinstance(part, str)]
     if not names:
         return None
+    # Catalogue editor bodies are nested per locale and per list item: keep the full path
+    # (e.g. "translations.en.summary", "capabilities.2.bg.title") so the editor can place the error.
+    if loc[0] == "body" and names[0] in CATALOGUE_EDITOR_FIELDS:
+        return ".".join(str(part) for part in loc[1:])
     field = names[-1]
     if "ai_managed" in names[:-1]:
         return field if field.startswith("ai_") else f"ai_{field}"
@@ -80,6 +87,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # Localize the human-readable message by stable error code (Accept-Language: bg | en).
         if isinstance(body["detail"], str):
             body["detail"] = error_message(body["code"], request_locale(request), body["detail"])
+        if getattr(exc, "errors", None):
+            body["errors"] = exc.errors
         return JSONResponse(status_code=exc.status_code, content=body, headers=getattr(exc, "headers", None))
 
     @app.exception_handler(RequestValidationError)
@@ -98,11 +107,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(health.router)
     app.include_router(public.router)
+    app.include_router(catalogue.router)
     app.include_router(advisor.router)
     app.include_router(readiness.router)
     app.include_router(team.router)
     app.include_router(admin_auth.router)
     app.include_router(admin.router)
+    app.include_router(admin_catalogue.router)
     app.include_router(ops.router)
     return app
 

@@ -17,5 +17,9 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
       </main>
     );
   }
-  return <AdminShell userName={check.session.user.full_name}>{children}</AdminShell>;
+  return (
+    <AdminShell userName={check.session.user.full_name} role={check.session.user.role ?? "admin"}>
+      {children}
+    </AdminShell>
+  );
 }

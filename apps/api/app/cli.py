@@ -8,7 +8,8 @@
     python -m app.cli ops-create-org --slug s --name n --owner-email x@y  # AI operations tenant + owner
     python -m app.cli ops-seed-demo --owner-email x@y   # labelled sample registry (not in production)
     python -m app.cli ops-purge-demo            # remove demo organisations
-    python -m app.cli catalogue-seed [--dry-run] # reconcile the service catalogue with seed_v1.json
+    python -m app.cli set-role --email x@y --role editor  # staff role: admin | editor | viewer
+    python -m app.cli catalogue-seed [--dry-run] [--reconcile]  # create (or mirror) the catalogue entries
     python -m app.cli catalogue-check           # BG/EN content, slugs and lead categories of the catalogue
     python -m app.cli catalogue-purge --yes     # delete catalogue rows (rollback helper; leads unaffected)
 """
@@ -31,7 +32,7 @@ from app.advisor import service as advisor
 from app.catalogue import seed as catalogue
 from app.config import get_settings
 from app.db import get_sessionmaker
-from app.models import AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
+from app.models import AdminRole, AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
 from app.ops import service as ops
 from app.security import hash_password, validate_password_strength
 from app.services import ai_actions, leads
@@ -149,7 +150,7 @@ def cmd_seed(_: argparse.Namespace) -> int:
             count = seed_synthetic_data(db, admin)
             _print(f"[seed] Synthetic leads created: {count}" if count else "[seed] Synthetic data already present")
     # The service catalogue mirrors the web content in every environment (idempotent).
-    return cmd_catalogue_seed(argparse.Namespace(dry_run=False, file=None))
+    return cmd_catalogue_seed(argparse.Namespace(dry_run=False, file=None, reconcile=False))
 
 
 def _read_password() -> str | None:
@@ -289,11 +290,41 @@ def cmd_catalogue_seed(args: argparse.Namespace) -> int:
     try:
         doc = catalogue.load_document(Path(args.file)) if args.file else catalogue.load_document()
         with get_sessionmaker()() as db:
-            result = catalogue.seed_catalogue(db, doc, dry_run=args.dry_run)
+            result = catalogue.seed_catalogue(db, doc, dry_run=args.dry_run, reconcile=args.reconcile)
     except (OSError, ValidationError, catalogue.SeedValidationError) as exc:
         _print(f"[catalogue-seed] Not seeded: {exc}")
         return 1
-    _print(f"[catalogue-seed] {'[dry-run] ' if args.dry_run else ''}{result.summary()}")
+    mode = "reconcile" if args.reconcile else "bootstrap"
+    _print(f"[catalogue-seed] {'[dry-run] ' if args.dry_run else ''}{mode}: {result.summary()}")
+    return 0
+
+
+def set_admin_role(db: Session, email: str, role: str) -> bool:
+    user = db.scalar(select(AdminUser).where(func.lower(AdminUser.email) == email.strip().lower()))
+    if user is None:
+        return False
+    if user.role != role:
+        previous, user.role = user.role, role
+        # A role change takes effect immediately: existing sessions are revoked.
+        db.execute(
+            update(AdminSession)
+            .where(AdminSession.user_id == user.id, AdminSession.revoked_at.is_(None))
+            .values(revoked_at=utcnow())
+        )
+        audit.record(
+            db, "admin.role_changed", actor_label="cli", entity_type="admin_user", entity_id=str(user.id),
+            details={"from": previous, "to": role},
+        )
+    db.commit()
+    return True
+
+
+def cmd_set_role(args: argparse.Namespace) -> int:
+    with get_sessionmaker()() as db:
+        if not set_admin_role(db, args.email, args.role):
+            _print("[set-role] No administrator with that e-mail address.")
+            return 1
+    _print(f"[set-role] Role set to {args.role}.")
     return 0
 
 
@@ -327,6 +358,10 @@ def main(argv: list[str] | None = None) -> int:
     reset = sub.add_parser("set-password", help="Reset an administrator's password (clears lockout, revokes sessions)")
     reset.add_argument("--email", required=True)
     reset.set_defaults(func=cmd_set_password)
+    role = sub.add_parser("set-role", help="Set a staff role: admin (all), editor or viewer (service catalogue only)")
+    role.add_argument("--email", required=True)
+    role.add_argument("--role", required=True, choices=[r.value for r in AdminRole])
+    role.set_defaults(func=cmd_set_role)
     maint = sub.add_parser("maintenance", help="Apply retention policy and remove expired sessions")
     maint.add_argument("--dry-run", action="store_true")
     maint.set_defaults(func=cmd_maintenance)
@@ -345,6 +380,11 @@ def main(argv: list[str] | None = None) -> int:
     cat = sub.add_parser("catalogue-seed", help="Reconcile the service catalogue with the seed document (idempotent)")
     cat.add_argument("--dry-run", action="store_true", help="Report what would change and roll back")
     cat.add_argument("--file", help="Seed document (default: app/catalogue/seed_v1.json)")
+    cat.add_argument(
+        "--reconcile",
+        action="store_true",
+        help="Overwrite the seeded entries with the document and republish (editor changes are lost)",
+    )
     cat.set_defaults(func=cmd_catalogue_seed)
     sub.add_parser(
         "catalogue-check", help="Check catalogue integrity (BG/EN content, slugs, lead categories)"

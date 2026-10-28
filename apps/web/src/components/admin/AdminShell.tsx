@@ -6,24 +6,36 @@ import { type ReactNode, useState } from "react";
 
 import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { AdminLanguageSwitch } from "@/components/admin/AdminLanguage";
+import { AdminRoleContext } from "@/components/admin/AdminRole";
 import { LogoMark } from "@/components/layout/Logo";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { cx } from "@/components/ui/primitives";
 import { adminFetch } from "@/lib/admin-api";
+import type { StaffRole } from "@/lib/admin-types";
 import { routes } from "@/lib/routes";
 
-type NavKey = "dashboard" | "leads" | "ai" | "operations" | "activity" | "account";
+type NavKey = "dashboard" | "leads" | "ai" | "operations" | "catalogue" | "activity" | "account";
 
-const NAV: { href: string; key: NavKey; icon: IconName; exact?: boolean }[] = [
+/** `staff`: every role; otherwise administrators only (the API refuses the rest with 403). */
+const NAV: { href: string; key: NavKey; icon: IconName; exact?: boolean; staff?: boolean }[] = [
   { href: routes.admin, key: "dashboard", icon: "dashboard", exact: true },
   { href: routes.adminLeads, key: "leads", icon: "inbox" },
   { href: routes.adminAiActions, key: "ai", icon: "bot" },
   { href: routes.adminOperations, key: "operations", icon: "layers" },
+  { href: routes.adminCatalogue, key: "catalogue", icon: "clipboard", staff: true },
   { href: routes.adminActivity, key: "activity", icon: "activity" },
-  { href: routes.adminAccount, key: "account", icon: "lock" },
+  { href: routes.adminAccount, key: "account", icon: "lock", staff: true },
 ];
 
-export function AdminShell({ userName, children }: { userName: string; children: ReactNode }) {
+export function AdminShell({
+  userName,
+  role = "admin",
+  children,
+}: {
+  userName: string;
+  role?: StaffRole;
+  children: ReactNode;
+}) {
   const pathname = usePathname();
   const { t, locale } = useAdminI18n();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -63,7 +75,7 @@ export function AdminShell({ userName, children }: { userName: string; children:
         </div>
         <nav aria-label={t.shell.navLabel} className="overflow-x-auto px-2 pb-3 lg:px-3">
           <ul className="flex gap-1 lg:flex-col">
-            {NAV.map((item) => (
+            {NAV.filter((item) => item.staff || role === "admin").map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
@@ -100,7 +112,7 @@ export function AdminShell({ userName, children }: { userName: string; children:
         </div>
       </aside>
       <main id="main" className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
-        {children}
+        <AdminRoleContext.Provider value={role}>{children}</AdminRoleContext.Provider>
       </main>
     </div>
   );

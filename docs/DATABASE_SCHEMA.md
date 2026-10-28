@@ -15,6 +15,7 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0005` | AI agent development: `ai_agents` added to the `service` / `submitted_service` CHECKs. No existing row changes. |
 | `0006` | `leads.marketing_consent_version` varchar(32) null — wording version of a given marketing consent (contact form and AI readiness submissions). Nullable, no default; downgrade drops the column. |
 | `0007` | `team_configurations`: saved AI team configurations (enumerated JSONB, schema/model/assumptions versions, visitor rate overrides, SHA-256 `token_hash` unique, `locale` CHECK, `expires_at` index, `lead_id` FK `ON DELETE CASCADE`). New table only; downgrade drops it. |
+| `0010` | Catalogue publishing and staff roles. `admin_users.role` (`admin`/`editor`/`viewer`, NOT NULL, server default `admin`, CHECK): existing accounts keep full rights. `catalogue_entities.published_revision`, `published_at`, `published_by_id`, `published_snapshot` (JSONB read model), with a CHECK that a published domain or service has a snapshot. Data step: 0009 rows that were `published` without a snapshot become `draft`, and the bootstrap seed publishes them again. `services`: offering types `assessment` and `workshop`, `duration_min_days` / `duration_max_days` (numeric(4,1), assessments and workshops only). `content_items` + `content_item_translations` (capabilities and deliverables, aligned between BG and EN). Downgrade drops all of it; assessment and workshop rows are deleted with their entities. |
 | `0009` | Service catalogue V1: `catalogue_entities` (supertype: `entity_type`, stable `key`, `status` draft/published/archived, `revision`), `service_domains`, `service_families`, `services` (subtypes sharing the entity id through the composite FK `(id, entity_type)`), `family_services`, `entity_translations` (per locale; slug unique per `(locale, route_namespace)`), `entity_relations` (typed edges with an allowed-combination CHECK). New tables only, no data; `leads` unchanged and not referenced. Downgrade drops the seven tables. See [Service catalogue](#service-catalogue-migration-0009). |
 | `0008` | AI operations scaffold: `ops_organizations` (slug unique, status/region, `is_demo`), `ops_workspaces` (unique `(organization_id, slug)` and `(id, organization_id)`), `ops_memberships` (user × organisation × role CHECK, unique pair), `ops_agents` (registry metadata; composite FK `(workspace_id, organization_id)` → workspaces so an agent cannot sit in another tenant's workspace). New tables only; downgrade drops them. See AI_OPERATIONS_PORTAL.md. |
 
@@ -122,7 +123,9 @@ Append-only activity log. `details` must never contain raw personal data.
 | `admin.created`, `admin.password_reset`, `seed.synthetic_data`, `seed.synthetic_purged` | CLI operations |
 | `ops.organization_created` | CLI `ops-create-org` / `ops-seed-demo` (actor `cli`) |
 | `ops.workspace_created`, `ops.agent_created`, `ops.agent_updated` | AI operations registry writes (`details.organization_id`; agent updates list changed field names) |
-| `catalogue.seeded`, `catalogue.purged` | service catalogue seed with changes (`created` / `updated` counts per type, `schema_version`) or purge (`entities`); actor `cli` |
+| `catalogue.seeded`, `catalogue.purged` | service catalogue seed with changes (`created` / `updated` / `published` counts per type, `mode`, `schema_version`) or purge (`entities`); actor `cli` |
+| `catalogue.entity_created`, `catalogue.entity_updated`, `catalogue.entity_published`, `catalogue.entity_archived`, `catalogue.entity_restored` | admin catalogue writes; `entity_type` `catalogue.domain` / `catalogue.service`, `details` = `key`, `revision`, changed areas (`fields`), never texts |
+| `admin.role_changed` | CLI `set-role` (`from`, `to`) |
 | `ops.member_added`, `ops.member_role_changed`, `ops.member_removed` | organisation membership changes (`user_id`, roles) |
 
 ## ai_action_requests
@@ -255,22 +258,68 @@ integrity check are in `app/catalogue/`.
 | `entity_translations` | `entity_id`, `locale`, `route_namespace`, `slug`, `name`, `short_name`, `summary`, `body`, `cta_label`, `prerequisite`, `seo_title`, `seo_description`, `primary_keyword` | PK `(entity_id, locale)`; unique `(locale, route_namespace, slug)` and `(locale, lower(primary_keyword))` (partial); slug format |
 | `entity_relations` | `from_entity_id`/`from_type`, `kind`, `to_entity_id`/`to_type`, `position` | composite FKs to `(id, entity_type)`; CHECK: `related` service→service, `cross_sell` domain→domain, `delivered_through` family→domain |
 
-**Not in V1** (later migrations, SCHEMA_V2 §3): content items, engagement models, tools,
-technologies and industries, assessments, workshops and managed offerings, slug history, releases,
-`admin_users.role`.
+**Added in 0010:**
+
+* `content_items` and `content_item_translations` hold the capabilities (services) and the
+  deliverables (domains and services). Each item has one row per locale, so the BG and EN lists stay
+  aligned.
+* `services.offering_type` adds `assessment` and `workshop`. Both may have a duration band in
+  working days; they have no lead category.
+* Publication columns on `catalogue_entities`: `published_snapshot` is the document the public API
+  serves, `published_revision` is the revision it was built from, plus `published_at` and
+  `published_by_id`.
+* `admin_users.role`.
+
+**Not yet:** engagement models, tools, technologies and industries, managed offerings, slug history
+and catalogue-wide releases (SCHEMA_V2 §3).
+
+**Publishing model.** An entry has a *working copy* (the relational rows) and, once published, a
+*publication snapshot* (`published_snapshot`), built by `app/catalogue/documents.py` from the
+working copy.
+
+* Saving in the admin editor changes only the working copy and increments `revision`.
+* Publishing validates both locales, then copies the working copy into the snapshot.
+* The public API reads snapshots of published entries only, so drafts and unpublished edits are
+  unreachable by construction.
+* "Unpublished changes" means `published_revision <> revision`.
+* Archiving (services only; domains are fixed by the taxonomy) removes the entry from the public API
+  and keeps the snapshot as history. Restoring makes it a draft, which must be published again.
+
+Per-entry snapshots replace the catalogue-wide releases of the original design
+(SERVICE_CATALOGUE_ARCHITECTURE §6) for this phase, because publishing is requested per entry.
+References to entries that are not published are dropped at read time, so an entry is never
+exposed through a link from another.
 
 **Source and seeding.** The web content stays the source of truth. `apps/web/src/lib/catalogue-seed.ts`
-generates `catalogue-seed.json`; the API keeps an identical copy, `app/catalogue/seed_v1.json`,
-and `scripts/test.ps1` compares the hashes. `python -m app.cli catalogue-seed`:
+generates `catalogue-seed.json` (schema version 2, with capabilities and deliverables). The API keeps
+an identical copy, `app/catalogue/seed_v1.json`, and `scripts/test.ps1` compares the hashes.
 
-* validates the document (Pydantic, then the cross-reference rules);
-* reconciles the database in one transaction: entities matched by `(entity_type, key)`, with new
-  ids that are deterministic (`uuid5`);
-* updates changed rows in place and increments `revision` once per changed entity;
-* **never deletes**: entities missing from the document are reported and left as they are.
+`python -m app.cli catalogue-seed` validates the document (Pydantic, then the cross-reference rules)
+and works in one transaction. Entities are matched by `(entity_type, key)`; new ids are
+deterministic (`uuid5`). Nothing is ever deleted: entities missing from the document are reported
+and left as they are. It has two modes:
 
-A repeated run changes nothing. `--dry-run` rolls back. `python -m app.cli seed` runs it on every
-container start.
+* **bootstrap** (default; run by `python -m app.cli seed` on every container start):
+  * creates and publishes the entries that do not exist yet;
+  * never modifies an existing entry, so admin edits survive restarts;
+  * backfill: a seeded domain or service that was never published and that no editor has touched
+    (`published_revision` and `updated_by_id` are null, e.g. 0009 rows) is published.
+* **reconcile** (`--reconcile`):
+  * makes the working rows of the document's entries equal to the document;
+  * increments `revision` once per changed entity and republishes what changed;
+  * overwrites admin edits to those entries. Use it only deliberately.
+
+A repeated run changes nothing. `--dry-run` rolls back.
+
+**Staff roles.** `python -m app.cli set-role --email <e-mail> --role admin|editor|viewer` changes a
+role, revokes that person's sessions and is audited (`admin.role_changed`).
+
+* `viewer` reads the catalogue.
+* `editor` also creates entries and saves drafts.
+* `admin` also publishes, archives and restores, and is the only role that reaches leads, retention,
+  AI approvals, audit and ops.
+
+The API enforces the roles (`app/deps.py`); the admin UI only hides what would be refused.
 
 **Existing service references.** `leads.service` / `submitted_service` keep their ServiceKey
 values and CHECKs, with no foreign key to the catalogue. The seed refuses a document in which any
@@ -287,8 +336,10 @@ after the downgrade.
 
 | Situation | Action | Effect |
 | --- | --- | --- |
-| Bad catalogue content | fix the web content, regenerate and copy the seed, run `catalogue-seed` | rows corrected in place, revision +1 |
+| Bad content in one entry | correct it in the admin editor and publish, or archive the entry | the public API serves the new snapshot; history in the audit log |
+| Bad seed content | fix the web content, regenerate and copy the seed, run `catalogue-seed --reconcile` | rows corrected in place, republished, revision +1 (admin edits to those entries are overwritten) |
 | Remove the catalogue data, keep the schema | `python -m app.cli catalogue-purge --yes` | catalogue rows deleted (audited `catalogue.purged`); rebuild with `catalogue-seed` |
+| Undo publishing and roles | `alembic downgrade 0009` | roles, snapshots, content items, assessments and workshops are removed; published domains and services stay `published` (0009 semantics) |
 | Remove the schema | `alembic downgrade 0008` | the seven tables are dropped; no other table is touched; `alembic upgrade head` + `catalogue-seed` restore it |
 
 Before rolling back the schema in production, the API image must be one without the catalogue

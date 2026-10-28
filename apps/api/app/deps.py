@@ -14,7 +14,7 @@ from app import audit
 from app.config import Settings, get_settings
 from app.db import get_db
 from app.errors import ApiError
-from app.models import AdminSession, AdminUser, utcnow
+from app.models import AdminRole, AdminSession, AdminUser, utcnow
 from app.rate_limit import limiter
 from app.security import hash_ip, hash_token, tokens_match
 
@@ -66,7 +66,8 @@ def _unauthorized(detail: str = "Необходим е вход в систем�
     return ApiError(status.HTTP_401_UNAUTHORIZED, detail, code)
 
 
-def require_admin(request: Request, db: DbSession) -> AdminContext:
+def require_session(request: Request, db: DbSession) -> AdminContext:
+    """A valid staff session (any role) with CSRF on state-changing requests."""
     settings = get_settings()
     token = request.cookies.get(settings.session_cookie_name)
     if not token or len(token) > 200:
@@ -101,4 +102,35 @@ def require_admin(request: Request, db: DbSession) -> AdminContext:
     return AdminContext(user=session.user, session=session, ip_hash=client_ip_hash(request))
 
 
+Staff = Annotated[AdminContext, Depends(require_session)]
+
+
+def _forbidden_role() -> ApiError:
+    return ApiError(status.HTTP_403_FORBIDDEN, "Ролята ви не позволява това действие.", "forbidden_role")
+
+
+def require_admin(ctx: Staff) -> AdminContext:
+    """Leads, retention, AI approvals, ops and audit: only the `admin` role (every pre-0010 account)."""
+    if ctx.user.role != AdminRole.ADMIN:
+        raise _forbidden_role()
+    return ctx
+
+
 Admin = Annotated[AdminContext, Depends(require_admin)]
+
+
+def require_role(*roles: AdminRole):
+    """Dependency for endpoints open to several staff roles (the service catalogue)."""
+    allowed = {role.value for role in roles}
+
+    def dependency(ctx: Staff) -> AdminContext:
+        if ctx.user.role not in allowed:
+            raise _forbidden_role()
+        return ctx
+
+    return dependency
+
+
+CatalogueReader = Annotated[AdminContext, Depends(require_role(AdminRole.ADMIN, AdminRole.EDITOR, AdminRole.VIEWER))]
+CatalogueEditor = Annotated[AdminContext, Depends(require_role(AdminRole.ADMIN, AdminRole.EDITOR))]
+CataloguePublisher = Annotated[AdminContext, Depends(require_role(AdminRole.ADMIN))]
