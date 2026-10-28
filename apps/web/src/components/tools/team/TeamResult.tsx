@@ -90,6 +90,9 @@ export function TeamResult({
           {r.title}
         </h2>
         <p className="max-w-3xl leading-relaxed text-fg-muted">{r.lead}</p>
+        <p className="max-w-3xl text-sm text-fg-subtle" data-testid="team-result-not-deployed">
+          {content.architecture.notDeployed}
+        </p>
         <p className="flex flex-wrap items-center gap-2 text-sm">
           <span className="text-fg-muted">{r.complexityLabel}:</span>
           <span className={cx("badge", BAND_BADGE[data.complexity.band])} data-testid="team-complexity">

@@ -1,31 +1,41 @@
+import type { ServiceKey } from "@/content/types";
 import { AGENTS, type AgentKey, type Department, recommendAgents } from "@/lib/ai-team";
 
 /**
  * Automation Opportunity Finder — rubric scoring (pure, deterministic, no network).
  * Method: docs/ROI_AND_FINDER.md. Texts: content/{bg,en}/tool-finder.ts.
  *
- * Each process is rated on nine criteria, levels 0–4 (the meaning of each level is in the content).
+ * Each process is rated on ten criteria, levels 0–4 (the meaning of each level is in the content).
  * Favourability f = level / 4 for "more is better" criteria and (4 − level) / 4 for "more is harder".
  *
- *   fit    = mean f(repetitiveness, rule clarity, data availability, exception rate)   × 100
+ *   fit    = mean f(repetitiveness, rule clarity, input structure, data availability, exception rate) × 100
  *   value  = mean f(frequency, business impact)                                         × 100
  *   effort = mean (1 − f)(integration complexity, compliance risk, oversight needs)     × 100
  *   suitability = 0.45 × fit + 0.30 × value + 0.25 × (100 − effort), rounded
  *
  * Categories (first rule that matches):
  *   not_ready   fit < 40, or no digital data (data availability = 0)
- *   quick_win   suitability ≥ 60, value ≥ 50, effort ≤ 50
+ *   quick_win   suitability ≥ 60, value ≥ 50, effort ≤ 50, and the risk is not high
  *   strategic   value ≥ 50 (worth doing, but a larger project)
  *   consider    everything else (low value today)
  * Ranking: suitability desc, then value desc, then the order the processes were entered.
+ *
+ * Suitability is not financial return: the score says how well a process fits automation, not what
+ * it is worth. The ROI calculator answers that from the visitor's own numbers.
+ *
+ * Risk (first rule that matches): high when compliance or oversight needs ≥ 3, or impact ≥ 3 with
+ * exceptions ≥ 3; medium when compliance, oversight or exceptions ≥ 2, or integration ≥ 3; else low.
+ * Risk overrides: a high-risk process is never a quick win, and it always needs human approval.
+ * Human approval is also mandatory for a critical process (business impact 4).
  */
 
-export const FINDER_MODEL_VERSION = "2026-10.1";
+export const FINDER_MODEL_VERSION = "2026-11.1";
 
 export const CRITERIA = [
   "frequency",
   "repetitiveness",
   "rule_clarity",
+  "input_structure",
   "data_availability",
   "exception_rate",
   "integration_complexity",
@@ -40,6 +50,7 @@ export const CRITERION_DIRECTION: Record<Criterion, "positive" | "negative"> = {
   frequency: "positive",
   repetitiveness: "positive",
   rule_clarity: "positive",
+  input_structure: "positive",
   data_availability: "positive",
   exception_rate: "negative",
   integration_complexity: "negative",
@@ -49,7 +60,7 @@ export const CRITERION_DIRECTION: Record<Criterion, "positive" | "negative"> = {
 };
 
 export const SUBSCORES = {
-  fit: ["repetitiveness", "rule_clarity", "data_availability", "exception_rate"],
+  fit: ["repetitiveness", "rule_clarity", "input_structure", "data_availability", "exception_rate"],
   value: ["frequency", "business_impact"],
   effort: ["integration_complexity", "compliance_risk", "oversight_needs"],
 } as const satisfies Record<string, readonly Criterion[]>;
@@ -71,6 +82,7 @@ export interface ProcessInput {
 }
 
 export type Category = "quick_win" | "strategic" | "consider" | "not_ready";
+export type Risk = "low" | "medium" | "high";
 export type Pattern = "workflow_automation" | "ai_extraction" | "ai_assistant_review" | "agent_workflow" | "fix_first";
 export type Blocker = "data_not_digital" | "unclear_rules" | "many_exceptions" | "compliance" | "integration" | "low_volume";
 export type NextStep =
@@ -98,8 +110,11 @@ export interface Opportunity {
   /** Points each part contributes to the suitability (sums to the unrounded score). */
   contributions: { fit: number; value: number; ease: number };
   category: Category;
+  risk: Risk;
   pattern: Pattern;
   approvalRequired: boolean;
+  /** Services that fit the recommended pattern (and its blockers), most relevant first. */
+  services: ServiceKey[];
   agents: AgentKey[];
   blockers: Blocker[];
   nextSteps: NextStep[];
@@ -134,9 +149,26 @@ export function subscores(ratings: Required<Ratings>) {
   return { fit, value, effort, contributions, suitability: contributions.fit + contributions.value + contributions.ease };
 }
 
-export function categorise(fit: number, value: number, effort: number, suitability: number, ratings: Required<Ratings>): Category {
+export function riskLevel(ratings: Required<Ratings>): Risk {
+  if (ratings.compliance_risk >= 3 || ratings.oversight_needs >= 3) return "high";
+  if (ratings.business_impact >= 3 && ratings.exception_rate >= 3) return "high";
+  if (ratings.compliance_risk >= 2 || ratings.oversight_needs >= 2 || ratings.exception_rate >= 2 || ratings.integration_complexity >= 3) {
+    return "medium";
+  }
+  return "low";
+}
+
+export function categorise(
+  fit: number,
+  value: number,
+  effort: number,
+  suitability: number,
+  ratings: Required<Ratings>,
+  risk: Risk = riskLevel(ratings),
+): Category {
   if (fit < 40 || ratings.data_availability === 0) return "not_ready";
-  if (suitability >= 60 && value >= 50 && effort <= 50) return "quick_win";
+  // Risk override: a high-risk process needs a scoped project with controls, never a "quick win".
+  if (suitability >= 60 && value >= 50 && effort <= 50 && risk !== "high") return "quick_win";
   if (value >= 50) return "strategic";
   return "consider";
 }
@@ -144,8 +176,12 @@ export function categorise(fit: number, value: number, effort: number, suitabili
 /** Rule order matters: the first matching pattern is recommended. */
 export function recommendPattern(ratings: Required<Ratings>, category: Category): Pattern {
   if (category === "not_ready") return "fix_first";
-  if (ratings.rule_clarity >= 3 && ratings.exception_rate <= 1 && ratings.data_availability >= 3) return "workflow_automation";
-  if (ratings.data_availability <= 2 && ratings.rule_clarity >= 2) return "ai_extraction";
+  // Clear rules, few exceptions and structured, available data: standard workflow automation, no AI.
+  if (ratings.rule_clarity >= 3 && ratings.exception_rate <= 1 && ratings.data_availability >= 3 && ratings.input_structure >= 3) {
+    return "workflow_automation";
+  }
+  // Unstructured inputs (e-mails, documents, free text) with workable rules: AI reads, rules decide.
+  if (ratings.input_structure <= 2 && ratings.rule_clarity >= 2) return "ai_extraction";
   if (ratings.integration_complexity >= 3 && ratings.frequency >= 3 && ratings.rule_clarity >= 2) return "agent_workflow";
   return "ai_assistant_review";
 }
@@ -183,6 +219,22 @@ export function nextSteps(category: Category, blockers: Blocker[]): NextStep[] {
   return [...new Set(steps)].slice(0, 4);
 }
 
+/** Services per pattern; integration work is added when integration is a blocker. */
+const PATTERN_SERVICES: Record<Pattern, ServiceKey[]> = {
+  workflow_automation: ["automation"],
+  ai_extraction: ["ai_tools", "automation"],
+  ai_assistant_review: ["ai_agents"],
+  agent_workflow: ["ai_agents", "integrations"],
+  fix_first: ["audit"],
+};
+
+export function recommendServices(pattern: Pattern, blockers: Blocker[]): ServiceKey[] {
+  const services = [...PATTERN_SERVICES[pattern]];
+  if (blockers.includes("integration")) services.push("integrations");
+  if (blockers.includes("compliance")) services.push("audit");
+  return [...new Set(services)].slice(0, 3);
+}
+
 /** AI agent roles from the "Build your AI team" library that fit the process (none for plain workflows). */
 export function suggestAgents(area: Department, pattern: Pattern, approvalRequired: boolean): AgentKey[] {
   if (pattern === "workflow_automation" || pattern === "fix_first") return [];
@@ -200,14 +252,16 @@ export function assessProcess(process: ProcessInput, index: number): Omit<Opport
   const ratings = process.ratings as Required<Ratings>;
   const { fit, value, effort, contributions, suitability } = subscores(ratings);
   const rounded = Math.round(suitability);
-  const category = categorise(fit, value, effort, rounded, ratings);
+  const risk = riskLevel(ratings);
+  const category = categorise(fit, value, effort, rounded, ratings, risk);
   const pattern = recommendPattern(ratings, category);
-  // Approval is a property of an automation; a process that is not ready yet gets none.
-  const approvalRequired = pattern !== "fix_first" && (ratings.compliance_risk >= 3 || ratings.oversight_needs >= 3);
+  // Approval is a property of an automation; a process that is not ready yet gets none. It is
+  // mandatory for high-risk processes and for critical ones (impact 4), whatever the pattern.
+  const approvalRequired = pattern !== "fix_first" && (risk === "high" || ratings.business_impact === MAX_LEVEL);
   const blockers = findBlockers(ratings);
   return {
     index,
-    name: process.name.trim(),
+    name: cleanProcessName(process.name),
     area: process.area,
     fit: Math.round(fit),
     value: Math.round(value),
@@ -216,12 +270,47 @@ export function assessProcess(process: ProcessInput, index: number): Omit<Opport
     breakdown: Object.fromEntries(CRITERIA.map((c) => [c, Math.round(favourability(c, ratings[c]) * 100)])) as Record<Criterion, number>,
     contributions,
     category,
+    risk,
     pattern,
     approvalRequired,
+    services: recommendServices(pattern, blockers),
     agents: suggestAgents(process.area, pattern, approvalRequired),
     blockers,
     nextSteps: nextSteps(category, blockers),
   };
+}
+
+export const MAX_NAME_LENGTH = 80;
+
+/** Display name: control characters removed, whitespace collapsed, length capped (rendered as text only). */
+export function cleanProcessName(name: string): string {
+  const printable = Array.from(name, (ch) => (ch.charCodeAt(0) < 32 || ch.charCodeAt(0) === 127 ? " " : ch)).join("");
+  return printable
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, MAX_NAME_LENGTH);
+}
+
+export interface PilotScope {
+  index: number;
+  pattern: Exclude<Pattern, "fix_first">;
+  approvalRequired: boolean;
+  /** Indicative duration of a scoped pilot, in weeks. */
+  weeks: [number, number];
+}
+
+const PILOT_WEEKS: Record<Exclude<Pattern, "fix_first">, [number, number]> = {
+  workflow_automation: [3, 6],
+  ai_extraction: [4, 8],
+  ai_assistant_review: [4, 8],
+  agent_workflow: [6, 12],
+};
+
+/** A pilot for the highest-ranked process that is a quick win or a strategic project; none otherwise. */
+export function suggestPilot(ranked: Opportunity[]): PilotScope | null {
+  const top = ranked.find((o) => (o.category === "quick_win" || o.category === "strategic") && o.pattern !== "fix_first");
+  if (!top || top.pattern === "fix_first") return null;
+  return { index: top.index, pattern: top.pattern, approvalRequired: top.approvalRequired, weeks: PILOT_WEEKS[top.pattern] };
 }
 
 /** Assesses every complete process and ranks them. */

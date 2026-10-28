@@ -48,6 +48,11 @@ def request_body(**overrides) -> dict:
     return body
 
 
+def save_body(**overrides) -> dict:
+    """A consented save request with a fresh form token."""
+    return request_body(**{"form_token": valid_token(), "storage_consent": True, **overrides})
+
+
 def model(config: dict) -> TeamConfig:
     return TeamConfig(
         config["context"],
@@ -359,7 +364,7 @@ def test_save_and_lookup_a_configuration_with_a_hashed_token(client, db, setting
     config = team_config(agents={"scheduling": {"volume": "v_lt100", "checkpoint": "every_action", "integrations": []}})
     response = client.post(
         f"{BASE}/configurations",
-        json=request_body(config=config, form_token=valid_token(), overrides={"day_rate": 650}),
+        json=request_body(config=config, form_token=valid_token(), overrides={"day_rate": 650}, storage_consent=True),
     )
     assert response.status_code == 201, response.text
     saved = response.json()
@@ -387,7 +392,7 @@ def test_save_and_lookup_a_configuration_with_a_hashed_token(client, db, setting
 def test_lookup_rejects_unknown_expired_and_lead_linked_configurations(client, db):
     assert client.post(f"{BASE}/configurations/lookup", json={"token": "x" * 43}).status_code == 404
     assert client.post(f"{BASE}/configurations/lookup", json={"token": "short"}).status_code == 422
-    token = client.post(f"{BASE}/configurations", json=request_body(form_token=valid_token())).json()["token"]
+    token = client.post(f"{BASE}/configurations", json=save_body()).json()["token"]
     row = db.scalar(select(TeamConfiguration))
     row.expires_at = utcnow() - timedelta(minutes=1)
     db.commit()
@@ -395,22 +400,22 @@ def test_lookup_rejects_unknown_expired_and_lead_linked_configurations(client, d
 
 
 def test_save_requires_a_form_token_and_is_rate_limited(client, settings):
-    assert client.post(f"{BASE}/configurations", json=request_body(form_token="")).status_code == 400
+    assert client.post(f"{BASE}/configurations", json=save_body(form_token="")).status_code == 400
     for _ in range(settings.team_save_rate_limit - 1):
-        assert client.post(f"{BASE}/configurations", json=request_body(form_token=valid_token())).status_code == 201
-    assert client.post(f"{BASE}/configurations", json=request_body(form_token=valid_token())).status_code == 429
+        assert client.post(f"{BASE}/configurations", json=save_body()).status_code == 201
+    assert client.post(f"{BASE}/configurations", json=save_body()).status_code == 429
 
 
 def test_tokens_never_reach_the_logs(client, caplog):
     caplog.set_level(logging.INFO)
-    token = client.post(f"{BASE}/configurations", json=request_body(form_token=valid_token())).json()["token"]
+    token = client.post(f"{BASE}/configurations", json=save_body()).json()["token"]
     client.post(f"{BASE}/configurations/lookup", json={"token": token})
     dumped = json.dumps([r.__dict__ for r in caplog.records], default=str)
     assert token not in dumped
 
 
 def test_expired_unlinked_configurations_are_purged(client, db):
-    client.post(f"{BASE}/configurations", json=request_body(form_token=valid_token()))
+    client.post(f"{BASE}/configurations", json=save_body())
     client.post(f"{BASE}/submissions", json=submission())
     for row in db.scalars(select(TeamConfiguration)):
         row.expires_at = utcnow() - timedelta(days=1)
@@ -522,7 +527,7 @@ def test_admin_team_report_is_404_for_other_leads(admin_client, make_lead, db):
 
 
 def test_admin_retention_includes_team_configurations(admin_client, db):
-    admin_client.post(f"{BASE}/configurations", json=request_body(form_token=valid_token()))
+    admin_client.post(f"{BASE}/configurations", json=save_body())
     row = db.scalar(select(TeamConfiguration))
     row.expires_at = utcnow() - timedelta(days=1)
     db.commit()
@@ -546,3 +551,17 @@ def test_team_leads_have_their_own_retention(client, db, make_lead):
 def test_assumptions_for_an_unknown_version_fall_back_to_the_current_document(settings):
     assert service.assumptions_for_version(settings, "1999-01.1")["version"] == DOC["version"]
     assert service.assumptions_for_version(settings, "../../etc/passwd")["version"] == DOC["version"]
+
+
+def test_a_configuration_is_stored_only_with_explicit_consent(client, db):
+    from app.models import TeamConfiguration
+
+    for consent in (None, False, "yes"):
+        body = request_body(form_token=valid_token())
+        if consent is not None:
+            body["storage_consent"] = consent
+        assert client.post(f"{BASE}/configurations", json=body).status_code == 422
+    assert db.scalar(select(func.count()).select_from(TeamConfiguration)) == 0
+    saved = client.post(f"{BASE}/configurations", json=save_body())
+    assert saved.status_code == 201
+    assert db.scalar(select(func.count()).select_from(TeamConfiguration)) == 1

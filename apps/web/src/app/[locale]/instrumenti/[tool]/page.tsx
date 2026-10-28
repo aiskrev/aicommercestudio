@@ -22,7 +22,7 @@ import { AGENT_SLUGS } from "@/lib/agent-library";
 import { ACTION_SERVICE } from "@/lib/readiness";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
-import { domainDefinition } from "@/lib/domains";
+import { type DomainKey, domainDefinition } from "@/lib/domains";
 import { TOOL_PAGE_SLUGS } from "@/lib/tool-slugs";
 import { isToolAvailable, isToolPlanned, TOOL_SLUGS, toolByKey, toolHrefs, TOOLS, type ToolKey, toolMinutes } from "@/lib/tools";
 
@@ -44,7 +44,7 @@ const TOOL_SERVICES: Record<HostedTool, ServiceKey[]> = {
   readiness: [...new Set(Object.values(ACTION_SERVICE))],
   team: ["ai_agents", "integrations", "ai_managed"],
   roi: [],
-  finder: [],
+  finder: ["automation", "ai_tools", "ai_agents", "integrations", "audit"],
   solution: ["ai_agents", "integrations", "automation", "ai_tools", "ai_managed", "audit"],
 };
 
@@ -80,6 +80,16 @@ function resolveTool(slug: string): HostedTool | null {
   const key = HOSTED[slug];
   if (!key || !isToolAvailable(toolByKey(key))) return null;
   return key;
+}
+
+/** Published domain hubs (they list the workshops and consultant-led assessments). */
+function hubLinks(locale: Locale, domains: DomainKey[]): { href: string; label: string }[] {
+  return domains
+    .filter((domain) => domainDefinition(domain).published)
+    .map((domain) => {
+      const hub = domainByKey(locale, domain);
+      return { href: localizePath(locale, routes.service(hub.slug)), label: hub.name };
+    });
 }
 
 function toolContent(locale: Locale, key: HostedTool) {
@@ -184,6 +194,8 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
             roiHref={hrefs.roi}
             teamHref={hrefs.team}
             advisorHref={hrefs.advisor}
+            services={services}
+            workshops={hubLinks(locale, ["ai_agents_automation", "advisory_enablement"])}
           />
         </Section>
       )}
@@ -215,12 +227,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
               advisorHref={hrefs.advisor}
               privacyHref={href(routes.privacy)}
               locale={locale}
-              workshops={(["ai_strategy", "advisory_enablement"] as const)
-                .filter((domain) => domainDefinition(domain).published)
-                .map((domain) => {
-                  const hub = domainByKey(locale, domain);
-                  return { href: href(routes.service(hub.slug)), label: hub.name };
-                })}
+              workshops={hubLinks(locale, ["ai_strategy", "advisory_enablement"])}
             />
           </Suspense>
         </Section>

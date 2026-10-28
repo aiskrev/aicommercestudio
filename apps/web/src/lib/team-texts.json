@@ -371,18 +371,18 @@
    "rolloutTitle": "Поетапно внедряване",
    "phases": {
     "pilot": {
-     "title": "Пилот",
-     "goal": "Един процес с ограничен обхват, одобрение от човек и измерване на качеството.",
+     "title": "MVP",
+     "goal": "Един агент за един процес, с тестови примери и човешко одобрение — без достъп до клиенти, докато качеството не бъде доказано.",
      "exit": "Продължете, когато качеството отговаря на критериите по тестовите примери."
     },
     "expand": {
-     "title": "Разширяване",
-     "goal": "Следващите агенти, по същите правила и тестове.",
+     "title": "Пилот",
+     "goal": "Ограничен обем в реална работа и следващите агенти, по същите правила и тестове.",
      "exit": "Продължете, когато предаването между агентите и хората работи надеждно."
     },
     "scale": {
-     "title": "Мащабиране",
-     "goal": "Координация, контрол и останалите роли за целия екип.",
+     "title": "Продукция",
+     "goal": "Координация, контрол, наблюдение и останалите роли за целия екип.",
      "exit": "Редовен преглед на качеството, разходите и инцидентите."
     }
    },
@@ -913,18 +913,18 @@
    "rolloutTitle": "Phased rollout",
    "phases": {
     "pilot": {
-     "title": "Pilot",
-     "goal": "One process with a limited scope, human approval and quality measurement.",
+     "title": "MVP",
+     "goal": "One agent for one process, with test examples and human approval — no customer access until the quality is proven.",
      "exit": "Continue when quality meets the criteria on the test examples."
     },
     "expand": {
-     "title": "Expand",
-     "goal": "The next agents, under the same rules and tests.",
+     "title": "Pilot",
+     "goal": "A limited volume in real work and the next agents, under the same rules and tests.",
      "exit": "Continue when hand-offs between agents and people work reliably."
     },
     "scale": {
-     "title": "Scale",
-     "goal": "Coordination, oversight and the remaining roles for the whole team.",
+     "title": "Production",
+     "goal": "Coordination, oversight, monitoring and the remaining roles for the whole team.",
      "exit": "Regular review of quality, cost and incidents."
     }
    },

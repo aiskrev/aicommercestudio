@@ -10,7 +10,7 @@ Nothing here deploys, configures or runs an agent; every page and the PDF say so
 | Build the team, see the result | nothing | nothing | — |
 | Costs, security, data flows (result page) | enumerated configuration + optional rate overrides | nothing | `POST /api/public/team/estimate` |
 | Download the PDF plan | the above + optional company name for the cover | nothing | `POST /api/public/team/report` |
-| Save the configuration | the above (no company) | configuration row, 90 days | `POST /api/public/team/configurations` |
+| Save the configuration (after ticking the storage consent) | the above (no company) + `storage_consent: true` | configuration row, 90 days | `POST /api/public/team/configurations` |
 | Open a saved link | the secret token (request body) | — | `POST /api/public/team/configurations/lookup` |
 | Request a consultation | the above + name, work e-mail, company, role, message, consents | lead + linked configuration | `POST /api/public/team/submissions` |
 
@@ -95,7 +95,7 @@ Common request fields: `schema_version` (`"1"`), `model_version` (`"2026-10.1"`,
 | `GET /api/public/team/meta` | — | versions, `assumptions` (whole document + `editable` bounds and defaults), `retention_days`, `submission_retention_days`, `email_delivery: false` | — |
 | `POST /api/public/team/estimate` | — | `{model_version, summary, security, data_flows, estimate}` (below) | `TEAM_ESTIMATE_RATE_LIMIT` per client |
 | `POST /api/public/team/report` | `company?` (≤ 120, no links/HTML), `form_token` | `application/pdf` (`ai-ekip-plan.pdf` / `ai-team-plan.pdf`), `no-store`, `nosniff` | `TEAM_REPORT_RATE_LIMIT`; form token |
-| `POST /api/public/team/configurations` → 201 | `form_token` | `{reference, token, expires_at}` | `TEAM_SAVE_RATE_LIMIT`; form token |
+| `POST /api/public/team/configurations` → 201 | `form_token`, `storage_consent` (must be `true`; missing or anything else → 422, nothing stored) | `{reference, token, expires_at}` | `TEAM_SAVE_RATE_LIMIT`; form token |
 | `POST /api/public/team/configurations/lookup` | `{token}` only | `{reference, created_at, expires_at, schema_version, model_version, assumptions_version, locale, config, overrides}`; 404 `team_configuration_not_found` | `TEAM_LOOKUP_RATE_LIMIT` |
 | `POST /api/public/team/submissions` → 201 | `name`, `email`, `company`, `role`, `message?`, `privacy_acknowledged` (must be true), `marketing_consent` (default false), `website` (honeypot), `form_token` | `{reference, message}` | contact-form limit; honeypot; form token; link spam |
 | `GET /api/admin/leads/{id}/team-report` (admin) | — | `application/pdf` from the stored configuration; audited `lead.team_report_downloaded`; 404 for other leads | session |
@@ -132,8 +132,11 @@ report `team_configurations_due` / `team_configurations_deleted`.
   whichever is shorter; their configuration row is deleted with the lead (FK `ON DELETE CASCADE`).
   Purged by `python -m app.cli maintenance` and *Admin → Retention*.
 * **Consent.** Privacy acknowledgement required (version recorded); marketing consent separate,
-  unticked, versioned (`marketing_consent_version`); downloading, saving and estimating need no consent
-  because no personal data is processed beyond the request itself.
+  unticked, versioned (`marketing_consent_version`). **Saving** stores only an explicitly consented
+  configuration: the save card has an unticked box stating what is kept and for how many days; without
+  it the UI shows an error and sends nothing, and the API rejects a request without
+  `storage_consent: true` (`Literal[True]`, tested). Downloading and estimating store nothing and need
+  no consent.
 * **Logs** carry counts, enumerations and references only (agents count, complexity band, locale,
   configuration/lead reference) — never tokens, names, e-mails, companies or messages (tested).
 * **No e-mail promises.** `email_delivery` is `false`; the UI says no automatic e-mails are sent.

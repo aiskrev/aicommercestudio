@@ -6,6 +6,7 @@ import {
   REALIZATION_OPTIONS,
   ROI_BOUNDS,
   ROI_FIELDS,
+  ROI_MODEL_VERSION,
   type RoiDraft,
   type RoiInputs,
   SCENARIOS,
@@ -17,6 +18,7 @@ import {
   encodeRoi,
   parseNumber,
   validateRoi,
+  workedSteps,
 } from "@/lib/roi";
 
 const BASE: RoiInputs = {
@@ -26,6 +28,7 @@ const BASE: RoiInputs = {
   coverage: 60,
   timeReduction: 70,
   reviewMinutes: 2,
+  exceptionRate: 0,
   implementationCost: 15000,
   runCost: 300,
   maintenanceCost: 200,
@@ -58,6 +61,9 @@ describe("input parsing and validation", () => {
     expect(validateRoi({ ...draft(BASE), hourlyCost: "-5" }).errors.hourlyCost).toBe("range");
     expect(validateRoi({ ...draft(BASE), minutes: "0" }).errors.minutes).toBe("range");
     expect(validateRoi({ ...draft(BASE), runCost: "lots" }).errors.runCost).toBe("number");
+    expect(validateRoi({ ...draft(BASE), exceptionRate: "120" }).errors.exceptionRate).toBe("range");
+    expect(validateRoi({ ...draft(BASE), exceptionRate: "-1" }).errors.exceptionRate).toBe("range");
+    expect(validateRoi({ ...draft(BASE), exceptionRate: "" }).errors.exceptionRate).toBe("required");
     expect(validateRoi(draft(BASE)).inputs).toEqual(BASE);
   });
 
@@ -131,6 +137,33 @@ describe("calculation", () => {
     expect(nothing.paybackMonths).toBeNull();
   });
 
+  it("adds full manual handling for exceptions on top of the review", () => {
+    const r = calculateRoi({ ...BASE, exceptionRate: 10 });
+    // 1 200 automated tasks × 10% = 120 exceptions × 12 min = 24 h on top of 272 h
+    expect(r.exceptionTasks).toBeCloseTo(120, 10);
+    expect(r.futureHours).toBeCloseTo(296, 10);
+    expect(r.hoursReleased).toBeCloseTo(104, 10);
+    expect(r.realizedSavings).toBeCloseTo(1950, 8); // 104 h × 25 × 75%
+    expect(r.netMonthly).toBeCloseTo(1450, 8);
+    // Every automated task an exception, no time saved and no review: nothing is released.
+    const allFail = calculateRoi({ ...BASE, coverage: 100, timeReduction: 100, reviewMinutes: 0, exceptionRate: 100 });
+    expect(allFail.hoursReleased).toBeCloseTo(0, 10);
+    expect(allFail.realizedSavings).toBeCloseTo(0, 10);
+    // With review time the process becomes slower, and that counts in full.
+    expect(calculateRoi({ ...BASE, coverage: 100, exceptionRate: 100 }).hoursReleased).toBeLessThan(0);
+  });
+
+  it("never double-counts: savings stay within the value of released time and the identities hold", () => {
+    for (const realization of REALIZATION_OPTIONS) {
+      for (const exceptionRate of [0, 25, 100]) {
+        const r = calculateRoi({ ...BASE, realization, exceptionRate });
+        if (r.hoursReleased >= 0) expect(r.realizedSavings).toBeLessThanOrEqual(r.capacityValue + 1e-9);
+        expect(r.netMonthly).toBeCloseTo(r.currentCost - r.futureCost, 8);
+        expect(r.netMonthly).toBeCloseTo(r.realizedSavings - r.runningCosts, 8);
+      }
+    }
+  });
+
   it("uses the chosen horizon for net benefit and ROI but always reports 12 months", () => {
     const r = calculateRoi({ ...BASE, horizon: 24 });
     expect(r.netHorizon).toBeCloseTo(24 * 1900 - 15000, 8);
@@ -146,6 +179,8 @@ describe("scenarios", () => {
     expect(high.coverage).toBe(100);
     expect(high.timeReduction).toBe(100);
     expect(applyScenario(BASE, "conservative")).toMatchObject({ coverage: 45, timeReduction: 52.5, reviewMinutes: 2.5, runCost: 360, maintenanceCost: 240, implementationCost: 18000 });
+    expect(applyScenario({ ...BASE, exceptionRate: 90 }, "conservative").exceptionRate).toBe(100);
+    expect(applyScenario({ ...BASE, exceptionRate: 20 }, "optimistic").exceptionRate).toBeCloseTo(17, 10);
   });
 
   it("orders conservative ≤ base ≤ optimistic for a typical process", () => {
@@ -156,19 +191,44 @@ describe("scenarios", () => {
   });
 
   it("documents every multiplier", () => {
-    for (const key of SCENARIO_KEYS) expect(Object.keys(SCENARIOS[key]).sort()).toEqual(["costs", "coverage", "implementation", "reviewMinutes", "timeReduction"]);
+    for (const key of SCENARIO_KEYS) {
+      expect(Object.keys(SCENARIOS[key]).sort()).toEqual(["costs", "coverage", "exceptionRate", "implementation", "reviewMinutes", "timeReduction"]);
+    }
   });
 });
 
 describe("share code", () => {
   it("round-trips the numbers only", () => {
     const code = encodeRoi(BASE);
-    expect(code).toBe("2000~12~25~60~70~2~15000~300~200~12~75");
+    expect(code).toBe("2000~12~25~60~70~2~0~15000~300~200~12~75");
     expect(validateRoi(decodeRoi(code)!).inputs).toEqual(BASE);
   });
 
   it("rejects malformed or out-of-range codes", () => {
-    for (const bad of [null, "", "1~2~3", "2000~12~25~60~70~2~15000~300~200~12~175", "x".repeat(400)]) expect(decodeRoi(bad)).toBeNull();
+    for (const bad of [null, "", "1~2~3", "2000~12~25~60~70~2~0~15000~300~200~12~175", "x".repeat(400)]) expect(decodeRoi(bad)).toBeNull();
+    // A link of formula version 2026-10.1 (no exception rate) is not decoded into the new fields.
+    expect(decodeRoi("2000~12~25~60~70~2~15000~300~200~12~75")).toBeNull();
+  });
+});
+
+describe("worked explanation", () => {
+  it("shows every step with the numbers the calculation used", () => {
+    const result = calculateRoi(BASE);
+    const steps = workedSteps(BASE, result);
+    expect(steps.map((s) => s.key)).toEqual(["currentHours", "currentCost", "futureHours", "hoursReleased", "realizedSavings", "netMonthly", "payback", "roi"]);
+    expect(steps.find((s) => s.key === "futureHours")!.values).toMatchObject({ A: 1200, rest: 800, E: 0, H1: result.futureHours });
+    expect(steps.find((s) => s.key === "roi")!.values.roi).toBe(result.roiPercent);
+  });
+
+  it("leaves out payback and ROI when they are not defined", () => {
+    const inputs = { ...BASE, realization: 0, implementationCost: 0, runCost: 0, maintenanceCost: 0 };
+    const keys = workedSteps(inputs, calculateRoi(inputs)).map((s) => s.key);
+    expect(keys).not.toContain("payback");
+    expect(keys).not.toContain("roi");
+  });
+
+  it("versions the formulas", () => {
+    expect(ROI_MODEL_VERSION).toBe("2026-11.1");
   });
 });
 
@@ -180,5 +240,10 @@ describe.each(locales)("ROI texts (%s)", (locale) => {
     for (const key of SCENARIO_KEYS) expect(t.scenarios[key].text).toBeTruthy();
     expect(t.formulas.length).toBeGreaterThanOrEqual(7);
     expect(t.disclaimer).toMatch(locale === "bg" ? /не е прогноза или гаранция/ : /not a forecast or a guarantee/);
+    expect(t.disclaimer).toMatch(locale === "bg" ? /^Илюстративна оценка, а не проверен финансов резултат/ : /^An illustrative estimate, not a verified financial outcome/);
+    expect(t.version).toContain("{version}");
+    for (const key of ["currentHours", "currentCost", "futureHours", "hoursReleased", "realizedSavings", "netMonthly", "payback", "roi"] as const) {
+      expect(t.worked.steps[key]).toMatch(/=/);
+    }
   });
 });

@@ -116,6 +116,7 @@ test("AI team configurator works on a phone: one-column agents, vertical diagram
   await form.getByRole("checkbox", { name: "Scheduling Agent" }).check();
   await form.getByRole("button", { name: "Next" }).click();
   await form.getByRole("radio", { name: /^Managed cloud environment/ }).check();
+  await form.getByRole("button", { name: "Next" }).click();
   await form.getByRole("radio", { name: /^We do/ }).check();
   await form.getByRole("button", { name: "Next" }).click();
 
@@ -141,6 +142,7 @@ test("ROI calculator works on a phone: live result and no horizontal scrolling",
     ["Share of tasks automated", "60"],
     ["Time reduction per automated task", "70"],
     ["Human review time", "2"],
+    ["Exception and rework rate", "0"],
     ["One-time implementation cost", "15000"],
     ["Monthly AI, API and infrastructure cost", "300"],
     ["Monthly maintenance cost", "200"],

@@ -55,6 +55,7 @@ async function reachTeamStep(user: User) {
 async function reachArchitecture(user: User) {
   await reachTeamStep(user);
   await user.click(screen.getByRole("radio", { name: new RegExp(`^${t.teamStep.deployment.options.managed_cloud.title}`) }));
+  await next(user); // data and systems → approval and risk
   await user.click(screen.getByRole("radio", { name: new RegExp(`^${t.teamStep.operations.options.shared.title}`) }));
   await next(user);
 }
@@ -135,7 +136,7 @@ describe("AI team configurator", () => {
     expect(screen.getByRole("heading", { level: 2, name: t.steps.agents.title })).toBeInTheDocument();
     await user.click(screen.getByRole("checkbox", { name: t.agents.sales_research.name }));
     await next(user);
-    expect(screen.getByRole("heading", { level: 2, name: t.steps.team.title })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: t.steps.data.title })).toBeInTheDocument();
   });
 
   it("keeps approvals at or above the rule minimum and requires deployment choices", async () => {
@@ -143,25 +144,40 @@ describe("AI team configurator", () => {
     renderBuilder();
     await reachTeamStep(user);
 
+    // Step 4 — data and systems: required integrations stay selected; optional ones can be added.
+    expect(screen.getByRole("heading", { level: 2, name: t.steps.data.title })).toBeInTheDocument();
+    const data = screen.getByTestId("settings-customer_support");
+    expect(within(data).getByRole("checkbox", { name: /Helpdesk/ })).toBeDisabled();
+    await user.click(within(data).getByRole("checkbox", { name: /E-mail/ }));
+    expect(within(data).getByRole("checkbox", { name: /E-mail/ })).toBeChecked();
+    expect(within(data).queryByRole("radio", { name: new RegExp(`^${t.checkpoints.every_action.title}`) })).toBeNull();
+    await next(user);
+    expect(screen.getAllByText(t.errors.choose)).toHaveLength(1); // the environment is required
+    await user.click(screen.getByRole("radio", { name: new RegExp(`^${t.teamStep.deployment.options.managed_cloud.title}`) }));
+    await next(user);
+
+    // Step 5 — approval and risk: approvals stay at or above the rule minimum.
+    expect(screen.getByRole("heading", { level: 2, name: t.steps.approval.title })).toBeInTheDocument();
+    expect(screen.getByTestId("team-risk-note")).toHaveTextContent(t.approvalStep.note);
     const settings = screen.getByTestId("settings-customer_support");
     expect(within(settings).getByRole("radio", { name: new RegExp(`^${t.checkpoints.none.title}`) })).toBeDisabled();
     expect(within(settings).getByRole("radio", { name: new RegExp(`^${t.checkpoints.sample_review.title}`) })).toBeDisabled();
     expect(within(settings).getByRole("radio", { name: new RegExp(`^${t.checkpoints.before_external.title}`) })).toBeChecked();
     await user.click(within(settings).getByRole("radio", { name: new RegExp(`^${t.checkpoints.every_action.title}`) }));
     expect(within(settings).getByRole("radio", { name: new RegExp(`^${t.checkpoints.every_action.title}`) })).toBeChecked();
-    // Required integrations stay selected; optional ones can be added.
-    expect(within(settings).getByRole("checkbox", { name: /Helpdesk/ })).toBeDisabled();
-    await user.click(within(settings).getByRole("checkbox", { name: /E-mail/ }));
-    expect(within(settings).getByRole("checkbox", { name: /E-mail/ })).toBeChecked();
-
     await next(user);
-    expect(screen.getAllByText(t.errors.choose)).toHaveLength(2);
+    expect(screen.getAllByText(t.errors.choose)).toHaveLength(1); // who maintains the system is required
+
+    // Back keeps the data step's choices.
+    await user.click(screen.getByRole("button", { name: ui.back }));
+    expect(within(screen.getByTestId("settings-customer_support")).getByRole("checkbox", { name: /E-mail/ })).toBeChecked();
   });
 
   it("navigates the architecture with the keyboard and shows the connections", async () => {
     const user = userEvent.setup();
     renderBuilder();
     await reachArchitecture(user);
+    expect(screen.getByTestId("team-not-deployed")).toHaveTextContent(t.architecture.notDeployed);
 
     const diagram = document.querySelector<SVGElement>("svg[data-orientation='horizontal']")!;
     const nodes = [...diagram.querySelectorAll<SVGGElement>("[data-node]")];
@@ -206,6 +222,8 @@ describe("AI team configurator", () => {
     expect(within(result).getByTestId("team-risks")).toHaveTextContent(t.result.risks.customer_facing_errors.title);
     expect(within(result).getByTestId("team-prerequisites")).toHaveTextContent(t.result.prerequisites.knowledge_curation.title);
     expect(within(result).getByTestId("team-rollout")).toHaveTextContent(t.result.phases.pilot.title);
+    expect(within(result).getByTestId("team-rollout")).toHaveTextContent("MVP");
+    expect(within(result).getByTestId("team-result-not-deployed")).toHaveTextContent(t.architecture.notDeployed);
     expect(within(result).getByTestId("team-effort-note")).toHaveTextContent(/indicative estimate/);
     expect(within(result).getByTestId("team-complexity-factors").querySelectorAll("li")).toHaveLength(5);
     expect(screen.getByRole("link", { name: t.leadCapture.cta })).toHaveAttribute("href", "/en/contact");
@@ -214,6 +232,7 @@ describe("AI team configurator", () => {
     expect(events.map((e) => e.name)).toEqual([
       "tool_opened",
       "tool_started",
+      "step_completed",
       "step_completed",
       "step_completed",
       "step_completed",

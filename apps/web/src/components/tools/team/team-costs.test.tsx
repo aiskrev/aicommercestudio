@@ -193,10 +193,17 @@ describe("configurator plan, export and consultation", () => {
       "/api/public/team/configurations": () => Response.json({ reference: "AB12CD34", token: "secret-token-value-0123456789abcdef", expires_at: "2027-01-25T10:00:00Z" }, { status: 201 }),
     });
     await renderResult();
-    await user.click(within(screen.getByTestId("team-save")).getByRole("button", { name: t.save.button }));
+    const card = screen.getByTestId("team-save");
+    // Nothing is stored without explicit consent.
+    await user.click(within(card).getByRole("button", { name: t.save.button }));
+    expect(within(card).getByRole("alert")).toHaveTextContent(t.save.consentError);
+    expect(calls.find((c) => c.url === "/api/public/team/configurations")).toBeUndefined();
+    await user.click(within(card).getByTestId("team-save-consent"));
+    await user.click(within(card).getByRole("button", { name: t.save.button }));
     expect(await screen.findByTestId("team-saved-link")).toHaveValue("http://localhost:3000/en/tools/ai-team?c=secret-token-value-0123456789abcdef");
     const save = calls.find((c) => c.url === "/api/public/team/configurations")!;
-    expect(Object.keys(save.body).sort()).toEqual(["config", "form_token", "locale", "model_version", "schema_version"]);
+    expect(Object.keys(save.body).sort()).toEqual(["config", "form_token", "locale", "model_version", "schema_version", "storage_consent"]);
+    expect(save.body.storage_consent).toBe(true);
   });
 
   it("requires explicit privacy consent for a consultation and keeps marketing separate", async () => {

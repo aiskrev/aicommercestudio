@@ -30,8 +30,17 @@ Registry keys `roi` and `finder` (flags `tool_roi`, `tool_finder`, both on).
   released time that becomes savings (an explicit choice, never a default).
 * Formulas are shown on the page and in the export; no AI-generated numbers.
 * Released time (**capacity**) is shown separately from **realised financial savings**.
-* No guarantees: the result says it is indicative, based only on the entered values, and should be
-  validated with a pilot. Scenario adjustments are stated with their exact percentages.
+* No guarantees: the disclaimer opens with "An illustrative estimate, not a verified financial
+  outcome" and is always visible under the result with the formula version (`roi-disclaimer`); the
+  result is based only on the entered values and should be validated with a pilot.
+  Scenario adjustments are stated with their exact percentages. No company-specific results are
+  published.
+* **Versioned formulas.** `ROI_MODEL_VERSION = "2026-11.1"` is shown on the page ("Formula version"),
+  in the methodology and in the `.txt` export. Share codes carry the field count of their version: a
+  2026-10.1 link (11 values, no exception rate) is rejected rather than silently reinterpreted.
+* **No double counting.** Savings come from one source only, the value of released labour time,
+  scaled by the realisation share; revenue effects are not modelled. Tests assert
+  `N = C₀ − C₁ = S − K` and `S ≤ ΔH × R` for every realisation share and exception rate.
 
 ### Inputs and bounds
 
@@ -43,6 +52,7 @@ Registry keys `roi` and `finder` (flags `tool_roi`, `tool_finder`, both on).
 | Share of tasks automated `c` | % | 0 – 100 |
 | Time reduction per automated task `r` | % | 0 – 100 |
 | Human review per automated task `q` | min | 0 – 600 |
+| Exception and rework rate `e` | % of automated tasks | 0 – 100 |
 | One-time implementation cost `I` | EUR | 0 – 10 000 000 |
 | Monthly AI/API/infrastructure | EUR/month | 0 – 1 000 000 |
 | Monthly maintenance | EUR/month | 0 – 1 000 000 |
@@ -58,7 +68,8 @@ non-integer value produces a field error and no result; nothing is calculated fr
 H₀ = V × M / 60                                   current hours per month
 C₀ = H₀ × R                                       current monthly process cost
 A  = V × c                                        automated tasks
-H₁ = (V − A) × M / 60 + A × (M × (1 − r) + q) / 60   future hours
+X  = A × e                                        exceptions (full manual handling again)
+H₁ = (V − A) × M / 60 + A × (M × (1 − r) + q) / 60 + X × M / 60   future hours
 ΔH = H₀ − H₁                                      capacity released (negative = extra time)
 value of released time = ΔH × R                   capacity, not cash
 S  = ΔH × R × p     if ΔH ≥ 0                     realised monthly savings
@@ -74,15 +85,20 @@ ROI(T) = (T × S − I − T × K) / (I + T × K) × 100  "not applicable" if I 
 Division is guarded (payback only for N > 0, ROI only for a positive cost base); every bound
 combination is tested to yield finite numbers.
 
+**Worked explanation.** `workedSteps(inputs, result)` returns each step (current hours and cost,
+future hours, released hours, realised savings, net monthly benefit, and payback and ROI when they
+are defined) with the visitor's numbers substituted; the page renders them under "The calculation
+step by step (base scenario)" (`roi-worked`).
+
 ### Scenarios
 
 Applied to the visitor's own inputs (percentages capped at 100):
 
-| Scenario | Coverage | Time reduction | Review time | Monthly costs | Implementation |
-| --- | --- | --- | --- | --- | --- |
-| Conservative | × 0.75 | × 0.75 | × 1.25 | × 1.20 | × 1.20 |
-| Base | your values | | | | |
-| Optimistic | × 1.15 | × 1.15 | × 0.85 | × 1.00 | × 1.00 |
+| Scenario | Coverage | Time reduction | Review time | Exception rate | Monthly costs | Implementation |
+| --- | --- | --- | --- | --- | --- | --- |
+| Conservative | × 0.75 | × 0.75 | × 1.25 | × 1.25 | × 1.20 | × 1.20 |
+| Base | your values | | | | | |
+| Optimistic | × 1.15 | × 1.15 | × 0.85 | × 0.85 | × 1.00 | × 1.00 |
 
 ### Output and export
 
@@ -94,11 +110,13 @@ link `?r=` with the numbers only (never the description).
 
 ## Automation Opportunity Finder
 
-Up to five processes (name + department), each rated on nine criteria with described levels 0–4.
+Model `FINDER_MODEL_VERSION = "2026-11.1"`. Up to five processes (name + department), each rated on
+ten criteria with described levels 0–4. Suitability is **not** a financial return: the result says so
+(`finder-suitability-note`) and links to the ROI calculator for the effect.
 
 | Criterion | Group | Direction |
 | --- | --- | --- |
-| Repetitiveness, rule clarity, data availability | fit | higher = better |
+| Repetitiveness, rule clarity (standardisation and stability), input structure, data availability and quality | fit | higher = better |
 | Exception rate | fit | higher = harder |
 | Frequency, business impact | value | higher = better |
 | Integration complexity, compliance risk, human oversight needs | effort | higher = harder |
@@ -112,15 +130,34 @@ effort = mean (1 − f)(effort criteria) × 100
 suitability = 0.45 × fit + 0.30 × value + 0.25 × (100 − effort), rounded
 ```
 
-**Categories** (first match): *not ready* — fit < 40 or data availability 0; *quick win* —
-suitability ≥ 60, value ≥ 50, effort ≤ 50; *high-value complex project* — value ≥ 50; otherwise
-*later*. **Ranking:** suitability, then value, then entry order.
+**Risk** (separate from suitability): *high* — compliance (regulatory/privacy sensitivity) ≥ 3,
+oversight (human judgement) ≥ 3, or business impact ≥ 3 together with exceptions ≥ 3; *medium* —
+compliance, oversight or exceptions ≥ 2, or integration ≥ 3; otherwise *low*.
 
-**Pattern** (first match): not ready → *sort out the process first*; rule clarity ≥ 3, exceptions ≤ 1,
-data ≥ 3 → *classic workflow automation* (no AI); data ≤ 2 and rule clarity ≥ 2 → *AI classification
-and extraction*; integration ≥ 3, frequency ≥ 3, rule clarity ≥ 2 → *agentic workflow*; otherwise *AI
-assistant with a human decision*. **Human approval** when compliance risk ≥ 3 or oversight needs ≥ 3
-(not for processes that are not ready).
+**Categories** (first match): *not ready* — fit < 40 or data availability 0; *quick win* —
+suitability ≥ 60, value ≥ 50, effort ≤ 50 **and risk not high** (risk override); *high-value complex
+project* — value ≥ 50; otherwise *later*. **Ranking:** suitability, then value, then entry order
+(stable for ties).
+
+**Pattern** (first match) — an AI agent is never assumed to be better than standard automation:
+not ready → *sort out the process first*; rule clarity ≥ 3, exceptions ≤ 1, data ≥ 3 and input
+structure ≥ 3 → *classic workflow automation* (no AI); input structure ≤ 2 and rule clarity ≥ 2 → *AI
+classification and extraction*; integration ≥ 3, frequency ≥ 3, rule clarity ≥ 2 → *agentic
+workflow*; otherwise *AI assistant with a human decision*. **Human approval is mandatory** when the
+risk is high or business impact is 4 (critical), whatever the pattern (not for processes that are
+not ready).
+
+**Services:** by pattern — workflow → AI workflow automation; extraction → custom AI engineering and
+workflow automation; assistant → AI agents; agentic → AI agents and integrations; not ready → audit —
+plus integrations or audit for the matching blockers (max three, links from the published catalogue).
+
+**Pilot scope:** the highest-ranked quick win or high-value project that is not "sort out first",
+with its pattern, approval requirement and an indicative duration (workflow 3–6 weeks, extraction and
+assistant 4–8, agentic 6–12). Workshops and consultant-led assessments from the *AI agents and
+automation* and *Advisory* domains are linked under the result.
+
+**Names** are free text, cleaned (control characters removed, whitespace collapsed, max 80
+characters) and rendered only as text.
 
 **Blockers:** data ≤ 1, rule clarity ≤ 1, exceptions ≥ 3, compliance ≥ 3, integration ≥ 3,
 frequency ≤ 1 — each mapped to a next step; category steps follow (max four steps).
@@ -132,8 +169,9 @@ agentic workflows and the Approval Supervisor when approval is required.
 
 **Output:** ranking bar chart, value × complexity matrix (quadrants at 50 = the category thresholds),
 and per process the score with its three parts and their contributions, category, pattern, agents,
-blockers, next steps and a per-criterion breakdown. Export: print and a `.txt` summary. There is no
-share link because process names are free text.
+blockers, next steps and a per-criterion breakdown, plus the risk badge, the approval and override
+notes and the suitable services. Export: print and a `.txt` summary (with risk). There is no share
+link because process names are free text, and nothing is stored or sent.
 
 ## Charts and accessibility
 
@@ -149,7 +187,10 @@ share link because process names are free text.
 
 ## Tests
 
-`src/lib/roi.test.ts`, `src/lib/finder.test.ts` (formulas with hand-checked examples, bounds, zero
-division, scenarios, categories, patterns, ranking ties, texts in both languages),
-`src/components/tools/roi-finder.test.tsx` (no presets, live result, validation, prefill, hand-off,
-export, Bulgarian), `e2e/tests/roi-finder.spec.ts` and `e2e/tests/mobile.spec.ts`.
+`src/lib/roi.test.ts` (hand-checked examples, bounds, zero division, exceptions, no double counting,
+scenarios, worked steps, version and share-code compatibility), `src/lib/finder.test.ts` (scoring
+boundaries, risk levels and overrides, mandatory approval, patterns, services, pilot, stable ordering,
+zero processes, hostile names, texts in both languages), `src/components/tools/roi-finder.test.tsx`
+(no presets, live result, validation, worked steps, prefill, hand-off, export, risk/pilot/services,
+hostile names rendered as text, Bulgarian), `e2e/tests/roi-finder.spec.ts` and
+`e2e/tests/mobile.spec.ts`.
