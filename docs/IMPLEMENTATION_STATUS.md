@@ -16,6 +16,33 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/tools-hub-v2` (from `main` @ `9d08ee9`, not merged, 2026-10-28): the bilingual
+Interactive Tools Hub (TOOLS_PLATFORM.md → "Tools and availability").
+
+* **Hub:**
+  * "Start here" with the featured live tools (Advisor, readiness, ROI).
+  * All 15 tools with category filters (AI planning, readiness and governance, business impact,
+    engineering assessments) and availability filters.
+  * Every card shows name, purpose, audience, expected output, availability, the time only for live
+    tools that state it, and a CTA.
+* **Eight new planned assessments:** cloud and platform maturity, DevOps delivery, observability and
+  reliability, e-commerce architecture, data integration, responsible AI governance, AI operations
+  readiness, FinOps and AI cost.
+  * They are marked "Очаквайте скоро" / "Coming soon".
+  * Each links only to an intro page under its final BG/EN slug. The page has purpose, audience,
+    expected output and covered areas, a consultant-led alternative, the domain hub and two live
+    tools.
+  * There is no form, question or start button. The pages are `noindex` and not in the sitemap.
+* **Routing:** tool slugs come from one table (`lib/tool-slugs.ts`). No API or backend change.
+
+| Check | Result |
+| --- | --- |
+| Web typecheck, lint, unit tests (`web-tests` container) | passed; **562** unit tests, 40 files (new: `components/tools/tools-hub.test.tsx`, 10 tests) |
+| e2e (production build, no-host-ports override, staff accounts, revalidation secret) | **121 passed** (7 new in `tools-hub.spec.ts`; the `ia.spec.ts` hub test migrated to the directory) |
+| Production build after the last change (card labels kept on one line, class only) | passed (154 static pages, including 16 intro pages); e2e not re-run for this class change |
+| docs sync | in sync |
+| `.\scripts\test.ps1 -Suite api` | not re-run (no API change) |
+
 Branch `feature/navigation-homepage` (from `main` @ `e51cbd3`, not merged, 2026-10-28): the header
 part of IA-1 and a homepage that explains the expanded offering (INFORMATION_ARCHITECTURE.md → "Main
 navigation", DESIGN_SYSTEM.md → "Homepage composition").

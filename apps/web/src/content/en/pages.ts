@@ -10,7 +10,7 @@ import type {
 export const toolsPage: typeof bgToolsPage = {
   metaTitle: "Interactive AI tools to assess your processes",
   metaDescription:
-    "Interactive AI tools with no sign-up: the AI Automation Advisor that assesses a manual process, plus tools in preparation for readiness, AI teams and impact.",
+    "Interactive AI tools with no sign-up: the AI Automation Advisor, AI readiness, AI team, ROI calculator and solution builder. More engineering assessments are coming.",
   eyebrow: "Tools",
   title: "Interactive tools for a first assessment",
   lead:
