@@ -21,6 +21,10 @@ export const en: Dictionary = {
     cta: "Book a consultation",
     openMenu: "Open menu",
     closeMenu: "Close menu",
+    solutions: "Solutions",
+    company: "Company",
+    founder: "Founder",
+    startHere: "Start here",
   },
   footer: {
     tagline:

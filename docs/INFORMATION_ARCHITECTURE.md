@@ -1,12 +1,14 @@
 # Information architecture
 
-> Describes the **current** IA (implemented). The next IA for the ten service domains — mega-menu, new page types,
-> indexability rules and a route-by-route matrix — is designed in [INFORMATION_ARCHITECTURE_V2.md](INFORMATION_ARCHITECTURE_V2.md)
-> (not implemented yet).
+> Describes the **current** IA (implemented). The next IA for the ten service domains — new page types,
+> indexability rules and a route-by-route matrix — is designed in [INFORMATION_ARCHITECTURE_V2.md](INFORMATION_ARCHITECTURE_V2.md).
+> Implemented from it: IA-2 (domain hubs) and the header part of IA-1 (mega-menu, Solutions ▾, Company ▾,
+> mobile accordion); the IA-1 footer columns are not done yet.
 
 Routes live under `apps/web/src/app/[locale]/`; Bulgarian path segments are canonical and English
-URLs are produced by `EN_SEGMENTS` in `src/i18n/config.ts` (`localizePath`). Navigation data is
-assembled in `app/[locale]/layout.tsx`; the service grouping is shared in `src/lib/navigation.ts`.
+URLs are produced by `EN_SEGMENTS` in `src/i18n/config.ts` (`localizePath`). Header navigation data
+is built by `src/lib/site-nav.ts` (`buildNavigation`) from the domain registry and the content; the
+footer and the AI solutions page still use the service grouping in `src/lib/navigation.ts`.
 
 ## Main navigation
 
@@ -14,19 +16,33 @@ Every destination appears once per navigation area (header, mobile sheet, footer
 
 | Entry | BG | EN | Destination |
 | --- | --- | --- | --- |
-| Services ▾ | Услуги | Services | panel: **AI services** · **E-commerce foundation** · "All services" (`/uslugi` ↔ `/en/services`) |
-| Solutions | AI решения | AI solutions | `/bg/ai-resheniya` ↔ `/en/ai-solutions` — how we design AI systems (agents, control, lifecycle) and the AI services index |
-| Tools | Инструменти | Tools | **new** hub `/bg/instrumenti` ↔ `/en/tools` |
-| Industries | За кого | Industries | `/bg/za-kogo` ↔ `/en/industries` — kept: segments include businesses already running an AI agent |
+| Services ▾ | Услуги | Services | **mega-menu**: three band columns (AI systems · Engineering and platforms · Operations and advisory) with every published domain hub (name + one-line summary) and, under each, the existing services whose primary domain it is; a fourth column **Start here**: Technical audit, AI readiness assessment, Opportunity Finder (each only while available) and "All services" (`/uslugi` ↔ `/en/services`) |
+| Solutions ▾ | Решения | Solutions | AI solutions (`/ai-resheniya`), AI agent library (`/ai-agenti`, while the tool is available) |
+| Tools | Инструменти | Tools | hub `/bg/instrumenti` ↔ `/en/tools` |
+| Industries | За кого | Industries | `/bg/za-kogo` ↔ `/en/industries` |
 | Insights | Статии | Insights | `/bg/statii` ↔ `/en/insights` |
-| About ▾ | За нас | About | panel: Who we are (`/za-nas`), How we work (`/proces`). The founder profile (`/za-nas/osnovatel` ↔ `/about/founder`) is linked from the homepage, the About page and three domain hubs, not from the menu. |
+| Company ▾ | Компания | Company | Who we are (`/za-nas`), Founder (`/za-nas/osnovatel`), How we work (`/proces`), Contact (`/kontakti`) — replaces "About ▾"; URLs unchanged |
 | CTA | Заяви консултация | Book a consultation | `/bg/kontakti` ↔ `/en/contact` |
 
-Mobile: one sheet with the same groups (AI services, E-commerce foundation, All services, the
-links, About), language switch and the CTA. While open: page scroll locked, the rest of the page is
-`inert`, focus starts on the first link, Escape closes and returns focus to the toggle; every link
-is ≥ 44 px tall. Desktop panels: one open at a time, outside click and Escape close, Escape
-returns focus to the trigger.
+Every destination of the previous header (nine services, all services, AI solutions, tools,
+industries, insights, about, process, contact) is still reachable from the desktop header and the
+mobile sheet (migration test in `Header.test.tsx`).
+
+**Desktop behaviour:** one open panel at a time; outside click and Escape close it, and Escape
+returns focus to the trigger; ArrowUp/ArrowDown move within a menu column (wrapping), Home/End
+jump to the first/last link, Tab keeps the normal order. The mega-menu spans the width below the
+sticky header and scrolls when the viewport is short; every link is ≥ 44 px tall.
+
+**Active states:** a link is `aria-current="page"` only when it is the most specific match for the
+current URL (the founder page does not also mark "Who we are"); a menu trigger shows the active
+style (`data-active`) when its section contains the current page (Services: every `/uslugi` page).
+
+**Mobile:** one sheet with accordion groups in the header order (Services → three bands with
+domains and their services, Start here, All services; Solutions; the plain links; Company), the
+language switch and the CTA pinned at the bottom. Only one group is open at a time, and the group
+of the current page opens first. While open: page scroll locked, the rest of the page is `inert`,
+focus starts on the first control, Escape closes and returns focus to the toggle; every link is
+≥ 44 px tall.
 
 Footer: AI services · E-commerce foundation (+ all services) · Company (AI solutions, Tools,
 Industries, How we work, About, Insights, Contact) · Legal.

@@ -88,6 +88,15 @@ test("navigation marks the current page", async ({ page }) => {
   const nav = page.locator("header nav").first();
   await expect(nav.getByRole("link", { name: "Инструменти" })).toHaveAttribute("aria-current", "page");
   await page.goto("/bg/proces");
-  await nav.getByRole("button", { name: "За нас" }).click();
+  const company = nav.getByRole("button", { name: "Компания" });
+  await expect(company).toHaveAttribute("data-active", "true"); // the trigger shows the current section
+  await company.click();
   await expect(nav.getByRole("link", { name: "Как работим" })).toHaveAttribute("aria-current", "page");
+  // A domain hub marks Services and the hub link; a nested page marks only the most specific link.
+  await page.goto("/bg/uslugi/devops-sre-i-nablyudaemost");
+  await expect(nav.getByRole("button", { name: "Услуги" })).toHaveAttribute("data-active", "true");
+  await page.goto("/bg/za-nas/osnovatel");
+  await nav.getByRole("button", { name: "Компания" }).click();
+  await expect(nav.getByRole("link", { name: "За основателя" })).toHaveAttribute("aria-current", "page");
+  await expect(nav.getByRole("link", { name: "Кои сме" })).not.toHaveAttribute("aria-current", "page");
 });

@@ -79,18 +79,53 @@ test("the AI agents service page follows the service template and preselects the
   await expect(page.getByLabel(/^Service/)).toHaveValue("ai_agents");
 });
 
-test("desktop About menu works with the keyboard", async ({ page }) => {
+test("desktop Company menu works with the keyboard (formerly About)", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/en");
-  const about = page.locator("header nav").first().getByRole("button", { name: "About" });
-  await about.focus();
+  const company = page.locator("header nav").first().getByRole("button", { name: "Company" });
+  await company.focus();
   await page.keyboard.press("Enter");
-  await expect(about).toHaveAttribute("aria-expanded", "true");
+  await expect(company).toHaveAttribute("aria-expanded", "true");
   await page.keyboard.press("Tab");
   await expect(page.locator(":focus")).toHaveText("Who we are");
+  await page.keyboard.press("ArrowDown");
+  await expect(page.locator(":focus")).toHaveText("Founder");
+  await page.keyboard.press("End");
+  await expect(page.locator(":focus")).toHaveText("Contact");
   await page.keyboard.press("Escape");
-  await expect(about).toHaveAttribute("aria-expanded", "false");
-  await expect(about).toBeFocused();
+  await expect(company).toHaveAttribute("aria-expanded", "false");
+  await expect(company).toBeFocused();
+});
+
+test("desktop services mega-menu: three bands, ten domains, keyboard and navigation", async ({ page }) => {
+  for (const width of [1024, 1440]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/bg");
+    const nav = page.locator("header nav").first();
+    const services = nav.getByRole("button", { name: "Услуги" });
+    await services.click();
+    const panel = page.locator(`[id="${await services.getAttribute("aria-controls")}"]`);
+    await expect(panel).toBeVisible();
+    for (const band of ["ai", "engineering", "operations"]) await expect(panel.getByTestId(`menu-band-${band}`)).toBeVisible();
+    await expect(panel.locator("[data-testid^='menu-band-'] [data-nav-column] > li > a")).toHaveCount(10);
+    await expect(panel.getByTestId("menu-start-here").getByRole("link", { name: /Всички услуги/ })).toHaveAttribute("href", "/bg/uslugi");
+    // Every link resolves; the panel stays inside the viewport.
+    const box = await panel.boundingBox();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+    await page.keyboard.press("Escape");
+    await expect(services).toBeFocused();
+  }
+  const nav = page.locator("header nav").first();
+  await nav.getByRole("button", { name: "Услуги" }).click();
+  const first = page.getByTestId("menu-band-ai").locator("[data-nav-column] a").first();
+  await first.focus();
+  await page.keyboard.press("ArrowDown");
+  await expect(page.getByTestId("menu-band-ai").locator("[data-nav-column] a").nth(1)).toBeFocused();
+  await page.getByTestId("menu-band-engineering").getByRole("link", { name: /^Инженеринг за електронна търговия/ }).click();
+  await expect(page).toHaveURL(/\/bg\/uslugi\/inzhenering-za-elektronna-targoviya$/);
+  await expect(nav.getByRole("button", { name: "Услуги" })).toHaveAttribute("aria-expanded", "false");
 });
 
 test("mobile menu at 360px groups services and keeps keyboard focus inside", async ({ page }) => {
@@ -100,9 +135,19 @@ test("mobile menu at 360px groups services and keeps keyboard focus inside", asy
   await toggle.click();
   const close = page.getByRole("button", { name: "Затвори менюто" });
   const panel = page.locator(`[id="${await close.getAttribute("aria-controls")}"]`);
-  await expect(panel.getByText("AI услуги", { exact: true })).toBeVisible();
-  await expect(panel.getByText("E-commerce основа", { exact: true })).toBeVisible();
+  // Accordion groups in the header order; Services expands into the three bands.
+  const services = panel.getByRole("button", { name: "Услуги" });
+  await expect(services).toHaveAttribute("aria-expanded", "false");
+  await services.click();
+  await expect(services).toHaveAttribute("aria-expanded", "true");
+  for (const band of ["AI системи", "Инженеринг и платформи", "Операции и консултации"]) {
+    await expect(panel.getByText(band, { exact: true })).toBeVisible();
+  }
   await expect(panel.getByRole("link", { name: "Разработка на AI агенти" })).toBeVisible();
+  await expect(panel.getByRole("link", { name: "DevOps, SRE и наблюдаемост" })).toBeVisible();
+  await panel.getByRole("button", { name: "Компания" }).click();
+  await expect(services).toHaveAttribute("aria-expanded", "false"); // one group at a time
+  await expect(panel.getByRole("link", { name: "За основателя" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
 
   // The page behind the sheet is inert: tabbing never leaves the header and the sheet.

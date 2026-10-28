@@ -5,14 +5,14 @@ export const home: typeof bgHome = {
   metaDescription:
     "We design, build and operate AI agents, automations and integrations for SMEs and online stores in Bulgaria and the EU — with human oversight built in.",
   hero: {
-    eyebrow: "AI consulting · Engineering · Automation · Managed AI",
-    title: "AI systems that do",
-    titleHighlight: "real work in your business",
+    eyebrow: "AI · Cloud · Platforms · Commerce",
+    title: "Engineering that turns AI and the cloud",
+    titleHighlight: "into business systems that work",
     lead:
-      "We design, build and operate AI agents, automations and integrations for small and mid-sized companies — connected to your store, CRM and documents, with human approval wherever a decision matters.",
-    primaryCta: "Explore AI solutions",
+      "We design, build and operate AI systems, cloud platforms and online stores for small and mid-sized companies — with a written scope, human approval wherever a decision matters, and care after launch.",
+    primaryCta: "Book a consultation",
     secondaryCta: "Assess your AI readiness",
-    highlights: ["Agents, automation, integrations", "Human approval by design", "GDPR-conscious from day one"],
+    highlights: ["Ten domains — from AI strategy to operations", "Written scope and quote before work starts", "Human approval by design"],
     systemMap: {
       label: "Architecture of an AI system",
       badge: "Concept",
@@ -40,77 +40,40 @@ export const home: typeof bgHome = {
       { icon: "shield", title: "Observability & security", items: ["Logging and alerts", "Least privilege", "GDPR practices"] },
     ],
   },
-  build: {
-    eyebrow: "What we build",
-    title: "From the first assessment to AI that works every day",
-    lead: "Six practices that fit together: start with one and add the next when it makes sense.",
-    items: [
+  offer: {
+    eyebrow: "What we offer",
+    title: "Four areas, ten domains, one team",
+    lead: "Pick the problem you want solved. Each domain states plainly what we offer today and what we take on as a custom engagement after an assessment.",
+    groups: [
       {
-        key: "agents",
-        icon: "bot",
-        title: "AI agents",
-        description:
-          "Assistants that read, classify, draft and act through your systems — within the limits you set.",
-        examples: ["Customer service agent", "Internal knowledge assistant", "Order and returns handling"],
-        linkLabel: "AI agent development",
-        link: { service: "ai_agents" },
+        key: "ai",
+        icon: "sparkles",
+        title: "AI",
+        problem: "Manual work, scattered knowledge or slow answers: agents, automation and applications on your own data — with rules and oversight.",
+        domains: ["ai_strategy", "ai_agents_automation", "ai_applications", "ai_governance"],
       },
       {
-        key: "automation",
-        icon: "workflow",
-        title: "Business process automation",
-        description:
-          "Repetitive work between systems runs on its own — inquiry triage, document processing, CRM workflows.",
-        examples: ["Inquiry triage", "Documents into the ERP", "Scheduled reports"],
-        linkLabel: "AI workflow automation",
-        link: { service: "automation" },
-      },
-      {
-        key: "integrations",
-        icon: "plug",
-        title: "AI integrations",
-        description:
-          "We connect models to your store, CRM, ERP, inbox and documents through APIs and webhooks — with logging, retries and least-privilege access.",
-        examples: ["Store ↔ CRM", "Couriers and warehouse", "Shared inbox"],
-        linkLabel: "AI integrations & data systems",
-        link: { service: "integrations" },
-      },
-      {
-        key: "custom",
+        key: "cloud",
         icon: "layers",
-        title: "Custom AI systems",
-        description:
-          "Tools built for your case: search over your own knowledge, product content generation, data extraction from documents.",
-        examples: ["RAG over internal documents", "Product descriptions", "Invoice extraction"],
-        linkLabel: "Custom AI engineering",
-        link: { service: "ai_tools" },
+        title: "Cloud and data",
+        problem: "Manual or costly infrastructure and data that never reaches your systems: cloud platforms, integrations and data pipelines.",
+        domains: ["cloud_platform", "data_integration"],
       },
       {
-        key: "consulting",
-        icon: "clipboard",
-        title: "AI consulting & readiness",
-        description:
-          "Where AI pays off, what data you need and what the risks are — before anything is built. Ends with a prioritised plan.",
-        examples: ["Process assessment", "Data readiness", "Prioritised roadmap"],
-        linkLabel: "AI strategy & readiness",
-        link: { service: "audit" },
-      },
-      {
-        key: "managed",
+        key: "platform",
         icon: "activity",
-        title: "AI Managed Services",
-        description:
-          "Monitoring, quality evaluation, incident response, security and cost control for AI agents already in production — ours or another team's.",
-        examples: ["Monitoring and alerts", "Quality evaluation", "Controlled changes"],
-        linkLabel: "AI Managed Services",
-        link: { service: "ai_managed" },
+        title: "Platforms and operations",
+        problem: "Risky releases and problems your customers notice first: CI/CD, observability and ongoing operation after launch.",
+        domains: ["devops_sre", "managed_operations"],
+      },
+      {
+        key: "commerce",
+        icon: "cart",
+        title: "Commerce",
+        problem: "A slow store, lost rankings or no clear view of where sales come from: maintenance, SEO, analytics and a technical audit.",
+        domains: ["commerce_engineering", "advisory_enablement"],
       },
     ],
-    foundation: {
-      title: "The engineering foundation",
-      lead: "AI only works well on a stable system, so we look after the online business itself too:",
-      services: ["maintenance", "seo", "analytics"],
-    },
   },
   process: {
     eyebrow: "How we work",
@@ -126,6 +89,7 @@ export const home: typeof bgHome = {
     ],
   },
   tools: {
+    startBadge: "Start here",
     eyebrow: "Interactive tools",
     title: "Try it before we talk",
     lead: "Tools you can use to assess the opportunity yourself — no sign-up. We only show what already works and clearly mark what is coming.",
@@ -157,55 +121,12 @@ export const home: typeof bgHome = {
     audit: ["who approved", "when and why", "what exactly was executed"],
     linkLabel: "How we design control",
   },
-  useCases: {
-    eyebrow: "Use cases",
-    title: "Where AI helps, function by function",
-    lead: "Realistic scenarios with no promised percentages. Each one is clear about what the system does and where a person decides.",
-    labels: { ai: "What AI does", human: "Where a person decides" },
-    items: [
-      {
-        icon: "message",
-        area: "Customer service",
-        title: "Answering and routing inquiries",
-        ai: "Classifies the inquiry and drafts a reply in the customer's language using the order data.",
-        human: "Approves refunds, exceptions and sensitive replies.",
-      },
-      {
-        icon: "trending",
-        area: "Sales & marketing",
-        title: "Product content and campaigns",
-        ai: "Drafts product descriptions, SEO metadata and segment emails from your catalogue.",
-        human: "Approves everything before it is published.",
-      },
-      {
-        icon: "store",
-        area: "Operations & logistics",
-        title: "Order, return and stock exceptions",
-        ai: "Spots mismatches between the store, warehouse and courier and proposes the fix.",
-        human: "Confirms changes to orders and stock.",
-      },
-      {
-        icon: "fileText",
-        area: "Finance & administration",
-        title: "Invoices and documents",
-        ai: "Extracts fields from invoices and contracts and prepares them for accounting or the ERP.",
-        human: "Approves payments and postings.",
-      },
-      {
-        icon: "chart",
-        area: "Management & reporting",
-        title: "A weekly business summary",
-        ai: "Summarises sales, traffic and inquiries with links back to the source data.",
-        human: "Decisions stay entirely yours — the summary never takes action.",
-      },
-      {
-        icon: "search",
-        area: "Internal knowledge",
-        title: "An assistant for your team",
-        ai: "Answers staff questions about policies and product documentation, citing its sources.",
-        human: "Document owners keep the sources up to date.",
-      },
-    ],
+  managed: {
+    eyebrow: "After launch",
+    title: "AI Managed Services: your system is monitored, maintained and improved",
+    lead: "A monthly service for the technical operation of AI systems — whether we built them or another team did. No published SLA: scope and response times are agreed in writing.",
+    primaryCta: "Explore AI Managed Services",
+    secondaryCta: "Request an assessment",
   },
   faq: {
     eyebrow: "Frequently asked questions",

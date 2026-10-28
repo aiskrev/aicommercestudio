@@ -209,9 +209,8 @@ Usage example:
 | `SystemMap` | `home/SystemMap.tsx` | homepage hero: layers of an AI system (data → intelligence → agents → human approval gate → actions) with an operations rail; server-rendered HTML in a `DiagramFrame`, captioned as illustrative |
 | `HeroWorkflow` | `home/HeroWorkflow.tsx` | product-style demo of a controlled automation (labelled demo data); used in the homepage solution-architecture section |
 | `ControlLanes` | `home/ControlLanes.tsx` | "AI may do alone" (periwinkle) / "requires approval" (amber) / "always recorded" (green) next to the workflow |
-| `BuildBento` | `home/BuildBento.tsx` | "What we build": six offerings on a 12-column bento (one featured, one full width), each card one link named by its title |
+| `OfferGroups` | `home/OfferGroups.tsx` | homepage capability groups: icon, title, the problem in one sentence, then one ≥ 44 px link per domain hub |
 | `ToolsPreview` | `home/ToolsPreview.tsx` | the AI Automation Advisor with the `AdvisorPreview` product window, plus up to three further live tools. All seven tools are live; a planned tool would be shown as "in preparation" and never linked. |
-| `UseCaseLedger` | `home/UseCaseLedger.tsx` | use cases by business function on paper: function / what AI does / where a person decides (`<dl>` per row) |
 | `ProcessSteps` | `home/ProcessSteps.tsx` | `vertical` or `horizontal` timeline |
 | `CredibilityStrip`, `AdvisorPreview` | `home/*` | capability strip; Advisor sample input → output window |
 | `ArticleCard` | `editorial/ArticleCard.tsx` | `card` / `featured` / `row` (row uses `.focus-frame`) |
@@ -290,16 +289,20 @@ size).
 
 | # | Section | Tone | Composition |
 | --- | --- | --- | --- |
-| 1 | Hero — positioning, CTAs (AI solutions; readiness → AI Automation Advisor), `SystemMap` | default + grid | asymmetric split |
-| 2 | Capabilities (`CredibilityStrip`) | raised strip | label + 3 × 2 index |
-| 3 | What we build (`BuildBento`) + engineering-foundation links | default, spacious | bento |
-| 3b | Founder & CEO introduction (`FounderPortrait`, name, title, two paragraphs, "Meet the Founder") | default, top hairline | portrait + text split; secondary weight (ghost CTA) so it never competes with the hero CTAs |
-| 4 | How we work — 5 stages (`ProcessSteps` horizontal) | raised | timeline |
-| 5 | Interactive tools (`ToolsPreview`) | default, spacious | product window + live tool cards |
+| 1 | Hero — engineering and business value (AI · cloud · platforms · commerce), CTAs: **Book a consultation** (contact) and **Assess your AI readiness** (AI Automation Advisor), `SystemMap` | default + grid | asymmetric split |
+| 2 | What we offer — four capability groups (`OfferGroups`: AI, Cloud and data, Platforms and operations, Commerce), each with the problem it solves and links to its domain hubs; "All services" | default, spacious | 2 × 2 cards; the ten hubs, never the individual services |
+| 3 | Which tool first (`ToolsPreview`, the Advisor marked **Start here**) | raised, spacious | product window + live tool cards |
+| 4 | After launch — AI Managed Services (the three packages from `ai-managed.ts`, "by individual quote"; CTAs: the service page and `#ams-inquiry`) | default | text + `card-accent` package list |
+| 5 | Methodology — 5 stages (`ProcessSteps` horizontal) | raised | timeline |
 | 6 | Solution architecture — "AI suggests. People decide." (`HeroWorkflow` + `ControlLanes`) | deep, spacious | statement + diagram split |
-| 7 | Use cases by function (`UseCaseLedger`) | paper, spacious | editorial ledger |
+| 7 | Who builds it — founder introduction (`FounderPortrait`, ghost CTA) + `CredibilityStrip` ("Expertise you can check", technologies and practices, no logos or numbers) | default + surface strip | portrait + text split, then the strip |
 | 8 | FAQ | raised | sticky `EditorialSplit` |
-| 9 | Final CTA (`CtaBand emphasis`) | — | full-bleed statement |
+| 9 | Final CTA (`CtaBand emphasis`: contact + Advisor) | — | full-bleed statement |
+
+The "What we build" bento and the use-case ledger were removed from the homepage: the capability
+groups replace the bento (they lead to the ten domains instead of six services), and the use cases
+added length without answering one of the four questions. The AI solutions page keeps the
+AI-specific detail.
 
 Honesty rules for the homepage:
 

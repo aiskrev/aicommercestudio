@@ -54,6 +54,7 @@ test("mobile menu opens, navigates and closes", async ({ page }) => {
   await expect(panel).toBeVisible();
   const box = await panel.boundingBox();
   expect(box && box.height > 300).toBeTruthy();
+  await panel.getByRole("button", { name: "Компания" }).click();
   const link = panel.getByRole("link", { name: "Как работим", exact: true });
   await expect(link).toBeVisible();
   await link.click();
