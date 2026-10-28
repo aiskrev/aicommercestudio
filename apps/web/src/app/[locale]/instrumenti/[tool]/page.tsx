@@ -7,10 +7,11 @@ import { OpportunityFinder } from "@/components/tools/finder/OpportunityFinder";
 import { RoiCalculator } from "@/components/tools/roi/RoiCalculator";
 import { SolutionBuilder } from "@/components/tools/solution/SolutionBuilder";
 import { AiTeamTool } from "@/components/tools/team/AiTeamTool";
+import { ToolIntro } from "@/components/tools/ToolIntro";
 import { ToolState } from "@/components/tools/ToolUi";
 import { Icon } from "@/components/ui/Icon";
 import { PageHero, Section } from "@/components/ui/primitives";
-import { getContent, serviceByKey } from "@/content";
+import { domainByKey, getContent, serviceByKey } from "@/content";
 import type { ServiceKey } from "@/content/types";
 import { type Locale, isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -20,7 +21,9 @@ import { AGENT_SLUGS } from "@/lib/agent-library";
 import { ACTION_SERVICE } from "@/lib/readiness";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
-import { isToolAvailable, TOOL_SLUGS, toolByKey, toolHrefs } from "@/lib/tools";
+import { domainDefinition } from "@/lib/domains";
+import { TOOL_PAGE_SLUGS } from "@/lib/tool-slugs";
+import { isToolAvailable, isToolPlanned, TOOL_SLUGS, toolByKey, toolHrefs, TOOLS, type ToolKey, toolMinutes } from "@/lib/tools";
 
 export const dynamicParams = false;
 
@@ -44,11 +47,32 @@ const TOOL_SERVICES: Record<HostedTool, ServiceKey[]> = {
   solution: ["ai_agents", "integrations", "automation", "ai_tools", "ai_managed", "audit"],
 };
 
+/**
+ * Planned tools get an intro page under their final slug ("Coming soon": no form, no start button,
+ * `noindex` and not in the sitemap until the tool is live).
+ */
+const PLANNED_INTROS: Record<string, ToolKey> = Object.fromEntries(
+  TOOLS.filter(isToolPlanned).map((tool) => [TOOL_PAGE_SLUGS[tool.key].bg, tool.key]),
+);
+
+/** Live tools offered on an intro page as alternatives that work today. */
+const INTRO_ALTERNATIVES: ToolKey[] = ["readiness", "advisor"];
+
 export function generateStaticParams({ params }: { params: { locale: string } }) {
   if (!isLocale(params.locale)) return [];
-  return Object.entries(HOSTED)
-    .filter(([, key]) => isToolAvailable(toolByKey(key)))
-    .map(([tool]) => ({ tool }));
+  return [
+    ...Object.entries(HOSTED)
+      .filter(([, key]) => isToolAvailable(toolByKey(key)))
+      .map(([tool]) => ({ tool })),
+    ...Object.keys(PLANNED_INTROS).map((tool) => ({ tool })),
+  ];
+}
+
+function plannedIntro(locale: Locale, slug: string) {
+  const key = PLANNED_INTROS[slug];
+  if (!key) return null;
+  const content = getContent(locale).tools.items.find((item) => item.key === key);
+  return content ? { key, content } : null;
 }
 
 function resolveTool(slug: string): HostedTool | null {
@@ -72,6 +96,16 @@ function toolContent(locale: Locale, key: HostedTool) {
 export async function generateMetadata({ params }: PageProps<"/[locale]/instrumenti/[tool]">) {
   const locale = await resolveLocale(params);
   const { tool } = await params;
+  const intro = plannedIntro(locale, tool);
+  if (intro) {
+    return buildMetadata({
+      locale,
+      title: intro.content.metaTitle ?? intro.content.title,
+      description: intro.content.metaDescription ?? intro.content.description,
+      path: routes.tool(tool),
+      noindex: true,
+    });
+  }
   const key = resolveTool(tool);
   if (!key) return {};
   const content = toolContent(locale, key);
@@ -86,6 +120,8 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/instrume
 export default async function ToolPage({ params }: PageProps<"/[locale]/instrumenti/[tool]">) {
   const locale = await resolveLocale(params);
   const { tool } = await params;
+  const intro = plannedIntro(locale, tool);
+  if (intro) return <PlannedToolPage locale={locale} slug={tool} tool={intro.content} toolKey={intro.key} />;
   const key = resolveTool(tool);
   if (!key) notFound();
 
@@ -199,5 +235,48 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
         </Section>
       )}
     </>
+  );
+}
+
+function PlannedToolPage({
+  locale,
+  slug,
+  tool,
+  toolKey,
+}: {
+  locale: Locale;
+  slug: string;
+  tool: ReturnType<typeof getContent>["tools"]["items"][number];
+  toolKey: ToolKey;
+}) {
+  const { tools } = getContent(locale);
+  const dict = getDictionary(locale);
+  const href = (path: string) => localizePath(locale, path);
+  const hrefs = toolHrefs(locale);
+  const minutes = toolMinutes();
+  const definition = toolByKey(toolKey);
+  const domain = definition.domain && domainDefinition(definition.domain).published ? domainByKey(locale, definition.domain) : undefined;
+  const contactService = definition.domain ? domainDefinition(definition.domain).contactService : "audit";
+  const alternatives = INTRO_ALTERNATIVES.flatMap((key) => {
+    const content = tools.items.find((item) => item.key === key);
+    return content && hrefs[key] ? [{ tool: content, href: hrefs[key]!, minutes: minutes[key] }] : [];
+  });
+
+  return (
+    <ToolIntro
+      tool={tool}
+      breadcrumbs={[
+        { name: dict.common.home, path: href(routes.home) },
+        { name: dict.nav.tools, path: href(routes.tools) },
+        { name: tool.title, path: href(routes.tool(slug)) },
+      ]}
+      badge={tools.upcomingBadge}
+      labels={tools.intro}
+      audienceLabel={tools.labels.audience}
+      contactHref={href(contactWithService(contactService))}
+      domain={domain ? { name: domain.name, href: href(routes.service(domain.slug)) } : undefined}
+      alternatives={alternatives}
+      cardLabels={{ liveBadge: tools.liveBadge, upcomingBadge: tools.upcomingBadge, ...tools.labels }}
+    />
   );
 }

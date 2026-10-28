@@ -21,12 +21,12 @@ for (const [locale, path, heading] of [
   ["bg", "/bg/instrumenti", "Интерактивни инструменти за първа оценка"],
   ["en", "/en/tools", "Interactive tools for a first assessment"],
 ] as const) {
-  test(`tools hub (${locale}) links every live tool and lists no unfinished one`, async ({ page }) => {
+  test(`tools hub (${locale}) links every live tool and never links a planned tool to a tool page`, async ({ page }) => {
     const response = await page.goto(path);
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
-    const live = page.locator("section[aria-labelledby='tools-live-title']");
-    const links = await live.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+    const all = page.locator("section[aria-labelledby='tools-all-title']");
+    const links = await all.locator("article[data-status='live'] a").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
     expect(links).toEqual(
       locale === "bg"
         ? [
@@ -48,9 +48,14 @@ for (const [locale, path, heading] of [
             "/en/ai-agents",
           ],
     );
-    // Every registered tool is live, so the "in preparation" section is not rendered.
-    await expect(page.locator("section[aria-labelledby='tools-upcoming-title']")).toHaveCount(0);
-    await expect(page.locator("article[data-status='planned']")).toHaveCount(0);
+    // The eight planned assessments are listed as "Coming soon" and link only to their intro page.
+    const planned = all.locator("article[data-status='planned']");
+    await expect(planned).toHaveCount(8);
+    for (const href of await planned.locator("a").evaluateAll((els) => els.map((el) => el.getAttribute("href")))) {
+      expect(href).toMatch(locale === "bg" ? /^\/bg\/instrumenti\/[a-z-]+$/ : /^\/en\/tools\/[a-z-]+$/);
+      expect(links).not.toContain(href);
+    }
+    await expect(planned.locator("button")).toHaveCount(0);
   });
 }
 

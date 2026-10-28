@@ -11,6 +11,7 @@
  */
 
 import { AGENT_SLUGS } from "@/lib/agent-slugs";
+import { TOOL_PAGE_SLUGS } from "@/lib/tool-slugs";
 
 export const locales = ["bg", "en"] as const;
 export type Locale = (typeof locales)[number];
@@ -52,8 +53,8 @@ const EN_SEGMENTS: Record<string, string> = {
 const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
   statii: { tema: "topic" },
   "za-nas": { osnovatel: "founder" },
-  // Tool slugs (lib/tools.ts → TOOL_SLUGS). Only implemented tools have pages.
-  instrumenti: { "ai-gotovnost": "ai-readiness", "ai-ekip": "ai-team", "roi-kalkulator": "roi-calculator", "avtomatizatsii": "automation-finder", "ai-reshenie": "solution-builder" },
+  // Tool pages (lib/tool-slugs.ts): live tools and the intro pages of planned ones.
+  instrumenti: Object.fromEntries(Object.values(TOOL_PAGE_SLUGS).map(({ bg, en }) => [bg, en])),
   // Agent library pages (lib/agent-library.ts → AGENT_SLUGS).
   "ai-agenti": Object.fromEntries(Object.values(AGENT_SLUGS).map(({ bg, en }) => [bg, en])),
 };

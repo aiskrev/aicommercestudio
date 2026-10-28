@@ -14,13 +14,34 @@ Foundations for the business assessment and solution-design tools. Hub: `/bg/ins
 | Automation Opportunity Finder (questionnaire) | `finder` | live | `/bg/instrumenti/avtomatizatsii` ↔ `/en/tools/automation-finder` | `tool_finder` (on) |
 | AI solution builder (architecture + roadmap) | `solution` | live | `/bg/instrumenti/ai-reshenie` ↔ `/en/tools/solution-builder` | `tool_solution` (on) |
 | AI agent library (10 static agent pages) | `agents` | live | `/bg/ai-agenti` ↔ `/en/ai-agents` | `tool_agents` (on) |
+| Cloud & Platform Maturity Assessment | `cloud_maturity` | planned | intro `/bg/instrumenti/zrelost-na-oblak-i-platforma` ↔ `/en/tools/cloud-platform-maturity` | — |
+| DevOps Delivery Maturity | `devops_maturity` | planned | intro `/bg/instrumenti/zrelost-na-devops-dostavkata` ↔ `/en/tools/devops-delivery-maturity` | — |
+| Observability & Reliability Assessment | `observability` | planned | intro `/bg/instrumenti/nablyudaemost-i-nadezhdnost` ↔ `/en/tools/observability-reliability` | — |
+| E-commerce Architecture Assessment | `ecommerce_architecture` | planned | intro `/bg/instrumenti/arhitektura-na-online-magazin` ↔ `/en/tools/ecommerce-architecture` | — |
+| Data Integration Assessment | `data_integration` | planned | intro `/bg/instrumenti/integratsiya-na-danni` ↔ `/en/tools/data-integration` | — |
+| Responsible AI Governance Assessment | `ai_governance` | planned | intro `/bg/instrumenti/otgovoren-ai` ↔ `/en/tools/responsible-ai-governance` | — |
+| AI Operations Readiness Assessment | `ai_ops_readiness` | planned | intro `/bg/instrumenti/gotovnost-za-ai-operatsii` ↔ `/en/tools/ai-operations-readiness` | — |
+| FinOps & AI Cost Assessment | `finops` | planned | intro `/bg/instrumenti/finops-i-ai-razhodi` ↔ `/en/tools/finops-ai-cost` | — |
 
 Solution builder and agent library: see [SOLUTION_BUILDER.md](SOLUTION_BUILDER.md).
 
-**Safeguard:** a tool is linked and routed only when `status === "live"`, it has a path and its
-flag is on (`isToolAvailable` in `lib/tools.ts`). Planned tools are shown as "in preparation"
-without links, and `/instrumenti/<slug>` is generated only for available tools
-(`dynamicParams = false`), so unbuilt tool URLs return 404.
+**Safeguard:** a tool is linked as a tool and routed to a working page only when `status === "live"`,
+it has a path and its flag is on (`isToolAvailable` in `lib/tools.ts`). Planned tools have no flag,
+no path and no time estimate: the hub marks them **"Очаквайте скоро" / "Coming soon"**, and their card
+links only to an **intro page** under the final slug. The intro page states the purpose, audience,
+expected output and what the assessment will cover, offers a consultant-led assessment (contact with
+the domain's lead category), the related domain hub and two live tools. It has no form, no
+questions and no start button (tested), is `noindex, follow` and is not in the sitemap. When the
+tool goes live it keeps the same URL. `/instrumenti/<slug>` is generated only for available tools and
+planned intros (`dynamicParams = false`); other slugs return 404.
+
+**Hub (`/instrumenti`):** "Start here" with the featured live tools (`featured` in the registry:
+Advisor, readiness, ROI), then every tool in `ToolsDirectory` with category filters (AI planning,
+Readiness and governance, Business impact, Engineering assessments; `category` in the registry)
+and availability filters (all, available now, coming soon). Filter buttons use `aria-pressed`, the
+count is a polite live region, and an empty result offers "Show all". Every card shows the name,
+purpose, audience, expected output (`output`), availability, the time only for live tools that
+state it, and a CTA: the tool's own CTA when live, "Learn more" (intro page) when planned.
 
 Flags: defaults in `lib/feature-flags.ts`; override at build/render time with
 `TOOL_FLAGS="tool_readiness=off,tool_team=on"`. Turning on a planned tool's flag has no effect.
@@ -29,14 +50,14 @@ Flags: defaults in `lib/feature-flags.ts`; override at build/render time with
 
 | Layer | Files |
 | --- | --- |
-| Registry (typed config) | `lib/tools.ts` — `ToolDefinition` (key, status, flag, icon, path, minutes, services), `TOOLS`, `toolHrefs`, `toolMinutes`, `SERVICE_TOOLS` |
+| Registry (typed config) | `lib/tools.ts` — `ToolDefinition` (key, status, flag, icon, category, featured, path, minutes, services, domain), `TOOLS`, `TOOL_CATEGORIES`, `toolHrefs`, `toolIntroHrefs`, `toolMinutes`, `SERVICE_TOOLS`; `lib/tool-slugs.ts` — BG/EN slugs of every page under `/instrumenti` (also feeds `EN_SUBSEGMENTS.instrumenti`) |
 | Flags | `lib/feature-flags.ts` |
 | Analytics | `lib/analytics.ts` — `trackToolEvent`, `sanitizeToolEvent`, `registerAnalyticsSink` |
 | Step workflow state | `lib/use-step-flow.ts` — steps, validation callback, start/step/complete callbacks |
 | Tool logic (pure) | `lib/readiness.ts` — questions, scoring, levels, recommendations, share code; `lib/ai-team.ts` — agent library, rules, architecture graph, share code |
 | Shared UI | `components/tools/ToolUi.tsx` (`StepProgress`, `ChoiceQuestion`, `StepNav`, `ResultSummary`, `RecommendationList`, `ToolLeadCapture`, `ToolState`), `ToolActions.tsx` (print / .txt / share link), `ToolCard.tsx` |
 | Tool | `components/tools/ReadinessAssessment.tsx`; `components/tools/team/` (`AiTeamBuilder`, `AgentCard`, `TeamArchitecture`, `TeamResult`, `TeamControls`) |
-| Pages | `app/[locale]/instrumenti/page.tsx` (hub), `app/[locale]/instrumenti/[tool]/page.tsx` (hosted tools) |
+| Pages | `app/[locale]/instrumenti/page.tsx` (hub: featured + `ToolsDirectory`), `app/[locale]/instrumenti/[tool]/page.tsx` (hosted tools and planned intros via `components/tools/ToolIntro.tsx`) |
 | Content | `content/{bg,en}/tools.ts` (catalog + shared UI strings), `content/{bg,en}/tool-readiness.ts`, `content/{bg,en}/tool-team.ts` |
 
 Business logic is pure and unit-tested; components only render and call it. No state library:
@@ -168,11 +189,14 @@ ROI calculator and Opportunity Finder (formulas, rubric, policy, charts): [ROI_A
 
 ## Adding a tool
 
-1. Add the key to `ToolKey`, a definition to `TOOLS` (status `planned`) and a flag (default off).
-2. Add catalog texts (BG + EN) in `content/{bg,en}/tools.ts`.
+1. Add the key to `ToolKey`, a definition to `TOOLS` (status `planned`, category, domain) and its
+   BG/EN slugs to `lib/tool-slugs.ts`; this publishes the "Coming soon" intro page.
+2. Add catalog texts (BG + EN) in `content/{bg,en}/tools.ts`: title, purpose, audience, output,
+   `covers`, intro `metaTitle` / `metaDescription`; no `cta` while planned.
 3. Build the logic in `lib/<tool>.ts` with unit tests; build the UI from `components/tools/*`.
-4. Host it: slug in `TOOL_SLUGS`, `EN_SUBSEGMENTS.instrumenti`, the `HOSTED` map in
-   `instrumenti/[tool]/page.tsx`; metadata, keyword map and the SEO title map.
-5. Switch `status` to `live` and the flag on; add e2e tests (BG + EN).
+4. Host it: a flag (default off), the `HOSTED` map in `instrumenti/[tool]/page.tsx`, page
+   content, metadata, keyword map and the SEO title map.
+5. Switch `status` to `live` with `path` and `minutes`, add the `cta`, turn the flag on; add e2e tests
+   (BG + EN). The URL stays the same, and the page becomes indexable and enters the sitemap.
 6. Future backend: keep the pure scoring as the source of truth and add an API call behind the
    same component (as the Advisor does in `lib/advisor.ts`).
