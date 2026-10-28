@@ -1,12 +1,21 @@
 """Idempotent, deterministic seeding of the service catalogue from `seed_v1.json`.
 
-The web content is the source of truth until phase S5 (SERVICE_CATALOGUE_ARCHITECTURE §11), so the
-seed *reconciles* the database with the document:
+Two modes:
+
+* **bootstrap** (default; run by `python -m app.cli seed` on every start): creates the entries
+  that do not exist yet and publishes them. Existing entries are never modified, so changes made
+  in the admin catalogue editor survive restarts. One backfill applies to existing entries: a seeded
+  domain or service that has never been published (e.g. rows from migration 0009, which 0010 turned
+  into drafts) and that no editor has touched gets its working rows completed from the document
+  (including the capabilities and deliverables 0009 did not have) and is then published.
+* **reconcile** (`catalogue-seed --reconcile`): makes the working rows equal to the document and
+  republishes what changed. It overwrites editor changes to the entries in the document.
+
+In both modes:
 
 * entities are matched by (entity_type, key); new ones get a deterministic UUID (uuid5 of type and
   key), so every environment has the same ids;
-* changed fields, translations, family links and relations are updated in place, and the entity's
-  revision is incremented once per run in which anything about it changed;
+* the revision of an entity is incremented once per run in which anything about it changed;
 * nothing is deleted. Entities that exist in the database but not in the document are reported
   (`extra`) and left untouched, so a mistaken document can never remove published content;
 * everything happens in one transaction; any validation or database error rolls the whole run back.
@@ -28,6 +37,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app import audit
+from app.catalogue import documents
 from app.catalogue.schemas import DomainSeed, FamilySeed, SeedDocument, ServiceSeed
 from app.models import (
     LEAD_CATEGORIES,
@@ -36,6 +46,9 @@ from app.models import (
     CatalogueEntityType,
     CatalogueFamily,
     CatalogueService,
+    ContentItem,
+    ContentItemTranslation,
+    ContentItemType,
     EntityRelation,
     EntityTranslation,
     FamilyService,
@@ -62,17 +75,19 @@ class SeedResult:
     created: Counter[str] = field(default_factory=Counter)
     updated: Counter[str] = field(default_factory=Counter)
     unchanged: Counter[str] = field(default_factory=Counter)
+    published: Counter[str] = field(default_factory=Counter)
     extra: list[str] = field(default_factory=list)
 
     @property
     def changed(self) -> bool:
-        return bool(self.created or self.updated)
+        return bool(self.created or self.updated or self.published)
 
     def summary(self) -> str:
         def fmt(counter: Counter[str]) -> str:
             return ", ".join(f"{kind}={counter[kind]}" for kind in ("domain", "family", "service") if counter[kind])
 
         parts = [f"created: {fmt(self.created) or 'none'}", f"updated: {fmt(self.updated) or 'none'}"]
+        parts.append(f"published: {fmt(self.published) or 'none'}")
         parts.append(f"unchanged: {sum(self.unchanged.values())}")
         if self.extra:
             parts.append(f"not in seed (left untouched): {', '.join(self.extra)}")
@@ -153,6 +168,12 @@ def validate_document(doc: SeedDocument) -> list[str]:
     if any(s.lead_category.value == "other" for s in doc.services):
         problems.append("lead category 'other' cannot be a catalogue service")
 
+    for entry in [*doc.domains, *doc.services]:
+        for list_name in ("capabilities", "deliverables"):
+            sizes = {len(getattr(getattr(entry.translations, loc), list_name, []) or []) for loc in LOCALES}
+            if len(sizes) > 1:
+                problems.append(f"{entry.key}: {list_name} differ in length between locales")
+
     # Domains and services share the /uslugi namespace; primary keywords must not repeat.
     for locale in LOCALES:
         slugs = [getattr(d.translations, locale).slug for d in doc.domains]
@@ -176,43 +197,83 @@ def _assign(row: Any, values: dict[str, Any]) -> bool:
 
 
 class _Seeder:
-    def __init__(self, db: Session) -> None:
+    def __init__(self, db: Session, *, reconcile: bool) -> None:
         self.db = db
+        self.reconcile = reconcile
         self.now = utcnow()
         self.result = SeedResult()
         self.ids: dict[tuple[str, str], uuid.UUID] = {}
+        self.wanted: dict[uuid.UUID, str] = {}
         self.touched: set[uuid.UUID] = set()
         self.created: set[uuid.UUID] = set()
+        # Seeded domains/services that were never published and never edited (0009 rows): bootstrap
+        # completes their working rows from the document before publishing them.
+        self.backfill: set[uuid.UUID] = set()
+
+    def writes(self, row_id: uuid.UUID) -> bool:
+        """Bootstrap writes new and backfilled entities; reconcile writes every entity in the document."""
+        return self.reconcile or row_id in self.created or row_id in self.backfill
 
     def entity(self, entity_type: str, key: str, status: str) -> CatalogueEntity:
         row = self.db.scalar(
             select(CatalogueEntity).where(CatalogueEntity.entity_type == entity_type, CatalogueEntity.key == key)
         )
+        # Domains and services become published only through documents.publish (it writes the
+        # snapshot); families are part of their domain's snapshot and carry the status directly.
+        publishable = entity_type != CatalogueEntityType.FAMILY
         if row is None:
+            initial = PublishStatus.DRAFT.value if publishable and status == PublishStatus.PUBLISHED else status
             row = CatalogueEntity(
                 id=entity_id(entity_type, key),
                 entity_type=entity_type,
                 key=key,
-                status=status,
+                status=initial,
                 revision=1,
                 created_at=self.now,
                 updated_at=self.now,
+                archived_at=self.now if initial == PublishStatus.ARCHIVED else None,
+                first_published_at=self.now if initial == PublishStatus.PUBLISHED else None,
             )
             self.db.add(row)
             self.created.add(row.id)
-        elif row.status != status:
+        elif (
+            publishable
+            and row.status == PublishStatus.DRAFT
+            and row.published_revision is None
+            and row.updated_by_id is None
+        ):
+            self.backfill.add(row.id)
+        status_change = self.reconcile and row.id not in self.created and row.status != status
+        if status_change and (not publishable or status == PublishStatus.ARCHIVED):
             row.status = status
+            row.archived_at = (row.archived_at or self.now) if status == PublishStatus.ARCHIVED else None
+            if status == PublishStatus.PUBLISHED and row.first_published_at is None:
+                row.first_published_at = self.now
             self.touched.add(row.id)
-        row.archived_at = (row.archived_at or self.now) if status == PublishStatus.ARCHIVED else None
-        if status == PublishStatus.PUBLISHED and row.first_published_at is None:
-            row.first_published_at = self.now
         self.ids[(entity_type, key)] = row.id
+        self.wanted[row.id] = status
         return row
+
+    def items(self, row_id: uuid.UUID, item_type: ContentItemType, wanted: list[dict[str, dict[str, Any]]]) -> None:
+        if documents.item_texts(self.db, row_id, item_type) == wanted:
+            return
+        stale = (ContentItem.entity_id == row_id) & (ContentItem.item_type == item_type.value)
+        self.db.execute(delete(ContentItem).where(stale))
+        self.db.flush()
+        for position, item in enumerate(wanted):
+            row = ContentItem(id=uuid.uuid4(), entity_id=row_id, item_type=item_type.value, position=position)
+            self.db.add(row)
+            self.db.flush()
+            for locale in LOCALES:
+                self.db.add(ContentItemTranslation(item_id=row.id, locale=locale, **item[locale]))
+        self.touched.add(row_id)
 
     def id_of(self, entity_type: CatalogueEntityType, key: str) -> uuid.UUID:
         return self.ids[(entity_type.value, key)]
 
     def subtype(self, model: type, row_id: uuid.UUID, values: dict[str, Any]) -> None:
+        if not self.writes(row_id):
+            return
         row = self.db.get(model, row_id)
         if row is None:
             self.db.add(model(id=row_id, **values))
@@ -221,6 +282,8 @@ class _Seeder:
             self.touched.add(row_id)
 
     def translations(self, row_id: uuid.UUID, wanted: dict[str, dict[str, Any]]) -> None:
+        if not self.writes(row_id):
+            return
         rows = self.db.scalars(select(EntityTranslation).where(EntityTranslation.entity_id == row_id))
         existing = {t.locale: t for t in rows}
         for locale, values in wanted.items():
@@ -236,6 +299,8 @@ class _Seeder:
             self.touched.add(row_id)
 
     def family_links(self, family_id: uuid.UUID, service_ids: list[uuid.UUID]) -> None:
+        if not self.writes(family_id):
+            return
         wanted = {service_id: position for position, service_id in enumerate(service_ids)}
         existing = {
             link.service_id: link
@@ -261,6 +326,8 @@ class _Seeder:
         to_type: CatalogueEntityType,
         to_ids: list[uuid.UUID],
     ) -> None:
+        if not self.writes(from_id):
+            return
         wanted = {to_id: position for position, to_id in enumerate(to_ids)}
         existing = {
             rel.to_entity_id: rel
@@ -290,6 +357,16 @@ class _Seeder:
                     )
                 )
                 self.touched.add(from_id)
+
+
+def _deliverables(entry: DomainSeed | ServiceSeed) -> list[dict[str, dict[str, Any]]]:
+    rows = zip(*(getattr(entry.translations, loc).deliverables for loc in LOCALES), strict=True)
+    return [{loc: {"title": None, "body": body} for loc, body in zip(LOCALES, row, strict=True)} for row in rows]
+
+
+def _capabilities(service: ServiceSeed) -> list[dict[str, dict[str, Any]]]:
+    rows = zip(*(getattr(service.translations, loc).capabilities for loc in LOCALES), strict=True)
+    return [{loc: {"title": c.title, "body": c.body} for loc, c in zip(LOCALES, row, strict=True)} for row in rows]
 
 
 def _domain_text(domain: DomainSeed, locale: str) -> dict[str, Any]:
@@ -343,14 +420,16 @@ def _service_text(service: ServiceSeed, locale: str) -> dict[str, Any]:
     }
 
 
-def seed_catalogue(db: Session, doc: SeedDocument | None = None, *, dry_run: bool = False) -> SeedResult:
-    """Reconcile the catalogue with the seed document in one transaction (rolled back on dry run)."""
+def seed_catalogue(
+    db: Session, doc: SeedDocument | None = None, *, dry_run: bool = False, reconcile: bool = False
+) -> SeedResult:
+    """Seed the catalogue in one transaction (rolled back on dry run). See the module docstring."""
     doc = doc or load_document()
     problems = validate_document(doc)
     if problems:
         raise SeedValidationError(problems)
 
-    s = _Seeder(db)
+    s = _Seeder(db, reconcile=reconcile)
     domain, family, service = CatalogueEntityType.DOMAIN, CatalogueEntityType.FAMILY, CatalogueEntityType.SERVICE
     try:
         # 1. Entities (supertype rows), then subtypes in dependency order.
@@ -396,12 +475,15 @@ def seed_catalogue(db: Session, doc: SeedDocument | None = None, *, dry_run: boo
         db.flush()
         for d in doc.domains:
             row = db.get(CatalogueDomain, s.id_of(domain, d.key))
-            if row is not None and _assign(row, {"contact_service_id": s.id_of(service, d.contact_service)}):
+            contact = {"contact_service_id": s.id_of(service, d.contact_service)}
+            if row is not None and s.writes(row.id) and _assign(row, contact):
                 s.touched.add(row.id)
 
         # 2. Translations, family links and relations.
         for d in doc.domains:
             s.translations(s.id_of(domain, d.key), {loc: _domain_text(d, loc) for loc in LOCALES})
+            if s.writes(s.id_of(domain, d.key)):
+                s.items(s.id_of(domain, d.key), ContentItemType.DELIVERABLE, _deliverables(d))
             s.relations(
                 s.id_of(domain, d.key), domain, RelationKind.CROSS_SELL, domain, [s.id_of(domain, k) for k in d.related]
             )
@@ -413,6 +495,9 @@ def seed_catalogue(db: Session, doc: SeedDocument | None = None, *, dry_run: boo
         for sv in doc.services:
             sid = s.id_of(service, sv.key)
             s.translations(sid, {loc: _service_text(sv, loc) for loc in LOCALES})
+            if s.writes(sid):
+                s.items(sid, ContentItemType.CAPABILITY, _capabilities(sv))
+                s.items(sid, ContentItemType.DELIVERABLE, _deliverables(sv))
             s.relations(sid, service, RelationKind.RELATED, service, [s.id_of(service, k) for k in sv.related])
         db.flush()
 
@@ -428,6 +513,26 @@ def seed_catalogue(db: Session, doc: SeedDocument | None = None, *, dry_run: boo
                 s.result.updated[entity_type] += 1
             else:
                 s.result.unchanged[entity_type] += 1
+        # 4. Publication: snapshots of the domains and services the document marks as published.
+        for (entity_type, _key), row_id in s.ids.items():
+            if entity_type == family.value or s.wanted[row_id] != PublishStatus.PUBLISHED:
+                continue
+            row = db.get(CatalogueEntity, row_id)
+            assert row is not None
+            if row.status == PublishStatus.ARCHIVED:
+                continue
+            if s.reconcile:
+                due = row.status != PublishStatus.PUBLISHED or row.published_revision != row.revision
+            else:
+                due = row_id in s.created or row_id in s.backfill
+            if not due:
+                continue
+            problems = documents.publish(db, row, actor_id=None)
+            if problems:
+                raise SeedValidationError([f"{entity_type}:{row.key}: {p.field} ({p.type})" for p in problems])
+            s.result.published[entity_type] += 1
+        db.flush()
+
         known = set(s.ids.values())
         s.result.extra = sorted(
             f"{row.entity_type}:{row.key}" for row in db.scalars(select(CatalogueEntity)) if row.id not in known
@@ -442,6 +547,8 @@ def seed_catalogue(db: Session, doc: SeedDocument | None = None, *, dry_run: boo
                 details={
                     "created": dict(s.result.created),
                     "updated": dict(s.result.updated),
+                    "published": dict(s.result.published),
+                    "mode": "reconcile" if reconcile else "bootstrap",
                     "schema_version": doc.schema_version,
                 },
             )

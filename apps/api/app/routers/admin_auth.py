@@ -11,9 +11,9 @@ from sqlalchemy import func, select, update
 from app import audit
 from app.config import Settings
 from app.deps import (
-    Admin,
     AppSettings,
     DbSession,
+    Staff,
     client_ip,
     client_ip_hash,
     enforce_rate_limit,
@@ -129,7 +129,7 @@ def login(payload: LoginIn, request: Request, response: Response, db: DbSession,
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
-def logout(ctx: Admin, response: Response, db: DbSession, settings: AppSettings) -> Response:
+def logout(ctx: Staff, response: Response, db: DbSession, settings: AppSettings) -> Response:
     ctx.session.revoked_at = utcnow()
     audit.record(db, "auth.logout", actor=ctx.user, entity_type="admin_user", entity_id=str(ctx.user.id),
                  ip_hash=ctx.ip_hash)
@@ -140,7 +140,7 @@ def logout(ctx: Admin, response: Response, db: DbSession, settings: AppSettings)
 
 
 @router.post("/logout-all", response_model=LogoutAllOut)
-def logout_all(ctx: Admin, response: Response, db: DbSession, settings: AppSettings) -> LogoutAllOut:
+def logout_all(ctx: Staff, response: Response, db: DbSession, settings: AppSettings) -> LogoutAllOut:
     """Revoke every active session of the current administrator (all devices, including this one)."""
     now = utcnow()
     result = db.execute(
@@ -156,7 +156,7 @@ def logout_all(ctx: Admin, response: Response, db: DbSession, settings: AppSetti
 
 
 @router.get("/sessions", response_model=list[AdminSessionInfo])
-def list_sessions(ctx: Admin, db: DbSession, response: Response) -> list[AdminSessionInfo]:
+def list_sessions(ctx: Staff, db: DbSession, response: Response) -> list[AdminSessionInfo]:
     response.headers["Cache-Control"] = "no-store"
     now = utcnow()
     sessions = db.scalars(
@@ -178,6 +178,6 @@ def list_sessions(ctx: Admin, db: DbSession, response: Response) -> list[AdminSe
 
 
 @router.get("/me", response_model=SessionOut)
-def me(ctx: Admin, response: Response) -> SessionOut:
+def me(ctx: Staff, response: Response) -> SessionOut:
     response.headers["Cache-Control"] = "no-store"
     return SessionOut(user=AdminUserOut.model_validate(ctx.user), expires_at=ctx.session.expires_at)

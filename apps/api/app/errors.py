@@ -31,9 +31,18 @@ DEFAULT_CODES: dict[int, str] = {
 class ApiError(HTTPException):
     """HTTPException with a stable machine-readable error code."""
 
-    def __init__(self, status_code: int, detail: str, code: str, headers: dict[str, str] | None = None) -> None:
+    def __init__(
+        self,
+        status_code: int,
+        detail: str,
+        code: str,
+        headers: dict[str, str] | None = None,
+        errors: list[dict[str, Any]] | None = None,
+    ) -> None:
         super().__init__(status_code=status_code, detail=detail, headers=headers)
         self.code = code
+        # Field errors ({field, message, type}), already localized; rendered like validation errors.
+        self.errors = errors
 
 
 def error_body(status_code: int, detail: Any, code: str | None = None, request_id: str | None = None) -> dict[str, Any]:

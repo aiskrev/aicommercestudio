@@ -44,12 +44,19 @@ Validation errors (422) add `errors`:
 | 401 | `invalid_credentials` | wrong e-mail or password (generic, no account enumeration) |
 | 403 | `csrf_failed` | missing or wrong `X-CSRF-Token` on a state-changing admin request |
 | 403 | `origin_rejected` | cross-site `Origin` on a state-changing request |
+| 403 | `forbidden_role` | the staff role does not allow the action (catalogue roles; non-`admin` roles outside the catalogue) |
 | 404 | `not_found`, `lead_not_found`, `action_not_found` | unknown route or resource |
+| 404 | `domain_not_found`, `service_not_found`, `catalogue_entity_not_found` | unknown or unpublished catalogue entry |
 | 409 | `status_conflict` | `expected_status` no longer matches (another admin changed the lead) |
 | 409 | `already_decided` | AI action was already approved/rejected |
+| 409 | `key_taken`, `slug_taken`, `invalid_transition`, `domain_archive_not_allowed` | catalogue: duplicate key, concurrent slug clash, action not possible in the current state |
+| 412 | `revision_conflict` | catalogue: `If-Match` revision is stale |
 | 413 | `payload_too_large` | body > 64 KB |
 | 422 | `validation_error` | see `errors` |
 | 422 | `advisor_declined` | the AI model declined to assess the text |
+| 422 | `invalid_filter` | catalogue: unknown filter value or query parameter |
+| 422 | `catalogue_incomplete` | catalogue: publishing (or preview) blocked; see `errors` |
+| 428 | `precondition_required` | catalogue write without `If-Match` |
 | 429 | `rate_limited` | rate limit or locked account; see `Retry-After` |
 | 502 | `ai_unavailable` | external AI provider failed |
 | 502 | `advisor_invalid_output` | the AI output failed schema validation or was truncated |
@@ -236,6 +243,38 @@ limits and errors: [READINESS_REPORTS.md](READINESS_REPORTS.md#api).
 Admins download a consultation's plan from `GET /api/admin/leads/{id}/team-report`. Fields, limits,
 cost model and errors: [TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md#api).
 
+## Public: service catalogue (read-only)
+
+Published content only. Responses are built from the publication snapshots of published domains and
+services; drafts, archived entries, unpublished edits, ids, revisions, lifecycle status and audit
+data never appear. References to entries that are not published are left out.
+
+* **Language:** `locale=bg|en`. Without it the `Accept-Language` header decides; anything else falls
+  back to `bg`. There is no text fallback between languages; every published entry is complete in
+  both.
+* **Unknown query parameters** answer 422 `invalid_filter`. A typo never silently changes a result.
+* **Rate limit:** `CATALOGUE_RATE_LIMIT` (120) per client address and `CATALOGUE_GLOBAL_RATE_LIMIT`
+  (3000) for all clients, per `CATALOGUE_RATE_WINDOW_SECONDS` (60) → 429 `rate_limited`.
+* **Caching:** `Cache-Control: public, max-age=60, stale-while-revalidate=300`, `Vary:
+  Accept-Language` and a strong `ETag` (a hash of the response). `If-None-Match` with the same tag
+  answers 304 without a body.
+  * The API keeps the parsed snapshots in process. Each request checks the number of published
+    entries and the latest publication time, so a publish or archive is served on the next request.
+  * A shared cache may serve the previous version for up to 60 s, and for up to 5 more minutes while
+    it revalidates.
+* **Errors:** 404 `domain_not_found` / `service_not_found`; 422 `validation_error` (bad key, slug,
+  enum, bounds) or `invalid_filter`.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/public/catalogue/domains` | `{locale, items, total, limit, offset}`; `limit` 1–100 (default 50), `offset` ≥ 0. Order: band (AI systems, engineering and platforms, operations and advisory), then position, then key. Item: `key, code, band, icon, slug, alternate_slugs{bg,en}, name, summary, delivery_status` (highest family status), `service_count`. |
+| GET | `/api/public/catalogue/domains/{key}` | Domain detail: the summary fields plus `body, cta_label, contact_service` (lead category for the contact form), `seo{title,description}, deliverables[], families[]` (`key, name, summary, delivery_status, prerequisite, services[], via[]`), `services[]` (published entries whose primary domain this is) and `related_domains[]`. |
+| GET | `/api/public/catalogue/domains/by-slug/{slug}` | The same, by the slug **in the requested locale** (the other locale's slug → 404). |
+| GET | `/api/public/catalogue/services` | `{locale, items, total, limit, offset}`; `limit` 1–100 (default 20). Filters: `domain` (key, repeat for OR; unknown → 422 `invalid_filter`), `offering_type` (`service`/`assessment`/`workshop`), `delivery_status` (`available`/`custom`/`planned`), `q` (substring of name or summary, ≤ 100). `sort=catalogue` (default): primary domain order, then type, position, key; `sort=name`: name in the locale, then key. Item: `key, offering_type, slug, alternate_slugs, name, short_name, summary, delivery_status, primary_domain{key,code,slug,name}, is_entry_offer, custom_page, duration{min_days,max_days}`. |
+| GET | `/api/public/catalogue/services/{key}` | Service, assessment or workshop detail: the summary fields plus `body, seo, lead_category, capabilities[{title,description}], deliverables[], families[{key,name,domain}]` and `related{services, assessments, workshops}`. |
+| GET | `/api/public/catalogue/services/by-slug/{slug}` | The same, by the slug in the requested locale. |
+| GET | `/api/public/catalogue/services/{key}/related` | `{locale, key, related}`. The service's explicitly related entries, plus the published assessments and workshops of its primary domain. |
+
 ## Admin authentication
 
 | Method | Path | Notes |
@@ -244,7 +283,7 @@ cost model and errors: [TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md#api).
 | POST | `/api/admin/auth/logout` | Revokes the current session, clears cookies → 204 |
 | POST | `/api/admin/auth/logout-all` | Revokes **all** sessions of the current admin → `{"sessions_revoked": n}` |
 | GET | `/api/admin/auth/sessions` | Active sessions: `id, created_at, last_seen_at, expires_at, user_agent, current` |
-| GET | `/api/admin/auth/me` | `{"user": {...}, "expires_at": ...}` |
+| GET | `/api/admin/auth/me` | `{"user": {..., "role"}, "expires_at": ...}`; open to every staff role (also `logout`, `logout-all`, `sessions`) |
 
 Every other `/api/admin/*` route requires the session cookie (401). `POST`/`PATCH`/`DELETE` additionally
 require `X-CSRF-Token: <acs_csrf cookie value>` (403 `csrf_failed`) and a same-site `Origin` when one is sent.
@@ -274,6 +313,44 @@ Admin responses are `Cache-Control: no-store`.
 | POST | `/api/admin/leads/{id}/ai/triage` | Read-only AI suggestion (mock provider by default); audited |
 | GET | `/api/admin/leads/{id}/readiness-report` | PDF of a readiness submission (404 for other leads) |
 | GET | `/api/admin/leads/{id}/team-report` | PDF plan of an AI team consultation (404 for other leads) |
+
+## Admin: service catalogue
+
+Editing, preview and publishing of the catalogue working copy. Model and lifecycle:
+[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) → "Service catalogue".
+
+* **Authentication:** the existing staff session and CSRF rules apply.
+* **Roles** (`admin_users.role`, set with `python -m app.cli set-role`). A role that does not allow an
+  action answers 403 `forbidden_role`.
+  * `viewer` reads.
+  * `editor` also creates entries and saves drafts.
+  * `admin` also publishes, archives and restores.
+  * Every route outside the catalogue and the session endpoints requires `admin`.
+* **Optimistic locking:** writes to an existing entry need `If-Match: "<revision>"`, the value of
+  the `ETag` of the last read. A missing header answers 428 `precondition_required`; a stale
+  revision answers 412 `revision_conflict`, with the current `ETag`.
+* **Content rules:** every text is plain text. HTML tags, HTML entities, Markdown links,
+  `javascript:`, `data:` and `vbscript:` URLs, control characters and bidirectional or zero-width
+  characters are rejected (422 `validation_error`; field `type` = `markup` or `control_chars`).
+* **Field errors** carry the full path, e.g. `translations.en.summary`, `capabilities.2.bg.title`,
+  `related.0`, `service.primary_domain`.
+* **Audit:** every write is audited: `catalogue.entity_created`, `_updated` (changed areas only, never
+  texts), `_published`, `_archived`, `_restored`.
+* Responses are `no-store`.
+
+| Method | Path | Role | Description |
+| --- | --- | --- | --- |
+| GET | `/api/admin/catalogue/entities` | viewer | `{items,total,page,page_size}`; filters `type` (`domain`/`service`), `status`, `offering_type`, `domain` (key), `q` (name, slug or key; ≤ 100); `page`, `page_size` ≤ 100. Items: `id, type, key, status, offering_type, domain, name_bg, name_en, revision, published_revision, has_unpublished_changes, updated_at, published_at`. |
+| GET | `/api/admin/catalogue/options` | viewer | the caller's `role`, domains and services for pickers, and `free_lead_categories` |
+| POST | `/api/admin/catalogue/entities` | editor | `{key, offering_type, primary_domain?, lead_category?, name_bg, name_en}` → 201 draft. A `service` needs a primary domain and an unused lead category (`ServiceKey` except `other`). Assessments and workshops have no lead category. Domains cannot be created (fixed taxonomy). 409 `key_taken`. |
+| GET | `/api/admin/catalogue/entities/{entity_id}` | viewer | Working copy: `translations{bg,en}` (`slug, name, short_name, summary, body, cta_label, seo_title, seo_description`), `capabilities[]` and `deliverables[]` (each item `{bg:{title,body}, en:{title,body}}`), `related[]` (keys), `service{…}` or `domain{code, band, icon, contact_service, families[]}`, `status, revision, published_revision, has_unpublished_changes`, and the caller's `permissions` (`edit`, `publish`, `archive`, `restore`). `ETag: "<revision>"`. |
+| PATCH | `/api/admin/catalogue/entities/{entity_id}` | editor | Saves the whole working copy (the body shape of the GET, minus read-only fields; lists are replaced in order). Drafts may be incomplete. The revision increases only when something changed. Archived entries → 409 `invalid_transition`; a slug in use → 422 `slug_taken`. The public API is unaffected until publishing. |
+| GET | `/api/admin/catalogue/entities/{entity_id}/checks` | viewer | `{publishable, errors[{field,message,type}]}`: what blocks publishing |
+| GET | `/api/admin/catalogue/entities/{entity_id}/preview` | viewer | The public detail (`?locale=bg\|en`) the working copy would have after publishing; 422 `catalogue_incomplete` with field errors if it could not be published |
+| POST | `/api/admin/catalogue/entities/{entity_id}/publish` | admin | Publishes the working copy. Both locales must be complete: name, slug, summary, body and SEO texts; a short name for services; a CTA for domains; every list item; SEO title ≤ 60 (domains) or ≤ 70 (services); SEO description 120–160 (domains) or 70–175 (services). Otherwise 422 `catalogue_incomplete` with field errors. Archived → 409 `invalid_transition`. |
+| POST | `/api/admin/catalogue/entities/{entity_id}/archive` | admin | Withdraws a service, assessment or workshop from the public API; 409 `domain_archive_not_allowed` for domains |
+| POST | `/api/admin/catalogue/entities/{entity_id}/restore` | admin | Archived → draft (publish again to make it public) |
+| GET | `/api/admin/catalogue/entities/{entity_id}/history` | viewer | The entry's audit entries, newest first (≤ 50) |
 
 ## Admin: AI action approvals
 

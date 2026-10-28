@@ -6,6 +6,7 @@ from __future__ import annotations
 import enum
 import uuid
 from datetime import UTC, datetime
+from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import (
@@ -17,6 +18,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
+    Numeric,
     SmallInteger,
     String,
     Text,
@@ -91,6 +93,14 @@ class Timeline(enum.StrEnum):
     FLEXIBLE = "flexible"
 
 
+class AdminRole(enum.StrEnum):
+    """Staff role. `admin` keeps every existing right; `editor` and `viewer` reach only the catalogue."""
+
+    ADMIN = "admin"
+    EDITOR = "editor"
+    VIEWER = "viewer"
+
+
 class AIActionStatus(enum.StrEnum):
     PENDING = "PENDING"
     APPROVED = "APPROVED"
@@ -109,6 +119,7 @@ TZDateTime = DateTime(timezone=True)
 
 class AdminUser(Base):
     __tablename__ = "admin_users"
+    __table_args__ = (CheckConstraint(_in_check("role", AdminRole), name="role"),)
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(String(254), unique=True, nullable=False)
@@ -120,6 +131,9 @@ class AdminUser(Base):
     # Persistent brute-force protection (survives API restarts, unlike the in-memory limiter).
     failed_login_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default=text("0"))
     locked_until: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    role: Mapped[str] = mapped_column(
+        String(12), nullable=False, default=AdminRole.ADMIN.value, server_default=AdminRole.ADMIN.value
+    )
 
 
 class AdminSession(Base):
@@ -506,9 +520,17 @@ class DomainBand(enum.StrEnum):
 
 
 class OfferingType(enum.StrEnum):
-    """V1 stores services only; assessments, workshops and managed offerings follow (SCHEMA_V2 §3.4)."""
+    """Services carry a lead category; assessments and workshops are fixed-scope offerings that may
+    carry a duration band. Managed offerings follow later (SCHEMA_V2 §3.4)."""
 
     SERVICE = "service"
+    ASSESSMENT = "assessment"
+    WORKSHOP = "workshop"
+
+
+class ContentItemType(enum.StrEnum):
+    CAPABILITY = "capability"
+    DELIVERABLE = "deliverable"
 
 
 class RouteNamespace(enum.StrEnum):
@@ -567,6 +589,13 @@ class CatalogueEntity(Base):
         CheckConstraint(f"key ~ '{CATALOGUE_KEY_PATTERN}'", name="key_format"),
         CheckConstraint("revision >= 1", name="revision_positive"),
         CheckConstraint("(status = 'archived') = (archived_at IS NOT NULL)", name="archived_at"),
+        # A published domain or service is served from its publication snapshot (families are part
+        # of their domain's snapshot).
+        CheckConstraint(
+            "entity_type = 'family' OR status <> 'published' "
+            "OR (published_snapshot IS NOT NULL AND published_revision IS NOT NULL)",
+            name="published_snapshot",
+        ),
         Index("ix_catalogue_entities_type_status", "entity_type", "status"),
     )
 
@@ -585,6 +614,15 @@ class CatalogueEntity(Base):
     updated_by_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid, ForeignKey("admin_users.id", ondelete="SET NULL"), nullable=True
     )
+    # Publication: the read model the public API serves. Edits change the working rows and the
+    # revision; they reach the public API only when the entity is published again.
+    published_revision: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    published_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    published_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("admin_users.id", ondelete="SET NULL"), nullable=True
+    )
+    # none_as_null: Python None must be SQL NULL (not JSON null), or the snapshot CHECK could be bypassed.
+    published_snapshot: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True), nullable=True)
 
 
 class CatalogueDomain(Base):
@@ -653,6 +691,12 @@ class CatalogueService(Base):
             "offering_type <> 'service' OR (primary_domain_id IS NOT NULL AND lead_category IS NOT NULL)",
             name="service_requirements",
         ),
+        CheckConstraint(
+            "(duration_min_days IS NULL AND duration_max_days IS NULL) OR "
+            "(offering_type IN ('assessment', 'workshop') AND duration_min_days > 0 "
+            "AND duration_max_days >= duration_min_days)",
+            name="duration",
+        ),
         CheckConstraint("position >= 0", name="position"),
     )
 
@@ -675,6 +719,9 @@ class CatalogueService(Base):
         Boolean, nullable=False, default=False, server_default=text("false")
     )
     position: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    # Assessments and workshops only: an indicative duration band in working days (no prices).
+    duration_min_days: Mapped[Decimal | None] = mapped_column(Numeric(4, 1), nullable=True)
+    duration_max_days: Mapped[Decimal | None] = mapped_column(Numeric(4, 1), nullable=True)
 
 
 class FamilyService(Base):
@@ -782,3 +829,45 @@ class EntityRelation(Base):
     to_entity_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
     to_type: Mapped[str] = mapped_column(String(16), nullable=False)
     position: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+
+
+class ContentItem(Base):
+    """An ordered list entry of a domain or service (capability, deliverable). Texts per locale in
+    content_item_translations; the same item exists in every locale, so BG and EN lists stay aligned."""
+
+    __tablename__ = "content_items"
+    __table_args__ = (
+        UniqueConstraint(
+            "entity_id",
+            "item_type",
+            "position",
+            name="uq_content_items_entity_type_position",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
+        CheckConstraint(_in_check("item_type", ContentItemType), name="item_type"),
+        CheckConstraint("position >= 0", name="position"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    entity_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("catalogue_entities.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    item_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    position: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+
+
+class ContentItemTranslation(Base):
+    __tablename__ = "content_item_translations"
+    __table_args__ = (
+        CheckConstraint(_in_check("locale", LeadLocale), name="locale"),
+        CheckConstraint("title IS NOT NULL OR body IS NOT NULL", name="not_empty"),
+        CheckConstraint("body IS NULL OR char_length(body) <= 1000", name="body_length"),
+    )
+
+    item_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("content_items.id", ondelete="CASCADE"), primary_key=True
+    )
+    locale: Mapped[str] = mapped_column(String(2), primary_key=True)
+    title: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    body: Mapped[str | None] = mapped_column(Text, nullable=True)

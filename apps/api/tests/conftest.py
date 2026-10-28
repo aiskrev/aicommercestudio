@@ -55,6 +55,7 @@ API_ROOT = Path(__file__).resolve().parents[1]
 ADMIN_EMAIL = "admin.test@example.com"
 ADMIN_PASSWORD = "Test-Password-2026"
 TABLES = [
+    "content_item_translations", "content_items",
     "entity_relations", "entity_translations", "family_services", "services", "service_families",
     "service_domains", "catalogue_entities",
     "ops_agents", "ops_memberships", "ops_workspaces", "ops_organizations",

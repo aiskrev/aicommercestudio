@@ -153,6 +153,622 @@
         }
       }
     },
+    "/api/public/catalogue/domains": {
+      "get": {
+        "tags": [
+          "catalogue"
+        ],
+        "summary": "Published service domains, in taxonomy order (band, then position)",
+        "operationId": "list_domains_api_public_catalogue_domains_get",
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "bg",
+                    "en"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Response language; defaults to the Accept-Language header, then bg.",
+              "title": "Locale"
+            },
+            "description": "Response language; defaults to the Accept-Language header, then bg."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size (1–100).",
+              "default": 50,
+              "title": "Limit"
+            },
+            "description": "Page size (1–100)."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DomainPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/catalogue/domains/by-slug/{slug}": {
+      "get": {
+        "tags": [
+          "catalogue"
+        ],
+        "summary": "One published domain by its slug in the requested locale",
+        "operationId": "domain_by_slug_api_public_catalogue_domains_by_slug__slug__get",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+              "description": "Slug in the requested locale.",
+              "title": "Slug"
+            },
+            "description": "Slug in the requested locale."
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "bg",
+                    "en"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Response language; defaults to the Accept-Language header, then bg.",
+              "title": "Locale"
+            },
+            "description": "Response language; defaults to the Accept-Language header, then bg."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DomainDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`domain_not_found`"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/catalogue/domains/{key}": {
+      "get": {
+        "tags": [
+          "catalogue"
+        ],
+        "summary": "One published domain with its families, services and related domains",
+        "operationId": "domain_by_key_api_public_catalogue_domains__key__get",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,59}$",
+              "description": "Stable key, e.g. `devops_sre`.",
+              "title": "Key"
+            },
+            "description": "Stable key, e.g. `devops_sre`."
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "bg",
+                    "en"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Response language; defaults to the Accept-Language header, then bg.",
+              "title": "Locale"
+            },
+            "description": "Response language; defaults to the Accept-Language header, then bg."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DomainDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`domain_not_found`"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/catalogue/services": {
+      "get": {
+        "tags": [
+          "catalogue"
+        ],
+        "summary": "Published services, assessments and workshops with filters",
+        "operationId": "list_services_api_public_catalogue_services_get",
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "bg",
+                    "en"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Response language; defaults to the Accept-Language header, then bg.",
+              "title": "Locale"
+            },
+            "description": "Response language; defaults to the Accept-Language header, then bg."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-z][a-z0-9_]{0,59}$"
+                  },
+                  "maxItems": 10
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Primary domain key; repeat for OR.",
+              "title": "Domain"
+            },
+            "description": "Primary domain key; repeat for OR."
+          },
+          {
+            "name": "offering_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "service",
+                      "assessment",
+                      "workshop"
+                    ],
+                    "type": "string"
+                  },
+                  "maxItems": 3
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Offering Type"
+            }
+          },
+          {
+            "name": "delivery_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "available",
+                      "custom",
+                      "planned"
+                    ],
+                    "type": "string"
+                  },
+                  "maxItems": 3
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Delivery Status"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Substring of name or summary.",
+              "title": "Q"
+            },
+            "description": "Substring of name or summary."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "catalogue",
+                "name"
+              ],
+              "type": "string",
+              "description": "`catalogue`: domain order, type, position, key. `name`: name in the locale, key.",
+              "default": "catalogue",
+              "title": "Sort"
+            },
+            "description": "`catalogue`: domain order, type, position, key. `name`: name in the locale, key."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size (1–100).",
+              "default": 20,
+              "title": "Limit"
+            },
+            "description": "Page size (1–100)."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServicePage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`validation_error` or `invalid_filter` (unknown domain or parameter)"
+          }
+        }
+      }
+    },
+    "/api/public/catalogue/services/by-slug/{slug}": {
+      "get": {
+        "tags": [
+          "catalogue"
+        ],
+        "summary": "One published service by its slug in the requested locale",
+        "operationId": "service_by_slug_api_public_catalogue_services_by_slug__slug__get",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 80,
+              "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+              "description": "Slug in the requested locale.",
+              "title": "Slug"
+            },
+            "description": "Slug in the requested locale."
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "bg",
+                    "en"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Response language; defaults to the Accept-Language header, then bg.",
+              "title": "Locale"
+            },
+            "description": "Response language; defaults to the Accept-Language header, then bg."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`service_not_found`"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/catalogue/services/{key}": {
+      "get": {
+        "tags": [
+          "catalogue"
+        ],
+        "summary": "One published service, assessment or workshop by its stable key",
+        "operationId": "service_by_key_api_public_catalogue_services__key__get",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,59}$",
+              "description": "Stable key, e.g. `devops_sre`.",
+              "title": "Key"
+            },
+            "description": "Stable key, e.g. `devops_sre`."
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "bg",
+                    "en"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Response language; defaults to the Accept-Language header, then bg.",
+              "title": "Locale"
+            },
+            "description": "Response language; defaults to the Accept-Language header, then bg."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`service_not_found`"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/catalogue/services/{key}/related": {
+      "get": {
+        "tags": [
+          "catalogue"
+        ],
+        "summary": "Related services, assessments and workshops of one published service",
+        "operationId": "service_related_api_public_catalogue_services__key__related_get",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,59}$",
+              "description": "Stable key, e.g. `devops_sre`.",
+              "title": "Key"
+            },
+            "description": "Stable key, e.g. `devops_sre`."
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "bg",
+                    "en"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Response language; defaults to the Accept-Language header, then bg.",
+              "title": "Locale"
+            },
+            "description": "Response language; defaults to the Accept-Language header, then bg."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelatedResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`service_not_found`"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/public/advisor/status": {
       "get": {
         "tags": [
@@ -1591,6 +2207,682 @@
         }
       }
     },
+    "/api/admin/catalogue/entities": {
+      "get": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "List Entities",
+        "operationId": "list_entities_api_admin_catalogue_entities_get",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "domain",
+                    "service"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Type"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "draft",
+                    "published",
+                    "archived"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "offering_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "service",
+                    "assessment",
+                    "workshop"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Offering Type"
+            }
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]{0,59}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Domain"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 100
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityPage"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Create Entity",
+        "description": "Create a draft service, assessment or workshop (domains are fixed by the taxonomy).",
+        "operationId": "create_entity_api_admin_catalogue_entities_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalogue/options": {
+      "get": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Options",
+        "operationId": "options_api_admin_catalogue_options_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OptionsOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalogue/entities/{entity_id}": {
+      "get": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Get Entity",
+        "operationId": "get_entity_api_admin_catalogue_entities__entity_id__get",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Update Entity",
+        "description": "Save the working copy (draft). The public API is unaffected until the entry is published.",
+        "operationId": "update_entity_api_admin_catalogue_entities__entity_id__patch",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Current revision as an ETag, e.g. \"3\".",
+              "title": "If-Match"
+            },
+            "description": "Current revision as an ETag, e.g. \"3\"."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntityUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalogue/entities/{entity_id}/checks": {
+      "get": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Entity Checks",
+        "description": "What would block publishing right now (both locales).",
+        "operationId": "entity_checks_api_admin_catalogue_entities__entity_id__checks_get",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecksOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalogue/entities/{entity_id}/preview": {
+      "get": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Preview Entity",
+        "description": "The public representation the working copy would have once published (staff only, never cached).",
+        "operationId": "preview_entity_api_admin_catalogue_entities__entity_id__preview_get",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "bg",
+                    "en"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Locale"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/ServiceDetail"
+                    },
+                    {
+                      "$ref": "#/components/schemas/DomainDetail"
+                    }
+                  ],
+                  "title": "Response Preview Entity Api Admin Catalogue Entities  Entity Id  Preview Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalogue/entities/{entity_id}/publish": {
+      "post": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Publish Entity",
+        "description": "Publish the current working copy (both locales must be complete).",
+        "operationId": "publish_entity_api_admin_catalogue_entities__entity_id__publish_post",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Current revision as an ETag, e.g. \"3\".",
+              "title": "If-Match"
+            },
+            "description": "Current revision as an ETag, e.g. \"3\"."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalogue/entities/{entity_id}/archive": {
+      "post": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Archive Entity",
+        "description": "Withdraw a service from the public API (domains are fixed and cannot be archived).",
+        "operationId": "archive_entity_api_admin_catalogue_entities__entity_id__archive_post",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Current revision as an ETag, e.g. \"3\".",
+              "title": "If-Match"
+            },
+            "description": "Current revision as an ETag, e.g. \"3\"."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalogue/entities/{entity_id}/restore": {
+      "post": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Restore Entity",
+        "description": "Archived → draft; publish again to make it public.",
+        "operationId": "restore_entity_api_admin_catalogue_entities__entity_id__restore_post",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Current revision as an ETag, e.g. \"3\".",
+              "title": "If-Match"
+            },
+            "description": "Current revision as an ETag, e.g. \"3\"."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/catalogue/entities/{entity_id}/history": {
+      "get": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Entity History",
+        "operationId": "entity_history_api_admin_catalogue_entities__entity_id__history_get",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HistoryEntry"
+                  },
+                  "title": "Response Entity History Api Admin Catalogue Entities  Entity Id  History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/ops/organizations": {
       "get": {
         "tags": [
@@ -2348,6 +3640,48 @@
         ],
         "title": "AIActionStatus"
       },
+      "AdminFamilyOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name_bg": {
+            "type": "string",
+            "title": "Name Bg"
+          },
+          "name_en": {
+            "type": "string",
+            "title": "Name En"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status"
+          },
+          "services": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Services"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "name_bg",
+          "name_en",
+          "delivery_status",
+          "services"
+        ],
+        "title": "AdminFamilyOut"
+      },
       "AdminSessionInfo": {
         "properties": {
           "id": {
@@ -2423,6 +3757,15 @@
               }
             ],
             "title": "Last Login At"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "editor",
+              "viewer"
+            ],
+            "title": "Role"
           }
         },
         "type": "object",
@@ -2430,7 +3773,8 @@
           "id",
           "email",
           "full_name",
-          "last_login_at"
+          "last_login_at",
+          "role"
         ],
         "title": "AdminUserOut"
       },
@@ -3122,6 +4466,25 @@
         ],
         "title": "AiSystemType"
       },
+      "AlternateSlugs": {
+        "properties": {
+          "bg": {
+            "type": "string",
+            "title": "Bg"
+          },
+          "en": {
+            "type": "string",
+            "title": "En"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bg",
+          "en"
+        ],
+        "title": "AlternateSlugs"
+      },
       "AssumptionOverrides": {
         "properties": {
           "day_rate": {
@@ -3402,6 +4765,47 @@
         ],
         "title": "BusinessType"
       },
+      "Capability": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title",
+          "description"
+        ],
+        "title": "Capability"
+      },
+      "ChecksOut": {
+        "properties": {
+          "publishable": {
+            "type": "boolean",
+            "title": "Publishable"
+          },
+          "errors": {
+            "items": {
+              "$ref": "#/components/schemas/FieldProblem"
+            },
+            "type": "array",
+            "title": "Errors"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "publishable",
+          "errors"
+        ],
+        "title": "ChecksOut"
+      },
       "Complexity": {
         "properties": {
           "level": {
@@ -3531,6 +4935,795 @@
         ],
         "title": "DashboardStats"
       },
+      "DomainDetail": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "band": {
+            "type": "string",
+            "enum": [
+              "ai",
+              "engineering",
+              "operations"
+            ],
+            "title": "Band"
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icon"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "alternate_slugs": {
+            "$ref": "#/components/schemas/AlternateSlugs"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status",
+            "description": "Highest status of the domain's families."
+          },
+          "service_count": {
+            "type": "integer",
+            "title": "Service Count",
+            "description": "Published services, assessments and workshops in this domain."
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "bg",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "cta_label": {
+            "type": "string",
+            "title": "Cta Label"
+          },
+          "contact_service": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Service",
+            "description": "Lead category to pre-select in the contact form."
+          },
+          "seo": {
+            "$ref": "#/components/schemas/Seo"
+          },
+          "deliverables": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Deliverables"
+          },
+          "families": {
+            "items": {
+              "$ref": "#/components/schemas/Family"
+            },
+            "type": "array",
+            "title": "Families"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceRef"
+            },
+            "type": "array",
+            "title": "Services",
+            "description": "Published services whose primary domain this is."
+          },
+          "related_domains": {
+            "items": {
+              "$ref": "#/components/schemas/DomainRef"
+            },
+            "type": "array",
+            "title": "Related Domains"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "code",
+          "band",
+          "icon",
+          "slug",
+          "alternate_slugs",
+          "name",
+          "summary",
+          "delivery_status",
+          "service_count",
+          "locale",
+          "body",
+          "cta_label",
+          "contact_service",
+          "seo",
+          "deliverables",
+          "families",
+          "services",
+          "related_domains"
+        ],
+        "title": "DomainDetail"
+      },
+      "DomainFieldsOut": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "band": {
+            "type": "string",
+            "enum": [
+              "ai",
+              "engineering",
+              "operations"
+            ],
+            "title": "Band"
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icon"
+          },
+          "contact_service": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Service"
+          },
+          "families": {
+            "items": {
+              "$ref": "#/components/schemas/AdminFamilyOut"
+            },
+            "type": "array",
+            "title": "Families"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "band",
+          "icon",
+          "contact_service",
+          "families"
+        ],
+        "title": "DomainFieldsOut"
+      },
+      "DomainPage": {
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "bg",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/DomainSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "locale",
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "DomainPage"
+      },
+      "DomainRef": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "code",
+          "slug",
+          "name"
+        ],
+        "title": "DomainRef"
+      },
+      "DomainSummary": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "band": {
+            "type": "string",
+            "enum": [
+              "ai",
+              "engineering",
+              "operations"
+            ],
+            "title": "Band"
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icon"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "alternate_slugs": {
+            "$ref": "#/components/schemas/AlternateSlugs"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status",
+            "description": "Highest status of the domain's families."
+          },
+          "service_count": {
+            "type": "integer",
+            "title": "Service Count",
+            "description": "Published services, assessments and workshops in this domain."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "code",
+          "band",
+          "icon",
+          "slug",
+          "alternate_slugs",
+          "name",
+          "summary",
+          "delivery_status",
+          "service_count"
+        ],
+        "title": "DomainSummary"
+      },
+      "Duration": {
+        "properties": {
+          "min_days": {
+            "type": "number",
+            "title": "Min Days"
+          },
+          "max_days": {
+            "type": "number",
+            "title": "Max Days"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "min_days",
+          "max_days"
+        ],
+        "title": "Duration"
+      },
+      "EntityCreate": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Key"
+          },
+          "offering_type": {
+            "type": "string",
+            "enum": [
+              "service",
+              "assessment",
+              "workshop"
+            ],
+            "title": "Offering Type"
+          },
+          "primary_domain": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,59}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Domain"
+          },
+          "lead_category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ServiceKey"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name_bg": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Name Bg"
+          },
+          "name_en": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Name En"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "offering_type",
+          "name_bg",
+          "name_en"
+        ],
+        "title": "EntityCreate"
+      },
+      "EntityOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "domain",
+              "service"
+            ],
+            "title": "Type"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          },
+          "published_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published Revision"
+          },
+          "has_unpublished_changes": {
+            "type": "boolean",
+            "title": "Has Unpublished Changes"
+          },
+          "first_published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Published At"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Archived At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "translations": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/TranslationOut"
+            },
+            "propertyNames": {
+              "enum": [
+                "bg",
+                "en"
+              ]
+            },
+            "type": "object",
+            "title": "Translations"
+          },
+          "capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/ItemOut"
+            },
+            "type": "array",
+            "title": "Capabilities"
+          },
+          "deliverables": {
+            "items": {
+              "$ref": "#/components/schemas/ItemOut"
+            },
+            "type": "array",
+            "title": "Deliverables"
+          },
+          "related": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Related"
+          },
+          "service": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ServiceFieldsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DomainFieldsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "permissions": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "edit",
+                "publish",
+                "archive",
+                "restore"
+              ]
+            },
+            "type": "array",
+            "title": "Permissions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "key",
+          "status",
+          "revision",
+          "published_revision",
+          "has_unpublished_changes",
+          "first_published_at",
+          "published_at",
+          "archived_at",
+          "updated_at",
+          "translations",
+          "capabilities",
+          "deliverables",
+          "related",
+          "service",
+          "domain",
+          "permissions"
+        ],
+        "title": "EntityOut"
+      },
+      "EntityPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EntitySummaryOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size"
+        ],
+        "title": "EntityPage"
+      },
+      "EntitySummaryOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "domain",
+              "service"
+            ],
+            "title": "Type"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status"
+          },
+          "offering_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "service",
+                  "assessment",
+                  "workshop"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offering Type"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain",
+            "description": "Primary domain key of a service, or the domain's own code."
+          },
+          "name_bg": {
+            "type": "string",
+            "title": "Name Bg"
+          },
+          "name_en": {
+            "type": "string",
+            "title": "Name En"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          },
+          "published_revision": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published Revision"
+          },
+          "has_unpublished_changes": {
+            "type": "boolean",
+            "title": "Has Unpublished Changes"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "key",
+          "status",
+          "offering_type",
+          "domain",
+          "name_bg",
+          "name_en",
+          "revision",
+          "published_revision",
+          "has_unpublished_changes",
+          "updated_at",
+          "published_at"
+        ],
+        "title": "EntitySummaryOut"
+      },
+      "EntityUpdate": {
+        "properties": {
+          "translations": {
+            "$ref": "#/components/schemas/TranslationsEdit"
+          },
+          "capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/ItemEdit"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Capabilities"
+          },
+          "deliverables": {
+            "items": {
+              "$ref": "#/components/schemas/ItemEdit"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Deliverables"
+          },
+          "related": {
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,59}$"
+            },
+            "type": "array",
+            "maxItems": 8,
+            "title": "Related"
+          },
+          "service": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ServiceFieldsEdit"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "translations"
+        ],
+        "title": "EntityUpdate",
+        "description": "The editor's working copy. Lists are replaced as a whole (ordering = list order)."
+      },
       "EstimateOut": {
         "properties": {
           "assumptions_version": {
@@ -3584,6 +5777,115 @@
         ],
         "title": "EstimateOut"
       },
+      "Family": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status"
+          },
+          "prerequisite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prerequisite"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceRef"
+            },
+            "type": "array",
+            "title": "Services"
+          },
+          "via": {
+            "items": {
+              "$ref": "#/components/schemas/DomainRef"
+            },
+            "type": "array",
+            "title": "Via"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "summary",
+          "delivery_status",
+          "prerequisite",
+          "services",
+          "via"
+        ],
+        "title": "Family"
+      },
+      "FamilyRef": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "domain": {
+            "$ref": "#/components/schemas/DomainRef"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "domain"
+        ],
+        "title": "FamilyRef"
+      },
+      "FieldProblem": {
+        "properties": {
+          "field": {
+            "type": "string",
+            "title": "Field"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "field",
+          "message",
+          "type"
+        ],
+        "title": "FieldProblem"
+      },
       "FormTokenOut": {
         "properties": {
           "token": {
@@ -3609,6 +5911,37 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "HistoryEntry": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "actor_label": {
+            "type": "string",
+            "title": "Actor Label"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action",
+          "actor_label",
+          "created_at",
+          "details"
+        ],
+        "title": "HistoryEntry"
       },
       "HumanApproval": {
         "properties": {
@@ -3720,6 +6053,105 @@
           "note"
         ],
         "title": "IntegrationStatus"
+      },
+      "ItemEdit": {
+        "properties": {
+          "bg": {
+            "$ref": "#/components/schemas/ItemTextEdit"
+          },
+          "en": {
+            "$ref": "#/components/schemas/ItemTextEdit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bg",
+          "en"
+        ],
+        "title": "ItemEdit",
+        "description": "One list entry in both locales (the lists stay aligned between BG and EN)."
+      },
+      "ItemOut": {
+        "properties": {
+          "bg": {
+            "$ref": "#/components/schemas/ItemTextOut"
+          },
+          "en": {
+            "$ref": "#/components/schemas/ItemTextOut"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bg",
+          "en"
+        ],
+        "title": "ItemOut"
+      },
+      "ItemTextEdit": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ItemTextEdit"
+      },
+      "ItemTextOut": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title",
+          "body"
+        ],
+        "title": "ItemTextOut"
       },
       "LeadCreate": {
         "properties": {
@@ -4654,6 +7086,123 @@
         ],
         "title": "OpsRole"
       },
+      "OptionDomain": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name_bg": {
+            "type": "string",
+            "title": "Name Bg"
+          },
+          "name_en": {
+            "type": "string",
+            "title": "Name En"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "code",
+          "name_bg",
+          "name_en"
+        ],
+        "title": "OptionDomain"
+      },
+      "OptionService": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "offering_type": {
+            "type": "string",
+            "enum": [
+              "service",
+              "assessment",
+              "workshop"
+            ],
+            "title": "Offering Type"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "published",
+              "archived"
+            ],
+            "title": "Status"
+          },
+          "name_bg": {
+            "type": "string",
+            "title": "Name Bg"
+          },
+          "name_en": {
+            "type": "string",
+            "title": "Name En"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "offering_type",
+          "status",
+          "name_bg",
+          "name_en"
+        ],
+        "title": "OptionService"
+      },
+      "OptionsOut": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "editor",
+              "viewer"
+            ],
+            "title": "Role"
+          },
+          "domains": {
+            "items": {
+              "$ref": "#/components/schemas/OptionDomain"
+            },
+            "type": "array",
+            "title": "Domains"
+          },
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/OptionService"
+            },
+            "type": "array",
+            "title": "Services"
+          },
+          "free_lead_categories": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Free Lead Categories",
+            "description": "ServiceKey values not yet used by a catalogue service."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "role",
+          "domains",
+          "services",
+          "free_lead_categories"
+        ],
+        "title": "OptionsOut"
+      },
       "OrganizationOut": {
         "properties": {
           "id": {
@@ -5214,6 +7763,66 @@
         ],
         "title": "ReadinessSubmitted"
       },
+      "Related": {
+        "properties": {
+          "services": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceRef"
+            },
+            "type": "array",
+            "title": "Services"
+          },
+          "assessments": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceRef"
+            },
+            "type": "array",
+            "title": "Assessments"
+          },
+          "workshops": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceRef"
+            },
+            "type": "array",
+            "title": "Workshops"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "services",
+          "assessments",
+          "workshops"
+        ],
+        "title": "Related"
+      },
+      "RelatedResponse": {
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "bg",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "related": {
+            "$ref": "#/components/schemas/Related"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "locale",
+          "key",
+          "related"
+        ],
+        "title": "RelatedResponse"
+      },
       "RetentionPreview": {
         "properties": {
           "lead_retention_days": {
@@ -5402,6 +8011,339 @@
         ],
         "title": "ScenarioOut"
       },
+      "Seo": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title",
+          "description"
+        ],
+        "title": "Seo"
+      },
+      "ServiceDetail": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "offering_type": {
+            "type": "string",
+            "enum": [
+              "service",
+              "assessment",
+              "workshop"
+            ],
+            "title": "Offering Type"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "alternate_slugs": {
+            "$ref": "#/components/schemas/AlternateSlugs"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "short_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Name"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status"
+          },
+          "primary_domain": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DomainRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_entry_offer": {
+            "type": "boolean",
+            "title": "Is Entry Offer"
+          },
+          "custom_page": {
+            "type": "boolean",
+            "title": "Custom Page",
+            "description": "Rendered by a dedicated website route instead of the service template."
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Duration"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Indicative duration band in working days (assessments, workshops)."
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "bg",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "seo": {
+            "$ref": "#/components/schemas/Seo"
+          },
+          "lead_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Category",
+            "description": "Contact-form category (ServiceKey) for services."
+          },
+          "capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/Capability"
+            },
+            "type": "array",
+            "title": "Capabilities"
+          },
+          "deliverables": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Deliverables"
+          },
+          "families": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyRef"
+            },
+            "type": "array",
+            "title": "Families"
+          },
+          "related": {
+            "$ref": "#/components/schemas/Related"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "offering_type",
+          "slug",
+          "alternate_slugs",
+          "name",
+          "short_name",
+          "summary",
+          "delivery_status",
+          "primary_domain",
+          "is_entry_offer",
+          "custom_page",
+          "duration",
+          "locale",
+          "body",
+          "seo",
+          "lead_category",
+          "capabilities",
+          "deliverables",
+          "families",
+          "related"
+        ],
+        "title": "ServiceDetail"
+      },
+      "ServiceFieldsEdit": {
+        "properties": {
+          "primary_domain": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,59}$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Domain"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status"
+          },
+          "position": {
+            "type": "integer",
+            "maximum": 999.0,
+            "minimum": 0.0,
+            "title": "Position"
+          },
+          "duration_min_days": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 99.0,
+                "minimum": 0.5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Min Days"
+          },
+          "duration_max_days": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 99.0,
+                "minimum": 0.5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Max Days"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "delivery_status",
+          "position"
+        ],
+        "title": "ServiceFieldsEdit"
+      },
+      "ServiceFieldsOut": {
+        "properties": {
+          "offering_type": {
+            "type": "string",
+            "enum": [
+              "service",
+              "assessment",
+              "workshop"
+            ],
+            "title": "Offering Type"
+          },
+          "primary_domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Domain"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status"
+          },
+          "lead_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lead Category"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "duration_min_days": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Min Days"
+          },
+          "duration_max_days": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Max Days"
+          },
+          "custom_page": {
+            "type": "boolean",
+            "title": "Custom Page"
+          },
+          "is_entry_offer": {
+            "type": "boolean",
+            "title": "Is Entry Offer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "offering_type",
+          "primary_domain",
+          "delivery_status",
+          "lead_category",
+          "position",
+          "duration_min_days",
+          "duration_max_days",
+          "custom_page",
+          "is_entry_offer"
+        ],
+        "title": "ServiceFieldsOut"
+      },
       "ServiceKey": {
         "type": "string",
         "enum": [
@@ -5417,6 +8359,202 @@
           "other"
         ],
         "title": "ServiceKey"
+      },
+      "ServicePage": {
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "bg",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ServiceSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "locale",
+          "items",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "title": "ServicePage"
+      },
+      "ServiceRef": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "offering_type": {
+            "type": "string",
+            "enum": [
+              "service",
+              "assessment",
+              "workshop"
+            ],
+            "title": "Offering Type"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "short_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Name"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "offering_type",
+          "slug",
+          "name",
+          "short_name",
+          "delivery_status"
+        ],
+        "title": "ServiceRef"
+      },
+      "ServiceSummary": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "offering_type": {
+            "type": "string",
+            "enum": [
+              "service",
+              "assessment",
+              "workshop"
+            ],
+            "title": "Offering Type"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "alternate_slugs": {
+            "$ref": "#/components/schemas/AlternateSlugs"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "short_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Name"
+          },
+          "summary": {
+            "type": "string",
+            "title": "Summary"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status"
+          },
+          "primary_domain": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DomainRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_entry_offer": {
+            "type": "boolean",
+            "title": "Is Entry Offer"
+          },
+          "custom_page": {
+            "type": "boolean",
+            "title": "Custom Page",
+            "description": "Rendered by a dedicated website route instead of the service template."
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Duration"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Indicative duration band in working days (assessments, workshops)."
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "offering_type",
+          "slug",
+          "alternate_slugs",
+          "name",
+          "short_name",
+          "summary",
+          "delivery_status",
+          "primary_domain",
+          "is_entry_offer",
+          "custom_page",
+          "duration"
+        ],
+        "title": "ServiceSummary"
       },
       "SessionOut": {
         "properties": {
@@ -6235,6 +9373,222 @@
           "none"
         ],
         "title": "ToolKey"
+      },
+      "TranslationEdit": {
+        "properties": {
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "short_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Name"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "cta_label": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cta Label"
+          },
+          "seo_title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 70
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seo Title"
+          },
+          "seo_description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 175
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seo Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "TranslationEdit",
+        "description": "Texts of one locale. Empty strings are stored as empty (allowed in drafts, not for publishing)."
+      },
+      "TranslationOut": {
+        "properties": {
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "short_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Short Name"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          },
+          "cta_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cta Label"
+          },
+          "seo_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seo Title"
+          },
+          "seo_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seo Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "slug",
+          "name",
+          "short_name",
+          "summary",
+          "body",
+          "cta_label",
+          "seo_title",
+          "seo_description"
+        ],
+        "title": "TranslationOut"
+      },
+      "TranslationsEdit": {
+        "properties": {
+          "bg": {
+            "$ref": "#/components/schemas/TranslationEdit"
+          },
+          "en": {
+            "$ref": "#/components/schemas/TranslationEdit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bg",
+          "en"
+        ],
+        "title": "TranslationsEdit"
       },
       "ValidationError": {
         "properties": {

@@ -8,7 +8,7 @@ import uuid
 
 import pytest
 from pydantic import ValidationError
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
 
 from app.catalogue.schemas import SeedDocument
@@ -22,6 +22,7 @@ from app.catalogue.seed import (
     seed_catalogue,
     validate_document,
 )
+from app.cli import ensure_admin
 from app.cli import main as cli_main
 from app.models import (
     LEAD_CATEGORIES,
@@ -29,6 +30,7 @@ from app.models import (
     CatalogueDomain,
     CatalogueEntity,
     CatalogueService,
+    ContentItem,
     EntityRelation,
     EntityTranslation,
     FamilyService,
@@ -106,8 +108,10 @@ def test_entity_ids_are_deterministic():
 def test_seed_on_an_empty_database_creates_the_full_catalogue(db):
     result = seed_catalogue(db)
     assert dict(result.created) == {"domain": 10, "family": 60, "service": 9}
+    assert dict(result.published) == {"domain": 10, "service": 9}
     assert not result.updated and not result.extra
     assert count(db, CatalogueEntity) == 79
+    assert count(db, ContentItem) > 0
     assert count(db, EntityTranslation) == 79 * 2
     assert count(db, FamilyService) > 0
     assert count(db, EntityRelation) > 0
@@ -121,37 +125,76 @@ def test_repeated_seeding_changes_nothing(db):
     seed_catalogue(db)
     snapshot = sorted((r.id, r.revision, r.updated_at) for r in db.scalars(select(CatalogueEntity)))
     result = seed_catalogue(db)
-    assert not result.created and not result.updated
+    assert not result.created and not result.updated and not result.published
     assert sum(result.unchanged.values()) == 79
+    assert not seed_catalogue(db, reconcile=True).changed
     db.expire_all()
     assert sorted((r.id, r.revision, r.updated_at) for r in db.scalars(select(CatalogueEntity))) == snapshot
     assert count(db, EntityTranslation) == 79 * 2
     assert db.scalar(select(func.count()).select_from(AuditLog).where(AuditLog.action == "catalogue.seeded")) == 1
 
 
-def test_changed_content_is_updated_in_place_with_a_new_revision(db):
+def test_reconcile_updates_in_place_and_republishes(db):
     seed_catalogue(db)
     data = raw()
     data["domains"][0]["translations"]["en"]["summary"] = "Changed summary for the test."
     data["services"][0]["related"] = data["services"][0]["related"][:1]
-    result = seed_catalogue(db, SeedDocument.model_validate(data))
+    changed = SeedDocument.model_validate(data)
+    assert not seed_catalogue(db, changed).changed  # bootstrap never touches existing entries
+    result = seed_catalogue(db, changed, reconcile=True)
     assert dict(result.updated) == {"domain": 1, "service": 1}
+    assert dict(result.published) == {"domain": 1, "service": 1}
     key = data["domains"][0]["key"]
     row = db.get(CatalogueEntity, entity_id("domain", key))
-    assert row.revision == 2
-    text = db.get(EntityTranslation, (row.id, "en"))
-    assert text.summary == "Changed summary for the test."
+    assert (row.revision, row.published_revision) == (2, 2)
+    assert db.get(EntityTranslation, (row.id, "en")).summary == "Changed summary for the test."
+    assert row.published_snapshot["texts"]["en"]["summary"] == "Changed summary for the test."
     assert count(db, CatalogueEntity) == 79
 
-    result = seed_catalogue(db)  # back to the committed document
+    result = seed_catalogue(db, reconcile=True)  # back to the committed document
     assert dict(result.updated) == {"domain": 1, "service": 1}
     db.expire_all()
     assert db.get(CatalogueEntity, row.id).revision == 3
 
 
+def test_bootstrap_keeps_editor_changes(db):
+    seed_catalogue(db)
+    entity = db.get(CatalogueEntity, entity_id("service", "seo"))
+    text = db.get(EntityTranslation, (entity.id, "en"))
+    text.summary = "Edited in the admin catalogue."
+    entity.revision += 1
+    db.commit()
+    assert not seed_catalogue(db).changed
+    db.expire_all()
+    assert db.get(EntityTranslation, (entity.id, "en")).summary == "Edited in the admin catalogue."
+
+
+def test_bootstrap_backfills_never_published_entries_but_not_edited_ones(db):
+    """A database seeded under 0009 has entries without items or snapshots (0010 made them drafts).
+    Bootstrap completes and publishes them; an entry an editor already touched is left alone."""
+    seed_catalogue(db)
+    editor, _ = ensure_admin(db, "backfill.editor@example.com", "Backfill-Password-2026", "Editor")
+    for entity in db.scalars(select(CatalogueEntity).where(CatalogueEntity.entity_type != "family")):
+        entity.status, entity.published_snapshot = "draft", None
+        entity.published_revision = entity.published_at = None
+        if entity.key == "analytics":
+            entity.updated_by_id = editor.id
+    db.execute(delete(ContentItem))
+    db.commit()
+
+    result = seed_catalogue(db)
+    assert dict(result.published) == {"domain": 10, "service": 8}
+    seo = db.get(CatalogueEntity, entity_id("service", "seo"))
+    assert seo.status == "published" and seo.published_snapshot["capabilities"]
+    analytics = db.get(CatalogueEntity, entity_id("service", "analytics"))
+    assert (analytics.status, analytics.published_snapshot) == ("draft", None)
+    assert not seed_catalogue(db).changed
+
+
 def test_dry_run_writes_nothing(db):
     result = seed_catalogue(db, dry_run=True)
     assert dict(result.created) == {"domain": 10, "family": 60, "service": 9}
+    assert dict(result.published) == {"domain": 10, "service": 9}
     assert count(db, CatalogueEntity) == 0
     assert count(db, AuditLog) == 0
 
@@ -284,6 +327,12 @@ def test_a_subtype_row_must_match_its_entity_type(db):
 
 def test_status_and_lead_category_checks(db):
     seed_catalogue(db)
+    entity = db.get(CatalogueEntity, entity_id("service", "seo"))
+
+    def published_without_snapshot():
+        entity.published_snapshot = None
+
+    _expect_integrity_error(db, published_without_snapshot)
     entity = db.get(CatalogueEntity, entity_id("service", "seo"))
 
     def archive_without_timestamp():

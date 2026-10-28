@@ -4,7 +4,7 @@ from alembic import command
 from sqlalchemy import create_engine, func, inspect, select, text
 from sqlalchemy.orm import Session
 
-from app.catalogue.seed import catalogue_problems, seed_catalogue
+from app.catalogue.seed import catalogue_problems, entity_id, seed_catalogue
 from app.cli import SYNTHETIC_SOURCE, ensure_admin, seed_synthetic_data
 from app.models import AIActionRequest, AuditLog, Lead, utcnow
 from app.services import leads
@@ -76,7 +76,7 @@ def test_migration_0009_keeps_existing_data_seeds_and_rolls_back():
 
     command.upgrade(cfg, "head")
     with Session(engine) as session:
-        assert dict(seed_catalogue(session).created) == {"domain": 10, "family": 60, "service": 9}
+        assert dict(seed_catalogue(session).published) == {"domain": 10, "service": 9}
         assert catalogue_problems(session) == []
         assert seed_catalogue(session).changed is False
     assert _row_snapshot(engine) == before
@@ -86,6 +86,41 @@ def test_migration_0009_keeps_existing_data_seeds_and_rolls_back():
     assert not tables & {"catalogue_entities", "services", "service_domains", "entity_translations"}
     assert _row_snapshot(engine) == before
     command.upgrade(cfg, "head")  # re-applying after a rollback works on the same data
+    engine.dispose()
+
+
+def test_migration_0010_turns_unsnapshotted_rows_into_drafts_and_the_seed_republishes():
+    """0009 published rows have no snapshot; 0010 makes them drafts, keeps admins as `admin`, and the
+    bootstrap seed publishes the seeded entries again."""
+    url = TEST_DATABASE_URL.rsplit("/", 1)[0] + "/acs_migration_0010"
+    recreate_database("acs_migration_0010")
+    cfg = alembic_config(url)
+    command.upgrade(cfg, "0009")
+    engine = create_engine(url)
+    service_id = entity_id("service", "seo")
+    with engine.begin() as conn:
+        conn.execute(text(
+            "INSERT INTO admin_users (id, email, full_name, password_hash, is_active, created_at, failed_login_count) "
+            "VALUES (gen_random_uuid(), 'old.admin@example.com', 'Old', 'x', true, now(), 0)"
+        ))
+        conn.execute(text(
+            "INSERT INTO catalogue_entities (id, entity_type, key, status, revision, created_at, updated_at) "
+            "VALUES (:id, 'service', 'seo', 'published', 1, now(), now())"
+        ), {"id": service_id})
+    command.upgrade(cfg, "0010")
+    with engine.connect() as conn:
+        assert conn.execute(text("SELECT role FROM admin_users")).scalar() == "admin"
+        assert conn.execute(text("SELECT status FROM catalogue_entities")).scalar() == "draft"
+    with engine.begin() as conn:  # the half-seeded 0009 row is replaced by a clean seed
+        conn.execute(text("DELETE FROM catalogue_entities"))
+    with Session(engine) as session:
+        assert dict(seed_catalogue(session).published) == {"domain": 10, "service": 9}
+        assert catalogue_problems(session) == []
+    command.downgrade(cfg, "0009")
+    with engine.connect() as conn:
+        assert conn.execute(text("SELECT count(*) FROM catalogue_entities WHERE status = 'published' "
+            "AND entity_type IN ('domain', 'service')")).scalar() == 19
+        assert "role" not in {c["name"] for c in inspect(engine).get_columns("admin_users")}
     engine.dispose()
 
 

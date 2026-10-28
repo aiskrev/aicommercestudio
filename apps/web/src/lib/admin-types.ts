@@ -7,11 +7,14 @@ export type LeadStatus = (typeof LEAD_STATUSES)[number];
 export type InquiryType = "contact" | "quote";
 export type LeadLocale = "bg" | "en";
 
+export type StaffRole = "admin" | "editor" | "viewer";
+
 export interface AdminUser {
   id: string;
   email: string;
   full_name: string;
   last_login_at: string | null;
+  role: StaffRole;
 }
 
 export interface AdminSession {
@@ -269,4 +272,134 @@ export interface OpsMember {
   full_name: string;
   role: OpsRole;
   created_at: string;
+}
+
+// --------------------------------------------------------------------------- service catalogue
+
+export type CatalogueStatus = "draft" | "published" | "archived";
+export type OfferingType = "service" | "assessment" | "workshop";
+export type DeliveryStatus = "available" | "custom" | "planned";
+export type CataloguePermission = "edit" | "publish" | "archive" | "restore";
+export type CatalogueLocale = "bg" | "en";
+
+export interface CatalogueEntitySummary {
+  id: string;
+  type: "domain" | "service";
+  key: string;
+  status: CatalogueStatus;
+  offering_type: OfferingType | null;
+  domain: string | null;
+  name_bg: string;
+  name_en: string;
+  revision: number;
+  published_revision: number | null;
+  has_unpublished_changes: boolean;
+  updated_at: string;
+  published_at: string | null;
+}
+
+export interface CatalogueEntityPage {
+  items: CatalogueEntitySummary[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface CatalogueTranslation {
+  slug: string | null;
+  name: string;
+  short_name: string | null;
+  summary: string | null;
+  body: string | null;
+  cta_label: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+}
+
+export interface CatalogueItemText {
+  title: string | null;
+  body: string | null;
+}
+
+export type CatalogueItem = Record<CatalogueLocale, CatalogueItemText>;
+
+export interface CatalogueServiceFields {
+  offering_type: OfferingType;
+  primary_domain: string | null;
+  delivery_status: DeliveryStatus;
+  lead_category: string | null;
+  position: number;
+  duration_min_days: number | null;
+  duration_max_days: number | null;
+  custom_page: boolean;
+  is_entry_offer: boolean;
+}
+
+export interface CatalogueDomainFields {
+  code: string;
+  band: "ai" | "engineering" | "operations";
+  icon: string;
+  contact_service: string | null;
+  families: { key: string; name_bg: string; name_en: string; delivery_status: DeliveryStatus; services: string[] }[];
+}
+
+export interface CatalogueEntity {
+  id: string;
+  type: "domain" | "service";
+  key: string;
+  status: CatalogueStatus;
+  revision: number;
+  published_revision: number | null;
+  has_unpublished_changes: boolean;
+  first_published_at: string | null;
+  published_at: string | null;
+  archived_at: string | null;
+  updated_at: string;
+  translations: Record<CatalogueLocale, CatalogueTranslation>;
+  capabilities: CatalogueItem[];
+  deliverables: CatalogueItem[];
+  related: string[];
+  service: CatalogueServiceFields | null;
+  domain: CatalogueDomainFields | null;
+  permissions: CataloguePermission[];
+}
+
+export interface CatalogueOptions {
+  role: StaffRole;
+  domains: { key: string; code: string; name_bg: string; name_en: string }[];
+  services: { key: string; offering_type: OfferingType; status: CatalogueStatus; name_bg: string; name_en: string }[];
+  free_lead_categories: string[];
+}
+
+export interface CatalogueFieldProblem {
+  field: string;
+  message: string;
+  type: string;
+}
+
+export interface CatalogueChecks {
+  publishable: boolean;
+  errors: CatalogueFieldProblem[];
+}
+
+export interface CatalogueHistoryEntry {
+  action: string;
+  actor_label: string;
+  created_at: string;
+  details: Record<string, unknown>;
+}
+
+/** Public detail shape returned by the preview endpoint (subset used by the preview panel). */
+export interface CataloguePreview {
+  locale: CatalogueLocale;
+  key: string;
+  name: string;
+  slug: string;
+  summary: string;
+  body: string;
+  seo: { title: string; description: string };
+  deliverables: string[];
+  capabilities?: { title: string; description: string }[];
+  related?: { services: { key: string; name: string }[]; assessments: { key: string; name: string }[]; workshops: { key: string; name: string }[] };
+  related_domains?: { key: string; name: string }[];
 }
