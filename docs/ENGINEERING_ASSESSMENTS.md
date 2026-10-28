@@ -1,4 +1,4 @@
-# Engineering assessments: Cloud & Platform Maturity and DevOps Delivery Maturity
+# Engineering assessments: Cloud & Platform, DevOps Delivery, Observability & Reliability
 
 Two self-assessments built as isolated definitions on the assessment engine
 ([ASSESSMENT_PLATFORM_ARCHITECTURE.md](ASSESSMENT_PLATFORM_ARCHITECTURE.md)). There is no
@@ -9,6 +9,7 @@ one registered extension for its metrics.
 | --- | --- | --- | --- |
 | Cloud & Platform Maturity | `cloud_platform/1.0.0.json` (live) | `/bg/instrumenti/zrelost-na-oblak-i-platforma` ↔ `/en/tools/cloud-platform-maturity` | `tool_cloud` |
 | DevOps Delivery Maturity | `devops_delivery/1.1.0.json` (live; 1.0.0 kept for saved results) | `/bg/instrumenti/zrelost-na-devops-dostavkata` ↔ `/en/tools/devops-delivery-maturity` | `tool_devops` |
+| Observability & Reliability | `observability_reliability/1.1.0.json` (live; 1.0.0 kept for saved results) | `/bg/instrumenti/nablyudaemost-i-nadezhdnost` ↔ `/en/tools/observability-reliability` | `tool_observability` |
 
 **Boundaries.** No access to customer cloud environments, repositories or pipelines. No live
 scanning, no credentials and no compliance certification. Every page, result and report says that
@@ -86,6 +87,26 @@ grouped by 30/60/90 days.
 
 **Versioning.** 1.0.0 (8 questions, preview) stays in the repository, so results saved with it
 re-render. New requests use 1.1.0. A client still on 1.0.0 gets 409 `assessment_version_outdated`.
+
+## 2a. Observability & Reliability (`observability_reliability` 1.1.0)
+
+It uses the same eight questions as 1.0.0, in four areas weighted 30/25/25/20:
+
+* signals: what is collected centrally, and log retention;
+* alerting: routing, and how many alerts are actionable;
+* incidents: the process, and reviews;
+* SLOs: targets, and status communication.
+
+1.1.0 makes it live and gives the rules kinds, horizons and domains:
+
+* 3 risks (30 days): no alerts, no incident process, blind spots when signals score below 25;
+* 2 quick wins (30 days): on-call routing, reducing alert noise;
+* 4 recommendations (central telemetry, an incident runbook, SLOs, and a workshop for the
+  reactive band), capped at 6;
+* 2 target states (90 days): a reliability review, and error budgets with a release policy.
+
+The `observability_signals` extension still rejects an on-call rota without collected telemetry,
+and still reports the missing core signals.
 
 ## 3. Shared engine features (backward compatible)
 

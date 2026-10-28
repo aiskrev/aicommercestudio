@@ -30,7 +30,7 @@ import { isToolAvailable, isToolPlanned, TOOL_SLUGS, toolByKey, toolHrefs, TOOLS
 
 export const dynamicParams = false;
 
-type HostedTool = "readiness" | "team" | "roi" | "finder" | "solution" | "cloud_maturity" | "devops_maturity";
+type HostedTool = "readiness" | "team" | "roi" | "finder" | "solution" | "cloud_maturity" | "devops_maturity" | "observability";
 
 /** Tools hosted under /instrumenti/<slug>. Only available tools (implemented + flag on) get a page. */
 const HOSTED: Record<string, HostedTool> = {
@@ -41,10 +41,15 @@ const HOSTED: Record<string, HostedTool> = {
   [TOOL_SLUGS.solution]: "solution",
   [TOOL_SLUGS.cloud_maturity]: "cloud_maturity",
   [TOOL_SLUGS.devops_maturity]: "devops_maturity",
+  [TOOL_SLUGS.observability]: "observability",
 };
 
 /** Engine assessments: the API key behind each tool, and how long a saved result is kept (ASSESSMENT_RETENTION_DAYS). */
-const ENGINE = { cloud_maturity: "cloud_platform", devops_maturity: "devops_delivery" } as const;
+const ENGINE = {
+  cloud_maturity: "cloud_platform",
+  devops_maturity: "devops_delivery",
+  observability: "observability_reliability",
+} as const;
 const ASSESSMENT_RETENTION_DAYS = 90;
 
 /** Services each hosted tool can link to from its result. */
@@ -56,6 +61,7 @@ const TOOL_SERVICES: Record<HostedTool, ServiceKey[]> = {
   solution: ["ai_agents", "integrations", "automation", "ai_tools", "ai_managed", "audit"],
   cloud_maturity: [],
   devops_maturity: [],
+  observability: [],
 };
 
 /**
@@ -112,6 +118,7 @@ function toolContent(locale: Locale, key: HostedTool) {
     solution: content.solutionTool,
     cloud_maturity: content.engineeringTool.pages.cloud_maturity,
     devops_maturity: content.engineeringTool.pages.devops_maturity,
+    observability: content.engineeringTool.pages.observability,
   };
   return pages[key];
 }
@@ -249,7 +256,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
           <ReadinessMethodology content={readinessTool} />
         </Section>
       )}
-      {(key === "cloud_maturity" || key === "devops_maturity") && (
+      {(key === "cloud_maturity" || key === "devops_maturity" || key === "observability") && (
         <Section size="narrow">
           <EngineAssessment
             assessment={ENGINE[key]}

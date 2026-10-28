@@ -126,6 +126,24 @@ test("DevOps delivery in English: metrics stay optional, unverified and unscored
   await expect(result.getByTestId("engine-findings-context")).toContainText("Your metrics are estimates");
 });
 
+test("observability & reliability in English: explained findings and a target state", async ({ page }) => {
+  await page.goto("/en/tools/observability-reliability");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Observability & Reliability Assessment");
+  const form = page.getByTestId("engine-form");
+  await expect(form.getByText("Area 1 of 4")).toBeVisible();
+  await answerAll(page, form, "last", "See the result", "Next", async (step) => {
+    if (step !== 0) return;
+    for (const signal of ["Logs", "Metrics", "Request tracing"]) await form.getByRole("checkbox", { name: signal }).check();
+    await form.getByLabel(/How many days do you keep logs/).fill("90");
+  });
+  const result = page.getByTestId("engine-result");
+  await expect(result.getByRole("heading", { level: 2, name: "Your result" })).toBeFocused();
+  await expect(result.getByTestId("engine-findings-target_state")).toContainText("Error budgets and a release policy");
+  await expect(result.getByTestId("engine-findings-target_state")).toContainText("Reliability targets: 100/100, at least 75");
+  await expect(result.getByTestId("engine-roadmap")).toContainText("90 days");
+  await expect(result.getByTestId("engine-findings-risk")).toHaveCount(0);
+});
+
 test("the assessment API keeps old versions out of scoring and reports behind the token", async ({ request }) => {
   const definition = await (await request.get("/api/public/assessments/devops_delivery?locale=en")).json();
   expect(definition.version).toBe("1.1.0");

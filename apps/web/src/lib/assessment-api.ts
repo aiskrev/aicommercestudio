@@ -7,7 +7,7 @@
 
 import type { DomainKey } from "@/lib/domains";
 
-export type AssessmentKey = "cloud_platform" | "devops_delivery";
+export type AssessmentKey = "cloud_platform" | "devops_delivery" | "observability_reliability";
 export type Evidence = "practice" | "metric" | "context";
 export type FindingKind = "recommendation" | "risk" | "quick_win" | "target_state" | "pattern" | "context";
 export type AnswerValue = string | string[] | number | boolean;

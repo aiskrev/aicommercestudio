@@ -16,6 +16,12 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/observability-assessment` (from `main` @ `6115a86`, 2026-10-28): Observability &
+Reliability assessment live (`observability_reliability` 1.1.0: same questions as 1.0.0, findings with
+kinds, horizons, domains and explanations; web wizard, report, PDF and consultation through the shared
+engine UI). No migration. Results: API **549 passed**, Ruff clean, docs in sync; web **603** unit tests,
+typecheck and lint clean; e2e **132 passed**.
+
 Branch `feature/advisor-v2-assessments` (from `feature/contact-config` @ `69947ad`, which is `main` @
 `8877d10` plus the contact configuration; not merged, 2026-10-28):
 

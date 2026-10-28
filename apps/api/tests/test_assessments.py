@@ -129,10 +129,11 @@ def test_shipped_definitions_load_and_validate():
     assert current == {
         "cloud_platform": ("1.0.0", "live"),
         "devops_delivery": ("1.1.0", "live"),
-        "observability_reliability": ("1.0.0", "preview"),
+        "observability_reliability": ("1.1.0", "live"),
     }
     # The superseded version stays, so results saved with it still re-render.
     assert reg.get("devops_delivery", "1.0.0") is not None
+    assert reg.get("observability_reliability", "1.0.0") is not None
     for key in reg.versions:
         assert not CYRILLIC.search(reg.current(key).texts["en"].model_dump_json())
     assert reg.current("observability_reliability").extension == "observability_signals"

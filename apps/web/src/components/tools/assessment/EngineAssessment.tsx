@@ -41,7 +41,7 @@ const fill = (template: string, values: Record<string, string | number>) =>
 
 interface Props {
   assessment: AssessmentKey;
-  tool: Extract<ToolKey, "cloud_maturity" | "devops_maturity">;
+  tool: Extract<ToolKey, "cloud_maturity" | "devops_maturity" | "observability">;
   content: Content;
   locale: Locale;
   domainLinks: Partial<Record<DomainKey, { href: string; label: string }>>;
@@ -161,6 +161,7 @@ export function EngineAssessment({ assessment, tool, content, locale, domainLink
         retentionDays={retentionDays}
         answers={toPayload(definition.questions, draft)}
         assessment={assessment}
+        tool={tool}
         version={definition.version}
         onRestart={() => {
           setResult(null);
@@ -365,6 +366,7 @@ function EngineResult({
   retentionDays,
   answers,
   assessment,
+  tool,
   version,
   onRestart,
 }: {
@@ -378,6 +380,7 @@ function EngineResult({
   retentionDays: number;
   answers: Record<string, AnswerValue>;
   assessment: AssessmentKey;
+  tool: Props["tool"];
   version: string;
   onRestart: () => void;
 }) {
@@ -431,7 +434,7 @@ function EngineResult({
     link.download = locale === "bg" ? "doklad-ocenka.pdf" : "assessment-report.pdf";
     link.click();
     URL.revokeObjectURL(url);
-    trackToolEvent({ name: "export_requested", tool: assessment === "cloud_platform" ? "cloud_maturity" : "devops_maturity", locale, format: "pdf" });
+    trackToolEvent({ name: "export_requested", tool, locale, format: "pdf" });
   }
 
   async function remove() {
