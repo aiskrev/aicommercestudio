@@ -16,6 +16,30 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/readiness-v3` (from `main` @ `6226281`, not merged, 2026-10-28): AI readiness model
+**`2026-11.1`** with the requested six dimensions (TOOLS_PLATFORM.md → "Readiness model").
+
+* **Dimensions:** strategy, infrastructure, data, governance, talent and skills, organizational
+  readiness; 12 questions, 2 per dimension.
+* **New questions and rules:** two new talent questions; a new "expertise" blocker with its action;
+  gap and use-case rules for the new dimensions.
+* **Vectors:** regenerated web/API golden vectors (`scripts/gen_readiness_vectors.py`) covering
+  both sides of every band threshold.
+* **Methodology:** published methodology and limitations on the tool page (indicative
+  self-assessment, no external benchmark).
+* **Workshops:** links to the hubs that list the workshops.
+* **Share links:** a versioned share code.
+* **Old submissions:** submissions of model `2026-10.2` keep rendering in the admin and the PDF
+  (stored version, legacy weights and texts).
+
+No migration.
+
+| Check | Result |
+| --- | --- |
+| `.\scripts\test.ps1 -Suite api` | **484 passed** (6 new in `test_readiness.py`), Ruff clean, docs and OpenAPI in sync, vector copies identical |
+| Web typecheck, lint, unit tests (`web-tests` container) | passed; **562** unit tests, 40 files (readiness tests +3; the parity file now has 58 vectors instead of 61, so the total is unchanged) |
+| e2e (production build, no-host-ports override, staff accounts, revalidation secret) | **125 passed** (4 new: published methodology, old share link, contact-free result with opt-in hand-off, complete mobile flow; readiness, admin and report specs migrated to the new model) |
+
 Branch `feature/assessment-engine` (from `main` @ `8b1c40b`, not merged, 2026-10-28): the reusable
 deterministic assessment engine ([ASSESSMENT_PLATFORM_ARCHITECTURE.md](ASSESSMENT_PLATFORM_ARCHITECTURE.md)).
 

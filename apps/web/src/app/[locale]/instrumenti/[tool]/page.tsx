@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ReadinessAssessment } from "@/components/tools/ReadinessAssessment";
+import { ReadinessMethodology } from "@/components/tools/ReadinessMethodology";
 import { OpportunityFinder } from "@/components/tools/finder/OpportunityFinder";
 import { RoiCalculator } from "@/components/tools/roi/RoiCalculator";
 import { SolutionBuilder } from "@/components/tools/solution/SolutionBuilder";
@@ -214,8 +215,19 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
               advisorHref={hrefs.advisor}
               privacyHref={href(routes.privacy)}
               locale={locale}
+              workshops={(["ai_strategy", "advisory_enablement"] as const)
+                .filter((domain) => domainDefinition(domain).published)
+                .map((domain) => {
+                  const hub = domainByKey(locale, domain);
+                  return { href: href(routes.service(hub.slug)), label: hub.name };
+                })}
             />
           </Suspense>
+        </Section>
+      )}
+      {key === "readiness" && (
+        <Section tone="raised" labelledBy="readiness-methodology-title">
+          <ReadinessMethodology content={readinessTool} />
         </Section>
       )}
       {key === "team" && (

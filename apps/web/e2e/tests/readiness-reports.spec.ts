@@ -5,12 +5,12 @@ import { type APIRequestContext, expect, test } from "@playwright/test";
 /** Readiness PDF report (anonymous, nothing stored), optional submission and the admin view of it. */
 
 const octet = () => Math.floor(Math.random() * 250) + 1;
-const MODEL_VERSION = "2026-10.2";
+const MODEL_VERSION = "2026-11.1";
 const answers = (level: number) =>
   Object.fromEntries(
     [
-      "strategy_goals", "strategy_use_cases", "data_access", "data_quality", "process_definition", "process_repeatability",
-      "tech_environment", "tech_integration", "people_ownership", "people_change", "gov_data_protection", "gov_oversight",
+      "strategy_goals", "strategy_use_cases", "tech_integration", "tech_environment", "data_access", "data_quality",
+      "gov_data_protection", "gov_oversight", "talent_skills", "talent_support", "people_ownership", "people_change",
     ].map((id) => [id, level]),
   );
 
@@ -26,7 +26,7 @@ async function agedToken(request: APIRequestContext): Promise<string> {
 }
 
 test("the PDF report downloads from the result without any personal data", async ({ page }) => {
-  await page.goto("/bg/instrumenti/ai-gotovnost?r=222222222222");
+  await page.goto("/bg/instrumenti/ai-gotovnost?r=b222222222222");
   await expect(page.getByTestId("tool-score")).toHaveText("50");
   const report = page.getByTestId("readiness-report");
   await expect(report).toContainText("нищо не се запазва");
@@ -63,7 +63,7 @@ test("the report API validates versions, answers and the form token", async ({ r
 });
 
 test("sending the result to the team validates consent and returns a reference", async ({ page }) => {
-  await page.goto("/en/tools/ai-readiness?r=333333333333");
+  await page.goto("/en/tools/ai-readiness?r=b333333333333");
   await expect(page.getByTestId("tool-score")).toHaveText("75");
   const send = page.getByTestId("readiness-send");
   await send.getByRole("button", { name: "Send the result to our team" }).click();

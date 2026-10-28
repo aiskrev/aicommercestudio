@@ -3,7 +3,7 @@ import type { readinessTool as bgReadinessTool } from "@/content/bg/tool-readine
 export const readinessTool: typeof bgReadinessTool = {
   metaTitle: "AI readiness assessment for your company — free check",
   metaDescription:
-    "A free AI readiness assessment: 12 questions across strategy, data, processes, technology, people and governance. A score, recommendations and a 90-day plan.",
+    "A free AI readiness assessment: 12 questions across strategy, infrastructure, data, governance, talent and organization. A score, recommendations and a 90-day plan.",
   eyebrow: "Tools · Strategy",
   title: "AI readiness assessment",
   lead: "Twelve questions across six dimensions show how ready your company is for AI — and what the next steps should be over the first 90 days.",
@@ -11,11 +11,11 @@ export const readinessTool: typeof bgReadinessTool = {
   levelLabel: "Level",
   steps: {
     strategy: { title: "Strategy", description: "Goals and specific use cases." },
+    infrastructure: { title: "Infrastructure", description: "Integrations and technical setup." },
     data: { title: "Data", description: "Access to data and its quality." },
-    process: { title: "Processes", description: "Documented, repeatable processes." },
-    technology: { title: "Technology", description: "Integrations and technical setup." },
-    people: { title: "People", description: "Ownership and readiness for change." },
-    governance: { title: "Governance", description: "Data, security and human approval." },
+    governance: { title: "Governance", description: "Personal data, security and human approval." },
+    talent: { title: "Talent and skills", description: "The team's experience and access to technical expertise." },
+    organization: { title: "Organizational readiness", description: "Ownership and readiness for change." },
   },
   questions: {
     strategy_goals: {
@@ -58,26 +58,6 @@ export const readinessTool: typeof bgReadinessTool = {
         "Quality is monitored with rules and checks.",
       ],
     },
-    process_definition: {
-      label: "Are the processes you want to improve documented?",
-      options: [
-        "Not documented, and everyone does them differently.",
-        "We know them, but they aren't documented.",
-        "Partly documented, without the exceptions.",
-        "Documented step by step, including exceptions.",
-        "Documented and measured — we know volume, time and errors.",
-      ],
-    },
-    process_repeatability: {
-      label: "How repeatable and frequent is this work?",
-      options: [
-        "Every case is different.",
-        "It repeats rarely — a few times a month.",
-        "Every week, with clear steps.",
-        "Every day, with clear steps.",
-        "Many times a day, with predictable inputs.",
-      ],
-    },
     tech_integration: {
       label: "Can your systems — store, CRM, ERP, e-mail — connect to other systems?",
       options: [
@@ -96,6 +76,26 @@ export const readinessTool: typeof bgReadinessTool = {
         "Platforms with extensions and a few integrations.",
         "A test environment and change control.",
         "Cloud infrastructure with automated deployment and monitoring.",
+      ],
+    },
+    talent_skills: {
+      label: "How experienced is the team with digital and AI tools?",
+      options: [
+        "Hardly at all — we mostly work manually.",
+        "A few people use AI tools on their own initiative.",
+        "Most use digital tools confidently, but not AI in their work.",
+        "Some people have hands-on experience with AI in daily work.",
+        "There is in-house experience in configuring and evaluating AI solutions.",
+      ],
+    },
+    talent_support: {
+      label: "Do you have access to technical expertise to build and maintain solutions?",
+      options: [
+        "No.",
+        "Only occasionally — for example a freelancer when needed.",
+        "There is an IT specialist or partner, without AI experience.",
+        "There is a technical team or partner experienced in integrations.",
+        "There is a team or partner experienced in AI, security and maintenance.",
       ],
     },
     people_ownership: {
@@ -169,6 +169,7 @@ export const readinessTool: typeof bgReadinessTool = {
       governance: { title: "Governance and data protection", text: "It isn't clear which data AI would process or who approves its actions. Until it is, keep AI away from customers and personal data." },
       data_quality: { title: "Data quality", text: "The data is incomplete or contradictory. AI would repeat its errors, so sort it out before development." },
       integration: { title: "Access to systems", text: "Your systems don't allow a reliable connection. A solution would need manual steps until an integration is in place." },
+      expertise: { title: "Technical expertise", text: "There is no access to people who can build and maintain the solution. Without that support, nobody can take a pilot into real work." },
       organisation: { title: "Ownership in the team", text: "No one has the time and authority to lead the initiative. Without an owner, pilots rarely make it into real work." },
     },
     strengthsTitle: "Strengths",
@@ -184,8 +185,9 @@ export const readinessTool: typeof bgReadinessTool = {
       ownership_first: { title: "Name an owner", text: "Appoint someone with time and authority who knows the process and decides when the solution is ready for real work." },
       strategy_definition: { title: "Tie AI to a business goal", text: "Pick one measurable goal and rate ideas by benefit, effort and risk to choose the first use case." },
       data_foundation: { title: "Make the data accessible", text: "Bring the data for the chosen use case into a system with an API or a regular export, rather than scattered files." },
-      process_mapping: { title: "Document one process step by step", text: "Map the steps, exceptions and volume — the foundation for any automation or agent." },
       tech_foundation: { title: "Prepare the technical setup", text: "A test environment, change control and monitoring reduce the risk of the first deployment." },
+      expertise_first: { title: "Secure technical support", text: "Decide who will build, integrate and maintain the solution — an internal person or a partner with a clear scope." },
+      talent_enablement: { title: "Build the team's skills", text: "Short hands-on training on real tasks, and clear rules on what may and may not be done with AI." },
       people_enablement: { title: "Prepare the team for change", text: "Set aside time for testing, explain what AI will do and what stays with people, and collect feedback." },
       governance_framework: { title: "Strengthen governance", text: "Add approval rules, an action log and periodic risk reviews." },
       discovery_workshop: { title: "Hold a discovery conversation", text: "A short, structured look at your processes and data that ends with one chosen use case and a plan." },
@@ -220,14 +222,31 @@ export const readinessTool: typeof bgReadinessTool = {
     },
     methodologyTitle: "How the score is calculated",
     methodology: {
-      scale: "Each question has five levels, from 0 (absent) to 4 (established practice). Each dimension has two questions and is expressed from 0 to 100.",
-      weights: "The overall score is a weighted sum of the dimensions: strategy 15%, data 20%, processes 15%, technology 15%, people 15% and governance 20%. Data and governance weigh more because they are what most often stops AI projects.",
-      bands: "Stages: 0–24 exploration, 25–49 foundation building, 50–74 pilot ready, 75–100 scaling readiness.",
-      blockers: "Some answers are flagged as blockers regardless of the overall score — for example unclear rules for personal data or very poor data quality.",
-      disclaimer: "This is an indicative self-assessment, not a certification or an audit. The result on this page is calculated in your browser and contains no forecasts of savings or results.",
+      scale: "Twelve questions, two in each of the six dimensions. Every answer has five levels — from 0 (absent) to 4 (established practice). A dimension's score is the sum of its two answers divided by 8, expressed from 0 to 100.",
+      weights: "The overall score is a weighted sum of the dimensions: strategy 15%, infrastructure 15%, data 20%, governance 20%, talent and skills 15%, organizational readiness 15%. Data and governance weigh more because they most often stop AI projects — this is our expert judgement, not an external standard.",
+      bands: "Stages: 0–24 exploration, 25–49 building foundations, 50–74 ready for a pilot, 75–100 ready to scale.",
+      blockers: "Some answers are flagged as blockers regardless of the overall score — for example unclear rules for personal data, very poor data quality or no access to technical expertise.",
+      disclaimer: "This is an indicative self-assessment, not a certified or scientifically validated maturity model. The result on this page is calculated in your browser and contains no forecasts of savings or results.",
+      limitationsTitle: "Limitations",
+      limitations: [
+        "The result depends entirely on your answers; we do not inspect your systems or processes.",
+        "It is not compared with other companies or industry figures — there is no external benchmark.",
+        "The weights and thresholds are our expert judgement, not a scientifically validated standard.",
+        "Twelve questions cannot cover everything — industry requirements, budget and timing are clarified in a conversation.",
+      ],
     },
     note: "An indicative self-assessment, not a certification. The result is calculated in your browser; your answers are sent only if you download the PDF report or send them to our team.",
     summaryHeading: "AI readiness assessment — summary",
+  },
+  methodologyPage: {
+    title: "Methodology and limitations",
+    lead: "How the score is calculated, what each stage means and what the assessment cannot tell you. We publish the method so you can check the result yourself.",
+    bandsTitle: "The four stages",
+    rangeLabel: "{min}–{max} points",
+  },
+  workshops: {
+    title: "Workshops and consultant-led assessments",
+    text: "If you would rather start together, see the fixed-scope formats in these domains:",
   },
   report: {
     title: "Personalised PDF report",

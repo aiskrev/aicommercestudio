@@ -113,7 +113,7 @@ describe("AI readiness assessment", () => {
   });
 
   it("restores a complete shared result from the link", async () => {
-    window.history.replaceState(null, "", "/en/tools/ai-readiness?r=444444444444");
+    window.history.replaceState(null, "", "/en/tools/ai-readiness?r=b444444444444");
     render(<ReadinessAssessment content={readinessTool} ui={tools.ui} services={services} contactHref="/en/contact" privacyHref="/en/privacy" locale="en" />);
     expect(await screen.findByTestId("tool-score")).toHaveTextContent("100");
     expect(screen.getByText(tools.ui.linkRestored)).toBeInTheDocument();

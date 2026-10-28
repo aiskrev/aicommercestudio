@@ -82,7 +82,9 @@ only on an explicit action, and the server re-scores them every time:
 * **Send the result to the team** (optional form) — creates an inquiry with contact details, answer
   levels and the server-computed result, kept for `READINESS_RETENTION_DAYS`.
 
-The share link contains a 12-digit answer code (`?r=`), never personal data. Details, API and
+The share link contains the answer code (`?r=b` + 12 digits, one per question), never personal
+data. Codes of the previous question set (12 digits without the `b` prefix) are not decoded, so an old
+link opens the empty form instead of mapping its answers onto different questions. Details, API and
 privacy assumptions: [READINESS_REPORTS.md](READINESS_REPORTS.md).
 
 ## States
@@ -93,18 +95,26 @@ Validation: per-step `ChoiceQuestion` errors (fieldset `aria-invalid` + `aria-de
 step-level error summary; focus moves to the first invalid answer, and to the next step's heading
 on success.
 
-## Readiness model (`lib/readiness.ts`)
+## Readiness model (`lib/readiness.ts`, model `2026-11.1`)
 
-Self-assessment, never a certification. Six dimensions, two questions each, answers 0–4.
+An indicative self-assessment — not a certified or scientifically validated maturity score, and
+not compared with any external benchmark. Six dimensions, two questions each, answers 0–4. The
+methodology and limitations are published on the tool page (`ReadinessMethodology`, `#methodology`),
+generated from the same constants the score uses.
 
 | Dimension | Weight | Questions |
 | --- | --- | --- |
 | Strategy | 15% | `strategy_goals`, `strategy_use_cases` |
+| Infrastructure | 15% | `tech_integration`, `tech_environment` |
 | Data | 20% | `data_access`, `data_quality` |
-| Process | 15% | `process_definition`, `process_repeatability` |
-| Technology & integration | 15% | `tech_integration`, `tech_environment` |
-| People & change | 15% | `people_ownership`, `people_change` |
-| Governance, security & risk | 20% | `gov_data_protection`, `gov_oversight` |
+| Governance | 20% | `gov_data_protection`, `gov_oversight` |
+| Talent and skills | 15% | `talent_skills`, `talent_support` |
+| Organizational readiness | 15% | `people_ownership`, `people_change` |
+
+Model `2026-10.2` (strategy, data, process, technology, people, governance) is retired for new
+scores. Its submissions keep their stored result: the admin view and the PDF use the stored
+`model_version` (`LEGACY_WEIGHTS` in `app/readiness/scoring.py`; the report texts keep the old
+dimension and action names).
 
 * Dimension score = (sum of its two answers / 8) × 100, rounded.
 * Weights are normalised at run time (sum = 1). Overall = Σ exact dimension ratio × 100 × weight,
@@ -113,15 +123,24 @@ Self-assessment, never a certification. Six dimensions, two questions each, answ
   75–100 scaling readiness.
 * Missing or invalid answers (not an integer 0–4) → `{ complete: false, missing: [...] }`; no score.
 * Blockers (independent of the score, priority order): governance (data protection ≤ 1 or
-  oversight = 0), data quality (≤ 1), integration (`tech_integration` ≤ 1), organisation
-  (ownership ≤ 1 or `people_change` = 0).
+  oversight = 0), data quality (≤ 1), integration (`tech_integration` ≤ 1), expertise
+  (`talent_support` = 0, no access to technical expertise), organisation (ownership ≤ 1 or
+  `people_change` = 0).
 * Actions (always three): positions 1–2 = blocker actions in priority order, then gap actions
   weakest-first (dimensions covered by a blocker skipped), then the remaining dimensions lowest-first;
   position 3 = the band's next step (discovery workshop / foundation plan / scoped pilot / scale
   operations). Each action links to a service (`ACTION_SERVICE`).
 * Strengths: dimensions ≥ 75 (else the best one if ≥ 50). Gaps: < 50, weakest first.
-* Use cases: gated by dimension minimums (e.g. inquiry triage needs process ≥ 50 and technology
-  ≥ 50); up to three, otherwise "process mapping".
+* Use cases: gated by dimension minimums (inquiry triage: infrastructure and organization ≥ 50;
+  document extraction: data ≥ 25 and infrastructure ≥ 50; knowledge assistant: data and governance
+  ≥ 50; reply drafting: organization and governance ≥ 50; reporting summaries: data ≥ 50); up to
+  three, otherwise "process mapping".
+* Next steps: each action links its service; the result also links the AI strategy and the advisory
+  and enablement hubs, which list the published workshops and consultant-led assessments (or say
+  that none are published yet).
+* Golden vectors: `apps/api/scripts/gen_readiness_vectors.py` regenerates them deterministically
+  (minimum, maximum, every uniform level, both sides of each band threshold, each blocker alone,
+  seeded random sets); copy the file to `apps/web/src/lib/readiness.vectors.json`.
 * Roadmap: blocker actions go into days 1–30 (the first two) and 31–60, plus the band's 30/60/90
   milestones.
 

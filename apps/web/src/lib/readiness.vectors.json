@@ -1,5 +1,5 @@
 {
- "model_version": "2026-10.2",
+ "model_version": "2026-11.1",
  "vectors": [
   {
    "answers": {
@@ -9,43 +9,968 @@
     "gov_oversight": 0,
     "people_change": 0,
     "people_ownership": 0,
-    "process_definition": 0,
-    "process_repeatability": 0,
     "strategy_goals": 0,
     "strategy_use_cases": 0,
+    "talent_skills": 0,
+    "talent_support": 0,
     "tech_environment": 0,
     "tech_integration": 0
    },
    "expected": {
+    "overall": 0,
+    "band": "exploration",
+    "dimensions": {
+     "strategy": 0,
+     "infrastructure": 0,
+     "data": 0,
+     "governance": 0,
+     "talent": 0,
+     "organization": 0
+    },
+    "blockers": [
+     "governance",
+     "data_quality",
+     "integration",
+     "expertise",
+     "organisation"
+    ],
+    "strengths": [],
+    "gaps": [
+     "strategy",
+     "infrastructure",
+     "data",
+     "governance",
+     "talent",
+     "organization"
+    ],
     "actions": [
      "governance_first",
      "data_quality_first",
      "discovery_workshop"
     ],
-    "band": "exploration",
+    "use_cases": [
+     "process_discovery"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "data_quality_first",
+      "exploration_d30"
+     ],
+     "d60": [
+      "integration_path",
+      "expertise_first",
+      "ownership_first",
+      "exploration_d60"
+     ],
+     "d90": [
+      "exploration_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 1,
+    "data_quality": 1,
+    "gov_data_protection": 1,
+    "gov_oversight": 1,
+    "people_change": 1,
+    "people_ownership": 1,
+    "strategy_goals": 1,
+    "strategy_use_cases": 1,
+    "talent_skills": 1,
+    "talent_support": 1,
+    "tech_environment": 1,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 25,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 25,
+     "data": 25,
+     "governance": 25,
+     "talent": 25,
+     "organization": 25
+    },
     "blockers": [
      "governance",
      "data_quality",
      "integration",
      "organisation"
     ],
-    "dimensions": {
-     "data": 0,
-     "governance": 0,
-     "people": 0,
-     "process": 0,
-     "strategy": 0,
-     "technology": 0
-    },
+    "strengths": [],
     "gaps": [
      "strategy",
+     "infrastructure",
      "data",
-     "process",
-     "technology",
-     "people",
+     "governance",
+     "talent",
+     "organization"
+    ],
+    "actions": [
+     "governance_first",
+     "data_quality_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "data_quality_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "integration_path",
+      "ownership_first",
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 2,
+    "data_quality": 2,
+    "gov_data_protection": 2,
+    "gov_oversight": 2,
+    "people_change": 2,
+    "people_ownership": 2,
+    "strategy_goals": 2,
+    "strategy_use_cases": 2,
+    "talent_skills": 2,
+    "talent_support": 2,
+    "tech_environment": 2,
+    "tech_integration": 2
+   },
+   "expected": {
+    "overall": 50,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 50,
+     "infrastructure": 50,
+     "data": 50,
+     "governance": 50,
+     "talent": 50,
+     "organization": 50
+    },
+    "blockers": [],
+    "strengths": [
+     "organization"
+    ],
+    "gaps": [],
+    "actions": [
+     "strategy_definition",
+     "tech_foundation",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 3,
+    "gov_data_protection": 3,
+    "gov_oversight": 3,
+    "people_change": 3,
+    "people_ownership": 3,
+    "strategy_goals": 3,
+    "strategy_use_cases": 3,
+    "talent_skills": 3,
+    "talent_support": 3,
+    "tech_environment": 3,
+    "tech_integration": 3
+   },
+   "expected": {
+    "overall": 75,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 75,
+     "infrastructure": 75,
+     "data": 75,
+     "governance": 75,
+     "talent": 75,
+     "organization": 75
+    },
+    "blockers": [],
+    "strengths": [
+     "organization",
+     "talent",
+     "governance",
+     "data",
+     "infrastructure",
+     "strategy"
+    ],
+    "gaps": [],
+    "actions": [
+     "strategy_definition",
+     "tech_foundation",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 4,
+    "people_change": 4,
+    "people_ownership": 4,
+    "strategy_goals": 4,
+    "strategy_use_cases": 4,
+    "talent_skills": 4,
+    "talent_support": 4,
+    "tech_environment": 4,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 100,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 100,
+     "data": 100,
+     "governance": 100,
+     "talent": 100,
+     "organization": 100
+    },
+    "blockers": [],
+    "strengths": [
+     "organization",
+     "talent",
+     "governance",
+     "data",
+     "infrastructure",
+     "strategy"
+    ],
+    "gaps": [],
+    "actions": [
+     "strategy_definition",
+     "tech_foundation",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 1,
+    "gov_oversight": 4,
+    "people_change": 4,
+    "people_ownership": 4,
+    "strategy_goals": 4,
+    "strategy_use_cases": 4,
+    "talent_skills": 4,
+    "talent_support": 4,
+    "tech_environment": 4,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 93,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 100,
+     "data": 100,
+     "governance": 63,
+     "talent": 100,
+     "organization": 100
+    },
+    "blockers": [
      "governance"
     ],
-    "overall": 0,
+    "strengths": [
+     "organization",
+     "talent",
+     "data",
+     "infrastructure",
+     "strategy"
+    ],
+    "gaps": [],
+    "actions": [
+     "governance_first",
+     "strategy_definition",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 0,
+    "people_change": 4,
+    "people_ownership": 4,
+    "strategy_goals": 4,
+    "strategy_use_cases": 4,
+    "talent_skills": 4,
+    "talent_support": 4,
+    "tech_environment": 4,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 90,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 100,
+     "data": 100,
+     "governance": 50,
+     "talent": 100,
+     "organization": 100
+    },
+    "blockers": [
+     "governance"
+    ],
+    "strengths": [
+     "organization",
+     "talent",
+     "data",
+     "infrastructure",
+     "strategy"
+    ],
+    "gaps": [],
+    "actions": [
+     "governance_first",
+     "strategy_definition",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 1,
+    "gov_data_protection": 4,
+    "gov_oversight": 4,
+    "people_change": 4,
+    "people_ownership": 4,
+    "strategy_goals": 4,
+    "strategy_use_cases": 4,
+    "talent_skills": 4,
+    "talent_support": 4,
+    "tech_environment": 4,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 93,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 100,
+     "data": 63,
+     "governance": 100,
+     "talent": 100,
+     "organization": 100
+    },
+    "blockers": [
+     "data_quality"
+    ],
+    "strengths": [
+     "organization",
+     "talent",
+     "governance",
+     "infrastructure",
+     "strategy"
+    ],
+    "gaps": [],
+    "actions": [
+     "data_quality_first",
+     "strategy_definition",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "data_quality_first",
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 4,
+    "people_change": 4,
+    "people_ownership": 4,
+    "strategy_goals": 4,
+    "strategy_use_cases": 4,
+    "talent_skills": 4,
+    "talent_support": 4,
+    "tech_environment": 4,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 94,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 63,
+     "data": 100,
+     "governance": 100,
+     "talent": 100,
+     "organization": 100
+    },
+    "blockers": [
+     "integration"
+    ],
+    "strengths": [
+     "organization",
+     "talent",
+     "governance",
+     "data",
+     "strategy"
+    ],
+    "gaps": [],
+    "actions": [
+     "integration_path",
+     "strategy_definition",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "integration_path",
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 4,
+    "people_change": 4,
+    "people_ownership": 4,
+    "strategy_goals": 4,
+    "strategy_use_cases": 4,
+    "talent_skills": 4,
+    "talent_support": 0,
+    "tech_environment": 4,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 93,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 100,
+     "data": 100,
+     "governance": 100,
+     "talent": 50,
+     "organization": 100
+    },
+    "blockers": [
+     "expertise"
+    ],
+    "strengths": [
+     "organization",
+     "governance",
+     "data",
+     "infrastructure",
+     "strategy"
+    ],
+    "gaps": [],
+    "actions": [
+     "expertise_first",
+     "strategy_definition",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "expertise_first",
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 4,
+    "people_change": 4,
+    "people_ownership": 1,
+    "strategy_goals": 4,
+    "strategy_use_cases": 4,
+    "talent_skills": 4,
+    "talent_support": 4,
+    "tech_environment": 4,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 94,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 100,
+     "data": 100,
+     "governance": 100,
+     "talent": 100,
+     "organization": 63
+    },
+    "blockers": [
+     "organisation"
+    ],
+    "strengths": [
+     "talent",
+     "governance",
+     "data",
+     "infrastructure",
+     "strategy"
+    ],
+    "gaps": [],
+    "actions": [
+     "ownership_first",
+     "strategy_definition",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "ownership_first",
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 4,
+    "people_change": 0,
+    "people_ownership": 4,
+    "strategy_goals": 4,
+    "strategy_use_cases": 4,
+    "talent_skills": 4,
+    "talent_support": 4,
+    "tech_environment": 4,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 93,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 100,
+     "data": 100,
+     "governance": 100,
+     "talent": 100,
+     "organization": 50
+    },
+    "blockers": [
+     "organisation"
+    ],
+    "strengths": [
+     "talent",
+     "governance",
+     "data",
+     "infrastructure",
+     "strategy"
+    ],
+    "gaps": [],
+    "actions": [
+     "ownership_first",
+     "strategy_definition",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "ownership_first",
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 1,
+    "people_change": 4,
+    "people_ownership": 3,
+    "strategy_goals": 0,
+    "strategy_use_cases": 0,
+    "talent_skills": 1,
+    "talent_support": 0,
+    "tech_environment": 1,
+    "tech_integration": 0
+   },
+   "expected": {
+    "overall": 49,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 0,
+     "infrastructure": 13,
+     "data": 100,
+     "governance": 63,
+     "talent": 13,
+     "organization": 88
+    },
+    "blockers": [
+     "integration",
+     "expertise"
+    ],
+    "strengths": [
+     "data",
+     "organization"
+    ],
+    "gaps": [
+     "strategy",
+     "infrastructure",
+     "talent"
+    ],
+    "actions": [
+     "integration_path",
+     "expertise_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "knowledge_assistant",
+     "reply_drafting",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "integration_path",
+      "expertise_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 0,
+    "gov_data_protection": 4,
+    "gov_oversight": 3,
+    "people_change": 4,
+    "people_ownership": 0,
+    "strategy_goals": 0,
+    "strategy_use_cases": 1,
+    "talent_skills": 2,
+    "talent_support": 4,
+    "tech_environment": 0,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 50,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 13,
+     "infrastructure": 13,
+     "data": 50,
+     "governance": 88,
+     "talent": 75,
+     "organization": 50
+    },
+    "blockers": [
+     "data_quality",
+     "integration",
+     "organisation"
+    ],
+    "strengths": [
+     "governance",
+     "talent"
+    ],
+    "gaps": [
+     "strategy",
+     "infrastructure"
+    ],
+    "actions": [
+     "data_quality_first",
+     "integration_path",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "knowledge_assistant",
+     "reply_drafting",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "data_quality_first",
+      "integration_path",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "ownership_first",
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 3,
+    "people_change": 4,
+    "people_ownership": 2,
+    "strategy_goals": 0,
+    "strategy_use_cases": 2,
+    "talent_skills": 0,
+    "talent_support": 4,
+    "tech_environment": 4,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 75,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 100,
+     "data": 100,
+     "governance": 88,
+     "talent": 50,
+     "organization": 75
+    },
+    "blockers": [],
+    "strengths": [
+     "data",
+     "infrastructure",
+     "governance",
+     "organization"
+    ],
+    "gaps": [
+     "strategy"
+    ],
+    "actions": [
+     "strategy_definition",
+     "talent_enablement",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "scaling_d30"
+     ],
+     "d60": [
+      "scaling_d60"
+     ],
+     "d90": [
+      "scaling_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 1,
+    "gov_data_protection": 0,
+    "gov_oversight": 2,
+    "people_change": 0,
+    "people_ownership": 0,
+    "strategy_goals": 0,
+    "strategy_use_cases": 0,
+    "talent_skills": 1,
+    "talent_support": 3,
+    "tech_environment": 4,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 24,
+    "band": "exploration",
+    "dimensions": {
+     "strategy": 0,
+     "infrastructure": 63,
+     "data": 13,
+     "governance": 25,
+     "talent": 50,
+     "organization": 0
+    },
+    "blockers": [
+     "governance",
+     "data_quality",
+     "integration",
+     "organisation"
+    ],
+    "strengths": [
+     "infrastructure"
+    ],
+    "gaps": [
+     "strategy",
+     "organization",
+     "data",
+     "governance"
+    ],
+    "actions": [
+     "governance_first",
+     "data_quality_first",
+     "discovery_workshop"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
     "roadmap": {
      "d30": [
       "governance_first",
@@ -60,58 +985,246 @@
      "d90": [
       "exploration_d90"
      ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 3,
+    "people_change": 3,
+    "people_ownership": 4,
+    "strategy_goals": 1,
+    "strategy_use_cases": 0,
+    "talent_skills": 4,
+    "talent_support": 3,
+    "tech_environment": 2,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 74,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 13,
+     "infrastructure": 75,
+     "data": 88,
+     "governance": 88,
+     "talent": 88,
+     "organization": 88
     },
-    "strengths": [],
+    "blockers": [],
+    "strengths": [
+     "organization",
+     "talent",
+     "governance",
+     "data",
+     "infrastructure"
+    ],
+    "gaps": [
+     "strategy"
+    ],
+    "actions": [
+     "strategy_definition",
+     "tech_foundation",
+     "scoped_pilot"
+    ],
     "use_cases": [
-     "process_discovery"
-    ]
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
    }
   },
   {
    "answers": {
     "data_access": 1,
-    "data_quality": 1,
+    "data_quality": 0,
     "gov_data_protection": 1,
-    "gov_oversight": 1,
-    "people_change": 1,
-    "people_ownership": 1,
-    "process_definition": 1,
-    "process_repeatability": 1,
+    "gov_oversight": 2,
+    "people_change": 0,
+    "people_ownership": 0,
     "strategy_goals": 1,
-    "strategy_use_cases": 1,
-    "tech_environment": 1,
-    "tech_integration": 1
+    "strategy_use_cases": 2,
+    "talent_skills": 0,
+    "talent_support": 0,
+    "tech_environment": 3,
+    "tech_integration": 2
    },
    "expected": {
+    "overall": 25,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 38,
+     "infrastructure": 63,
+     "data": 13,
+     "governance": 38,
+     "talent": 0,
+     "organization": 0
+    },
+    "blockers": [
+     "governance",
+     "data_quality",
+     "expertise",
+     "organisation"
+    ],
+    "strengths": [
+     "infrastructure"
+    ],
+    "gaps": [
+     "talent",
+     "organization",
+     "data",
+     "strategy",
+     "governance"
+    ],
     "actions": [
      "governance_first",
      "data_quality_first",
      "foundation_plan"
     ],
+    "use_cases": [
+     "process_discovery"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "data_quality_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "expertise_first",
+      "ownership_first",
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 1,
+    "gov_data_protection": 2,
+    "gov_oversight": 2,
+    "people_change": 2,
+    "people_ownership": 0,
+    "strategy_goals": 1,
+    "strategy_use_cases": 3,
+    "talent_skills": 1,
+    "talent_support": 2,
+    "tech_environment": 1,
+    "tech_integration": 3
+   },
+   "expected": {
+    "overall": 37,
     "band": "foundation",
+    "dimensions": {
+     "strategy": 50,
+     "infrastructure": 50,
+     "data": 13,
+     "governance": 50,
+     "talent": 38,
+     "organization": 25
+    },
+    "blockers": [
+     "data_quality",
+     "organisation"
+    ],
+    "strengths": [
+     "governance"
+    ],
+    "gaps": [
+     "data",
+     "organization",
+     "talent"
+    ],
+    "actions": [
+     "data_quality_first",
+     "ownership_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
+    "roadmap": {
+     "d30": [
+      "data_quality_first",
+      "ownership_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 0,
+    "gov_data_protection": 1,
+    "gov_oversight": 2,
+    "people_change": 2,
+    "people_ownership": 4,
+    "strategy_goals": 0,
+    "strategy_use_cases": 0,
+    "talent_skills": 2,
+    "talent_support": 1,
+    "tech_environment": 2,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 30,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 0,
+     "infrastructure": 38,
+     "data": 0,
+     "governance": 38,
+     "talent": 38,
+     "organization": 75
+    },
     "blockers": [
      "governance",
      "data_quality",
-     "integration",
-     "organisation"
+     "integration"
     ],
-    "dimensions": {
-     "data": 25,
-     "governance": 25,
-     "people": 25,
-     "process": 25,
-     "strategy": 25,
-     "technology": 25
-    },
+    "strengths": [
+     "organization"
+    ],
     "gaps": [
      "strategy",
      "data",
-     "process",
-     "technology",
-     "people",
-     "governance"
+     "infrastructure",
+     "governance",
+     "talent"
     ],
-    "overall": 25,
+    "actions": [
+     "governance_first",
+     "data_quality_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
     "roadmap": {
      "d30": [
       "governance_first",
@@ -120,415 +1233,64 @@
      ],
      "d60": [
       "integration_path",
-      "ownership_first",
       "foundation_d60"
      ],
      "d90": [
       "foundation_d90"
      ]
-    },
-    "strengths": [],
-    "use_cases": [
-     "process_discovery"
-    ]
+    }
    }
   },
   {
    "answers": {
-    "data_access": 2,
-    "data_quality": 2,
-    "gov_data_protection": 2,
-    "gov_oversight": 2,
-    "people_change": 2,
-    "people_ownership": 2,
-    "process_definition": 2,
-    "process_repeatability": 2,
-    "strategy_goals": 2,
-    "strategy_use_cases": 2,
-    "tech_environment": 2,
-    "tech_integration": 2
-   },
-   "expected": {
-    "actions": [
-     "strategy_definition",
-     "data_foundation",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [],
-    "dimensions": {
-     "data": 50,
-     "governance": 50,
-     "people": 50,
-     "process": 50,
-     "strategy": 50,
-     "technology": 50
-    },
-    "gaps": [],
-    "overall": 50,
-    "roadmap": {
-     "d30": [
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 3,
-    "gov_data_protection": 3,
-    "gov_oversight": 3,
-    "people_change": 3,
-    "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 3,
-    "strategy_use_cases": 3,
-    "tech_environment": 3,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "strategy_definition",
-     "data_foundation",
-     "scale_operations"
-    ],
-    "band": "scaling",
-    "blockers": [],
-    "dimensions": {
-     "data": 75,
-     "governance": 75,
-     "people": 75,
-     "process": 75,
-     "strategy": 75,
-     "technology": 75
-    },
-    "gaps": [],
-    "overall": 75,
-    "roadmap": {
-     "d30": [
-      "scaling_d30"
-     ],
-     "d60": [
-      "scaling_d60"
-     ],
-     "d90": [
-      "scaling_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "people",
-     "technology",
-     "process",
-     "data",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
+    "data_access": 0,
     "data_quality": 4,
-    "gov_data_protection": 4,
+    "gov_data_protection": 1,
     "gov_oversight": 4,
     "people_change": 4,
-    "people_ownership": 4,
-    "process_definition": 4,
-    "process_repeatability": 4,
-    "strategy_goals": 4,
-    "strategy_use_cases": 4,
-    "tech_environment": 4,
-    "tech_integration": 4
-   },
-   "expected": {
-    "actions": [
-     "strategy_definition",
-     "data_foundation",
-     "scale_operations"
-    ],
-    "band": "scaling",
-    "blockers": [],
-    "dimensions": {
-     "data": 100,
-     "governance": 100,
-     "people": 100,
-     "process": 100,
-     "strategy": 100,
-     "technology": 100
-    },
-    "gaps": [],
-    "overall": 100,
-    "roadmap": {
-     "d30": [
-      "scaling_d30"
-     ],
-     "d60": [
-      "scaling_d60"
-     ],
-     "d90": [
-      "scaling_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "people",
-     "technology",
-     "process",
-     "data",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 3,
-    "gov_data_protection": 1,
-    "gov_oversight": 3,
-    "people_change": 3,
     "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 3,
+    "strategy_goals": 0,
     "strategy_use_cases": 3,
-    "tech_environment": 3,
-    "tech_integration": 3
+    "talent_skills": 1,
+    "talent_support": 3,
+    "tech_environment": 2,
+    "tech_integration": 1
    },
    "expected": {
-    "actions": [
-     "governance_first",
-     "strategy_definition",
-     "scoped_pilot"
-    ],
+    "overall": 54,
     "band": "pilot_ready",
-    "blockers": [
-     "governance"
-    ],
     "dimensions": {
-     "data": 75,
-     "governance": 50,
-     "people": 75,
-     "process": 75,
-     "strategy": 75,
-     "technology": 75
-    },
-    "gaps": [],
-    "overall": 70,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "people",
-     "technology",
-     "process",
-     "data",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 3,
-    "gov_data_protection": 3,
-    "gov_oversight": 0,
-    "people_change": 3,
-    "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 3,
-    "strategy_use_cases": 3,
-    "tech_environment": 3,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "strategy_definition",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance"
-    ],
-    "dimensions": {
-     "data": 75,
-     "governance": 38,
-     "people": 75,
-     "process": 75,
-     "strategy": 75,
-     "technology": 75
-    },
-    "gaps": [
-     "governance"
-    ],
-    "overall": 68,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "people",
-     "technology",
-     "process",
-     "data",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 1,
-    "gov_data_protection": 3,
-    "gov_oversight": 3,
-    "people_change": 3,
-    "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 3,
-    "strategy_use_cases": 3,
-    "tech_environment": 3,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "data_quality_first",
-     "strategy_definition",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "data_quality"
-    ],
-    "dimensions": {
+     "strategy": 38,
+     "infrastructure": 38,
      "data": 50,
-     "governance": 75,
-     "people": 75,
-     "process": 75,
-     "strategy": 75,
-     "technology": 75
+     "governance": 63,
+     "talent": 50,
+     "organization": 88
     },
-    "gaps": [],
-    "overall": 70,
-    "roadmap": {
-     "d30": [
-      "data_quality_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "people",
-     "technology",
-     "process",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 3,
-    "gov_data_protection": 3,
-    "gov_oversight": 3,
-    "people_change": 3,
-    "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 3,
-    "strategy_use_cases": 3,
-    "tech_environment": 3,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "integration_path",
-     "strategy_definition",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
     "blockers": [
+     "governance",
      "integration"
     ],
-    "dimensions": {
-     "data": 75,
-     "governance": 75,
-     "people": 75,
-     "process": 75,
-     "strategy": 75,
-     "technology": 38
-    },
-    "gaps": [
-     "technology"
+    "strengths": [
+     "organization"
     ],
-    "overall": 69,
+    "gaps": [
+     "strategy",
+     "infrastructure"
+    ],
+    "actions": [
+     "governance_first",
+     "integration_path",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "knowledge_assistant",
+     "reply_drafting",
+     "reporting_summary"
+    ],
     "roadmap": {
      "d30": [
+      "governance_first",
       "integration_path",
       "pilot_ready_d30"
      ],
@@ -538,122 +1300,61 @@
      "d90": [
       "pilot_ready_d90"
      ]
-    },
-    "strengths": [
-     "governance",
-     "people",
-     "process",
-     "data",
-     "strategy"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "knowledge_assistant",
-     "reply_drafting"
-    ]
+    }
    }
   },
   {
    "answers": {
-    "data_access": 3,
+    "data_access": 4,
     "data_quality": 3,
-    "gov_data_protection": 3,
-    "gov_oversight": 3,
-    "people_change": 3,
-    "people_ownership": 1,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 3,
-    "strategy_use_cases": 3,
-    "tech_environment": 3,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "ownership_first",
-     "strategy_definition",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 75,
-     "governance": 75,
-     "people": 50,
-     "process": 75,
-     "strategy": 75,
-     "technology": 75
-    },
-    "gaps": [],
-    "overall": 71,
-    "roadmap": {
-     "d30": [
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "technology",
-     "process",
-     "data",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 3,
-    "gov_data_protection": 3,
-    "gov_oversight": 3,
-    "people_change": 0,
+    "gov_data_protection": 4,
+    "gov_oversight": 0,
+    "people_change": 1,
     "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 3,
     "strategy_goals": 3,
-    "strategy_use_cases": 3,
-    "tech_environment": 3,
-    "tech_integration": 3
+    "strategy_use_cases": 4,
+    "talent_skills": 2,
+    "talent_support": 4,
+    "tech_environment": 1,
+    "tech_integration": 1
    },
    "expected": {
+    "overall": 63,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 88,
+     "infrastructure": 25,
+     "data": 88,
+     "governance": 50,
+     "talent": 75,
+     "organization": 50
+    },
+    "blockers": [
+     "governance",
+     "integration"
+    ],
+    "strengths": [
+     "data",
+     "strategy",
+     "talent"
+    ],
+    "gaps": [
+     "infrastructure"
+    ],
     "actions": [
-     "ownership_first",
-     "strategy_definition",
+     "governance_first",
+     "integration_path",
      "scoped_pilot"
     ],
-    "band": "pilot_ready",
-    "blockers": [
-     "organisation"
+    "use_cases": [
+     "knowledge_assistant",
+     "reply_drafting",
+     "reporting_summary"
     ],
-    "dimensions": {
-     "data": 75,
-     "governance": 75,
-     "people": 38,
-     "process": 75,
-     "strategy": 75,
-     "technology": 75
-    },
-    "gaps": [
-     "people"
-    ],
-    "overall": 69,
     "roadmap": {
      "d30": [
-      "ownership_first",
+      "governance_first",
+      "integration_path",
       "pilot_ready_d30"
      ],
      "d60": [
@@ -662,19 +1363,128 @@
      "d90": [
       "pilot_ready_d90"
      ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 4,
+    "gov_data_protection": 1,
+    "gov_oversight": 0,
+    "people_change": 0,
+    "people_ownership": 2,
+    "strategy_goals": 1,
+    "strategy_use_cases": 1,
+    "talent_skills": 2,
+    "talent_support": 1,
+    "tech_environment": 0,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 43,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 50,
+     "data": 100,
+     "governance": 13,
+     "talent": 38,
+     "organization": 25
     },
+    "blockers": [
+     "governance",
+     "organisation"
+    ],
+    "strengths": [
+     "data"
+    ],
+    "gaps": [
+     "governance",
+     "strategy",
+     "organization",
+     "talent"
+    ],
+    "actions": [
+     "governance_first",
+     "ownership_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "document_extraction",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "ownership_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 4,
+    "gov_data_protection": 3,
+    "gov_oversight": 4,
+    "people_change": 2,
+    "people_ownership": 3,
+    "strategy_goals": 2,
+    "strategy_use_cases": 0,
+    "talent_skills": 0,
+    "talent_support": 1,
+    "tech_environment": 2,
+    "tech_integration": 3
+   },
+   "expected": {
+    "overall": 59,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 63,
+     "data": 88,
+     "governance": 88,
+     "talent": 13,
+     "organization": 63
+    },
+    "blockers": [],
     "strengths": [
      "governance",
-     "technology",
-     "process",
-     "data",
+     "data"
+    ],
+    "gaps": [
+     "talent",
      "strategy"
+    ],
+    "actions": [
+     "talent_enablement",
+     "strategy_definition",
+     "scoped_pilot"
     ],
     "use_cases": [
      "inquiry_triage",
      "document_extraction",
      "knowledge_assistant"
-    ]
+    ],
+    "roadmap": {
+     "d30": [
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
    }
   },
   {
@@ -682,164 +1492,173 @@
     "data_access": 3,
     "data_quality": 0,
     "gov_data_protection": 3,
-    "gov_oversight": 0,
-    "people_change": 3,
-    "people_ownership": 0,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 3,
-    "strategy_use_cases": 3,
-    "tech_environment": 3,
-    "tech_integration": 0
+    "gov_oversight": 4,
+    "people_change": 0,
+    "people_ownership": 3,
+    "strategy_goals": 1,
+    "strategy_use_cases": 1,
+    "talent_skills": 0,
+    "talent_support": 0,
+    "tech_environment": 2,
+    "tech_integration": 2
    },
    "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "foundation_plan"
-    ],
+    "overall": 42,
     "band": "foundation",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 50,
+     "data": 38,
+     "governance": 88,
+     "talent": 0,
+     "organization": 38
+    },
     "blockers": [
-     "governance",
      "data_quality",
-     "integration",
+     "expertise",
      "organisation"
     ],
-    "dimensions": {
-     "data": 38,
-     "governance": 38,
-     "people": 38,
-     "process": 75,
-     "strategy": 75,
-     "technology": 38
-    },
-    "gaps": [
-     "data",
-     "technology",
-     "people",
+    "strengths": [
      "governance"
     ],
-    "overall": 49,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "integration_path",
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "process",
-     "strategy"
+    "gaps": [
+     "talent",
+     "strategy",
+     "data",
+     "organization"
+    ],
+    "actions": [
+     "data_quality_first",
+     "expertise_first",
+     "foundation_plan"
     ],
     "use_cases": [
      "document_extraction"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 3,
-    "gov_data_protection": 3,
-    "gov_oversight": 3,
-    "people_change": 3,
-    "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 3,
-    "strategy_use_cases": 3,
-    "tech_environment": 2,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "tech_foundation",
-     "strategy_definition",
-     "scoped_pilot"
     ],
-    "band": "pilot_ready",
-    "blockers": [],
-    "dimensions": {
-     "data": 75,
-     "governance": 75,
-     "people": 75,
-     "process": 75,
-     "strategy": 75,
-     "technology": 63
-    },
-    "gaps": [],
-    "overall": 73,
     "roadmap": {
      "d30": [
-      "pilot_ready_d30"
+      "data_quality_first",
+      "expertise_first",
+      "foundation_d30"
      ],
      "d60": [
-      "pilot_ready_d60"
+      "ownership_first",
+      "foundation_d60"
      ],
      "d90": [
-      "pilot_ready_d90"
+      "foundation_d90"
      ]
-    },
-    "strengths": [
-     "governance",
-     "people",
-     "process",
-     "data",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
+    }
    }
   },
   {
    "answers": {
-    "data_access": 4,
-    "data_quality": 4,
-    "gov_data_protection": 1,
+    "data_access": 1,
+    "data_quality": 2,
+    "gov_data_protection": 4,
     "gov_oversight": 4,
-    "people_change": 4,
-    "people_ownership": 4,
-    "process_definition": 4,
-    "process_repeatability": 4,
+    "people_change": 0,
+    "people_ownership": 3,
     "strategy_goals": 4,
     "strategy_use_cases": 4,
-    "tech_environment": 4,
-    "tech_integration": 4
+    "talent_skills": 2,
+    "talent_support": 3,
+    "tech_environment": 1,
+    "tech_integration": 1
    },
    "expected": {
-    "actions": [
-     "governance_first",
-     "strategy_definition",
-     "scale_operations"
-    ],
-    "band": "scaling",
-    "blockers": [
-     "governance"
-    ],
+    "overall": 61,
+    "band": "pilot_ready",
     "dimensions": {
-     "data": 100,
-     "governance": 63,
-     "people": 100,
-     "process": 100,
      "strategy": 100,
-     "technology": 100
+     "infrastructure": 25,
+     "data": 38,
+     "governance": 100,
+     "talent": 63,
+     "organization": 38
     },
-    "gaps": [],
-    "overall": 93,
+    "blockers": [
+     "integration",
+     "organisation"
+    ],
+    "strengths": [
+     "governance",
+     "strategy"
+    ],
+    "gaps": [
+     "infrastructure",
+     "data",
+     "organization"
+    ],
+    "actions": [
+     "integration_path",
+     "ownership_first",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
     "roadmap": {
      "d30": [
-      "governance_first",
+      "integration_path",
+      "ownership_first",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 3,
+    "gov_data_protection": 4,
+    "gov_oversight": 4,
+    "people_change": 3,
+    "people_ownership": 2,
+    "strategy_goals": 4,
+    "strategy_use_cases": 3,
+    "talent_skills": 4,
+    "talent_support": 2,
+    "tech_environment": 2,
+    "tech_integration": 2
+   },
+   "expected": {
+    "overall": 79,
+    "band": "scaling",
+    "dimensions": {
+     "strategy": 88,
+     "infrastructure": 50,
+     "data": 88,
+     "governance": 100,
+     "talent": 75,
+     "organization": 63
+    },
+    "blockers": [],
+    "strengths": [
+     "governance",
+     "data",
+     "strategy",
+     "talent"
+    ],
+    "gaps": [],
+    "actions": [
+     "tech_foundation",
+     "people_enablement",
+     "scale_operations"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
       "scaling_d30"
      ],
      "d60": [
@@ -848,120 +1667,432 @@
      "d90": [
       "scaling_d90"
      ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 3,
+    "gov_data_protection": 0,
+    "gov_oversight": 2,
+    "people_change": 2,
+    "people_ownership": 4,
+    "strategy_goals": 2,
+    "strategy_use_cases": 0,
+    "talent_skills": 0,
+    "talent_support": 3,
+    "tech_environment": 0,
+    "tech_integration": 2
+   },
+   "expected": {
+    "overall": 37,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 25,
+     "data": 38,
+     "governance": 25,
+     "talent": 38,
+     "organization": 75
     },
+    "blockers": [
+     "governance"
+    ],
     "strengths": [
-     "people",
-     "technology",
-     "process",
+     "organization"
+    ],
+    "gaps": [
+     "strategy",
+     "infrastructure",
+     "governance",
      "data",
+     "talent"
+    ],
+    "actions": [
+     "governance_first",
+     "strategy_definition",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 0,
+    "gov_data_protection": 1,
+    "gov_oversight": 1,
+    "people_change": 1,
+    "people_ownership": 0,
+    "strategy_goals": 0,
+    "strategy_use_cases": 3,
+    "talent_skills": 1,
+    "talent_support": 0,
+    "tech_environment": 2,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 33,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 38,
+     "infrastructure": 75,
+     "data": 38,
+     "governance": 25,
+     "talent": 13,
+     "organization": 13
+    },
+    "blockers": [
+     "governance",
+     "data_quality",
+     "expertise",
+     "organisation"
+    ],
+    "strengths": [
+     "infrastructure"
+    ],
+    "gaps": [
+     "talent",
+     "organization",
+     "governance",
+     "strategy",
+     "data"
+    ],
+    "actions": [
+     "governance_first",
+     "data_quality_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "document_extraction"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "data_quality_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "expertise_first",
+      "ownership_first",
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 2,
+    "data_quality": 0,
+    "gov_data_protection": 2,
+    "gov_oversight": 3,
+    "people_change": 4,
+    "people_ownership": 0,
+    "strategy_goals": 2,
+    "strategy_use_cases": 2,
+    "talent_skills": 4,
+    "talent_support": 4,
+    "tech_environment": 3,
+    "tech_integration": 0
+   },
+   "expected": {
+    "overall": 53,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 50,
+     "infrastructure": 38,
+     "data": 25,
+     "governance": 63,
+     "talent": 100,
+     "organization": 50
+    },
+    "blockers": [
+     "data_quality",
+     "integration",
+     "organisation"
+    ],
+    "strengths": [
+     "talent"
+    ],
+    "gaps": [
+     "data",
+     "infrastructure"
+    ],
+    "actions": [
+     "data_quality_first",
+     "integration_path",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "reply_drafting"
+    ],
+    "roadmap": {
+     "d30": [
+      "data_quality_first",
+      "integration_path",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "ownership_first",
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 1,
+    "data_quality": 3,
+    "gov_data_protection": 3,
+    "gov_oversight": 2,
+    "people_change": 1,
+    "people_ownership": 3,
+    "strategy_goals": 1,
+    "strategy_use_cases": 0,
+    "talent_skills": 1,
+    "talent_support": 4,
+    "tech_environment": 3,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 54,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 13,
+     "infrastructure": 88,
+     "data": 50,
+     "governance": 63,
+     "talent": 63,
+     "organization": 50
+    },
+    "blockers": [],
+    "strengths": [
+     "infrastructure"
+    ],
+    "gaps": [
      "strategy"
+    ],
+    "actions": [
+     "strategy_definition",
+     "data_foundation",
+     "scoped_pilot"
     ],
     "use_cases": [
      "inquiry_triage",
      "document_extraction",
      "knowledge_assistant"
-    ]
+    ],
+    "roadmap": {
+     "d30": [
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 2,
+    "gov_data_protection": 0,
+    "gov_oversight": 2,
+    "people_change": 4,
+    "people_ownership": 1,
+    "strategy_goals": 1,
+    "strategy_use_cases": 2,
+    "talent_skills": 2,
+    "talent_support": 3,
+    "tech_environment": 0,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 52,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 38,
+     "infrastructure": 50,
+     "data": 75,
+     "governance": 25,
+     "talent": 63,
+     "organization": 63
+    },
+    "blockers": [
+     "governance",
+     "organisation"
+    ],
+    "strengths": [
+     "data"
+    ],
+    "gaps": [
+     "governance",
+     "strategy"
+    ],
+    "actions": [
+     "governance_first",
+     "ownership_first",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "ownership_first",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
    }
   },
   {
    "answers": {
     "data_access": 3,
     "data_quality": 3,
-    "gov_data_protection": 4,
-    "gov_oversight": 2,
-    "people_change": 0,
-    "people_ownership": 4,
-    "process_definition": 0,
-    "process_repeatability": 0,
-    "strategy_goals": 3,
-    "strategy_use_cases": 1,
-    "tech_environment": 4,
-    "tech_integration": 4
+    "gov_data_protection": 0,
+    "gov_oversight": 3,
+    "people_change": 1,
+    "people_ownership": 0,
+    "strategy_goals": 4,
+    "strategy_use_cases": 3,
+    "talent_skills": 4,
+    "talent_support": 0,
+    "tech_environment": 0,
+    "tech_integration": 0
    },
    "expected": {
-    "actions": [
-     "ownership_first",
-     "process_mapping",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
+    "overall": 45,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 88,
+     "infrastructure": 0,
+     "data": 75,
+     "governance": 38,
+     "talent": 50,
+     "organization": 13
+    },
     "blockers": [
+     "governance",
+     "integration",
+     "expertise",
      "organisation"
     ],
-    "dimensions": {
-     "data": 75,
-     "governance": 75,
-     "people": 50,
-     "process": 0,
-     "strategy": 50,
-     "technology": 100
-    },
-    "gaps": [
-     "process"
-    ],
-    "overall": 60,
-    "roadmap": {
-     "d30": [
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
     "strengths": [
-     "technology",
-     "governance",
+     "strategy",
      "data"
     ],
+    "gaps": [
+     "infrastructure",
+     "organization",
+     "governance"
+    ],
+    "actions": [
+     "governance_first",
+     "integration_path",
+     "foundation_plan"
+    ],
     "use_cases": [
-     "knowledge_assistant",
      "reporting_summary"
-    ]
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "integration_path",
+      "foundation_d30"
+     ],
+     "d60": [
+      "expertise_first",
+      "ownership_first",
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
    }
   },
   {
    "answers": {
-    "data_access": 2,
-    "data_quality": 2,
+    "data_access": 1,
+    "data_quality": 0,
     "gov_data_protection": 3,
     "gov_oversight": 2,
-    "people_change": 0,
+    "people_change": 3,
     "people_ownership": 0,
-    "process_definition": 4,
-    "process_repeatability": 1,
-    "strategy_goals": 2,
+    "strategy_goals": 3,
     "strategy_use_cases": 4,
-    "tech_environment": 3,
-    "tech_integration": 2
+    "talent_skills": 2,
+    "talent_support": 2,
+    "tech_environment": 4,
+    "tech_integration": 3
    },
    "expected": {
-    "actions": [
-     "ownership_first",
-     "data_foundation",
-     "scoped_pilot"
-    ],
+    "overall": 54,
     "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 88,
+     "infrastructure": 88,
+     "data": 13,
+     "governance": 63,
+     "talent": 50,
+     "organization": 38
+    },
     "blockers": [
+     "data_quality",
      "organisation"
     ],
-    "dimensions": {
-     "data": 50,
-     "governance": 63,
-     "people": 0,
-     "process": 63,
-     "strategy": 75,
-     "technology": 63
-    },
-    "gaps": [
-     "people"
+    "strengths": [
+     "infrastructure",
+     "strategy"
     ],
-    "overall": 53,
+    "gaps": [
+     "data",
+     "organization"
+    ],
+    "actions": [
+     "data_quality_first",
+     "ownership_first",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
     "roadmap": {
      "d30": [
+      "data_quality_first",
       "ownership_first",
       "pilot_ready_d30"
      ],
@@ -971,1612 +2102,1482 @@
      "d90": [
       "pilot_ready_d90"
      ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 1,
+    "data_quality": 3,
+    "gov_data_protection": 3,
+    "gov_oversight": 3,
+    "people_change": 2,
+    "people_ownership": 3,
+    "strategy_goals": 3,
+    "strategy_use_cases": 3,
+    "talent_skills": 2,
+    "talent_support": 2,
+    "tech_environment": 0,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 55,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 75,
+     "infrastructure": 13,
+     "data": 50,
+     "governance": 75,
+     "talent": 50,
+     "organization": 63
     },
+    "blockers": [
+     "integration"
+    ],
     "strengths": [
+     "governance",
      "strategy"
+    ],
+    "gaps": [
+     "infrastructure"
+    ],
+    "actions": [
+     "integration_path",
+     "data_foundation",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "knowledge_assistant",
+     "reply_drafting",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "integration_path",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 3,
+    "gov_data_protection": 2,
+    "gov_oversight": 4,
+    "people_change": 4,
+    "people_ownership": 0,
+    "strategy_goals": 2,
+    "strategy_use_cases": 1,
+    "talent_skills": 1,
+    "talent_support": 3,
+    "tech_environment": 3,
+    "tech_integration": 3
+   },
+   "expected": {
+    "overall": 64,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 38,
+     "infrastructure": 75,
+     "data": 88,
+     "governance": 75,
+     "talent": 50,
+     "organization": 50
+    },
+    "blockers": [
+     "organisation"
+    ],
+    "strengths": [
+     "data",
+     "governance",
+     "infrastructure"
+    ],
+    "gaps": [
+     "strategy"
+    ],
+    "actions": [
+     "ownership_first",
+     "strategy_definition",
+     "scoped_pilot"
     ],
     "use_cases": [
      "inquiry_triage",
      "document_extraction",
      "knowledge_assistant"
-    ]
+    ],
+    "roadmap": {
+     "d30": [
+      "ownership_first",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
    }
   },
   {
    "answers": {
     "data_access": 2,
-    "data_quality": 2,
-    "gov_data_protection": 4,
+    "data_quality": 4,
+    "gov_data_protection": 1,
     "gov_oversight": 4,
-    "people_change": 0,
+    "people_change": 4,
     "people_ownership": 4,
-    "process_definition": 3,
-    "process_repeatability": 1,
     "strategy_goals": 0,
+    "strategy_use_cases": 0,
+    "talent_skills": 0,
+    "talent_support": 2,
+    "tech_environment": 1,
+    "tech_integration": 3
+   },
+   "expected": {
+    "overall": 54,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 0,
+     "infrastructure": 50,
+     "data": 75,
+     "governance": 63,
+     "talent": 25,
+     "organization": 100
+    },
+    "blockers": [
+     "governance"
+    ],
+    "strengths": [
+     "organization",
+     "data"
+    ],
+    "gaps": [
+     "strategy",
+     "talent"
+    ],
+    "actions": [
+     "governance_first",
+     "strategy_definition",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 0,
+    "gov_data_protection": 2,
+    "gov_oversight": 1,
+    "people_change": 4,
+    "people_ownership": 1,
+    "strategy_goals": 2,
+    "strategy_use_cases": 2,
+    "talent_skills": 3,
+    "talent_support": 2,
+    "tech_environment": 3,
+    "tech_integration": 4
+   },
+   "expected": {
+    "overall": 47,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 50,
+     "infrastructure": 88,
+     "data": 0,
+     "governance": 38,
+     "talent": 63,
+     "organization": 63
+    },
+    "blockers": [
+     "data_quality",
+     "organisation"
+    ],
+    "strengths": [
+     "infrastructure"
+    ],
+    "gaps": [
+     "data",
+     "governance"
+    ],
+    "actions": [
+     "data_quality_first",
+     "ownership_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "inquiry_triage"
+    ],
+    "roadmap": {
+     "d30": [
+      "data_quality_first",
+      "ownership_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 3,
+    "gov_data_protection": 3,
+    "gov_oversight": 4,
+    "people_change": 2,
+    "people_ownership": 0,
+    "strategy_goals": 4,
     "strategy_use_cases": 4,
+    "talent_skills": 3,
+    "talent_support": 1,
+    "tech_environment": 1,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 55,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 25,
+     "data": 38,
+     "governance": 88,
+     "talent": 50,
+     "organization": 25
+    },
+    "blockers": [
+     "integration",
+     "organisation"
+    ],
+    "strengths": [
+     "strategy",
+     "governance"
+    ],
+    "gaps": [
+     "infrastructure",
+     "organization",
+     "data"
+    ],
+    "actions": [
+     "integration_path",
+     "ownership_first",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
+    "roadmap": {
+     "d30": [
+      "integration_path",
+      "ownership_first",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 1,
+    "gov_data_protection": 2,
+    "gov_oversight": 4,
+    "people_change": 2,
+    "people_ownership": 2,
+    "strategy_goals": 2,
+    "strategy_use_cases": 2,
+    "talent_skills": 2,
+    "talent_support": 3,
+    "tech_environment": 4,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 51,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 50,
+     "infrastructure": 63,
+     "data": 13,
+     "governance": 75,
+     "talent": 63,
+     "organization": 50
+    },
+    "blockers": [
+     "data_quality",
+     "integration"
+    ],
+    "strengths": [
+     "governance"
+    ],
+    "gaps": [
+     "data"
+    ],
+    "actions": [
+     "data_quality_first",
+     "integration_path",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "reply_drafting"
+    ],
+    "roadmap": {
+     "d30": [
+      "data_quality_first",
+      "integration_path",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 1,
+    "data_quality": 4,
+    "gov_data_protection": 3,
+    "gov_oversight": 0,
+    "people_change": 0,
+    "people_ownership": 2,
+    "strategy_goals": 0,
+    "strategy_use_cases": 3,
+    "talent_skills": 2,
+    "talent_support": 1,
     "tech_environment": 0,
     "tech_integration": 3
    },
    "expected": {
+    "overall": 41,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 38,
+     "infrastructure": 38,
+     "data": 63,
+     "governance": 38,
+     "talent": 38,
+     "organization": 25
+    },
+    "blockers": [
+     "governance",
+     "organisation"
+    ],
+    "strengths": [
+     "data"
+    ],
+    "gaps": [
+     "organization",
+     "strategy",
+     "infrastructure",
+     "governance",
+     "talent"
+    ],
     "actions": [
+     "governance_first",
      "ownership_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "ownership_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 4,
+    "gov_data_protection": 1,
+    "gov_oversight": 2,
+    "people_change": 0,
+    "people_ownership": 3,
+    "strategy_goals": 0,
+    "strategy_use_cases": 1,
+    "talent_skills": 1,
+    "talent_support": 3,
+    "tech_environment": 1,
+    "tech_integration": 2
+   },
+   "expected": {
+    "overall": 46,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 13,
+     "infrastructure": 38,
+     "data": 88,
+     "governance": 38,
+     "talent": 50,
+     "organization": 38
+    },
+    "blockers": [
+     "governance",
+     "organisation"
+    ],
+    "strengths": [
+     "data"
+    ],
+    "gaps": [
+     "strategy",
+     "infrastructure",
+     "governance",
+     "organization"
+    ],
+    "actions": [
+     "governance_first",
+     "ownership_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "ownership_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 1,
+    "people_change": 2,
+    "people_ownership": 2,
+    "strategy_goals": 1,
+    "strategy_use_cases": 0,
+    "talent_skills": 4,
+    "talent_support": 2,
+    "tech_environment": 3,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 58,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 13,
+     "infrastructure": 50,
+     "data": 88,
+     "governance": 63,
+     "talent": 75,
+     "organization": 50
+    },
+    "blockers": [
+     "integration"
+    ],
+    "strengths": [
+     "data",
+     "talent"
+    ],
+    "gaps": [
+     "strategy"
+    ],
+    "actions": [
+     "integration_path",
+     "strategy_definition",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "knowledge_assistant"
+    ],
+    "roadmap": {
+     "d30": [
+      "integration_path",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 1,
+    "gov_data_protection": 1,
+    "gov_oversight": 1,
+    "people_change": 4,
+    "people_ownership": 2,
+    "strategy_goals": 1,
+    "strategy_use_cases": 1,
+    "talent_skills": 0,
+    "talent_support": 1,
+    "tech_environment": 3,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 32,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 50,
+     "data": 13,
+     "governance": 25,
+     "talent": 13,
+     "organization": 75
+    },
+    "blockers": [
+     "governance",
+     "data_quality",
+     "integration"
+    ],
+    "strengths": [
+     "organization"
+    ],
+    "gaps": [
+     "data",
+     "talent",
+     "strategy",
+     "governance"
+    ],
+    "actions": [
+     "governance_first",
+     "data_quality_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "inquiry_triage"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "data_quality_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "integration_path",
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 1,
+    "gov_data_protection": 3,
+    "gov_oversight": 2,
+    "people_change": 2,
+    "people_ownership": 0,
+    "strategy_goals": 2,
+    "strategy_use_cases": 3,
+    "talent_skills": 0,
+    "talent_support": 3,
+    "tech_environment": 0,
+    "tech_integration": 2
+   },
+   "expected": {
+    "overall": 38,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 63,
+     "infrastructure": 25,
+     "data": 13,
+     "governance": 63,
+     "talent": 38,
+     "organization": 25
+    },
+    "blockers": [
+     "data_quality",
+     "organisation"
+    ],
+    "strengths": [
+     "governance"
+    ],
+    "gaps": [
+     "data",
+     "infrastructure",
+     "organization",
+     "talent"
+    ],
+    "actions": [
+     "data_quality_first",
+     "ownership_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
+    "roadmap": {
+     "d30": [
+      "data_quality_first",
+      "ownership_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 1,
+    "gov_data_protection": 0,
+    "gov_oversight": 1,
+    "people_change": 4,
+    "people_ownership": 0,
+    "strategy_goals": 3,
+    "strategy_use_cases": 2,
+    "talent_skills": 1,
+    "talent_support": 0,
+    "tech_environment": 3,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 41,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 63,
+     "infrastructure": 50,
+     "data": 63,
+     "governance": 13,
+     "talent": 13,
+     "organization": 50
+    },
+    "blockers": [
+     "governance",
+     "data_quality",
+     "integration",
+     "expertise",
+     "organisation"
+    ],
+    "strengths": [
+     "data"
+    ],
+    "gaps": [
+     "governance",
+     "talent"
+    ],
+    "actions": [
+     "governance_first",
+     "data_quality_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "data_quality_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "integration_path",
+      "expertise_first",
+      "ownership_first",
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 1,
+    "data_quality": 3,
+    "gov_data_protection": 0,
+    "gov_oversight": 3,
+    "people_change": 4,
+    "people_ownership": 2,
+    "strategy_goals": 2,
+    "strategy_use_cases": 0,
+    "talent_skills": 0,
+    "talent_support": 4,
+    "tech_environment": 3,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 48,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 50,
+     "data": 50,
+     "governance": 38,
+     "talent": 50,
+     "organization": 75
+    },
+    "blockers": [
+     "governance",
+     "integration"
+    ],
+    "strengths": [
+     "organization"
+    ],
+    "gaps": [
+     "strategy",
+     "governance"
+    ],
+    "actions": [
+     "governance_first",
+     "integration_path",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "inquiry_triage",
+     "document_extraction",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "integration_path",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 3,
+    "gov_data_protection": 3,
+    "gov_oversight": 4,
+    "people_change": 0,
+    "people_ownership": 0,
+    "strategy_goals": 1,
+    "strategy_use_cases": 3,
+    "talent_skills": 0,
+    "talent_support": 4,
+    "tech_environment": 3,
+    "tech_integration": 1
+   },
+   "expected": {
+    "overall": 55,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 50,
+     "infrastructure": 50,
+     "data": 75,
+     "governance": 88,
+     "talent": 50,
+     "organization": 0
+    },
+    "blockers": [
+     "integration",
+     "organisation"
+    ],
+    "strengths": [
+     "governance",
+     "data"
+    ],
+    "gaps": [
+     "organization"
+    ],
+    "actions": [
+     "integration_path",
+     "ownership_first",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "document_extraction",
+     "knowledge_assistant",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "integration_path",
+      "ownership_first",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 2,
+    "gov_data_protection": 1,
+    "gov_oversight": 3,
+    "people_change": 2,
+    "people_ownership": 2,
+    "strategy_goals": 0,
+    "strategy_use_cases": 1,
+    "talent_skills": 0,
+    "talent_support": 1,
+    "tech_environment": 1,
+    "tech_integration": 0
+   },
+   "expected": {
+    "overall": 36,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 13,
+     "infrastructure": 13,
+     "data": 63,
+     "governance": 50,
+     "talent": 13,
+     "organization": 50
+    },
+    "blockers": [
+     "governance",
+     "integration"
+    ],
+    "strengths": [
+     "data"
+    ],
+    "gaps": [
+     "strategy",
+     "infrastructure",
+     "talent"
+    ],
+    "actions": [
+     "governance_first",
+     "integration_path",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "knowledge_assistant",
+     "reply_drafting",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "integration_path",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 1,
+    "data_quality": 0,
+    "gov_data_protection": 0,
+    "gov_oversight": 0,
+    "people_change": 3,
+    "people_ownership": 3,
+    "strategy_goals": 3,
+    "strategy_use_cases": 0,
+    "talent_skills": 2,
+    "talent_support": 2,
+    "tech_environment": 2,
+    "tech_integration": 0
+   },
+   "expected": {
+    "overall": 31,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 38,
+     "infrastructure": 25,
+     "data": 13,
+     "governance": 0,
+     "talent": 50,
+     "organization": 75
+    },
+    "blockers": [
+     "governance",
+     "data_quality",
+     "integration"
+    ],
+    "strengths": [
+     "organization"
+    ],
+    "gaps": [
+     "governance",
+     "data",
+     "infrastructure",
+     "strategy"
+    ],
+    "actions": [
+     "governance_first",
+     "data_quality_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "data_quality_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "integration_path",
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 3,
+    "gov_data_protection": 0,
+    "gov_oversight": 4,
+    "people_change": 4,
+    "people_ownership": 0,
+    "strategy_goals": 2,
+    "strategy_use_cases": 0,
+    "talent_skills": 1,
+    "talent_support": 4,
+    "tech_environment": 1,
+    "tech_integration": 2
+   },
+   "expected": {
+    "overall": 44,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 38,
+     "data": 38,
+     "governance": 50,
+     "talent": 63,
+     "organization": 50
+    },
+    "blockers": [
+     "governance",
+     "organisation"
+    ],
+    "strengths": [
+     "talent"
+    ],
+    "gaps": [
+     "strategy",
+     "infrastructure",
+     "data"
+    ],
+    "actions": [
+     "governance_first",
+     "ownership_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "reply_drafting"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "ownership_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 0,
+    "gov_data_protection": 1,
+    "gov_oversight": 0,
+    "people_change": 2,
+    "people_ownership": 2,
+    "strategy_goals": 0,
+    "strategy_use_cases": 2,
+    "talent_skills": 0,
+    "talent_support": 2,
+    "tech_environment": 3,
+    "tech_integration": 3
+   },
+   "expected": {
+    "overall": 29,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 75,
+     "data": 0,
+     "governance": 13,
+     "talent": 25,
+     "organization": 50
+    },
+    "blockers": [
+     "governance",
+     "data_quality"
+    ],
+    "strengths": [
+     "infrastructure"
+    ],
+    "gaps": [
+     "data",
+     "governance",
+     "strategy",
+     "talent"
+    ],
+    "actions": [
+     "governance_first",
+     "data_quality_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "inquiry_triage"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "data_quality_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 4,
+    "gov_data_protection": 1,
+    "gov_oversight": 1,
+    "people_change": 2,
+    "people_ownership": 1,
+    "strategy_goals": 4,
+    "strategy_use_cases": 4,
+    "talent_skills": 3,
+    "talent_support": 2,
+    "tech_environment": 3,
+    "tech_integration": 2
+   },
+   "expected": {
+    "overall": 62,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 100,
+     "infrastructure": 63,
+     "data": 88,
+     "governance": 25,
+     "talent": 63,
+     "organization": 38
+    },
+    "blockers": [
+     "governance",
+     "organisation"
+    ],
+    "strengths": [
+     "strategy",
+     "data"
+    ],
+    "gaps": [
+     "governance",
+     "organization"
+    ],
+    "actions": [
+     "governance_first",
+     "ownership_first",
+     "scoped_pilot"
+    ],
+    "use_cases": [
+     "document_extraction",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "ownership_first",
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 0,
+    "data_quality": 2,
+    "gov_data_protection": 1,
+    "gov_oversight": 4,
+    "people_change": 2,
+    "people_ownership": 0,
+    "strategy_goals": 0,
+    "strategy_use_cases": 2,
+    "talent_skills": 0,
+    "talent_support": 2,
+    "tech_environment": 0,
+    "tech_integration": 2
+   },
+   "expected": {
+    "overall": 33,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 25,
+     "data": 25,
+     "governance": 63,
+     "talent": 25,
+     "organization": 25
+    },
+    "blockers": [
+     "governance",
+     "organisation"
+    ],
+    "strengths": [
+     "governance"
+    ],
+    "gaps": [
+     "strategy",
+     "infrastructure",
+     "data",
+     "talent",
+     "organization"
+    ],
+    "actions": [
+     "governance_first",
+     "ownership_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "process_discovery"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "ownership_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 4,
+    "data_quality": 1,
+    "gov_data_protection": 2,
+    "gov_oversight": 3,
+    "people_change": 0,
+    "people_ownership": 1,
+    "strategy_goals": 0,
+    "strategy_use_cases": 3,
+    "talent_skills": 0,
+    "talent_support": 4,
+    "tech_environment": 4,
+    "tech_integration": 0
+   },
+   "expected": {
+    "overall": 48,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 38,
+     "infrastructure": 50,
+     "data": 63,
+     "governance": 63,
+     "talent": 50,
+     "organization": 13
+    },
+    "blockers": [
+     "data_quality",
+     "integration",
+     "organisation"
+    ],
+    "strengths": [
+     "governance"
+    ],
+    "gaps": [
+     "organization",
+     "strategy"
+    ],
+    "actions": [
+     "data_quality_first",
+     "integration_path",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "document_extraction",
+     "knowledge_assistant",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "data_quality_first",
+      "integration_path",
+      "foundation_d30"
+     ],
+     "d60": [
+      "ownership_first",
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 1,
+    "data_quality": 4,
+    "gov_data_protection": 1,
+    "gov_oversight": 2,
+    "people_change": 0,
+    "people_ownership": 2,
+    "strategy_goals": 0,
+    "strategy_use_cases": 0,
+    "talent_skills": 2,
+    "talent_support": 3,
+    "tech_environment": 3,
+    "tech_integration": 3
+   },
+   "expected": {
+    "overall": 44,
+    "band": "foundation",
+    "dimensions": {
+     "strategy": 0,
+     "infrastructure": 75,
+     "data": 63,
+     "governance": 38,
+     "talent": 63,
+     "organization": 25
+    },
+    "blockers": [
+     "governance",
+     "organisation"
+    ],
+    "strengths": [
+     "infrastructure"
+    ],
+    "gaps": [
+     "strategy",
+     "organization",
+     "governance"
+    ],
+    "actions": [
+     "governance_first",
+     "ownership_first",
+     "foundation_plan"
+    ],
+    "use_cases": [
+     "document_extraction",
+     "reporting_summary"
+    ],
+    "roadmap": {
+     "d30": [
+      "governance_first",
+      "ownership_first",
+      "foundation_d30"
+     ],
+     "d60": [
+      "foundation_d60"
+     ],
+     "d90": [
+      "foundation_d90"
+     ]
+    }
+   }
+  },
+  {
+   "answers": {
+    "data_access": 3,
+    "data_quality": 4,
+    "gov_data_protection": 4,
+    "gov_oversight": 1,
+    "people_change": 4,
+    "people_ownership": 4,
+    "strategy_goals": 1,
+    "strategy_use_cases": 1,
+    "talent_skills": 1,
+    "talent_support": 4,
+    "tech_environment": 0,
+    "tech_integration": 3
+   },
+   "expected": {
+    "overall": 64,
+    "band": "pilot_ready",
+    "dimensions": {
+     "strategy": 25,
+     "infrastructure": 38,
+     "data": 88,
+     "governance": 63,
+     "talent": 63,
+     "organization": 100
+    },
+    "blockers": [],
+    "strengths": [
+     "organization",
+     "data"
+    ],
+    "gaps": [
+     "strategy",
+     "infrastructure"
+    ],
+    "actions": [
+     "strategy_definition",
      "tech_foundation",
      "scoped_pilot"
     ],
-    "band": "pilot_ready",
-    "blockers": [
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 50,
-     "governance": 100,
-     "people": 50,
-     "process": 50,
-     "strategy": 50,
-     "technology": 38
-    },
-    "gaps": [
-     "technology"
-    ],
-    "overall": 58,
-    "roadmap": {
-     "d30": [
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance"
-    ],
     "use_cases": [
-     "document_extraction",
      "knowledge_assistant",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 2,
-    "data_quality": 3,
-    "gov_data_protection": 3,
-    "gov_oversight": 4,
-    "people_change": 2,
-    "people_ownership": 2,
-    "process_definition": 2,
-    "process_repeatability": 2,
-    "strategy_goals": 3,
-    "strategy_use_cases": 1,
-    "tech_environment": 3,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "strategy_definition",
-     "process_mapping",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [],
-    "dimensions": {
-     "data": 63,
-     "governance": 88,
-     "people": 50,
-     "process": 50,
-     "strategy": 50,
-     "technology": 75
-    },
-    "gaps": [],
-    "overall": 64,
-    "roadmap": {
-     "d30": [
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "technology"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 4,
-    "gov_data_protection": 4,
-    "gov_oversight": 0,
-    "people_change": 0,
-    "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 4,
-    "strategy_goals": 2,
-    "strategy_use_cases": 0,
-    "tech_environment": 2,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "ownership_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 50,
-     "governance": 50,
-     "people": 38,
-     "process": 88,
-     "strategy": 25,
-     "technology": 63
-    },
-    "gaps": [
-     "strategy",
-     "people"
-    ],
-    "overall": 52,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "process"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 2,
-    "data_quality": 1,
-    "gov_data_protection": 1,
-    "gov_oversight": 1,
-    "people_change": 0,
-    "people_ownership": 1,
-    "process_definition": 0,
-    "process_repeatability": 2,
-    "strategy_goals": 3,
-    "strategy_use_cases": 2,
-    "tech_environment": 0,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 38,
-     "governance": 25,
-     "people": 13,
-     "process": 25,
-     "strategy": 63,
-     "technology": 0
-    },
-    "gaps": [
-     "technology",
-     "people",
-     "process",
-     "governance",
-     "data"
-    ],
-    "overall": 28,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "integration_path",
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "strategy"
-    ],
-    "use_cases": [
-     "process_discovery"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 1,
-    "data_quality": 0,
-    "gov_data_protection": 0,
-    "gov_oversight": 4,
-    "people_change": 3,
-    "people_ownership": 0,
-    "process_definition": 2,
-    "process_repeatability": 2,
-    "strategy_goals": 1,
-    "strategy_use_cases": 2,
-    "tech_environment": 0,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 13,
-     "governance": 50,
-     "people": 38,
-     "process": 50,
-     "strategy": 38,
-     "technology": 38
-    },
-    "gaps": [
-     "data",
-     "strategy",
-     "technology",
-     "people"
-    ],
-    "overall": 37,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "governance"
-    ],
-    "use_cases": [
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 3,
-    "gov_data_protection": 2,
-    "gov_oversight": 0,
-    "people_change": 4,
-    "people_ownership": 3,
-    "process_definition": 4,
-    "process_repeatability": 0,
-    "strategy_goals": 0,
-    "strategy_use_cases": 2,
-    "tech_environment": 4,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "integration_path",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance",
-     "integration"
-    ],
-    "dimensions": {
-     "data": 88,
-     "governance": 25,
-     "people": 88,
-     "process": 50,
-     "strategy": 25,
-     "technology": 63
-    },
-    "gaps": [
-     "strategy",
-     "governance"
-    ],
-    "overall": 56,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "integration_path",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "people",
-     "data"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
+     "reply_drafting",
      "reporting_summary"
-    ]
+    ],
+    "roadmap": {
+     "d30": [
+      "pilot_ready_d30"
+     ],
+     "d60": [
+      "pilot_ready_d60"
+     ],
+     "d90": [
+      "pilot_ready_d90"
+     ]
+    }
    }
   },
   {
    "answers": {
-    "data_access": 0,
+    "data_access": 2,
     "data_quality": 2,
-    "gov_data_protection": 4,
-    "gov_oversight": 1,
-    "people_change": 3,
-    "people_ownership": 0,
-    "process_definition": 3,
-    "process_repeatability": 3,
+    "gov_data_protection": 2,
+    "gov_oversight": 2,
+    "people_change": 1,
+    "people_ownership": 1,
     "strategy_goals": 2,
-    "strategy_use_cases": 4,
-    "tech_environment": 0,
+    "strategy_use_cases": 1,
+    "talent_skills": 0,
+    "talent_support": 3,
+    "tech_environment": 4,
     "tech_integration": 2
    },
    "expected": {
-    "actions": [
-     "ownership_first",
-     "data_foundation",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 25,
-     "governance": 63,
-     "people": 38,
-     "process": 75,
-     "strategy": 75,
-     "technology": 25
-    },
-    "gaps": [
-     "data",
-     "technology",
-     "people"
-    ],
-    "overall": 49,
-    "roadmap": {
-     "d30": [
-      "ownership_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "process",
-     "strategy"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 2,
-    "data_quality": 1,
-    "gov_data_protection": 3,
-    "gov_oversight": 3,
-    "people_change": 4,
-    "people_ownership": 4,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 4,
-    "strategy_use_cases": 3,
-    "tech_environment": 4,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "data_quality_first",
-     "process_mapping",
-     "scale_operations"
-    ],
-    "band": "scaling",
-    "blockers": [
-     "data_quality"
-    ],
-    "dimensions": {
-     "data": 38,
-     "governance": 75,
-     "people": 100,
-     "process": 75,
-     "strategy": 88,
-     "technology": 88
-    },
-    "gaps": [
-     "data"
-    ],
-    "overall": 75,
-    "roadmap": {
-     "d30": [
-      "data_quality_first",
-      "scaling_d30"
-     ],
-     "d60": [
-      "scaling_d60"
-     ],
-     "d90": [
-      "scaling_d90"
-     ]
-    },
-    "strengths": [
-     "people",
-     "technology",
-     "strategy",
-     "governance",
-     "process"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 1,
-    "data_quality": 4,
-    "gov_data_protection": 2,
-    "gov_oversight": 0,
-    "people_change": 1,
-    "people_ownership": 3,
-    "process_definition": 4,
-    "process_repeatability": 2,
-    "strategy_goals": 3,
-    "strategy_use_cases": 0,
-    "tech_environment": 3,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "integration_path",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "integration"
-    ],
-    "dimensions": {
-     "data": 63,
-     "governance": 25,
-     "people": 50,
-     "process": 75,
-     "strategy": 38,
-     "technology": 50
-    },
-    "gaps": [
-     "governance",
-     "strategy"
-    ],
-    "overall": 49,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "integration_path",
-      "foundation_d30"
-     ],
-     "d60": [
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "process"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 2,
-    "data_quality": 1,
-    "gov_data_protection": 4,
-    "gov_oversight": 4,
-    "people_change": 0,
-    "people_ownership": 0,
-    "process_definition": 1,
-    "process_repeatability": 4,
-    "strategy_goals": 4,
-    "strategy_use_cases": 0,
-    "tech_environment": 1,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "data_quality_first",
-     "integration_path",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "data_quality",
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 38,
-     "governance": 100,
-     "people": 0,
-     "process": 63,
-     "strategy": 50,
-     "technology": 25
-    },
-    "gaps": [
-     "people",
-     "technology",
-     "data"
-    ],
-    "overall": 48,
-    "roadmap": {
-     "d30": [
-      "data_quality_first",
-      "integration_path",
-      "foundation_d30"
-     ],
-     "d60": [
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "governance"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 0,
-    "gov_data_protection": 0,
-    "gov_oversight": 4,
-    "people_change": 0,
-    "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 4,
-    "strategy_goals": 0,
-    "strategy_use_cases": 3,
-    "tech_environment": 0,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 0,
-     "governance": 50,
-     "people": 38,
-     "process": 88,
-     "strategy": 38,
-     "technology": 13
-    },
-    "gaps": [
-     "data",
-     "technology",
-     "strategy",
-     "people"
-    ],
-    "overall": 36,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "integration_path",
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "process"
-    ],
-    "use_cases": [
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 2,
-    "gov_data_protection": 1,
-    "gov_oversight": 3,
-    "people_change": 2,
-    "people_ownership": 2,
-    "process_definition": 4,
-    "process_repeatability": 2,
-    "strategy_goals": 3,
-    "strategy_use_cases": 1,
-    "tech_environment": 1,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_foundation",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance"
-    ],
-    "dimensions": {
-     "data": 25,
-     "governance": 50,
-     "people": 50,
-     "process": 75,
-     "strategy": 50,
-     "technology": 50
-    },
-    "gaps": [
-     "data"
-    ],
-    "overall": 49,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "process"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 1,
-    "gov_data_protection": 3,
-    "gov_oversight": 0,
-    "people_change": 2,
-    "people_ownership": 3,
-    "process_definition": 0,
-    "process_repeatability": 1,
-    "strategy_goals": 2,
-    "strategy_use_cases": 3,
-    "tech_environment": 0,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "integration"
-    ],
-    "dimensions": {
-     "data": 13,
-     "governance": 38,
-     "people": 63,
-     "process": 13,
-     "strategy": 63,
-     "technology": 13
-    },
-    "gaps": [
-     "data",
-     "process",
-     "technology",
-     "governance"
-    ],
-    "overall": 33,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "integration_path",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "people"
-    ],
-    "use_cases": [
-     "process_discovery"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 0,
-    "gov_data_protection": 4,
-    "gov_oversight": 4,
-    "people_change": 1,
-    "people_ownership": 4,
-    "process_definition": 0,
-    "process_repeatability": 1,
-    "strategy_goals": 0,
-    "strategy_use_cases": 1,
-    "tech_environment": 3,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "data_quality_first",
-     "integration_path",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "data_quality",
-     "integration"
-    ],
-    "dimensions": {
-     "data": 0,
-     "governance": 100,
-     "people": 63,
-     "process": 13,
-     "strategy": 13,
-     "technology": 50
-    },
-    "gaps": [
-     "data",
-     "strategy",
-     "process"
-    ],
-    "overall": 41,
-    "roadmap": {
-     "d30": [
-      "data_quality_first",
-      "integration_path",
-      "foundation_d30"
-     ],
-     "d60": [
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "governance"
-    ],
-    "use_cases": [
-     "process_discovery"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 3,
-    "gov_data_protection": 0,
-    "gov_oversight": 4,
-    "people_change": 2,
-    "people_ownership": 3,
-    "process_definition": 0,
-    "process_repeatability": 4,
-    "strategy_goals": 2,
-    "strategy_use_cases": 1,
-    "tech_environment": 4,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "integration_path",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "integration"
-    ],
-    "dimensions": {
-     "data": 38,
-     "governance": 50,
-     "people": 63,
-     "process": 50,
-     "strategy": 38,
-     "technology": 50
-    },
-    "gaps": [
-     "strategy",
-     "data"
-    ],
-    "overall": 48,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "integration_path",
-      "foundation_d30"
-     ],
-     "d60": [
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "people"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 1,
-    "gov_data_protection": 1,
-    "gov_oversight": 1,
-    "people_change": 1,
-    "people_ownership": 3,
-    "process_definition": 1,
-    "process_repeatability": 2,
-    "strategy_goals": 1,
-    "strategy_use_cases": 2,
-    "tech_environment": 0,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "integration"
-    ],
-    "dimensions": {
-     "data": 63,
-     "governance": 25,
-     "people": 50,
-     "process": 38,
-     "strategy": 38,
-     "technology": 0
-    },
-    "gaps": [
-     "technology",
-     "governance",
-     "strategy",
-     "process"
-    ],
-    "overall": 36,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "integration_path",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "data"
-    ],
-    "use_cases": [
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 2,
-    "gov_data_protection": 4,
-    "gov_oversight": 4,
-    "people_change": 1,
-    "people_ownership": 2,
-    "process_definition": 4,
-    "process_repeatability": 4,
-    "strategy_goals": 3,
-    "strategy_use_cases": 0,
-    "tech_environment": 2,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "integration_path",
-     "strategy_definition",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "integration"
-    ],
-    "dimensions": {
-     "data": 75,
-     "governance": 100,
-     "people": 38,
-     "process": 100,
-     "strategy": 38,
-     "technology": 25
-    },
-    "gaps": [
-     "technology",
-     "strategy",
-     "people"
-    ],
-    "overall": 65,
-    "roadmap": {
-     "d30": [
-      "integration_path",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "process",
-     "data"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "knowledge_assistant",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 2,
-    "gov_data_protection": 1,
-    "gov_oversight": 3,
-    "people_change": 4,
-    "people_ownership": 1,
-    "process_definition": 0,
-    "process_repeatability": 0,
-    "strategy_goals": 0,
-    "strategy_use_cases": 3,
-    "tech_environment": 2,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "ownership_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 25,
-     "governance": 50,
-     "people": 63,
-     "process": 0,
-     "strategy": 38,
-     "technology": 63
-    },
-    "gaps": [
-     "process",
-     "data",
-     "strategy"
-    ],
-    "overall": 39,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "ownership_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "people"
-    ],
-    "use_cases": [
-     "process_discovery"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 2,
-    "data_quality": 4,
-    "gov_data_protection": 4,
-    "gov_oversight": 2,
-    "people_change": 0,
-    "people_ownership": 4,
-    "process_definition": 0,
-    "process_repeatability": 1,
-    "strategy_goals": 2,
-    "strategy_use_cases": 0,
-    "tech_environment": 1,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "ownership_first",
-     "process_mapping",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 75,
-     "governance": 75,
-     "people": 50,
-     "process": 13,
-     "strategy": 25,
-     "technology": 50
-    },
-    "gaps": [
-     "process",
-     "strategy"
-    ],
-    "overall": 51,
-    "roadmap": {
-     "d30": [
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "data"
-    ],
-    "use_cases": [
-     "knowledge_assistant",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 1,
-    "data_quality": 4,
-    "gov_data_protection": 1,
-    "gov_oversight": 1,
-    "people_change": 2,
-    "people_ownership": 3,
-    "process_definition": 3,
-    "process_repeatability": 2,
-    "strategy_goals": 2,
-    "strategy_use_cases": 2,
-    "tech_environment": 0,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "integration_path",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "integration"
-    ],
-    "dimensions": {
-     "data": 63,
-     "governance": 25,
-     "people": 63,
-     "process": 63,
-     "strategy": 50,
-     "technology": 13
-    },
-    "gaps": [
-     "technology",
-     "governance"
-    ],
     "overall": 46,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "integration_path",
-      "foundation_d30"
-     ],
-     "d60": [
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "people"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 1,
-    "data_quality": 3,
-    "gov_data_protection": 1,
-    "gov_oversight": 4,
-    "people_change": 0,
-    "people_ownership": 2,
-    "process_definition": 2,
-    "process_repeatability": 3,
-    "strategy_goals": 1,
-    "strategy_use_cases": 4,
-    "tech_environment": 1,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "integration_path",
-     "foundation_plan"
-    ],
     "band": "foundation",
-    "blockers": [
-     "governance",
-     "integration",
-     "organisation"
-    ],
     "dimensions": {
-     "data": 50,
-     "governance": 63,
-     "people": 25,
-     "process": 63,
-     "strategy": 63,
-     "technology": 25
-    },
-    "gaps": [
-     "technology",
-     "people"
-    ],
-    "overall": 49,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "integration_path",
-      "foundation_d30"
-     ],
-     "d60": [
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "governance"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "knowledge_assistant",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 1,
-    "gov_data_protection": 1,
-    "gov_oversight": 4,
-    "people_change": 4,
-    "people_ownership": 1,
-    "process_definition": 0,
-    "process_repeatability": 2,
-    "strategy_goals": 1,
-    "strategy_use_cases": 3,
-    "tech_environment": 4,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 63,
-     "governance": 63,
-     "people": 63,
-     "process": 25,
-     "strategy": 50,
-     "technology": 50
-    },
-    "gaps": [
-     "process"
-    ],
-    "overall": 53,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "integration_path",
-      "ownership_first",
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance"
-    ],
-    "use_cases": [
-     "knowledge_assistant",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 0,
-    "gov_data_protection": 1,
-    "gov_oversight": 3,
-    "people_change": 3,
-    "people_ownership": 4,
-    "process_definition": 2,
-    "process_repeatability": 4,
-    "strategy_goals": 3,
-    "strategy_use_cases": 1,
-    "tech_environment": 1,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "integration"
-    ],
-    "dimensions": {
+     "strategy": 38,
+     "infrastructure": 75,
      "data": 50,
      "governance": 50,
-     "people": 88,
-     "process": 75,
-     "strategy": 50,
-     "technology": 25
+     "talent": 38,
+     "organization": 25
     },
-    "gaps": [
-     "technology"
+    "blockers": [
+     "organisation"
     ],
-    "overall": 56,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "integration_path",
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
     "strengths": [
-     "people",
-     "process"
+     "infrastructure"
     ],
-    "use_cases": [
-     "document_extraction",
-     "knowledge_assistant",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 2,
-    "gov_data_protection": 3,
-    "gov_oversight": 1,
-    "people_change": 1,
-    "people_ownership": 1,
-    "process_definition": 2,
-    "process_repeatability": 4,
-    "strategy_goals": 2,
-    "strategy_use_cases": 1,
-    "tech_environment": 2,
-    "tech_integration": 4
-   },
-   "expected": {
+    "gaps": [
+     "organization",
+     "strategy",
+     "talent"
+    ],
     "actions": [
      "ownership_first",
      "strategy_definition",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 75,
-     "governance": 50,
-     "people": 25,
-     "process": 75,
-     "strategy": 38,
-     "technology": 75
-    },
-    "gaps": [
-     "people",
-     "strategy"
-    ],
-    "overall": 57,
-    "roadmap": {
-     "d30": [
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "technology",
-     "process",
-     "data"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 2,
-    "gov_data_protection": 2,
-    "gov_oversight": 3,
-    "people_change": 4,
-    "people_ownership": 1,
-    "process_definition": 4,
-    "process_repeatability": 2,
-    "strategy_goals": 0,
-    "strategy_use_cases": 4,
-    "tech_environment": 0,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "integration_path",
-     "ownership_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 63,
-     "governance": 63,
-     "people": 63,
-     "process": 75,
-     "strategy": 50,
-     "technology": 0
-    },
-    "gaps": [
-     "technology"
-    ],
-    "overall": 53,
-    "roadmap": {
-     "d30": [
-      "integration_path",
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "process"
+     "foundation_plan"
     ],
     "use_cases": [
      "document_extraction",
      "knowledge_assistant",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 3,
-    "gov_data_protection": 3,
-    "gov_oversight": 4,
-    "people_change": 3,
-    "people_ownership": 1,
-    "process_definition": 0,
-    "process_repeatability": 0,
-    "strategy_goals": 0,
-    "strategy_use_cases": 2,
-    "tech_environment": 1,
-    "tech_integration": 4
-   },
-   "expected": {
-    "actions": [
-     "ownership_first",
-     "process_mapping",
-     "foundation_plan"
+     "reporting_summary"
     ],
-    "band": "foundation",
-    "blockers": [
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 38,
-     "governance": 88,
-     "people": 50,
-     "process": 0,
-     "strategy": 25,
-     "technology": 63
-    },
-    "gaps": [
-     "process",
-     "strategy",
-     "data"
-    ],
-    "overall": 46,
     "roadmap": {
      "d30": [
       "ownership_first",
@@ -2588,1192 +3589,7 @@
      "d90": [
       "foundation_d90"
      ]
-    },
-    "strengths": [
-     "governance"
-    ],
-    "use_cases": [
-     "process_discovery"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 1,
-    "gov_data_protection": 3,
-    "gov_oversight": 1,
-    "people_change": 4,
-    "people_ownership": 4,
-    "process_definition": 4,
-    "process_repeatability": 0,
-    "strategy_goals": 3,
-    "strategy_use_cases": 4,
-    "tech_environment": 4,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "data_quality_first",
-     "integration_path",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "data_quality",
-     "integration"
-    ],
-    "dimensions": {
-     "data": 63,
-     "governance": 50,
-     "people": 100,
-     "process": 50,
-     "strategy": 88,
-     "technology": 50
-    },
-    "gaps": [],
-    "overall": 66,
-    "roadmap": {
-     "d30": [
-      "data_quality_first",
-      "integration_path",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "people",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 4,
-    "gov_data_protection": 1,
-    "gov_oversight": 3,
-    "people_change": 2,
-    "people_ownership": 2,
-    "process_definition": 0,
-    "process_repeatability": 4,
-    "strategy_goals": 4,
-    "strategy_use_cases": 2,
-    "tech_environment": 2,
-    "tech_integration": 2
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "process_mapping",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance"
-    ],
-    "dimensions": {
-     "data": 88,
-     "governance": 50,
-     "people": 50,
-     "process": 50,
-     "strategy": 75,
-     "technology": 50
-    },
-    "gaps": [],
-    "overall": 61,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "data",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 2,
-    "data_quality": 3,
-    "gov_data_protection": 0,
-    "gov_oversight": 3,
-    "people_change": 2,
-    "people_ownership": 1,
-    "process_definition": 2,
-    "process_repeatability": 2,
-    "strategy_goals": 2,
-    "strategy_use_cases": 1,
-    "tech_environment": 0,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "integration_path",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 63,
-     "governance": 38,
-     "people": 38,
-     "process": 50,
-     "strategy": 38,
-     "technology": 0
-    },
-    "gaps": [
-     "technology",
-     "strategy",
-     "people",
-     "governance"
-    ],
-    "overall": 39,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "integration_path",
-      "foundation_d30"
-     ],
-     "d60": [
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "data"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 4,
-    "gov_data_protection": 1,
-    "gov_oversight": 3,
-    "people_change": 2,
-    "people_ownership": 0,
-    "process_definition": 4,
-    "process_repeatability": 2,
-    "strategy_goals": 2,
-    "strategy_use_cases": 0,
-    "tech_environment": 1,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "ownership_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 100,
-     "governance": 50,
-     "people": 25,
-     "process": 75,
-     "strategy": 25,
-     "technology": 50
-    },
-    "gaps": [
-     "strategy",
-     "people"
-    ],
-    "overall": 56,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "data",
-     "process"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 2,
-    "data_quality": 4,
-    "gov_data_protection": 1,
-    "gov_oversight": 2,
-    "people_change": 2,
-    "people_ownership": 1,
-    "process_definition": 1,
-    "process_repeatability": 3,
-    "strategy_goals": 4,
-    "strategy_use_cases": 1,
-    "tech_environment": 2,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "integration_path",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance",
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 75,
-     "governance": 38,
-     "people": 38,
-     "process": 50,
-     "strategy": 63,
-     "technology": 38
-    },
-    "gaps": [
-     "technology",
-     "people",
-     "governance"
-    ],
-    "overall": 51,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "integration_path",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "ownership_first",
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "data"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 1,
-    "data_quality": 1,
-    "gov_data_protection": 0,
-    "gov_oversight": 2,
-    "people_change": 1,
-    "people_ownership": 0,
-    "process_definition": 0,
-    "process_repeatability": 1,
-    "strategy_goals": 0,
-    "strategy_use_cases": 0,
-    "tech_environment": 3,
-    "tech_integration": 4
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 25,
-     "governance": 25,
-     "people": 13,
-     "process": 13,
-     "strategy": 0,
-     "technology": 88
-    },
-    "gaps": [
-     "strategy",
-     "process",
-     "people",
-     "data",
-     "governance"
-    ],
-    "overall": 27,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "technology"
-    ],
-    "use_cases": [
-     "process_discovery"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 2,
-    "data_quality": 0,
-    "gov_data_protection": 1,
-    "gov_oversight": 4,
-    "people_change": 2,
-    "people_ownership": 4,
-    "process_definition": 3,
-    "process_repeatability": 3,
-    "strategy_goals": 2,
-    "strategy_use_cases": 1,
-    "tech_environment": 0,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "integration"
-    ],
-    "dimensions": {
-     "data": 25,
-     "governance": 63,
-     "people": 75,
-     "process": 75,
-     "strategy": 38,
-     "technology": 13
-    },
-    "gaps": [
-     "technology",
-     "data",
-     "strategy"
-    ],
-    "overall": 48,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "integration_path",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "people",
-     "process"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 4,
-    "gov_data_protection": 4,
-    "gov_oversight": 4,
-    "people_change": 1,
-    "people_ownership": 0,
-    "process_definition": 0,
-    "process_repeatability": 1,
-    "strategy_goals": 2,
-    "strategy_use_cases": 3,
-    "tech_environment": 0,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "integration_path",
-     "ownership_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 88,
-     "governance": 100,
-     "people": 13,
-     "process": 13,
-     "strategy": 63,
-     "technology": 0
-    },
-    "gaps": [
-     "technology",
-     "process",
-     "people"
-    ],
-    "overall": 51,
-    "roadmap": {
-     "d30": [
-      "integration_path",
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "data"
-    ],
-    "use_cases": [
-     "knowledge_assistant",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 1,
-    "gov_data_protection": 2,
-    "gov_oversight": 1,
-    "people_change": 2,
-    "people_ownership": 0,
-    "process_definition": 3,
-    "process_repeatability": 0,
-    "strategy_goals": 1,
-    "strategy_use_cases": 1,
-    "tech_environment": 3,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "data_quality_first",
-     "integration_path",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "data_quality",
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 63,
-     "governance": 38,
-     "people": 25,
-     "process": 38,
-     "strategy": 25,
-     "technology": 50
-    },
-    "gaps": [
-     "strategy",
-     "people",
-     "process",
-     "governance"
-    ],
-    "overall": 41,
-    "roadmap": {
-     "d30": [
-      "data_quality_first",
-      "integration_path",
-      "foundation_d30"
-     ],
-     "d60": [
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "data"
-    ],
-    "use_cases": [
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 3,
-    "gov_data_protection": 3,
-    "gov_oversight": 4,
-    "people_change": 3,
-    "people_ownership": 1,
-    "process_definition": 2,
-    "process_repeatability": 2,
-    "strategy_goals": 4,
-    "strategy_use_cases": 3,
-    "tech_environment": 1,
-    "tech_integration": 0
-   },
-   "expected": {
-    "actions": [
-     "integration_path",
-     "ownership_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 38,
-     "governance": 88,
-     "people": 50,
-     "process": 50,
-     "strategy": 88,
-     "technology": 13
-    },
-    "gaps": [
-     "technology",
-     "data"
-    ],
-    "overall": 55,
-    "roadmap": {
-     "d30": [
-      "integration_path",
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "strategy"
-    ],
-    "use_cases": [
-     "document_extraction",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 1,
-    "data_quality": 2,
-    "gov_data_protection": 3,
-    "gov_oversight": 2,
-    "people_change": 2,
-    "people_ownership": 1,
-    "process_definition": 4,
-    "process_repeatability": 2,
-    "strategy_goals": 3,
-    "strategy_use_cases": 0,
-    "tech_environment": 3,
-    "tech_integration": 1
-   },
-   "expected": {
-    "actions": [
-     "integration_path",
-     "ownership_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "integration",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 38,
-     "governance": 63,
-     "people": 38,
-     "process": 75,
-     "strategy": 38,
-     "technology": 50
-    },
-    "gaps": [
-     "strategy",
-     "data",
-     "people"
-    ],
-    "overall": 50,
-    "roadmap": {
-     "d30": [
-      "integration_path",
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "process"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "reply_drafting"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 2,
-    "data_quality": 4,
-    "gov_data_protection": 4,
-    "gov_oversight": 0,
-    "people_change": 0,
-    "people_ownership": 4,
-    "process_definition": 1,
-    "process_repeatability": 1,
-    "strategy_goals": 3,
-    "strategy_use_cases": 4,
-    "tech_environment": 0,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "ownership_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 75,
-     "governance": 50,
-     "people": 50,
-     "process": 25,
-     "strategy": 88,
-     "technology": 38
-    },
-    "gaps": [
-     "process",
-     "technology"
-    ],
-    "overall": 55,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "strategy",
-     "data"
-    ],
-    "use_cases": [
-     "knowledge_assistant",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 0,
-    "data_quality": 4,
-    "gov_data_protection": 3,
-    "gov_oversight": 4,
-    "people_change": 0,
-    "people_ownership": 4,
-    "process_definition": 3,
-    "process_repeatability": 1,
-    "strategy_goals": 3,
-    "strategy_use_cases": 3,
-    "tech_environment": 2,
-    "tech_integration": 4
-   },
-   "expected": {
-    "actions": [
-     "ownership_first",
-     "data_foundation",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 50,
-     "governance": 88,
-     "people": 50,
-     "process": 50,
-     "strategy": 75,
-     "technology": 75
-    },
-    "gaps": [],
-    "overall": 65,
-    "roadmap": {
-     "d30": [
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "technology",
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 4,
-    "data_quality": 3,
-    "gov_data_protection": 4,
-    "gov_oversight": 2,
-    "people_change": 0,
-    "people_ownership": 3,
-    "process_definition": 0,
-    "process_repeatability": 2,
-    "strategy_goals": 1,
-    "strategy_use_cases": 4,
-    "tech_environment": 2,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "ownership_first",
-     "process_mapping",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 88,
-     "governance": 75,
-     "people": 38,
-     "process": 25,
-     "strategy": 63,
-     "technology": 63
-    },
-    "gaps": [
-     "process",
-     "people"
-    ],
-    "overall": 61,
-    "roadmap": {
-     "d30": [
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "data",
-     "governance"
-    ],
-    "use_cases": [
-     "knowledge_assistant",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 1,
-    "data_quality": 4,
-    "gov_data_protection": 1,
-    "gov_oversight": 4,
-    "people_change": 1,
-    "people_ownership": 0,
-    "process_definition": 2,
-    "process_repeatability": 1,
-    "strategy_goals": 4,
-    "strategy_use_cases": 3,
-    "tech_environment": 2,
-    "tech_integration": 2
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "ownership_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 63,
-     "governance": 63,
-     "people": 13,
-     "process": 38,
-     "strategy": 88,
-     "technology": 50
-    },
-    "gaps": [
-     "people",
-     "process"
-    ],
-    "overall": 53,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "ownership_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "strategy"
-    ],
-    "use_cases": [
-     "knowledge_assistant",
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 3,
-    "gov_data_protection": 0,
-    "gov_oversight": 1,
-    "people_change": 1,
-    "people_ownership": 0,
-    "process_definition": 1,
-    "process_repeatability": 2,
-    "strategy_goals": 4,
-    "strategy_use_cases": 2,
-    "tech_environment": 0,
-    "tech_integration": 4
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "ownership_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 75,
-     "governance": 13,
-     "people": 13,
-     "process": 38,
-     "strategy": 75,
-     "technology": 50
-    },
-    "gaps": [
-     "people",
-     "governance",
-     "process"
-    ],
-    "overall": 44,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "ownership_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "data",
-     "strategy"
-    ],
-    "use_cases": [
-     "reporting_summary"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 1,
-    "data_quality": 0,
-    "gov_data_protection": 2,
-    "gov_oversight": 0,
-    "people_change": 1,
-    "people_ownership": 0,
-    "process_definition": 0,
-    "process_repeatability": 3,
-    "strategy_goals": 4,
-    "strategy_use_cases": 0,
-    "tech_environment": 4,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "foundation_plan"
-    ],
-    "band": "foundation",
-    "blockers": [
-     "governance",
-     "data_quality",
-     "organisation"
-    ],
-    "dimensions": {
-     "data": 13,
-     "governance": 25,
-     "people": 13,
-     "process": 38,
-     "strategy": 50,
-     "technology": 88
-    },
-    "gaps": [
-     "data",
-     "people",
-     "governance",
-     "process"
-    ],
-    "overall": 36,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "foundation_d30"
-     ],
-     "d60": [
-      "ownership_first",
-      "foundation_d60"
-     ],
-     "d90": [
-      "foundation_d90"
-     ]
-    },
-    "strengths": [
-     "technology"
-    ],
-    "use_cases": [
-     "process_discovery"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 1,
-    "gov_data_protection": 4,
-    "gov_oversight": 3,
-    "people_change": 2,
-    "people_ownership": 2,
-    "process_definition": 1,
-    "process_repeatability": 3,
-    "strategy_goals": 1,
-    "strategy_use_cases": 4,
-    "tech_environment": 4,
-    "tech_integration": 2
-   },
-   "expected": {
-    "actions": [
-     "data_quality_first",
-     "process_mapping",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "data_quality"
-    ],
-    "dimensions": {
-     "data": 50,
-     "governance": 88,
-     "people": 50,
-     "process": 50,
-     "strategy": 63,
-     "technology": 75
-    },
-    "gaps": [],
-    "overall": 63,
-    "roadmap": {
-     "d30": [
-      "data_quality_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "governance",
-     "technology"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "knowledge_assistant"
-    ]
-   }
-  },
-  {
-   "answers": {
-    "data_access": 3,
-    "data_quality": 1,
-    "gov_data_protection": 0,
-    "gov_oversight": 2,
-    "people_change": 1,
-    "people_ownership": 3,
-    "process_definition": 1,
-    "process_repeatability": 4,
-    "strategy_goals": 3,
-    "strategy_use_cases": 4,
-    "tech_environment": 1,
-    "tech_integration": 3
-   },
-   "expected": {
-    "actions": [
-     "governance_first",
-     "data_quality_first",
-     "scoped_pilot"
-    ],
-    "band": "pilot_ready",
-    "blockers": [
-     "governance",
-     "data_quality"
-    ],
-    "dimensions": {
-     "data": 50,
-     "governance": 25,
-     "people": 50,
-     "process": 63,
-     "strategy": 88,
-     "technology": 50
-    },
-    "gaps": [
-     "governance"
-    ],
-    "overall": 53,
-    "roadmap": {
-     "d30": [
-      "governance_first",
-      "data_quality_first",
-      "pilot_ready_d30"
-     ],
-     "d60": [
-      "pilot_ready_d60"
-     ],
-     "d90": [
-      "pilot_ready_d90"
-     ]
-    },
-    "strengths": [
-     "strategy"
-    ],
-    "use_cases": [
-     "inquiry_triage",
-     "document_extraction",
-     "reporting_summary"
-    ]
+    }
    }
   }
  ]

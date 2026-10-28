@@ -232,8 +232,9 @@ export const adminBg = {
     model: "Версия на модела: {version}",
     download: "Изтегли PDF отчета",
     bands: { exploration: "Проучване", foundation: "Изграждане на основи", pilot_ready: "Готовност за пилот", scaling: "Готовност за мащабиране" },
-    dimensionNames: { strategy: "Стратегия", data: "Данни", process: "Процеси", technology: "Технологии", people: "Хора", governance: "Контрол" } as Record<string, string>,
-    blockerNames: { governance: "Контрол и защита на данните", data_quality: "Качество на данните", integration: "Достъп до системите", organisation: "Отговорност в екипа" } as Record<string, string>,
+    // Current model first; process, technology and people belong to submissions of model 2026-10.2.
+    dimensionNames: { strategy: "Стратегия", infrastructure: "Инфраструктура", data: "Данни", governance: "Управление и контрол", talent: "Таланти и умения", organization: "Организационна готовност", process: "Процеси", technology: "Технологии", people: "Хора" } as Record<string, string>,
+    blockerNames: { governance: "Контрол и защита на данните", data_quality: "Качество на данните", integration: "Достъп до системите", expertise: "Техническа експертиза", organisation: "Отговорност в екипа" } as Record<string, string>,
   },
   aiManaged: {
     title: "AI система на клиента",

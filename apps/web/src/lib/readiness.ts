@@ -16,30 +16,30 @@ import type { ServiceKey } from "@/content/types";
  */
 
 /** Must equal MODEL_VERSION in the API; the API rejects answers made with another model version. */
-export const READINESS_MODEL_VERSION = "2026-10.2";
+export const READINESS_MODEL_VERSION = "2026-11.1";
 /** Version of the request shape sent to /api/public/readiness/*. */
 export const READINESS_SCHEMA_VERSION = "1";
 
-export const READINESS_DIMENSIONS = ["strategy", "data", "process", "technology", "people", "governance"] as const;
+export const READINESS_DIMENSIONS = ["strategy", "infrastructure", "data", "governance", "talent", "organization"] as const;
 export type ReadinessDimension = (typeof READINESS_DIMENSIONS)[number];
 
 /** Relative weights (percent). Normalised at run time, so they always sum to 1. */
 export const DIMENSION_WEIGHTS: Record<ReadinessDimension, number> = {
   strategy: 15,
+  infrastructure: 15,
   data: 20,
-  process: 15,
-  technology: 15,
-  people: 15,
   governance: 20,
+  talent: 15,
+  organization: 15,
 };
 
 export const READINESS_QUESTIONS = {
   strategy: ["strategy_goals", "strategy_use_cases"],
+  infrastructure: ["tech_integration", "tech_environment"],
   data: ["data_access", "data_quality"],
-  process: ["process_definition", "process_repeatability"],
-  technology: ["tech_integration", "tech_environment"],
-  people: ["people_ownership", "people_change"],
   governance: ["gov_data_protection", "gov_oversight"],
+  talent: ["talent_skills", "talent_support"],
+  organization: ["people_ownership", "people_change"],
 } as const satisfies Record<ReadinessDimension, readonly [string, string]>;
 
 export type ReadinessQuestionId = (typeof READINESS_QUESTIONS)[ReadinessDimension][number];
@@ -61,19 +61,20 @@ export const BAND_THRESHOLDS: { band: ReadinessBand; min: number }[] = [
   { band: "exploration", min: 0 },
 ];
 
-export type ReadinessBlocker = "governance" | "data_quality" | "integration" | "organisation";
+export type ReadinessBlocker = "governance" | "data_quality" | "integration" | "expertise" | "organisation";
 
 export type ReadinessAction =
   | "governance_first"
   | "data_quality_first"
   | "integration_path"
+  | "expertise_first"
   | "ownership_first"
   | "strategy_definition"
-  | "data_foundation"
-  | "process_mapping"
   | "tech_foundation"
-  | "people_enablement"
+  | "data_foundation"
   | "governance_framework"
+  | "talent_enablement"
+  | "people_enablement"
   | "discovery_workshop"
   | "foundation_plan"
   | "scoped_pilot"
@@ -123,13 +124,14 @@ export const ACTION_SERVICE: Record<ReadinessAction, ServiceKey> = {
   governance_first: "audit",
   data_quality_first: "integrations",
   integration_path: "integrations",
+  expertise_first: "ai_managed",
   ownership_first: "audit",
   strategy_definition: "audit",
-  data_foundation: "integrations",
-  process_mapping: "automation",
   tech_foundation: "integrations",
-  people_enablement: "audit",
+  data_foundation: "integrations",
   governance_framework: "audit",
+  talent_enablement: "audit",
+  people_enablement: "audit",
   discovery_workshop: "audit",
   foundation_plan: "audit",
   scoped_pilot: "ai_agents",
@@ -139,17 +141,18 @@ export const ACTION_SERVICE: Record<ReadinessAction, ServiceKey> = {
 const BLOCKER_ACTION: Record<ReadinessBlocker, { action: ReadinessAction; dimension: ReadinessDimension }> = {
   governance: { action: "governance_first", dimension: "governance" },
   data_quality: { action: "data_quality_first", dimension: "data" },
-  integration: { action: "integration_path", dimension: "technology" },
-  organisation: { action: "ownership_first", dimension: "people" },
+  integration: { action: "integration_path", dimension: "infrastructure" },
+  expertise: { action: "expertise_first", dimension: "talent" },
+  organisation: { action: "ownership_first", dimension: "organization" },
 };
 
 const GAP_ACTION: Record<ReadinessDimension, ReadinessAction> = {
   strategy: "strategy_definition",
+  infrastructure: "tech_foundation",
   data: "data_foundation",
-  process: "process_mapping",
-  technology: "tech_foundation",
-  people: "people_enablement",
   governance: "governance_framework",
+  talent: "talent_enablement",
+  organization: "people_enablement",
 };
 
 const BAND_ACTION: Record<ReadinessBand, ReadinessAction> = {
@@ -161,10 +164,10 @@ const BAND_ACTION: Record<ReadinessBand, ReadinessAction> = {
 
 /** Use cases in priority order with the minimum dimension scores they need. */
 const USE_CASE_RULES: { useCase: ReadinessUseCase; requires: Partial<Record<ReadinessDimension, number>> }[] = [
-  { useCase: "inquiry_triage", requires: { process: 50, technology: 50 } },
-  { useCase: "document_extraction", requires: { data: 25, process: 50 } },
+  { useCase: "inquiry_triage", requires: { infrastructure: 50, organization: 50 } },
+  { useCase: "document_extraction", requires: { data: 25, infrastructure: 50 } },
   { useCase: "knowledge_assistant", requires: { data: 50, governance: 50 } },
-  { useCase: "reply_drafting", requires: { process: 50, governance: 50 } },
+  { useCase: "reply_drafting", requires: { organization: 50, governance: 50 } },
   { useCase: "reporting_summary", requires: { data: 50 } },
 ];
 
@@ -215,6 +218,7 @@ export function overallScore(answers: Required<ReadinessAnswers>, weights = norm
  *   governance:   personal data not documented (≤ 1) or no decision on AI oversight (0)
  *   data_quality: data quality unknown or poor (≤ 1)
  *   integration:  systems cannot be connected or it is unknown (≤ 1)
+ *   expertise:    no access to technical expertise at all (0)
  *   organisation: no real owner (≤ 1) or undiscussed resistance to change (0)
  */
 export function findBlockers(answers: Required<ReadinessAnswers>): ReadinessBlocker[] {
@@ -222,13 +226,14 @@ export function findBlockers(answers: Required<ReadinessAnswers>): ReadinessBloc
   if (answers.gov_data_protection <= 1 || answers.gov_oversight === 0) blockers.push("governance");
   if (answers.data_quality <= 1) blockers.push("data_quality");
   if (answers.tech_integration <= 1) blockers.push("integration");
+  if (answers.talent_support === 0) blockers.push("expertise");
   if (answers.people_ownership <= 1 || answers.people_change === 0) blockers.push("organisation");
   return blockers;
 }
 
 /**
  * Top three actions. Positions 1–2: the most urgent items — blockers in priority order
- * (governance → data quality → integration → organisation), then gaps weakest-first, skipping
+ * (governance → data quality → integration → expertise → organisation), then gaps weakest-first, skipping
  * dimensions a blocker already covers; when fewer than two exist, the remaining dimensions fill in,
  * lowest score first. Position 3: always the band's next step.
  */
@@ -298,15 +303,23 @@ export function scoreReadiness(answers: ReadinessAnswers): ReadinessResult | Inc
   };
 }
 
-/** Non-personal share code: one digit (0–4) per question in READINESS_QUESTION_ORDER. */
+/**
+ * Prefix of the share code for this question set. Codes of an earlier model (12 digits without a
+ * prefix) are not decoded, so an old link never maps its answers onto different questions.
+ */
+export const SHARE_CODE_PREFIX = "b";
+
+/** Non-personal share code: the prefix, then one digit (0–4) per question in READINESS_QUESTION_ORDER. */
 export function encodeAnswers(answers: ReadinessAnswers): string {
-  return READINESS_QUESTION_ORDER.map((id) => answers[id] ?? "x").join("");
+  return SHARE_CODE_PREFIX + READINESS_QUESTION_ORDER.map((id) => answers[id] ?? "x").join("");
 }
 
-/** Inverse of `encodeAnswers`; null for anything that is not a complete, valid code. */
+/** Inverse of `encodeAnswers`; null for anything that is not a complete, valid code of this model. */
 export function decodeAnswers(code: string | null | undefined): ReadinessAnswers | null {
-  if (!code || code.length !== READINESS_QUESTION_ORDER.length || !/^[0-4]+$/.test(code)) return null;
-  return Object.fromEntries(READINESS_QUESTION_ORDER.map((id, i) => [id, Number(code[i]) as AnswerScore])) as ReadinessAnswers;
+  if (!code?.startsWith(SHARE_CODE_PREFIX)) return null;
+  const digits = code.slice(SHARE_CODE_PREFIX.length);
+  if (digits.length !== READINESS_QUESTION_ORDER.length || !/^[0-4]+$/.test(digits)) return null;
+  return Object.fromEntries(READINESS_QUESTION_ORDER.map((id, i) => [id, Number(digits[i]) as AnswerScore])) as ReadinessAnswers;
 }
 
 /** The result in the API's JSON shape (`ReadinessResult.summary()`), used for the parity vectors. */
