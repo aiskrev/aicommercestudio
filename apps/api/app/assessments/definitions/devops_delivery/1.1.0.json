@@ -1,0 +1,1977 @@
+{
+  "key": "devops_delivery",
+  "version": "1.1.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 10
+  },
+  "dimensions": [
+    {
+      "key": "version_control",
+      "weight": 9
+    },
+    {
+      "key": "branching",
+      "weight": 9
+    },
+    {
+      "key": "ci_reliability",
+      "weight": 9
+    },
+    {
+      "key": "testing",
+      "weight": 9
+    },
+    {
+      "key": "cd",
+      "weight": 9
+    },
+    {
+      "key": "iac",
+      "weight": 9
+    },
+    {
+      "key": "supply_chain",
+      "weight": 9
+    },
+    {
+      "key": "secrets",
+      "weight": 9
+    },
+    {
+      "key": "gitops",
+      "weight": 9
+    },
+    {
+      "key": "devex",
+      "weight": 9
+    },
+    {
+      "key": "feedback",
+      "weight": 10
+    }
+  ],
+  "questions": [
+    {
+      "key": "vc_scope",
+      "type": "single_choice",
+      "dimension": "version_control",
+      "options": [
+        {
+          "key": "some_code",
+          "points": 0
+        },
+        {
+          "key": "all_code",
+          "points": 1
+        },
+        {
+          "key": "code_config",
+          "points": 2
+        },
+        {
+          "key": "everything",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "vc_review",
+      "type": "single_choice",
+      "dimension": "version_control",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "sometimes",
+          "points": 1
+        },
+        {
+          "key": "always",
+          "points": 2
+        },
+        {
+          "key": "enforced",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "br_lifetime",
+      "type": "single_choice",
+      "dimension": "branching",
+      "options": [
+        {
+          "key": "months",
+          "points": 0
+        },
+        {
+          "key": "weeks",
+          "points": 1
+        },
+        {
+          "key": "days",
+          "points": 2
+        },
+        {
+          "key": "hours",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "br_integration",
+      "type": "single_choice",
+      "dimension": "branching",
+      "options": [
+        {
+          "key": "release",
+          "points": 0
+        },
+        {
+          "key": "weekly",
+          "points": 1
+        },
+        {
+          "key": "daily",
+          "points": 2
+        },
+        {
+          "key": "continuous",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ci_speed",
+      "type": "single_choice",
+      "dimension": "ci_reliability",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "slow",
+          "points": 1
+        },
+        {
+          "key": "medium",
+          "points": 2
+        },
+        {
+          "key": "fast",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ci_flaky",
+      "type": "single_choice",
+      "dimension": "ci_reliability",
+      "options": [
+        {
+          "key": "often",
+          "points": 0
+        },
+        {
+          "key": "sometimes",
+          "points": 1
+        },
+        {
+          "key": "rarely",
+          "points": 2
+        },
+        {
+          "key": "tracked",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "test_automation",
+      "type": "single_choice",
+      "dimension": "testing",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "unit",
+          "points": 1
+        },
+        {
+          "key": "layers",
+          "points": 2
+        },
+        {
+          "key": "risk_based",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "test_gates",
+      "type": "single_choice",
+      "dimension": "testing",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "advisory",
+          "points": 1
+        },
+        {
+          "key": "blocking",
+          "points": 2
+        },
+        {
+          "key": "full_gates",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cd_deploy",
+      "type": "single_choice",
+      "dimension": "cd",
+      "options": [
+        {
+          "key": "manual",
+          "points": 0
+        },
+        {
+          "key": "scripted",
+          "points": 1
+        },
+        {
+          "key": "pipeline",
+          "points": 2
+        },
+        {
+          "key": "progressive",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cd_frequency",
+      "type": "single_choice",
+      "dimension": "cd",
+      "options": [
+        {
+          "key": "monthly",
+          "points": 0
+        },
+        {
+          "key": "weekly",
+          "points": 1
+        },
+        {
+          "key": "daily",
+          "points": 2
+        },
+        {
+          "key": "on_demand",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "iac_coverage",
+      "type": "single_choice",
+      "dimension": "iac",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "most",
+          "points": 2
+        },
+        {
+          "key": "all",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "iac_change",
+      "type": "single_choice",
+      "dimension": "iac",
+      "options": [
+        {
+          "key": "local",
+          "points": 0
+        },
+        {
+          "key": "reviewed",
+          "points": 1
+        },
+        {
+          "key": "pipeline",
+          "points": 2
+        },
+        {
+          "key": "policy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "sc_dependencies",
+      "type": "single_choice",
+      "dimension": "supply_chain",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "occasional",
+          "points": 1
+        },
+        {
+          "key": "ci",
+          "points": 2
+        },
+        {
+          "key": "ci_policy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "sc_provenance",
+      "type": "single_choice",
+      "dimension": "supply_chain",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "tags",
+          "points": 1
+        },
+        {
+          "key": "registry",
+          "points": 2
+        },
+        {
+          "key": "signed",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "secrets_storage",
+      "type": "single_choice",
+      "dimension": "secrets",
+      "options": [
+        {
+          "key": "in_code",
+          "points": 0
+        },
+        {
+          "key": "ci_vars",
+          "points": 1
+        },
+        {
+          "key": "vault",
+          "points": 2
+        },
+        {
+          "key": "vault_short",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "secrets_rotation",
+      "type": "single_choice",
+      "dimension": "secrets",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "incident",
+          "points": 1
+        },
+        {
+          "key": "scheduled",
+          "points": 2
+        },
+        {
+          "key": "automatic",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "gitops_state",
+      "type": "single_choice",
+      "dimension": "gitops",
+      "options": [
+        {
+          "key": "nowhere",
+          "points": 0
+        },
+        {
+          "key": "docs",
+          "points": 1
+        },
+        {
+          "key": "git_push",
+          "points": 2
+        },
+        {
+          "key": "git_pull",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "gitops_drift",
+      "type": "single_choice",
+      "dimension": "gitops",
+      "options": [
+        {
+          "key": "incident",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "scheduled",
+          "points": 2
+        },
+        {
+          "key": "continuous",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "dx_new_service",
+      "type": "single_choice",
+      "dimension": "devex",
+      "options": [
+        {
+          "key": "months",
+          "points": 0
+        },
+        {
+          "key": "weeks",
+          "points": 1
+        },
+        {
+          "key": "days",
+          "points": 2
+        },
+        {
+          "key": "hours",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "dx_onboarding",
+      "type": "single_choice",
+      "dimension": "devex",
+      "options": [
+        {
+          "key": "months",
+          "points": 0
+        },
+        {
+          "key": "weeks",
+          "points": 1
+        },
+        {
+          "key": "week",
+          "points": 2
+        },
+        {
+          "key": "day",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fb_postmortems",
+      "type": "single_choice",
+      "dimension": "feedback",
+      "options": [
+        {
+          "key": "nothing",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "reviews",
+          "points": 2
+        },
+        {
+          "key": "actions",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fb_metrics",
+      "type": "single_choice",
+      "dimension": "feedback",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "reviewed",
+          "points": 2
+        },
+        {
+          "key": "drives",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "dora_deploy_frequency",
+      "type": "number",
+      "dimension": "feedback",
+      "required": false,
+      "evidence": "metric",
+      "min": 0,
+      "max": 10000,
+      "integer": true,
+      "bands": [
+        {
+          "at_least": 0,
+          "points": 0
+        },
+        {
+          "at_least": 10000,
+          "points": 0
+        }
+      ]
+    },
+    {
+      "key": "dora_lead_time_hours",
+      "type": "number",
+      "dimension": "feedback",
+      "required": false,
+      "evidence": "metric",
+      "min": 0,
+      "max": 8760,
+      "integer": false,
+      "bands": [
+        {
+          "at_least": 0,
+          "points": 0
+        },
+        {
+          "at_least": 8760,
+          "points": 0
+        }
+      ]
+    },
+    {
+      "key": "dora_change_failure_rate",
+      "type": "number",
+      "dimension": "feedback",
+      "required": false,
+      "evidence": "metric",
+      "min": 0,
+      "max": 100,
+      "integer": false,
+      "bands": [
+        {
+          "at_least": 0,
+          "points": 0
+        },
+        {
+          "at_least": 100,
+          "points": 0
+        }
+      ]
+    },
+    {
+      "key": "dora_restore_hours",
+      "type": "number",
+      "dimension": "feedback",
+      "required": false,
+      "evidence": "metric",
+      "min": 0,
+      "max": 8760,
+      "integer": false,
+      "bands": [
+        {
+          "at_least": 0,
+          "points": 0
+        },
+        {
+          "at_least": 8760,
+          "points": 0
+        }
+      ]
+    },
+    {
+      "key": "dora_source",
+      "type": "single_choice",
+      "dimension": "feedback",
+      "required": false,
+      "evidence": "metric",
+      "options": [
+        {
+          "key": "tooling",
+          "points": 0
+        },
+        {
+          "key": "estimate",
+          "points": 0
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_no_review",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "vc_review",
+        "options": [
+          "never"
+        ]
+      },
+      "recommendation": "risk_no_review",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "risk_secrets_in_code",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "secrets_storage",
+        "options": [
+          "in_code"
+        ]
+      },
+      "recommendation": "risk_secrets_in_code",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre",
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "risk_manual_release",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "cd_deploy",
+        "options": [
+          "manual"
+        ]
+      },
+      "recommendation": "risk_manual_release",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "risk_unknown_artifacts",
+      "priority": 2,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "sc_provenance",
+            "options": [
+              "no"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "sc_dependencies",
+            "options": [
+              "no"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_unknown_artifacts",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre",
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "risk_no_gates",
+      "priority": 3,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "test_gates",
+            "options": [
+              "none",
+              "advisory"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "cd_deploy",
+            "options": [
+              "pipeline",
+              "progressive"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_no_gates",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "risk_long_branches",
+      "priority": 3,
+      "when": {
+        "kind": "answer_in",
+        "question": "br_lifetime",
+        "options": [
+          "months"
+        ]
+      },
+      "recommendation": "risk_long_branches",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "qw_branch_protection",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "vc_review",
+        "options": [
+          "never",
+          "sometimes",
+          "always"
+        ]
+      },
+      "recommendation": "qw_branch_protection",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "qw_secret_scanning",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "secrets_storage",
+        "options": [
+          "in_code",
+          "ci_vars"
+        ]
+      },
+      "recommendation": "qw_secret_scanning",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre",
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "qw_dependency_scan",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "sc_dependencies",
+        "options": [
+          "no",
+          "occasional"
+        ]
+      },
+      "recommendation": "qw_dependency_scan",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "qw_flaky_tests",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "ci_flaky",
+        "options": [
+          "often",
+          "sometimes"
+        ]
+      },
+      "recommendation": "qw_flaky_tests",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "qw_measure_delivery",
+      "priority": 6,
+      "when": {
+        "kind": "answer_missing",
+        "question": "dora_deploy_frequency"
+      },
+      "recommendation": "qw_measure_delivery",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre",
+        "advisory_enablement"
+      ]
+    },
+    {
+      "key": "qw_blameless_reviews",
+      "priority": 6,
+      "when": {
+        "kind": "answer_in",
+        "question": "fb_postmortems",
+        "options": [
+          "nothing",
+          "informal"
+        ]
+      },
+      "recommendation": "qw_blameless_reviews",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "rec_version_control",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "version_control",
+        "value": 50
+      },
+      "recommendation": "rec_version_control",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "rec_trunk_based",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "branching",
+        "value": 50
+      },
+      "recommendation": "rec_trunk_based",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "rec_ci",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "ci_reliability",
+        "value": 50
+      },
+      "recommendation": "rec_ci",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "rec_testing",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "testing",
+        "value": 50
+      },
+      "recommendation": "rec_testing",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "rec_cd",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "cd",
+        "value": 50
+      },
+      "recommendation": "rec_cd",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "rec_iac",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "iac",
+        "value": 50
+      },
+      "recommendation": "rec_iac",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform",
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "rec_supply_chain",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "supply_chain",
+        "value": 50
+      },
+      "recommendation": "rec_supply_chain",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "rec_secrets",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "secrets",
+        "value": 50
+      },
+      "recommendation": "rec_secrets",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "rec_gitops",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "gitops",
+        "value": 50
+      },
+      "recommendation": "rec_gitops",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "rec_devex",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "devex",
+        "value": 50
+      },
+      "recommendation": "rec_devex",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "rec_feedback",
+      "priority": 15,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "feedback",
+        "value": 50
+      },
+      "recommendation": "rec_feedback",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "advisory_enablement"
+      ]
+    },
+    {
+      "key": "pattern_trunk_ci",
+      "priority": 20,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "branching",
+        "value": 75
+      },
+      "recommendation": "pattern_trunk_ci",
+      "kind": "pattern",
+      "horizon": 90,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "pattern_gitops_pull",
+      "priority": 21,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "gitops_state",
+            "options": [
+              "nowhere",
+              "docs",
+              "git_push"
+            ]
+          },
+          {
+            "kind": "dimension_below",
+            "dimension": "gitops",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "pattern_gitops_pull",
+      "kind": "pattern",
+      "horizon": 90,
+      "domains": [
+        "devops_sre",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "pattern_progressive",
+      "priority": 22,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "cd_deploy",
+            "options": [
+              "pipeline"
+            ]
+          },
+          {
+            "kind": "dimension_below",
+            "dimension": "cd",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "pattern_progressive",
+      "kind": "pattern",
+      "horizon": 90,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "ctx_metrics_estimated",
+      "priority": 30,
+      "when": {
+        "kind": "answer_in",
+        "question": "dora_source",
+        "options": [
+          "estimate"
+        ]
+      },
+      "recommendation": "ctx_metrics_estimated",
+      "kind": "context"
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на зрелостта на DevOps доставката",
+      "intro": "22 въпроса за практиките в 11 области и по желание 4 метрики за доставката. Оценката се изчислява само от практиките; метриките се показват отделно като въведени от вас.",
+      "disclaimer": "Самооценка по вашите отговори. Не се свързваме с вашите хранилища или pipeline-и и не сканираме нищо. Метриките, които въведете, не са проверени и не влизат в оценката.",
+      "dimensions": {
+        "version_control": {
+          "title": "Контрол на версиите",
+          "description": "Всичко в контрол на версиите, с прегледи на промените."
+        },
+        "branching": {
+          "title": "Trunk-based разработка и разклонения",
+          "description": "Колко дълго живеят разклоненията и колко често се интегрират промените."
+        },
+        "ci_reliability": {
+          "title": "Надеждност на CI",
+          "description": "Колко бързи и стабилни са проверките при всяка промяна."
+        },
+        "testing": {
+          "title": "Автоматизирани тестове и quality gates",
+          "description": "Тестове на различни нива и правила, които спират лоша промяна."
+        },
+        "cd": {
+          "title": "Непрекъсната доставка и постепенно пускане",
+          "description": "Как промените стигат до продукция и колко рисково е това."
+        },
+        "iac": {
+          "title": "Инфраструктура като код",
+          "description": "Средите се описват и променят като код."
+        },
+        "supply_chain": {
+          "title": "Произход на артефактите и веригата на доставки",
+          "description": "Знаете ли какво е вградено в артефактите и откъде идва."
+        },
+        "secrets": {
+          "title": "Управление на тайни",
+          "description": "Къде се пазят паролите и ключовете и как се сменят."
+        },
+        "gitops": {
+          "title": "GitOps и отклонения в средите",
+          "description": "Дали желаното състояние е в Git и как се открива отклонение."
+        },
+        "devex": {
+          "title": "Опит на разработчиците",
+          "description": "Колко бързо нов човек или нова услуга стигат до продукция."
+        },
+        "feedback": {
+          "title": "Учене от инциденти и обратна връзка",
+          "description": "Разбори след инциденти и данни за доставката, които водят до промени."
+        }
+      },
+      "questions": {
+        "vc_scope": {
+          "text": "Какво е в контрол на версиите?",
+          "options": {
+            "some_code": "Част от кода",
+            "all_code": "Целият код на приложенията",
+            "code_config": "Кодът и конфигурацията",
+            "everything": "Код, конфигурация, инфраструктура и pipeline-и"
+          }
+        },
+        "vc_review": {
+          "text": "Преглеждат ли се промените преди сливане?",
+          "options": {
+            "never": "Не",
+            "sometimes": "Понякога",
+            "always": "Винаги, по договорка",
+            "enforced": "Винаги, наложено със защитени разклонения"
+          }
+        },
+        "br_lifetime": {
+          "text": "Колко дълго живеят разклоненията?",
+          "options": {
+            "months": "Седмици до месеци",
+            "weeks": "Около седмица",
+            "days": "Няколко дни",
+            "hours": "Под ден (trunk-based)"
+          }
+        },
+        "br_integration": {
+          "text": "Колко често промените се сливат в основния клон?",
+          "options": {
+            "release": "При издание",
+            "weekly": "Седмично",
+            "daily": "Всеки ден",
+            "continuous": "Многократно на ден, с feature flags за незавършена работа"
+          }
+        },
+        "ci_speed": {
+          "text": "Колко време отнема CI проверката на една промяна?",
+          "options": {
+            "none": "Нямаме CI",
+            "slow": "Над 30 минути",
+            "medium": "10–30 минути",
+            "fast": "Под 10 минути"
+          }
+        },
+        "ci_flaky": {
+          "text": "Колко често CI се проваля без истински проблем?",
+          "options": {
+            "often": "Често; рестартираме, докато мине",
+            "sometimes": "Понякога",
+            "rarely": "Рядко",
+            "tracked": "Рядко, а нестабилните тестове се проследяват и поправят"
+          }
+        },
+        "test_automation": {
+          "text": "Какви автоматизирани тестове имате?",
+          "options": {
+            "none": "Почти никакви",
+            "unit": "Основно unit тестове",
+            "layers": "Unit, интеграционни и няколко end-to-end",
+            "risk_based": "Няколко нива, избрани по риск, включително договорни тестове"
+          }
+        },
+        "test_gates": {
+          "text": "Спират ли автоматичните проверки лоша промяна?",
+          "options": {
+            "none": "Не",
+            "advisory": "Показват резултат, но не спират",
+            "blocking": "Тестовете спират сливането",
+            "full_gates": "Тестове, анализ на кода и сигурност спират сливането и пускането"
+          }
+        },
+        "cd_deploy": {
+          "text": "Как се внедрява в продукция?",
+          "options": {
+            "manual": "Ръчно",
+            "scripted": "Със скрипт, пускан ръчно",
+            "pipeline": "Автоматично през pipeline",
+            "progressive": "Постепенно (canary или blue-green) с автоматично връщане"
+          }
+        },
+        "cd_frequency": {
+          "text": "Колко често можете да внедрите безопасно?",
+          "options": {
+            "monthly": "Месечно или по-рядко",
+            "weekly": "Седмично",
+            "daily": "Всеки ден",
+            "on_demand": "При нужда, многократно на ден"
+          }
+        },
+        "iac_coverage": {
+          "text": "Колко от средите са описани като код?",
+          "options": {
+            "none": "Създават се ръчно",
+            "some": "Част от тях",
+            "most": "Повечето",
+            "all": "Всички, включително средите за преглед"
+          }
+        },
+        "iac_change": {
+          "text": "Как се прилагат промените в инфраструктурата?",
+          "options": {
+            "local": "От компютрите на хората",
+            "reviewed": "С преглед, ръчно",
+            "pipeline": "През pipeline с план",
+            "policy": "През pipeline с план и проверка на политики"
+          }
+        },
+        "sc_dependencies": {
+          "text": "Проверяват ли се зависимостите за уязвимости?",
+          "options": {
+            "no": "Не",
+            "occasional": "От време на време",
+            "ci": "При всяка промяна в CI",
+            "ci_policy": "При всяка промяна, с правила какво спира пускането"
+          }
+        },
+        "sc_provenance": {
+          "text": "Знаете ли откъде идва всеки артефакт в продукция?",
+          "options": {
+            "no": "Не",
+            "tags": "По етикет или версия",
+            "registry": "Изграден в CI и пазен в регистър",
+            "signed": "Подписан, с SBOM и проверка на подписа при внедряване"
+          }
+        },
+        "secrets_storage": {
+          "text": "Къде се пазят тайните (пароли, ключове)?",
+          "options": {
+            "in_code": "В кода или във файлове",
+            "ci_vars": "В променливи на CI",
+            "vault": "В управлявано хранилище за тайни",
+            "vault_short": "В хранилище, с краткотрайни идентификационни данни"
+          }
+        },
+        "secrets_rotation": {
+          "text": "Сменят ли се тайните?",
+          "options": {
+            "never": "Почти никога",
+            "incident": "След инцидент",
+            "scheduled": "По график",
+            "automatic": "Автоматично"
+          }
+        },
+        "gitops_state": {
+          "text": "Къде е описано желаното състояние на средите?",
+          "options": {
+            "nowhere": "Никъде; знаем го",
+            "docs": "В документация",
+            "git_push": "В Git, прилага се от pipeline (push)",
+            "git_pull": "В Git, прилага се от агент в средата (pull)"
+          }
+        },
+        "gitops_drift": {
+          "text": "Как разбирате, че средата се е отклонила от описанието?",
+          "options": {
+            "incident": "Когато нещо се счупи",
+            "manual": "При ръчна проверка",
+            "scheduled": "При планирана проверка",
+            "continuous": "Непрекъснато, с известие или автоматично връщане"
+          }
+        },
+        "dx_new_service": {
+          "text": "Колко време отнема нова услуга да стигне до продукция?",
+          "options": {
+            "months": "Месеци",
+            "weeks": "Седмици",
+            "days": "Дни",
+            "hours": "Часове, от шаблон"
+          }
+        },
+        "dx_onboarding": {
+          "text": "Кога нов разработчик внедрява първата си промяна?",
+          "options": {
+            "months": "След месец или повече",
+            "weeks": "След няколко седмици",
+            "week": "През първата седмица",
+            "day": "През първия ден"
+          }
+        },
+        "fb_postmortems": {
+          "text": "Какво се случва след инцидент?",
+          "options": {
+            "nothing": "Нищо особено",
+            "informal": "Неформален разговор",
+            "reviews": "Разбор без търсене на виновни",
+            "actions": "Разбор с действия, които се проследяват до завършване"
+          }
+        },
+        "fb_metrics": {
+          "text": "Използвате ли данни за доставката при решения?",
+          "options": {
+            "no": "Не",
+            "ad_hoc": "От време на време",
+            "reviewed": "Преглеждаме ги редовно",
+            "drives": "Те определят какво подобряваме"
+          }
+        },
+        "dora_deploy_frequency": {
+          "text": "Внедрявания в продукция за последните 30 дни",
+          "help": "Само ако имате реално число. Не влиза в оценката.",
+          "unit": "внедрявания"
+        },
+        "dora_lead_time_hours": {
+          "text": "Типично време от сливане до продукция",
+          "help": "В часове. Не влиза в оценката.",
+          "unit": "часа"
+        },
+        "dora_change_failure_rate": {
+          "text": "Дял на внедряванията, довели до проблем",
+          "help": "В проценти. Не влиза в оценката.",
+          "unit": "%"
+        },
+        "dora_restore_hours": {
+          "text": "Типично време за възстановяване след инцидент",
+          "help": "В часове. Не влиза в оценката.",
+          "unit": "часа"
+        },
+        "dora_source": {
+          "text": "Откъде са тези числа?",
+          "options": {
+            "tooling": "Измерени от нашите инструменти (CI/CD, инциденти)",
+            "estimate": "Наша приблизителна оценка"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_no_review": {
+          "title": "Промени без преглед",
+          "description": "Без преглед грешки и тайни стигат до основния клон незабелязано."
+        },
+        "risk_secrets_in_code": {
+          "title": "Тайни в кода",
+          "description": "Паролите и ключовете в кода или във файлове изтичат с всяко копие на хранилището."
+        },
+        "risk_manual_release": {
+          "title": "Ръчни внедрявания",
+          "description": "Всяко ръчно внедряване е различно и трудно се връща назад."
+        },
+        "risk_unknown_artifacts": {
+          "title": "Неизвестен произход на артефактите",
+          "description": "Не знаете какво е вградено в продукция, затова не можете бързо да реагирате на уязвима зависимост."
+        },
+        "risk_no_gates": {
+          "title": "Автоматично внедряване без спиращи проверки",
+          "description": "Pipeline-ът пуска промени, които никой тест не е спрял."
+        },
+        "risk_long_branches": {
+          "title": "Дълго живеещи разклонения",
+          "description": "Големите сливания крият конфликти и забавят всяка доставка."
+        },
+        "qw_branch_protection": {
+          "title": "Защитени разклонения",
+          "description": "Наложете преглед и зелен CI преди сливане в основния клон."
+        },
+        "qw_secret_scanning": {
+          "title": "Сканиране за тайни и преместване в хранилище",
+          "description": "Включете сканиране за тайни, сменете откритите и ги преместете в хранилище."
+        },
+        "qw_dependency_scan": {
+          "title": "Проверка на зависимостите в CI",
+          "description": "Добавете автоматична проверка на зависимостите при всяка промяна."
+        },
+        "qw_flaky_tests": {
+          "title": "Списък на нестабилните тестове",
+          "description": "Изолирайте и поправете тестовете, които се провалят случайно, вместо да рестартирате."
+        },
+        "qw_measure_delivery": {
+          "title": "Започнете да измервате доставката",
+          "description": "Изчислявайте честотата на внедряване и времето до продукция от данните на CI/CD, вместо да ги оценявате."
+        },
+        "qw_blameless_reviews": {
+          "title": "Кратък разбор след всеки инцидент",
+          "description": "Шаблон на една страница: какво стана, защо, едно до три действия със срок."
+        },
+        "rec_version_control": {
+          "title": "Всичко в контрол на версиите, с прегледи",
+          "description": "Конфигурация, инфраструктура и pipeline-и в Git, с наложен преглед."
+        },
+        "rec_trunk_based": {
+          "title": "По-къси разклонения и feature flags",
+          "description": "Сливайте поне веднъж на ден и скривайте незавършената работа с feature flags."
+        },
+        "rec_ci": {
+          "title": "Бърз и стабилен CI",
+          "description": "Целете под 10 минути: кеширане, паралелни задачи и поправяне на нестабилните тестове."
+        },
+        "rec_testing": {
+          "title": "Тестове по риск и спиращи проверки",
+          "description": "Интеграционни тестове за критичните пътища и правила, които спират сливането при провал."
+        },
+        "rec_cd": {
+          "title": "Автоматична доставка до продукция",
+          "description": "Едно и също внедряване през pipeline за всички среди, с лесно връщане назад."
+        },
+        "rec_iac": {
+          "title": "Средите като код",
+          "description": "Опишете средите като код и ги прилагайте през pipeline с план и преглед."
+        },
+        "rec_supply_chain": {
+          "title": "Проследим произход на артефактите",
+          "description": "Изграждайте само в CI, пазете в регистър, генерирайте SBOM и подписвайте."
+        },
+        "rec_secrets": {
+          "title": "Хранилище за тайни и смяна",
+          "description": "Всички тайни в хранилище, достъп по роля и автоматична смяна."
+        },
+        "rec_gitops": {
+          "title": "Желаното състояние в Git",
+          "description": "Описвайте средите в Git и проверявайте редовно за отклонения."
+        },
+        "rec_devex": {
+          "title": "Шаблони и самообслужване",
+          "description": "Шаблон за нова услуга с готов pipeline, наблюдаемост и среда за преглед."
+        },
+        "rec_feedback": {
+          "title": "Учене от инциденти и данни за доставката",
+          "description": "Разбори без търсене на виновни и месечен преглед на данните за доставката."
+        },
+        "pattern_trunk_ci": {
+          "title": "Модел: trunk-based разработка с бърз CI",
+          "description": "Кратки разклонения → преглед → CI под 10 минути (тестове, анализ, проверка на зависимостите) → сливане в основния клон → артефакт в регистър."
+        },
+        "pattern_gitops_pull": {
+          "title": "Модел: GitOps с pull агент",
+          "description": "CI изгражда и подписва артефакта → промяна на версията в конфигурационно хранилище → агент в средата прилага и поправя отклоненията."
+        },
+        "pattern_progressive": {
+          "title": "Модел: постепенно пускане с автоматично връщане",
+          "description": "Canary за малък дял от трафика → проверка на грешки и латентност → разширяване или автоматично връщане."
+        },
+        "ctx_metrics_estimated": {
+          "title": "Метриките ви са приблизителни",
+          "description": "Въведените числа са оценка, не измерване. Използвайте ги като хипотеза, докато не ги изчислите от данните на CI/CD."
+        }
+      }
+    },
+    "en": {
+      "title": "DevOps Delivery Maturity Assessment",
+      "intro": "22 questions on practices across 11 areas, and optionally 4 delivery metrics. The score is computed from the practices only; the metrics are shown separately as entered by you.",
+      "disclaimer": "A self-assessment based on your answers. We do not connect to your repositories or pipelines and scan nothing. Metrics you enter are not verified and are not scored.",
+      "dimensions": {
+        "version_control": {
+          "title": "Version control",
+          "description": "Everything in version control, with reviewed changes."
+        },
+        "branching": {
+          "title": "Trunk-based development and branching",
+          "description": "How long branches live and how often changes are integrated."
+        },
+        "ci_reliability": {
+          "title": "CI pipeline reliability",
+          "description": "How fast and stable the checks on every change are."
+        },
+        "testing": {
+          "title": "Automated testing and quality gates",
+          "description": "Tests at several levels and gates that stop a bad change."
+        },
+        "cd": {
+          "title": "Continuous delivery and progressive deployment",
+          "description": "How changes reach production and how risky that is."
+        },
+        "iac": {
+          "title": "Infrastructure as Code",
+          "description": "Environments are defined and changed as code."
+        },
+        "supply_chain": {
+          "title": "Artifact provenance and supply-chain security",
+          "description": "Whether you know what is in your artifacts and where it came from."
+        },
+        "secrets": {
+          "title": "Secrets management",
+          "description": "Where passwords and keys are kept and how they are rotated."
+        },
+        "gitops": {
+          "title": "GitOps and environment drift",
+          "description": "Whether the desired state lives in Git and how drift is detected."
+        },
+        "devex": {
+          "title": "Developer experience",
+          "description": "How quickly a new person or a new service reaches production."
+        },
+        "feedback": {
+          "title": "Incident learning and delivery feedback",
+          "description": "Post-incident reviews and delivery data that lead to changes."
+        }
+      },
+      "questions": {
+        "vc_scope": {
+          "text": "What is in version control?",
+          "options": {
+            "some_code": "Some of the code",
+            "all_code": "All application code",
+            "code_config": "Code and configuration",
+            "everything": "Code, configuration, infrastructure and pipelines"
+          }
+        },
+        "vc_review": {
+          "text": "Are changes reviewed before merging?",
+          "options": {
+            "never": "No",
+            "sometimes": "Sometimes",
+            "always": "Always, by convention",
+            "enforced": "Always, enforced with protected branches"
+          }
+        },
+        "br_lifetime": {
+          "text": "How long do branches live?",
+          "options": {
+            "months": "Weeks to months",
+            "weeks": "About a week",
+            "days": "A few days",
+            "hours": "Under a day (trunk-based)"
+          }
+        },
+        "br_integration": {
+          "text": "How often are changes merged into the main branch?",
+          "options": {
+            "release": "At release time",
+            "weekly": "Weekly",
+            "daily": "Daily",
+            "continuous": "Several times a day, with feature flags for unfinished work"
+          }
+        },
+        "ci_speed": {
+          "text": "How long does CI take for one change?",
+          "options": {
+            "none": "We have no CI",
+            "slow": "Over 30 minutes",
+            "medium": "10–30 minutes",
+            "fast": "Under 10 minutes"
+          }
+        },
+        "ci_flaky": {
+          "text": "How often does CI fail without a real problem?",
+          "options": {
+            "often": "Often; we re-run until it passes",
+            "sometimes": "Sometimes",
+            "rarely": "Rarely",
+            "tracked": "Rarely, and flaky tests are tracked and fixed"
+          }
+        },
+        "test_automation": {
+          "text": "What automated tests do you have?",
+          "options": {
+            "none": "Almost none",
+            "unit": "Mostly unit tests",
+            "layers": "Unit, integration and a few end-to-end",
+            "risk_based": "Several levels chosen by risk, including contract tests"
+          }
+        },
+        "test_gates": {
+          "text": "Do automated checks stop a bad change?",
+          "options": {
+            "none": "No",
+            "advisory": "They report but do not block",
+            "blocking": "Tests block the merge",
+            "full_gates": "Tests, code analysis and security checks block merge and release"
+          }
+        },
+        "cd_deploy": {
+          "text": "How do you deploy to production?",
+          "options": {
+            "manual": "By hand",
+            "scripted": "With a script run by hand",
+            "pipeline": "Automatically through a pipeline",
+            "progressive": "Progressively (canary or blue-green) with automatic rollback"
+          }
+        },
+        "cd_frequency": {
+          "text": "How often can you deploy safely?",
+          "options": {
+            "monthly": "Monthly or less often",
+            "weekly": "Weekly",
+            "daily": "Daily",
+            "on_demand": "On demand, several times a day"
+          }
+        },
+        "iac_coverage": {
+          "text": "How much of your environments is defined as code?",
+          "options": {
+            "none": "Created by hand",
+            "some": "Some of them",
+            "most": "Most of them",
+            "all": "All, including review environments"
+          }
+        },
+        "iac_change": {
+          "text": "How are infrastructure changes applied?",
+          "options": {
+            "local": "From people's computers",
+            "reviewed": "Reviewed, applied by hand",
+            "pipeline": "Through a pipeline with a plan",
+            "policy": "Through a pipeline with a plan and policy checks"
+          }
+        },
+        "sc_dependencies": {
+          "text": "Are dependencies checked for vulnerabilities?",
+          "options": {
+            "no": "No",
+            "occasional": "Occasionally",
+            "ci": "On every change in CI",
+            "ci_policy": "On every change, with rules on what blocks a release"
+          }
+        },
+        "sc_provenance": {
+          "text": "Do you know where every artifact in production came from?",
+          "options": {
+            "no": "No",
+            "tags": "By tag or version",
+            "registry": "Built in CI and stored in a registry",
+            "signed": "Signed, with an SBOM and signature verification at deploy time"
+          }
+        },
+        "secrets_storage": {
+          "text": "Where are secrets (passwords, keys) kept?",
+          "options": {
+            "in_code": "In code or in files",
+            "ci_vars": "In CI variables",
+            "vault": "In a managed secrets store",
+            "vault_short": "In a store, with short-lived credentials"
+          }
+        },
+        "secrets_rotation": {
+          "text": "Are secrets rotated?",
+          "options": {
+            "never": "Almost never",
+            "incident": "After an incident",
+            "scheduled": "On a schedule",
+            "automatic": "Automatically"
+          }
+        },
+        "gitops_state": {
+          "text": "Where is the desired state of environments described?",
+          "options": {
+            "nowhere": "Nowhere; we just know it",
+            "docs": "In documentation",
+            "git_push": "In Git, applied by a pipeline (push)",
+            "git_pull": "In Git, applied by an agent in the environment (pull)"
+          }
+        },
+        "gitops_drift": {
+          "text": "How do you find out that an environment drifted from its definition?",
+          "options": {
+            "incident": "When something breaks",
+            "manual": "During a manual check",
+            "scheduled": "During a scheduled check",
+            "continuous": "Continuously, with an alert or automatic reconciliation"
+          }
+        },
+        "dx_new_service": {
+          "text": "How long does it take a new service to reach production?",
+          "options": {
+            "months": "Months",
+            "weeks": "Weeks",
+            "days": "Days",
+            "hours": "Hours, from a template"
+          }
+        },
+        "dx_onboarding": {
+          "text": "When does a new developer ship their first change?",
+          "options": {
+            "months": "After a month or more",
+            "weeks": "After a few weeks",
+            "week": "In the first week",
+            "day": "On the first day"
+          }
+        },
+        "fb_postmortems": {
+          "text": "What happens after an incident?",
+          "options": {
+            "nothing": "Nothing in particular",
+            "informal": "An informal conversation",
+            "reviews": "A blameless review",
+            "actions": "A review with actions tracked to completion"
+          }
+        },
+        "fb_metrics": {
+          "text": "Do you use delivery data in decisions?",
+          "options": {
+            "no": "No",
+            "ad_hoc": "Occasionally",
+            "reviewed": "We review them regularly",
+            "drives": "They drive what we improve"
+          }
+        },
+        "dora_deploy_frequency": {
+          "text": "Production deployments in the last 30 days",
+          "help": "Only if you have an actual number. It is not scored.",
+          "unit": "deployments"
+        },
+        "dora_lead_time_hours": {
+          "text": "Typical time from merge to production",
+          "help": "In hours. It is not scored.",
+          "unit": "hours"
+        },
+        "dora_change_failure_rate": {
+          "text": "Share of deployments that caused a problem",
+          "help": "As a percentage. It is not scored.",
+          "unit": "%"
+        },
+        "dora_restore_hours": {
+          "text": "Typical time to restore service after an incident",
+          "help": "In hours. It is not scored.",
+          "unit": "hours"
+        },
+        "dora_source": {
+          "text": "Where do these numbers come from?",
+          "options": {
+            "tooling": "Measured by our tools (CI/CD, incident system)",
+            "estimate": "Our own estimate"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_no_review": {
+          "title": "Changes without review",
+          "description": "Without review, mistakes and secrets reach the main branch unnoticed."
+        },
+        "risk_secrets_in_code": {
+          "title": "Secrets in code",
+          "description": "Passwords and keys in code or files leak with every copy of the repository."
+        },
+        "risk_manual_release": {
+          "title": "Manual deployments",
+          "description": "Every manual deployment is different and hard to roll back."
+        },
+        "risk_unknown_artifacts": {
+          "title": "Unknown artifact provenance",
+          "description": "You do not know what is in production, so you cannot react quickly to a vulnerable dependency."
+        },
+        "risk_no_gates": {
+          "title": "Automatic deployment without blocking checks",
+          "description": "The pipeline releases changes that no test was able to stop."
+        },
+        "risk_long_branches": {
+          "title": "Long-lived branches",
+          "description": "Big merges hide conflicts and slow down every delivery."
+        },
+        "qw_branch_protection": {
+          "title": "Protected branches",
+          "description": "Require a review and green CI before merging into the main branch."
+        },
+        "qw_secret_scanning": {
+          "title": "Secret scanning and a secrets store",
+          "description": "Turn on secret scanning, rotate what it finds and move secrets into a store."
+        },
+        "qw_dependency_scan": {
+          "title": "Dependency checks in CI",
+          "description": "Add an automated dependency check on every change."
+        },
+        "qw_flaky_tests": {
+          "title": "A list of flaky tests",
+          "description": "Quarantine and fix tests that fail at random instead of re-running."
+        },
+        "qw_measure_delivery": {
+          "title": "Start measuring delivery",
+          "description": "Compute deployment frequency and lead time from CI/CD data instead of estimating them."
+        },
+        "qw_blameless_reviews": {
+          "title": "A short review after every incident",
+          "description": "A one-page template: what happened, why, one to three actions with an owner and date."
+        },
+        "rec_version_control": {
+          "title": "Everything in version control, reviewed",
+          "description": "Configuration, infrastructure and pipelines in Git, with enforced review."
+        },
+        "rec_trunk_based": {
+          "title": "Shorter branches and feature flags",
+          "description": "Merge at least daily and hide unfinished work behind feature flags."
+        },
+        "rec_ci": {
+          "title": "Fast and stable CI",
+          "description": "Aim for under 10 minutes: caching, parallel jobs and fixing flaky tests."
+        },
+        "rec_testing": {
+          "title": "Risk-based tests and blocking gates",
+          "description": "Integration tests for critical paths and gates that block the merge on failure."
+        },
+        "rec_cd": {
+          "title": "Automated delivery to production",
+          "description": "The same pipeline deployment for every environment, with an easy rollback."
+        },
+        "rec_iac": {
+          "title": "Environments as code",
+          "description": "Define environments as code and apply them through a pipeline with a plan and review."
+        },
+        "rec_supply_chain": {
+          "title": "Traceable artifact provenance",
+          "description": "Build only in CI, store in a registry, generate SBOMs and sign."
+        },
+        "rec_secrets": {
+          "title": "A secrets store and rotation",
+          "description": "All secrets in a store, role-based access and automated rotation."
+        },
+        "rec_gitops": {
+          "title": "Desired state in Git",
+          "description": "Describe environments in Git and check regularly for drift."
+        },
+        "rec_devex": {
+          "title": "Templates and self-service",
+          "description": "A new-service template with a ready pipeline, observability and a review environment."
+        },
+        "rec_feedback": {
+          "title": "Learning from incidents and delivery data",
+          "description": "Blameless reviews and a monthly review of delivery data."
+        },
+        "pattern_trunk_ci": {
+          "title": "Pattern: trunk-based development with fast CI",
+          "description": "Short branches → review → CI under 10 minutes (tests, analysis, dependency checks) → merge to main → artifact in a registry."
+        },
+        "pattern_gitops_pull": {
+          "title": "Pattern: pull-based GitOps",
+          "description": "CI builds and signs the artifact → a version change in a config repository → an agent in the environment applies it and reconciles drift."
+        },
+        "pattern_progressive": {
+          "title": "Pattern: progressive delivery with automatic rollback",
+          "description": "A canary for a small share of traffic → check errors and latency → expand or roll back automatically."
+        },
+        "ctx_metrics_estimated": {
+          "title": "Your metrics are estimates",
+          "description": "The numbers you entered are an estimate, not a measurement. Treat them as a hypothesis until you compute them from CI/CD data."
+        }
+      }
+    }
+  },
+  "extension": "devops_evidence"
+}

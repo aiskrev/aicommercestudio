@@ -61,7 +61,8 @@ describe("feature flags and tool registry", () => {
     try {
       process.env.TOOL_FLAGS = TOOLS.map((t) => `${t.flag}=on`).join(",");
       expect(TOOLS.filter((t) => t.status === "planned").some(isToolAvailable)).toBe(false);
-      process.env.TOOL_FLAGS = "tool_readiness=off,tool_team=off,tool_roi=off,tool_finder=off,tool_solution=off,tool_agents=off";
+      process.env.TOOL_FLAGS =
+        "tool_readiness=off,tool_team=off,tool_roi=off,tool_finder=off,tool_solution=off,tool_agents=off,tool_cloud=off,tool_devops=off";
       expect(Object.keys(toolHrefs("en"))).toEqual(["advisor"]);
     } finally {
       process.env.TOOL_FLAGS = previous;
@@ -77,6 +78,8 @@ describe("feature flags and tool registry", () => {
       finder: "/en/tools/automation-finder",
       solution: "/en/tools/solution-builder",
       agents: "/en/ai-agents",
+      cloud_maturity: "/en/tools/cloud-platform-maturity",
+      devops_maturity: "/en/tools/devops-delivery-maturity",
     });
     expect(toolHrefs("bg").roi).toBe("/bg/instrumenti/roi-kalkulator");
     expect(toolHrefs("bg").finder).toBe("/bg/instrumenti/avtomatizatsii");

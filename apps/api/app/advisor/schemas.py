@@ -16,7 +16,7 @@ from collections.abc import Callable
 from datetime import datetime
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator
+from pydantic import BaseModel, BeforeValidator, ConfigDict, Field, field_validator, model_validator
 from pydantic_core import PydanticCustomError
 
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
@@ -194,8 +194,25 @@ def _clean(value: str) -> str:
     return value.strip()
 
 
+class AdvisorContext(BaseModel):
+    """V2: richer business and integration context, enumerated only (no free text, no personal data)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    goal: Literal["save_time", "reduce_errors", "faster_response", "handle_growth", "better_visibility"]
+    data_sensitivity: Literal["none", "business", "personal", "financial", "special_category"]
+    customer_facing: bool
+    system_access: Literal["api", "exports", "manual_only", "unknown"]
+    change_capacity: Literal["no_it", "external_it", "internal_it"]
+
+
 class AdvisorRequest(BaseModel):
-    """What a visitor submits. No personal data is requested."""
+    """What a visitor submits. No personal data is requested.
+
+    `contract_version` "1" (the default) is the original contract, unchanged. "2" requires `context`
+    and returns V2 insights as well; V2-only fields are rejected on a V1 request instead of being
+    silently ignored.
+    """
 
     model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
 
@@ -209,6 +226,20 @@ class AdvisorRequest(BaseModel):
     form_token: str = Field(default="", max_length=200)
     # Language of the generated assessment (the page the visitor is on).
     locale: AdvisorLocale = "bg"
+    contract_version: Literal["1", "2"] = "1"
+    context: AdvisorContext | None = None
+    # V2: also return an indicative 30/60/90-day roadmap.
+    include_roadmap: bool = False
+
+    @model_validator(mode="after")
+    def _contract(self) -> "AdvisorRequest":
+        if self.contract_version == "1" and (self.context is not None or self.include_roadmap):
+            raise PydanticCustomError(
+                "contract_version", "Полетата context и include_roadmap изискват contract_version \"2\"."
+            )
+        if self.contract_version == "2" and self.context is None:
+            raise PydanticCustomError("context_required", "Версия 2 изисква контекст на процеса.")
+        return self
 
     @field_validator("process_description")
     @classmethod
@@ -362,3 +393,5 @@ class AdvisorAssessmentSummary(BaseModel):
     team_size: str
     tools: list[str]
     assessment: AutomationAssessment
+    contract_version: str = "1"
+    insights: dict[str, Any] | None = None

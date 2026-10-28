@@ -5,10 +5,24 @@ definitions, typed answers, weighted dimensions, versioned scoring algorithms, r
 rule-based recommendations, localized texts, an opt-in saved result with retention and deletion,
 and extension points for assessment-specific logic.
 
-**Status:** backend implemented on branch `feature/assessment-engine` (API, migration `0011`, tests).
-Two definitions ship in `preview`: DevOps Delivery Maturity and Observability & Reliability. The
-website still shows them as "Coming soon" (TOOLS_PLATFORM.md); the public API serves preview
-definitions only when `ASSESSMENTS_PREVIEW_ENABLED=true` (tests, staging).
+**Status:**
+
+* **Live:** `cloud_platform` 1.0.0 and `devops_delivery` 1.1.0, both with web wizards
+  ([ENGINEERING_ASSESSMENTS.md](ENGINEERING_ASSESSMENTS.md)), plus reports and PDF
+  ([REPORTS.md](REPORTS.md)) and an optional consultation (migration `0012`).
+* **Preview:** `devops_delivery` 1.0.0, kept for saved results, and Observability & Reliability. The
+  public API serves preview definitions only when `ASSESSMENTS_PREVIEW_ENABLED=true` (tests,
+  staging).
+
+**Additions since the first version** (all optional fields, so existing definitions and saved
+results are unchanged):
+
+* question `evidence`: `practice` (scored), `metric` and `context` (never scored);
+* rule `kind`: `recommendation`, `risk`, `quick_win`, `target_state`, `pattern`, `context` (only
+  `recommendation` counts toward the cap);
+* rule `horizon` (30/60/90) and `domains`;
+* in the result view: `because` (the inputs or thresholds behind each finding), a level per
+  dimension, `roadmap`, `domains` and `inputs`.
 
 ## 1. What already existed (inspected)
 

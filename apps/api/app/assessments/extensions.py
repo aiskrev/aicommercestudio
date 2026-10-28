@@ -45,4 +45,31 @@ class ObservabilitySignals(AssessmentExtension):
         return {"missing_signals": [s for s in self.CORE_SIGNALS if s not in collected]}
 
 
-EXTENSIONS: dict[str, AssessmentExtension] = {ext.name: ext for ext in (ObservabilitySignals(),)}
+class DevopsEvidence(AssessmentExtension):
+    """DevOps delivery: keeps self-reported practices apart from the delivery metrics.
+
+    Metrics are optional and never scored. A metrics source without any metric is inconsistent;
+    the derived `metrics_evidence` says whether the numbers were measured by tooling, estimated,
+    given without a source, or not given at all, so they are never presented as measured by default.
+    """
+
+    name = "devops_evidence"
+    METRICS = ("dora_deploy_frequency", "dora_lead_time_hours", "dora_change_failure_rate", "dora_restore_hours")
+
+    def validate(self, definition: AssessmentDefinition, answers: Answers) -> list[AnswerError]:
+        if "dora_source" in answers and not any(m in answers for m in self.METRICS):
+            return [AnswerError("dora_source", "inconsistent")]
+        return []
+
+    def derive(self, definition: AssessmentDefinition, answers: Answers, result: ScoreResult) -> dict[str, Any]:
+        provided = [m for m in self.METRICS if m in answers]
+        if not provided:
+            evidence = "none"
+        else:
+            evidence = {"tooling": "measured", "estimate": "estimate"}.get(answers.get("dora_source"), "unspecified")
+        return {"metrics_provided": len(provided), "metrics_evidence": evidence}
+
+
+EXTENSIONS: dict[str, AssessmentExtension] = {
+    ext.name: ext for ext in (ObservabilitySignals(), DevopsEvidence())
+}

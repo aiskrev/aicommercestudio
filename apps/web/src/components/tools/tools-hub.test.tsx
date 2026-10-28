@@ -30,6 +30,7 @@ const REQUIRED: ToolKey[] = [
   "solution",
   "cloud_maturity",
   "devops_maturity",
+  // Planned from here on (REQUIRED.slice(PLANNED_FROM)).
   "observability",
   "ecommerce_architecture",
   "data_integration",
@@ -37,6 +38,9 @@ const REQUIRED: ToolKey[] = [
   "ai_ops_readiness",
   "finops",
 ];
+
+/** Index in REQUIRED of the first planned tool: the engineering assessments before it are live. */
+const PLANNED_FROM = 8;
 
 describe("tool registry", () => {
   it("registers every required tool once, with content in both languages", () => {
@@ -61,7 +65,7 @@ describe("tool registry", () => {
 
   it("keeps planned tools unreachable, without a time estimate or a start CTA", () => {
     const planned = TOOLS.filter((t) => t.status === "planned");
-    expect(planned.map((t) => t.key).sort()).toEqual(REQUIRED.slice(6).sort());
+    expect(planned.map((t) => t.key).sort()).toEqual(REQUIRED.slice(PLANNED_FROM).sort());
     for (const tool of planned) {
       expect(isToolAvailable(tool), tool.key).toBe(false);
       expect(tool.path, tool.key).toBeUndefined();
@@ -100,7 +104,9 @@ describe("tool routing", () => {
   it("links live tools to the tool and planned tools only to their intro page", () => {
     const live = toolHrefs("en");
     const intros = toolIntroHrefs("en");
-    expect(Object.keys(intros).sort()).toEqual(REQUIRED.slice(6).sort());
+    expect(Object.keys(intros).sort()).toEqual(REQUIRED.slice(PLANNED_FROM).sort());
+    expect(live.cloud_maturity).toBe("/en/tools/cloud-platform-maturity");
+    expect(live.devops_maturity).toBe("/en/tools/devops-delivery-maturity");
     for (const key of Object.keys(intros)) expect(live[key as ToolKey], key).toBeUndefined();
     expect(intros.finops).toBe("/en/tools/finops-ai-cost");
     expect(live.readiness).toBe("/en/tools/ai-readiness");
@@ -157,16 +163,22 @@ describe("tools directory", () => {
     fireEvent.click(engineering);
     expect(engineering).toHaveAttribute("aria-pressed", "true");
     expect(count).toHaveTextContent("Tools shown: 5");
-    expect(Array.from(document.querySelectorAll("article[data-tool]")).every((a) => a.getAttribute("data-status") === "planned")).toBe(true);
+    const statuses = Array.from(document.querySelectorAll("article[data-tool]")).map((a) => a.getAttribute("data-status"));
+    expect(statuses.filter((s) => s === "live")).toHaveLength(2); // cloud & platform, DevOps delivery
 
     const availability = screen.getByRole("group", { name: "Availability" });
     fireEvent.click(within(availability).getByRole("button", { name: "Available now" }));
+    expect(count).toHaveTextContent("Tools shown: 2");
+    fireEvent.click(within(availability).getByRole("button", { name: "Coming soon" }));
+    expect(count).toHaveTextContent("Tools shown: 3");
+    // Every AI-planning tool is live, so this combination has nothing left.
+    fireEvent.click(within(categories).getByRole("button", { name: "AI planning" }));
     expect(screen.getByText("No tools match this selection.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Show all" }));
     expect(count).toHaveTextContent(`Tools shown: ${TOOLS.length}`);
 
     fireEvent.click(within(availability).getByRole("button", { name: "Coming soon" }));
-    expect(count).toHaveTextContent("Tools shown: 8");
+    expect(count).toHaveTextContent("Tools shown: 6");
   });
 });
 

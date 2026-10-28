@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ReadinessAssessment } from "@/components/tools/ReadinessAssessment";
 import { ReadinessMethodology } from "@/components/tools/ReadinessMethodology";
+import { EngineAssessment } from "@/components/tools/assessment/EngineAssessment";
 import { OpportunityFinder } from "@/components/tools/finder/OpportunityFinder";
 import { RoiCalculator } from "@/components/tools/roi/RoiCalculator";
 import { SolutionBuilder } from "@/components/tools/solution/SolutionBuilder";
@@ -22,13 +23,14 @@ import { AGENT_SLUGS } from "@/lib/agent-library";
 import { ACTION_SERVICE } from "@/lib/readiness";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
+import { domainHubLinks } from "@/lib/domain-links";
 import { type DomainKey, domainDefinition } from "@/lib/domains";
 import { TOOL_PAGE_SLUGS } from "@/lib/tool-slugs";
 import { isToolAvailable, isToolPlanned, TOOL_SLUGS, toolByKey, toolHrefs, TOOLS, type ToolKey, toolMinutes } from "@/lib/tools";
 
 export const dynamicParams = false;
 
-type HostedTool = "readiness" | "team" | "roi" | "finder" | "solution";
+type HostedTool = "readiness" | "team" | "roi" | "finder" | "solution" | "cloud_maturity" | "devops_maturity";
 
 /** Tools hosted under /instrumenti/<slug>. Only available tools (implemented + flag on) get a page. */
 const HOSTED: Record<string, HostedTool> = {
@@ -37,7 +39,13 @@ const HOSTED: Record<string, HostedTool> = {
   [TOOL_SLUGS.roi]: "roi",
   [TOOL_SLUGS.finder]: "finder",
   [TOOL_SLUGS.solution]: "solution",
+  [TOOL_SLUGS.cloud_maturity]: "cloud_maturity",
+  [TOOL_SLUGS.devops_maturity]: "devops_maturity",
 };
+
+/** Engine assessments: the API key behind each tool, and how long a saved result is kept (ASSESSMENT_RETENTION_DAYS). */
+const ENGINE = { cloud_maturity: "cloud_platform", devops_maturity: "devops_delivery" } as const;
+const ASSESSMENT_RETENTION_DAYS = 90;
 
 /** Services each hosted tool can link to from its result. */
 const TOOL_SERVICES: Record<HostedTool, ServiceKey[]> = {
@@ -46,6 +54,8 @@ const TOOL_SERVICES: Record<HostedTool, ServiceKey[]> = {
   roi: [],
   finder: ["automation", "ai_tools", "ai_agents", "integrations", "audit"],
   solution: ["ai_agents", "integrations", "automation", "ai_tools", "ai_managed", "audit"],
+  cloud_maturity: [],
+  devops_maturity: [],
 };
 
 /**
@@ -100,6 +110,8 @@ function toolContent(locale: Locale, key: HostedTool) {
     roi: content.roiTool,
     finder: content.finderTool,
     solution: content.solutionTool,
+    cloud_maturity: content.engineeringTool.pages.cloud_maturity,
+    devops_maturity: content.engineeringTool.pages.devops_maturity,
   };
   return pages[key];
 }
@@ -136,7 +148,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
   const key = resolveTool(tool);
   if (!key) notFound();
 
-  const { readinessTool, teamTool, roiTool, finderTool, solutionTool, agentLibrary, tools } = getContent(locale);
+  const { readinessTool, teamTool, roiTool, finderTool, solutionTool, agentLibrary, tools, engineeringTool } = getContent(locale);
   const hrefs = toolHrefs(locale);
   const page = toolContent(locale, key);
   const dict = getDictionary(locale);
@@ -235,6 +247,20 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
       {key === "readiness" && (
         <Section tone="raised" labelledBy="readiness-methodology-title">
           <ReadinessMethodology content={readinessTool} />
+        </Section>
+      )}
+      {(key === "cloud_maturity" || key === "devops_maturity") && (
+        <Section size="narrow">
+          <EngineAssessment
+            assessment={ENGINE[key]}
+            tool={key}
+            content={engineeringTool}
+            locale={locale}
+            domainLinks={domainHubLinks(locale)}
+            contactHref={href(contactWithService(domainDefinition(ENGINE[key] === "cloud_platform" ? "cloud_platform" : "devops_sre").contactService))}
+            privacyHref={href(routes.privacy)}
+            retentionDays={ASSESSMENT_RETENTION_DAYS}
+          />
         </Section>
       )}
       {key === "team" && (

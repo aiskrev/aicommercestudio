@@ -98,7 +98,8 @@ def question_fraction(question: Question, value: Any) -> Fraction:
 def dimension_ratios(definition: AssessmentDefinition, answers: Answers) -> dict[str, Fraction]:
     ratios: dict[str, Fraction] = {}
     for dimension in definition.dimension_keys:
-        answered = [q for q in definition.questions if q.dimension == dimension and q.key in answers]
+        # Only practices are scored; metrics and context answers never move a score.
+        answered = [q for q in definition.questions if q.dimension == dimension and q.scored and q.key in answers]
         if not answered:
             # Unreachable for validated answers (each dimension has a required question).
             raise ValueError(f"dimension {dimension} has no answered question")

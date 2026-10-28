@@ -171,3 +171,26 @@ test("the AI readiness assessment can be completed on a phone", async ({ page })
   await expect(result.getByRole("heading", { name: "План за първите 90 дни" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
 });
+
+test("the DevOps delivery assessment can be completed on a phone without horizontal scrolling", async ({ page }) => {
+  await page.goto("/bg/instrumenti/zrelost-na-devops-dostavkata");
+  const form = page.getByTestId("engine-form");
+  await expect(form.getByText("Област 1 от 11")).toBeVisible();
+  for (let step = 0; step < 11; step++) {
+    const groups = form.locator("fieldset:has(input[type=radio])");
+    const count = await groups.count();
+    for (let i = 0; i < count; i++) {
+      const legend = await groups.nth(i).locator("legend").innerText();
+      if (/\(по желание\)$/.test(legend.trim())) continue; // optional metric source
+      await groups.nth(i).getByRole("radio").nth(1).check();
+    }
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    await form.getByRole("button", { name: step === 10 ? "Вижте резултата" : "Напред" }).click();
+  }
+  const result = page.getByTestId("engine-result");
+  await expect(result.getByRole("heading", { level: 2, name: "Вашият резултат" })).toBeVisible();
+  await expect(result.getByTestId("engine-metrics")).toContainText("Не сте въвели метрики");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});

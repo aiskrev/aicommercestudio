@@ -16,6 +16,7 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0006` | `leads.marketing_consent_version` varchar(32) null — wording version of a given marketing consent (contact form and AI readiness submissions). Nullable, no default; downgrade drops the column. |
 | `0007` | `team_configurations`: saved AI team configurations (enumerated JSONB, schema/model/assumptions versions, visitor rate overrides, SHA-256 `token_hash` unique, `locale` CHECK, `expires_at` index, `lead_id` FK `ON DELETE CASCADE`). New table only; downgrade drops it. |
 | `0011` | `assessment_results`: opt-in saved assessment results (key, definition version, algorithm, locale, normalised answers and server result as JSONB, fingerprint, SHA-256 `token_hash` unique, `expires_at` and `assessment_key` indexes, `locale` CHECK). New table only; downgrade drops it. |
+| `0012` | `advisor_assessments.contract_version` (default `'1'`) and `insights` (JSONB, nullable); `assessment_results.lead_id` (FK `ON DELETE CASCADE`, index) and `linked_at`. Additive only; downgrade drops the columns. |
 | `0010` | Catalogue publishing and staff roles. `admin_users.role` (`admin`/`editor`/`viewer`, NOT NULL, server default `admin`, CHECK): existing accounts keep full rights. `catalogue_entities.published_revision`, `published_at`, `published_by_id`, `published_snapshot` (JSONB read model), with a CHECK that a published domain or service has a snapshot. Data step: 0009 rows that were `published` without a snapshot become `draft`, and the bootstrap seed publishes them again. `services`: offering types `assessment` and `workshop`, `duration_min_days` / `duration_max_days` (numeric(4,1), assessments and workshops only). `content_items` + `content_item_translations` (capabilities and deliverables, aligned between BG and EN). Downgrade drops all of it; assessment and workshop rows are deleted with their entities. |
 | `0009` | Service catalogue V1: `catalogue_entities` (supertype: `entity_type`, stable `key`, `status` draft/published/archived, `revision`), `service_domains`, `service_families`, `services` (subtypes sharing the entity id through the composite FK `(id, entity_type)`), `family_services`, `entity_translations` (per locale; slug unique per `(locale, route_namespace)`), `entity_relations` (typed edges with an allowed-combination CHECK). New tables only, no data; `leads` unchanged and not referenced. Downgrade drops the seven tables. See [Service catalogue](#service-catalogue-migration-0009). |
 | `0008` | AI operations scaffold: `ops_organizations` (slug unique, status/region, `is_demo`), `ops_workspaces` (unique `(organization_id, slug)` and `(id, organization_id)`), `ops_memberships` (user × organisation × role CHECK, unique pair), `ops_agents` (registry metadata; composite FK `(workspace_id, organization_id)` → workspaces so an agent cannot sit in another tenant's workspace). New tables only; downgrade drops them. See AI_OPERATIONS_PORTAL.md. |
@@ -162,6 +163,8 @@ description is stored after e-mails, phone numbers and links were removed.
 | mode | varchar(8) | `demo` or `ai` (CHECK `ck_advisor_assessments_mode`) |
 | provider, model, prompt_version | varchar | which engine produced the result |
 | injection_suspected | bool | injection phrasing detected in the input |
+| contract_version | varchar(4), default `'1'` | `1` for V1 requests and all rows before migration `0012`; `2` with V2 insights ([AI_ADVISOR_V2.md](AI_ADVISOR_V2.md)) |
+| insights | jsonb, nullable | V2 deterministic insights (rule-based, with provenance); NULL for V1 |
 | lead_id | uuid FK → leads.id **ON DELETE CASCADE**, nullable | set when the visitor requests a consultation; index `ix_advisor_assessments_lead_id` |
 | linked_at | timestamptz | when it was linked |
 
@@ -196,6 +199,8 @@ No personal data and no free text.
 | fingerprint | varchar(16) | SHA-256 prefix of key, version, algorithm and answers (non-personal) |
 | answers | jsonb | normalised answers: option keys, booleans, numbers |
 | result | jsonb | `ScoreResult.summary()`: overall, band, dimension scores, recommendation keys, extras |
+| lead_id | uuid FK → leads.id **ON DELETE CASCADE**, nullable | set when the visitor asks for a consultation about the result (migration `0012`); linked rows are not purged on expiry and follow the lead; index `ix_assessment_results_lead_id` |
+| linked_at | timestamptz, nullable | when it was linked |
 
 ## AI operations scaffold (`ops_*`, migration 0008)
 
