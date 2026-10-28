@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { company } from "@/lib/company";
 import { founderJsonLd, organizationJsonLd } from "@/lib/seo";
@@ -30,6 +30,28 @@ describe("company contact configuration", () => {
     expect(company.plannedDomain).toBe("ai-ecomstudio.site");
     expect(company.emailDeliveryVerified).toBe(false);
     expect(company.publicWebsiteLaunched).toBe(false);
+  });
+
+  it("moves the e-mail with the domain and lets each value be overridden per build", async () => {
+    vi.stubEnv("PUBLIC_CONTACT_DOMAIN", "example-studio.eu");
+    vi.resetModules();
+    let moved = (await import("@/lib/company")).company;
+    expect(moved.plannedDomain).toBe("example-studio.eu");
+    expect(moved.contactEmail).toBe("contact@example-studio.eu");
+    expect(moved.contactEmailUri).toBe("mailto:contact@example-studio.eu");
+    expect(moved.phoneUri).toBe("tel:+359882377753");
+
+    vi.stubEnv("PUBLIC_CONTACT_EMAIL", "office@example-studio.eu");
+    vi.stubEnv("PUBLIC_CONTACT_PHONE", "+359 2 123 4567");
+    vi.resetModules();
+    moved = (await import("@/lib/company")).company;
+    expect(moved.contactEmail).toBe("office@example-studio.eu");
+    expect(moved.phoneE164).toBe("+35921234567");
+    expect(moved.phoneUri).toBe("tel:+35921234567");
+
+    vi.unstubAllEnvs();
+    vi.resetModules();
+    expect((await import("@/lib/company")).company.contactEmail).toBe("contact@ai-ecomstudio.site");
   });
 
   it("keeps the phone, the e-mail and the domain in one source file", () => {
