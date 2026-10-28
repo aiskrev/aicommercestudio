@@ -16,16 +16,29 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
-Branch `feature/domain-hubs` (from `main` @ `52bf6e1`, not merged, 2026-10-27): the ten domain
+Branch `docs/service-catalogue-architecture` (PR #22, up to date with `main` @ `c49fdc7`,
+2026-10-28): service catalogue V1 persistence. It adds Alembic migration **`0009`** (seven new
+tables, no change to existing tables), the models, the seed schema, the idempotent
+`catalogue-seed` / `catalogue-check` / `catalogue-purge` commands, and the web-generated seed
+snapshot (DATABASE_SCHEMA.md → "Service catalogue").
+
+| Check | Result |
+| --- | --- |
+| `.\scripts\test.ps1 -Suite api` | **394 passed**, Ruff clean, docs in sync, seed copies identical |
+| `.\scripts\test.ps1 -Suite web` (after merging `main`) | **492 passed** (31 files), tsc and ESLint clean |
+| e2e (production build, after merging `main`) | **92 passed** |
+| Copy of the local dev database (277 leads) | 0008 → 0009, seed, re-seed (no change), integrity check clean, downgrade to 0008 and re-apply; lead, note, admin, assessment and configuration data unchanged |
+
+Domain hubs (`feature/domain-hubs`, squash-merged into `main` as `c49fdc7`, 2026-10-27): the ten domain
 hubs of SERVICE_TAXONOMY.md (`/uslugi/<domain>` ↔ `/services/<domain>`), the services index in
 three bands, the primary domain in service breadcrumbs, sitemap entries and the keyword map
 (INFORMATION_ARCHITECTURE.md → "Service domains"). It makes no API or database change.
 
 | Check | Result on the branch |
 | --- | --- |
-| `.\scripts	est.ps1 -Suite web` | **483 passed** (28 files), tsc and ESLint clean |
+| `.\scripts\test.ps1 -Suite web` | **483 passed** (28 files), tsc and ESLint clean |
 | e2e (production build, no-host-ports override) | **92 passed** (8 new in `domains.spec.ts`; `seo.spec.ts` and `links.spec.ts` crawl the hubs through the sitemap) |
-| `.\scripts	est.ps1 -Suite api` | not re-run (no API change) |
+| `.\scripts\test.ps1 -Suite api` | not re-run (no API change) |
 
 Shipped since the seventh iteration:
 

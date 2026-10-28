@@ -17,6 +17,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Index,
     Integer,
+    SmallInteger,
     String,
     Text,
     UniqueConstraint,
@@ -469,3 +470,315 @@ class OpsAgent(Base):
     purpose: Mapped[str | None] = mapped_column(String(300), nullable=True)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow, onupdate=utcnow)
+
+
+# --------------------------------------------------------------------------- service catalogue (V1)
+# Bounded first slice of docs/DATABASE_SCHEMA_V2.md: domains, families, services, their translations,
+# publishing status, ordering and relations. Content items, engagements, tools, slug history and
+# releases follow in later migrations. Until the catalogue becomes the source (phase S5) the rows are
+# a verified mirror of the web content, written only by `python -m app.cli catalogue-seed`.
+# Leads keep `service` as a ServiceKey string: there is deliberately no foreign key between leads and
+# the catalogue, so archiving catalogue rows can never touch a lead.
+
+
+class CatalogueEntityType(enum.StrEnum):
+    DOMAIN = "domain"
+    FAMILY = "family"
+    SERVICE = "service"
+
+
+class PublishStatus(enum.StrEnum):
+    DRAFT = "draft"
+    PUBLISHED = "published"
+    ARCHIVED = "archived"
+
+
+class DeliveryStatus(enum.StrEnum):
+    AVAILABLE = "available"
+    CUSTOM = "custom"
+    PLANNED = "planned"
+
+
+class DomainBand(enum.StrEnum):
+    AI = "ai"
+    ENGINEERING = "engineering"
+    OPERATIONS = "operations"
+
+
+class OfferingType(enum.StrEnum):
+    """V1 stores services only; assessments, workshops and managed offerings follow (SCHEMA_V2 §3.4)."""
+
+    SERVICE = "service"
+
+
+class RouteNamespace(enum.StrEnum):
+    """Domains and services share `/uslugi/<slug>` ↔ `/services/<slug>`."""
+
+    SERVICES = "services"
+
+
+class RelationKind(enum.StrEnum):
+    RELATED = "related"
+    CROSS_SELL = "cross_sell"
+    DELIVERED_THROUGH = "delivered_through"
+
+
+# (kind, from_type, to_type) combinations a relation may have.
+RELATION_TYPES: tuple[tuple[RelationKind, CatalogueEntityType, CatalogueEntityType], ...] = (
+    (RelationKind.RELATED, CatalogueEntityType.SERVICE, CatalogueEntityType.SERVICE),
+    (RelationKind.CROSS_SELL, CatalogueEntityType.DOMAIN, CatalogueEntityType.DOMAIN),
+    (RelationKind.DELIVERED_THROUGH, CatalogueEntityType.FAMILY, CatalogueEntityType.DOMAIN),
+)
+
+CATALOGUE_KEY_PATTERN = r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?$"
+SLUG_PATTERN = r"^[a-z0-9]+(-[a-z0-9]+)*$"
+# Every ServiceKey except "other" is a lead category a catalogue service can map to.
+LEAD_CATEGORIES: tuple[ServiceKey, ...] = tuple(k for k in ServiceKey if k is not ServiceKey.OTHER)
+
+RELATION_TYPES_CHECK = " OR ".join(
+    f"(kind = '{kind.value}' AND from_type = '{src.value}' AND to_type = '{dst.value}')"
+    for kind, src, dst in RELATION_TYPES
+)
+LEAD_CATEGORY_CHECK = "lead_category IS NULL OR lead_category IN ({})".format(
+    ", ".join(f"'{k.value}'" for k in LEAD_CATEGORIES)
+)
+
+
+def _subtype_fk(table: str) -> ForeignKeyConstraint:
+    """A subtype row shares the id of its catalogue_entities row and must carry the same type."""
+    return ForeignKeyConstraint(
+        ["id", "entity_type"],
+        ["catalogue_entities.id", "catalogue_entities.entity_type"],
+        ondelete="CASCADE",
+        name=f"fk_{table}_entity",
+    )
+
+
+class CatalogueEntity(Base):
+    """Supertype of every catalogue object: stable key, publishing status, revision, authorship."""
+
+    __tablename__ = "catalogue_entities"
+    __table_args__ = (
+        UniqueConstraint("entity_type", "key", name="uq_catalogue_entities_type_key"),
+        # Target of the typed composite foreign keys (subtypes, relations).
+        UniqueConstraint("id", "entity_type", name="uq_catalogue_entities_id_type"),
+        CheckConstraint(_in_check("entity_type", CatalogueEntityType), name="entity_type"),
+        CheckConstraint(_in_check("status", PublishStatus), name="status"),
+        CheckConstraint(f"key ~ '{CATALOGUE_KEY_PATTERN}'", name="key_format"),
+        CheckConstraint("revision >= 1", name="revision_positive"),
+        CheckConstraint("(status = 'archived') = (archived_at IS NOT NULL)", name="archived_at"),
+        Index("ix_catalogue_entities_type_status", "entity_type", "status"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    entity_type: Mapped[str] = mapped_column(String(16), nullable=False)
+    key: Mapped[str] = mapped_column(String(80), nullable=False)
+    status: Mapped[str] = mapped_column(String(12), nullable=False, server_default=PublishStatus.DRAFT.value)
+    revision: Mapped[int] = mapped_column(Integer, nullable=False, default=1, server_default=text("1"))
+    first_published_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    archived_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+    created_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("admin_users.id", ondelete="SET NULL"), nullable=True
+    )
+    updated_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("admin_users.id", ondelete="SET NULL"), nullable=True
+    )
+
+
+class CatalogueDomain(Base):
+    __tablename__ = "service_domains"
+    __table_args__ = (
+        _subtype_fk("service_domains"),
+        UniqueConstraint("code", name="uq_service_domains_code"),
+        UniqueConstraint(
+            "band", "position", name="uq_service_domains_band_position", deferrable=True, initially="DEFERRED"
+        ),
+        CheckConstraint("entity_type = 'domain'", name="entity_type"),
+        CheckConstraint("code ~ '^[A-Z]$'", name="code_format"),
+        CheckConstraint(_in_check("band", DomainBand), name="band"),
+        CheckConstraint("position >= 0", name="position"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
+    entity_type: Mapped[str] = mapped_column(
+        String(16), nullable=False, default=CatalogueEntityType.DOMAIN.value, server_default="domain"
+    )
+    code: Mapped[str] = mapped_column(String(1), nullable=False)
+    band: Mapped[str] = mapped_column(String(16), nullable=False)
+    icon: Mapped[str] = mapped_column(String(32), nullable=False)
+    position: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+    # Nullable only to break the insert cycle with services.primary_domain_id; required once published.
+    contact_service_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("services.id", ondelete="RESTRICT", use_alter=True), nullable=True
+    )
+
+
+class CatalogueFamily(Base):
+    __tablename__ = "service_families"
+    __table_args__ = (
+        _subtype_fk("service_families"),
+        UniqueConstraint(
+            "domain_id", "position", name="uq_service_families_domain_position", deferrable=True, initially="DEFERRED"
+        ),
+        CheckConstraint("entity_type = 'family'", name="entity_type"),
+        CheckConstraint(_in_check("delivery_status", DeliveryStatus), name="delivery_status"),
+        CheckConstraint("position >= 0", name="position"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
+    entity_type: Mapped[str] = mapped_column(
+        String(16), nullable=False, default=CatalogueEntityType.FAMILY.value, server_default="family"
+    )
+    domain_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("service_domains.id", ondelete="RESTRICT"), nullable=False, index=True
+    )
+    delivery_status: Mapped[str] = mapped_column(String(12), nullable=False)
+    position: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+
+
+class CatalogueService(Base):
+    """A service in the catalogue (named so to avoid confusion with the app.services package)."""
+
+    __tablename__ = "services"
+    __table_args__ = (
+        _subtype_fk("services"),
+        UniqueConstraint("lead_category", name="uq_services_lead_category"),
+        CheckConstraint("entity_type = 'service'", name="entity_type"),
+        CheckConstraint(_in_check("offering_type", OfferingType), name="offering_type"),
+        CheckConstraint(_in_check("delivery_status", DeliveryStatus), name="delivery_status"),
+        CheckConstraint(LEAD_CATEGORY_CHECK, name="lead_category"),
+        CheckConstraint(
+            "offering_type <> 'service' OR (primary_domain_id IS NOT NULL AND lead_category IS NOT NULL)",
+            name="service_requirements",
+        ),
+        CheckConstraint("position >= 0", name="position"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
+    entity_type: Mapped[str] = mapped_column(
+        String(16), nullable=False, default=CatalogueEntityType.SERVICE.value, server_default="service"
+    )
+    offering_type: Mapped[str] = mapped_column(
+        String(20), nullable=False, default=OfferingType.SERVICE.value, server_default="service"
+    )
+    primary_domain_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("service_domains.id", ondelete="RESTRICT"), nullable=True, index=True
+    )
+    delivery_status: Mapped[str] = mapped_column(String(12), nullable=False)
+    # The lead category (ServiceKey) this service maps to. Not a foreign key: leads stay independent.
+    lead_category: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    icon: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    custom_page: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=text("false"))
+    is_entry_offer: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default=text("false")
+    )
+    position: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+
+
+class FamilyService(Base):
+    """An existing service that implements a family (N:M)."""
+
+    __tablename__ = "family_services"
+    __table_args__ = (
+        UniqueConstraint(
+            "family_id", "position", name="uq_family_services_family_position", deferrable=True, initially="DEFERRED"
+        ),
+        CheckConstraint("position >= 0", name="position"),
+    )
+
+    family_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("service_families.id", ondelete="CASCADE"), primary_key=True
+    )
+    service_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("services.id", ondelete="RESTRICT"), primary_key=True, index=True
+    )
+    position: Mapped[int] = mapped_column(SmallInteger, nullable=False)
+
+
+class EntityTranslation(Base):
+    """Localized texts, slug and SEO of one entity in one locale. No text fallback between locales."""
+
+    __tablename__ = "entity_translations"
+    __table_args__ = (
+        CheckConstraint(_in_check("locale", LeadLocale), name="locale"),
+        CheckConstraint(_in_check("route_namespace", RouteNamespace, nullable=True), name="route_namespace"),
+        CheckConstraint("(route_namespace IS NULL) = (slug IS NULL)", name="slug_namespace"),
+        CheckConstraint(f"slug IS NULL OR slug ~ '{SLUG_PATTERN}'", name="slug_format"),
+        CheckConstraint("body IS NULL OR char_length(body) <= 2000", name="body_length"),
+        # Domains and services share one URL namespace per locale.
+        Index(
+            "uq_entity_translations_route",
+            "locale",
+            "route_namespace",
+            "slug",
+            unique=True,
+            postgresql_where=text("slug IS NOT NULL"),
+        ),
+        Index(
+            "uq_entity_translations_primary_keyword",
+            "locale",
+            text("lower(primary_keyword)"),
+            unique=True,
+            postgresql_where=text("primary_keyword IS NOT NULL"),
+        ),
+    )
+
+    entity_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("catalogue_entities.id", ondelete="CASCADE"), primary_key=True
+    )
+    locale: Mapped[str] = mapped_column(String(2), primary_key=True)
+    route_namespace: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    slug: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    short_name: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    summary: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    body: Mapped[str | None] = mapped_column(Text, nullable=True)
+    cta_label: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    prerequisite: Mapped[str | None] = mapped_column(String(400), nullable=True)
+    seo_title: Mapped[str | None] = mapped_column(String(70), nullable=True)
+    seo_description: Mapped[str | None] = mapped_column(String(175), nullable=True)
+    primary_keyword: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+
+
+class EntityRelation(Base):
+    """Typed, ordered edge between two entities. The composite foreign keys make the stored types
+    provably those of the referenced rows, so the allowed-combination CHECK is sound."""
+
+    __tablename__ = "entity_relations"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["from_entity_id", "from_type"],
+            ["catalogue_entities.id", "catalogue_entities.entity_type"],
+            ondelete="CASCADE",
+            name="fk_entity_relations_from",
+        ),
+        ForeignKeyConstraint(
+            ["to_entity_id", "to_type"],
+            ["catalogue_entities.id", "catalogue_entities.entity_type"],
+            ondelete="RESTRICT",
+            name="fk_entity_relations_to",
+        ),
+        UniqueConstraint(
+            "from_entity_id",
+            "kind",
+            "position",
+            name="uq_entity_relations_from_kind_position",
+            deferrable=True,
+            initially="DEFERRED",
+        ),
+        CheckConstraint(_in_check("kind", RelationKind), name="kind"),
+        CheckConstraint(RELATION_TYPES_CHECK, name="kind_types"),
+        CheckConstraint("from_entity_id <> to_entity_id", name="not_self"),
+        CheckConstraint("position >= 0", name="position"),
+        Index("ix_entity_relations_to", "to_entity_id", "kind"),
+    )
+
+    from_entity_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
+    from_type: Mapped[str] = mapped_column(String(16), nullable=False)
+    kind: Mapped[str] = mapped_column(String(20), primary_key=True)
+    to_entity_id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True)
+    to_type: Mapped[str] = mapped_column(String(16), nullable=False)
+    position: Mapped[int] = mapped_column(SmallInteger, nullable=False)

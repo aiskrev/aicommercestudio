@@ -1,6 +1,6 @@
 """Operational commands.
 
-    python -m app.cli seed                      # bootstrap admin (+ synthetic demo data in development)
+    python -m app.cli seed                      # bootstrap admin (+ synthetic data in development) + catalogue
     python -m app.cli create-admin --email x@y  # password read from ADMIN_PASSWORD env or prompted
     python -m app.cli set-password --email x@y  # reset a password, clear lockout, revoke sessions
     python -m app.cli maintenance [--dry-run]   # GDPR retention + expired session cleanup
@@ -8,6 +8,9 @@
     python -m app.cli ops-create-org --slug s --name n --owner-email x@y  # AI operations tenant + owner
     python -m app.cli ops-seed-demo --owner-email x@y   # labelled sample registry (not in production)
     python -m app.cli ops-purge-demo            # remove demo organisations
+    python -m app.cli catalogue-seed [--dry-run] # reconcile the service catalogue with seed_v1.json
+    python -m app.cli catalogue-check           # BG/EN content, slugs and lead categories of the catalogue
+    python -m app.cli catalogue-purge --yes     # delete catalogue rows (rollback helper; leads unaffected)
 """
 
 from __future__ import annotations
@@ -17,12 +20,15 @@ import getpass
 import os
 import sys
 from datetime import timedelta
+from pathlib import Path
 
+from pydantic import ValidationError
 from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.orm import Session
 
 from app import audit
 from app.advisor import service as advisor
+from app.catalogue import seed as catalogue
 from app.config import get_settings
 from app.db import get_sessionmaker
 from app.models import AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
@@ -142,7 +148,8 @@ def cmd_seed(_: argparse.Namespace) -> int:
         if settings.seed_sample_data and not settings.is_production:
             count = seed_synthetic_data(db, admin)
             _print(f"[seed] Synthetic leads created: {count}" if count else "[seed] Synthetic data already present")
-    return 0
+    # The service catalogue mirrors the web content in every environment (idempotent).
+    return cmd_catalogue_seed(argparse.Namespace(dry_run=False, file=None))
 
 
 def _read_password() -> str | None:
@@ -278,6 +285,37 @@ def cmd_ops_purge_demo(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_catalogue_seed(args: argparse.Namespace) -> int:
+    try:
+        doc = catalogue.load_document(Path(args.file)) if args.file else catalogue.load_document()
+        with get_sessionmaker()() as db:
+            result = catalogue.seed_catalogue(db, doc, dry_run=args.dry_run)
+    except (OSError, ValidationError, catalogue.SeedValidationError) as exc:
+        _print(f"[catalogue-seed] Not seeded: {exc}")
+        return 1
+    _print(f"[catalogue-seed] {'[dry-run] ' if args.dry_run else ''}{result.summary()}")
+    return 0
+
+
+def cmd_catalogue_check(_: argparse.Namespace) -> int:
+    with get_sessionmaker()() as db:
+        problems = catalogue.catalogue_problems(db)
+    for problem in problems:
+        _print(f"[catalogue-check] {problem}")
+    _print(f"[catalogue-check] {len(problems)} problem(s)")
+    return 1 if problems else 0
+
+
+def cmd_catalogue_purge(args: argparse.Namespace) -> int:
+    if not args.yes:
+        _print("[catalogue-purge] Refused: pass --yes. Leads are not affected; run catalogue-seed to rebuild.")
+        return 1
+    with get_sessionmaker()() as db:
+        removed = catalogue.purge_catalogue(db)
+    _print(f"[catalogue-purge] Removed catalogue entities: {removed}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m app.cli")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -304,6 +342,16 @@ def main(argv: list[str] | None = None) -> int:
     demo.add_argument("--owner-email", required=True)
     demo.set_defaults(func=cmd_ops_seed_demo)
     sub.add_parser("ops-purge-demo", help="Delete demo organisations").set_defaults(func=cmd_ops_purge_demo)
+    cat = sub.add_parser("catalogue-seed", help="Reconcile the service catalogue with the seed document (idempotent)")
+    cat.add_argument("--dry-run", action="store_true", help="Report what would change and roll back")
+    cat.add_argument("--file", help="Seed document (default: app/catalogue/seed_v1.json)")
+    cat.set_defaults(func=cmd_catalogue_seed)
+    sub.add_parser(
+        "catalogue-check", help="Check catalogue integrity (BG/EN content, slugs, lead categories)"
+    ).set_defaults(func=cmd_catalogue_check)
+    purge = sub.add_parser("catalogue-purge", help="Delete all catalogue rows (rollback helper; leads unaffected)")
+    purge.add_argument("--yes", action="store_true")
+    purge.set_defaults(func=cmd_catalogue_purge)
     args = parser.parse_args(argv)
     return args.func(args)
 

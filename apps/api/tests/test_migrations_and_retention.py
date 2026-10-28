@@ -2,7 +2,9 @@ from datetime import timedelta
 
 from alembic import command
 from sqlalchemy import create_engine, func, inspect, select, text
+from sqlalchemy.orm import Session
 
+from app.catalogue.seed import catalogue_problems, seed_catalogue
 from app.cli import SYNTHETIC_SOURCE, ensure_admin, seed_synthetic_data
 from app.models import AIActionRequest, AuditLog, Lead, utcnow
 from app.services import leads
@@ -49,6 +51,49 @@ def test_migration_0002_backfills_existing_leads():
     assert tuple(row) == ("seo", "seo", "contact", None)
     command.downgrade(cfg, "0001")
     engine.dispose()
+
+
+def test_migration_0009_keeps_existing_data_seeds_and_rolls_back():
+    """An existing 0008 database migrates to 0009 without data loss, the catalogue seeds into it, and
+    downgrading removes only the catalogue tables (the documented rollback)."""
+    url = TEST_DATABASE_URL.rsplit("/", 1)[0] + "/acs_migration_catalogue"
+    recreate_database("acs_migration_catalogue")
+    cfg = alembic_config(url)
+    command.upgrade(cfg, "0008")
+    engine = create_engine(url)
+    with engine.begin() as conn:
+        conn.execute(text(
+            "INSERT INTO leads (id, service, submitted_service, name, company, email, message, status, source, "
+            "privacy_acknowledged_at, privacy_notice_version, marketing_consent, created_at, updated_at) "
+            "VALUES (gen_random_uuid(), 'ai_managed', 'ai_managed', 'Стар', 'Стара ООД', 'old@example.com', "
+            "'Запис отпреди каталога', 'QUALIFIED', 'website_contact_form', now(), 'v1', false, now(), now())"
+        ))
+        conn.execute(text(
+            "INSERT INTO ops_organizations (id, slug, name, created_at) "
+            "VALUES (gen_random_uuid(), 'acme', 'Acme', now())"
+        ))
+    before = _row_snapshot(engine)
+
+    command.upgrade(cfg, "head")
+    with Session(engine) as session:
+        assert dict(seed_catalogue(session).created) == {"domain": 10, "family": 60, "service": 9}
+        assert catalogue_problems(session) == []
+        assert seed_catalogue(session).changed is False
+    assert _row_snapshot(engine) == before
+
+    command.downgrade(cfg, "0008")
+    tables = set(inspect(engine).get_table_names())
+    assert not tables & {"catalogue_entities", "services", "service_domains", "entity_translations"}
+    assert _row_snapshot(engine) == before
+    command.upgrade(cfg, "head")  # re-applying after a rollback works on the same data
+    engine.dispose()
+
+
+def _row_snapshot(engine):
+    with engine.connect() as conn:
+        leads_rows = conn.execute(text("SELECT id, service, submitted_service, status, updated_at FROM leads")).all()
+        orgs = conn.execute(text("SELECT id, slug FROM ops_organizations")).all()
+    return sorted(map(tuple, leads_rows)), sorted(map(tuple, orgs))
 
 
 def test_retention_deletes_only_expired_leads(client, make_lead, db):

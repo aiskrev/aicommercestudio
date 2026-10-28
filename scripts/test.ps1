@@ -35,6 +35,13 @@ if ($Suite -in @("api", "web", "all")) {
         foreach ($pair in $diff) { Write-Host "$($pair[0]) differs from $($pair[1])" -ForegroundColor Red }
         $global:LASTEXITCODE = [int]([bool]$diff)
     }
+    # The service catalogue seed is generated from the web content (catalogue-seed.test.ts) and seeded by the API.
+    Invoke-Suite "Catalogue seed (API = web copy)" {
+        $api = (Get-FileHash "apps/api/app/catalogue/seed_v1.json").Hash
+        $web = (Get-FileHash "apps/web/src/lib/catalogue-seed.json").Hash
+        if ($api -ne $web) { Write-Host "catalogue seed differs between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
+        $global:LASTEXITCODE = [int]($api -ne $web)
+    }
 }
 if ($Suite -in @("api", "all")) {
     Invoke-Suite "API tests (pytest)" { docker compose --profile test run --rm --build api-tests }
