@@ -1,6 +1,6 @@
 "use client";
 
-import type { MouseEvent } from "react";
+import { type MouseEvent, useSyncExternalStore } from "react";
 
 import { cx } from "@/components/ui/primitives";
 import {
@@ -10,6 +10,7 @@ import {
   LOCALE_COOKIE_MAX_AGE,
   localeMeta,
   locales,
+  localizePath,
   type SlugMap,
 } from "@/i18n/config";
 import { usePublicPathname } from "@/lib/use-public-pathname";
@@ -24,6 +25,25 @@ export interface LanguageSwitcherLabels {
 export function rememberLocale(locale: Locale) {
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
   document.cookie = `${LOCALE_COOKIE}=${locale}; Path=/; Max-Age=${LOCALE_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
+}
+
+/** The page's own hreflang alternate for `target` (pathname), from the metadata in <head>. */
+function headAlternate(target: Locale): string {
+  const link = document.head.querySelector<HTMLLinkElement>(`link[rel="alternate"][hreflang="${localeMeta[target].htmlLang}"]`);
+  return link?.href ? new URL(link.href).pathname : "";
+}
+
+const noSubscription = () => () => {};
+
+/**
+ * Pages whose slugs are not in the static slug map (entries that exist only in the published service
+ * catalogue) still declare reciprocal hreflang alternates. When the map has no translation, the
+ * switcher uses that alternate instead of falling back to the other language's homepage.
+ */
+function withHeadFallback(mapped: string, target: Locale, pathname: string, alternate: string): string {
+  const isFallback = mapped.split("?")[0] === localizePath(target, "/");
+  const onHomepage = pathname === localizePath("bg", "/") || pathname === localizePath("en", "/");
+  return isFallback && !onHomepage && alternate ? alternate : mapped;
 }
 
 /**
@@ -43,6 +63,13 @@ export function LanguageSwitcher({
   className?: string;
 }) {
   const pathname = usePublicPathname();
+  // Read once per render on the client; the server renders without it (no <head> access there).
+  const alternates = useSyncExternalStore(
+    noSubscription,
+    () => locales.map((target) => headAlternate(target)).join("|"),
+    () => "",
+  ).split("|");
+  const alternateFor = (target: Locale) => alternates[locales.indexOf(target)] ?? "";
 
   function onSelect(event: MouseEvent<HTMLAnchorElement>, target: Locale) {
     if (target === locale) {
@@ -51,7 +78,12 @@ export function LanguageSwitcher({
     }
     rememberLocale(target);
     // Query parameters are only known in the browser; carry over the safe ones.
-    const withQuery = alternateLocalePath(pathname, window.location.search, target, slugs);
+    const withQuery = withHeadFallback(
+      alternateLocalePath(pathname, window.location.search, target, slugs),
+      target,
+      pathname,
+      headAlternate(target),
+    );
     if (withQuery !== event.currentTarget.getAttribute("href")) {
       event.preventDefault();
       window.location.assign(withQuery);
@@ -66,7 +98,7 @@ export function LanguageSwitcher({
           return (
             <li key={target}>
               <a
-                href={alternateLocalePath(pathname, "", target, slugs)}
+                href={withHeadFallback(alternateLocalePath(pathname, "", target, slugs), target, pathname, alternateFor(target))}
                 hrefLang={localeMeta[target].htmlLang}
                 lang={localeMeta[target].htmlLang}
                 aria-current={active ? "true" : undefined}

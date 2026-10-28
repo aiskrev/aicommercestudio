@@ -10,8 +10,12 @@ the idempotent `catalogue-seed`. Then, on branch `feature/catalogue-api-admin`:
 * the admin editor with draft, preview, publish and archive (`/admin/catalogue`).
 
 **Deviation from §6:** publishing is per entry, through a snapshot on the entity, instead of
-catalogue-wide releases (DATABASE_SCHEMA.md → "Publishing model"). The website pages still render
-from the TypeScript content (phase S5 is open). Baseline: branch
+catalogue-wide releases (DATABASE_SCHEMA.md → "Publishing model"). The website renders the ten
+domains and nine existing services from the TypeScript content, and adds the entries that exist
+only in the published catalogue (assessments, workshops, new services) from the public API with
+300 s regeneration and an on-demand hook (`feature/service-discovery`, INFORMATION_ARCHITECTURE.md
+→ "Service catalogue on the website"). Phase S5, switching the source for the existing entries,
+is still open; the API does not yet call the web revalidation hook after publishing. Baseline: branch
 `feature/domain-hubs` @ `2a6866a` (the ten domain hubs, built on `main` @ `52bf6e1`; Alembic head
 `0008`).
 

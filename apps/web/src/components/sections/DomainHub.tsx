@@ -1,7 +1,9 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
 import { RelatedTools } from "@/components/home/ToolsPreview";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { StatusChip } from "@/components/sections/StatusChip";
 import { Icon } from "@/components/ui/Icon";
 import { EditorialSplit } from "@/components/ui/patterns";
 import {
@@ -18,20 +20,9 @@ import { domainByKey, getContent, serviceByKey } from "@/content";
 import type { DomainContent } from "@/content/types";
 import type { Dictionary } from "@/i18n";
 import { type Locale, localizePath } from "@/i18n/config";
-import { type DeliveryStatus, type DomainDefinition, type DomainKey, domainStatus, isDomainPublished } from "@/lib/domains";
+import { type DomainDefinition, type DomainKey, domainStatus, isDomainPublished } from "@/lib/domains";
 import { contactWithService, routes } from "@/lib/routes";
 import { isToolAvailable, toolByKey, toolHrefs, toolMinutes } from "@/lib/tools";
-
-const STATUS_BADGE: Record<DeliveryStatus, string> = {
-  available: "badge-success",
-  custom: "",
-  planned: "badge-warning",
-};
-
-/** Delivery status chip; the label carries the meaning, the colour only repeats it. */
-export function StatusChip({ status, label, className }: { status: DeliveryStatus; label: string; className?: string }) {
-  return <span className={cx("badge badge-dot", STATUS_BADGE[status], className)}>{label}</span>;
-}
 
 /**
  * Domain hub (docs/CONTENT_STRATEGY_BG_EN.md §5.1): what the domain covers, which families are
@@ -43,11 +34,14 @@ export function DomainHub({
   domain,
   definition,
   dict,
+  offerings,
 }: {
   locale: Locale;
   domain: DomainContent;
   definition: DomainDefinition;
   dict: Dictionary;
+  /** Assessments and workshops from the published catalogue (or their empty state). */
+  offerings?: ReactNode;
 }) {
   const labels = dict.domain;
   const { tools } = getContent(locale);
@@ -167,6 +161,8 @@ export function DomainHub({
           })}
         </ul>
       </Section>
+
+      {offerings && <Section labelledBy="domain-offerings-title">{offerings}</Section>}
 
       {/* ------------------------------------------------------------ deliverables + engagement */}
       <Section labelledBy="domain-deliverables-title">

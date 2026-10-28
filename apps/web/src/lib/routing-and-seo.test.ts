@@ -167,8 +167,8 @@ describe("SEO helpers", () => {
     expect(data.mainEntity[0].acceptedAnswer.text).toBe("A.");
   });
 
-  it("sitemap lists every public page, service and article in both languages", () => {
-    const entries = sitemap();
+  it("sitemap lists every public page, service and article in both languages", async () => {
+    const entries = await sitemap();
     const urls = entries.map((entry) => new URL(entry.url).pathname);
     for (const locale of ["bg", "en"] as const) {
       const { services, articles } = getContent(locale);

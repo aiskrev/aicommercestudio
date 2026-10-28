@@ -73,6 +73,7 @@ exists, see the note above). `.env` is git-ignored; never commit it.
 | `SEED_SAMPLE_DATA` | `true` | 7 clearly synthetic leads in development; forced off in production |
 | `AI_PROVIDER` / `ANTHROPIC_API_KEY` | `mock` / empty | optional real AI; the key stays in the API container |
 | `SMTP_*` | empty | e-mail notifications are off unless configured |
+| `CATALOGUE_REVALIDATE_SECRET` | empty | web runtime: enables `POST /api/catalogue-revalidate` (≥ 16 characters); empty = pages refresh every 300 s |
 | `SITE_URL`, `PUBLIC_CONTACT_*` | localhost / empty | baked into the web build — rebuild after changing. Empty `PUBLIC_CONTACT_*` means the approved values in `apps/web/src/lib/company.ts` |
 | `POSTGRES_HOST_PORT` | `5433` | host port for database tools |
 

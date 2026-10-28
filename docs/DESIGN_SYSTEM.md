@@ -315,6 +315,16 @@ consultation CTAs, then the contact card. Contact details everywhere use
 `components/sections/ContactDetails.tsx` (visible labels, descriptive accessible names, no
 icon-only links). There are no badges, counters, logos or certification walls.
 
+**Service catalogue** (`components/sections/Catalogue.tsx`, `CatalogueBrowser.tsx`,
+`OfferingPage.tsx`, `StatusChip.tsx`): `OfferingCard` is the shared card: a type badge (Service,
+Assessment, Workshop), the status chip only when an entry is not available, the name as a stretched
+link, summary, then domain and duration as a small `dl`. The index filter uses `aria-pressed` type
+buttons (shown only when more than one type exists) and a labelled native `select` for the domain;
+the result count is an `aria-live` line, and an empty result offers "Show all". Hubs show a
+`panel` empty state with a contact button instead of an empty grid. `ManagedRelation` is a
+`card-accent` aside. The entry page follows the service template's hero and summary strip, without
+the concept diagram, use cases or FAQ, which catalogue entries do not have.
+
 ## Composition rules
 
 * No two consecutive sections share the same composition; use `tone` and `density` to vary rhythm.

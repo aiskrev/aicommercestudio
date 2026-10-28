@@ -52,7 +52,10 @@ Hero (title, intro, quote CTA, concept diagram, summary strip) → **business pr
 **solution approach** (`approach`, 3 steps) → **technical capabilities** (`capabilities`) →
 **use cases** (`useCases`, scenarios only) → technical checks (`checks`) → deliverables and
 engagement → **delivery process** (`workflow`, inputs) → FAQ + **related tools** (`SERVICE_TOOLS`) →
-related articles → related services → **CTA** (contact with the service preselected).
+related articles → related services → **CTA** (contact with the service preselected). Between
+deliverables and the delivery process: the published **assessments and workshops** of the
+service's primary domain (only when there are any) and, for build services, the **managed
+operation** panel linking AI Managed Services.
 
 Content: `content/{bg,en}/services.ts` (base), `services-depth.ts` (headings, checks, workflow,
 inputs, articles), `services-template.ts` (approach, use cases). EN is typed against BG.
@@ -75,12 +78,14 @@ The ten domains of [SERVICE_TAXONOMY.md](SERVICE_TAXONOMY.md) group the services
   3. Problems.
   4. Service families with status chips and links to the existing service pages or to the domain
      that delivers them.
-  5. Deliverables.
-  6. Engagement models.
-  7. Prerequisites and limitations.
-  8. Related domains.
-  9. Live tools.
-  10. CTA band.
+  5. Assessments and workshops of the domain from the published catalogue; with none published,
+     a plain statement and a contact link (no invented offers).
+  6. Deliverables.
+  7. Engagement models.
+  8. Prerequisites and limitations.
+  9. Related domains.
+  10. Live tools.
+  11. CTA band.
 
   There is no FAQ yet.
 * **Services index:** a "Ten service domains" section shows three bands: AI systems,
@@ -89,6 +94,40 @@ The ten domains of [SERVICE_TAXONOMY.md](SERVICE_TAXONOMY.md) group the services
   includes AI Managed Services under "Managed AI & Platform Operations".
 * **Navigation:** the header, mobile and footer navigation are unchanged, with two service groups.
   The move to bands is phase IA-1.
+
+### Service catalogue on the website (route coverage)
+
+All service routes share `/bg/uslugi/<slug>` ↔ `/en/services/<slug>`. Data: `src/lib/catalogue.ts`.
+
+| Page | Route | Source | Rendering |
+| --- | --- | --- | --- |
+| Services index (domain bands, showcase, **full catalogue** with type and domain filters) | `uslugi/page.tsx` | TypeScript content + published catalogue | prerendered at build, regenerated every 300 s |
+| Ten domain hubs | `uslugi/[slug]` | TypeScript content (`domains.ts`); the assessments-and-workshops block from the catalogue | prerendered, 300 s |
+| Eight existing service pages | `uslugi/[slug]` | TypeScript content (unchanged template) | prerendered, 300 s |
+| AI Managed Services | `uslugi/ai-managed-services` | TypeScript content | static (dedicated route) |
+| Assessments, workshops and services that exist only in the catalogue | `uslugi/[slug]` → `OfferingPage` | public catalogue API | rendered on first request, cached, 300 s |
+| Unknown or malformed slug | `uslugi/[slug]` | — | 404 (no API call for malformed slugs or slugs missing from the cached list) |
+
+Rules:
+
+* **Source of truth.** The TypeScript content stays authoritative for the ten domains and the nine
+  existing services (phase S5 of SERVICE_CATALOGUE_ARCHITECTURE.md is still open). A catalogue
+  entry with the same key never overrides them. Catalogue-only entries are shown when their
+  primary domain is a published hub and their slugs are valid and do not collide with an
+  existing service or hub slug in either language.
+* **Build without the API.** `next build` never needs the API: the fetch fails fast and the pages
+  are built from the TypeScript content. At runtime the catalogue is fetched with a 300 s cache
+  (tag `catalogue`). If the API is down, the pages keep showing the TypeScript content.
+* **On-demand refresh.** `POST /api/catalogue-revalidate` with `X-Revalidate-Secret`
+  (`CATALOGUE_REVALIDATE_SECRET`) regenerates the catalogue pages at once. Without the variable
+  the endpoint answers 404 and pages refresh every 300 s. The API does not call it yet.
+* **Entry page.** Type, status (when not available), name, summary, format, domain and duration;
+  body; capabilities; deliverables; engagement format with the pricing note; related services and
+  other assessments and workshops (published only); the managed-operation panel when the domain
+  continues as a managed service; CTA to the contact form with the domain's lead category.
+* **Language switch.** Catalogue-only slugs are not in the static slug map; the switcher uses the
+  page's own hreflang alternate instead of the other language's homepage.
+* **Legacy URLs and redirects** are unchanged: no existing route was removed or renamed.
 
 ## Interactive tools
 
