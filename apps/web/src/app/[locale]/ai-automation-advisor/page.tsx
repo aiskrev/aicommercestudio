@@ -11,6 +11,7 @@ import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { contactFormProps } from "@/lib/contact-form-props";
+import { domainHubLinks } from "@/lib/domain-links";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
 
 /** Default shown before the client reads the configured value from /api/public/advisor/status. */
@@ -59,7 +60,13 @@ export default async function AdvisorPage({ params }: PageProps<"/[locale]/ai-au
       <section aria-label={advisor.form.title} className="py-12 sm:py-16">
         <Container className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="min-w-0">
-            <AdvisorTool content={advisor} contact={contact} retentionDays={DEFAULT_RETENTION_DAYS} locale={locale} />
+            <AdvisorTool
+              content={advisor}
+              contact={contact}
+              retentionDays={DEFAULT_RETENTION_DAYS}
+              locale={locale}
+              domainLinks={domainHubLinks(locale)}
+            />
           </div>
           <aside className="grid content-start gap-5 print:hidden">
             <section className="card rounded-2xl p-6" aria-labelledby="advisor-privacy-title">

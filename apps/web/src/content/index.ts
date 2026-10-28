@@ -19,6 +19,7 @@ import { readinessTool } from "@/content/bg/tool-readiness";
 import { agentLibrary } from "@/content/bg/agent-library";
 import { finderTool } from "@/content/bg/tool-finder";
 import { roiTool } from "@/content/bg/tool-roi";
+import { engineeringTool } from "@/content/bg/tool-engineering";
 import { solutionTool } from "@/content/bg/tool-solution";
 import { teamTool } from "@/content/bg/tool-team";
 import { tools } from "@/content/bg/tools";
@@ -49,6 +50,7 @@ import { readinessTool as enReadinessTool } from "@/content/en/tool-readiness";
 import { agentLibrary as enAgentLibrary } from "@/content/en/agent-library";
 import { finderTool as enFinderTool } from "@/content/en/tool-finder";
 import { roiTool as enRoiTool } from "@/content/en/tool-roi";
+import { engineeringTool as enEngineeringTool } from "@/content/en/tool-engineering";
 import { solutionTool as enSolutionTool } from "@/content/en/tool-solution";
 import { teamTool as enTeamTool } from "@/content/en/tool-team";
 import { tools as enTools } from "@/content/en/tools";
@@ -76,6 +78,7 @@ const bg = {
   readinessTool,
   teamTool,
   roiTool,
+  engineeringTool,
   finderTool,
   solutionTool,
   agentLibrary,
@@ -108,6 +111,7 @@ const en: SiteContent = {
   readinessTool: enReadinessTool,
   teamTool: enTeamTool,
   roiTool: enRoiTool,
+  engineeringTool: enEngineeringTool,
   finderTool: enFinderTool,
   solutionTool: enSolutionTool,
   agentLibrary: enAgentLibrary,

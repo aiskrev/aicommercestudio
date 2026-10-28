@@ -7,6 +7,7 @@ import logging
 from fastapi import APIRouter, Depends, Request, Response, status
 
 from app.advisor import service
+from app.advisor.insights import AdvisorResponseV2
 from app.advisor.schemas import AdvisorRequest, AdvisorResponse, AdvisorStatus
 from app.ai.factory import get_ai_provider
 from app.config import get_settings
@@ -70,13 +71,17 @@ def advisor_status(request: Request, settings: AppSettings) -> AdvisorStatus:
 @router.post(
     "/assessments",
     status_code=status.HTTP_201_CREATED,
-    response_model=AdvisorResponse,
+    response_model=AdvisorResponseV2 | AdvisorResponse,
     dependencies=[Depends(advisor_rate_limit)],
     summary="Generate an automation assessment (no personal data required)",
+    description=(
+        "contract_version \"1\" (default) returns the original response unchanged. "
+        "contract_version \"2\" requires `context` and also returns `insights`."
+    ),
 )
 def create_assessment(
     payload: AdvisorRequest, response: Response, db: DbSession, settings: AppSettings
-) -> AdvisorResponse:
+) -> AdvisorResponse | AdvisorResponseV2:
     response.headers["Cache-Control"] = "no-store"
     problem = check_form_token(
         payload.form_token, settings.secret_key, settings.form_token_min_seconds, settings.form_token_max_age_seconds

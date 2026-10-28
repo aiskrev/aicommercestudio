@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+import shutil
 from datetime import timedelta
 from fractions import Fraction
 from pathlib import Path
@@ -100,17 +101,42 @@ def assessed(definition: AssessmentDefinition, answers: dict[str, Any]):
     return service.assess(definition, answers)[1]
 
 
+@pytest.fixture(autouse=True)
+def legacy_registry(tmp_path_factory, monkeypatch):
+    """The engine tests here were written against devops_delivery 1.0.0 and observability 1.0.0.
+
+    devops_delivery 1.1.0 (tests/test_assessments_v2.py) is now current; pinning a registry with only
+    the 1.0.0 files keeps these tests about the engine itself, unchanged.
+    """
+    folder = tmp_path_factory.mktemp("legacy")
+    for key in ("devops_delivery", "observability_reliability"):
+        (folder / key).mkdir()
+        shutil.copy(DEFINITIONS_DIR / key / "1.0.0.json", folder / key / "1.0.0.json")
+    legacy = build_registry(folder)
+    monkeypatch.setattr("app.assessments.service.registry", lambda: legacy)
+    monkeypatch.setattr("app.routers.assessments.registry", lambda: legacy)
+    monkeypatch.setitem(globals(), "registry", lambda: legacy)
+    return legacy
+
+
 # --------------------------------------------------------------------------- definitions
 
 
 def test_shipped_definitions_load_and_validate():
     reg = build_registry()
-    assert reg.keys() == ["devops_delivery", "observability_reliability"]
+    assert reg.keys() == ["cloud_platform", "devops_delivery", "observability_reliability"]
+    current = {key: (reg.current(key).version, reg.current(key).status) for key in reg.versions}
+    assert current == {
+        "cloud_platform": ("1.0.0", "live"),
+        "devops_delivery": ("1.1.0", "live"),
+        "observability_reliability": ("1.0.0", "preview"),
+    }
+    # The superseded version stays, so results saved with it still re-render.
+    assert reg.get("devops_delivery", "1.0.0") is not None
     for key in reg.versions:
-        definition = reg.current(key)
-        assert definition is not None and definition.status == "preview"
-        assert not CYRILLIC.search(definition.texts["en"].model_dump_json())
+        assert not CYRILLIC.search(reg.current(key).texts["en"].model_dump_json())
     assert reg.current("observability_reliability").extension == "observability_signals"
+    assert reg.current("devops_delivery").extension == "devops_evidence"
 
 
 @pytest.mark.parametrize(

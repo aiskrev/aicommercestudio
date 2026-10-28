@@ -14,8 +14,8 @@ Foundations for the business assessment and solution-design tools. Hub: `/bg/ins
 | Automation Opportunity Finder (questionnaire) | `finder` | live | `/bg/instrumenti/avtomatizatsii` ↔ `/en/tools/automation-finder` | `tool_finder` (on) |
 | AI solution builder (architecture + roadmap) | `solution` | live | `/bg/instrumenti/ai-reshenie` ↔ `/en/tools/solution-builder` | `tool_solution` (on) |
 | AI agent library (10 static agent pages) | `agents` | live | `/bg/ai-agenti` ↔ `/en/ai-agents` | `tool_agents` (on) |
-| Cloud & Platform Maturity Assessment | `cloud_maturity` | planned | intro `/bg/instrumenti/zrelost-na-oblak-i-platforma` ↔ `/en/tools/cloud-platform-maturity` | — |
-| DevOps Delivery Maturity | `devops_maturity` | planned | intro `/bg/instrumenti/zrelost-na-devops-dostavkata` ↔ `/en/tools/devops-delivery-maturity` | — |
+| Cloud & Platform Maturity Assessment (engine, 10 areas) | `cloud_maturity` | live | `/bg/instrumenti/zrelost-na-oblak-i-platforma` ↔ `/en/tools/cloud-platform-maturity` | `tool_cloud` (on) |
+| DevOps Delivery Maturity (engine, 11 areas, unscored metrics) | `devops_maturity` | live | `/bg/instrumenti/zrelost-na-devops-dostavkata` ↔ `/en/tools/devops-delivery-maturity` | `tool_devops` (on) |
 | Observability & Reliability Assessment | `observability` | planned | intro `/bg/instrumenti/nablyudaemost-i-nadezhdnost` ↔ `/en/tools/observability-reliability` | — |
 | E-commerce Architecture Assessment | `ecommerce_architecture` | planned | intro `/bg/instrumenti/arhitektura-na-online-magazin` ↔ `/en/tools/ecommerce-architecture` | — |
 | Data Integration Assessment | `data_integration` | planned | intro `/bg/instrumenti/integratsiya-na-danni` ↔ `/en/tools/data-integration` | — |
@@ -23,7 +23,9 @@ Foundations for the business assessment and solution-design tools. Hub: `/bg/ins
 | AI Operations Readiness Assessment | `ai_ops_readiness` | planned | intro `/bg/instrumenti/gotovnost-za-ai-operatsii` ↔ `/en/tools/ai-operations-readiness` | — |
 | FinOps & AI Cost Assessment | `finops` | planned | intro `/bg/instrumenti/finops-i-ai-razhodi` ↔ `/en/tools/finops-ai-cost` | — |
 
-Solution builder and agent library: see [SOLUTION_BUILDER.md](SOLUTION_BUILDER.md).
+Solution builder and agent library: see [SOLUTION_BUILDER.md](SOLUTION_BUILDER.md). The two engineering
+assessments: [ENGINEERING_ASSESSMENTS.md](ENGINEERING_ASSESSMENTS.md); their reports:
+[REPORTS.md](REPORTS.md). Advisor V2: [AI_ADVISOR_V2.md](AI_ADVISOR_V2.md).
 
 **Safeguard:** a tool is linked as a tool and routed to a working page only when `status === "live"`,
 it has a path and its flag is on (`isToolAvailable` in `lib/tools.ts`). Planned tools have no flag,

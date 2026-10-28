@@ -92,7 +92,10 @@ def database() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 def clean_state(database: None) -> Iterator[None]:
+    from app.advisor.service import reset_ai_budget
+
     limiter.reset()
+    reset_ai_budget()
     yield
     with get_sessionmaker()() as db:
         db.execute(text(f"TRUNCATE {', '.join(TABLES)} RESTART IDENTITY CASCADE"))

@@ -797,6 +797,7 @@
           "advisor"
         ],
         "summary": "Generate an automation assessment (no personal data required)",
+        "description": "contract_version \"1\" (default) returns the original response unchanged. contract_version \"2\" requires `context` and also returns `insights`.",
         "operationId": "create_assessment_api_public_advisor_assessments_post",
         "requestBody": {
           "content": {
@@ -814,7 +815,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdvisorResponse"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/AdvisorResponseV2"
+                    },
+                    {
+                      "$ref": "#/components/schemas/AdvisorResponse"
+                    }
+                  ],
+                  "title": "Response Create Assessment Api Public Advisor Assessments Post"
                 }
               }
             }
@@ -1385,6 +1394,103 @@
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/assessments/results/report": {
+      "post": {
+        "tags": [
+          "assessments"
+        ],
+        "summary": "Report of a saved result: PDF, or the same document as JSON for the HTML view",
+        "description": "Only the result the token opens is ever rendered (the token is the access right). Expired,\nunknown and tampered results are 404. The file name carries no reference, token or name.",
+        "operationId": "result_report_api_public_assessments_results_report_post",
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "bg",
+                "en"
+              ],
+              "type": "string",
+              "default": "bg",
+              "title": "Locale"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultReportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/assessments/results/consultation": {
+      "post": {
+        "tags": [
+          "assessments"
+        ],
+        "summary": "Optional consultation about a saved result (creates a lead; marketing consent is separate)",
+        "operationId": "result_consultation_api_public_assessments_results_consultation_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultConsultationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsultationOut"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -4204,6 +4310,23 @@
           },
           "assessment": {
             "$ref": "#/components/schemas/AutomationAssessment"
+          },
+          "contract_version": {
+            "type": "string",
+            "title": "Contract Version",
+            "default": "1"
+          },
+          "insights": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Insights"
           }
         },
         "type": "object",
@@ -4220,6 +4343,152 @@
         ],
         "title": "AdvisorAssessmentSummary",
         "description": "Shown to administrators on a lead that was submitted from an assessment."
+      },
+      "AdvisorContext": {
+        "properties": {
+          "goal": {
+            "type": "string",
+            "enum": [
+              "save_time",
+              "reduce_errors",
+              "faster_response",
+              "handle_growth",
+              "better_visibility"
+            ],
+            "title": "Goal"
+          },
+          "data_sensitivity": {
+            "type": "string",
+            "enum": [
+              "none",
+              "business",
+              "personal",
+              "financial",
+              "special_category"
+            ],
+            "title": "Data Sensitivity"
+          },
+          "customer_facing": {
+            "type": "boolean",
+            "title": "Customer Facing"
+          },
+          "system_access": {
+            "type": "string",
+            "enum": [
+              "api",
+              "exports",
+              "manual_only",
+              "unknown"
+            ],
+            "title": "System Access"
+          },
+          "change_capacity": {
+            "type": "string",
+            "enum": [
+              "no_it",
+              "external_it",
+              "internal_it"
+            ],
+            "title": "Change Capacity"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "goal",
+          "data_sensitivity",
+          "customer_facing",
+          "system_access",
+          "change_capacity"
+        ],
+        "title": "AdvisorContext",
+        "description": "V2: richer business and integration context, enumerated only (no free text, no personal data)."
+      },
+      "AdvisorInsights": {
+        "properties": {
+          "contract_version": {
+            "type": "string",
+            "const": "2",
+            "title": "Contract Version",
+            "default": "2"
+          },
+          "engine": {
+            "type": "string",
+            "const": "advisor-insights/1",
+            "title": "Engine",
+            "default": "advisor-insights/1"
+          },
+          "opportunities": {
+            "items": {
+              "$ref": "#/components/schemas/ClassifiedOpportunity"
+            },
+            "type": "array",
+            "title": "Opportunities"
+          },
+          "feasibility": {
+            "$ref": "#/components/schemas/Feasibility"
+          },
+          "risk": {
+            "$ref": "#/components/schemas/RiskProfile"
+          },
+          "domains": {
+            "items": {
+              "$ref": "#/components/schemas/DomainLink"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Domains"
+          },
+          "checkpoints": {
+            "items": {
+              "$ref": "#/components/schemas/Checkpoint"
+            },
+            "type": "array",
+            "title": "Checkpoints"
+          },
+          "prerequisites": {
+            "items": {
+              "$ref": "#/components/schemas/Prerequisite"
+            },
+            "type": "array",
+            "title": "Prerequisites"
+          },
+          "pilot": {
+            "$ref": "#/components/schemas/Pilot"
+          },
+          "roadmap": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/RoadmapPhase"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Roadmap"
+          },
+          "provenance_note": {
+            "type": "string",
+            "maxLength": 400,
+            "title": "Provenance Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "opportunities",
+          "feasibility",
+          "risk",
+          "domains",
+          "checkpoints",
+          "prerequisites",
+          "pilot",
+          "provenance_note"
+        ],
+        "title": "AdvisorInsights"
       },
       "AdvisorRequest": {
         "properties": {
@@ -4271,6 +4540,30 @@
             ],
             "title": "Locale",
             "default": "bg"
+          },
+          "contract_version": {
+            "type": "string",
+            "enum": [
+              "1",
+              "2"
+            ],
+            "title": "Contract Version",
+            "default": "1"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdvisorContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "include_roadmap": {
+            "type": "boolean",
+            "title": "Include Roadmap",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -4282,7 +4575,7 @@
           "team_size"
         ],
         "title": "AdvisorRequest",
-        "description": "What a visitor submits. No personal data is requested."
+        "description": "What a visitor submits. No personal data is requested.\n\n`contract_version` \"1\" (the default) is the original contract, unchanged. \"2\" requires `context`\nand returns V2 insights as well; V2-only fields are rejected on a V1 request instead of being\nsilently ignored."
       },
       "AdvisorResponse": {
         "properties": {
@@ -4376,6 +4669,110 @@
           "assessment"
         ],
         "title": "AdvisorResponse"
+      },
+      "AdvisorResponseV2": {
+        "properties": {
+          "assessment_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessment Id"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "demo",
+              "ai"
+            ],
+            "title": "Mode"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "model": {
+            "type": "string",
+            "title": "Model"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          },
+          "notices": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notices"
+          },
+          "stored": {
+            "type": "boolean",
+            "title": "Stored"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "assessment": {
+            "$ref": "#/components/schemas/AutomationAssessment"
+          },
+          "contract_version": {
+            "type": "string",
+            "const": "2",
+            "title": "Contract Version",
+            "default": "2"
+          },
+          "insights": {
+            "$ref": "#/components/schemas/AdvisorInsights"
+          }
+        },
+        "type": "object",
+        "required": [
+          "assessment_id",
+          "reference",
+          "mode",
+          "provider",
+          "model",
+          "disclaimer",
+          "notices",
+          "stored",
+          "expires_at",
+          "created_at",
+          "assessment",
+          "insights"
+        ],
+        "title": "AdvisorResponseV2",
+        "description": "V2 response: the unchanged V1 fields plus the contract version and the insights."
       },
       "AdvisorStatus": {
         "properties": {
@@ -5002,10 +5399,31 @@
           },
           "recommendations": {
             "items": {
-              "$ref": "#/components/schemas/TitledOut"
+              "$ref": "#/components/schemas/FindingOut"
             },
             "type": "array",
             "title": "Recommendations"
+          },
+          "roadmap": {
+            "items": {
+              "$ref": "#/components/schemas/RoadmapStepOut"
+            },
+            "type": "array",
+            "title": "Roadmap"
+          },
+          "domains": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Domains"
+          },
+          "inputs": {
+            "items": {
+              "$ref": "#/components/schemas/InputOut"
+            },
+            "type": "array",
+            "title": "Inputs"
           },
           "answered": {
             "type": "integer",
@@ -5051,6 +5469,9 @@
           "band",
           "dimensions",
           "recommendations",
+          "roadmap",
+          "domains",
+          "inputs",
           "answered",
           "questions",
           "fingerprint",
@@ -5398,6 +5819,38 @@
         ],
         "title": "AutomationAssessment"
       },
+      "Basis": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "input",
+              "assessment",
+              "rule"
+            ],
+            "title": "Source"
+          },
+          "key": {
+            "type": "string",
+            "maxLength": 60,
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Label"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "key",
+          "label"
+        ],
+        "title": "Basis",
+        "description": "Where an insight comes from: an input the visitor chose, the assessment, or a named rule."
+      },
       "BudgetRange": {
         "type": "string",
         "enum": [
@@ -5444,6 +5897,35 @@
         ],
         "title": "Capability"
       },
+      "Checkpoint": {
+        "properties": {
+          "step": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Step"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Reason"
+          },
+          "basis": {
+            "items": {
+              "$ref": "#/components/schemas/Basis"
+            },
+            "type": "array",
+            "title": "Basis"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "step",
+          "reason",
+          "basis"
+        ],
+        "title": "Checkpoint"
+      },
       "ChecksOut": {
         "properties": {
           "publishable": {
@@ -5465,6 +5947,56 @@
           "errors"
         ],
         "title": "ChecksOut"
+      },
+      "ClassifiedOpportunity": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Title"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "workflow_automation",
+              "ai_assisted",
+              "integration",
+              "reporting"
+            ],
+            "title": "Category"
+          },
+          "fit": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Fit"
+          },
+          "explanation": {
+            "type": "string",
+            "maxLength": 400,
+            "title": "Explanation"
+          },
+          "basis": {
+            "items": {
+              "$ref": "#/components/schemas/Basis"
+            },
+            "type": "array",
+            "title": "Basis"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title",
+          "category",
+          "fit",
+          "explanation",
+          "basis"
+        ],
+        "title": "ClassifiedOpportunity"
       },
       "Complexity": {
         "properties": {
@@ -5506,6 +6038,24 @@
           "token"
         ],
         "title": "ConfigurationLookup"
+      },
+      "ConsultationOut": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "message"
+        ],
+        "title": "ConsultationOut"
       },
       "DashboardStats": {
         "properties": {
@@ -5614,6 +6164,9 @@
             "maximum": 100.0,
             "minimum": 0.0,
             "title": "Score"
+          },
+          "level": {
+            "$ref": "#/components/schemas/LevelOut"
           }
         },
         "additionalProperties": false,
@@ -5622,7 +6175,8 @@
           "key",
           "title",
           "description",
-          "score"
+          "score",
+          "level"
         ],
         "title": "DimensionScoreOut"
       },
@@ -5813,6 +6367,46 @@
           "families"
         ],
         "title": "DomainFieldsOut"
+      },
+      "DomainLink": {
+        "properties": {
+          "domain": {
+            "type": "string",
+            "enum": [
+              "ai_strategy",
+              "ai_agents_automation",
+              "ai_applications",
+              "commerce_engineering",
+              "cloud_platform",
+              "devops_sre",
+              "data_integration",
+              "ai_governance",
+              "managed_operations",
+              "advisory_enablement"
+            ],
+            "title": "Domain"
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Reason"
+          },
+          "basis": {
+            "items": {
+              "$ref": "#/components/schemas/Basis"
+            },
+            "type": "array",
+            "title": "Basis"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "domain",
+          "reason",
+          "basis"
+        ],
+        "title": "DomainLink"
       },
       "DomainPage": {
         "properties": {
@@ -6484,6 +7078,38 @@
         ],
         "title": "EstimateOut"
       },
+      "Factor": {
+        "properties": {
+          "effect": {
+            "type": "string",
+            "enum": [
+              "supports",
+              "limits"
+            ],
+            "title": "Effect"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Text"
+          },
+          "basis": {
+            "items": {
+              "$ref": "#/components/schemas/Basis"
+            },
+            "type": "array",
+            "title": "Basis"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "effect",
+          "text",
+          "basis"
+        ],
+        "title": "Factor"
+      },
       "Family": {
         "properties": {
           "key": {
@@ -6699,6 +7325,39 @@
         ],
         "title": "FamilyTextOut"
       },
+      "Feasibility": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Level"
+          },
+          "explanation": {
+            "type": "string",
+            "maxLength": 400,
+            "title": "Explanation"
+          },
+          "factors": {
+            "items": {
+              "$ref": "#/components/schemas/Factor"
+            },
+            "type": "array",
+            "title": "Factors"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "level",
+          "explanation",
+          "factors"
+        ],
+        "title": "Feasibility"
+      },
       "FieldProblem": {
         "properties": {
           "field": {
@@ -6722,6 +7381,76 @@
           "type"
         ],
         "title": "FieldProblem"
+      },
+      "FindingOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "recommendation",
+              "risk",
+              "quick_win",
+              "target_state",
+              "pattern",
+              "context"
+            ],
+            "title": "Kind"
+          },
+          "horizon": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "enum": [
+                  30,
+                  60,
+                  90
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Horizon"
+          },
+          "domains": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Domains"
+          },
+          "because": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Because"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "description",
+          "kind",
+          "horizon",
+          "domains",
+          "because"
+        ],
+        "title": "FindingOut"
       },
       "FormTokenOut": {
         "properties": {
@@ -6800,6 +7529,45 @@
           "reason"
         ],
         "title": "HumanApproval"
+      },
+      "InputOut": {
+        "properties": {
+          "question": {
+            "type": "string",
+            "title": "Question"
+          },
+          "dimension": {
+            "type": "string",
+            "title": "Dimension"
+          },
+          "evidence": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "metric",
+              "context"
+            ],
+            "title": "Evidence"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "question",
+          "dimension",
+          "evidence",
+          "text",
+          "answer"
+        ],
+        "title": "InputOut"
       },
       "InquiryType": {
         "type": "string",
@@ -7630,6 +8398,25 @@
         "title": "LeadUpdate",
         "description": "Change pipeline status and/or service categorisation.\n\n`expected_status` enables optimistic concurrency: if another administrator changed the\nstatus in the meantime, the update is rejected with 409 instead of silently overwriting it."
       },
+      "LevelOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "title"
+        ],
+        "title": "LevelOut"
+      },
       "LoginIn": {
         "properties": {
           "email": {
@@ -8175,6 +8962,58 @@
         ],
         "title": "Phase"
       },
+      "Pilot": {
+        "properties": {
+          "scope": {
+            "type": "string",
+            "maxLength": 400,
+            "title": "Scope"
+          },
+          "duration_weeks": {
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Duration Weeks"
+          },
+          "success_criteria": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Success Criteria"
+          },
+          "human_in_the_loop": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Human In The Loop"
+          },
+          "basis": {
+            "items": {
+              "$ref": "#/components/schemas/Basis"
+            },
+            "type": "array",
+            "title": "Basis"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "scope",
+          "duration_weeks",
+          "success_criteria",
+          "human_in_the_loop",
+          "basis"
+        ],
+        "title": "Pilot"
+      },
       "Platform": {
         "type": "string",
         "enum": [
@@ -8185,6 +9024,38 @@
           "none"
         ],
         "title": "Platform"
+      },
+      "Prerequisite": {
+        "properties": {
+          "area": {
+            "type": "string",
+            "enum": [
+              "integration",
+              "security"
+            ],
+            "title": "Area"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Text"
+          },
+          "basis": {
+            "items": {
+              "$ref": "#/components/schemas/Basis"
+            },
+            "type": "array",
+            "title": "Basis"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "area",
+          "text",
+          "basis"
+        ],
+        "title": "Prerequisite"
       },
       "QuestionOut": {
         "properties": {
@@ -8294,6 +9165,16 @@
               }
             ],
             "title": "Integer"
+          },
+          "evidence": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "metric",
+              "context"
+            ],
+            "title": "Evidence",
+            "default": "practice"
           }
         },
         "additionalProperties": false,
@@ -8802,6 +9683,102 @@
         ],
         "title": "RelatedResponse"
       },
+      "ResultConsultationRequest": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 20,
+            "title": "Token"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email",
+            "title": "Email"
+          },
+          "company": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Company"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Message",
+            "default": ""
+          },
+          "privacy_acknowledged": {
+            "type": "boolean",
+            "title": "Privacy Acknowledged"
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "default": false
+          },
+          "website": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Website",
+            "default": ""
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token",
+          "name",
+          "email",
+          "company",
+          "privacy_acknowledged"
+        ],
+        "title": "ResultConsultationRequest",
+        "description": "Optional: ask for a consultation about a saved result. Creates a lead; nothing is required to see results."
+      },
+      "ResultReportRequest": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 20,
+            "title": "Token"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "pdf",
+              "json"
+            ],
+            "title": "Format",
+            "default": "pdf"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "ResultReportRequest",
+        "description": "`pdf` downloads the PDF; `json` returns the same document for the accessible HTML view."
+      },
       "ResultTokenRequest": {
         "properties": {
           "token": {
@@ -8956,6 +9933,122 @@
           "mitigation"
         ],
         "title": "Risk"
+      },
+      "RiskItem": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Title"
+          },
+          "explanation": {
+            "type": "string",
+            "maxLength": 400,
+            "title": "Explanation"
+          },
+          "basis": {
+            "items": {
+              "$ref": "#/components/schemas/Basis"
+            },
+            "type": "array",
+            "title": "Basis"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title",
+          "explanation",
+          "basis"
+        ],
+        "title": "RiskItem"
+      },
+      "RiskProfile": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Level"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RiskItem"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "level",
+          "items"
+        ],
+        "title": "RiskProfile"
+      },
+      "RoadmapPhase": {
+        "properties": {
+          "horizon": {
+            "type": "integer",
+            "enum": [
+              30,
+              60,
+              90
+            ],
+            "title": "Horizon"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 120,
+            "title": "Title"
+          },
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "horizon",
+          "title",
+          "items"
+        ],
+        "title": "RoadmapPhase"
+      },
+      "RoadmapStepOut": {
+        "properties": {
+          "horizon": {
+            "type": "integer",
+            "enum": [
+              30,
+              60,
+              90
+            ],
+            "title": "Horizon"
+          },
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "horizon",
+          "items"
+        ],
+        "title": "RoadmapStepOut"
       },
       "RoleUpdate": {
         "properties": {
