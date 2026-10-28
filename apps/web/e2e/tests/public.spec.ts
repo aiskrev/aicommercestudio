@@ -1,26 +1,28 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("public website", () => {
-  test("homepage renders the hero, CTAs and the six offerings", async ({ page }) => {
+  test("homepage renders the hero, the consultation and assessment CTAs and the four capability groups", async ({ page }) => {
     const response = await page.goto("/bg");
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(/A\.I\. Commerce Studio/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("AI системи");
-    const hero = page.locator("main").getByRole("link", { name: "Разгледайте AI решенията" });
-    await expect(hero).toHaveAttribute("href", "/bg/ai-resheniya");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Инженеринг");
+    const hero = page.locator("main").getByRole("link", { name: "Заявете консултация" }).first();
+    await expect(hero).toHaveAttribute("href", "/bg/kontakti");
     await expect(page.getByRole("link", { name: "Оценете AI готовността си" })).toHaveAttribute("href", "/bg/ai-automation-advisor");
     await expect(page.getByTestId("system-map")).toBeVisible();
-    const build = page.locator("section[aria-labelledby='build-title']");
-    await expect(build.locator("article")).toHaveCount(6);
+    const offer = page.locator("section[aria-labelledby='offer-title']");
+    await expect(offer.locator("article")).toHaveCount(4);
+    await expect(offer.getByRole("heading", { level: 3 })).toHaveText(["AI", "Облак и данни", "Платформи и експлоатация", "Електронна търговия"]);
+    await expect(offer.locator("article a")).toHaveCount(10); // the ten domain hubs, not every service
     await expect(page.locator("html")).toHaveAttribute("lang", "bg");
   });
 
   test("English homepage mirrors the structure with English destinations", async ({ page }) => {
     await page.goto("/en");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("AI systems");
-    await expect(page.getByRole("link", { name: "Explore AI solutions" })).toHaveAttribute("href", "/en/ai-solutions");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Engineering");
+    await expect(page.locator("main").getByRole("link", { name: "Book a consultation" }).first()).toHaveAttribute("href", "/en/contact");
     await expect(page.getByRole("link", { name: "Assess your AI readiness" })).toHaveAttribute("href", "/en/ai-automation-advisor");
-    for (const id of ["build-title", "process-title", "tools-title", "orchestration-title", "use-cases-title", "faq-title"]) {
+    for (const id of ["offer-title", "tools-title", "managed-title", "process-title", "orchestration-title", "founder-title", "credibility-title", "faq-title"]) {
       await expect(page.locator(`[id="${id}"]`)).toBeVisible();
     }
     await expect(page.locator("section[aria-labelledby='process-title'] ol > li")).toHaveCount(5);
@@ -38,11 +40,25 @@ test.describe("public website", () => {
     await expect(planned.getByRole("link")).toHaveCount(0);
   });
 
-  test("hero CTA navigates to the AI solutions page", async ({ page }) => {
+  test("homepage journeys: consultation, first tool, a domain hub and AI Managed Services", async ({ page }) => {
     await page.goto("/bg");
-    await page.locator("main").getByRole("link", { name: "Разгледайте AI решенията" }).click();
-    await expect(page).toHaveURL(/\/ai-resheniya$/);
-    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await page.locator("main").getByRole("link", { name: "Заявете консултация" }).first().click();
+    await expect(page).toHaveURL(/\/bg\/kontakti$/);
+    await expect(page.locator("form").first()).toBeVisible();
+
+    await page.goto("/bg");
+    const tools = page.locator("section[aria-labelledby='tools-title']");
+    await expect(tools.getByTestId("tool-start-here")).toHaveText("Започнете оттук");
+
+    await page.locator("section[aria-labelledby='offer-title']").getByRole("link", { name: "DevOps, SRE и наблюдаемост" }).click();
+    await expect(page).toHaveURL(/\/bg\/uslugi\/devops-sre-i-nablyudaemost$/);
+
+    await page.goto("/en");
+    const managed = page.locator("section[aria-labelledby='managed-title']");
+    await expect(managed.getByTestId("managed-packages")).toContainText("AI Monitor");
+    await managed.getByRole("link", { name: "Request an assessment" }).click();
+    await expect(page).toHaveURL(/\/en\/services\/ai-managed-services#ams-inquiry$/);
+    await expect(page.locator("#ams-inquiry")).toBeVisible();
   });
 
   test("service pages have unique SEO metadata and structured data", async ({ page }) => {

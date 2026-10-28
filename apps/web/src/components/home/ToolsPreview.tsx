@@ -25,8 +25,9 @@ const cardLabels = (catalog: ToolsCatalog) => ({
 });
 
 /**
- * Homepage tools preview: the Advisor with its product window, then the other tools as cards
- * (available ones linked, the rest labelled "in preparation"). `limit` caps the secondary cards.
+ * Homepage tools preview: the Advisor with its product window (the recommended first tool), then
+ * the other tools as cards (available ones linked, the rest labelled "in preparation"). `limit`
+ * caps the secondary cards.
  */
 export function ToolsPreview({
   catalog,
@@ -34,12 +35,15 @@ export function ToolsPreview({
   minutes,
   showcase,
   limit = 3,
+  startBadge,
 }: {
   catalog: ToolsCatalog;
   hrefs: ToolHrefs;
   minutes: ToolMinutes;
   showcase: Showcase;
   limit?: number;
+  /** Marks the Advisor as the recommended first tool ("Start here"). */
+  startBadge?: string;
 }) {
   const advisor = catalog.items.find((tool) => tool.key === "advisor");
   const others = catalog.items
@@ -52,7 +56,14 @@ export function ToolsPreview({
       {advisor && advisorHref && (
         <article className="tool-frame grid gap-8 p-6 sm:p-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-center lg:gap-12 lg:p-10">
           <div className="min-w-0">
-            <span className="badge badge-success badge-dot">{catalog.liveBadge}</span>
+            <div className="flex flex-wrap items-center gap-2">
+              {startBadge && (
+                <span className="badge badge-accent" data-testid="tool-start-here">
+                  {startBadge}
+                </span>
+              )}
+              <span className="badge badge-success badge-dot">{catalog.liveBadge}</span>
+            </div>
             <p className="t-label mt-5">{advisor.category}</p>
             <h3 className="t-h3-lg mt-2">{advisor.title}</h3>
             <p className="mt-3 leading-relaxed text-fg-muted">{advisor.description}</p>

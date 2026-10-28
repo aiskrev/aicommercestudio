@@ -1,13 +1,12 @@
 import Link from "next/link";
 
-import { BuildBento } from "@/components/home/BuildBento";
 import { ControlLanes } from "@/components/home/ControlLanes";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { HeroWorkflow } from "@/components/home/HeroWorkflow";
+import { OfferGroups } from "@/components/home/OfferGroups";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
 import { SystemMap } from "@/components/home/SystemMap";
 import { ToolsPreview } from "@/components/home/ToolsPreview";
-import { UseCaseLedger } from "@/components/home/UseCaseLedger";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { FounderPortrait } from "@/components/sections/Founder";
 import { Faq } from "@/components/sections/Faq";
@@ -15,10 +14,10 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
 import { EditorialSplit } from "@/components/ui/patterns";
 import { ButtonLink, Container, Eyebrow, Section, SectionHeading } from "@/components/ui/primitives";
-import type { HomeLink } from "@/content/bg/home";
-import { getContent, serviceByKey } from "@/content";
+import { domainByKey, getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
+import { isDomainPublished } from "@/lib/domains";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { toolHrefs, toolMinutes } from "@/lib/tools";
@@ -37,17 +36,26 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">) {
 }
 
 /**
- * Homepage. Section order: hero (system map) → capabilities → what we build → how we work →
- * interactive tools → solution architecture → use cases by function → FAQ → final CTA.
+ * Homepage. It answers four questions in order: what we offer (hero + four capability groups that
+ * lead to the ten domain hubs), which tool to try first (tools, the Advisor marked "Start here"),
+ * what happens after launch (AI Managed Services), and how we work and who does it (methodology,
+ * human-approval controls, the founder and the verifiable capabilities), then FAQ and the final CTA.
+ * Consultation and assessment CTAs sit in the hero, the managed section and the final band.
  * Everything is a server component; motion comes from the shared interaction system (CSS).
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
-  const { home, advisor, tools, founder } = getContent(locale);
+  const { home, advisor, tools, founder, aiManaged } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
-  const linkFor = (link: HomeLink) =>
-    "service" in link ? href(routes.service(serviceByKey(locale, link.service).slug)) : href(routes[link.route]);
+  const managedHref = href(routes.service(serviceByKey(locale, "ai_managed").slug));
+  const offerGroups = home.offer.groups.map((group) => ({
+    ...group,
+    domains: group.domains.filter(isDomainPublished).map((key) => {
+      const domain = domainByKey(locale, key);
+      return { key, name: domain.name, href: href(routes.service(domain.slug)) };
+    }),
+  }));
 
   return (
     <>
@@ -65,7 +73,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </h1>
             <p className="t-lead mt-6 max-w-xl">{home.hero.lead}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={href(routes.aiSolutions)} size="lg" icon="arrowRight">
+              <ButtonLink href={href(routes.contact)} size="lg" icon="arrowRight">
                 {home.hero.primaryCta}
               </ButtonLink>
               <ButtonLink href={href(routes.advisor)} size="lg" variant="secondary">
@@ -85,16 +93,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </Container>
       </div>
 
-      {/* 2 ---------------------------------------------------------------- credibility and capabilities */}
-      <CredibilityStrip label={home.capabilities.eyebrow} groups={home.capabilities.groups} />
-
-      {/* 3 ---------------------------------------------------------------- what we build (bento) */}
-      <Section labelledBy="build-title" density="spacious">
+      {/* 2 ---------------------------------------------------------------- what we offer: four capability groups */}
+      <Section labelledBy="offer-title" density="spacious">
         <SectionHeading
-          id="build-title"
-          eyebrow={home.build.eyebrow}
-          title={home.build.title}
-          lead={home.build.lead}
+          id="offer-title"
+          eyebrow={home.offer.eyebrow}
+          title={home.offer.title}
+          lead={home.offer.lead}
           action={
             <ButtonLink href={href(routes.services)} variant="secondary" icon="arrowRight">
               {dict.common.allServices}
@@ -102,50 +107,67 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           }
         />
         <div className="mt-12">
-          <BuildBento items={home.build.items.map((item) => ({ ...item, href: linkFor(item.link) }))} />
-        </div>
-        <div className="mt-10 flex flex-col gap-3 border-t border-line-subtle pt-6 lg:flex-row lg:items-baseline lg:gap-8">
-          <p className="shrink-0 text-[15px] font-semibold text-fg">{home.build.foundation.title}</p>
-          <p className="text-[15px] text-fg-muted">
-            {home.build.foundation.lead}{" "}
-            {home.build.foundation.services.map((key, index) => {
-              const service = serviceByKey(locale, key);
-              return (
-                <span key={key}>
-                  {index > 0 && <span aria-hidden="true"> · </span>}
-                  <Link href={href(routes.service(service.slug))} className="link font-medium">
-                    {service.shortTitle}
-                  </Link>
-                </span>
-              );
-            })}
-          </p>
+          <OfferGroups groups={offerGroups} />
         </div>
       </Section>
 
-      {/* 3b --------------------------------------------------------------- founder (executive introduction) */}
-      <Section labelledBy="founder-title" className="border-t border-line-subtle">
-        <div className="grid items-center gap-8 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:gap-12 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)]">
-          <FounderPortrait alt={founder.portraitAlt} sizes="(min-width: 1024px) 17rem, (min-width: 768px) 15rem, 12rem" className="aspect-[4/5] w-48 md:w-full" />
-          <div className="min-w-0">
-            <Eyebrow>{founder.home.eyebrow}</Eyebrow>
-            <h2 id="founder-title" className="t-h2 mt-4">
-              {founder.name}
-            </h2>
-            <p className="mt-2 font-medium text-fg-secondary">{founder.title}</p>
-            <div className="measure mt-5 grid gap-4 leading-relaxed text-fg-muted">
-              {founder.home.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-            </div>
-            <ButtonLink href={href(routes.founder)} variant="ghost" icon="arrowRight" className="mt-6">
-              {founder.home.cta}
+      {/* 3 ---------------------------------------------------------------- which tool to try first */}
+      <Section labelledBy="tools-title" tone="raised" density="spacious">
+        <SectionHeading
+          id="tools-title"
+          eyebrow={home.tools.eyebrow}
+          title={home.tools.title}
+          lead={home.tools.lead}
+          action={
+            <ButtonLink href={href(routes.tools)} variant="secondary" icon="arrowRight">
+              {home.tools.allTools}
             </ButtonLink>
+          }
+        />
+        <div className="mt-12">
+          <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} minutes={toolMinutes()} showcase={advisor.showcase} startBadge={home.tools.startBadge} />
+        </div>
+      </Section>
+
+      {/* 4 ---------------------------------------------------------------- after launch: AI Managed Services */}
+      <Section labelledBy="managed-title">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-14">
+          <div className="min-w-0">
+            <Eyebrow>{home.managed.eyebrow}</Eyebrow>
+            <h2 id="managed-title" className="t-h2 reveal mt-4">
+              {home.managed.title}
+            </h2>
+            <p className="t-lead mt-5 max-w-xl">{home.managed.lead}</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <ButtonLink href={managedHref} icon="arrowRight">
+                {home.managed.primaryCta}
+              </ButtonLink>
+              <ButtonLink href={`${managedHref}#ams-inquiry`} variant="secondary">
+                {home.managed.secondaryCta}
+              </ButtonLink>
+            </div>
+          </div>
+          <div className="card card-accent min-w-0 p-6 sm:p-8" data-testid="managed-packages">
+            <p className="t-label">{aiManaged.packages.title}</p>
+            <ul className="mt-4 grid gap-px overflow-hidden rounded-[var(--radius-md)] border border-line-subtle bg-line-subtle">
+              {aiManaged.packages.items.map((item) => (
+                <li key={item.key} className="flex items-start gap-3 bg-surface-1 p-4">
+                  <Icon name="activity" className="mt-0.5 h-4.5 w-4.5 shrink-0 text-brand" />
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-fg">{item.name}</span>
+                    <span className="mt-0.5 block text-sm leading-relaxed text-fg-muted">{item.summary}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-4 text-sm text-fg-muted">
+              {aiManaged.packages.priceLabel}. {aiManaged.packages.lead}
+            </p>
           </div>
         </div>
       </Section>
 
-      {/* 4 ---------------------------------------------------------------- how we work */}
+      {/* 5 ---------------------------------------------------------------- methodology: how we work */}
       <Section labelledBy="process-title" tone="raised">
         <SectionHeading
           id="process-title"
@@ -160,24 +182,6 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         />
         <div className="mt-14">
           <ProcessSteps steps={home.process.steps} layout="horizontal" />
-        </div>
-      </Section>
-
-      {/* 5 ---------------------------------------------------------------- interactive tools */}
-      <Section labelledBy="tools-title" density="spacious">
-        <SectionHeading
-          id="tools-title"
-          eyebrow={home.tools.eyebrow}
-          title={home.tools.title}
-          lead={home.tools.lead}
-          action={
-            <ButtonLink href={href(routes.tools)} variant="secondary" icon="arrowRight">
-              {home.tools.allTools}
-            </ButtonLink>
-          }
-        />
-        <div className="mt-12">
-          <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} minutes={toolMinutes()} showcase={advisor.showcase} />
         </div>
       </Section>
 
@@ -207,16 +211,29 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
       </Section>
 
-      {/* 7 ---------------------------------------------------------------- use cases by business function (light) */}
-      <Section labelledBy="use-cases-title" tone="light" density="spacious">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.8fr)] lg:items-end">
-          <SectionHeading id="use-cases-title" eyebrow={home.useCases.eyebrow} title={home.useCases.title} />
-          <p className="t-lead lg:pb-1">{home.useCases.lead}</p>
-        </div>
-        <div className="mt-12">
-          <UseCaseLedger items={home.useCases.items} labels={home.useCases.labels} />
+      {/* 7 ---------------------------------------------------------------- who builds it: founder + verifiable capabilities */}
+      <Section labelledBy="founder-title" className="border-t border-line-subtle">
+        <div className="grid items-center gap-8 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:gap-12 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)]">
+          <FounderPortrait alt={founder.portraitAlt} sizes="(min-width: 1024px) 17rem, (min-width: 768px) 15rem, 12rem" className="aspect-[4/5] w-48 md:w-full" />
+          <div className="min-w-0">
+            <Eyebrow>{founder.home.eyebrow}</Eyebrow>
+            <h2 id="founder-title" className="t-h2 mt-4">
+              {founder.name}
+            </h2>
+            <p className="mt-2 font-medium text-fg-secondary">{founder.title}</p>
+            <div className="measure mt-5 grid gap-4 leading-relaxed text-fg-muted">
+              {founder.home.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+            <ButtonLink href={href(routes.founder)} variant="ghost" icon="arrowRight" className="mt-6">
+              {founder.home.cta}
+            </ButtonLink>
+          </div>
         </div>
       </Section>
+
+      <CredibilityStrip label={home.capabilities.title} lead={home.capabilities.lead} groups={home.capabilities.groups} />
 
       {/* 8 ---------------------------------------------------------------- FAQ */}
       <Section labelledBy="faq-title" tone="raised">

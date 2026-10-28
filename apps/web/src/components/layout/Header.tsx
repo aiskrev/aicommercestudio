@@ -1,52 +1,65 @@
 "use client";
 
 import Link from "next/link";
-import { usePublicPathname } from "@/lib/use-public-pathname";
-import { useEffect, useId, useRef, useState } from "react";
+import { type ComponentProps, type KeyboardEvent, type ReactNode, useEffect, useId, useRef, useState } from "react";
 
 import { LanguageSwitcher, type LanguageSwitcherLabels } from "@/components/layout/LanguageSwitcher";
 import { Logo } from "@/components/layout/Logo";
-import { Icon, type IconName } from "@/components/ui/Icon";
+import { Icon } from "@/components/ui/Icon";
 import { buttonClass, Container, cx } from "@/components/ui/primitives";
 import type { Locale, SlugMap } from "@/i18n/config";
-
-export interface NavItem {
-  href: string;
-  label: string;
-}
-
-export interface NavService extends NavItem {
-  description: string;
-  icon: IconName;
-}
-
-export interface NavServiceGroup {
-  title: string;
-  items: NavService[];
-}
+import type { NavEntry, NavItem, ServiceMenu } from "@/lib/site-nav";
+import { usePublicPathname } from "@/lib/use-public-pathname";
 
 interface Labels {
   nav: string;
   openMenu: string;
   closeMenu: string;
-  services: string;
-  allServices: string;
 }
 
-type MenuId = "services" | "about";
+const SERVICES = "services";
+
+/** The href among `hrefs` that best matches the current page: exact, else the longest parent path. */
+export function activeHref(pathname: string, hrefs: string[]): string | undefined {
+  return hrefs
+    .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+    .sort((a, b) => b.length - a.length)[0];
+}
 
 /**
- * Site header. Desktop: Services and About open as panels (one at a time; outside click and
- * Escape close them, Escape returns focus to the trigger); the other destinations are plain links.
- * Mobile: a full-height sheet with the same grouping; while it is open the rest of the page is
- * `inert`, page scroll is locked and focus moves into the sheet.
+ * Arrow keys move focus between the links of one menu column (`data-nav-column`); Home/End jump to
+ * the first/last link. Tab keeps its normal order, so the menu never traps focus.
+ */
+function onColumnKeyDown(event: KeyboardEvent<HTMLElement>) {
+  if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+  const target = event.target as HTMLElement;
+  const column = target.closest<HTMLElement>("[data-nav-column]");
+  if (!column || target.tagName !== "A") return;
+  const links = Array.from(column.querySelectorAll<HTMLAnchorElement>("a"));
+  const index = links.indexOf(target as HTMLAnchorElement);
+  const next =
+    event.key === "Home"
+      ? 0
+      : event.key === "End"
+        ? links.length - 1
+        : (index + (event.key === "ArrowDown" ? 1 : -1) + links.length) % links.length;
+  event.preventDefault();
+  links[next]?.focus();
+}
+
+/**
+ * Site header (docs/INFORMATION_ARCHITECTURE_V2.md §4, phase IA-1).
+ *
+ * Desktop: "Services" opens a mega-menu with the published domains in three bands and a "Start here"
+ * column; "Solutions" and "Company" open small menus; the rest are plain links. One panel at a time;
+ * outside click and Escape close it and Escape returns focus to the trigger; arrow keys move within
+ * a column. Mobile: a full-height sheet with accordion groups in the same order. While it is open the
+ * rest of the page is `inert`, page scroll is locked and focus moves into the sheet.
  */
 export function Header({
   homeHref,
-  servicesHref,
-  serviceGroups,
-  items,
-  aboutMenu,
+  services,
+  entries,
   cta,
   labels,
   locale,
@@ -54,10 +67,8 @@ export function Header({
   languageLabels,
 }: {
   homeHref: string;
-  servicesHref: string;
-  serviceGroups: NavServiceGroup[];
-  items: NavItem[];
-  aboutMenu: { label: string; items: NavItem[] };
+  services: ServiceMenu;
+  entries: NavEntry[];
   cta: NavItem;
   labels: Labels;
   locale: Locale;
@@ -66,23 +77,41 @@ export function Header({
 }) {
   const pathname = usePublicPathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
-  const mobilePanelId = useId();
-  const servicesPanelId = useId();
-  const aboutPanelId = useId();
+  const idBase = useId();
+  const mobilePanelId = `${idBase}-mobile`;
+  const panelId = (id: string) => `${idBase}-${id}`;
   const headerRef = useRef<HTMLElement>(null);
-  const menuRefs = useRef<Record<MenuId, HTMLLIElement | null>>({ services: null, about: null });
-  const menuButtonRefs = useRef<Record<MenuId, HTMLButtonElement | null>>({ services: null, about: null });
+  const menuRefs = useRef<Record<string, HTMLElement | null>>({});
+  const menuButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const mobileButtonRef = useRef<HTMLButtonElement>(null);
   const mobilePanelRef = useRef<HTMLDivElement>(null);
+
+  const serviceHrefs = [
+    services.href,
+    ...services.bands.flatMap((band) => band.domains.flatMap((domain) => [domain.href, ...domain.services.map((s) => s.href)])),
+    ...services.startHere.items.map((item) => item.href),
+  ];
+  const allHrefs = [
+    ...serviceHrefs,
+    ...entries.flatMap((entry) => (entry.kind === "link" ? [entry.href] : entry.items.map((item) => item.href))),
+  ];
+  const current = activeHref(pathname, allHrefs);
+  const isCurrent = (href: string) => href === current;
+  const servicesActive = pathname === services.href || pathname.startsWith(`${services.href}/`);
+  const menuActive = (entry: NavEntry) => entry.kind === "menu" && entry.items.some((item) => isCurrent(item.href));
+  // The mobile accordion opens on the group of the current page.
+  const currentGroup = servicesActive ? SERVICES : entries.find(menuActive)?.label;
+  const [expanded, setExpanded] = useState<string | null>(currentGroup ?? null);
 
   // Close menus after navigation (state adjusted during render instead of in an effect).
   if (pathname !== lastPath) {
     setLastPath(pathname);
     setMobileOpen(false);
     setOpenMenu(null);
+    setExpanded(currentGroup ?? null);
   }
 
   useEffect(() => {
@@ -97,7 +126,7 @@ export function Header({
     const onPointer = (event: PointerEvent) => {
       if (!menuRefs.current[openMenu]?.contains(event.target as Node)) setOpenMenu(null);
     };
-    const onKey = (event: KeyboardEvent) => {
+    const onKey = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpenMenu(null);
         menuButtonRefs.current[openMenu]?.focus();
@@ -122,7 +151,7 @@ export function Header({
     );
     for (const el of background) el.inert = true;
     mobilePanelRef.current?.querySelector<HTMLElement>("a, button")?.focus();
-    const onKey = (event: KeyboardEvent) => {
+    const onKey = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
         setMobileOpen(false);
         mobileButtonRef.current?.focus();
@@ -136,22 +165,20 @@ export function Header({
     };
   }, [mobileOpen]);
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
-  const servicesActive = isActive(servicesHref);
-  const aboutActive = aboutMenu.items.some((item) => isActive(item.href));
-  const toggle = (id: MenuId) => setOpenMenu((current) => (current === id ? null : id));
+  const toggle = (id: string) => setOpenMenu((open) => (open === id ? null : id));
 
-  const menuButton = (id: MenuId, label: string, panelId: string, active: boolean) => (
+  const menuButton = (id: string, label: string, active: boolean) => (
     <button
       ref={(el) => {
         menuButtonRefs.current[id] = el;
       }}
       type="button"
       aria-expanded={openMenu === id}
-      aria-controls={panelId}
+      aria-controls={panelId(id)}
       onClick={() => toggle(id)}
+      data-active={active || undefined}
       className={cx(
-        "nav-link inline-flex items-center gap-1 px-3 py-2 text-[14.5px] font-medium transition-colors",
+        "nav-link inline-flex min-h-11 items-center gap-1 px-3 text-[14.5px] font-medium transition-colors",
         active || openMenu === id ? "text-fg" : "text-fg-muted hover:text-fg",
       )}
     >
@@ -160,111 +187,161 @@ export function Header({
     </button>
   );
 
+  const menuLinkClass =
+    "rounded-[var(--radius-md)] transition-colors duration-150 hover:bg-surface-2 focus-visible:bg-surface-2 aria-[current=page]:bg-surface-2";
+
   return (
     <>
       <header
         ref={headerRef}
         className={cx(
           "sticky top-0 z-50 border-b transition-colors duration-300",
-          scrolled || mobileOpen
+          scrolled || mobileOpen || openMenu
             ? "border-line-subtle bg-ink-950/92 backdrop-blur-xl"
             : "border-transparent bg-ink-950/70 backdrop-blur-md",
         )}
       >
-        <Container className="flex h-16 items-center justify-between gap-6">
+        <Container className="flex h-16 items-center justify-between gap-4 xl:gap-6">
           <Logo href={homeHref} />
 
           <nav aria-label={labels.nav} className="hidden lg:block">
-            <ul className="flex items-center gap-1">
+            <ul className="flex items-center gap-0.5 xl:gap-1">
+              {/* ---------------------------------------------------------------- Services mega-menu */}
               <li
                 ref={(el) => {
-                  menuRefs.current.services = el;
+                  menuRefs.current[SERVICES] = el;
                 }}
-                className="relative"
               >
-                {menuButton("services", labels.services, servicesPanelId, servicesActive)}
-                <div
-                  id={servicesPanelId}
-                  hidden={openMenu !== "services"}
-                  className="absolute left-0 top-full z-50 mt-3 w-[min(52rem,calc(100vw-4rem))] -translate-x-4"
-                >
-                  <div className="panel menu-enter origin-top-left p-2.5">
-                    <div className="grid gap-2 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-                      {serviceGroups.map((group, index) => (
-                        <div key={group.title} className={cx("min-w-0", index > 0 && "xl:border-l xl:border-line-subtle xl:pl-2")}>
-                          <p className="t-label px-3 pb-1 pt-2">{group.title}</p>
-                          <ul className={cx("grid gap-1", index === 0 && "sm:grid-cols-2")}>
-                            {group.items.map((service) => (
-                              <li key={service.href}>
+                {menuButton(SERVICES, services.label, servicesActive)}
+                {/* Positioned against the sticky header, so the panel spans the full width below it. */}
+                <div id={panelId(SERVICES)} hidden={openMenu !== SERVICES} className="absolute inset-x-0 top-full z-50">
+                  <div className="menu-enter max-h-[calc(100dvh-4.5rem)] origin-top overflow-y-auto border-b border-line-subtle bg-ink-950 shadow-[var(--shadow-panel)] backdrop-blur-xl">
+                    <Container className="grid gap-6 py-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,0.85fr)] xl:gap-8">
+                      {services.bands.map((band) => (
+                        <div key={band.key} className="min-w-0" data-testid={`menu-band-${band.key}`}>
+                          <p className="t-label px-3 pb-2">{band.title}</p>
+                          <ul className="grid gap-1" data-nav-column onKeyDown={onColumnKeyDown}>
+                            {band.domains.map((domain) => (
+                              <li key={domain.href}>
                                 <Link
-                                  href={service.href}
-                                  aria-current={isActive(service.href) ? "page" : undefined}
-                                  className="group flex gap-3 rounded-[var(--radius-md)] p-3 transition-colors duration-150 hover:bg-surface-2 focus-visible:bg-surface-2 aria-[current=page]:bg-surface-2"
+                                  href={domain.href}
+                                  aria-current={isCurrent(domain.href) ? "page" : undefined}
+                                  className={cx("group flex min-h-11 gap-3 p-3", menuLinkClass)}
                                 >
-                                  <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand transition-colors group-hover:border-brand/50">
-                                    <Icon name={service.icon} className="h-4.5 w-4.5" />
+                                  <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand transition-colors group-hover:border-brand/50">
+                                    <Icon name={domain.icon} className="h-4 w-4" />
                                   </span>
                                   <span className="min-w-0">
-                                    <span className="block text-sm font-semibold text-fg">{service.label}</span>
-                                    <span className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-fg-muted">
-                                      {service.description}
-                                    </span>
+                                    <span className="block text-sm font-semibold leading-snug text-fg">{domain.label}</span>
+                                    <span className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-fg-muted">{domain.description}</span>
                                   </span>
                                 </Link>
+                                {domain.services.length > 0 && (
+                                  <ul className="mb-1 ml-[1.625rem] grid border-l border-line-subtle pl-[1.125rem]">
+                                    {domain.services.map((service) => (
+                                      <li key={service.href}>
+                                        <Link
+                                          href={service.href}
+                                          aria-current={isCurrent(service.href) ? "page" : undefined}
+                                          className={cx(
+                                            "flex min-h-11 items-center px-3 text-[13.5px] text-fg-secondary hover:text-fg aria-[current=page]:text-fg",
+                                            menuLinkClass,
+                                          )}
+                                        >
+                                          {service.label}
+                                        </Link>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
                               </li>
                             ))}
                           </ul>
                         </div>
                       ))}
-                    </div>
-                    <Link
-                      href={servicesHref}
-                      aria-current={pathname === servicesHref ? "page" : undefined}
-                      className="group mt-1.5 flex items-center justify-between rounded-[var(--radius-md)] border-t border-line-subtle px-4 py-3 text-sm font-semibold text-brand transition-colors duration-150 hover:bg-surface-2"
-                    >
-                      {labels.allServices}
-                      <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
-                    </Link>
+                      <div className="min-w-0 lg:border-l lg:border-line-subtle lg:pl-6" data-testid="menu-start-here">
+                        <p className="t-label px-3 pb-2">{services.startHere.title}</p>
+                        <ul className="grid gap-1" data-nav-column onKeyDown={onColumnKeyDown}>
+                          {services.startHere.items.map((item) => (
+                            <li key={item.href}>
+                              <Link
+                                href={item.href}
+                                aria-current={isCurrent(item.href) ? "page" : undefined}
+                                className={cx("group flex min-h-11 gap-3 p-3", menuLinkClass)}
+                              >
+                                <Icon name={item.icon} className="mt-0.5 h-4.5 w-4.5 shrink-0 text-brand-2" />
+                                <span className="min-w-0">
+                                  <span className="block text-sm font-semibold leading-snug text-fg">{item.label}</span>
+                                  <span className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-fg-muted">{item.description}</span>
+                                </span>
+                              </Link>
+                            </li>
+                          ))}
+                          <li>
+                            <Link
+                              href={services.href}
+                              aria-current={pathname === services.href ? "page" : undefined}
+                              className={cx(
+                                "group mt-2 flex min-h-11 items-center justify-between border-t border-line-subtle px-3 text-sm font-semibold text-brand",
+                                menuLinkClass,
+                              )}
+                            >
+                              {services.allLabel}
+                              <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
+                            </Link>
+                          </li>
+                        </ul>
+                      </div>
+                    </Container>
                   </div>
                 </div>
               </li>
-              {items.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    aria-current={isActive(item.href) ? "page" : undefined}
-                    className={cx(
-                      "nav-link px-3 py-2 text-[14.5px] font-medium transition-colors",
-                      isActive(item.href) ? "text-fg" : "text-fg-muted hover:text-fg",
-                    )}
+
+              {/* ---------------------------------------------------------------- other entries */}
+              {entries.map((entry) =>
+                entry.kind === "link" ? (
+                  <li key={entry.href}>
+                    <Link
+                      href={entry.href}
+                      aria-current={isCurrent(entry.href) ? "page" : undefined}
+                      className={cx(
+                        "nav-link inline-flex min-h-11 items-center px-3 text-[14.5px] font-medium transition-colors",
+                        isCurrent(entry.href) ? "text-fg" : "text-fg-muted hover:text-fg",
+                      )}
+                    >
+                      {entry.label}
+                    </Link>
+                  </li>
+                ) : (
+                  <li
+                    key={entry.id}
+                    ref={(el) => {
+                      menuRefs.current[entry.id] = el;
+                    }}
+                    className="relative"
                   >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-              <li
-                ref={(el) => {
-                  menuRefs.current.about = el;
-                }}
-                className="relative"
-              >
-                {menuButton("about", aboutMenu.label, aboutPanelId, aboutActive)}
-                <div id={aboutPanelId} hidden={openMenu !== "about"} className="absolute right-0 top-full z-50 mt-3 w-60">
-                  <ul className="panel menu-enter origin-top-right grid gap-1 p-2">
-                    {aboutMenu.items.map((item) => (
-                      <li key={item.href}>
-                        <Link
-                          href={item.href}
-                          aria-current={isActive(item.href) ? "page" : undefined}
-                          className="block rounded-[var(--radius-md)] px-3 py-2.5 text-sm font-medium text-fg-secondary transition-colors duration-150 hover:bg-surface-2 hover:text-fg focus-visible:bg-surface-2 aria-[current=page]:bg-surface-2 aria-[current=page]:text-fg"
-                        >
-                          {item.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </li>
+                    {menuButton(entry.id, entry.label, menuActive(entry))}
+                    <div id={panelId(entry.id)} hidden={openMenu !== entry.id} className="absolute right-0 top-full z-50 mt-3 w-64">
+                      <ul className="panel menu-enter origin-top-right grid gap-1 p-2" data-nav-column onKeyDown={onColumnKeyDown}>
+                        {entry.items.map((item) => (
+                          <li key={item.href}>
+                            <Link
+                              href={item.href}
+                              aria-current={isCurrent(item.href) ? "page" : undefined}
+                              className={cx(
+                                "flex min-h-11 items-center px-3 text-sm font-medium text-fg-secondary hover:text-fg aria-[current=page]:text-fg",
+                                menuLinkClass,
+                              )}
+                            >
+                              {item.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </li>
+                ),
+              )}
             </ul>
           </nav>
 
@@ -299,48 +376,79 @@ export function Header({
       >
         <Container className="flex min-h-full flex-col py-5">
           <nav aria-label={labels.nav}>
-            {serviceGroups.map((group) => (
-              <div key={group.title} className="mb-3">
-                <p className="t-label px-4 pb-2">{group.title}</p>
-                <ul className="grid gap-0.5">
-                  {group.items.map((service) => (
-                    <li key={service.href}>
-                      <Link
-                        href={service.href}
-                        aria-current={isActive(service.href) ? "page" : undefined}
-                        className="flex min-h-11 items-center gap-3 rounded-xl px-4 py-2.5 text-[15px] text-fg-secondary hover:bg-surface-2 aria-[current=page]:bg-surface-3 aria-[current=page]:text-fg"
-                      >
-                        <Icon name={service.icon} className="h-4 w-4 shrink-0 text-brand" />
-                        {service.label}
-                      </Link>
-                    </li>
+            <ul className="grid gap-0.5">
+              <li>
+                <MobileGroup
+                  id={`${mobilePanelId}-${SERVICES}`}
+                  label={services.label}
+                  active={servicesActive}
+                  expanded={expanded === SERVICES}
+                  onToggle={() => setExpanded((open) => (open === SERVICES ? null : SERVICES))}
+                >
+                  {services.bands.map((band) => (
+                    <div key={band.key} className="mt-2">
+                      <p className="t-label px-4 pb-1.5 pt-2">{band.title}</p>
+                      <ul className="grid gap-0.5">
+                        {band.domains.map((domain) => (
+                          <li key={domain.href}>
+                            <MobileLink item={domain} current={isCurrent(domain.href)} icon={domain.icon} strong />
+                            {domain.services.length > 0 && (
+                              <ul className="ml-6 grid border-l border-line-subtle pl-2">
+                                {domain.services.map((service) => (
+                                  <li key={service.href}>
+                                    <MobileLink item={service} current={isCurrent(service.href)} small />
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            ))}
-            <Link
-              href={servicesHref}
-              aria-current={pathname === servicesHref ? "page" : undefined}
-              className="flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-[15px] font-semibold text-brand hover:bg-surface-2"
-            >
-              {labels.allServices}
-              <Icon name="arrowRight" className="h-4 w-4" />
-            </Link>
-            <div className="divider-glow my-4" aria-hidden="true" />
-            <ul className="grid gap-0.5">
-              {items.map((item) => (
-                <li key={item.href}>
-                  <MobileLink item={item} active={isActive(item.href)} />
-                </li>
-              ))}
-            </ul>
-            <p className="t-label mt-4 px-4 pb-2">{aboutMenu.label}</p>
-            <ul className="grid gap-0.5">
-              {aboutMenu.items.map((item) => (
-                <li key={item.href}>
-                  <MobileLink item={item} active={isActive(item.href)} />
-                </li>
-              ))}
+                  <p className="t-label mt-2 px-4 pb-1.5 pt-2">{services.startHere.title}</p>
+                  <ul className="grid gap-0.5">
+                    {services.startHere.items.map((item) => (
+                      <li key={item.href}>
+                        <MobileLink item={item} current={isCurrent(item.href)} icon={item.icon} />
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={services.href}
+                    aria-current={pathname === services.href ? "page" : undefined}
+                    className="mt-1 flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-[15px] font-semibold text-brand hover:bg-surface-2"
+                  >
+                    {services.allLabel}
+                    <Icon name="arrowRight" className="h-4 w-4" />
+                  </Link>
+                </MobileGroup>
+              </li>
+              {entries.map((entry) =>
+                entry.kind === "link" ? (
+                  <li key={entry.href}>
+                    <MobileLink item={entry} current={isCurrent(entry.href)} chevron />
+                  </li>
+                ) : (
+                  <li key={entry.id}>
+                    <MobileGroup
+                      id={`${mobilePanelId}-${entry.id}`}
+                      label={entry.label}
+                      active={menuActive(entry)}
+                      expanded={expanded === entry.label}
+                      onToggle={() => setExpanded((open) => (open === entry.label ? null : entry.label))}
+                    >
+                      <ul className="grid gap-0.5">
+                        {entry.items.map((item) => (
+                          <li key={item.href}>
+                            <MobileLink item={item} current={isCurrent(item.href)} />
+                          </li>
+                        ))}
+                      </ul>
+                    </MobileGroup>
+                  </li>
+                ),
+              )}
             </ul>
           </nav>
           <div className="mt-auto flex flex-col gap-4 pt-6">
@@ -355,18 +463,75 @@ export function Header({
   );
 }
 
-function MobileLink({ item, active }: { item: NavItem; active: boolean }) {
+/** Disclosure group of the mobile sheet (button + region; the region is removed from the tab order when closed). */
+function MobileGroup({
+  id,
+  label,
+  active,
+  expanded,
+  onToggle,
+  children,
+}: {
+  id: string;
+  label: string;
+  active: boolean;
+  expanded: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <>
+      <button
+        type="button"
+        aria-expanded={expanded}
+        aria-controls={id}
+        onClick={onToggle}
+        data-active={active || undefined}
+        className={cx(
+          "flex min-h-11 w-full items-center justify-between rounded-xl px-4 py-3 text-left text-base font-medium transition-colors",
+          active || expanded ? "text-fg" : "text-fg-secondary hover:bg-surface-2",
+          expanded && "bg-surface-2",
+        )}
+      >
+        {label}
+        <Icon name="chevronDown" className={cx("h-4 w-4 text-fg-subtle transition-transform duration-200", expanded && "rotate-180")} />
+      </button>
+      <div id={id} hidden={!expanded} className="pb-2">
+        {children}
+      </div>
+    </>
+  );
+}
+
+function MobileLink({
+  item,
+  current,
+  icon,
+  strong = false,
+  small = false,
+  chevron = false,
+}: {
+  item: NavItem;
+  current: boolean;
+  icon?: ComponentProps<typeof Icon>["name"];
+  strong?: boolean;
+  small?: boolean;
+  chevron?: boolean;
+}) {
   return (
     <Link
       href={item.href}
-      aria-current={active ? "page" : undefined}
+      aria-current={current ? "page" : undefined}
       className={cx(
-        "flex min-h-11 items-center justify-between rounded-xl px-4 py-3 text-base font-medium",
-        active ? "bg-surface-3 text-fg" : "text-fg-secondary hover:bg-surface-2",
+        "flex min-h-11 items-center gap-3 rounded-xl px-4 py-2.5 transition-colors hover:bg-surface-2 aria-[current=page]:bg-surface-3 aria-[current=page]:text-fg",
+        small ? "text-[14px] text-fg-muted" : "text-[15px] text-fg-secondary",
+        strong && "font-semibold text-fg",
+        chevron && "justify-between text-base font-medium",
       )}
     >
-      {item.label}
-      <Icon name="chevronRight" className="h-4 w-4 text-fg-subtle" />
+      {icon && <Icon name={icon} className="h-4 w-4 shrink-0 text-brand" />}
+      <span className="min-w-0">{item.label}</span>
+      {chevron && <Icon name="chevronRight" className="h-4 w-4 shrink-0 text-fg-subtle" />}
     </Link>
   );
 }

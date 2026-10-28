@@ -71,9 +71,9 @@ test("navigation labels are localized", async ({ page }) => {
   const nav = (path: string) =>
     page.goto(path).then(() => page.locator("header nav").first().innerText());
   const bg = await nav("/bg");
-  for (const label of ["Услуги", "AI решения", "Инструменти", "За кого", "За нас"]) expect(bg).toContain(label);
+  for (const label of ["Услуги", "Решения", "Инструменти", "За кого", "Статии", "Компания"]) expect(bg).toContain(label);
   const en = await nav("/en");
-  for (const label of ["Services", "AI solutions", "Tools", "Industries", "Insights", "About"]) expect(en).toContain(label);
+  for (const label of ["Services", "Solutions", "Tools", "Industries", "Insights", "Company"]) expect(en).toContain(label);
 });
 
 test.describe("language switcher", () => {

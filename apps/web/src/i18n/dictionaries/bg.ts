@@ -18,6 +18,10 @@ export const bg = {
     cta: "Заяви консултация",
     openMenu: "Отвори менюто",
     closeMenu: "Затвори менюто",
+    solutions: "Решения",
+    company: "Компания",
+    founder: "За основателя",
+    startHere: "Започнете оттук",
   },
   footer: {
     tagline:

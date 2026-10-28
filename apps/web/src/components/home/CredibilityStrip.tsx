@@ -1,18 +1,25 @@
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Container } from "@/components/ui/primitives";
 
-/** Concise capability strip under the hero: what we work with, no logos and no numbers. */
+/** Concise capability strip: what we work with and can be checked on, no logos and no numbers. */
 export function CredibilityStrip({
   label,
+  lead,
   groups,
 }: {
   label: string;
+  lead?: string;
   groups: { icon: IconName; title: string; items: string[] }[];
 }) {
   return (
-    <section aria-label={label} className="border-b border-line-subtle bg-surface-1">
-      <Container className="grid gap-5 py-8 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-10">
-        <p className="t-eyebrow self-start">{label}</p>
+    <section aria-labelledby="credibility-title" className="border-y border-line-subtle bg-surface-1">
+      <Container className="grid gap-5 py-10 lg:grid-cols-[17rem_minmax(0,1fr)] lg:gap-10">
+        <div className="min-w-0">
+          <h2 id="credibility-title" className="t-h3">
+            {label}
+          </h2>
+          {lead && <p className="mt-2 text-sm leading-relaxed text-fg-muted">{lead}</p>}
+        </div>
         <ul className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
           {groups.map((group) => (
             <li key={group.title} className="flex gap-3">

@@ -16,6 +16,38 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/navigation-homepage` (from `main` @ `e51cbd3`, not merged, 2026-10-28): the header
+part of IA-1 and a homepage that explains the expanded offering (INFORMATION_ARCHITECTURE.md → "Main
+navigation", DESIGN_SYSTEM.md → "Homepage composition").
+
+* **Header:**
+  * Services ▾ is a mega-menu: three bands, ten domain hubs with their services, and a "Start here"
+    column (technical audit, readiness, Opportunity Finder, all services).
+  * Solutions ▾ and Company ▾ (replaces About ▾; adds the founder and contact).
+  * Arrow, Home and End keys within a column; most-specific `aria-current`; active triggers.
+  * Mobile accordion that opens on the current group.
+  * Data comes from `lib/site-nav.ts`. URLs are unchanged.
+* **Homepage:**
+  * The hero is about engineering and business value, with consultation and AI-readiness CTAs.
+  * Four capability groups (AI, cloud and data, platforms and operations, commerce) state the
+    problem each solves and link the ten hubs.
+  * The Advisor is marked "Start here".
+  * New AI Managed Services section.
+  * Methodology and the control model are kept.
+  * The founder and the capability strip form the honest credibility block.
+  * The bento and the use-case ledger were removed.
+* **Not done:** the IA-1 footer columns; the homepage meta title and description (they still name
+  AI solutions, and changing them changes the keyword map).
+
+| Check | Result |
+| --- | --- |
+| `.\scripts\test.ps1 -Suite web` | passed (typecheck, lint, **553** unit tests, 39 files; `Header.test.tsx` 9 tests incl. the migration check that every destination of the previous header is still reachable; `home.test.tsx` 6) |
+| e2e (production build, no-host-ports override, staff accounts, revalidation secret) | **114 passed**: `ia.spec.ts` (Company menu keyboard, mega-menu at 1024 and 1440 px, mobile accordion at 360 px), `public.spec.ts` (hero, capability groups, homepage journeys), `seo.spec.ts` (active states), `i18n.spec.ts` (localized labels), `mobile.spec.ts` migrated, not deleted |
+| Production build after the last change (opaque mega-menu background, class only) | passed (138 static pages); e2e not re-run for this class change |
+| Manual check | mega-menu at 1024 × 768: panel 1008 px wide, no horizontal overflow, scrolls 10 px; mobile sheet at 360 px opens the Services group on a service page with the current link marked |
+| docs sync | in sync |
+| `.\scripts\test.ps1 -Suite api` | not re-run (no API change) |
+
 Branch `feature/service-discovery` (from `main` @ `c5b96d1`, not merged, 2026-10-28): service
 discovery on the public site from the published catalogue (INFORMATION_ARCHITECTURE.md → "Service
 catalogue on the website").
