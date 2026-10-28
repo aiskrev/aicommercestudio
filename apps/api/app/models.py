@@ -320,6 +320,9 @@ class AdvisorAssessment(Base):
     model: Mapped[str] = mapped_column(String(64), nullable=False)
     prompt_version: Mapped[str] = mapped_column(String(32), nullable=False)
     injection_suspected: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    # "1" for V1 requests and every row created before migration 0012; "2" with V2 insights.
+    contract_version: Mapped[str] = mapped_column(String(4), nullable=False, default="1", server_default="1")
+    insights: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     lead_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid, ForeignKey("leads.id", ondelete="CASCADE"), nullable=True, index=True
     )
@@ -388,6 +391,11 @@ class AssessmentResultRecord(Base):
     fingerprint: Mapped[str] = mapped_column(String(16), nullable=False)
     answers: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     result: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    # Set only when the visitor explicitly asks for a consultation about this result (migration 0012).
+    lead_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("leads.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    linked_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
 
     @property
     def reference(self) -> str:

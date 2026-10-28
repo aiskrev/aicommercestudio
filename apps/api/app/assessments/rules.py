@@ -54,13 +54,20 @@ def holds(
 def evaluate_rules(
     definition: AssessmentDefinition, *, answers: dict[str, Any], dimensions: dict[str, int], overall: int, band: str
 ) -> list[str]:
-    """Recommendation keys of the rules that hold, by (priority, rule key), without duplicates."""
-    recommendations: list[str] = []
+    """Finding keys of the rules that hold, by (priority, rule key), without duplicates.
+
+    Only `recommendation` findings count toward `max_recommendations`; risks, quick wins, target
+    states, patterns and context notes are bounded by the rules themselves. A definition that uses
+    only plain recommendations therefore gets exactly the same list as before kinds existed.
+    """
+    findings: list[str] = []
+    capped = 0
     for rule in sorted(definition.rules, key=lambda r: (r.priority, r.key)):
-        if rule.recommendation in recommendations:
+        if rule.recommendation in findings:
+            continue
+        if rule.kind == "recommendation" and capped == definition.scoring.max_recommendations:
             continue
         if holds(rule.when, answers=answers, dimensions=dimensions, overall=overall, band=band):
-            recommendations.append(rule.recommendation)
-        if len(recommendations) == definition.scoring.max_recommendations:
-            break
-    return recommendations
+            findings.append(rule.recommendation)
+            capped += rule.kind == "recommendation"
+    return findings

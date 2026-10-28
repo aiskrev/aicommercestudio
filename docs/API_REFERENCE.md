@@ -199,6 +199,15 @@ instructed to answer in English).
 | other_tools | optional, ≤ 200 chars, no links/HTML |
 | save_assessment | bool, default `true`; `false` → nothing is stored |
 | form_token | from `GET /api/public/form-token`, ≥ 3 s old |
+| contract_version | `"1"` (default; the original contract, response unchanged) or `"2"` |
+| context | V2 only, required there: `{goal: save_time\|reduce_errors\|faster_response\|handle_growth\|better_visibility, data_sensitivity: none\|business\|personal\|financial\|special_category, customer_facing: bool, system_access: api\|exports\|manual_only\|unknown, change_capacity: no_it\|external_it\|internal_it}`; rejected on V1 |
+| include_roadmap | V2 only, bool (default `false`): add the indicative 30/60/90-day roadmap |
+
+V2 responses add `contract_version: "2"` and `insights` (classified opportunities, feasibility with factors,
+risk profile, up to four service domains, approval checkpoints, integration and security prerequisites,
+a pilot, the optional roadmap and a provenance note). Every insight carries `basis[]` (`source`: `input`,
+`assessment` or `rule`). Insights are computed by fixed rules on the server, never by the model
+([AI_ADVISOR_V2.md](AI_ADVISOR_V2.md)).
 
 ```json
 {
@@ -257,6 +266,13 @@ Definitions with status `preview` are served only when `ASSESSMENTS_PREVIEW_ENAB
 | POST | `/api/public/assessments/{key}/score` | `{schema_version, definition_version, locale, answers, save}` → localized result; with `save: true` also a secret link token (only its SHA-256 hash is stored; expires). 409 `assessment_version_outdated` (current version in `errors[0].message`), 422 `assessment_invalid_answers` (`errors[].field` = `answers.<question>`, `type` = missing_required, unknown_question, invalid_type, invalid_option, out_of_range, too_many_selections, duplicate_selection, inconsistent) |
 | POST | `/api/public/assessments/results/lookup` | `{token}` → the saved result, re-scored with its own definition version; 404 `assessment_result_not_found` |
 | POST | `/api/public/assessments/results/delete` | `{token}` → 204; deletes the saved result (idempotent) |
+| POST | `/api/public/assessments/results/report` | `{token, format}` (`pdf` default \| `json`), `?locale=bg\|en` → the report of the saved result the token opens: `application/pdf` (`attachment; filename="doklad-ocenka.pdf"` / `"assessment-report.pdf"`, `no-store`, `nosniff`) or the same document as JSON for the HTML view. 404 `assessment_result_not_found`, 413 `report_too_large`, 503 `report_unavailable`; own limit `ASSESSMENT_REPORT_RATE_LIMIT` |
+| POST | `/api/public/assessments/results/consultation` → 201 | optional: `{token, locale, name, email, company, message?, privacy_acknowledged: true, marketing_consent (default false), website (honeypot), form_token}` → `{reference, message}`; creates a lead (`source = engineering_assessment`) linked to the saved result. 409 `assessment_consultation_exists`, 400 `form_token_invalid` / `spam_suspected`; contact-form rate limit |
+
+Results include `dimensions[].level` (maturity per area), `recommendations[]` with `kind` (`recommendation`,
+`risk`, `quick_win`, `target_state`, `pattern`, `context`), `horizon` (30 \| 60 \| 90 \| null), `domains` and
+`because` (the inputs or thresholds that triggered the finding), plus `roadmap`, `domains` and `inputs`
+(each answer with its `evidence`: `practice`, `metric` or `context`).
 
 ## Public: service catalogue (read-only)
 

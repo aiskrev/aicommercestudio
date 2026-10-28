@@ -101,6 +101,8 @@ class Settings(BaseSettings):
     assessment_rate_limit: int = Field(default=30, ge=1)
     assessment_save_rate_limit: int = Field(default=10, ge=1)
     assessment_lookup_rate_limit: int = Field(default=30, ge=1)
+    # Report generation (PDF/JSON) per client and window; separate from lookups because PDFs cost CPU.
+    assessment_report_rate_limit: int = Field(default=10, ge=1)
     assessment_rate_window_seconds: int = Field(default=600, ge=1)
     assessment_global_rate_limit: int = Field(default=600, ge=1)
     # Saved results are deleted after this many days (or earlier by the visitor with the link token).

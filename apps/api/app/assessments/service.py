@@ -20,11 +20,13 @@ from typing import Any
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
+from app import audit
 from app.assessments.answers import AnswerError, Answers, validate_answers
 from app.assessments.definition import AssessmentDefinition
 from app.assessments.registry import extension_for, registry
 from app.assessments.scoring import ScoreResult, score
-from app.models import AssessmentResultRecord, utcnow
+from app.models import AssessmentResultRecord, InquiryType, Lead, LeadStatus, ServiceKey, utcnow
+from app.services.leads import ASSESSMENT_SOURCE
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +112,7 @@ def delete_result(db: Session, token: str) -> bool:
     return bool(deleted)
 
 
-def rescore_saved(row: AssessmentResultRecord) -> tuple[AssessmentDefinition, ScoreResult]:
+def rescore_saved(row: AssessmentResultRecord) -> tuple[AssessmentDefinition, Answers, ScoreResult]:
     """Re-score a saved result with the definition version it was saved with.
 
     The stored result is the record; the re-score proves the versioned definition and algorithm still
@@ -119,14 +121,14 @@ def rescore_saved(row: AssessmentResultRecord) -> tuple[AssessmentDefinition, Sc
     definition = registry().get(row.assessment_key, row.definition_version)
     if definition is None or definition.scoring.algorithm != row.algorithm:
         raise LookupError(f"definition {row.assessment_key} {row.definition_version} is no longer available")
-    _, result = assess(definition, row.answers)
+    answers, result = assess(definition, row.answers)
     if result.summary() != row.result:
         logger.error(
             "assessment_rescore_mismatch",
             extra={"assessment": row.assessment_key, "version": row.definition_version, "reference": row.reference},
         )
         raise LookupError("saved result does not match its definition version")
-    return definition, result
+    return definition, answers, result
 
 
 # --------------------------------------------------------------------------- retention
@@ -138,11 +140,16 @@ class AssessmentRetention:
     deleted: int
 
 
+def _expired(cutoff: datetime):
+    # A result linked to a consultation follows the lead's retention and erasure (FK ON DELETE CASCADE).
+    return (AssessmentResultRecord.expires_at <= cutoff) & AssessmentResultRecord.lead_id.is_(None)
+
+
 def count_expired(db: Session, now: datetime | None = None) -> int:
     cutoff = now or utcnow()
     return (
         db.scalar(
-            select(func.count()).select_from(AssessmentResultRecord).where(AssessmentResultRecord.expires_at <= cutoff)
+            select(func.count()).select_from(AssessmentResultRecord).where(_expired(cutoff))
         )
         or 0
     )
@@ -153,6 +160,86 @@ def purge_expired(db: Session, *, dry_run: bool = False, now: datetime | None = 
     due = count_expired(db, now)
     if dry_run:
         return AssessmentRetention(due, 0)
-    deleted = db.execute(delete(AssessmentResultRecord).where(AssessmentResultRecord.expires_at <= now)).rowcount or 0
+    deleted = db.execute(delete(AssessmentResultRecord).where(_expired(now))).rowcount or 0
     db.commit()
     return AssessmentRetention(due, deleted)
+
+
+# --------------------------------------------------------------------------- consultation (optional)
+
+
+def create_consultation(
+    db: Session,
+    row: AssessmentResultRecord,
+    definition: AssessmentDefinition,
+    result: ScoreResult,
+    *,
+    name: str,
+    email: str,
+    company: str,
+    message: str,
+    locale: str,
+    marketing_consent: bool,
+    privacy_notice_version: str,
+    marketing_consent_version: str,
+    ip_hash: str | None,
+) -> Lead:
+    """The visitor's explicit request: a lead with the result summary, linked to the saved result.
+
+    Marketing consent is separate and optional; the privacy acknowledgement is checked by the schema.
+    """
+    now = utcnow()
+    summary = definition.texts[locale].title
+    lead = Lead(
+        service=ServiceKey.AUDIT.value,
+        submitted_service=ServiceKey.AUDIT.value,
+        inquiry_type=InquiryType.CONTACT.value,
+        locale=locale,
+        service_details={
+            "kind": "assessment",
+            "assessment": definition.key,
+            "definition_version": definition.version,
+            "algorithm": result.algorithm,
+            "overall": result.overall,
+            "band": result.band,
+            "dimensions": dict(result.dimensions),
+            "findings": list(result.recommendations),
+            "reference": row.reference,
+        },
+        name=name,
+        company=company,
+        email=email,
+        message=f"{summary}: {result.overall}/100 ({result.band})" + (f"\n\n{message}" if message else ""),
+        status=LeadStatus.NEW.value,
+        source=ASSESSMENT_SOURCE,
+        privacy_acknowledged_at=now,
+        privacy_notice_version=privacy_notice_version,
+        marketing_consent=marketing_consent,
+        marketing_consent_at=now if marketing_consent else None,
+        marketing_consent_version=marketing_consent_version if marketing_consent else None,
+        ip_hash=ip_hash,
+        created_at=now,
+        updated_at=now,
+    )
+    db.add(lead)
+    db.flush()
+    row.lead_id = lead.id
+    row.linked_at = now
+    audit.record(
+        db,
+        "lead.created",
+        actor_label="website",
+        entity_type="lead",
+        entity_id=str(lead.id),
+        details={
+            "service": lead.service,
+            "source": ASSESSMENT_SOURCE,
+            "assessment": definition.key,
+            "band": result.band,
+            "marketing_consent": marketing_consent,
+            "locale": locale,
+        },
+        ip_hash=ip_hash,
+    )
+    db.commit()
+    return lead

@@ -17,6 +17,9 @@ import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
 import {
   ADVISOR_LIMITS,
+  type AdvisorContextValues,
+  CONTEXT_OPTIONS,
+  type ContextField,
   type AdvisorErrors,
   type AdvisorField,
   type AdvisorResponse,
@@ -30,10 +33,13 @@ import {
   validateAdvisor,
 } from "@/lib/advisor";
 import { trackToolEvent } from "@/lib/analytics";
+import type { DomainKey } from "@/lib/domains";
 import { fetchFormToken } from "@/lib/public-api";
 
 interface Props {
   content: AdvisorContent;
+  /** Domain hub links for the V2 insights (published hubs only). */
+  domainLinks?: Partial<Record<DomainKey, { href: string; label: string }>>;
   contact: {
     labels: Dictionary["form"];
     messages: Dictionary["validation"];
@@ -50,7 +56,7 @@ interface Props {
 
 const FIELD_ORDER: AdvisorField[] = ["business_type", "process_description", "monthly_volume", "team_size", "tools", "other_tools"];
 
-export function AdvisorTool({ content, contact, retentionDays, locale }: Props) {
+export function AdvisorTool({ content, contact, retentionDays, locale, domainLinks }: Props) {
   const f = content.form;
   const [values, setValues] = useState<AdvisorValues>(emptyAdvisorValues);
   const [errors, setErrors] = useState<AdvisorErrors>({});
@@ -93,6 +99,12 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
     if (errors[field]) setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
+  function updateContext<K extends keyof AdvisorContextValues>(field: K, value: AdvisorContextValues[K]) {
+    setValues((current) => ({ ...current, context: { ...current.context, [field]: value } }));
+    const key: ContextField = `context.${field}`;
+    if (errors[key]) setErrors((current) => ({ ...current, [key]: undefined }));
+  }
+
   function validateOnBlur(field: AdvisorField) {
     const value = values[field];
     if (typeof value === "string" && !value.trim()) return;
@@ -104,7 +116,9 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
     setFormError(message);
     requestAnimationFrame(() => {
       const first = FIELD_ORDER.find((field) => next[field]);
+      const firstContext = (Object.keys(next) as ContextField[]).find((field) => field.startsWith("context.") && next[field]);
       if (first) document.getElementById(`advisor-${first}`)?.focus();
+      else if (firstContext) document.getElementById(`advisor-${firstContext.replace(".", "-")}`)?.focus();
       else summaryRef.current?.focus();
     });
   }
@@ -149,7 +163,7 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
     const ref = result.reference ?? "";
     return (
       <div className="grid gap-8">
-        <AdvisorResult result={result} content={content} headingRef={resultHeadingRef} locale={locale} />
+        <AdvisorResult result={result} content={content} headingRef={resultHeadingRef} locale={locale} domainLinks={domainLinks} />
 
         <div className="flex flex-wrap gap-3 print:hidden">
           {!consulting && (
@@ -365,6 +379,99 @@ export function AdvisorTool({ content, contact, retentionDays, locale }: Props) 
           onBlur={() => validateOnBlur("other_tools")}
         />
       </Field>
+
+      <fieldset className="grid gap-4 rounded-[var(--radius-md)] border border-line-subtle p-4" data-testid="advisor-v2">
+        <legend className="sr-only">{content.v2.toggle}</legend>
+        <label className="flex cursor-pointer gap-3 text-sm font-medium leading-relaxed text-fg">
+          <input
+            id="advisor-deeper"
+            type="checkbox"
+            className="checkbox mt-0.5"
+            checked={values.deeper}
+            aria-describedby="advisor-deeper-hint"
+            onChange={(e) => setValues((current) => ({ ...current, deeper: e.target.checked }))}
+          />
+          <span>{content.v2.toggle}</span>
+        </label>
+        <p id="advisor-deeper-hint" className="field-hint -mt-2">
+          {content.v2.toggleHint}
+        </p>
+        {values.deeper && (
+          <div className="grid gap-5 sm:grid-cols-2">
+            {(["goal", "data_sensitivity", "system_access", "change_capacity"] as const).map((field) => {
+              const label = { goal: content.v2.goal, data_sensitivity: content.v2.dataSensitivity, system_access: content.v2.systemAccess, change_capacity: content.v2.changeCapacity }[field];
+              const key: ContextField = `context.${field}`;
+              const id = `advisor-context-${field}`;
+              return (
+                <div key={field} className="flex flex-col">
+                  <label htmlFor={id} className="field-label">
+                    {label} <span className="field-required" aria-hidden="true">*</span>
+                  </label>
+                  <select
+                    id={id}
+                    className="field"
+                    value={values.context[field]}
+                    aria-invalid={Boolean(errors[key]) || undefined}
+                    aria-describedby={errors[key] ? `${id}-error` : undefined}
+                    onChange={(e) => updateContext(field, e.target.value)}
+                  >
+                    <option value="">{content.v2.placeholder}</option>
+                    {CONTEXT_OPTIONS[field].map((option) => (
+                      <option key={option} value={option}>
+                        {(content.v2.options[field] as Record<string, string>)[option]}
+                      </option>
+                    ))}
+                  </select>
+                  {errors[key] && (
+                    <p id={`${id}-error`} className="field-error">
+                      {errors[key]}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+            <fieldset
+              className="sm:col-span-2"
+              aria-invalid={Boolean(errors["context.customer_facing"]) || undefined}
+              aria-describedby={errors["context.customer_facing"] ? "advisor-context-customer_facing-error" : undefined}
+            >
+              <legend className="field-label">
+                {content.v2.customerFacing} <span className="field-required" aria-hidden="true">*</span>
+              </legend>
+              <div className="mt-2 flex gap-6">
+                {(["yes", "no"] as const).map((option, index) => (
+                  <label key={option} className="flex cursor-pointer items-center gap-2 text-sm text-fg-secondary">
+                    <input
+                      id={index === 0 ? "advisor-context-customer_facing" : undefined}
+                      type="radio"
+                      name="customer_facing"
+                      className="checkbox"
+                      checked={values.context.customer_facing === option}
+                      onChange={() => updateContext("customer_facing", option)}
+                    />
+                    {content.v2[option]}
+                  </label>
+                ))}
+              </div>
+              {errors["context.customer_facing"] && (
+                <p id="advisor-context-customer_facing-error" className="field-error">
+                  {errors["context.customer_facing"]}
+                </p>
+              )}
+            </fieldset>
+            <label className="flex cursor-pointer gap-3 text-sm text-fg-secondary sm:col-span-2">
+              <input
+                id="advisor-include_roadmap"
+                type="checkbox"
+                className="checkbox mt-0.5"
+                checked={values.include_roadmap}
+                onChange={(e) => setValues((current) => ({ ...current, include_roadmap: e.target.checked }))}
+              />
+              <span>{content.v2.includeRoadmap}</span>
+            </label>
+          </div>
+        )}
+      </fieldset>
 
       <label className="flex cursor-pointer gap-3 text-sm leading-relaxed text-fg-secondary">
         <input

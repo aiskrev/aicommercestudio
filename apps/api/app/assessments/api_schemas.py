@@ -5,10 +5,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.models import LeadLocale
-from app.schemas import StrictModel, _error
+from app.schemas import _URL_LIKE, StrictModel, _clean_text, _error, _no_secrets
 
 MAX_ANSWERS = 60
 MAX_SELECTIONS = 12
@@ -45,6 +45,62 @@ class AssessmentScoreRequest(StrictModel):
 
 class ResultTokenRequest(StrictModel):
     token: str = Field(min_length=20, max_length=100)
+
+
+class ResultReportRequest(ResultTokenRequest):
+    """`pdf` downloads the PDF; `json` returns the same document for the accessible HTML view."""
+
+    format: Literal["pdf", "json"] = "pdf"
+
+
+class ResultConsultationRequest(ResultTokenRequest):
+    """Optional: ask for a consultation about a saved result. Creates a lead; nothing is required to see results."""
+
+    locale: LeadLocale = LeadLocale.BG
+    name: str = Field(min_length=2, max_length=120)
+    email: EmailStr = Field(max_length=254)
+    company: str = Field(min_length=2, max_length=160)
+    message: str = Field(default="", max_length=1000)
+    privacy_acknowledged: bool
+    # Separate, optional and unticked by default.
+    marketing_consent: bool = False
+    website: str = Field(default="", max_length=200)
+    form_token: str = Field(default="", max_length=200)
+
+    @field_validator("name", "company")
+    @classmethod
+    def _plain(cls, value: str) -> str:
+        value = _clean_text(value)
+        if _URL_LIKE.search(value):
+            raise _error("no_links", "Полето не може да съдържа връзки или HTML.")
+        return value
+
+    @field_validator("message")
+    @classmethod
+    def _message(cls, value: str) -> str:
+        value = _no_secrets(_clean_text(value))
+        if len(_URL_LIKE.findall(value)) > 3:
+            raise _error("too_many_links", "Съобщението съдържа твърде много връзки.")
+        return value
+
+    @field_validator("email")
+    @classmethod
+    def _email_lower(cls, value: str) -> str:
+        return value.lower()
+
+    @field_validator("privacy_acknowledged")
+    @classmethod
+    def _must_ack(cls, value: bool) -> bool:
+        if value is not True:
+            raise _error(
+                "privacy_required", "Необходимо е да потвърдите, че сте запознати с информацията за поверителност."
+            )
+        return value
+
+
+class ConsultationOut(BaseModel):
+    reference: str
+    message: str
 
 
 class OutModel(BaseModel):
@@ -84,6 +140,7 @@ class QuestionOut(OutModel):
     min: float | None = None
     max: float | None = None
     integer: bool | None = None
+    evidence: Literal["practice", "metric", "context"] = "practice"
 
 
 class TitledOut(OutModel):
@@ -105,8 +162,36 @@ class AssessmentDefinitionOut(OutModel):
     questions: list[QuestionOut]
 
 
+class LevelOut(OutModel):
+    key: str
+    title: str
+
+
 class DimensionScoreOut(TitledOut):
     score: int = Field(ge=0, le=100)
+    # Maturity indicator of the dimension, using the same bands as the overall score.
+    level: LevelOut
+
+
+class FindingOut(TitledOut):
+    kind: Literal["recommendation", "risk", "quick_win", "target_state", "pattern", "context"]
+    horizon: Literal[30, 60, 90] | None
+    domains: list[str]
+    # The inputs or score thresholds that triggered this finding (empty only without answers).
+    because: list[str]
+
+
+class RoadmapStepOut(OutModel):
+    horizon: Literal[30, 60, 90]
+    items: list[str]
+
+
+class InputOut(OutModel):
+    question: str
+    dimension: str
+    evidence: Literal["practice", "metric", "context"]
+    text: str
+    answer: str
 
 
 class SavedOut(OutModel):
@@ -126,7 +211,10 @@ class AssessmentResultOut(OutModel):
     overall: int = Field(ge=0, le=100)
     band: TitledOut
     dimensions: list[DimensionScoreOut]
-    recommendations: list[TitledOut]
+    recommendations: list[FindingOut]
+    roadmap: list[RoadmapStepOut]
+    domains: list[str]
+    inputs: list[InputOut]
     answered: int
     questions: int
     fingerprint: str

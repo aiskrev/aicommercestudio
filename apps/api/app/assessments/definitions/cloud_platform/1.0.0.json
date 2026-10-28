@@ -1,0 +1,2027 @@
+{
+  "key": "cloud_platform",
+  "version": "1.0.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 10
+  },
+  "dimensions": [
+    {
+      "key": "landing_zones",
+      "weight": 10
+    },
+    {
+      "key": "identity",
+      "weight": 10
+    },
+    {
+      "key": "network",
+      "weight": 10
+    },
+    {
+      "key": "iac",
+      "weight": 10
+    },
+    {
+      "key": "platform_ops",
+      "weight": 10
+    },
+    {
+      "key": "cicd",
+      "weight": 10
+    },
+    {
+      "key": "observability",
+      "weight": 10
+    },
+    {
+      "key": "resilience",
+      "weight": 10
+    },
+    {
+      "key": "security_policy",
+      "weight": 10
+    },
+    {
+      "key": "finops",
+      "weight": 10
+    }
+  ],
+  "questions": [
+    {
+      "key": "cloud_context",
+      "type": "multi_choice",
+      "dimension": "landing_zones",
+      "evidence": "context",
+      "options": [
+        {
+          "key": "aws",
+          "points": 0
+        },
+        {
+          "key": "azure",
+          "points": 0
+        },
+        {
+          "key": "gcp",
+          "points": 0
+        },
+        {
+          "key": "hybrid",
+          "points": 0
+        },
+        {
+          "key": "private_cloud",
+          "points": 0
+        },
+        {
+          "key": "on_premises",
+          "points": 0
+        }
+      ],
+      "cap": 1,
+      "max_selections": 6
+    },
+    {
+      "key": "lz_structure",
+      "type": "single_choice",
+      "dimension": "landing_zones",
+      "options": [
+        {
+          "key": "single_shared",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "per_environment",
+          "points": 2
+        },
+        {
+          "key": "landing_zone",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "lz_guardrails",
+      "type": "single_choice",
+      "dimension": "landing_zones",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "documented",
+          "points": 1
+        },
+        {
+          "key": "partial",
+          "points": 2
+        },
+        {
+          "key": "enforced",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "id_sso",
+      "type": "single_choice",
+      "dimension": "identity",
+      "options": [
+        {
+          "key": "local_users",
+          "points": 0
+        },
+        {
+          "key": "mixed",
+          "points": 1
+        },
+        {
+          "key": "sso",
+          "points": 2
+        },
+        {
+          "key": "sso_mfa_jit",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "id_least_privilege",
+      "type": "single_choice",
+      "dimension": "identity",
+      "options": [
+        {
+          "key": "admin_broad",
+          "points": 0
+        },
+        {
+          "key": "role_based",
+          "points": 1
+        },
+        {
+          "key": "reviewed",
+          "points": 2
+        },
+        {
+          "key": "least_privilege",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "net_segmentation",
+      "type": "single_choice",
+      "dimension": "network",
+      "options": [
+        {
+          "key": "flat",
+          "points": 0
+        },
+        {
+          "key": "basic",
+          "points": 1
+        },
+        {
+          "key": "segmented",
+          "points": 2
+        },
+        {
+          "key": "controlled",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "net_connectivity",
+      "type": "single_choice",
+      "dimension": "network",
+      "options": [
+        {
+          "key": "ad_hoc",
+          "points": 0
+        },
+        {
+          "key": "documented",
+          "points": 1
+        },
+        {
+          "key": "hub_spoke",
+          "points": 2
+        },
+        {
+          "key": "as_code",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "iac_coverage",
+      "type": "single_choice",
+      "dimension": "iac",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "most",
+          "points": 2
+        },
+        {
+          "key": "all",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "iac_workflow",
+      "type": "single_choice",
+      "dimension": "iac",
+      "options": [
+        {
+          "key": "local",
+          "points": 0
+        },
+        {
+          "key": "reviewed",
+          "points": 1
+        },
+        {
+          "key": "pipeline",
+          "points": 2
+        },
+        {
+          "key": "pipeline_policy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "platform_ops",
+      "type": "single_choice",
+      "dimension": "platform_ops",
+      "options": [
+        {
+          "key": "manual",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "managed",
+          "points": 2
+        },
+        {
+          "key": "platform",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "platform_patching",
+      "type": "single_choice",
+      "dimension": "platform_ops",
+      "options": [
+        {
+          "key": "manual",
+          "points": 0
+        },
+        {
+          "key": "scheduled",
+          "points": 1
+        },
+        {
+          "key": "automated",
+          "points": 2
+        },
+        {
+          "key": "immutable",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cicd_deploy",
+      "type": "single_choice",
+      "dimension": "cicd",
+      "options": [
+        {
+          "key": "manual",
+          "points": 0
+        },
+        {
+          "key": "scripted",
+          "points": 1
+        },
+        {
+          "key": "pipeline",
+          "points": 2
+        },
+        {
+          "key": "progressive",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cicd_governance",
+      "type": "single_choice",
+      "dimension": "cicd",
+      "options": [
+        {
+          "key": "anyone",
+          "points": 0
+        },
+        {
+          "key": "restricted",
+          "points": 1
+        },
+        {
+          "key": "approved",
+          "points": 2
+        },
+        {
+          "key": "policy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "obs_coverage",
+      "type": "single_choice",
+      "dimension": "observability",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "basic",
+          "points": 1
+        },
+        {
+          "key": "central",
+          "points": 2
+        },
+        {
+          "key": "slo",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "obs_incident",
+      "type": "single_choice",
+      "dimension": "observability",
+      "options": [
+        {
+          "key": "ad_hoc",
+          "points": 0
+        },
+        {
+          "key": "contacts",
+          "points": 1
+        },
+        {
+          "key": "runbooks",
+          "points": 2
+        },
+        {
+          "key": "practiced",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "bk_backups",
+      "type": "single_choice",
+      "dimension": "resilience",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "all",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "bk_dr",
+      "type": "single_choice",
+      "dimension": "resilience",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "documented",
+          "points": 1
+        },
+        {
+          "key": "tested",
+          "points": 2
+        },
+        {
+          "key": "automated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "sec_posture",
+      "type": "single_choice",
+      "dimension": "security_policy",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "periodic",
+          "points": 1
+        },
+        {
+          "key": "tooling",
+          "points": 2
+        },
+        {
+          "key": "continuous",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "sec_policy_code",
+      "type": "single_choice",
+      "dimension": "security_policy",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "some",
+          "points": 2
+        },
+        {
+          "key": "broad",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fin_visibility",
+      "type": "single_choice",
+      "dimension": "finops",
+      "options": [
+        {
+          "key": "bill_only",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "allocated",
+          "points": 2
+        },
+        {
+          "key": "unit",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fin_capacity",
+      "type": "single_choice",
+      "dimension": "finops",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "reactive",
+          "points": 1
+        },
+        {
+          "key": "regular",
+          "points": 2
+        },
+        {
+          "key": "automated",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_shared_account",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "lz_structure",
+        "options": [
+          "single_shared"
+        ]
+      },
+      "recommendation": "risk_shared_account",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "risk_identity",
+      "priority": 1,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "id_sso",
+            "options": [
+              "local_users"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "id_least_privilege",
+            "options": [
+              "admin_broad"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_identity",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform",
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "risk_flat_network",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "net_segmentation",
+        "options": [
+          "flat"
+        ]
+      },
+      "recommendation": "risk_flat_network",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "risk_manual_infra",
+      "priority": 2,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "iac_coverage",
+            "options": [
+              "none"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "iac_workflow",
+            "options": [
+              "local"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_manual_infra",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "risk_uncontrolled_deploys",
+      "priority": 2,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "cicd_deploy",
+            "options": [
+              "manual"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "cicd_governance",
+            "options": [
+              "anyone"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_uncontrolled_deploys",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "risk_blind_operations",
+      "priority": 3,
+      "when": {
+        "kind": "answer_in",
+        "question": "obs_coverage",
+        "options": [
+          "none"
+        ]
+      },
+      "recommendation": "risk_blind_operations",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "risk_no_recovery",
+      "priority": 1,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "bk_backups",
+            "options": [
+              "none"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "bk_dr",
+            "options": [
+              "none"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_no_recovery",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "risk_unknown_posture",
+      "priority": 3,
+      "when": {
+        "kind": "answer_in",
+        "question": "sec_posture",
+        "options": [
+          "unknown"
+        ]
+      },
+      "recommendation": "risk_unknown_posture",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "qw_sso_mfa",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "id_sso",
+        "options": [
+          "local_users",
+          "mixed"
+        ]
+      },
+      "recommendation": "qw_sso_mfa",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "qw_restore_test",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "bk_backups",
+        "options": [
+          "some",
+          "all"
+        ]
+      },
+      "recommendation": "qw_restore_test",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "qw_tagging_budgets",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "fin_visibility",
+        "options": [
+          "bill_only",
+          "partial"
+        ]
+      },
+      "recommendation": "qw_tagging_budgets",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "qw_key_alerts",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "obs_coverage",
+        "options": [
+          "none",
+          "basic"
+        ]
+      },
+      "recommendation": "qw_key_alerts",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "qw_iac_pipeline",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "iac_workflow",
+        "options": [
+          "local",
+          "reviewed"
+        ]
+      },
+      "recommendation": "qw_iac_pipeline",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform",
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "qw_posture_baseline",
+      "priority": 6,
+      "when": {
+        "kind": "answer_in",
+        "question": "sec_posture",
+        "options": [
+          "unknown",
+          "periodic"
+        ]
+      },
+      "recommendation": "qw_posture_baseline",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "rec_landing_zone",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "landing_zones",
+        "value": 50
+      },
+      "recommendation": "rec_landing_zone",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "rec_identity",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "identity",
+        "value": 50
+      },
+      "recommendation": "rec_identity",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform",
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "rec_network",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "network",
+        "value": 50
+      },
+      "recommendation": "rec_network",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "rec_iac",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "iac",
+        "value": 50
+      },
+      "recommendation": "rec_iac",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform",
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "rec_platform",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "platform_ops",
+        "value": 50
+      },
+      "recommendation": "rec_platform",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "rec_cicd",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "cicd",
+        "value": 50
+      },
+      "recommendation": "rec_cicd",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "rec_observability",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "observability",
+        "value": 50
+      },
+      "recommendation": "rec_observability",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "rec_resilience",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "resilience",
+        "value": 50
+      },
+      "recommendation": "rec_resilience",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "rec_security",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "security_policy",
+        "value": 50
+      },
+      "recommendation": "rec_security",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "rec_finops",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "finops",
+        "value": 50
+      },
+      "recommendation": "rec_finops",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "ts_platform",
+      "priority": 20,
+      "when": {
+        "kind": "dimension_at_least",
+        "dimension": "platform_ops",
+        "value": 50
+      },
+      "recommendation": "ts_platform",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "cloud_platform",
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "ts_policy_as_code",
+      "priority": 20,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "security_policy",
+            "value": 50
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "iac",
+            "value": 50
+          }
+        ]
+      },
+      "recommendation": "ts_policy_as_code",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "ai_governance",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "ts_slo",
+      "priority": 21,
+      "when": {
+        "kind": "dimension_at_least",
+        "dimension": "observability",
+        "value": 50
+      },
+      "recommendation": "ts_slo",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "ts_dr_automation",
+      "priority": 21,
+      "when": {
+        "kind": "dimension_at_least",
+        "dimension": "resilience",
+        "value": 50
+      },
+      "recommendation": "ts_dr_automation",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "cloud_platform",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "ts_unit_economics",
+      "priority": 22,
+      "when": {
+        "kind": "dimension_at_least",
+        "dimension": "finops",
+        "value": 50
+      },
+      "recommendation": "ts_unit_economics",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "ctx_multi_cloud",
+      "priority": 30,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "all",
+            "conditions": [
+              {
+                "kind": "answer_in",
+                "question": "cloud_context",
+                "options": [
+                  "aws"
+                ]
+              },
+              {
+                "kind": "answer_in",
+                "question": "cloud_context",
+                "options": [
+                  "azure"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "all",
+            "conditions": [
+              {
+                "kind": "answer_in",
+                "question": "cloud_context",
+                "options": [
+                  "aws"
+                ]
+              },
+              {
+                "kind": "answer_in",
+                "question": "cloud_context",
+                "options": [
+                  "gcp"
+                ]
+              }
+            ]
+          },
+          {
+            "kind": "all",
+            "conditions": [
+              {
+                "kind": "answer_in",
+                "question": "cloud_context",
+                "options": [
+                  "azure"
+                ]
+              },
+              {
+                "kind": "answer_in",
+                "question": "cloud_context",
+                "options": [
+                  "gcp"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "recommendation": "ctx_multi_cloud",
+      "kind": "context",
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "ctx_aws",
+      "priority": 31,
+      "when": {
+        "kind": "answer_in",
+        "question": "cloud_context",
+        "options": [
+          "aws"
+        ]
+      },
+      "recommendation": "ctx_aws",
+      "kind": "context"
+    },
+    {
+      "key": "ctx_azure",
+      "priority": 31,
+      "when": {
+        "kind": "answer_in",
+        "question": "cloud_context",
+        "options": [
+          "azure"
+        ]
+      },
+      "recommendation": "ctx_azure",
+      "kind": "context"
+    },
+    {
+      "key": "ctx_gcp",
+      "priority": 31,
+      "when": {
+        "kind": "answer_in",
+        "question": "cloud_context",
+        "options": [
+          "gcp"
+        ]
+      },
+      "recommendation": "ctx_gcp",
+      "kind": "context"
+    },
+    {
+      "key": "ctx_hybrid_private",
+      "priority": 32,
+      "when": {
+        "kind": "answer_in",
+        "question": "cloud_context",
+        "options": [
+          "hybrid",
+          "private_cloud",
+          "on_premises"
+        ]
+      },
+      "recommendation": "ctx_hybrid_private",
+      "kind": "context",
+      "domains": [
+        "cloud_platform",
+        "managed_operations"
+      ]
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на зрелостта на облака и платформата",
+      "intro": "21 въпроса в 10 области: от landing zones и идентичност до устойчивост и FinOps. Резултатът показва зрелост по области, рискове, бързи подобрения, целево състояние и пътна карта за 30/60/90 дни.",
+      "disclaimer": "Самооценка по вашите отговори. Нямаме достъп до вашите облачни среди и не правим сканиране. Резултатът не е сертификат за съответствие и не е проверен от независима страна.",
+      "dimensions": {
+        "landing_zones": {
+          "title": "Landing zones и организация",
+          "description": "Как са организирани акаунтите, абонаментите или проектите и общите предпазни правила."
+        },
+        "identity": {
+          "title": "Идентичност и минимални права",
+          "description": "Централен вход, MFA и права само колкото са нужни."
+        },
+        "network": {
+          "title": "Мрежова сегментация и свързаност",
+          "description": "Разделяне на мрежите и управление на връзките между среди, обекти и облаци."
+        },
+        "iac": {
+          "title": "Инфраструктура като код",
+          "description": "Колко от инфраструктурата е описана като код и как се прилагат промените."
+        },
+        "platform_ops": {
+          "title": "Операции на контейнерни и изчислителни платформи",
+          "description": "Как се управляват Kubernetes, контейнери, виртуални машини и serverless."
+        },
+        "cicd": {
+          "title": "CI/CD и управление на внедряванията",
+          "description": "Как промените стигат до продукция и кой ги одобрява."
+        },
+        "observability": {
+          "title": "Наблюдаемост и готовност за инциденти",
+          "description": "Мониторинг, известяване и работа при инциденти."
+        },
+        "resilience": {
+          "title": "Архивиране, възстановяване и устойчивост",
+          "description": "Резервни копия, тестове за възстановяване и план при бедствие."
+        },
+        "security_policy": {
+          "title": "Състояние на сигурността и автоматизирани политики",
+          "description": "Видимост на сигурността и политики, наложени автоматично."
+        },
+        "finops": {
+          "title": "FinOps и управление на капацитета",
+          "description": "Видимост на разходите, разпределение и оптимизация на капацитета."
+        }
+      },
+      "questions": {
+        "cloud_context": {
+          "text": "Къде работят вашите системи?",
+          "help": "Изберете всичко приложимо. Използва се само за бележки към резултата и не променя оценката.",
+          "options": {
+            "aws": "AWS",
+            "azure": "Microsoft Azure",
+            "gcp": "Google Cloud",
+            "hybrid": "Хибридно (облак и собствени центрове)",
+            "private_cloud": "Частен облак (напр. OpenStack, VMware)",
+            "on_premises": "Собствени сървъри без облачна платформа"
+          }
+        },
+        "lz_structure": {
+          "text": "Как са организирани облачните акаунти, абонаменти или проекти?",
+          "options": {
+            "single_shared": "Един общ акаунт/абонамент за всичко",
+            "ad_hoc": "Няколко, създадени при нужда",
+            "per_environment": "Разделени по среди (продукция и непродукция)",
+            "landing_zone": "Управлявана landing zone с процес за създаване на нови"
+          }
+        },
+        "lz_guardrails": {
+          "text": "Прилагат ли се общи предпазни правила на ниво организация?",
+          "help": "Напр. политики за цялата организация, management group или folder.",
+          "options": {
+            "none": "Не",
+            "documented": "Описани са, прилагат се ръчно",
+            "partial": "Наложени за част от акаунтите",
+            "enforced": "Наложени централно за всички"
+          }
+        },
+        "id_sso": {
+          "text": "Как хората влизат в облачните конзоли?",
+          "options": {
+            "local_users": "Отделни локални потребители или споделени пароли",
+            "mixed": "Частично централно (SSO), частично локални потребители",
+            "sso": "Централен доставчик на идентичност (SSO) за всички",
+            "sso_mfa_jit": "SSO с MFA и временен повишен достъп"
+          }
+        },
+        "id_least_privilege": {
+          "text": "Как се дават права?",
+          "options": {
+            "admin_broad": "Широки администраторски права са честа практика",
+            "role_based": "По роли, рядко преглеждани",
+            "reviewed": "По роли, преглеждани периодично",
+            "least_privilege": "Минимални права, редовни прегледи, без дълготрайни ключове"
+          }
+        },
+        "net_segmentation": {
+          "text": "Как е сегментирана мрежата?",
+          "options": {
+            "flat": "Една обща мрежа",
+            "basic": "Отделни публични и частни подмрежи",
+            "segmented": "Сегментирана по среди и натоварвания",
+            "controlled": "Сегментирана, с централен контрол на входящ и изходящ трафик и частни крайни точки"
+          }
+        },
+        "net_connectivity": {
+          "text": "Как се управлява свързаността между среди, обекти и облаци?",
+          "options": {
+            "ad_hoc": "При нужда (VPN или peering се създават ръчно)",
+            "documented": "Описана, но ръчна",
+            "hub_spoke": "Hub-and-spoke или транзитен дизайн",
+            "as_code": "Стандартна топология, управлявана като код"
+          }
+        },
+        "iac_coverage": {
+          "text": "Колко от инфраструктурата е описана като код?",
+          "options": {
+            "none": "Създава се предимно ръчно в конзолите",
+            "some": "Част от компонентите",
+            "most": "Повечето",
+            "all": "Практически всичко; ръчните промени са изключение"
+          }
+        },
+        "iac_workflow": {
+          "text": "Как се прилагат промените в инфраструктурата?",
+          "options": {
+            "local": "От компютрите на отделни хора",
+            "reviewed": "С преглед, прилагат се ръчно",
+            "pipeline": "През pipeline с преглед на плана",
+            "pipeline_policy": "През pipeline с преглед, проверки на политики и откриване на отклонения (drift)"
+          }
+        },
+        "platform_ops": {
+          "text": "Как се управляват платформите за изпълнение (виртуални машини, контейнери, Kubernetes, serverless)?",
+          "options": {
+            "manual": "Настройват се ръчно",
+            "partial": "Частично автоматизирано; обновяванията са при нужда",
+            "managed": "Управлявани услуги, автоматични обновявания и базови конфигурации",
+            "platform": "Вътрешна платформа с шаблони, политики и самообслужване"
+          }
+        },
+        "platform_patching": {
+          "text": "Как се обновяват образите и средите за изпълнение?",
+          "options": {
+            "manual": "Ръчно, когато има време",
+            "scheduled": "Ръчно, по график",
+            "automated": "Автоматично, в прозорци за поддръжка",
+            "immutable": "Неизменни образи, пресъздавани и внедрявани автоматично"
+          }
+        },
+        "cicd_deploy": {
+          "text": "Как промените стигат до продукция?",
+          "options": {
+            "manual": "Ръчно копиране или команди",
+            "scripted": "Със скриптове, пускани ръчно",
+            "pipeline": "През pipeline с одобрение",
+            "progressive": "През pipeline с автоматични тестове, одобрение и постепенно пускане"
+          }
+        },
+        "cicd_governance": {
+          "text": "Кой може да внедрява в продукция и как се записва?",
+          "options": {
+            "anyone": "Много хора, без запис",
+            "restricted": "Ограничен кръг, частичен запис",
+            "approved": "Одобрени промени и одитна следа",
+            "policy": "Наложени одобрения, разделение на отговорностите и пълна одитна следа"
+          }
+        },
+        "obs_coverage": {
+          "text": "Какъв мониторинг имате?",
+          "options": {
+            "none": "Почти няма централен мониторинг",
+            "basic": "Основни метрики на инфраструктурата",
+            "central": "Централни логове, метрики и известия",
+            "slo": "Логове, метрики, трасиране и известия по SLO"
+          }
+        },
+        "obs_incident": {
+          "text": "Как се работи при инцидент?",
+          "options": {
+            "ad_hoc": "Импровизирано",
+            "contacts": "Има отговорни хора, няма инструкции",
+            "runbooks": "Дежурства и инструкции (runbooks)",
+            "practiced": "Дежурства, инструкции, разбор след инцидент и учения"
+          }
+        },
+        "bk_backups": {
+          "text": "Как се правят резервни копия?",
+          "options": {
+            "none": "Няма редовни резервни копия",
+            "some": "За част от системите",
+            "all": "Автоматично за всички критични данни",
+            "tested": "Автоматично, извън основния акаунт или неизменни, с редовни тестове за възстановяване"
+          }
+        },
+        "bk_dr": {
+          "text": "Имате ли план за възстановяване при бедствие?",
+          "options": {
+            "none": "Не",
+            "documented": "Описан, но не е тестван",
+            "tested": "Тестван от време на време, с определени RTO и RPO",
+            "automated": "Тестван редовно, до голяма степен автоматизиран, няколко зони или региона по дизайн"
+          }
+        },
+        "sec_posture": {
+          "text": "Как следите състоянието на сигурността?",
+          "options": {
+            "unknown": "Не го следим",
+            "periodic": "Периодични ръчни прегледи",
+            "tooling": "Инструмент за posture management, находките се проследяват",
+            "continuous": "Непрекъснато наблюдение с автоматично отстраняване"
+          }
+        },
+        "sec_policy_code": {
+          "text": "Налагат ли се политиките за сигурност автоматично?",
+          "options": {
+            "none": "Не",
+            "manual": "Проверяват се ръчно при преглед",
+            "some": "Политики като код за част от контролите",
+            "broad": "Политики като код в pipeline и по време на работа, с записани изключения"
+          }
+        },
+        "fin_visibility": {
+          "text": "Каква видимост имате върху облачните разходи?",
+          "options": {
+            "bill_only": "Само общата сметка",
+            "partial": "Частични етикети и разбивка",
+            "allocated": "Разходите са разпределени по екипи или продукти",
+            "unit": "Разпределени, с бюджети, известия и разход на единица"
+          }
+        },
+        "fin_capacity": {
+          "text": "Как се управляват капацитетът и оптимизацията?",
+          "options": {
+            "none": "Рядко се преглеждат",
+            "reactive": "Когато сметката скочи",
+            "regular": "Редовно преоразмеряване и преглед на ангажиментите",
+            "automated": "Автоматично мащабиране, графици и непрекъсната оптимизация"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_shared_account": {
+          "title": "Всичко в един общ акаунт",
+          "description": "Продукция, тестове и експерименти споделят граници, права и лимити. Една грешка или пробив засяга всичко."
+        },
+        "risk_identity": {
+          "title": "Неуправлявани идентичности и широки права",
+          "description": "Локални потребители, споделени пароли или широки администраторски права са най-честият път към пробив в облака."
+        },
+        "risk_flat_network": {
+          "title": "Плоска мрежа",
+          "description": "Без сегментация един компрометиран ресурс може да достигне всичко останало."
+        },
+        "risk_manual_infra": {
+          "title": "Ръчна инфраструктура",
+          "description": "Средите не могат да се възпроизведат, промените не се преглеждат и отклоненията остават незабелязани."
+        },
+        "risk_uncontrolled_deploys": {
+          "title": "Неконтролирани внедрявания",
+          "description": "Без pipeline и одитна следа е трудно да разберете какво е променено, от кого и как да го върнете."
+        },
+        "risk_blind_operations": {
+          "title": "Работа на сляпо",
+          "description": "Проблемите се откриват от клиентите, а не от мониторинга."
+        },
+        "risk_no_recovery": {
+          "title": "Няма надежден път за възстановяване",
+          "description": "Без редовни резервни копия или план за възстановяване загубата на данни или регион може да е необратима."
+        },
+        "risk_unknown_posture": {
+          "title": "Неизвестно състояние на сигурността",
+          "description": "Публично отворени ресурси и грешни настройки остават незабелязани, докато някой не ги използва."
+        },
+        "qw_sso_mfa": {
+          "title": "SSO и MFA за всеки достъп до конзолата",
+          "description": "Свържете конзолите с вашия доставчик на идентичност, наложете MFA и закрийте локалните потребители."
+        },
+        "qw_restore_test": {
+          "title": "Тест за възстановяване на една критична система",
+          "description": "Възстановете една критична база данни в отделна среда и запишете колко време отне."
+        },
+        "qw_tagging_budgets": {
+          "title": "Етикети, бюджети и известия за разходите",
+          "description": "Задайте задължителни етикети (екип, среда, продукт) и бюджети с известия."
+        },
+        "qw_key_alerts": {
+          "title": "Известия за няколкото сигнала, които имат значение",
+          "description": "Започнете с наличност, грешки и латентност на основните услуги, с ясен получател на известията."
+        },
+        "qw_iac_pipeline": {
+          "title": "Прилагане на инфраструктурата през pipeline",
+          "description": "Преместете plan и apply в pipeline с преглед, така че всяка промяна да има запис."
+        },
+        "qw_posture_baseline": {
+          "title": "Вградената проверка на сигурността на доставчика",
+          "description": "Включете вградения инструмент на вашия доставчик за проверка на състоянието и прегледайте най-сериозните находки."
+        },
+        "rec_landing_zone": {
+          "title": "Landing zone с ясна структура",
+          "description": "Разделете продукция и непродукция, въведете процес за нови акаунти и общи предпазни правила."
+        },
+        "rec_identity": {
+          "title": "Централна идентичност и минимални права",
+          "description": "Роли по задачи, редовни прегледи на достъпа и временен повишен достъп вместо постоянни администратори."
+        },
+        "rec_network": {
+          "title": "Сегментирана мрежа със стандартна топология",
+          "description": "Сегменти по среди и натоварвания, централен контрол на изходящия трафик и топология, описана като код."
+        },
+        "rec_iac": {
+          "title": "Инфраструктура като код за основните компоненти",
+          "description": "Модули за мрежа, идентичност и изчисления, прилагани през pipeline с преглед."
+        },
+        "rec_platform": {
+          "title": "Управлявани платформи и автоматични обновявания",
+          "description": "Предпочетете управлявани услуги, базови конфигурации и автоматично обновяване на образите."
+        },
+        "rec_cicd": {
+          "title": "Pipeline с одобрения и одитна следа",
+          "description": "Всяко внедряване през pipeline, с одобрение за продукция и запис кой какво е пуснал."
+        },
+        "rec_observability": {
+          "title": "Централна наблюдаемост и дежурства",
+          "description": "Централни логове и метрики, известия към дежурен и инструкции за най-честите инциденти."
+        },
+        "rec_resilience": {
+          "title": "Определени RTO/RPO и тествано възстановяване",
+          "description": "Определете колко данни и време може да загубите, архивирайте извън основния акаунт и тествайте."
+        },
+        "rec_security": {
+          "title": "Видимост на сигурността и първи политики като код",
+          "description": "Непрекъсната проверка на състоянието и няколко наложени политики (криптиране, публичен достъп, регион)."
+        },
+        "rec_finops": {
+          "title": "Разпределение на разходите и редовна оптимизация",
+          "description": "Разходи по екип и продукт, месечен преглед и преоразмеряване на най-големите позиции."
+        },
+        "ts_platform": {
+          "title": "Вътрешна платформа със „златни пътища“",
+          "description": "Шаблони за нови услуги с вградени мрежа, идентичност, наблюдаемост и pipeline, достъпни на самообслужване."
+        },
+        "ts_policy_as_code": {
+          "title": "Политики като код от pipeline до работеща среда",
+          "description": "Едни и същи правила се проверяват при промяна и непрекъснато, а изключенията се записват и изтичат."
+        },
+        "ts_slo": {
+          "title": "SLO за ключовите услуги",
+          "description": "Цели за надеждност, договорени с бизнеса, и известия по изразходвания бюджет за грешки."
+        },
+        "ts_dr_automation": {
+          "title": "Автоматизирано и редовно тествано възстановяване",
+          "description": "Възстановяване, описано като код и тествано по график, с измерени RTO и RPO."
+        },
+        "ts_unit_economics": {
+          "title": "Разход на единица и автоматична оптимизация",
+          "description": "Разход на поръчка, клиент или заявка и автоматични графици и мащабиране."
+        },
+        "ctx_multi_cloud": {
+          "title": "Няколко облака не са еквивалентни",
+          "description": "AWS акаунтите, Azure абонаментите и GCP проектите имат различни граници, модели на права и мрежи. Препоръките трябва да се приложат поотделно за всеки доставчик, не чрез обща абстракция."
+        },
+        "ctx_aws": {
+          "title": "AWS: термини",
+          "description": "В AWS структурата е AWS Organizations с акаунти и SCP политики; входът обикновено е през IAM Identity Center."
+        },
+        "ctx_azure": {
+          "title": "Azure: термини",
+          "description": "В Azure структурата е management groups и абонаменти с Azure Policy; идентичността е в Microsoft Entra ID."
+        },
+        "ctx_gcp": {
+          "title": "Google Cloud: термини",
+          "description": "В Google Cloud структурата е организация, папки и проекти с Organization Policy; правата са в IAM на ниво ресурс."
+        },
+        "ctx_hybrid_private": {
+          "title": "Хибридни и частни среди",
+          "description": "В собствени центрове и частни облаци много от управляваните услуги липсват: архивирането, обновяванията и мрежата изискват собствени процеси и хора."
+        }
+      }
+    },
+    "en": {
+      "title": "Cloud & Platform Maturity Assessment",
+      "intro": "21 questions across 10 areas, from landing zones and identity to resilience and FinOps. The result shows maturity per area, risks, quick wins, a target state and a 30/60/90-day roadmap.",
+      "disclaimer": "A self-assessment based on your answers. We have no access to your cloud environments and perform no scanning. The result is not a compliance certification and has not been independently verified.",
+      "dimensions": {
+        "landing_zones": {
+          "title": "Landing zones and organisation",
+          "description": "How accounts, subscriptions or projects are organised, and the organisation-wide guardrails."
+        },
+        "identity": {
+          "title": "Identity and least privilege",
+          "description": "Central sign-in, MFA and permissions limited to what is needed."
+        },
+        "network": {
+          "title": "Network segmentation and connectivity",
+          "description": "Network separation and how connections between environments, sites and clouds are managed."
+        },
+        "iac": {
+          "title": "Infrastructure as Code",
+          "description": "How much infrastructure is defined as code and how changes are applied."
+        },
+        "platform_ops": {
+          "title": "Container and compute platform operations",
+          "description": "How Kubernetes, containers, virtual machines and serverless are operated."
+        },
+        "cicd": {
+          "title": "CI/CD and deployment governance",
+          "description": "How changes reach production and who approves them."
+        },
+        "observability": {
+          "title": "Observability and incident readiness",
+          "description": "Monitoring, alerting and how incidents are handled."
+        },
+        "resilience": {
+          "title": "Backup, recovery and resilience",
+          "description": "Backups, restore tests and disaster recovery."
+        },
+        "security_policy": {
+          "title": "Security posture and policy automation",
+          "description": "Visibility of the security posture and automatically enforced policies."
+        },
+        "finops": {
+          "title": "FinOps and capacity management",
+          "description": "Cost visibility, allocation and capacity optimisation."
+        }
+      },
+      "questions": {
+        "cloud_context": {
+          "text": "Where do your systems run?",
+          "help": "Select all that apply. Used only for notes on the result; it does not change the score.",
+          "options": {
+            "aws": "AWS",
+            "azure": "Microsoft Azure",
+            "gcp": "Google Cloud",
+            "hybrid": "Hybrid (cloud and own data centres)",
+            "private_cloud": "Private cloud (e.g. OpenStack, VMware)",
+            "on_premises": "Own servers without a cloud platform"
+          }
+        },
+        "lz_structure": {
+          "text": "How are cloud accounts, subscriptions or projects organised?",
+          "options": {
+            "single_shared": "One shared account or subscription for everything",
+            "ad_hoc": "Several, created as needed",
+            "per_environment": "Separated by environment (production and non-production)",
+            "landing_zone": "A governed landing zone with a process for creating new ones"
+          }
+        },
+        "lz_guardrails": {
+          "text": "Are organisation-wide guardrails applied?",
+          "help": "For example, policies at the organisation, management group or folder level.",
+          "options": {
+            "none": "No",
+            "documented": "Documented, applied manually",
+            "partial": "Enforced for some accounts",
+            "enforced": "Enforced centrally for all"
+          }
+        },
+        "id_sso": {
+          "text": "How do people sign in to the cloud consoles?",
+          "options": {
+            "local_users": "Individual local users or shared passwords",
+            "mixed": "Partly central (SSO), partly local users",
+            "sso": "A central identity provider (SSO) for everyone",
+            "sso_mfa_jit": "SSO with MFA and time-limited elevated access"
+          }
+        },
+        "id_least_privilege": {
+          "text": "How are permissions granted?",
+          "options": {
+            "admin_broad": "Broad administrator rights are common",
+            "role_based": "Role-based, rarely reviewed",
+            "reviewed": "Role-based, reviewed periodically",
+            "least_privilege": "Least privilege, regular reviews, no long-lived keys"
+          }
+        },
+        "net_segmentation": {
+          "text": "How is the network segmented?",
+          "options": {
+            "flat": "One flat network",
+            "basic": "Separate public and private subnets",
+            "segmented": "Segmented by environment and workload",
+            "controlled": "Segmented, with central ingress/egress control and private endpoints"
+          }
+        },
+        "net_connectivity": {
+          "text": "How is connectivity between environments, sites and clouds managed?",
+          "options": {
+            "ad_hoc": "As needed (VPNs or peerings created by hand)",
+            "documented": "Documented but manual",
+            "hub_spoke": "Hub-and-spoke or transit design",
+            "as_code": "A standard topology managed as code"
+          }
+        },
+        "iac_coverage": {
+          "text": "How much of the infrastructure is defined as code?",
+          "options": {
+            "none": "Mostly created by hand in the consoles",
+            "some": "Some components",
+            "most": "Most of it",
+            "all": "Practically all; manual changes are exceptions"
+          }
+        },
+        "iac_workflow": {
+          "text": "How are infrastructure changes applied?",
+          "options": {
+            "local": "From individual people's computers",
+            "reviewed": "Reviewed, applied manually",
+            "pipeline": "Through a pipeline with plan review",
+            "pipeline_policy": "Through a pipeline with review, policy checks and drift detection"
+          }
+        },
+        "platform_ops": {
+          "text": "How are your runtime platforms (virtual machines, containers, Kubernetes, serverless) operated?",
+          "options": {
+            "manual": "Configured by hand",
+            "partial": "Partly automated; upgrades happen when needed",
+            "managed": "Managed services, automated upgrades and baselines",
+            "platform": "An internal platform with templates, policies and self-service"
+          }
+        },
+        "platform_patching": {
+          "text": "How are images and runtimes patched?",
+          "options": {
+            "manual": "By hand, when there is time",
+            "scheduled": "By hand, on a schedule",
+            "automated": "Automatically, in maintenance windows",
+            "immutable": "Immutable images rebuilt and rolled out automatically"
+          }
+        },
+        "cicd_deploy": {
+          "text": "How do changes reach production?",
+          "options": {
+            "manual": "Manual copying or commands",
+            "scripted": "With scripts run by hand",
+            "pipeline": "Through a pipeline with approval",
+            "progressive": "Through a pipeline with automated tests, approval and progressive rollout"
+          }
+        },
+        "cicd_governance": {
+          "text": "Who can deploy to production and how is it recorded?",
+          "options": {
+            "anyone": "Many people, not recorded",
+            "restricted": "A restricted group, partly recorded",
+            "approved": "Approved changes and an audit trail",
+            "policy": "Enforced approvals, separation of duties and a full audit trail"
+          }
+        },
+        "obs_coverage": {
+          "text": "What monitoring do you have?",
+          "options": {
+            "none": "Little or no central monitoring",
+            "basic": "Basic infrastructure metrics",
+            "central": "Central logs, metrics and alerts",
+            "slo": "Logs, metrics, traces and SLO-based alerts"
+          }
+        },
+        "obs_incident": {
+          "text": "How are incidents handled?",
+          "options": {
+            "ad_hoc": "Improvised",
+            "contacts": "There are named people, no runbooks",
+            "runbooks": "On-call and runbooks",
+            "practiced": "On-call, runbooks, post-incident reviews and drills"
+          }
+        },
+        "bk_backups": {
+          "text": "How are backups made?",
+          "options": {
+            "none": "No regular backups",
+            "some": "For some systems",
+            "all": "Automatically for all critical data",
+            "tested": "Automatic, isolated or immutable, with regular restore tests"
+          }
+        },
+        "bk_dr": {
+          "text": "Do you have a disaster recovery plan?",
+          "options": {
+            "none": "No",
+            "documented": "Documented, never tested",
+            "tested": "Tested occasionally, with defined RTO and RPO",
+            "automated": "Tested regularly, largely automated, multi-zone or multi-region by design"
+          }
+        },
+        "sec_posture": {
+          "text": "How do you track your security posture?",
+          "options": {
+            "unknown": "We do not track it",
+            "periodic": "Periodic manual reviews",
+            "tooling": "Posture management tooling, findings are tracked",
+            "continuous": "Continuous monitoring with automated remediation"
+          }
+        },
+        "sec_policy_code": {
+          "text": "Are security policies enforced automatically?",
+          "options": {
+            "none": "No",
+            "manual": "Checked by hand in reviews",
+            "some": "Policy as code for some controls",
+            "broad": "Policy as code in pipelines and at runtime, with recorded exceptions"
+          }
+        },
+        "fin_visibility": {
+          "text": "What visibility do you have of cloud costs?",
+          "options": {
+            "bill_only": "Only the total bill",
+            "partial": "Some tagging and breakdown",
+            "allocated": "Costs allocated to teams or products",
+            "unit": "Allocated, with budgets, alerts and unit costs"
+          }
+        },
+        "fin_capacity": {
+          "text": "How are capacity and optimisation managed?",
+          "options": {
+            "none": "Rarely reviewed",
+            "reactive": "When the bill spikes",
+            "regular": "Regular rightsizing and review of commitments",
+            "automated": "Automated scaling, scheduling and continuous optimisation"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_shared_account": {
+          "title": "Everything in one shared account",
+          "description": "Production, tests and experiments share boundaries, permissions and limits. One mistake or breach affects everything."
+        },
+        "risk_identity": {
+          "title": "Unmanaged identities and broad privileges",
+          "description": "Local users, shared passwords or broad administrator rights are the most common path to a cloud breach."
+        },
+        "risk_flat_network": {
+          "title": "Flat network",
+          "description": "Without segmentation, one compromised resource can reach everything else."
+        },
+        "risk_manual_infra": {
+          "title": "Manual infrastructure",
+          "description": "Environments cannot be reproduced, changes are not reviewed and drift goes unnoticed."
+        },
+        "risk_uncontrolled_deploys": {
+          "title": "Uncontrolled deployments",
+          "description": "Without a pipeline and an audit trail it is hard to know what changed, who changed it and how to roll it back."
+        },
+        "risk_blind_operations": {
+          "title": "Operating blind",
+          "description": "Problems are found by customers, not by monitoring."
+        },
+        "risk_no_recovery": {
+          "title": "No reliable path to recovery",
+          "description": "Without regular backups or a recovery plan, losing data or a region may be irreversible."
+        },
+        "risk_unknown_posture": {
+          "title": "Unknown security posture",
+          "description": "Publicly exposed resources and misconfigurations go unnoticed until someone exploits them."
+        },
+        "qw_sso_mfa": {
+          "title": "SSO and MFA for all console access",
+          "description": "Connect the consoles to your identity provider, enforce MFA and close local users."
+        },
+        "qw_restore_test": {
+          "title": "A restore test of one critical system",
+          "description": "Restore one critical database into a separate environment and record how long it took."
+        },
+        "qw_tagging_budgets": {
+          "title": "Tags, budgets and cost alerts",
+          "description": "Make a few tags mandatory (team, environment, product) and set budgets with alerts."
+        },
+        "qw_key_alerts": {
+          "title": "Alerts for the few signals that matter",
+          "description": "Start with availability, errors and latency of the main services, each with a clear recipient."
+        },
+        "qw_iac_pipeline": {
+          "title": "Apply infrastructure through a pipeline",
+          "description": "Move plan and apply into a reviewed pipeline so every change is recorded."
+        },
+        "qw_posture_baseline": {
+          "title": "Your provider's built-in posture checks",
+          "description": "Turn on your provider's native posture tool and review the most severe findings."
+        },
+        "rec_landing_zone": {
+          "title": "A landing zone with a clear structure",
+          "description": "Separate production and non-production, introduce a process for new accounts and shared guardrails."
+        },
+        "rec_identity": {
+          "title": "Central identity and least privilege",
+          "description": "Task-based roles, regular access reviews and time-limited elevation instead of permanent administrators."
+        },
+        "rec_network": {
+          "title": "A segmented network with a standard topology",
+          "description": "Segments per environment and workload, central egress control and a topology defined as code."
+        },
+        "rec_iac": {
+          "title": "Infrastructure as Code for the core components",
+          "description": "Modules for network, identity and compute, applied through a reviewed pipeline."
+        },
+        "rec_platform": {
+          "title": "Managed platforms and automated patching",
+          "description": "Prefer managed services, baseline configurations and automated image updates."
+        },
+        "rec_cicd": {
+          "title": "A pipeline with approvals and an audit trail",
+          "description": "Every deployment through a pipeline, with approval for production and a record of who released what."
+        },
+        "rec_observability": {
+          "title": "Central observability and on-call",
+          "description": "Central logs and metrics, alerts routed to an on-call person and runbooks for the most common incidents."
+        },
+        "rec_resilience": {
+          "title": "Defined RTO/RPO and tested recovery",
+          "description": "Define how much data and time you can lose, back up outside the main account and test it."
+        },
+        "rec_security": {
+          "title": "Posture visibility and first policies as code",
+          "description": "Continuous posture checks and a few enforced policies (encryption, public access, region)."
+        },
+        "rec_finops": {
+          "title": "Cost allocation and regular optimisation",
+          "description": "Costs per team and product, a monthly review and rightsizing of the largest items."
+        },
+        "ts_platform": {
+          "title": "An internal platform with golden paths",
+          "description": "Templates for new services with network, identity, observability and pipeline built in, available as self-service."
+        },
+        "ts_policy_as_code": {
+          "title": "Policy as code from pipeline to runtime",
+          "description": "The same rules are checked at change time and continuously; exceptions are recorded and expire."
+        },
+        "ts_slo": {
+          "title": "SLOs for the key services",
+          "description": "Reliability targets agreed with the business and alerts on error-budget burn."
+        },
+        "ts_dr_automation": {
+          "title": "Automated, regularly tested recovery",
+          "description": "Recovery defined as code and tested on a schedule, with measured RTO and RPO."
+        },
+        "ts_unit_economics": {
+          "title": "Unit costs and automated optimisation",
+          "description": "Cost per order, customer or request, with automated schedules and scaling."
+        },
+        "ctx_multi_cloud": {
+          "title": "Several clouds are not equivalent",
+          "description": "AWS accounts, Azure subscriptions and GCP projects have different boundaries, permission models and networking. Apply the recommendations per provider, not through one common abstraction."
+        },
+        "ctx_aws": {
+          "title": "AWS: terms",
+          "description": "In AWS the structure is AWS Organizations with accounts and SCPs; sign-in usually goes through IAM Identity Center."
+        },
+        "ctx_azure": {
+          "title": "Azure: terms",
+          "description": "In Azure the structure is management groups and subscriptions with Azure Policy; identity lives in Microsoft Entra ID."
+        },
+        "ctx_gcp": {
+          "title": "Google Cloud: terms",
+          "description": "In Google Cloud the structure is an organisation, folders and projects with Organization Policy; permissions are IAM bindings on resources."
+        },
+        "ctx_hybrid_private": {
+          "title": "Hybrid and private environments",
+          "description": "In own data centres and private clouds many managed services are missing: backups, patching and networking need your own processes and people."
+        }
+      }
+    }
+  }
+}

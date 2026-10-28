@@ -8,9 +8,11 @@ once at save time. Every request is rate limited per client and globally.
 from __future__ import annotations
 
 import logging
+import secrets
 from typing import Literal
 
-from fastapi import APIRouter, Depends, Query, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, Response, status
+from fastapi.responses import JSONResponse
 
 from app.assessments import service
 from app.assessments.answers import ERROR_MESSAGES
@@ -19,14 +21,25 @@ from app.assessments.api_schemas import (
     AssessmentListOut,
     AssessmentResultOut,
     AssessmentScoreRequest,
+    ConsultationOut,
+    ResultConsultationRequest,
+    ResultReportRequest,
     ResultTokenRequest,
 )
 from app.assessments.definition import AssessmentDefinition
 from app.assessments.presenter import present_result, public_definition, public_summary
 from app.assessments.registry import registry
+from app.assessments.report import FILE_NAMES, build_document
 from app.config import get_settings
 from app.deps import AppSettings, DbSession, client_ip, enforce_rate_limit
 from app.errors import ApiError
+from app.notifications import notify_new_lead
+from app.readiness.report import ReportUnavailable
+from app.reports.document import ReportTooLarge
+from app.reports.pdf import render_pdf
+from app.routers.public import contact_rate_limit
+from app.security import hash_ip
+from app.spam import check_form_token, looks_like_link_spam
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/public/assessments", tags=["assessments"])
@@ -43,6 +56,24 @@ _OUTDATED = {
     "en": "The questions have been updated. Please reload the page and answer again.",
 }
 _INVALID = {"bg": "Някои отговори са невалидни или липсват.", "en": "Some answers are invalid or missing."}
+_REPORT_FAILED = {"bg": "Отчетът временно не може да бъде създаден.", "en": "The report cannot be created right now."}
+_REPORT_TOO_LARGE = {"bg": "Докладът е твърде голям.", "en": "The report is too large."}
+_CONSULTATION_EXISTS = {
+    "bg": "За този резултат вече е изпратено запитване.",
+    "en": "A consultation request has already been sent for this result.",
+}
+_CONSULTATION_SENT = {
+    "bg": "Благодарим! Получихме запитването ви и ще се свържем с вас.",
+    "en": "Thank you! We received your request and will get in touch.",
+}
+_TOKEN_ERROR = {
+    "bg": "Формулярът е изпратен твърде бързо или е изтекъл. Моля, презаредете страницата и опитайте отново.",
+    "en": "The form was sent too quickly or has expired. Please reload the page and try again.",
+}
+_SPAM = {
+    "bg": "Съобщението съдържа твърде много връзки. Моля, опишете проекта си с думи.",
+    "en": "The message contains too many links. Please describe your project in words.",
+}
 
 
 def _limit(kind: str, setting: str):
@@ -113,7 +144,7 @@ def score_assessment(
             ],
         ) from exc
 
-    body = present_result(definition, result, locale)
+    body = present_result(definition, result, locale, answers)
     if payload.save:
         enforce_rate_limit(
             f"assessment-save:{client_ip(request)}",
@@ -151,10 +182,10 @@ def lookup_result(
     if row is None:
         raise ApiError(status.HTTP_404_NOT_FOUND, _RESULT_NOT_FOUND[locale], "assessment_result_not_found")
     try:
-        definition, result = service.rescore_saved(row)
+        definition, answers, result = service.rescore_saved(row)
     except LookupError as exc:
         raise ApiError(status.HTTP_404_NOT_FOUND, _RESULT_NOT_FOUND[locale], "assessment_result_not_found") from exc
-    body = present_result(definition, result, locale)
+    body = present_result(definition, result, locale, answers)
     body["saved"] = {"reference": row.reference, "token": None, "expires_at": row.expires_at}
     return AssessmentResultOut.model_validate(body)
 
@@ -170,3 +201,105 @@ def delete_result(payload: ResultTokenRequest, db: DbSession) -> Response:
     deleted = service.delete_result(db, payload.token)
     logger.info("assessment_result_deleted", extra={"deleted": deleted})
     return Response(status_code=status.HTTP_204_NO_CONTENT, headers={"Cache-Control": "no-store"})
+
+
+def _saved(db: DbSession, token: str, locale: str):
+    row = service.find_result(db, token)
+    if row is None:
+        raise ApiError(status.HTTP_404_NOT_FOUND, _RESULT_NOT_FOUND[locale], "assessment_result_not_found")
+    try:
+        definition, answers, result = service.rescore_saved(row)
+    except LookupError as exc:
+        raise ApiError(status.HTTP_404_NOT_FOUND, _RESULT_NOT_FOUND[locale], "assessment_result_not_found") from exc
+    return row, definition, answers, result
+
+
+@router.post(
+    "/results/report",
+    response_model=None,
+    dependencies=[_limit("report", "assessment_report_rate_limit")],
+    summary="Report of a saved result: PDF, or the same document as JSON for the HTML view",
+)
+def result_report(
+    payload: ResultReportRequest, db: DbSession, locale: Locale = Query(default="bg")
+) -> Response:
+    """Only the result the token opens is ever rendered (the token is the access right). Expired,
+    unknown and tampered results are 404. The file name carries no reference, token or name."""
+    row, definition, answers, result = _saved(db, payload.token, locale)
+    view = present_result(definition, result, locale, answers)
+    document = build_document(
+        view, locale=locale, created_at=row.created_at, expires_at=row.expires_at, reference=row.reference
+    )
+    headers = {"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"}
+    if payload.format == "json":
+        return JSONResponse(document.to_dict(), headers=headers)
+    try:
+        pdf = render_pdf(document)
+    except ReportTooLarge as exc:
+        logger.warning("assessment_report_too_large", extra={"assessment": definition.key, "reason": str(exc)})
+        raise ApiError(status.HTTP_413_CONTENT_TOO_LARGE, _REPORT_TOO_LARGE[locale], "report_too_large") from exc
+    except ReportUnavailable as exc:
+        logger.error("assessment_report_unavailable", extra={"assessment": definition.key})
+        raise ApiError(status.HTTP_503_SERVICE_UNAVAILABLE, _REPORT_FAILED[locale], "report_unavailable") from exc
+    logger.info(
+        "assessment_report_generated",
+        extra={"assessment": definition.key, "version": definition.version, "bytes": len(pdf), "locale": locale},
+    )
+    headers["Content-Disposition"] = f'attachment; filename="{FILE_NAMES[locale]}"'
+    return Response(pdf, media_type="application/pdf", headers=headers)
+
+
+@router.post(
+    "/results/consultation",
+    status_code=status.HTTP_201_CREATED,
+    response_model=ConsultationOut,
+    dependencies=[Depends(contact_rate_limit)],
+    summary="Optional consultation about a saved result (creates a lead; marketing consent is separate)",
+)
+def result_consultation(
+    payload: ResultConsultationRequest,
+    request: Request,
+    background: BackgroundTasks,
+    db: DbSession,
+    settings: AppSettings,
+) -> ConsultationOut:
+    locale = payload.locale.value
+    ip_hash = hash_ip(client_ip(request), settings.secret_key)
+    if payload.website:
+        # Honeypot filled: pretend success, store nothing.
+        logger.warning("assessment_spam_rejected", extra={"reason": "honeypot", "ip_hash": ip_hash})
+        return ConsultationOut(reference=secrets.token_hex(4).upper(), message=_CONSULTATION_SENT[locale])
+    problem = check_form_token(
+        payload.form_token, settings.secret_key, settings.form_token_min_seconds, settings.form_token_max_age_seconds
+    )
+    if problem:
+        logger.info("assessment_form_token_rejected", extra={"reason": problem})
+        raise ApiError(status.HTTP_400_BAD_REQUEST, _TOKEN_ERROR[locale], "form_token_invalid")
+    if looks_like_link_spam(payload.message):
+        raise ApiError(status.HTTP_400_BAD_REQUEST, _SPAM[locale], "spam_suspected")
+    row, definition, _answers, result = _saved(db, payload.token, locale)
+    if row.lead_id is not None:
+        raise ApiError(status.HTTP_409_CONFLICT, _CONSULTATION_EXISTS[locale], "assessment_consultation_exists")
+    lead = service.create_consultation(
+        db,
+        row,
+        definition,
+        result,
+        name=payload.name,
+        email=payload.email,
+        company=payload.company,
+        message=payload.message,
+        locale=locale,
+        marketing_consent=payload.marketing_consent,
+        privacy_notice_version=settings.privacy_notice_version,
+        marketing_consent_version=settings.marketing_consent_version,
+        ip_hash=ip_hash,
+    )
+    logger.info(
+        "assessment_consultation_created",
+        extra={"lead": lead.reference, "assessment": definition.key, "band": result.band, "locale": locale},
+    )
+    background.add_task(
+        notify_new_lead, settings, str(lead.id), lead.reference, lead.service, lead.inquiry_type, lead.locale
+    )
+    return ConsultationOut(reference=lead.reference, message=_CONSULTATION_SENT[locale])

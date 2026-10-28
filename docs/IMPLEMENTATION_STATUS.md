@@ -16,6 +16,36 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/advisor-v2-assessments` (from `feature/contact-config` @ `69947ad`, which is `main` @
+`8877d10` plus the contact configuration; not merged, 2026-10-28):
+
+* **AI Advisor V2** ([AI_ADVISOR_V2.md](AI_ADVISOR_V2.md)):
+  * a versioned contract: `contract_version` "1" is the default and is unchanged key by key;
+  * an enumerated V2 context and deterministic, provider-neutral insights with provenance:
+    classification, feasibility, risk, up to four service domains, approval checkpoints,
+    prerequisites, a pilot and an optional 30/60/90 roadmap;
+  * the V1 prompt is byte-for-byte unchanged.
+* **Reports** ([REPORTS.md](REPORTS.md)): a reusable typed report document, a PDF renderer (DejaVu,
+  Cyrillic) and an accessible HTML view rendering the same JSON. Access is only by the saved
+  result's secret token, which also expires. File names are generic, logs never carry the token,
+  and the size and text limits are enforced. An optional consultation creates a lead linked to the
+  saved result, with a separate, unticked marketing consent.
+* **Cloud & Platform Maturity** (`cloud_platform` 1.0.0) and **DevOps Delivery Maturity**
+  (`devops_delivery` 1.1.0) are live ([ENGINEERING_ASSESSMENTS.md](ENGINEERING_ASSESSMENTS.md)):
+  * engine additions: unscored metric and context questions, finding kinds, a 30/60/90 horizon,
+    service domains, explanations of the trigger for every finding, and a maturity level per area;
+  * a web wizard, a result view, the report and PDF, and an optional consultation;
+  * DevOps metrics are never scored and are labelled measured, estimate, unspecified or none.
+
+Migration **`0012`**: `advisor_assessments.contract_version` / `insights`, `assessment_results.lead_id`
+/ `linked_at` (additive). It was not applied to any production database.
+
+| Check | Result |
+| --- | --- |
+| `.\scripts	est.ps1 -Suite api` | **544 passed** (59 new: `test_advisor_v2.py`, `test_assessments_v2.py`; the existing V1 advisor and engine tests are unchanged), Ruff clean, docs, README links and OpenAPI in sync, vector copies identical |
+| Web typecheck, lint, unit tests (`web-tests` container) | passed; **603** unit tests, 43 files (17 new: `advisor-v2.test.tsx`, `engine.test.tsx`; registry tests updated for the two live tools) |
+| e2e (production build, no-host-ports override, staff accounts, revalidation secret) | **131 passed** (6 new in `engineering-assessments.spec.ts`, 1 new in `mobile.spec.ts`; `ia.spec` and `tools-hub.spec` updated: 2 more live tools, 6 planned) |
+
 Branch `feature/tools-depth` (from `main` @ `f75b58d`, not merged, 2026-10-28): deeper
 "Build your AI team", ROI calculator and Opportunity Finder (TOOLS_PLATFORM.md, TEAM_CONFIGURATOR.md,
 ROI_AND_FINDER.md).

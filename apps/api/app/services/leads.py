@@ -330,6 +330,7 @@ class RetentionResult:
 
 READINESS_SOURCE = "readiness_assessment"
 TEAM_SOURCE = "team_configurator"
+ASSESSMENT_SOURCE = "engineering_assessment"
 
 
 def _expired_leads(

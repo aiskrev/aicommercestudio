@@ -14,7 +14,9 @@ export type FeatureFlag =
   | "tool_roi"
   | "tool_finder"
   | "tool_solution"
-  | "tool_agents";
+  | "tool_agents"
+  | "tool_cloud"
+  | "tool_devops";
 
 export const FLAG_DEFAULTS: Record<FeatureFlag, boolean> = {
   tool_advisor: true,
@@ -24,6 +26,8 @@ export const FLAG_DEFAULTS: Record<FeatureFlag, boolean> = {
   tool_finder: true,
   tool_solution: true,
   tool_agents: true,
+  tool_cloud: true,
+  tool_devops: true,
 };
 
 /** Parses `name=on|off` pairs; unknown names and malformed parts are ignored. */

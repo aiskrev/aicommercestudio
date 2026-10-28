@@ -15,6 +15,22 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 LOCALES: tuple[str, ...] = ("bg", "en")
+# The ten service domains of the published catalogue (apps/web/src/lib/domains.ts). Findings may link
+# to them; the web turns a key into a link to the domain hub.
+SERVICE_DOMAINS: tuple[str, ...] = (
+    "ai_strategy",
+    "ai_agents_automation",
+    "ai_applications",
+    "commerce_engineering",
+    "cloud_platform",
+    "devops_sre",
+    "data_integration",
+    "ai_governance",
+    "managed_operations",
+    "advisory_enablement",
+)
+FindingKind = Literal["recommendation", "risk", "quick_win", "target_state", "pattern", "context"]
+Evidence = Literal["practice", "metric", "context"]
 KEY = Annotated[str, Field(pattern=r"^[a-z][a-z0-9_]{0,47}$")]
 VERSION_PATTERN = r"^\d+\.\d+\.\d+$"
 _CYRILLIC = re.compile(r"[Ѐ-ӿ]")
@@ -39,6 +55,14 @@ class _QuestionBase(Frozen):
     # Relative weight inside its dimension.
     weight: int = Field(default=1, ge=1, le=10)
     required: bool = True
+    # `practice`: a self-reported practice that is scored. `metric`: a measurement the visitor may
+    # provide (never scored, shown as provided and unverified). `context`: describes the environment
+    # (e.g. which clouds) and steers findings, never the score. Only practices are scored.
+    evidence: Evidence = "practice"
+
+    @property
+    def scored(self) -> bool:
+        return self.evidence == "practice"
 
 
 class SingleChoiceQuestion(_QuestionBase):
@@ -164,12 +188,20 @@ MAX_CONDITION_DEPTH = 3
 
 
 class Rule(Frozen):
-    """When `when` holds, recommend `recommendation`. Lower `priority` comes first."""
+    """When `when` holds, recommend `recommendation`. Lower `priority` comes first.
+
+    `kind` groups findings in the result (only `recommendation` counts toward
+    `scoring.max_recommendations`); `horizon` places it on the 30/60/90-day roadmap; `domains` link it
+    to service domains. All three are optional, so older definitions keep their exact results.
+    """
 
     key: KEY
     priority: int = Field(ge=1, le=100)
     when: Condition
     recommendation: KEY
+    kind: FindingKind = "recommendation"
+    horizon: Literal[30, 60, 90] | None = None
+    domains: tuple[KEY, ...] = Field(default=(), max_length=3)
 
 
 # --------------------------------------------------------------------------- structure
@@ -258,6 +290,10 @@ class AssessmentDefinition(Frozen):
     def recommendation_keys(self) -> set[str]:
         return {r.recommendation for r in self.rules}
 
+    def rules_for(self, recommendation: str) -> list[Rule]:
+        """The rules that recommend `recommendation`, in evaluation order."""
+        return sorted((r for r in self.rules if r.recommendation == recommendation), key=lambda r: (r.priority, r.key))
+
     # ----------------------------------------------------------------- validation
 
     @model_validator(mode="after")
@@ -277,7 +313,7 @@ class AssessmentDefinition(Frozen):
         for d in dimensions:
             if not any(q.dimension == d for q in self.questions):
                 problems.append(f"dimension {d} has no question")
-            if not any(q.dimension == d and q.required for q in self.questions):
+            if not any(q.dimension == d and q.required and q.scored for q in self.questions):
                 problems.append(f"dimension {d} needs at least one required question")
 
         minimums = [b.min for b in self.bands]
@@ -287,6 +323,11 @@ class AssessmentDefinition(Frozen):
         bands = {b.key for b in self.bands}
         for rule in self.rules:
             problems += [f"rule {rule.key}: {p}" for p in _check_condition(rule.when, dimensions, questions, bands, 1)]
+            if not set(rule.domains) <= set(SERVICE_DOMAINS):
+                problems.append(f"rule {rule.key}: unknown service domain")
+        for recommendation in self.recommendation_keys:
+            if len({r.kind for r in self.rules if r.recommendation == recommendation}) > 1:
+                problems.append(f"recommendation {recommendation} is used with more than one kind")
 
         for locale in LOCALES:
             texts = self.texts.get(locale)
@@ -310,6 +351,15 @@ def _unique(kind: str, keys: list[str]) -> list[str]:
 
 def _check_question(q: Question) -> list[str]:
     problems: list[str] = []
+    if not q.scored:
+        # Metrics and context are never scored, so they carry no points.
+        if isinstance(q, SingleChoiceQuestion | MultiChoiceQuestion):
+            problems += _unique(f"option in {q.key}", [o.key for o in q.options])
+            if any(o.points for o in q.options):
+                problems.append(f"question {q.key}: an unscored question cannot have points")
+        if isinstance(q, NumberQuestion) and q.max <= q.min:
+            problems.append(f"question {q.key}: max must exceed min")
+        return problems
     if isinstance(q, SingleChoiceQuestion | MultiChoiceQuestion):
         problems += _unique(f"option in {q.key}", [o.key for o in q.options])
         if max(o.points for o in q.options) == 0:

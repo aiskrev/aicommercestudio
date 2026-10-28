@@ -1,10 +1,12 @@
 import type { ReactNode, Ref } from "react";
 
+import { AdvisorInsights } from "@/components/advisor/AdvisorInsights";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Alert, Badge, CheckList, cx } from "@/components/ui/primitives";
 import type { AdvisorContent } from "@/content/bg/advisor";
 import type { Locale } from "@/i18n/config";
 import type { AdvisorResponse, Level } from "@/lib/advisor";
+import type { DomainKey } from "@/lib/domains";
 import { formatDate } from "@/lib/format";
 
 const levelTone: Record<Level, string> = {
@@ -36,11 +38,13 @@ export function AdvisorResult({
   content,
   headingRef,
   locale = "bg",
+  domainLinks,
 }: {
   result: AdvisorResponse;
   content: AdvisorContent;
   headingRef?: Ref<HTMLHeadingElement>;
   locale?: Locale;
+  domainLinks?: Partial<Record<DomainKey, { href: string; label: string }>>;
 }) {
   const { assessment: a } = result;
   const t = content.result;
@@ -219,6 +223,8 @@ export function AdvisorResult({
           </ol>
         </Block>
       </div>
+
+      {result.insights && <AdvisorInsights insights={result.insights} content={content.v2.insights} domainLinks={domainLinks} />}
     </div>
   );
 }

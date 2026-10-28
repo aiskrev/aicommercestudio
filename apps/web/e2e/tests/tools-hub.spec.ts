@@ -46,8 +46,9 @@ for (const l of [
     await page.keyboard.press("Enter");
     await expect(engineering).toHaveAttribute("aria-pressed", "true");
     await expect(directory.locator("article")).toHaveCount(5);
-    await expect(directory.locator("article[data-status='live']")).toHaveCount(0);
-    for (const card of await directory.locator("article").all()) {
+    // Cloud & platform and DevOps delivery are live; the other three are still "Coming soon".
+    await expect(directory.locator("article[data-status='live']")).toHaveCount(2);
+    for (const card of await directory.locator("article[data-status='planned']").all()) {
       await expect(card).toContainText(l.planned);
       await expect(card.locator("button")).toHaveCount(0);
     }

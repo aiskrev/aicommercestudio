@@ -37,6 +37,8 @@ for (const [locale, path, heading] of [
             "/bg/instrumenti/avtomatizatsii",
             "/bg/instrumenti/ai-reshenie",
             "/bg/ai-agenti",
+            "/bg/instrumenti/zrelost-na-oblak-i-platforma",
+            "/bg/instrumenti/zrelost-na-devops-dostavkata",
           ]
         : [
             "/en/ai-automation-advisor",
@@ -46,11 +48,13 @@ for (const [locale, path, heading] of [
             "/en/tools/automation-finder",
             "/en/tools/solution-builder",
             "/en/ai-agents",
+            "/en/tools/cloud-platform-maturity",
+            "/en/tools/devops-delivery-maturity",
           ],
     );
-    // The eight planned assessments are listed as "Coming soon" and link only to their intro page.
+    // The six planned assessments are listed as "Coming soon" and link only to their intro page.
     const planned = all.locator("article[data-status='planned']");
-    await expect(planned).toHaveCount(8);
+    await expect(planned).toHaveCount(6);
     for (const href of await planned.locator("a").evaluateAll((els) => els.map((el) => el.getAttribute("href")))) {
       expect(href).toMatch(locale === "bg" ? /^\/bg\/instrumenti\/[a-z-]+$/ : /^\/en\/tools\/[a-z-]+$/);
       expect(links).not.toContain(href);

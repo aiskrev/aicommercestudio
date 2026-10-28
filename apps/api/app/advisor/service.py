@@ -16,7 +16,8 @@ from pydantic import ValidationError
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
-from app.advisor.prompt import PROMPT_VERSION, AdvisorPromptInput
+from app.advisor.insights import AdvisorInsights, AdvisorResponseV2, build_insights
+from app.advisor.prompt import PROMPT_VERSION, PROMPT_VERSION_V2, AdvisorPromptInput
 from app.advisor.safety import sanitize_assessment, screen_text
 from app.advisor.schemas import (
     AdvisorAssessmentSummary,
@@ -113,7 +114,7 @@ def disclaimer_for(mode: AdvisorMode, locale: str = "bg") -> str:
 
 def create_assessment(
     db: Session, settings: Settings, provider: AIProvider, request: AdvisorRequest
-) -> AdvisorResponse:
+) -> AdvisorResponse | AdvisorResponseV2:
     started = time.perf_counter()
     locale = request.locale
     description = screen_text(request.process_description, locale)
@@ -128,7 +129,9 @@ def create_assessment(
         other_tools=other_tools.text if other_tools else "",
         injection_suspected=injection,
         locale=locale,
+        context=request.context,
     )
+    v2 = request.contract_version == "2"
     mode = mode_for(provider)
     log_meta = {
         "mode": mode.value,
@@ -140,6 +143,7 @@ def create_assessment(
         "description_chars": len(request.process_description),
         "injection_suspected": injection,
         "locale": locale,
+        "contract_version": request.contract_version,
     }
 
     try:
@@ -168,6 +172,11 @@ def create_assessment(
     }
     notices = [message(locale, key) for key, raised in flags.items() if raised]
 
+    # V2: deterministic insights from the enumerated context and the validated, sanitised assessment.
+    insights: AdvisorInsights | None = None
+    if v2:
+        insights = build_insights(request, assessment, locale, include_roadmap=request.include_roadmap)
+
     now = utcnow()
     row: AdvisorAssessment | None = None
     if request.save_assessment:
@@ -184,8 +193,10 @@ def create_assessment(
             mode=mode.value,
             provider=draft.provider,
             model=draft.model[:64],
-            prompt_version=PROMPT_VERSION,
+            prompt_version=PROMPT_VERSION_V2 if v2 else PROMPT_VERSION,
             injection_suspected=injection,
+            contract_version=request.contract_version,
+            insights=insights.model_dump(mode="json") if insights else None,
         )
         db.add(row)
         db.commit()
@@ -202,19 +213,22 @@ def create_assessment(
             "duration_ms": _ms(started),
         },
     )
-    return AdvisorResponse(
-        assessment_id=row.id if row else None,
-        reference=row.reference if row else None,
-        mode=mode.value,
-        provider=draft.provider,
-        model=draft.model,
-        disclaimer=disclaimer_for(mode, locale),
-        notices=notices,
-        stored=row is not None,
-        expires_at=row.expires_at if row else None,
-        created_at=now,
-        assessment=assessment,
-    )
+    fields = {
+        "assessment_id": row.id if row else None,
+        "reference": row.reference if row else None,
+        "mode": mode.value,
+        "provider": draft.provider,
+        "model": draft.model,
+        "disclaimer": disclaimer_for(mode, locale),
+        "notices": notices,
+        "stored": row is not None,
+        "expires_at": row.expires_at if row else None,
+        "created_at": now,
+        "assessment": assessment,
+    }
+    if insights is not None:
+        return AdvisorResponseV2(**fields, insights=insights)
+    return AdvisorResponse(**fields)
 
 
 def link_to_lead(db: Session, assessment_id: uuid.UUID, lead_id: uuid.UUID) -> bool:
@@ -243,6 +257,8 @@ def summary_for_lead(db: Session, lead_id: uuid.UUID) -> AdvisorAssessmentSummar
         team_size=row.team_size,
         tools=row.tools,
         assessment=AutomationAssessment.model_validate(row.result),
+        contract_version=row.contract_version,
+        insights=row.insights,
     )
 
 
