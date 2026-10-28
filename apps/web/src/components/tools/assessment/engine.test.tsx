@@ -244,7 +244,7 @@ describe("engine assessment wizard", () => {
       answers: { vc_review: "never", fb_postmortems: "reviews", dora_deploy_frequency: 12 },
       save: false,
     });
-    expect(screen.getByRole("heading", { level: 2, name: "Your result" })).toHaveFocus();
+    await waitFor(() => expect(screen.getByRole("heading", { level: 2, name: "Your result" })).toHaveFocus());
     const risks = screen.getByTestId("engine-findings-risk");
     expect(within(risks).getByText("Changes without review")).toBeInTheDocument();
     expect(within(risks).getByText("“Are changes reviewed before merging?”: No")).toBeInTheDocument();
