@@ -125,7 +125,8 @@ Append-only activity log. `details` must never contain raw personal data.
 | `ops.workspace_created`, `ops.agent_created`, `ops.agent_updated` | AI operations registry writes (`details.organization_id`; agent updates list changed field names) |
 | `catalogue.seeded`, `catalogue.purged` | service catalogue seed with changes (`created` / `updated` / `published` counts per type, `mode`, `schema_version`) or purge (`entities`); actor `cli` |
 | `catalogue.entity_created`, `catalogue.entity_updated`, `catalogue.entity_published`, `catalogue.entity_archived`, `catalogue.entity_restored` | admin catalogue writes; `entity_type` `catalogue.domain` / `catalogue.service`, `details` = `key`, `revision`, changed areas (`fields`), never texts |
-| `admin.role_changed` | CLI `set-role` (`from`, `to`) |
+| `admin.role_changed` | role change from the admin staff page (actor = the administrator) or CLI `set-role` (actor `cli`); `from`, `to` |
+| `catalogue.entity_deleted` | a never-published draft was deleted (`key`, `revision`) |
 | `ops.member_added`, `ops.member_role_changed`, `ops.member_removed` | organisation membership changes (`user_id`, roles) |
 
 ## ai_action_requests
@@ -311,8 +312,17 @@ and left as they are. It has two modes:
 
 A repeated run changes nothing. `--dry-run` rolls back.
 
-**Staff roles.** `python -m app.cli set-role --email <e-mail> --role admin|editor|viewer` changes a
-role, revokes that person's sessions and is audited (`admin.role_changed`).
+**Staff roles.** Administrators change roles on the admin page "Staff and roles"
+(`/api/admin/staff`), or with `python -m app.cli set-role --email <e-mail> --role admin|editor|viewer`.
+A change revokes that person's sessions and is audited (`admin.role_changed`). Nobody can change
+their own role, and the last active administrator cannot be demoted. Accounts are still created
+with the CLI.
+
+**Families and drafts.** A domain's families are edited as part of the domain's working copy. A
+family left out of the list is archived (`status = archived`, position moved behind the live ones)
+and comes back if its key is added again; it is never deleted. A service, assessment or workshop
+that was never published and that nothing links to can be deleted by an admin. Everything else is
+archived instead.
 
 * `viewer` reads the catalogue.
 * `editor` also creates entries and saves drafts.

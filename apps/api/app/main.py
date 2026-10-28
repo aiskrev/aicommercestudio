@@ -16,11 +16,23 @@ from app.errors import error_body
 from app.i18n import Locale, error_message, request_locale, validation_message
 from app.logging_config import configure_logging
 from app.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
-from app.routers import admin, admin_auth, admin_catalogue, advisor, catalogue, health, ops, public, readiness, team
+from app.routers import (
+    admin,
+    admin_auth,
+    admin_catalogue,
+    admin_staff,
+    advisor,
+    catalogue,
+    health,
+    ops,
+    public,
+    readiness,
+    team,
+)
 
 logger = logging.getLogger(__name__)
 
-CATALOGUE_EDITOR_FIELDS = frozenset({"translations", "capabilities", "deliverables", "service"})
+CATALOGUE_EDITOR_FIELDS = frozenset({"translations", "capabilities", "deliverables", "service", "families"})
 
 
 def _error_field(loc: tuple[Any, ...]) -> str | None:
@@ -114,6 +126,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_auth.router)
     app.include_router(admin.router)
     app.include_router(admin_catalogue.router)
+    app.include_router(admin_staff.router)
     app.include_router(ops.router)
     return app
 

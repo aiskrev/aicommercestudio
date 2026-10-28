@@ -260,6 +260,29 @@ class ServiceFieldsEdit(EditModel):
         return self
 
 
+class FamilyTextEdit(EditModel):
+    name: Annotated[str, StringConstraints(min_length=1, max_length=160)]
+    summary: Annotated[str, StringConstraints(max_length=300)] | None = None
+    prerequisite: Annotated[str, StringConstraints(max_length=400)] | None = None
+
+    @field_validator("name", "summary", "prerequisite")
+    @classmethod
+    def _plain(cls, value: str | None) -> str | None:
+        return _plain(value)
+
+
+class FamilyEdit(EditModel):
+    """A service family of a domain. `key` is the part after "<domain>." and cannot be renamed:
+    a new key creates a new family; a family left out of the list is archived, not deleted."""
+
+    key: Annotated[str, StringConstraints(pattern=r"^[a-z][a-z0-9_]{0,40}$")]
+    delivery_status: Delivery
+    services: list[CatalogueKey] = Field(default_factory=list, max_length=10)
+    via: list[CatalogueKey] = Field(default_factory=list, max_length=4)
+    bg: FamilyTextEdit
+    en: FamilyTextEdit
+
+
 class EntityUpdate(EditModel):
     """The editor's working copy. Lists are replaced as a whole (ordering = list order)."""
 
@@ -268,6 +291,8 @@ class EntityUpdate(EditModel):
     deliverables: list[ItemEdit] = Field(default_factory=list, max_length=20)
     related: list[CatalogueKey] = Field(default_factory=list, max_length=8)
     service: ServiceFieldsEdit | None = None
+    # Domains only; None keeps the families unchanged.
+    families: list[FamilyEdit] | None = Field(default=None, max_length=20)
 
 
 class EntityCreate(EditModel):
@@ -338,12 +363,19 @@ class ServiceFieldsOut(OutModel):
     is_entry_offer: bool
 
 
+class FamilyTextOut(OutModel):
+    name: str
+    summary: str | None
+    prerequisite: str | None
+
+
 class AdminFamilyOut(OutModel):
-    key: str
-    name_bg: str
-    name_en: str
+    key: str = Field(description="Local key (the part after '<domain>.').")
     delivery_status: Delivery
     services: list[str]
+    via: list[str]
+    bg: FamilyTextOut
+    en: FamilyTextOut
 
 
 class DomainFieldsOut(OutModel):
@@ -372,7 +404,7 @@ class EntityOut(OutModel):
     related: list[str]
     service: ServiceFieldsOut | None
     domain: DomainFieldsOut | None
-    permissions: list[Literal["edit", "publish", "archive", "restore"]]
+    permissions: list[Literal["edit", "publish", "archive", "restore", "delete"]]
 
 
 class EntitySummaryOut(OutModel):
@@ -429,6 +461,20 @@ class OptionService(OutModel):
     status: Status
     name_bg: str
     name_en: str
+
+
+class StaffOut(OutModel):
+    id: uuid.UUID
+    email: str
+    full_name: str
+    role: Role
+    is_active: bool
+    last_login_at: datetime | None
+    is_self: bool
+
+
+class RoleUpdate(EditModel):
+    role: Role
 
 
 class OptionsOut(OutModel):

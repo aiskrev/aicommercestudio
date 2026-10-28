@@ -2532,6 +2532,59 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "admin-catalogue"
+        ],
+        "summary": "Delete Entity",
+        "description": "Delete a draft that was never published and that nothing links to; otherwise archive it.",
+        "operationId": "delete_entity_api_admin_catalogue_entities__entity_id__delete",
+        "parameters": [
+          {
+            "name": "entity_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Entity Id"
+            }
+          },
+          {
+            "name": "if-match",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Current revision as an ETag, e.g. \"3\".",
+              "title": "If-Match"
+            },
+            "description": "Current revision as an ETag, e.g. \"3\"."
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/admin/catalogue/entities/{entity_id}/checks": {
@@ -2866,6 +2919,85 @@
                     "$ref": "#/components/schemas/HistoryEntry"
                   },
                   "title": "Response Entity History Api Admin Catalogue Entities  Entity Id  History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/staff": {
+      "get": {
+        "tags": [
+          "admin-staff"
+        ],
+        "summary": "List Staff",
+        "operationId": "list_staff_api_admin_staff_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StaffOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Staff Api Admin Staff Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/staff/{user_id}": {
+      "patch": {
+        "tags": [
+          "admin-staff"
+        ],
+        "summary": "Change Role",
+        "description": "Change a staff member's role; their sessions are revoked. Audited as `admin.role_changed`.",
+        "operationId": "change_role_api_admin_staff__user_id__patch",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffOut"
                 }
               }
             }
@@ -3644,15 +3776,8 @@
         "properties": {
           "key": {
             "type": "string",
-            "title": "Key"
-          },
-          "name_bg": {
-            "type": "string",
-            "title": "Name Bg"
-          },
-          "name_en": {
-            "type": "string",
-            "title": "Name En"
+            "title": "Key",
+            "description": "Local key (the part after '<domain>.')."
           },
           "delivery_status": {
             "type": "string",
@@ -3669,16 +3794,30 @@
             },
             "type": "array",
             "title": "Services"
+          },
+          "via": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Via"
+          },
+          "bg": {
+            "$ref": "#/components/schemas/FamilyTextOut"
+          },
+          "en": {
+            "$ref": "#/components/schemas/FamilyTextOut"
           }
         },
         "additionalProperties": false,
         "type": "object",
         "required": [
           "key",
-          "name_bg",
-          "name_en",
           "delivery_status",
-          "services"
+          "services",
+          "via",
+          "bg",
+          "en"
         ],
         "title": "AdminFamilyOut"
       },
@@ -5492,7 +5631,8 @@
                 "edit",
                 "publish",
                 "archive",
-                "restore"
+                "restore",
+                "delete"
               ]
             },
             "type": "array",
@@ -5714,6 +5854,21 @@
                 "type": "null"
               }
             ]
+          },
+          "families": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/FamilyEdit"
+                },
+                "type": "array",
+                "maxItems": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Families"
           }
         },
         "additionalProperties": false,
@@ -5839,6 +5994,58 @@
         ],
         "title": "Family"
       },
+      "FamilyEdit": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]{0,40}$",
+            "title": "Key"
+          },
+          "delivery_status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "custom",
+              "planned"
+            ],
+            "title": "Delivery Status"
+          },
+          "services": {
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,59}$"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Services"
+          },
+          "via": {
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,59}$"
+            },
+            "type": "array",
+            "maxItems": 4,
+            "title": "Via"
+          },
+          "bg": {
+            "$ref": "#/components/schemas/FamilyTextEdit"
+          },
+          "en": {
+            "$ref": "#/components/schemas/FamilyTextEdit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "delivery_status",
+          "bg",
+          "en"
+        ],
+        "title": "FamilyEdit",
+        "description": "A service family of a domain. `key` is the part after \"<domain>.\" and cannot be renamed:\na new key creates a new family; a family left out of the list is archived, not deleted."
+      },
       "FamilyRef": {
         "properties": {
           "key": {
@@ -5861,6 +6068,84 @@
           "domain"
         ],
         "title": "FamilyRef"
+      },
+      "FamilyTextEdit": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "prerequisite": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 400
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prerequisite"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "FamilyTextEdit"
+      },
+      "FamilyTextOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Summary"
+          },
+          "prerequisite": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prerequisite"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "summary",
+          "prerequisite"
+        ],
+        "title": "FamilyTextOut"
       },
       "FieldProblem": {
         "properties": {
@@ -7947,6 +8232,25 @@
         ],
         "title": "Risk"
       },
+      "RoleUpdate": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "editor",
+              "viewer"
+            ],
+            "title": "Role"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "role"
+        ],
+        "title": "RoleUpdate"
+      },
       "ScenarioOut": {
         "properties": {
           "one_time": {
@@ -8573,6 +8877,64 @@
           "expires_at"
         ],
         "title": "SessionOut"
+      },
+      "StaffOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "editor",
+              "viewer"
+            ],
+            "title": "Role"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "last_login_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login At"
+          },
+          "is_self": {
+            "type": "boolean",
+            "title": "Is Self"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "full_name",
+          "role",
+          "is_active",
+          "last_login_at",
+          "is_self"
+        ],
+        "title": "StaffOut"
       },
       "SystemStatus": {
         "properties": {

@@ -103,6 +103,16 @@ ERROR_MESSAGES: dict[str, dict[Locale, str]] = {
         "bg": "Това действие не е възможно в текущото състояние на записа.",
         "en": "This action is not possible in the entry's current state.",
     },
+    "entity_referenced": {
+        "bg": "Записът се използва от други записи. Премахнете връзките или го архивирайте.",
+        "en": "Other entries link to this entry. Remove those links or archive it instead.",
+    },
+    "staff_not_found": {"bg": "Служителят не е намерен.", "en": "Staff member not found."},
+    "own_role": {"bg": "Не можете да промените собствената си роля.", "en": "You cannot change your own role."},
+    "last_admin": {
+        "bg": "Трябва да остане поне един активен администратор.",
+        "en": "At least one active administrator must remain.",
+    },
     "domain_archive_not_allowed": {
         "bg": "Направленията са фиксирани от таксономията и не се архивират.",
         "en": "Service domains are fixed by the taxonomy and cannot be archived.",
@@ -208,6 +218,7 @@ VALIDATION_MESSAGES: dict[str, dict[Locale, str]] = {
         "bg": "Свързаният запис е архивиран.",
         "en": "The linked entry is archived.",
     },
+    "duplicate_key": {"bg": "Ключът се повтаря.", "en": "This key is used twice."},
     "lead_category_taken": {
         "bg": "Тази категория вече се използва от друга услуга.",
         "en": "This category is already used by another service.",

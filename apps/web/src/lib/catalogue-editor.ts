@@ -8,6 +8,7 @@
 
 import type {
   CatalogueEntity,
+  CatalogueFamily,
   CatalogueItem,
   CatalogueLocale,
   CatalogueServiceFields,
@@ -46,12 +47,39 @@ export interface ServiceForm {
   duration_max_days: string;
 }
 
+export interface FamilyForm {
+  key: string;
+  delivery_status: DeliveryStatus;
+  services: string[];
+  via: string[];
+  bg: { name: string; summary: string; prerequisite: string };
+  en: { name: string; summary: string; prerequisite: string };
+}
+
 export interface EditorForm {
   translations: Record<CatalogueLocale, Record<TextField, string>>;
   capabilities: CatalogueItem[];
   deliverables: CatalogueItem[];
   related: string[];
   service: ServiceForm | null;
+  /** Domains only. */
+  families: FamilyForm[] | null;
+}
+
+export const FAMILY_KEY = /^[a-z][a-z0-9_]{0,40}$/;
+
+function familyForm(family: CatalogueFamily): FamilyForm {
+  const text = (locale: CatalogueLocale) => ({
+    name: family[locale].name,
+    summary: family[locale].summary ?? "",
+    prerequisite: family[locale].prerequisite ?? "",
+  });
+  return { key: family.key, delivery_status: family.delivery_status, services: [...family.services], via: [...family.via], bg: text("bg"), en: text("en") };
+}
+
+export function emptyFamily(key: string): FamilyForm {
+  const text = { name: "", summary: "", prerequisite: "" };
+  return { key, delivery_status: "custom", services: [], via: [], bg: { ...text }, en: { ...text } };
 }
 
 const TEXT_FIELDS: TextField[] = ["slug", "name", "short_name", "summary", "body", "cta_label", "seo_title", "seo_description"];
@@ -69,6 +97,7 @@ export function formFromEntity(entity: CatalogueEntity): EditorForm {
     deliverables: entity.deliverables.map(copyItem),
     related: [...entity.related],
     service: entity.service ? serviceForm(entity.service) : null,
+    families: entity.domain ? entity.domain.families.map(familyForm) : null,
   };
 }
 
@@ -140,6 +169,22 @@ export function payloadFromForm(form: EditorForm, type: "domain" | "service") {
           duration_max_days: number(form.service.duration_max_days),
         }
       : null,
+    ...(type === "domain" && form.families
+      ? {
+          families: form.families.map((family) => ({
+            key: family.key,
+            delivery_status: family.delivery_status,
+            services: family.services,
+            via: family.via,
+            ...Object.fromEntries(
+              CATALOGUE_LOCALES.map((locale) => [
+                locale,
+                { name: family[locale].name.trim(), summary: blank(family[locale].summary), prerequisite: blank(family[locale].prerequisite) },
+              ]),
+            ),
+          })),
+        }
+      : {}),
   };
 }
 
@@ -153,7 +198,7 @@ const MARKUP = /<\s*[/!?]?\s*[a-zA-Z]|&(?:#\d+|#x[0-9a-fA-F]+|[a-zA-Z]{2,8});|!?
 const CONTROL = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f​-‏‪-‮⁦-⁩﻿]/;
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
-export type ClientProblem = "markup" | "control_chars" | "catalogue_slug" | "missing" | "duration";
+export type ClientProblem = "markup" | "control_chars" | "catalogue_slug" | "catalogue_key" | "missing" | "duration";
 
 /** Client-side problems keyed like the API's field errors (e.g. `translations.en.summary`). */
 export function validateForm(form: EditorForm): Record<string, ClientProblem> {
@@ -177,6 +222,16 @@ export function validateForm(form: EditorForm): Record<string, ClientProblem> {
       }
     });
   }
+  form.families?.forEach((family, index) => {
+    if (!FAMILY_KEY.test(family.key)) problems[`families.${index}.key`] = "catalogue_key";
+    for (const locale of CATALOGUE_LOCALES) {
+      const text = family[locale];
+      if (!text.name.trim()) problems[`families.${index}.${locale}.name`] = "missing";
+      check(`families.${index}.${locale}.name`, text.name);
+      check(`families.${index}.${locale}.summary`, text.summary);
+      check(`families.${index}.${locale}.prerequisite`, text.prerequisite);
+    }
+  });
   if (form.service) {
     const low = number(form.service.duration_min_days);
     const high = number(form.service.duration_max_days);

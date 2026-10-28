@@ -28,7 +28,7 @@ CLI/bootstrap; there is no public registration. Password policy: ≥12 chars, mi
 `/api/admin/*` route outside the catalogue depends on `require_admin`, which requires the `admin` role
 (403 `forbidden_role` otherwise). The session endpoints accept every role. The catalogue
 (`/api/admin/catalogue/*`) is open by role: `viewer` reads, `editor` also writes drafts, `admin` also
-publishes, archives and restores (`tests/test_catalogue_api.py`). Catalogue texts are plain text:
+publishes, archives, restores and deletes never-published drafts (`tests/test_catalogue_api.py`, `tests/test_catalogue_admin_extras.py`). Roles are changed by administrators only (`/api/admin/staff`): nobody can change their own role, the last active administrator cannot be demoted, and a change revokes the person's sessions. Catalogue texts are plain text:
 markup, HTML entities, Markdown links, script URLs and invisible control or bidi characters are
 rejected, not escaped (`app/catalogue/text.py`). The public catalogue API serves publication
 snapshots only, never working copies. In addition, every `/api/admin/*` route depends on the staff session. A parametrised test lists 18

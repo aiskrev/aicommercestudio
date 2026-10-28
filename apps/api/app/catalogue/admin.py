@@ -25,12 +25,14 @@ from app.models import (
     CatalogueDomain,
     CatalogueEntity,
     CatalogueEntityType,
+    CatalogueFamily,
     CatalogueService,
     ContentItem,
     ContentItemTranslation,
     ContentItemType,
     EntityRelation,
     EntityTranslation,
+    FamilyService,
     OfferingType,
     PublishStatus,
     RelationKind,
@@ -71,6 +73,15 @@ def has_unpublished_changes(entity: CatalogueEntity) -> bool:
     return entity.status != PublishStatus.ARCHIVED and entity.published_revision != entity.revision
 
 
+def deletable(entity: CatalogueEntity) -> bool:
+    """Only a service, assessment or workshop that never reached the public API may be deleted."""
+    return (
+        entity.entity_type == CatalogueEntityType.SERVICE
+        and entity.status == PublishStatus.DRAFT
+        and entity.first_published_at is None
+    )
+
+
 def permissions(entity: CatalogueEntity, role: str) -> list[str]:
     archived = entity.status == PublishStatus.ARCHIVED
     allowed: list[str] = []
@@ -83,6 +94,8 @@ def permissions(entity: CatalogueEntity, role: str) -> list[str]:
             allowed.append("archive")
         if archived:
             allowed.append("restore")
+        if deletable(entity):
+            allowed.append("delete")
     return allowed
 
 
@@ -224,13 +237,21 @@ def entity_out(db: Session, entity: CatalogueEntity, role: str) -> schemas.Entit
             contact_service=doc.get("contact_service"),
             families=[
                 schemas.AdminFamilyOut(
-                    key=f["key"],
-                    name_bg=(f["texts"].get("bg") or {}).get("name") or f["key"],
-                    name_en=(f["texts"].get("en") or {}).get("name") or f["key"],
+                    key=f["key"].split(".", 1)[-1],
                     delivery_status=f["delivery_status"],
                     services=f["services"],
+                    via=f["via"],
+                    **{
+                        locale: schemas.FamilyTextOut(
+                            name=(f["texts"].get(locale) or {}).get("name") or f["key"],
+                            summary=(f["texts"].get(locale) or {}).get("summary"),
+                            prerequisite=(f["texts"].get(locale) or {}).get("prerequisite"),
+                        )
+                        for locale in LOCALES
+                    },
                 )
                 for f in doc.get("families") or []
+                if not f.get("archived")
             ],
         )
     return schemas.EntityOut(
@@ -396,7 +417,108 @@ def _replace_relations(
 
 
 def _comparable(doc: dict[str, Any]) -> dict[str, Any]:
-    return {k: v for k, v in doc.items() if k not in ("revision", "families", "schema")}
+    return {k: v for k, v in doc.items() if k not in ("revision", "schema")}
+
+
+def _validate_families(db: Session, entity: CatalogueEntity, families: list[schemas.FamilyEdit]) -> list[Problem]:
+    problems: list[Problem] = []
+    seen: set[str] = set()
+    for index, family in enumerate(families):
+        if family.key in seen:
+            problems.append(Problem(f"families.{index}.key", "duplicate_key"))
+        seen.add(family.key)
+        for j, key in enumerate(family.services):
+            if _id_by_key(db, CatalogueEntityType.SERVICE.value, key) is None:
+                problems.append(Problem(f"families.{index}.services.{j}", "unknown_reference"))
+        for j, key in enumerate(family.via):
+            if key == entity.key:
+                problems.append(Problem(f"families.{index}.via.{j}", "self_reference"))
+            elif _id_by_key(db, CatalogueEntityType.DOMAIN.value, key) is None:
+                problems.append(Problem(f"families.{index}.via.{j}", "unknown_reference"))
+    return problems
+
+
+def _write_families(db: Session, domain: CatalogueEntity, families: list[schemas.FamilyEdit], now: Any) -> None:
+    """Create, update, reorder and archive the domain's families to match the editor's list."""
+    rows = db.execute(
+        select(CatalogueEntity, CatalogueFamily)
+        .join(CatalogueFamily, CatalogueFamily.id == CatalogueEntity.id)
+        .where(CatalogueFamily.domain_id == domain.id)
+    ).all()
+    existing = {entity.key.split(".", 1)[-1]: (entity, family) for entity, family in rows}
+    wanted = {f.key for f in families}
+    # Families left out are archived and moved behind the live positions (positions are unique per domain).
+    parked = 500
+    for local, (entity, family) in sorted(existing.items()):
+        if local not in wanted:
+            if entity.status != PublishStatus.ARCHIVED:
+                entity.status, entity.archived_at = PublishStatus.ARCHIVED.value, now
+            family.position = parked
+            parked += 1
+
+    for position, edit in enumerate(families):
+        pair = existing.get(edit.key)
+        if pair is None:
+            entity = CatalogueEntity(
+                id=uuid.uuid4(),
+                entity_type=CatalogueEntityType.FAMILY.value,
+                key=f"{domain.key}.{edit.key}",
+                status=PublishStatus.PUBLISHED.value,
+                revision=1,
+                created_at=now,
+                updated_at=now,
+                first_published_at=now,
+            )
+            db.add(entity)
+            db.flush()
+            family = CatalogueFamily(
+                id=entity.id, domain_id=domain.id, delivery_status=edit.delivery_status, position=position
+            )
+            db.add(family)
+        else:
+            entity, family = pair
+            if entity.status == PublishStatus.ARCHIVED:
+                entity.status, entity.archived_at = PublishStatus.PUBLISHED.value, None
+            family.delivery_status = edit.delivery_status
+            family.position = position
+        db.flush()
+        for locale in LOCALES:
+            text = getattr(edit, locale)
+            row = db.get(EntityTranslation, (entity.id, locale))
+            if row is None:
+                row = EntityTranslation(entity_id=entity.id, locale=locale, name=text.name, updated_at=now)
+                db.add(row)
+            row.name, row.summary, row.prerequisite, row.updated_at = text.name, text.summary, text.prerequisite, now
+        db.execute(delete(FamilyService).where(FamilyService.family_id == entity.id))
+        for index, key in enumerate(dict.fromkeys(edit.services)):
+            service_id = _id_by_key(db, CatalogueEntityType.SERVICE.value, key)
+            db.add(FamilyService(family_id=entity.id, service_id=service_id, position=index))
+        via_ids = [_id_by_key(db, CatalogueEntityType.DOMAIN.value, key) for key in dict.fromkeys(edit.via)]
+        _replace_relations(db, entity, RelationKind.DELIVERED_THROUGH, CatalogueEntityType.DOMAIN.value, via_ids)
+    db.flush()
+
+
+class DeleteError(Exception):
+    def __init__(self, code: str) -> None:
+        super().__init__(code)
+        self.code = code
+
+
+def delete_draft(db: Session, entity: CatalogueEntity) -> None:
+    """Hard-delete a never-published draft that nothing references (otherwise archive it)."""
+    if not deletable(entity):
+        raise DeleteError("invalid_transition")
+    referenced = (
+        db.scalar(select(func.count()).select_from(EntityRelation).where(EntityRelation.to_entity_id == entity.id))
+        or db.scalar(select(func.count()).select_from(FamilyService).where(FamilyService.service_id == entity.id))
+        or db.scalar(
+            select(func.count()).select_from(CatalogueDomain).where(CatalogueDomain.contact_service_id == entity.id)
+        )
+    )
+    if referenced:
+        raise DeleteError("entity_referenced")
+    db.delete(entity)
+    db.flush()
 
 
 def update_entity(
@@ -422,6 +544,10 @@ def update_entity(
         problems.append(Problem("capabilities", "items_not_allowed"))
     if not is_service and payload.service is not None:
         problems.append(Problem("service", "value_error"))
+    if is_service and payload.families is not None:
+        problems.append(Problem("families", "value_error"))
+    if not is_service and payload.families is not None:
+        problems.extend(_validate_families(db, entity, payload.families))
 
     service = db.get(CatalogueService, entity.id) if is_service else None
     domain_id = None
@@ -485,6 +611,8 @@ def update_entity(
     _replace_relations(
         db, entity, RelationKind.RELATED if is_service else RelationKind.CROSS_SELL, related_type, related_ids
     )
+    if not is_service and payload.families is not None:
+        _write_families(db, entity, payload.families, now)
     if service is not None and payload.service is not None:
         fields = payload.service
         service.primary_domain_id = domain_id

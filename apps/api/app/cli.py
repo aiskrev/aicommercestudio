@@ -35,7 +35,7 @@ from app.db import get_sessionmaker
 from app.models import AdminRole, AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
 from app.ops import service as ops
 from app.security import hash_password, validate_password_strength
-from app.services import ai_actions, leads
+from app.services import ai_actions, leads, staff
 from app.team import service as team
 
 SYNTHETIC_SOURCE = "synthetic_seed"
@@ -300,28 +300,23 @@ def cmd_catalogue_seed(args: argparse.Namespace) -> int:
 
 
 def set_admin_role(db: Session, email: str, role: str) -> bool:
+    """Set a role by e-mail (sessions revoked, audited; the last active admin cannot be demoted)."""
     user = db.scalar(select(AdminUser).where(func.lower(AdminUser.email) == email.strip().lower()))
     if user is None:
         return False
-    if user.role != role:
-        previous, user.role = user.role, role
-        # A role change takes effect immediately: existing sessions are revoked.
-        db.execute(
-            update(AdminSession)
-            .where(AdminSession.user_id == user.id, AdminSession.revoked_at.is_(None))
-            .values(revoked_at=utcnow())
-        )
-        audit.record(
-            db, "admin.role_changed", actor_label="cli", entity_type="admin_user", entity_id=str(user.id),
-            details={"from": previous, "to": role},
-        )
+    staff.change_role(db, user, role)
     db.commit()
     return True
 
 
 def cmd_set_role(args: argparse.Namespace) -> int:
     with get_sessionmaker()() as db:
-        if not set_admin_role(db, args.email, args.role):
+        try:
+            found = set_admin_role(db, args.email, args.role)
+        except staff.StaffError as exc:
+            _print(f"[set-role] Not changed: {exc.code}")
+            return 1
+        if not found:
             _print("[set-role] No administrator with that e-mail address.")
             return 1
     _print(f"[set-role] Role set to {args.role}.")

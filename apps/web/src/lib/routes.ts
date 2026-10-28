@@ -32,6 +32,7 @@ export const routes = {
   adminCatalogue: "/admin/catalogue",
   adminCatalogueNew: "/admin/catalogue/new",
   adminCatalogueEntry: (id: string) => `/admin/catalogue/${id}`,
+  adminStaff: "/admin/staff",
 } as const;
 
 export function contactWithService(serviceKey: string): string {

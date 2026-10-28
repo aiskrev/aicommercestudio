@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { type MouseEvent, type ReactNode, useCallback, useEffect, useState } from "react";
 
 import { useAdminI18n } from "@/components/admin/AdminI18n";
@@ -24,7 +25,10 @@ import type {
 import {
   CATALOGUE_LOCALES,
   type EditorForm,
+  emptyFamily,
   emptyItem,
+  FAMILY_KEY,
+  type FamilyForm,
   formFromEntity,
   isDirty,
   move,
@@ -64,9 +68,10 @@ function EditorForm({ initial, options }: { initial: CatalogueEntity; options: C
   const [tab, setTab] = useState<CatalogueLocale>(adminLocale);
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState<Notice>(null);
-  const [busy, setBusy] = useState<null | "save" | "publish" | "archive" | "restore">(null);
+  const [busy, setBusy] = useState<null | "save" | "publish" | "archive" | "restore" | "delete">(null);
   const [conflict, setConflict] = useState(false);
   const [preview, setPreview] = useState<{ data?: CataloguePreview; error?: string } | null>(null);
+  const router = useRouter();
   const checks = useAdminData<CatalogueChecks>(`/api/admin/catalogue/entities/${entity.id}/checks?r=${entity.revision}-${entity.status}`);
   const history = useAdminData<CatalogueHistoryEntry[]>(`/api/admin/catalogue/entities/${entity.id}/history?r=${entity.revision}-${entity.status}`);
 
@@ -126,6 +131,23 @@ function EditorForm({ initial, options }: { initial: CatalogueEntity; options: C
         setNotice({ tone: "error", text: error.message });
       } else setNotice({ tone: "error", text: dict.common.saveError });
     } finally {
+      setBusy(null);
+    }
+  }
+
+  async function deleteDraft() {
+    if (!window.confirm(fmt(t.deleteConfirm, { name: name(adminLocale) }))) return;
+    setNotice(null);
+    setBusy("delete");
+    try {
+      await adminFetch<void>(`/api/admin/catalogue/entities/${entity.id}`, {
+        method: "DELETE",
+        headers: { "If-Match": `"${entity.revision}"` },
+      });
+      router.push(routes.adminCatalogue);
+    } catch (error) {
+      if (error instanceof ApiError && error.code === "revision_conflict") setConflict(true);
+      setNotice({ tone: "error", text: error instanceof ApiError ? error.message : dict.common.saveError });
       setBusy(null);
     }
   }
@@ -236,6 +258,11 @@ function EditorForm({ initial, options }: { initial: CatalogueEntity; options: C
         {permissions.includes("restore") && (
           <button type="button" className={buttonClass("secondary")} onClick={() => request("restore")} disabled={busy !== null}>
             {t.restore}
+          </button>
+        )}
+        {permissions.includes("delete") && (
+          <button type="button" className={buttonClass("danger")} onClick={deleteDraft} disabled={busy !== null}>
+            {t.deleteDraft}
           </button>
         )}
         {dirty && permissions.includes("publish") && <p className="self-center text-sm text-amber-200">{t.saveFirst}</p>}
@@ -383,17 +410,22 @@ function EditorForm({ initial, options }: { initial: CatalogueEntity; options: C
                 <h3 className="font-semibold text-white">{fmt(t.domainInfo, { code: entity.domain.code })}</h3>
                 <p className="mt-1 text-slate-400">{t.domainInfoText}</p>
                 {entity.domain.contact_service && <p className="mt-2 text-slate-300">{fmt(t.contactService, { category: entity.domain.contact_service })}</p>}
-                <h4 className="mt-4 font-medium text-slate-200">{t.families}</h4>
-                <ul className="mt-2 grid gap-1 text-slate-300">
-                  {entity.domain.families.map((family) => (
-                    <li key={family.key}>
-                      {adminLocale === "en" ? family.name_en : family.name_bg} — {t.delivery[family.delivery_status]}
-                    </li>
-                  ))}
-                </ul>
               </div>
             )}
           </Panel>
+
+          {form.families && (
+            <Panel title={`${t.familiesTitle} (${t.locales[tab]})`}>
+              <FamilyEditor
+                families={form.families}
+                locale={tab}
+                errors={errors}
+                services={options.services.filter((s) => s.status !== "archived").map((s) => ({ key: s.key, name: adminLocale === "en" ? s.name_en : s.name_bg }))}
+                domains={options.domains.filter((d) => d.key !== entity.key).map((d) => ({ key: d.key, name: `${d.code} · ${adminLocale === "en" ? d.name_en : d.name_bg}` }))}
+                onChange={(families) => setForm((current) => ({ ...current, families }))}
+              />
+            </Panel>
+          )}
         </fieldset>
 
         <aside className="grid content-start gap-6">
@@ -700,5 +732,160 @@ function PreviewBody({ preview, note }: { preview: CataloguePreview; note: strin
         SEO: {preview.seo.title} — {preview.seo.description}
       </p>
     </article>
+  );
+}
+
+function KeyChips({
+  label,
+  selected,
+  choices,
+  onChange,
+  max,
+  idPrefix,
+}: {
+  label: string;
+  selected: string[];
+  choices: { key: string; name: string }[];
+  onChange: (keys: string[]) => void;
+  max: number;
+  idPrefix: string;
+}) {
+  const { t } = useAdminI18n();
+  const c = t.catalogue;
+  const [pick, setPick] = useState("");
+  const nameOf = (key: string) => choices.find((choice) => choice.key === key)?.name ?? key;
+  return (
+    <div className="grid gap-2 text-sm">
+      <span className="text-slate-300">{label}</span>
+      <ul className="flex flex-wrap gap-2">
+        {selected.map((key) => (
+          <li key={key} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1 text-slate-200">
+            {nameOf(key)}
+            <button type="button" className="text-slate-400 hover:text-white" aria-label={`${c.removeItem}: ${nameOf(key)}`} onClick={() => onChange(selected.filter((k) => k !== key))}>
+              ×
+            </button>
+          </li>
+        ))}
+      </ul>
+      <div className="flex flex-wrap gap-2">
+        <label htmlFor={`${idPrefix}-pick`} className="sr-only">
+          {label}
+        </label>
+        <select id={`${idPrefix}-pick`} className="field max-w-xs" value={pick} onChange={(e) => setPick(e.target.value)}>
+          <option value="">{c.chooseRelated}</option>
+          {choices
+            .filter((choice) => !selected.includes(choice.key))
+            .map((choice) => (
+              <option key={choice.key} value={choice.key}>
+                {choice.name}
+              </option>
+            ))}
+        </select>
+        <button
+          type="button"
+          className={buttonClass("secondary", "sm")}
+          disabled={!pick || selected.length >= max}
+          onClick={() => {
+            onChange([...selected, pick]);
+            setPick("");
+          }}
+        >
+          {c.addRelated}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function FamilyEditor({
+  families,
+  locale,
+  errors,
+  services,
+  domains,
+  onChange,
+}: {
+  families: FamilyForm[];
+  locale: CatalogueLocale;
+  errors: Record<string, string>;
+  services: { key: string; name: string }[];
+  domains: { key: string; name: string }[];
+  onChange: (families: FamilyForm[]) => void;
+}) {
+  const { t } = useAdminI18n();
+  const c = t.catalogue;
+  const [newKey, setNewKey] = useState("");
+  const update = (index: number, change: Partial<FamilyForm>) =>
+    onChange(families.map((family, i) => (i === index ? { ...family, ...change } : family)));
+  const setText = (index: number, field: "name" | "summary" | "prerequisite", value: string) =>
+    update(index, { [locale]: { ...families[index][locale], [field]: value } } as Partial<FamilyForm>);
+  const keyTaken = families.some((family) => family.key === newKey);
+  const keyValid = FAMILY_KEY.test(newKey) && !keyTaken;
+
+  return (
+    <div className="grid gap-4" data-testid="family-editor">
+      <p className="text-xs text-slate-400">{c.familiesHint}</p>
+      {families.length === 0 && <p className="text-sm text-slate-400">{c.noFamilies}</p>}
+      <ol className="grid gap-4">
+        {families.map((family, index) => (
+          <li key={family.key} className="grid gap-3 rounded-xl border border-white/[0.06] p-4" data-testid={`family-${family.key}`}>
+            <p className="font-mono text-xs text-slate-400">
+              {index + 1}. {family.key}
+            </p>
+            <TextInput path={`families.${index}.${locale}.name`} label={c.familyName} value={family[locale].name} max={160} errors={errors} onChange={(v) => setText(index, "name", v)} required />
+            <TextInput path={`families.${index}.${locale}.summary`} label={c.familySummary} value={family[locale].summary} max={300} errors={errors} rows={2} onChange={(v) => setText(index, "summary", v)} />
+            <SelectInput
+              path={`families.${index}.delivery_status`}
+              label={c.deliveryStatus}
+              value={family.delivery_status}
+              errors={errors}
+              onChange={(value) => update(index, { delivery_status: value as FamilyForm["delivery_status"] })}
+              options={(["available", "custom", "planned"] as const).map((value) => ({ value, label: c.delivery[value] }))}
+            />
+            <TextInput path={`families.${index}.${locale}.prerequisite`} label={c.familyPrerequisite} value={family[locale].prerequisite} max={400} errors={errors} onChange={(v) => setText(index, "prerequisite", v)} />
+            <KeyChips label={c.familyServices} idPrefix={`family-${index}-services`} selected={family.services} choices={services} max={10} onChange={(keys) => update(index, { services: keys })} />
+            <KeyChips label={c.familyVia} idPrefix={`family-${index}-via`} selected={family.via} choices={domains} max={4} onChange={(keys) => update(index, { via: keys })} />
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className={buttonClass("ghost", "sm")} onClick={() => onChange(move(families, index, index - 1))} disabled={index === 0}>
+                {c.moveUp}
+              </button>
+              <button type="button" className={buttonClass("ghost", "sm")} onClick={() => onChange(move(families, index, index + 1))} disabled={index === families.length - 1}>
+                {c.moveDown}
+              </button>
+              <button type="button" className={buttonClass("ghost", "sm")} onClick={() => onChange(families.filter((_, i) => i !== index))}>
+                {c.removeItem}
+              </button>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="grid gap-1.5 text-sm">
+          <label htmlFor="new-family-key" className="text-slate-300">
+            {c.familyKey}
+          </label>
+          <input
+            id="new-family-key"
+            className="field max-w-xs font-mono"
+            value={newKey}
+            maxLength={41}
+            aria-invalid={newKey !== "" && !keyValid}
+            onChange={(e) => setNewKey(e.target.value.trim())}
+          />
+        </div>
+        <button
+          type="button"
+          className={buttonClass("secondary", "sm")}
+          disabled={!keyValid || families.length >= 20}
+          onClick={() => {
+            onChange([...families, emptyFamily(newKey)]);
+            setNewKey("");
+          }}
+        >
+          {c.addFamily}
+        </button>
+      </div>
+      {newKey !== "" && !keyValid && <p className="text-xs text-rose-300">{keyTaken ? c.familyKeyTaken : c.problems.catalogue_key}</p>}
+    </div>
   );
 }

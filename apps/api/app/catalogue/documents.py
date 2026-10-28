@@ -233,6 +233,17 @@ def publication_problems(db: Session, entity: CatalogueEntity, document: dict[st
                 if not (text.get("body") or "").strip():
                     problems.append(Problem(f"{list_name}.{index}.{locale}.body", "required_to_publish"))
 
+    live_families = [f for f in document.get("families") or [] if not f.get("archived")]
+    if kind == CatalogueEntityType.DOMAIN:
+        for index, family in enumerate(live_families):
+            for locale in LOCALES:
+                texts = family["texts"].get(locale) or {}
+                for name in ("name", "summary"):
+                    if not (texts.get(name) or "").strip():
+                        problems.append(Problem(f"families.{index}.{locale}.{name}", "required_to_publish"))
+                if family["delivery_status"] == "planned" and not (texts.get("prerequisite") or "").strip():
+                    problems.append(Problem(f"families.{index}.{locale}.prerequisite", "required_to_publish"))
+
     is_service = kind == CatalogueEntityType.SERVICE and document["offering_type"] == OfferingType.SERVICE
     if is_service and not document.get("primary_domain"):
         problems.append(Problem("service.primary_domain", "primary_domain_required"))

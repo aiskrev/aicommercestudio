@@ -14,7 +14,7 @@ import { adminFetch } from "@/lib/admin-api";
 import type { StaffRole } from "@/lib/admin-types";
 import { routes } from "@/lib/routes";
 
-type NavKey = "dashboard" | "leads" | "ai" | "operations" | "catalogue" | "activity" | "account";
+type NavKey = "dashboard" | "leads" | "ai" | "operations" | "catalogue" | "staff" | "activity" | "account";
 
 /** `staff`: every role; otherwise administrators only (the API refuses the rest with 403). */
 const NAV: { href: string; key: NavKey; icon: IconName; exact?: boolean; staff?: boolean }[] = [
@@ -23,6 +23,7 @@ const NAV: { href: string; key: NavKey; icon: IconName; exact?: boolean; staff?:
   { href: routes.adminAiActions, key: "ai", icon: "bot" },
   { href: routes.adminOperations, key: "operations", icon: "layers" },
   { href: routes.adminCatalogue, key: "catalogue", icon: "clipboard", staff: true },
+  { href: routes.adminStaff, key: "staff", icon: "users" },
   { href: routes.adminActivity, key: "activity", icon: "activity" },
   { href: routes.adminAccount, key: "account", icon: "lock", staff: true },
 ];
