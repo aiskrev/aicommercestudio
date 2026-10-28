@@ -149,8 +149,8 @@ describe.each(locales)("domain content (%s)", (locale) => {
     }
   });
 
-  it("lists every published hub in the sitemap with reciprocal hreflang", () => {
-    const entries = sitemap();
+  it("lists every published hub in the sitemap with reciprocal hreflang", async () => {
+    const entries = await sitemap();
     for (const domain of domains.filter((d) => isDomainPublished(d.key))) {
       const entry = entries.find((e) => new URL(e.url).pathname === localizePath(locale, routes.service(domain.slug)));
       expect(entry, domain.slug).toBeDefined();

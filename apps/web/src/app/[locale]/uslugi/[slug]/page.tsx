@@ -2,9 +2,11 @@ import { notFound } from "next/navigation";
 
 import { ArticleCard } from "@/components/editorial/ArticleCard";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { CatalogueOfferings, ManagedRelation } from "@/components/sections/Catalogue";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { DomainHub } from "@/components/sections/DomainHub";
 import { Faq } from "@/components/sections/Faq";
+import { hasManagedFollowUp, OfferingPage } from "@/components/sections/OfferingPage";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
 import { RelatedTools } from "@/components/home/ToolsPreview";
 import { ServiceCard } from "@/components/sections/ServiceCard";
@@ -32,15 +34,24 @@ import {
   serviceRoutePaths,
 } from "@/content";
 import type { DomainContent } from "@/content/types";
-import { isLocale, localizePath } from "@/i18n/config";
+import { isLocale, type Locale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { domainDefinition, isDomainPublished, primaryDomainOf } from "@/lib/domains";
+import { type CatalogueEntry, domainOfferings, getCatalogue, getCatalogueDetail } from "@/lib/catalogue";
 import { resolveLocale } from "@/lib/params";
 import { contactWithService, quoteWithService, routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
 import { SERVICE_TOOLS, toolHrefs, toolMinutes } from "@/lib/tools";
 
-export const dynamicParams = false;
+/**
+ * Rendering (docs/SERVICE_CATALOGUE_ARCHITECTURE.md §9): the domain hubs and the existing service
+ * pages are prerendered from the TypeScript content at build time, without the API. Entries that
+ * exist only in the published catalogue (assessments, workshops, services created in the admin) are
+ * rendered on first request and cached. Every page is regenerated at most every 300 s
+ * (= CATALOGUE_REVALIDATE_SECONDS) or at once via POST /api/catalogue-revalidate. Unknown slugs are 404.
+ */
+export const dynamicParams = true;
+export const revalidate = 300;
 
 /** Published domain hub for this slug; domain and service slugs share the `/uslugi` namespace. */
 function publishedDomain(locale: Parameters<typeof findDomain>[0], slug: string): DomainContent | undefined {
@@ -50,13 +61,16 @@ function publishedDomain(locale: Parameters<typeof findDomain>[0], slug: string)
 
 // Services with a dedicated route (e.g. uslugi/ai-managed-services) are not rendered by this template.
 // Published domain hubs (docs/SERVICE_TAXONOMY.md) are rendered here as well.
-export function generateStaticParams({ params }: { params: { locale: string } }) {
+export async function generateStaticParams({ params }: { params: { locale: string } }) {
   const { locale } = params;
   if (!isLocale(locale)) return [];
   const { services, domains } = getContent(locale);
+  // During `next build` the API is normally unreachable and this adds nothing; see lib/catalogue.ts.
+  const { entries } = await getCatalogue(locale);
   return [
     ...services.filter((service) => !service.customPage).map((service) => ({ slug: service.slug })),
     ...domains.filter((domain) => isDomainPublished(domain.key)).map((domain) => ({ slug: domain.slug })),
+    ...entries.filter((entry) => entry.origin === "catalogue").map((entry) => ({ slug: entry.slug })),
   ];
 }
 
@@ -73,12 +87,22 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/uslugi/[
     });
   }
   const service = findService(locale, slug);
-  if (!service || service.customPage) return {};
+  if (service) {
+    if (service.customPage) return {};
+    return buildMetadata({
+      locale,
+      title: service.metaTitle,
+      description: service.metaDescription,
+      path: serviceRoutePaths(service.key),
+    });
+  }
+  const entry = await getCatalogueDetail(locale, slug);
+  if (!entry) return {};
   return buildMetadata({
     locale,
-    title: service.metaTitle,
-    description: service.metaDescription,
-    path: serviceRoutePaths(service.key),
+    title: entry.seo.title,
+    description: entry.seo.description,
+    path: { bg: routes.service(entry.alternateSlugs.bg), en: routes.service(entry.alternateSlugs.en) },
   });
 }
 
@@ -90,7 +114,12 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   if (domain) return <DomainPage locale={locale} domain={domain} dict={dict} />;
 
   const service = findService(locale, slug);
-  if (!service || service.customPage) notFound();
+  if (!service) {
+    const entry = await getCatalogueDetail(locale, slug);
+    if (!entry) notFound();
+    return <OfferingPage entry={entry} locale={locale} dict={dict} />;
+  }
+  if (service.customPage) notFound();
 
   const { home, tools } = getContent(locale);
   const href = (path: string) => localizePath(locale, path);
@@ -103,6 +132,8 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   const quoteHref = href(quoteWithService(service.key));
   const parentDomain = primaryDomainOf(service.key);
   const parent = parentDomain?.published ? domainByKey(locale, parentDomain.key) : undefined;
+  const offerings = parentDomain ? domainOfferings((await getCatalogue(locale)).entries, parentDomain.key) : [];
+  const managedFollowUp = parentDomain ? hasManagedFollowUp(parentDomain.key) && service.key !== "ai_managed" : false;
 
   return (
     <>
@@ -291,6 +322,28 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         </div>
       </Section>
 
+      {/* ------------------------------------------------------------ catalogue cross-links (only when there is something to link) */}
+      {(offerings.length > 0 || managedFollowUp) && (
+        <Section labelledBy={offerings.length > 0 ? "service-offerings-title" : undefined}>
+          <div className="grid gap-10">
+            {offerings.length > 0 && (
+              <CatalogueOfferings
+                id="service-offerings-title"
+                entries={offerings}
+                hrefFor={(entry) => href(routes.service(entry.slug))}
+                locale={locale}
+                labels={dict.catalogue}
+                statusLabels={dict.domain.status}
+                contactHref={contactHref}
+              />
+            )}
+            {managedFollowUp && (
+              <ManagedRelation href={href(routes.service(serviceByKey(locale, "ai_managed").slug))} labels={dict.catalogue} />
+            )}
+          </div>
+        </Section>
+      )}
+
       {/* ------------------------------------------------------------ process */}
       <Section labelledBy="service-process-title">
         <EditorialSplit
@@ -372,17 +425,10 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   );
 }
 
-function DomainPage({
-  locale,
-  domain,
-  dict,
-}: {
-  locale: Parameters<typeof findDomain>[0];
-  domain: DomainContent;
-  dict: ReturnType<typeof getDictionary>;
-}) {
+async function DomainPage({ locale, domain, dict }: { locale: Locale; domain: DomainContent; dict: ReturnType<typeof getDictionary> }) {
   const href = (path: string) => localizePath(locale, path);
   const path = href(routes.service(domain.slug));
+  const offerings = domainOfferings((await getCatalogue(locale)).entries, domain.key);
   return (
     <>
       <JsonLd
@@ -395,7 +441,23 @@ function DomainPage({
           { name: domain.name, path },
         ]}
       />
-      <DomainHub locale={locale} domain={domain} definition={domainDefinition(domain.key)} dict={dict} />
+      <DomainHub
+        locale={locale}
+        domain={domain}
+        definition={domainDefinition(domain.key)}
+        dict={dict}
+        offerings={
+          <CatalogueOfferings
+            id="domain-offerings-title"
+            entries={offerings}
+            hrefFor={(entry: CatalogueEntry) => href(routes.service(entry.slug))}
+            locale={locale}
+            labels={dict.catalogue}
+            statusLabels={dict.domain.status}
+            contactHref={href(contactWithService(domainDefinition(domain.key).contactService))}
+          />
+        }
+      />
     </>
   );
 }

@@ -37,6 +37,13 @@ of them (`tests/test_admin_auth.py::PROTECTED`). The two report downloads have t
 the organisation and a permission from `app/ops/rbac.py`, and is covered by authorisation and
 tenant-isolation tests (`tests/test_ops_portal.py`).
 
+**Catalogue revalidation** — `POST /api/catalogue-revalidate` (web) only marks cached catalogue
+data stale. It requires `X-Revalidate-Secret` equal to `CATALOGUE_REVALIDATE_SECRET` (compared in
+constant time on SHA-256 digests), answers 404 when the variable is unset or shorter than 16
+characters, and is `no-store`. Public catalogue pages make no API call for malformed slugs or for
+slugs that are not in the cached published list, so random URLs cannot multiply API requests.
+Only published entries reach the pages; catalogue texts are rendered as plain React text.
+
 **Public company contact** — the phone and e-mail shown on the site are approved business data in
 `apps/web/src/lib/company.ts`, separate from lead e-mail fields, admin accounts, synthetic seed data
 and SMTP settings. No personal address is published, no SMTP credentials are configured, and the

@@ -85,6 +85,7 @@ serves customers; they are a reason not to expect traffic from it.
 | Legal pages (`/bg/poveritelnost`, `/bg/biskvitki`, `/bg/obshti-usloviya`, `/en/privacy`, `/en/cookies`, `/en/terms`) | **no** (`noindex, follow`) | no | while `LEGAL_TEXTS_ARE_DRAFTS = true` in `content/bg/legal.ts` (re-exported for English) — set to `false` after legal review |
 | Topic pages `/bg/statii/tema/<slug>`, `/en/insights/topic/<slug>` | only with ≥ 2 articles | only when indexed | `MIN_ARTICLES_FOR_INDEXED_CATEGORY` in `content/index.ts`; currently only *Автоматизация* qualifies |
 | Case studies `/bg/proekti`, `/en/case-studies` | — | — | 404 until a publishable case study exists |
+| Catalogue-only entries (assessments, workshops, services created in the admin) `/bg/uslugi/<slug>` ↔ `/en/services/<slug>` | yes | yes, while published | Localized title and description from the entry's SEO texts; self-canonical; reciprocal hreflang + `x-default` from the entry's two slugs; `Service` + `BreadcrumbList` JSON-LD; no `lastModified` (the public API exposes no publication date). Listed after regeneration (≤ 300 s, or at once via `/api/catalogue-revalidate`); archived entries return 404 and leave the sitemap. |
 | Admin, API | no | no | `X-Robots-Tag: noindex, nofollow`, disallowed in `robots.txt` |
 
 ## 4. Editorial guidelines

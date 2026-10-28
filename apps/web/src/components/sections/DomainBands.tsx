@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { StatusChip } from "@/components/sections/DomainHub";
+import { StatusChip } from "@/components/sections/StatusChip";
 import { Icon } from "@/components/ui/Icon";
 import { domainByKey, serviceByKey } from "@/content";
 import type { Dictionary } from "@/i18n";

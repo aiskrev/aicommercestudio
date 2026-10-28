@@ -1,17 +1,23 @@
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { CatalogueBrowser } from "@/components/sections/CatalogueBrowser";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { DomainBands } from "@/components/sections/DomainBands";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { ServiceShowcase } from "@/components/sections/ServiceShowcase";
 import { ServiceMotif } from "@/components/sections/ServiceMotif";
 import { ButtonLink, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
-import { getContent, serviceByKey } from "@/content";
+import { domainByKey, getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
+import { getCatalogue } from "@/lib/catalogue";
+import { BANDS, domainsInBand, isDomainPublished } from "@/lib/domains";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildMetadata, itemListJsonLd } from "@/lib/seo";
+
+/** Prerendered from the TypeScript content; catalogue-only entries join on regeneration (lib/catalogue.ts). */
+export const revalidate = 300;
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/uslugi">) {
   const locale = await resolveLocale(params);
@@ -30,6 +36,10 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const audit = serviceByKey(locale, "audit");
+  const { entries } = await getCatalogue(locale);
+  const catalogueDomains = BANDS.flatMap(domainsInBand)
+    .filter((domain) => isDomainPublished(domain.key))
+    .map((domain) => ({ key: domain.key, name: domainByKey(locale, domain.key).name }));
 
   return (
     <>
@@ -76,7 +86,21 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
         </div>
       </Section>
 
-      <Section labelledBy="services-process-title">
+      <Section labelledBy="services-catalogue-title">
+        <SectionHeading id="services-catalogue-title" title={dict.catalogue.browserTitle} lead={dict.catalogue.browserLead} />
+        <div className="mt-10">
+          <CatalogueBrowser
+            entries={entries}
+            hrefs={Object.fromEntries(entries.map((entry) => [entry.key, href(routes.service(entry.slug))]))}
+            domains={catalogueDomains}
+            locale={locale}
+            labels={dict.catalogue}
+            statusLabels={dict.domain.status}
+          />
+        </div>
+      </Section>
+
+      <Section labelledBy="services-process-title" alt>
         <SectionHeading id="services-process-title" eyebrow={home.process.eyebrow} title={home.process.title} />
         <ProcessTimeline steps={home.process.steps} className="mt-14" />
       </Section>

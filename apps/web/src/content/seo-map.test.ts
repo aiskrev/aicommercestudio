@@ -9,7 +9,8 @@ import { localizePath, locales } from "@/i18n/config";
 import { routes } from "@/lib/routes";
 import { site } from "@/lib/site";
 
-const sitemapPaths = new Set(sitemap().map((entry) => new URL(entry.url).pathname));
+const sitemapEntries = await sitemap();
+const sitemapPaths = new Set(sitemapEntries.map((entry) => new URL(entry.url).pathname));
 const withBrand = (title: string) => `${title} | ${site.name}`;
 
 describe.each(locales)("SEO structure (%s)", (locale) => {
@@ -206,7 +207,7 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
     });
 
     it("dates every entry", () => {
-      for (const entry of sitemap()) expect(entry.lastModified, entry.url).toBeTruthy();
+      for (const entry of sitemapEntries) expect(entry.lastModified, entry.url).toBeTruthy();
     });
   });
 });

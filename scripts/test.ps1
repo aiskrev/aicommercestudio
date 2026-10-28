@@ -54,6 +54,10 @@ if ($Suite -in @("web", "all")) {
 }
 if ($Suite -in @("e2e", "all")) {
     Invoke-Suite "End-to-end tests (Playwright)" {
+        # The catalogue e2e flow regenerates the public pages on demand; web and e2e share a per-run secret.
+        if (-not $env:CATALOGUE_REVALIDATE_SECRET) {
+            $env:CATALOGUE_REVALIDATE_SECRET = [guid]::NewGuid().ToString("N")
+        }
         docker compose up --build -d --wait
         # Throwaway editor and viewer accounts for the role-based admin flows; the password is generated per run.
         $staffPassword = "E2e-" + [guid]::NewGuid().ToString("N").Substring(0, 20) + "Aa9"

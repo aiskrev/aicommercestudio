@@ -16,6 +16,35 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/service-discovery` (from `main` @ `c5b96d1`, not merged, 2026-10-28): service
+discovery on the public site from the published catalogue (INFORMATION_ARCHITECTURE.md → "Service
+catalogue on the website").
+
+* **Services index:** a full catalogue section with type and domain filters.
+* **Catalogue-only entries:** assessments, workshops and admin-created services get their own pages
+  under `/uslugi/<slug>` ↔ `/services/<slug>`, with localized metadata, reciprocal hreflang, a
+  `Service` JSON-LD and a sitemap entry.
+* **Cross-links:** an assessments-and-workshops block on every domain hub (with an empty state), on
+  service pages when the domain has published entries, and a managed-operation panel on build
+  services.
+* **Rendering:** incremental regeneration every 300 s, plus the secret-protected
+  `POST /api/catalogue-revalidate`.
+* **Language switcher:** a hreflang fallback for slugs outside the static slug map.
+
+The ten hubs and nine existing services still render from the TypeScript content. No route was
+removed or renamed. There is no API or database change.
+
+| Check | Result |
+| --- | --- |
+| `.\scripts\test.ps1 -Suite web` | passed (typecheck, lint, **548** unit tests, 39 files; new: `lib/catalogue.test.ts`, `components/sections/catalogue.test.tsx`, `components/layout/LanguageSwitcher.test.tsx`) |
+| Production build without the API (`docker compose build web`) | passed; `/[locale]/uslugi` and the 36 hub and service pages prerendered with **Revalidate 5m** |
+| e2e (production build, no-host-ports override, staff accounts, per-run `CATALOGUE_REVALIDATE_SECRET`) | **113 passed** (7 new in `service-discovery.spec.ts`; `catalogue.spec.ts` now also checks the published workshop on the site, its hubs, the index filter and the sitemap, then the 404 after archiving). The API log shows the web server fetching the workshop detail and the catalogue list after each revalidation, so the website checks ran. |
+| docs sync (`docs_sync.py`) | in sync |
+| `.\scripts\test.ps1 -Suite api` | not re-run (no API change) |
+
+Not done: the API does not call the revalidation hook after publishing (pages follow within 300 s),
+and phase S5 (the catalogue as the source for the existing entries) is still open.
+
 Branch `feature/founder-profile` (from `main` @ `5948322`, not merged, 2026-10-28): the Founder & CEO
 profile and the company contact integration. It adds the homepage founder introduction, the
 profile page `/bg/za-nas/osnovatel` ↔ `/en/about/founder` with the approved portrait (`next/image`),

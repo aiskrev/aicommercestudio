@@ -11,11 +11,15 @@ import {
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
 import { AGENT_KEYS } from "@/lib/ai-team";
 import { AGENT_SLUGS } from "@/lib/agent-library";
+import { getCatalogue } from "@/lib/catalogue";
 import { isDomainPublished } from "@/lib/domains";
 import { routes } from "@/lib/routes";
 import { isToolAvailable, toolByKey, TOOLS } from "@/lib/tools";
 import { type LocalizedPaths, samePathEverywhere } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/site";
+
+/** Regenerated like the catalogue pages, so published catalogue-only entries are listed (lib/catalogue.ts). */
+export const revalidate = 300;
 
 /** Date of the last substantive content revision of the static pages. */
 export const CONTENT_REVISED = "2026-10-27";
@@ -51,7 +55,12 @@ function alternates(paths: LocalizedPaths, availableIn: readonly Locale[] = loca
  * Only real, indexable URLs are listed — one entry per locale, each with reciprocal hreflang
  * alternates. Draft legal pages and thin topic pages are `noindex` and therefore omitted.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const catalogueOnly = Object.fromEntries(
+    await Promise.all(
+      locales.map(async (locale) => [locale, (await getCatalogue(locale)).entries.filter((entry) => entry.origin === "catalogue")] as const),
+    ),
+  );
   return locales.flatMap((locale) => {
     const { services, domains, articles, editorialCategories, caseStudies, legal } = getContent(locale);
     const url = (path: string) => absoluteUrl(localizePath(locale, path));
@@ -100,6 +109,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
           priority: 0.8,
           alternates: alternates(domainRoutePaths(domain.key)),
         })),
+      // Assessments, workshops and services that exist only in the published catalogue.
+      ...catalogueOnly[locale].map((entry) => ({
+        url: url(routes.service(entry.slug)),
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+        alternates: alternates({ bg: routes.service(entry.alternateSlugs.bg), en: routes.service(entry.alternateSlugs.en) }),
+      })),
       ...articles.map((article) => {
         const { paths, availableIn } = articleRoutePaths(article.key);
         return {
