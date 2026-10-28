@@ -8,6 +8,8 @@ import type { DomainContent } from "@/content/types";
 export const domains: DomainContent[] = [
   {
     key: "ai_strategy",
+    founderNote:
+      "Стратегическата работа стъпва на опита на основателя ни Александър Искрев в enterprise архитектурата и AI platform engineering.",
     slug: "ai-strategiya-i-transformatsiya",
     name: "AI стратегия и трансформация",
     summary: "Къде си струва AI, в какъв ред и с какви контроли — преди да инвестирате във внедряване.",
@@ -271,6 +273,8 @@ export const domains: DomainContent[] = [
   },
   {
     key: "cloud_platform",
+    founderNote:
+      "Платформеният инженеринг развива опита на Александър Искрев с Microsoft Azure, AWS, Kubernetes и software-defined инфраструктура.",
     slug: "oblachen-i-platformen-inzhenering",
     name: "Облачен и платформен инженеринг",
     summary: "Облачна инфраструктура като код: среди, контейнери, бази данни, тайни, архиви и разходи.",
@@ -568,6 +572,8 @@ export const domains: DomainContent[] = [
   },
   {
     key: "managed_operations",
+    founderNote:
+      "Подходът към експлоатацията отразява опита на Александър Искрев в Site Reliability Engineering и критична инфраструктура.",
     slug: "upravlyavani-ai-i-platformeni-operatsii",
     name: "Управлявани AI и платформени операции",
     summary: "Текущата работа на изграденото: наблюдение, поддръжка, оценка, разходи и инциденти — по писмен обхват.",

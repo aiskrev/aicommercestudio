@@ -321,4 +321,12 @@ export const keywordMap: KeywordTarget[] = [
     rationale: "Консултации и обучение; „технически одит на онлайн магазин“ остава на страницата на одита.",
     volumeStatus: "unverified",
   },
+  {
+    path: "/za-nas/osnovatel",
+    primaryKeyword: "Александър Искрев",
+    secondaryKeywords: ["основател на Iskrev Consulting Ltd", "CEO на Iskrev Consulting Ltd"],
+    intent: "navigational",
+    rationale: "Профил на основателя; не поема заявки на услугите.",
+    volumeStatus: "unverified",
+  },
 ];

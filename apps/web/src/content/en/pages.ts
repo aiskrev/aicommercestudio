@@ -169,7 +169,7 @@ export const about: typeof bgAbout = {
   ],
   companyTitle: "Company information",
   companyNote:
-    "This website is in a preparatory stage. \"A.I. Commerce Studio\" is a working name; details of the legal entity, registration and team will be published once they are finalized.",
+    "A.I. Commerce Studio is the digital platform and technology brand of Iskrev Consulting Ltd. The website is in a preparatory stage; the company's registration details will be published once they are finalised.",
 };
 
 export const processPage: typeof bgProcessPage = {

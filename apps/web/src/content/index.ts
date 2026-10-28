@@ -3,6 +3,7 @@ import { aiManaged } from "@/content/bg/ai-managed";
 import { articles, insightsPage } from "@/content/bg/articles";
 import { domains } from "@/content/bg/domains";
 import { editorialCategories, publishableCaseStudies } from "@/content/bg/editorial";
+import { founder } from "@/content/bg/founder";
 import { home } from "@/content/bg/home";
 import {
   cookiePolicy,
@@ -26,6 +27,7 @@ import { aiManaged as enAiManaged } from "@/content/en/ai-managed";
 import { articles as enArticles, insightsPage as enInsightsPage } from "@/content/en/articles";
 import { domains as enDomains } from "@/content/en/domains";
 import { editorialCategories as enEditorialCategories } from "@/content/en/editorial";
+import { founder as enFounder } from "@/content/en/founder";
 import { home as enHome } from "@/content/en/home";
 import {
   cookiePolicy as enCookiePolicy,
@@ -62,6 +64,7 @@ const bg = {
   coreServices,
   domains,
   servicesPage,
+  founder,
   industries,
   about,
   processPage,
@@ -93,6 +96,7 @@ const en: SiteContent = {
   coreServices: enCoreServices,
   domains: enDomains,
   servicesPage: enServicesPage,
+  founder: enFounder,
   industries: enIndustries,
   about: enAbout,
   processPage: enProcessPage,

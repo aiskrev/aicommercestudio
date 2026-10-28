@@ -5,7 +5,8 @@ every number that the business must decide is marked `[to define]`.
 
 ## 1. Positioning
 
-**A.I. Commerce Studio** (provisional name) — an e-commerce engineering and growth studio that
+**A.I. Commerce Studio** — the digital platform and technology brand of **Iskrev Consulting Ltd**
+(Founder & CEO: Aleksandar Iskrev) — an e-commerce engineering and growth studio that
 combines store maintenance, SEO, data, integrations and applied AI for small and medium businesses
 in Bulgaria and the EU.
 

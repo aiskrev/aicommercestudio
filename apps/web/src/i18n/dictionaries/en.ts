@@ -33,7 +33,7 @@ export const en: Dictionary = {
     cookies: "Cookies",
     terms: "Terms of use",
     draftNote: "Legal texts are drafts under review.",
-    provisional: "Working name. Company details will be published once registration is complete.",
+    provisional: "A.I. Commerce Studio is a platform of Iskrev Consulting Ltd. Company registration details will be published.",
     rights: "All rights reserved.",
   },
   common: {
@@ -107,6 +107,7 @@ export const en: Dictionary = {
   },
   domain: {
     eyebrow: "Domain",
+    founderLink: "Meet the Founder",
     bands: {
       ai: { title: "AI systems", lead: "Strategy, agents, applications on your own data, and the controls around them." },
       engineering: {
@@ -159,6 +160,12 @@ export const en: Dictionary = {
       "Each domain groups related services and states plainly what is offered today and what is taken on as a custom engagement after an assessment.",
     ctaLead: "Describe your task. We will clarify the scope and the engagement model and send a written quote.",
   },
+  contactDetails: {
+    phone: "Phone",
+    email: "Email",
+    phoneAria: "Call Iskrev Consulting Ltd at {phone}",
+    emailAria: "Email Iskrev Consulting Ltd at {email}",
+  },
   contact: {
     metaTitle: "Contact us and request a quote",
     metaDescription:
@@ -173,7 +180,6 @@ export const en: Dictionary = {
       "We propose a scope, an engagement model and a written quote.",
     ],
     directTitle: "Direct contact",
-    directPending: "Direct contact details will be published soon. Until then, please use the form.",
     privacyTitle: "Privacy",
     privacyText:
       "We use your details only to respond to your inquiry. We do not share them with third parties for marketing.",

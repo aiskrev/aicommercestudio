@@ -116,8 +116,8 @@ test.describe("English forms", () => {
     await page.goto("/en/contact");
     await page.getByRole("button", { name: "Send inquiry" }).click();
     await expect(page.getByText("Please correct the highlighted fields.").first()).toBeVisible();
-    await page.getByLabel(/^Email/).fill("not-an-email");
-    await page.getByLabel(/^Email/).blur();
+    await page.getByRole("textbox", { name: /^Email/ }).fill("not-an-email");
+    await page.getByRole("textbox", { name: /^Email/ }).blur();
     await expect(page.locator("main")).not.toContainText(CYRILLIC);
   });
 

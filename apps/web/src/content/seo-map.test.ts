@@ -30,6 +30,7 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
     [routes.industries]: withBrand(content.industries.metaTitle),
     [routes.process]: withBrand(content.processPage.metaTitle),
     [routes.about]: withBrand(content.about.metaTitle),
+    [routes.founder]: withBrand(content.founder.profile.metaTitle),
     [routes.contact]: withBrand(dict.contact.metaTitle),
     [routes.insights]: withBrand(content.insightsPage.metaTitle),
     ...Object.fromEntries(content.services.map((s) => [routes.service(s.slug), withBrand(s.metaTitle)])),

@@ -93,6 +93,8 @@ export interface DomainContent {
   cta: string;
   metaTitle: string;
   metaDescription: string;
+  /** Optional one-sentence, domain-specific reference to the founder (links to the profile). */
+  founderNote?: string;
 }
 
 export interface InlineLink {

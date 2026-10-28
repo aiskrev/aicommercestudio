@@ -299,4 +299,12 @@ export const keywordMap: KeywordTarget[] = [
     rationale: "Advisory and enablement; the technical audit of an online store keeps its own page.",
     volumeStatus: "unverified",
   },
+  {
+    path: "/za-nas/osnovatel",
+    primaryKeyword: "Aleksandar Iskrev",
+    secondaryKeywords: ["Founder of Iskrev Consulting Ltd", "CEO of Iskrev Consulting Ltd"],
+    intent: "navigational",
+    rationale: "Founder profile; it does not take over service queries.",
+    volumeStatus: "unverified",
+  },
 ];

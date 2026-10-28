@@ -77,6 +77,14 @@ export function DomainHub({
             </div>
             <h1 className="t-h1 mt-6">{domain.name}</h1>
             <p className="t-lead mt-6 max-w-2xl">{domain.positioning}</p>
+            {domain.founderNote && (
+              <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-fg-muted">
+                {domain.founderNote}{" "}
+                <Link href={href(routes.founder)} className="link whitespace-nowrap">
+                  {labels.founderLink}
+                </Link>
+              </p>
+            )}
             <p className="mt-6 flex flex-wrap items-center gap-2 text-sm text-fg-muted">
               <span>{labels.statusLabel}:</span>
               <StatusChip status={status} label={labels.status[status]} />

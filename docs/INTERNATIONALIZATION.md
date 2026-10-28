@@ -23,6 +23,7 @@ URLs are rewritten to them by `src/proxy.ts` (decision logic in `src/lib/locale-
 | Industries | `/bg/za-kogo` | `/en/industries` |
 | Process | `/bg/proces` | `/en/process` |
 | About | `/bg/za-nas` | `/en/about` |
+| Founder & CEO | `/bg/za-nas/osnovatel` | `/en/about/founder` (`EN_SUBSEGMENTS["za-nas"]`) |
 | Contact | `/bg/kontakti` | `/en/contact` |
 | Insights | `/bg/statii`, `/bg/statii/<slug>`, `/bg/statii/tema/<topic>` | `/en/insights`, `/en/insights/<slug>`, `/en/insights/topic/<topic>` |
 | Case studies | `/bg/proekti` | `/en/case-studies` (404 until verified case studies exist) |

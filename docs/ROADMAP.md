@@ -65,7 +65,7 @@ in [PLATFORM_BASELINE_AUDIT.md](PLATFORM_BASELINE_AUDIT.md).
 
 ## Before public launch (parallel, owner-driven)
 
-- Complete company details, contact e-mail and phone; legal review of the privacy policy and terms
+- Company registration details (the contact phone and e-mail are approved and published; the mailbox domain `ai-ecomstudio.site` must be activated and verified); legal review of the privacy policy and terms
 - Production deployment (VPS or managed containers) behind Caddy with TLS, with automated backups
 - Scheduled retention job; uptime monitoring and error alerting
 - Configure SMTP lead notifications (a transactional e-mail provider with an EU DPA)
