@@ -278,6 +278,8 @@ def result_consultation(
     if looks_like_link_spam(payload.message):
         raise ApiError(status.HTTP_400_BAD_REQUEST, _SPAM[locale], "spam_suspected")
     row, definition, _answers, result = _saved(db, payload.token, locale)
+    # Lock the row, so two simultaneous requests cannot both create a lead for the same result.
+    db.refresh(row, with_for_update=True)
     if row.lead_id is not None:
         raise ApiError(status.HTTP_409_CONFLICT, _CONSULTATION_EXISTS[locale], "assessment_consultation_exists")
     lead = service.create_consultation(

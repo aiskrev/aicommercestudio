@@ -114,7 +114,9 @@ export function EngineAssessment({ assessment, tool, content, locale, domainLink
     setErrors(found);
     if (Object.keys(found).length) {
       setFormError(t.errorSummary);
-      requestAnimationFrame(() => document.getElementById(`engine-q-${Object.keys(found)[0]}`)?.focus());
+      const first = Object.keys(found)[0];
+      // Focus the first option of a choice question (announced with its group), else the field itself.
+      requestAnimationFrame(() => (document.getElementById(`engine-q-${first}-options-0`) ?? document.getElementById(`engine-q-${first}`))?.focus());
       return false;
     }
     setFormError(null);
@@ -249,7 +251,6 @@ function QuestionField({
     const index = options.findIndex((o) => o.key === value);
     return (
       <div data-question={q.key} data-evidence={q.evidence}>
-        <span id={id} tabIndex={-1} />
         <ChoiceQuestion
           id={`${id}-options`}
           label={label}
