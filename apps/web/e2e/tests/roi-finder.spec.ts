@@ -16,6 +16,7 @@ test("the ROI calculator computes from the visitor's own numbers in Bulgarian", 
     ["Дял на автоматизираните задачи", "60"],
     ["Намаление на времето за автоматизирана задача", "70"],
     ["Време за човешки преглед", "2"],
+    ["Дял на изключенията и преработката", "0"],
     ["Еднократни разходи за внедряване", "15000"],
     ["Месечни разходи за AI, API и инфраструктура", "300"],
     ["Месечни разходи за поддръжка", "200"],
@@ -29,6 +30,14 @@ test("the ROI calculator computes from the visitor's own numbers in Bulgarian", 
   await expect(page.getByTestId("roi-net-monthly")).toHaveText("1100 €"); // 50% of 3 200 − 500
   await expect(page.getByTestId("roi-capacity")).toContainText("капацитет, не пари");
   await expect(page.getByTestId("roi-scenarios")).toContainText("Консервативен");
+  await expect(page.getByTestId("roi-worked")).toContainText("= 400 ч/мес");
+  const disclaimer = page.getByTestId("roi-disclaimer");
+  await expect(disclaimer).toBeVisible();
+  await expect(disclaimer).toHaveText(/^Илюстративна оценка, а не проверен финансов резултат.*Версия на формулите: 2026-11\.1$/);
+
+  // Exceptions return to full manual handling: 1 200 × 10% × 12 min = 24 h more.
+  await page.getByLabel("Дял на изключенията и преработката").fill("10");
+  await expect(page.getByTestId("roi-net-monthly")).toHaveText("800 €"); // 50% of (104 h × 25 €) − 500
 
   // Invalid input is explained and removes the result.
   await page.getByLabel("Дял на автоматизираните задачи").fill("140");
@@ -38,7 +47,7 @@ test("the ROI calculator computes from the visitor's own numbers in Bulgarian", 
 });
 
 test("the cumulative chart can be read with the keyboard and a shared link restores the result", async ({ page }) => {
-  await page.goto("/en/tools/roi-calculator?r=2000~12~25~60~70~2~15000~300~200~12~75");
+  await page.goto("/en/tools/roi-calculator?r=2000~12~25~60~70~2~0~15000~300~200~12~75");
   await expect(page.getByText("The result was loaded from a shared link.")).toBeVisible();
   await expect(page.getByTestId("roi-payback")).toHaveText("7.9 months");
   const chart = page.getByRole("img", { name: "Cumulative net benefit by month" });
@@ -59,11 +68,11 @@ test("the finder ranks processes and hands the best one to the ROI calculator", 
   await form.getByRole("button", { name: "Next" }).click();
 
   for (const [index, levels] of [
-    [0, [1, 2, 1, 1, 3, 4, 2, 3, 4]],
-    [1, [4, 4, 3, 2, 1, 2, 3, 2, 2]],
+    [0, [1, 2, 1, 1, 1, 3, 4, 2, 3, 4]],
+    [1, [4, 4, 3, 2, 2, 1, 2, 3, 2, 2]],
   ] as const) {
     const groups = await form.getByRole("group").all();
-    expect(groups).toHaveLength(9);
+    expect(groups).toHaveLength(10);
     for (let c = 0; c < groups.length; c++) await groups[c].getByRole("radio").nth(levels[c]).check();
     await form.getByRole("button", { name: index === 1 ? "See the result" : "Next" }).click();
   }
@@ -72,9 +81,17 @@ test("the finder ranks processes and hands the best one to the ROI calculator", 
   await expect(result.getByTestId("finder-ranking")).toContainText("1. Invoice processing");
   const first = result.locator("[data-category]").first();
   await expect(first).toHaveAttribute("data-category", "quick_win");
-  await expect(first.getByTestId("finder-score")).toHaveText("73");
+  await expect(first.getByTestId("finder-score")).toHaveText("70");
   await expect(first).toContainText("AI classification and extraction");
-  await expect(result.locator("[data-category]").nth(1)).toHaveAttribute("data-category", "not_ready");
+  await expect(first.getByTestId("finder-risk")).toHaveAttribute("data-risk", "medium");
+  await expect(first.getByTestId("finder-services").getByRole("link")).not.toHaveCount(0);
+  const second = result.locator("[data-category]").nth(1);
+  await expect(second).toHaveAttribute("data-category", "not_ready");
+  // High compliance and oversight needs raise the risk and make human approval mandatory.
+  await expect(second.getByTestId("finder-risk")).toHaveAttribute("data-risk", "high");
+  await expect(result.getByTestId("finder-suitability-note")).toContainText("not a financial return");
+  await expect(result.getByTestId("finder-pilot")).toContainText("Invoice processing");
+  await expect(result.getByTestId("finder-workshops").getByRole("link")).not.toHaveCount(0);
   await expect(result.locator("[data-point]")).toHaveCount(2);
 
   await first.getByRole("button", { name: "Calculate the effect for this process" }).click();

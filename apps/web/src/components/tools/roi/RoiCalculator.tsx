@@ -18,6 +18,7 @@ import {
   REALIZATION_OPTIONS,
   ROI_BOUNDS,
   ROI_FIELDS,
+  ROI_MODEL_VERSION,
   type RoiDraft,
   type RoiErrors,
   type RoiField,
@@ -29,6 +30,7 @@ import {
   decodeRoi,
   encodeRoi,
   validateRoi,
+  workedSteps,
 } from "@/lib/roi";
 
 type Content = typeof roiTool;
@@ -39,7 +41,7 @@ export const ROI_PROCESS_KEY = "acs:roi:process";
 
 const GROUPS: { key: keyof Content["sections"]; fields: RoiField[] }[] = [
   { key: "process", fields: ["volume", "minutes", "hourlyCost"] },
-  { key: "automation", fields: ["coverage", "timeReduction", "reviewMinutes"] },
+  { key: "automation", fields: ["coverage", "timeReduction", "reviewMinutes", "exceptionRate"] },
   { key: "costs", fields: ["implementationCost", "runCost", "maintenanceCost"] },
 ];
 
@@ -97,9 +99,43 @@ export function roiSummaryText(content: Content, inputs: RoiInputs, result: RoiR
         `- ${content.scenarios[key].title} (${content.scenarios[key].text}): ${r.netMonthly} ${money(scenarios[key].netMonthly)}; ${r.payback} ${paybackText(content, scenarios[key], locale)}; ${r.net12} ${money(scenarios[key].net12)}`,
     ),
     "",
+    fill(content.version, { version: ROI_MODEL_VERSION }),
     content.disclaimer,
   ];
   return lines.filter((line, i) => line !== "" || lines[i - 1] !== "").join("\n");
+}
+
+const MONEY_KEYS = new Set(["R", "C0", "S", "K", "N", "I"]);
+const PERCENT_KEYS = new Set(["r", "p", "roi"]);
+const COUNT_KEYS = new Set(["V", "T"]);
+
+/** The base calculation with the visitor's numbers substituted into each formula. */
+function WorkedSteps({ content, inputs, result, locale }: { content: Content; inputs: RoiInputs; result: RoiResult; locale: Locale }) {
+  const format = (key: string, value: number) =>
+    MONEY_KEYS.has(key)
+      ? formatEur(value, locale)
+      : PERCENT_KEYS.has(key)
+        ? formatNumber(value, locale, key === "roi" ? 0 : 1)
+        : COUNT_KEYS.has(key)
+          ? formatNumber(value, locale, 0)
+          : formatNumber(value, locale, 1);
+  return (
+    <details className="accordion group rounded-[var(--radius-lg)] border border-line-subtle bg-surface-1 px-5 py-4" data-testid="roi-worked">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-fg [&::-webkit-details-marker]:hidden">
+        {content.worked.title}
+      </summary>
+      <ol className="mt-3 grid gap-2 font-mono text-[13.5px] leading-relaxed text-fg-secondary">
+        {workedSteps(inputs, result).map((step) => (
+          <li key={step.key} data-step={step.key}>
+            {fill(
+              content.worked.steps[step.key],
+              Object.fromEntries(Object.entries(step.values).map(([key, value]) => [key, format(key, value)])),
+            )}
+          </li>
+        ))}
+      </ol>
+    </details>
+  );
 }
 
 function paybackText(content: Content, result: RoiResult, locale: Locale): string {
@@ -325,7 +361,14 @@ export function RoiCalculator({
           onExport={(format) => track("export_requested", { format })}
         />
       )}
-      <MethodologyNote title={content.methodologyTitle} paragraphs={[...content.formulas, content.disclaimer]} />
+      {result && inputs && <WorkedSteps content={content} inputs={inputs} result={result} locale={locale} />}
+      <p className="text-sm text-fg-muted" data-testid="roi-disclaimer">
+        {content.disclaimer} {fill(content.version, { version: ROI_MODEL_VERSION })}
+      </p>
+      <MethodologyNote
+        title={content.methodologyTitle}
+        paragraphs={[fill(content.version, { version: ROI_MODEL_VERSION }), ...content.formulas, content.disclaimer]}
+      />
       <ToolLeadCapture
         title={content.leadCapture.title}
         text={content.leadCapture.text}

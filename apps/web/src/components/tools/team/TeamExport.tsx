@@ -181,9 +181,16 @@ function SaveCard({
   const [busy, setBusy] = useState(false);
   const [link, setLink] = useState<{ url: string; expires: string } | null>(null);
   const [status, setStatus] = useState<{ tone: "success" | "error"; text: string } | null>(null);
+  const [consent, setConsent] = useState(false);
+  const [consentError, setConsentError] = useState(false);
 
   async function save() {
     if (busy) return;
+    // Only an explicitly consented configuration is stored; without the tick nothing is sent.
+    if (!consent) {
+      setConsentError(true);
+      return;
+    }
     setBusy(true);
     setStatus(null);
     const result = await saveTeamConfiguration(config, locale, overrides, formToken.token);
@@ -229,10 +236,32 @@ function SaveCard({
           </div>
         </div>
       ) : (
-        <div>
-          <Button variant="secondary" loading={busy} loadingLabel={t.saving} onClick={save}>
-            {t.button}
-          </Button>
+        <div className="grid gap-3">
+          <label className="flex items-start gap-3 text-sm text-fg-secondary">
+            <input
+              type="checkbox"
+              className="checkbox mt-0.5"
+              checked={consent}
+              aria-invalid={consentError || undefined}
+              aria-describedby={consentError ? "team-save-consent-error" : undefined}
+              onChange={(event) => {
+                setConsent(event.target.checked);
+                setConsentError(false);
+              }}
+              data-testid="team-save-consent"
+            />
+            <span>{fill(t.consent, { days: meta?.retention_days ?? 90 })}</span>
+          </label>
+          {consentError && (
+            <p id="team-save-consent-error" className="field-error" role="alert">
+              {t.consentError}
+            </p>
+          )}
+          <div>
+            <Button variant="secondary" loading={busy} loadingLabel={t.saving} onClick={save}>
+              {t.button}
+            </Button>
+          </div>
         </div>
       )}
       <Status status={status} />

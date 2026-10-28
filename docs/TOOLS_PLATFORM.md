@@ -146,9 +146,13 @@ dimension and action names).
 
 ## AI team model (`lib/ai-team.ts`)
 
-Six screens: context → departments → agents → configuration → architecture → result. Everything is
-calculated in the browser from fixed rules; nothing is sent or stored (backend persistence is the
-next phase). Each recommendation carries a reason the UI shows.
+Six steps and a result: business context → departments and problems → agent roles → data and
+systems (volume, integrations, environment) → approval and risk (approval checkpoints, who maintains
+it) → architecture and rollout → result. Everything is calculated in the browser from fixed rules;
+each recommendation carries a reason the UI shows. The architecture step and the result say that the
+suggested agents are illustrative: not deployed, not connected to the visitor's systems and not
+running. Only an explicitly consented configuration is stored (see
+[TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md)).
 
 **Agent library** (10 roles). Each has a role (`task`, `coordination`, `oversight`), departments,
 required and optional integrations, whether it acts externally, data sensitivity, a minimum
@@ -188,8 +192,11 @@ Rules:
 * **Workflows:** fixed chains (inquiry → meeting, support resolution, document intake, content
   pipeline, reporting, knowledge answers) filtered to the selected agents, with the coordinator first
   and a human step after any agent approved before external actions or on every action.
-* **Rollout:** pilot = the most relevant selected task agent (simplest on ties) plus its
-  dependencies; expand = up to two further task agents; scale = the rest, coordination and oversight.
+* **Rollout (MVP → pilot → production):** MVP = the most relevant selected task agent (simplest on
+  ties) plus its dependencies, with test examples and human approval and no customer access until
+  quality is proven; pilot = up to two further task agents with real users; production = the rest,
+  coordination and oversight. A phase with no agents is not shown. (Internal keys stay `pilot`,
+  `expand`, `scale` so saved links and the API are unchanged.)
   Phase effort is an indicative range by phase complexity (low 3–5, medium 5–8, high 8–12 weeks),
   labelled as an estimate with its assumptions; no savings or productivity figures are shown.
 * **Architecture graph:** users (team, and customers when an agent acts externally) → orchestration

@@ -3,12 +3,13 @@
  * savings). Policy: docs/PLATFORM_EXPANSION_PLAN.md issue #2; method: docs/ROI_AND_FINDER.md.
  *
  * Time is in hours per month, money in EUR. With V tasks/month, M minutes per task, R hourly cost,
- * coverage c, time reduction r, review minutes q, realisation share p:
+ * coverage c, time reduction r, review minutes q, exception/rework rate e, realisation share p:
  *
  *   current hours        H₀ = V × M / 60
  *   current cost         C₀ = H₀ × R
  *   automated tasks      A  = V × c
- *   future hours         H₁ = (V − A) × M / 60 + A × (M × (1 − r) + q) / 60
+ *   future hours         H₁ = (V − A) × M / 60 + A × (M × (1 − r) + q) / 60 + A × e × M / 60
+ *                        (an exception falls back to full manual handling on top of the review)
  *   capacity released    ΔH = H₀ − H₁              (may be negative: review takes longer than it saves)
  *   value of that time   ΔH × R                    (capacity, not cash)
  *   realised savings     S  = ΔH × R × p   if ΔH ≥ 0,   ΔH × R   if ΔH < 0 (extra time always costs)
@@ -19,10 +20,13 @@
  *   net over T months    T × N − I       (12-month net benefit: T = 12)
  *   ROI over T months    (T × S − I − T × K) / (I + T × K) × 100; undefined when I + T × K = 0
  *
- * Scenarios scale the visitor's coverage, time reduction, review time and costs by SCENARIOS; base = inputs.
+ * Scenarios scale the visitor's coverage, time reduction, review time, exception rate and costs by
+ * SCENARIOS; base = inputs. Labour savings are counted once (time × hourly cost × realisation share);
+ * there is no revenue term, so nothing is double-counted.
  */
 
-export const ROI_MODEL_VERSION = "2026-10.1";
+/** Version of the formulas, shown on the page and in the export. A formula change is a new version. */
+export const ROI_MODEL_VERSION = "2026-11.1";
 
 export const ROI_FIELDS = [
   "volume",
@@ -31,6 +35,7 @@ export const ROI_FIELDS = [
   "coverage",
   "timeReduction",
   "reviewMinutes",
+  "exceptionRate",
   "implementationCost",
   "runCost",
   "maintenanceCost",
@@ -47,6 +52,7 @@ export const ROI_BOUNDS: Record<RoiField, { min: number; max: number; integer?: 
   coverage: { min: 0, max: 100 },
   timeReduction: { min: 0, max: 100 },
   reviewMinutes: { min: 0, max: 600 },
+  exceptionRate: { min: 0, max: 100 },
   implementationCost: { min: 0, max: 10_000_000 },
   runCost: { min: 0, max: 1_000_000 },
   maintenanceCost: { min: 0, max: 1_000_000 },
@@ -95,10 +101,13 @@ export const SCENARIO_KEYS = ["conservative", "base", "optimistic"] as const;
 export type RoiScenario = (typeof SCENARIO_KEYS)[number];
 
 /** Multipliers applied to the visitor's own inputs (shown in the UI). Percentages are capped at 100. */
-export const SCENARIOS: Record<RoiScenario, { coverage: number; timeReduction: number; reviewMinutes: number; costs: number; implementation: number }> = {
-  conservative: { coverage: 0.75, timeReduction: 0.75, reviewMinutes: 1.25, costs: 1.2, implementation: 1.2 },
-  base: { coverage: 1, timeReduction: 1, reviewMinutes: 1, costs: 1, implementation: 1 },
-  optimistic: { coverage: 1.15, timeReduction: 1.15, reviewMinutes: 0.85, costs: 1, implementation: 1 },
+export const SCENARIOS: Record<
+  RoiScenario,
+  { coverage: number; timeReduction: number; reviewMinutes: number; exceptionRate: number; costs: number; implementation: number }
+> = {
+  conservative: { coverage: 0.75, timeReduction: 0.75, reviewMinutes: 1.25, exceptionRate: 1.25, costs: 1.2, implementation: 1.2 },
+  base: { coverage: 1, timeReduction: 1, reviewMinutes: 1, exceptionRate: 1, costs: 1, implementation: 1 },
+  optimistic: { coverage: 1.15, timeReduction: 1.15, reviewMinutes: 0.85, exceptionRate: 0.85, costs: 1, implementation: 1 },
 };
 
 export interface RoiResult {
@@ -106,6 +115,8 @@ export interface RoiResult {
   currentCost: number;
   futureHours: number;
   automatedTasks: number;
+  /** Automated tasks that fall back to manual handling (A × e). */
+  exceptionTasks: number;
   /** Capacity released (hours/month); negative when review takes longer than the automation saves. */
   hoursReleased: number;
   /** Value of the released time at the hourly cost — capacity, not cash. */
@@ -139,6 +150,7 @@ export function applyScenario(inputs: RoiInputs, scenario: RoiScenario): RoiInpu
     coverage: clampPct(inputs.coverage * s.coverage),
     timeReduction: clampPct(inputs.timeReduction * s.timeReduction),
     reviewMinutes: inputs.reviewMinutes * s.reviewMinutes,
+    exceptionRate: clampPct(inputs.exceptionRate * s.exceptionRate),
     runCost: inputs.runCost * s.costs,
     maintenanceCost: inputs.maintenanceCost * s.costs,
     implementationCost: inputs.implementationCost * s.implementation,
@@ -151,11 +163,13 @@ export function calculateRoi(inputs: RoiInputs): RoiResult {
   const r = inputs.timeReduction / 100;
   const p = inputs.realization / 100;
   const q = inputs.reviewMinutes;
+  const e = inputs.exceptionRate / 100;
 
   const currentHours = (V * M) / 60;
   const currentCost = currentHours * R;
   const automatedTasks = V * c;
-  const futureHours = ((V - automatedTasks) * M) / 60 + (automatedTasks * (M * (1 - r) + q)) / 60;
+  const exceptionTasks = automatedTasks * e;
+  const futureHours = ((V - automatedTasks) * M) / 60 + (automatedTasks * (M * (1 - r) + q)) / 60 + (exceptionTasks * M) / 60;
   const hoursReleased = currentHours - futureHours;
   const capacityValue = hoursReleased * R;
   const realizedSavings = hoursReleased >= 0 ? capacityValue * p : capacityValue;
@@ -176,6 +190,7 @@ export function calculateRoi(inputs: RoiInputs): RoiResult {
     currentCost,
     futureHours,
     automatedTasks,
+    exceptionTasks,
     hoursReleased,
     capacityValue,
     realizedSavings,
@@ -196,6 +211,43 @@ export function calculateRoi(inputs: RoiInputs): RoiResult {
 
 export function calculateScenarios(inputs: RoiInputs): Record<RoiScenario, RoiResult> {
   return Object.fromEntries(SCENARIO_KEYS.map((key) => [key, calculateRoi(applyScenario(inputs, key))])) as Record<RoiScenario, RoiResult>;
+}
+
+/** One line of the worked explanation: a template key and the values to substitute into it. */
+export interface WorkedStep {
+  key: "currentHours" | "currentCost" | "futureHours" | "hoursReleased" | "realizedSavings" | "netMonthly" | "payback" | "roi";
+  values: Record<string, number>;
+}
+
+/**
+ * The base calculation step by step with the visitor's own numbers (the page shows each formula with
+ * the values substituted). Pure; uses exactly the numbers `calculateRoi` returns.
+ */
+export function workedSteps(inputs: RoiInputs, result: RoiResult): WorkedStep[] {
+  const steps: WorkedStep[] = [
+    { key: "currentHours", values: { V: inputs.volume, M: inputs.minutes, H0: result.currentHours } },
+    { key: "currentCost", values: { H0: result.currentHours, R: inputs.hourlyCost, C0: result.currentCost } },
+    {
+      key: "futureHours",
+      values: {
+        A: result.automatedTasks,
+        rest: inputs.volume - result.automatedTasks,
+        E: result.exceptionTasks,
+        M: inputs.minutes,
+        r: inputs.timeReduction,
+        q: inputs.reviewMinutes,
+        H1: result.futureHours,
+      },
+    },
+    { key: "hoursReleased", values: { H0: result.currentHours, H1: result.futureHours, dH: result.hoursReleased } },
+    { key: "realizedSavings", values: { dH: result.hoursReleased, R: inputs.hourlyCost, p: inputs.realization, S: result.realizedSavings } },
+    { key: "netMonthly", values: { S: result.realizedSavings, K: result.runningCosts, N: result.netMonthly } },
+  ];
+  if (result.paybackMonths !== null) steps.push({ key: "payback", values: { I: result.investment, N: result.netMonthly, months: result.paybackMonths } });
+  if (result.roiPercent !== null) {
+    steps.push({ key: "roi", values: { T: result.horizon, S: result.realizedSavings, I: result.investment, K: result.runningCosts, roi: result.roiPercent } });
+  }
+  return steps;
 }
 
 /** Non-personal share code: the numbers only (the process description is never included). */

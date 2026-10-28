@@ -165,6 +165,8 @@ class TeamReportRequest(TeamRequest):
 
 class TeamSaveRequest(TeamRequest):
     form_token: str = Field(default="", max_length=200)
+    # Only explicitly consented configurations are stored (the visitor ticks the box before saving).
+    storage_consent: Literal[True]
 
 
 class TeamSubmissionCreate(TeamRequest):

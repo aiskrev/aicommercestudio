@@ -67,7 +67,8 @@ type Content = typeof teamTool;
 type Ui = (typeof tools)["ui"];
 type ServiceLinks = Partial<Record<ServiceKey, { href: string; label: string }>>;
 
-const STEPS = ["context", "departments", "agents", "team", "architecture"] as const;
+/** Context → departments → agents → data and systems → approval and risk → architecture (then the result). */
+const STEPS = ["context", "departments", "agents", "data", "approval", "architecture"] as const;
 const CONTEXT_FIELDS = ["industry", "size", "leadDepartment", "challenge", "volume"] as const;
 const CUSTOM_NAME_MAX = 60;
 const EMPTY: TeamConfig = { context: {}, departments: [], chosen: [], agents: {} };
@@ -129,8 +130,10 @@ export function AiTeamBuilder({
       }
       case "agents":
         return selectionIssues(selected).length > 0 ? ["agents"] : [];
-      case "team":
-        return [!config.deployment && "deployment", !config.operations && "operations"].filter(Boolean) as string[];
+      case "data":
+        return config.deployment ? [] : ["deployment"];
+      case "approval":
+        return config.operations ? [] : ["operations"];
       default:
         return [];
     }
@@ -566,11 +569,12 @@ export function AiTeamBuilder({
             </div>
           )}
 
-          {step === "team" && (
+          {step === "data" && (
             <div className="grid gap-8">
               {selected.map((agent) => (
                 <AgentSettings
                   key={agent}
+                  part="data"
                   agent={agent}
                   content={content}
                   config={configs[agent]}
@@ -599,6 +603,25 @@ export function AiTeamBuilder({
                 </div>
                 {errors.has("deployment") && <p className="field-error">{e.choose}</p>}
               </fieldset>
+            </div>
+          )}
+
+          {step === "approval" && (
+            <div className="grid gap-8">
+              <p className="text-sm leading-relaxed text-fg-muted" data-testid="team-risk-note">
+                {content.approvalStep.note}
+              </p>
+              {selected.map((agent) => (
+                <AgentSettings
+                  key={agent}
+                  part="approval"
+                  agent={agent}
+                  content={content}
+                  config={configs[agent]}
+                  volumeLabel={volumeLabel}
+                  onChange={(patch) => updateAgent(agent, patch)}
+                />
+              ))}
               <fieldset aria-invalid={errors.has("operations") || undefined} id="team-operations">
                 <legend className="field-label mb-3 text-base">{content.teamStep.operations.label}</legend>
                 <div className="grid gap-3 md:grid-cols-3">
@@ -624,7 +647,12 @@ export function AiTeamBuilder({
           )}
 
           {step === "architecture" && architecture && (
-            <TeamArchitecture content={content} nodes={architecture.nodes} edges={architecture.edges} describe={describe} />
+            <>
+              <p className="rounded-[var(--radius-md)] border border-dashed border-line-strong p-3 text-sm text-fg-secondary" data-testid="team-not-deployed">
+                {content.architecture.notDeployed}
+              </p>
+              <TeamArchitecture content={content} nodes={architecture.nodes} edges={architecture.edges} describe={describe} />
+            </>
           )}
         </div>
         <StepNav isFirst={flow.isFirst} isLast={flow.isLast} labels={ui} onBack={flow.back} />
@@ -643,12 +671,15 @@ export function AiTeamBuilder({
 }
 
 function AgentSettings({
+  part,
   agent,
   content,
   config,
   volumeLabel,
   onChange,
 }: {
+  /** "data": volume and systems; "approval": the human approval checkpoint. */
+  part: "data" | "approval";
   agent: AgentKey;
   content: Content;
   config: AgentConfig;
@@ -665,6 +696,7 @@ function AgentSettings({
       <h3 id={`settings-${agent}`} className="t-h3">
         {content.agents[agent].name}
       </h3>
+      {part === "data" && (
       <div className="grid gap-5 md:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
         <div>
           <label htmlFor={`volume-${agent}`} className="field-label">
@@ -717,6 +749,8 @@ function AgentSettings({
           </fieldset>
         )}
       </div>
+      )}
+      {part === "approval" && (
       <fieldset aria-describedby={`checkpoint-${agent}-note`}>
         <legend className="field-label">{t.checkpoint}</legend>
         <div className="grid gap-2 sm:grid-cols-2">
@@ -738,6 +772,7 @@ function AgentSettings({
           {content.checkpointReasons[minimum.reason]} ({content.checkpoints[minimum.checkpoint].title})
         </p>
       </fieldset>
+      )}
     </section>
   );
 }

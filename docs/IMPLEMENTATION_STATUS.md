@@ -16,6 +16,34 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/tools-depth` (from `main` @ `f75b58d`, not merged, 2026-10-28): deeper
+"Build your AI team", ROI calculator and Opportunity Finder (TOOLS_PLATFORM.md, TEAM_CONFIGURATOR.md,
+ROI_AND_FINDER.md).
+
+* **AI team:** six steps as briefed (data and systems and approval and risk are now separate
+  screens); "illustrative, not deployed, not connected, not running" notices on the architecture step
+  and the result; rollout phases renamed MVP → pilot → production (internal keys unchanged);
+  saving requires an explicit consent tick in the UI and `storage_consent: true` in the API (422
+  otherwise, nothing stored). Team PDF texts regenerated (web and API copies identical).
+* **ROI calculator (formulas `2026-11.1`):** exception/rework rate input (exceptions return to full
+  manual handling, included in all three scenarios), a worked explanation with the visitor's numbers,
+  the formula version on the page and in the export, and an always-visible disclaimer ("illustrative
+  estimates, not verified financial outcomes"). Old 11-value share links are rejected, not
+  reinterpreted.
+* **Opportunity Finder (model `2026-11.1`):** a tenth criterion (structured vs unstructured inputs),
+  a separate risk rating with an override (high risk is never a quick win), mandatory human approval
+  for high-risk or critical-impact processes, standard workflow automation preferred where rules
+  suffice, suitable services, a suggested pilot scope, workshop links, a "suitability is not a
+  financial return" note, and cleaned process names rendered as text only.
+
+No migration; the API change is the new required `storage_consent` field (OpenAPI regenerated).
+
+| Check | Result |
+| --- | --- |
+| `.\scripts\test.ps1 -Suite api` | **485 passed** (1 new: storage only with explicit consent), Ruff clean, docs and OpenAPI in sync, vector and text copies identical |
+| Web typecheck, lint, unit tests (`web-tests` container) | passed; **576** unit tests, 40 files |
+| e2e (production build, no-host-ports override, staff accounts, revalidation secret) | **125 passed** (team, team-costs, roi-finder and mobile specs updated for the new steps, consent, exception rate, worked steps, disclaimer and the ten finder criteria) |
+
 Branch `feature/readiness-v3` (from `main` @ `6226281`, not merged, 2026-10-28): AI readiness model
 **`2026-11.1`** with the requested six dimensions (TOOLS_PLATFORM.md → "Readiness model").
 

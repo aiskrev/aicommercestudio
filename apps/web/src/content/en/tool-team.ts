@@ -12,7 +12,8 @@ export const teamTool: typeof bgTeamTool = {
     context: { title: "Context", description: "A few questions about the business, so we can suggest suitable roles." },
     departments: { title: "Departments", description: "Which departments will work with the AI agents?" },
     agents: { title: "Agents", description: "Choose the roles in the team. Recommended ones match your context." },
-    team: { title: "Configuration", description: "Volume, systems and human approval points for each agent." },
+    data: { title: "Data and systems", description: "Volume, systems and data for each agent, and where the team runs." },
+    approval: { title: "Approval and risk", description: "Which actions a person approves and who maintains the system." },
     architecture: { title: "Architecture", description: "How agents, people, data and systems connect." },
   },
   stepResults: "Result",
@@ -268,7 +269,11 @@ export const teamTool: typeof bgTeamTool = {
     approvals: "Approval points",
     complexity: "Complexity (indicative)",
   },
+  approvalStep: {
+    note: "The minimum approval level is raised automatically for agents that act externally or handle sensitive data; lower levels are disabled.",
+  },
   architecture: {
+    notDeployed: "Illustrative architecture: the suggested agents are not deployed, not connected to your systems and not running.",
     title: "Team architecture",
     hint: "Select an element to see its connections. Use the arrow keys to move between elements.",
     lanes: {
@@ -360,9 +365,9 @@ export const teamTool: typeof bgTeamTool = {
     },
     rolloutTitle: "Phased rollout",
     phases: {
-      pilot: { title: "Pilot", goal: "One process with a limited scope, human approval and quality measurement.", exit: "Continue when quality meets the criteria on the test examples." },
-      expand: { title: "Expand", goal: "The next agents, under the same rules and tests.", exit: "Continue when hand-offs between agents and people work reliably." },
-      scale: { title: "Scale", goal: "Coordination, oversight and the remaining roles for the whole team.", exit: "Regular review of quality, cost and incidents." },
+      pilot: { title: "MVP", goal: "One agent for one process, with test examples and human approval — no customer access until the quality is proven.", exit: "Continue when quality meets the criteria on the test examples." },
+      expand: { title: "Pilot", goal: "A limited volume in real work and the next agents, under the same rules and tests.", exit: "Continue when hand-offs between agents and people work reliably." },
+      scale: { title: "Production", goal: "Coordination, oversight, monitoring and the remaining roles for the whole team.", exit: "Regular review of quality, cost and incidents." },
     },
     weeks: "Indicative: {min}–{max} weeks",
     phaseComplexity: "Phase complexity: {complexity}",
@@ -474,6 +479,8 @@ export const teamTool: typeof bgTeamTool = {
     title: "Save the configuration",
     text: "Saves only the selected values (no personal data and no custom department name) for {days} days. You get a link to open it again.",
     button: "Save and get a link",
+    consent: "I agree that the configuration (selected values only, no personal data) is stored for {days} days so I can open it with the link.",
+    consentError: "Confirm that the configuration may be stored.",
     saving: "Saving…",
     saved: "Saved until {date}. The link is the only way to access it — keep it safe.",
     copy: "Copy the link",

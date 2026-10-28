@@ -49,15 +49,24 @@ test("the AI team configurator runs end to end in Bulgarian", async ({ page }) =
   await expect(page.getByTestId("team-summary")).toContainText("Асистент за вътрешни знания");
   await form.getByRole("button", { name: "Напред" }).click();
 
-  // Step 4 — approval floor and deployment preferences.
+  // Step 4 — data and systems: the environment is required.
+  await expect(form.getByRole("heading", { level: 2, name: "Данни и системи" })).toBeFocused();
+  await form.getByRole("button", { name: "Напред" }).click();
+  await expect(form.getByRole("alert")).toContainText("Попълнете отбелязаните полета");
+  await form.getByRole("radio", { name: /^Управлявана облачна среда/ }).check();
+  await form.getByRole("button", { name: "Напред" }).click();
+
+  // Step 5 — approval and risk: the approval floor cannot be lowered.
+  await expect(form.getByRole("heading", { level: 2, name: "Одобрение и риск" })).toBeFocused();
+  await expect(form.getByTestId("team-risk-note")).toContainText("повишава автоматично");
   const support = form.getByTestId("settings-customer_support");
   await expect(support.getByRole("radio", { name: /^Без одобрение/ })).toBeDisabled();
   await expect(support.getByRole("radio", { name: /^Одобрение преди външно действие/ })).toBeChecked();
-  await form.getByRole("radio", { name: /^Управлявана облачна среда/ }).check();
   await form.getByRole("radio", { name: /^Съвместно/ }).check();
   await form.getByRole("button", { name: "Напред" }).click();
 
-  // Step 5 — the diagram is operable with the keyboard.
+  // Step 6 — the diagram is illustrative and operable with the keyboard.
+  await expect(form.getByTestId("team-not-deployed")).toContainText("не са внедрени");
   const diagram = form.locator("svg[data-orientation='horizontal']");
   await expect(diagram).toBeVisible();
   await diagram.locator("[data-node='users:team']").focus();
@@ -75,7 +84,8 @@ test("the AI team configurator runs end to end in Bulgarian", async ({ page }) =
   await expect(result.getByRole("heading", { level: 2, name: "Вашият препоръчан AI екип" })).toBeFocused();
   await expect(result.getByTestId("team-roles")).toContainText("Асистент за вътрешни знания");
   await expect(result.getByTestId("team-workflows")).toContainText("Разрешаване на клиентски въпрос");
-  await expect(result.getByTestId("team-rollout")).toContainText("Пилот");
+  await expect(result.getByTestId("team-rollout")).toContainText("MVP");
+  await expect(result.getByTestId("team-result-not-deployed")).toContainText("не работят");
   await expect(result.getByTestId("team-effort-note")).toContainText("не са оферта");
   await expect(result.getByTestId("team-risks")).toContainText("Грешки пред клиенти");
   await expect(page.getByRole("button", { name: "Копирай връзка към резултата" })).toBeVisible();

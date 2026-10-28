@@ -145,7 +145,8 @@ export async function requestTeamReport(input: {
 export function saveTeamConfiguration(config: TeamConfig, locale: Locale, overrides: Overrides | undefined, formToken: string) {
   return postJson<{ reference: string; token: string; expires_at: string }>(
     "/api/public/team/configurations",
-    { ...base(config, locale, overrides), form_token: formToken },
+    // Saving is an explicit, consented action: the UI sends it only after the consent box is ticked.
+    { ...base(config, locale, overrides), form_token: formToken, storage_consent: true },
     locale,
   );
 }

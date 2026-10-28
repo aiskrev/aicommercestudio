@@ -70,7 +70,13 @@ test("the PDF plan downloads and a saved link reopens the configuration", async 
   expect(download.suggestedFilename()).toBe("ai-ekip-plan.pdf");
   expect((await readFile((await download.path())!)).subarray(0, 5).toString()).toBe("%PDF-");
 
-  await page.getByTestId("team-save").getByRole("button", { name: "Запази и вземи връзка" }).click();
+  // Nothing is stored until the visitor explicitly agrees.
+  const save = page.getByTestId("team-save");
+  await save.getByRole("button", { name: "Запази и вземи връзка" }).click();
+  await expect(save.getByRole("alert")).toContainText("Потвърдете, че конфигурацията може да бъде запазена.");
+  await expect(page.getByTestId("team-saved-link")).toHaveCount(0);
+  await save.getByTestId("team-save-consent").check();
+  await save.getByRole("button", { name: "Запази и вземи връзка" }).click();
   const link = await page.getByTestId("team-saved-link").inputValue();
   expect(link).toMatch(/\/bg\/instrumenti\/ai-ekip\?c=[\w-]{40,}$/);
 
@@ -115,7 +121,9 @@ test("the team API validates versions and configurations and hides unknown links
   expect((await request.post("/api/public/team/configurations/lookup", { data: { token: "x".repeat(43) } })).status()).toBe(404);
   expect((await request.post("/api/public/team/report", { data: { ...base, form_token: "" } })).status()).toBe(400);
   const token = await agedToken(request);
-  const saved = await request.post("/api/public/team/configurations", { data: { ...base, form_token: token } });
+  // Without explicit storage consent nothing is stored.
+  expect((await request.post("/api/public/team/configurations", { data: { ...base, form_token: token } })).status()).toBe(422);
+  const saved = await request.post("/api/public/team/configurations", { data: { ...base, form_token: token, storage_consent: true } });
   expect(saved.status()).toBe(201);
   const lookup = await request.post("/api/public/team/configurations/lookup", { data: { token: (await saved.json()).token } });
   expect((await lookup.json()).config.chosen).toEqual(["customer_support"]);

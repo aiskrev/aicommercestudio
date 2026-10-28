@@ -10284,6 +10284,11 @@
             "maxLength": 200,
             "title": "Form Token",
             "default": ""
+          },
+          "storage_consent": {
+            "type": "boolean",
+            "const": true,
+            "title": "Storage Consent"
           }
         },
         "additionalProperties": false,
@@ -10291,7 +10296,8 @@
         "required": [
           "schema_version",
           "model_version",
-          "config"
+          "config",
+          "storage_consent"
         ],
         "title": "TeamSaveRequest"
       },
