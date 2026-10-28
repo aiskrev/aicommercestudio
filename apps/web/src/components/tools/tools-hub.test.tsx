@@ -30,8 +30,8 @@ const REQUIRED: ToolKey[] = [
   "solution",
   "cloud_maturity",
   "devops_maturity",
-  // Planned from here on (REQUIRED.slice(PLANNED_FROM)).
   "observability",
+  // Planned from here on (REQUIRED.slice(PLANNED_FROM)).
   "ecommerce_architecture",
   "data_integration",
   "ai_governance",
@@ -40,7 +40,7 @@ const REQUIRED: ToolKey[] = [
 ];
 
 /** Index in REQUIRED of the first planned tool: the engineering assessments before it are live. */
-const PLANNED_FROM = 8;
+const PLANNED_FROM = 9;
 
 describe("tool registry", () => {
   it("registers every required tool once, with content in both languages", () => {
@@ -107,6 +107,7 @@ describe("tool routing", () => {
     expect(Object.keys(intros).sort()).toEqual(REQUIRED.slice(PLANNED_FROM).sort());
     expect(live.cloud_maturity).toBe("/en/tools/cloud-platform-maturity");
     expect(live.devops_maturity).toBe("/en/tools/devops-delivery-maturity");
+    expect(live.observability).toBe("/en/tools/observability-reliability");
     for (const key of Object.keys(intros)) expect(live[key as ToolKey], key).toBeUndefined();
     expect(intros.finops).toBe("/en/tools/finops-ai-cost");
     expect(live.readiness).toBe("/en/tools/ai-readiness");
@@ -164,13 +165,13 @@ describe("tools directory", () => {
     expect(engineering).toHaveAttribute("aria-pressed", "true");
     expect(count).toHaveTextContent("Tools shown: 5");
     const statuses = Array.from(document.querySelectorAll("article[data-tool]")).map((a) => a.getAttribute("data-status"));
-    expect(statuses.filter((s) => s === "live")).toHaveLength(2); // cloud & platform, DevOps delivery
+    expect(statuses.filter((s) => s === "live")).toHaveLength(3); // cloud & platform, DevOps delivery, observability
 
     const availability = screen.getByRole("group", { name: "Availability" });
     fireEvent.click(within(availability).getByRole("button", { name: "Available now" }));
-    expect(count).toHaveTextContent("Tools shown: 2");
-    fireEvent.click(within(availability).getByRole("button", { name: "Coming soon" }));
     expect(count).toHaveTextContent("Tools shown: 3");
+    fireEvent.click(within(availability).getByRole("button", { name: "Coming soon" }));
+    expect(count).toHaveTextContent("Tools shown: 2");
     // Every AI-planning tool is live, so this combination has nothing left.
     fireEvent.click(within(categories).getByRole("button", { name: "AI planning" }));
     expect(screen.getByText("No tools match this selection.")).toBeInTheDocument();
@@ -178,21 +179,21 @@ describe("tools directory", () => {
     expect(count).toHaveTextContent(`Tools shown: ${TOOLS.length}`);
 
     fireEvent.click(within(availability).getByRole("button", { name: "Coming soon" }));
-    expect(count).toHaveTextContent("Tools shown: 6");
+    expect(count).toHaveTextContent("Tools shown: 5");
   });
 });
 
 describe("planned tool intro", () => {
   it("states the purpose and status without any form, question or start button", () => {
     const { tools } = getContent("bg");
-    const tool = tools.items.find((i) => i.key === "observability")!;
+    const tool = tools.items.find((i) => i.key === "ecommerce_architecture")!;
     render(
       <ToolIntro
         tool={tool}
         breadcrumbs={[
           { name: "Начало", path: "/bg" },
           { name: "Инструменти", path: "/bg/instrumenti" },
-          { name: tool.title, path: "/bg/instrumenti/nablyudaemost-i-nadezhdnost" },
+          { name: tool.title, path: "/bg/instrumenti/arhitektura-na-online-magazin" },
         ]}
         badge={tools.upcomingBadge}
         labels={tools.intro}

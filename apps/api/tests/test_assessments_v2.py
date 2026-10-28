@@ -233,6 +233,65 @@ def test_definitions_reject_points_on_unscored_questions_and_unknown_domains():
         AssessmentDefinition.model_validate(data)
 
 
+def observability() -> AssessmentDefinition:
+    return registry().current("observability_reliability")
+
+
+OBS_WEAK = {
+    "telemetry": [],
+    "log_retention_days": 0,
+    "alert_routing": "none",
+    "actionable_alerts": 0,
+    "incident_process": "none",
+    "postmortems": False,
+    "slos": "none",
+}
+OBS_STRONG = {
+    "telemetry": ["logs", "metrics", "traces", "error_tracking"],
+    "log_retention_days": 90,
+    "alert_routing": "on_call_rotation",
+    "actionable_alerts": 4,
+    "incident_process": "practiced",
+    "postmortems": True,
+    "slos": "all_critical",
+    "status_communication": True,
+}
+
+
+def test_observability_1_1_0_is_live_with_the_same_questions_as_1_0_0():
+    current, previous = observability(), registry().get("observability_reliability", "1.0.0")
+    assert (current.version, current.status, previous.status) == ("1.1.0", "live", "preview")
+    assert [q.key for q in current.questions] == [q.key for q in previous.questions]
+    assert current.extension == "observability_signals"
+
+
+def test_observability_boundaries_and_explained_findings():
+    definition = observability()
+    answers, weak = service.assess(definition, OBS_WEAK)
+    assert (weak.overall, weak.band) == (0, "reactive")
+    assert weak.extras == {"missing_signals": ["logs", "metrics", "traces"]}
+    view = present_result(definition, weak, "en", answers)
+    kinds = {f["key"]: f["kind"] for f in view["recommendations"]}
+    assert kinds["risk_no_alerts"] == kinds["risk_no_incident_process"] == kinds["risk_blind_spots"] == "risk"
+    assert kinds["on_call_routing"] == "quick_win"
+    assert all(f["because"] for f in view["recommendations"])
+    alerts = next(f for f in view["recommendations"] if f["key"] == "risk_no_alerts")
+    assert alerts["because"] == ["“How do alerts reach the team?”: We have no alerts"]
+
+    answers, strong = service.assess(definition, OBS_STRONG)
+    assert (strong.overall, strong.band) == (100, "reliable")
+    view = present_result(definition, strong, "bg", answers)
+    assert {f["kind"] for f in view["recommendations"]} == {"target_state"}
+    assert [step["horizon"] for step in view["roadmap"]] == [90]
+
+
+def test_observability_keeps_its_cross_question_check(client):
+    response = score(
+        client, "observability_reliability", dict(OBS_STRONG, telemetry=[], alert_routing="on_call_rotation")
+    )
+    assert response.status_code == 422 and response.json()["errors"][0]["type"] == "inconsistent"
+
+
 # --------------------------------------------------------------------------- API
 
 

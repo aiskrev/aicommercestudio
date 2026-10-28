@@ -20,6 +20,15 @@ export const engineeringTool: typeof bgEngineeringTool = {
       lead: "22 questions on practices across 11 areas, and optional delivery metrics. The score comes from the practices only; metrics are shown separately as your own, unverified data.",
       facts: ["deterministic scoring", "metrics are not scored", "no sign-up"],
     },
+    observability: {
+      metaTitle: "Observability & Reliability Assessment",
+      metaDescription:
+        "A self-assessment across 4 areas: telemetry, alerting, incidents and reliability targets (SLOs). Risks, quick wins and a 30/60/90-day roadmap with the reason why.",
+      eyebrow: "Tools · DevOps & SRE",
+      title: "Observability & Reliability Assessment",
+      lead: "Eight questions on whether you find problems before your customers do. The result shows scores by area, risks, quick wins and a roadmap — every recommendation says which answer triggered it.",
+      facts: ["about 4 minutes", "no access to your systems", "no sign-up"],
+    },
   },
   wizard: {
     loading: "Loading the questions…",

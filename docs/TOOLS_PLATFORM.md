@@ -16,7 +16,7 @@ Foundations for the business assessment and solution-design tools. Hub: `/bg/ins
 | AI agent library (10 static agent pages) | `agents` | live | `/bg/ai-agenti` ↔ `/en/ai-agents` | `tool_agents` (on) |
 | Cloud & Platform Maturity Assessment (engine, 10 areas) | `cloud_maturity` | live | `/bg/instrumenti/zrelost-na-oblak-i-platforma` ↔ `/en/tools/cloud-platform-maturity` | `tool_cloud` (on) |
 | DevOps Delivery Maturity (engine, 11 areas, unscored metrics) | `devops_maturity` | live | `/bg/instrumenti/zrelost-na-devops-dostavkata` ↔ `/en/tools/devops-delivery-maturity` | `tool_devops` (on) |
-| Observability & Reliability Assessment | `observability` | planned | intro `/bg/instrumenti/nablyudaemost-i-nadezhdnost` ↔ `/en/tools/observability-reliability` | — |
+| Observability & Reliability Assessment (engine, 4 areas) | `observability` | live | `/bg/instrumenti/nablyudaemost-i-nadezhdnost` ↔ `/en/tools/observability-reliability` | `tool_observability` (on) |
 | E-commerce Architecture Assessment | `ecommerce_architecture` | planned | intro `/bg/instrumenti/arhitektura-na-online-magazin` ↔ `/en/tools/ecommerce-architecture` | — |
 | Data Integration Assessment | `data_integration` | planned | intro `/bg/instrumenti/integratsiya-na-danni` ↔ `/en/tools/data-integration` | — |
 | Responsible AI Governance Assessment | `ai_governance` | planned | intro `/bg/instrumenti/otgovoren-ai` ↔ `/en/tools/responsible-ai-governance` | — |

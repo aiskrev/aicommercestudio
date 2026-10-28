@@ -13,9 +13,9 @@ for (const l of [
     engineering: "Инженерни оценки",
     planned: "Очаквайте скоро",
     count: /Показани инструменти: (\d+)/,
-    intro: "/bg/instrumenti/nablyudaemost-i-nadezhdnost",
-    introEn: "/en/tools/observability-reliability",
-    introTitle: "Оценка на наблюдаемостта и надеждността",
+    intro: "/bg/instrumenti/arhitektura-na-online-magazin",
+    introEn: "/en/tools/ecommerce-architecture",
+    introTitle: "Оценка на архитектурата на онлайн магазин",
     consult: "Заявете оценка с консултант",
   },
   {
@@ -24,9 +24,9 @@ for (const l of [
     engineering: "Engineering assessments",
     planned: "Coming soon",
     count: /Tools shown: (\d+)/,
-    intro: "/en/tools/observability-reliability",
-    introEn: "/en/tools/observability-reliability",
-    introTitle: "Observability & Reliability Assessment",
+    intro: "/en/tools/ecommerce-architecture",
+    introEn: "/en/tools/ecommerce-architecture",
+    introTitle: "E-commerce Architecture Assessment",
     consult: "Request the assessment from a consultant",
   },
 ] as const) {
@@ -46,8 +46,8 @@ for (const l of [
     await page.keyboard.press("Enter");
     await expect(engineering).toHaveAttribute("aria-pressed", "true");
     await expect(directory.locator("article")).toHaveCount(5);
-    // Cloud & platform and DevOps delivery are live; the other three are still "Coming soon".
-    await expect(directory.locator("article[data-status='live']")).toHaveCount(2);
+    // Cloud & platform, DevOps delivery and observability are live; the other two are "Coming soon".
+    await expect(directory.locator("article[data-status='live']")).toHaveCount(3);
     for (const card of await directory.locator("article[data-status='planned']").all()) {
       await expect(card).toContainText(l.planned);
       await expect(card.locator("button")).toHaveCount(0);
@@ -72,11 +72,11 @@ for (const l of [
       links.map((link) => new URL(link.getAttribute("href") ?? "").pathname),
     );
     expect(alternates).toContain(l.introEn);
-    expect(alternates).toContain("/bg/instrumenti/nablyudaemost-i-nadezhdnost");
+    expect(alternates).toContain("/bg/instrumenti/arhitektura-na-online-magazin");
 
     const sitemap = await (await request.get("/sitemap.xml")).text();
-    expect(sitemap).not.toContain("nablyudaemost-i-nadezhdnost");
-    expect(sitemap).not.toContain("observability-reliability");
+    expect(sitemap).not.toContain("arhitektura-na-online-magazin");
+    expect(sitemap).not.toContain("ecommerce-architecture");
 
     await main.getByRole("link", { name: l.consult }).click();
     await expect(page).toHaveURL(/\/(kontakti|contact)\?(usluga|service)=[a-z_]+$/);
