@@ -47,9 +47,11 @@ Validation errors (422) add `errors`:
 | 403 | `forbidden_role` | the staff role does not allow the action (catalogue roles; non-`admin` roles outside the catalogue) |
 | 404 | `not_found`, `lead_not_found`, `action_not_found` | unknown route or resource |
 | 404 | `domain_not_found`, `service_not_found`, `catalogue_entity_not_found` | unknown or unpublished catalogue entry |
+| 404 | `staff_not_found` | unknown staff account |
 | 409 | `status_conflict` | `expected_status` no longer matches (another admin changed the lead) |
 | 409 | `already_decided` | AI action was already approved/rejected |
-| 409 | `key_taken`, `slug_taken`, `invalid_transition`, `domain_archive_not_allowed` | catalogue: duplicate key, concurrent slug clash, action not possible in the current state |
+| 409 | `key_taken`, `slug_taken`, `invalid_transition`, `domain_archive_not_allowed`, `entity_referenced` | catalogue: duplicate key, concurrent slug clash, action not possible in the current state, delete blocked by links |
+| 409 | `own_role`, `last_admin` | staff: changing one's own role; demoting the last active administrator |
 | 412 | `revision_conflict` | catalogue: `If-Match` revision is stale |
 | 413 | `payload_too_large` | body > 64 KB |
 | 422 | `validation_error` | see `errors` |
@@ -344,13 +346,24 @@ Editing, preview and publishing of the catalogue working copy. Model and lifecyc
 | GET | `/api/admin/catalogue/options` | viewer | the caller's `role`, domains and services for pickers, and `free_lead_categories` |
 | POST | `/api/admin/catalogue/entities` | editor | `{key, offering_type, primary_domain?, lead_category?, name_bg, name_en}` → 201 draft. A `service` needs a primary domain and an unused lead category (`ServiceKey` except `other`). Assessments and workshops have no lead category. Domains cannot be created (fixed taxonomy). 409 `key_taken`. |
 | GET | `/api/admin/catalogue/entities/{entity_id}` | viewer | Working copy: `translations{bg,en}` (`slug, name, short_name, summary, body, cta_label, seo_title, seo_description`), `capabilities[]` and `deliverables[]` (each item `{bg:{title,body}, en:{title,body}}`), `related[]` (keys), `service{…}` or `domain{code, band, icon, contact_service, families[]}`, `status, revision, published_revision, has_unpublished_changes`, and the caller's `permissions` (`edit`, `publish`, `archive`, `restore`). `ETag: "<revision>"`. |
-| PATCH | `/api/admin/catalogue/entities/{entity_id}` | editor | Saves the whole working copy (the body shape of the GET, minus read-only fields; lists are replaced in order). Drafts may be incomplete. The revision increases only when something changed. Archived entries → 409 `invalid_transition`; a slug in use → 422 `slug_taken`. The public API is unaffected until publishing. |
+| PATCH | `/api/admin/catalogue/entities/{entity_id}` | editor | Domains may also send `families`: the full ordered list of `{key, delivery_status, services[], via[], bg{name, summary, prerequisite}, en{…}}`. `key` is the local key (`[a-z][a-z0-9_]*`); a new key creates a family, a family left out is archived (it is excluded from snapshots and revived if its key comes back). Field errors look like `families.2.en.name`, `families.0.services.1`, `families.1.key` (`duplicate_key`). Publishing a domain needs a name and summary for every family in both locales, and a prerequisite for planned families. Saves the whole working copy (the body shape of the GET, minus read-only fields; lists are replaced in order). Drafts may be incomplete. The revision increases only when something changed. Archived entries → 409 `invalid_transition`; a slug in use → 422 `slug_taken`. The public API is unaffected until publishing. |
 | GET | `/api/admin/catalogue/entities/{entity_id}/checks` | viewer | `{publishable, errors[{field,message,type}]}`: what blocks publishing |
 | GET | `/api/admin/catalogue/entities/{entity_id}/preview` | viewer | The public detail (`?locale=bg\|en`) the working copy would have after publishing; 422 `catalogue_incomplete` with field errors if it could not be published |
 | POST | `/api/admin/catalogue/entities/{entity_id}/publish` | admin | Publishes the working copy. Both locales must be complete: name, slug, summary, body and SEO texts; a short name for services; a CTA for domains; every list item; SEO title ≤ 60 (domains) or ≤ 70 (services); SEO description 120–160 (domains) or 70–175 (services). Otherwise 422 `catalogue_incomplete` with field errors. Archived → 409 `invalid_transition`. |
 | POST | `/api/admin/catalogue/entities/{entity_id}/archive` | admin | Withdraws a service, assessment or workshop from the public API; 409 `domain_archive_not_allowed` for domains |
 | POST | `/api/admin/catalogue/entities/{entity_id}/restore` | admin | Archived → draft (publish again to make it public) |
+| DELETE | `/api/admin/catalogue/entities/{entity_id}` | admin | Deletes a service, assessment or workshop that was **never published** (status draft, no `first_published_at`) and that nothing links to → 204, audited `catalogue.entity_deleted`. Otherwise 409 `invalid_transition` (published, once published, or a domain) or `entity_referenced` (linked as related, from a family, or as a domain's contact service). Needs `If-Match`. The `delete` permission appears in `permissions` only when allowed. |
 | GET | `/api/admin/catalogue/entities/{entity_id}/history` | viewer | The entry's audit entries, newest first (≤ 50) |
+
+## Admin: staff and roles
+
+Administrators only (`editor`/`viewer` → 403 `forbidden_role`). Accounts are still created with the
+CLI; this API only changes roles. Responses are `no-store`.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/admin/staff` | `[{id, email, full_name, role, is_active, last_login_at, is_self}]`, sorted by e-mail (no password data) |
+| PATCH | `/api/admin/staff/{user_id}` | `{"role": "admin" \| "editor" \| "viewer"}`. Revokes the person's sessions (the new rights apply immediately), audited `admin.role_changed` with the acting admin. 409 `own_role` for one's own account, 409 `last_admin` when it would leave no active administrator, 404 `staff_not_found`. |
 
 ## Admin: AI action approvals
 

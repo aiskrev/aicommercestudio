@@ -279,7 +279,7 @@ export interface OpsMember {
 export type CatalogueStatus = "draft" | "published" | "archived";
 export type OfferingType = "service" | "assessment" | "workshop";
 export type DeliveryStatus = "available" | "custom" | "planned";
-export type CataloguePermission = "edit" | "publish" | "archive" | "restore";
+export type CataloguePermission = "edit" | "publish" | "archive" | "restore" | "delete";
 export type CatalogueLocale = "bg" | "en";
 
 export interface CatalogueEntitySummary {
@@ -335,12 +335,38 @@ export interface CatalogueServiceFields {
   is_entry_offer: boolean;
 }
 
+export interface CatalogueFamilyText {
+  name: string;
+  summary: string | null;
+  prerequisite: string | null;
+}
+
+export interface CatalogueFamily {
+  /** Local key: the part after "<domain>.". */
+  key: string;
+  delivery_status: DeliveryStatus;
+  services: string[];
+  via: string[];
+  bg: CatalogueFamilyText;
+  en: CatalogueFamilyText;
+}
+
+export interface StaffMember {
+  id: string;
+  email: string;
+  full_name: string;
+  role: StaffRole;
+  is_active: boolean;
+  last_login_at: string | null;
+  is_self: boolean;
+}
+
 export interface CatalogueDomainFields {
   code: string;
   band: "ai" | "engineering" | "operations";
   icon: string;
   contact_service: string | null;
-  families: { key: string; name_bg: string; name_en: string; delivery_status: DeliveryStatus; services: string[] }[];
+  families: CatalogueFamily[];
 }
 
 export interface CatalogueEntity {

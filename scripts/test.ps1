@@ -54,8 +54,15 @@ if ($Suite -in @("web", "all")) {
 }
 if ($Suite -in @("e2e", "all")) {
     Invoke-Suite "End-to-end tests (Playwright)" {
-        docker compose up --build -d
-        docker compose --profile test run --rm --build e2e
+        docker compose up --build -d --wait
+        # Throwaway editor and viewer accounts for the role-based admin flows; the password is generated per run.
+        $staffPassword = "E2e-" + [guid]::NewGuid().ToString("N").Substring(0, 20) + "Aa9"
+        foreach ($account in @(@("e2e.editor@example.com", "editor"), @("e2e.viewer@example.com", "viewer"))) {
+            docker compose exec -T -e ADMIN_PASSWORD=$staffPassword api python -m app.cli create-admin --email $account[0] --name "E2E $($account[1])" | Out-Null
+            docker compose exec -T -e ADMIN_PASSWORD=$staffPassword api python -m app.cli set-password --email $account[0] | Out-Null
+            docker compose exec -T api python -m app.cli set-role --email $account[0] --role $account[1] | Out-Null
+        }
+        docker compose --profile test run --rm --build -e E2E_STAFF_PASSWORD=$staffPassword e2e
     }
 }
 if ($Suite -eq "audit") {

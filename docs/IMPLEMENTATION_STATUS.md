@@ -16,6 +16,17 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/catalogue-admin-extras` (from `main` @ `d17d741`, not merged, 2026-10-28):
+domain family editing in the admin catalogue, deleting never-published drafts, the "Staff and roles"
+admin page (`/api/admin/staff`), and role-based Playwright flows with editor and viewer accounts
+created by `test.ps1`. No migration (head stays `0010`).
+
+| Check | Result |
+| --- | --- |
+| `.\scripts	est.ps1 -Suite api` | **444 passed**, Ruff clean, docs and OpenAPI in sync |
+| `.\scripts	est.ps1 -Suite web` | passed (typecheck, lint, **515** unit tests); the admin component tests ran 3× without failures after making the request mock safe for components that unmount late (the likely cause of the earlier one-off failure) |
+| e2e (production build, no-host-ports override, the `test.ps1` staff-account steps) | **97 passed** (3 new in `catalogue-roles.spec.ts`) |
+
 Branch `feature/catalogue-api-admin` (on top of `docs/service-catalogue-architecture`, not merged,
 2026-10-28): migration **`0010`** (staff roles, per-entry publication snapshots, assessments and
 workshops, capabilities and deliverables), the read-only public catalogue API

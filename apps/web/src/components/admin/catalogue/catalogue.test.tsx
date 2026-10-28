@@ -15,7 +15,8 @@ vi.mock("@/lib/admin-api", async (original) => ({
   ...(await original<typeof import("@/lib/admin-api")>()),
   adminFetch: (path: string, init?: RequestInit) => fetchMock(path, init),
 }));
-vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), replace: vi.fn() }) }));
+const { push } = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push, replace: vi.fn() }) }));
 
 const t = adminDictionaries.bg.catalogue;
 const ID = "00000000-0000-4000-8000-000000000001";
@@ -49,7 +50,12 @@ function renderAs(role: StaffRole, ui: ReactElement) {
   return render(<AdminRoleContext.Provider value={role}>{ui}</AdminRoleContext.Provider>);
 }
 
-afterEach(() => fetchMock.mockReset());
+// Requests that a component still makes while it is unmounted after a test stay pending instead of failing.
+afterEach(() => {
+  fetchMock.mockReset();
+  fetchMock.mockImplementation(() => new Promise(() => {}));
+  push.mockReset();
+});
 
 describe("catalogue list", () => {
   const page: CatalogueEntityPage = {
@@ -210,5 +216,83 @@ describe("catalogue editor", () => {
     await screen.findByText(t.saved);
     expect(body!.related).toEqual(["maintenance", "analytics"]);
     expect(body!.deliverables).toHaveLength(2);
+  });
+
+  it("deletes a never-published draft after confirmation and returns to the list", async () => {
+    let method: string | undefined;
+    serveEditor(
+      sampleEntity({ status: "draft", published_revision: null, first_published_at: null, permissions: ["edit", "publish", "archive", "delete"] }),
+      (_path, init) => {
+        method = init.method;
+        expect(new Headers(init.headers).get("If-Match")).toBe('"3"');
+        return undefined;
+      },
+    );
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+    renderAs("admin", <CatalogueEditor id={ID} />);
+    fireEvent.click(await screen.findByRole("button", { name: t.deleteDraft }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/admin/catalogue"));
+    expect(method).toBe("DELETE");
+    confirm.mockRestore();
+  });
+
+  it("does not offer deletion for published entries", async () => {
+    serveEditor(sampleEntity());
+    renderAs("admin", <CatalogueEditor id={ID} />);
+    await screen.findByRole("button", { name: t.publish });
+    expect(screen.queryByRole("button", { name: t.deleteDraft })).not.toBeInTheDocument();
+  });
+
+  it("edits, reorders, adds and removes the service families of a domain", async () => {
+    const text = (name: string) => ({ name, summary: `${name} summary`, prerequisite: null });
+    const domain = sampleEntity({
+      type: "domain",
+      key: "devops_sre",
+      service: null,
+      capabilities: [],
+      related: [],
+      translations: {
+        bg: { ...sampleEntity().translations.bg, short_name: null, cta_label: "Заявете преглед" },
+        en: { ...sampleEntity().translations.en, short_name: null, cta_label: "Request a review" },
+      },
+      domain: {
+        code: "F",
+        band: "engineering",
+        icon: "activity",
+        contact_service: "integrations",
+        families: [
+          { key: "cicd", delivery_status: "custom", services: [], via: [], bg: text("CI/CD"), en: text("CI/CD pipelines") },
+          { key: "release", delivery_status: "custom", services: ["seo"], via: [], bg: text("Версии"), en: text("Release engineering") },
+        ],
+      },
+    });
+    let body: { families: { key: string; services: string[]; bg: { name: string }; en: { name: string } }[] } | null = null;
+    serveEditor(domain, (_path, init) => {
+      body = JSON.parse(init.body as string);
+      return { ...domain, revision: 4 };
+    });
+    renderAs("admin", <CatalogueEditor id={ID} />);
+    const editor = await screen.findByTestId("family-editor");
+
+    fireEvent.click(within(screen.getByTestId("family-release")).getByRole("button", { name: t.moveUp }));
+    fireEvent.change(within(editor).getByLabelText(t.familyKey), { target: { value: "ai_costs" } });
+    fireEvent.click(within(editor).getByRole("button", { name: t.addFamily }));
+    const added = screen.getByTestId("family-ai_costs");
+    fireEvent.change(within(added).getByLabelText(t.familyName), { target: { value: "AI разходи" } });
+    fireEvent.change(within(added).getByLabelText(t.familyServices), { target: { value: "analytics" } });
+    fireEvent.click(within(added).getAllByRole("button", { name: t.addRelated })[0]);
+    fireEvent.click(within(screen.getByTestId("family-cicd")).getByRole("button", { name: t.removeItem }));
+
+    // The English name is still empty: saving is blocked until it is filled in.
+    fireEvent.click(screen.getByRole("button", { name: t.save }));
+    expect(await screen.findByText(t.clientErrors)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: new RegExp(t.locales.en) }));
+    fireEvent.change(within(screen.getByTestId("family-ai_costs")).getByLabelText(t.familyName), { target: { value: "AI costs" } });
+    fireEvent.click(screen.getByRole("button", { name: t.save }));
+    await screen.findByText(t.saved);
+
+    expect(body!.families.map((f) => f.key)).toEqual(["release", "ai_costs"]);
+    expect(body!.families[0].services).toEqual(["seo"]);
+    expect(body!.families[1]).toMatchObject({ services: ["analytics"], bg: { name: "AI разходи" }, en: { name: "AI costs" } });
   });
 });

@@ -255,6 +255,23 @@ def restore_entity(
     return _transition(entity_id, "restore", ctx, db, request, response, if_match)
 
 
+@router.delete("/entities/{entity_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_entity(
+    entity_id: uuid.UUID, ctx: CataloguePublisher, db: DbSession, if_match: IfMatch = None
+) -> Response:
+    """Delete a draft that was never published and that nothing links to; otherwise archive it."""
+    entity = _entity(db, entity_id)
+    _check_revision(entity, if_match)
+    _audit(db, ctx, "catalogue.entity_deleted", entity)
+    try:
+        service.delete_draft(db, entity)
+    except service.DeleteError as exc:
+        db.rollback()
+        raise ApiError(status.HTTP_409_CONFLICT, "Not possible.", exc.code) from exc
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT, headers={"Cache-Control": "no-store"})
+
+
 @router.get("/entities/{entity_id}/history", response_model=list[schemas.HistoryEntry])
 def entity_history(
     entity_id: uuid.UUID, ctx: CatalogueReader, db: DbSession, response: Response

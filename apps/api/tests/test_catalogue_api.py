@@ -10,7 +10,7 @@ from sqlalchemy import select
 
 from app.catalogue import public
 from app.catalogue.seed import entity_id, seed_catalogue
-from app.cli import ensure_admin, set_admin_role
+from app.cli import ensure_admin
 from app.config import get_settings
 from app.models import AuditLog
 from tests.conftest import ADMIN_EMAIL
@@ -51,8 +51,9 @@ def walk_keys(value: Any) -> set[str]:
 def staff_client(db, email: str, role: str) -> TestClient:
     from app.main import app
 
-    ensure_admin(db, email, "Staff-Password-2026", "Staff")
-    set_admin_role(db, email, role)
+    user, _ = ensure_admin(db, email, "Staff-Password-2026", "Staff")
+    user.role = role  # direct: the test database may have no other admin (the API guards the last one)
+    db.commit()
     client = TestClient(app)
     response = client.post("/api/admin/auth/login", json={"email": email, "password": "Staff-Password-2026"})
     assert response.status_code == 200, response.text
@@ -356,7 +357,7 @@ def test_draft_lifecycle_create_publish_archive_restore(admin_client, client, se
     )
     assert created.status_code == 201, created.text
     workshop = created.json()
-    assert (workshop["status"], workshop["permissions"]) == ("draft", ["edit", "publish", "archive"])
+    assert (workshop["status"], workshop["permissions"]) == ("draft", ["edit", "publish", "archive", "delete"])
 
     # Drafts are invisible publicly.
     assert client.get(f"{API}/services/seo_migration_workshop").status_code == 404
