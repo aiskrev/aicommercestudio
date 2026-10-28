@@ -7,6 +7,7 @@ the generated text.
 from __future__ import annotations
 
 import logging
+import threading
 import time
 import uuid
 from dataclasses import dataclass
@@ -57,6 +58,10 @@ MESSAGES: dict[str, dict[str, str]] = {
             "Стъпки, които биха изпратили съобщения, плащания или промени към външни системи, бяха маркирани "
             "като изискващи човешко одобрение."
         ),
+        "ai_budget": (
+            "Дневният лимит за AI анализи е достигнат, затова този резултат е от демонстрационния режим. "
+            "Опитайте отново утре за анализ с AI."
+        ),
     },
     "en": {
         "demo": (
@@ -83,6 +88,10 @@ MESSAGES: dict[str, dict[str, str]] = {
             "Steps that would send messages, payments or changes to external systems were marked as "
             "requiring human approval."
         ),
+        "ai_budget": (
+            "Today's limit for AI analyses has been reached, so this result comes from demo mode. "
+            "Try again tomorrow for an AI analysis."
+        ),
     },
 }
 DEMO_DISCLAIMER = MESSAGES["bg"]["demo"]
@@ -104,6 +113,31 @@ class AdvisorError(Exception):
         self.kind = kind
 
 
+_ai_calls: dict[str, int] = {}
+_ai_calls_lock = threading.Lock()
+
+
+def take_ai_budget(settings: Settings) -> bool:
+    """Count one AI-provider call against today's cap; False when the cap is reached (0 = no cap)."""
+    limit = settings.advisor_ai_daily_limit
+    if limit == 0:
+        return True
+    today = utcnow().date().isoformat()
+    with _ai_calls_lock:
+        used = _ai_calls.get(today, 0)
+        if used >= limit:
+            return False
+        if today not in _ai_calls:
+            _ai_calls.clear()  # keep only today's count
+        _ai_calls[today] = used + 1
+        return True
+
+
+def reset_ai_budget() -> None:
+    with _ai_calls_lock:
+        _ai_calls.clear()
+
+
 def mode_for(provider: AIProvider) -> AdvisorMode:
     return AdvisorMode.DEMO if provider.name == "mock" else AdvisorMode.AI
 
@@ -116,6 +150,13 @@ def create_assessment(
     db: Session, settings: Settings, provider: AIProvider, request: AdvisorRequest
 ) -> AdvisorResponse | AdvisorResponseV2:
     started = time.perf_counter()
+    budget_exhausted = False
+    if provider.name != "mock" and not take_ai_budget(settings):
+        # Spending guard: answer honestly from the demo engine instead of calling the AI provider.
+        from app.ai.mock import MockProvider
+
+        provider, budget_exhausted = MockProvider(), True
+        logger.warning("advisor_ai_budget_exhausted", extra={"limit": settings.advisor_ai_daily_limit})
     locale = request.locale
     description = screen_text(request.process_description, locale)
     other_tools = screen_text(request.other_tools, locale) if request.other_tools else None
@@ -169,6 +210,7 @@ def create_assessment(
         "links": description.links_removed,
         "claims": report.claims_removed,
         "approvals": report.approvals_enforced,
+        "ai_budget": budget_exhausted,
     }
     notices = [message(locale, key) for key, raised in flags.items() if raised]
 

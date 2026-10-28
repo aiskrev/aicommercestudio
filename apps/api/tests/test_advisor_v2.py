@@ -252,3 +252,27 @@ def test_v2_insights_survive_a_consultation_link(client, db):
     row = db.get(AdvisorAssessment, uuid.UUID(body["assessment_id"]))
     summary = service.summary_for_lead(db, row.lead_id)
     assert summary.contract_version == "2" and summary.insights == body["insights"]
+
+
+def test_daily_ai_budget_falls_back_to_the_labelled_demo(client, use_provider, settings, monkeypatch, db):
+    monkeypatch.setattr(settings, "advisor_ai_daily_limit", 2)
+    provider = use_provider(FakeProvider())
+    for _ in range(2):
+        assert client.post(URL, json=advisor_payload(save_assessment=False)).json()["mode"] == "ai"
+    over = client.post(URL, json=v2_payload(locale="en"))
+    assert over.status_code == 201
+    body = over.json()
+    assert (body["mode"], body["provider"]) == ("demo", "mock")
+    assert any("limit for AI analyses" in notice for notice in body["notices"])
+    assert body["disclaimer"].startswith("Demo mode")
+    assert len(provider.calls) == 2  # the provider was not called beyond the cap
+    assert body["insights"]["engine"] == "advisor-insights/1"  # V2 still works on the demo engine
+    row = db.get(AdvisorAssessment, uuid.UUID(body["assessment_id"]))
+    assert (row.mode, row.provider) == ("demo", "mock")
+
+
+def test_no_daily_cap_by_default(client, use_provider, settings):
+    assert settings.advisor_ai_daily_limit == 0
+    use_provider(FakeProvider())
+    for _ in range(3):
+        assert client.post(URL, json=advisor_payload(save_assessment=False)).json()["mode"] == "ai"

@@ -149,7 +149,15 @@ step 10 of the demo script greps the container logs).
 AI_PROVIDER=anthropic
 ANTHROPIC_API_KEY=<server-side secret, never in the web container or browser>
 ANTHROPIC_MODEL=claude-opus-5-5
+ADVISOR_AI_DAILY_LIMIT=20   # spending guard; 0 = no cap
 ```
+
+**Cost and the spending guard.** With Claude Opus 5.5 ($4 input / $20 output per million tokens), one
+assessment uses roughly 3–4k input tokens and a few thousand output tokens including thinking (`effort:
+medium`, `max_tokens` 16 000), so about $0.10–0.20 each and at most about $0.35. `ADVISOR_AI_DAILY_LIMIT`
+caps AI calls per UTC day. Beyond it, the advisor answers with the demo engine, labelled as demo, with a
+notice; the provider is not called. The counter is in memory, per API instance, like the rate limits.
+Also set a spend limit in the Anthropic Console: it is the hard limit.
 
 The key is read only by the API container; the browser talks to the same-origin proxy and never sees it.
 The Anthropic path is tested with a fake SDK client (request shape, no tools, timeouts, refusals, invalid
