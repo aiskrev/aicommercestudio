@@ -153,3 +153,19 @@ test("ROI calculator works on a phone: live result and no horizontal scrolling",
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test("the AI readiness assessment can be completed on a phone", async ({ page }) => {
+  await page.goto("/bg/instrumenti/ai-gotovnost");
+  const form = page.getByTestId("readiness-form");
+  for (let step = 0; step < 6; step++) {
+    for (const group of await form.getByRole("group").all()) await group.getByRole("radio").nth(3).check();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, `step ${step + 1}`).toBeLessThanOrEqual(0);
+    await form.getByRole("button", { name: step === 5 ? "Вижте резултата" : "Напред" }).click();
+  }
+  const result = page.getByTestId("readiness-result");
+  await expect(result.getByTestId("tool-score")).toHaveText("75");
+  await expect(result.getByTestId("tool-level")).toHaveText("Готовност за мащабиране");
+  await expect(result.getByRole("heading", { name: "План за първите 90 дни" })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+});

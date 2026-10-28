@@ -49,7 +49,7 @@ messages follow `Accept-Language: bg|en`.
 | Field | Type | Rules |
 | --- | --- | --- |
 | `schema_version` | `"1"` | required; version of this request shape |
-| `model_version` | string | must equal the server's scoring model (`2026-10.2`), else 422 `readiness_model` |
+| `model_version` | string | must equal the server's scoring model (`2026-11.1`), else 422 `readiness_model` |
 | `locale` | `bg` \| `en` | default `bg`; language of the PDF and messages |
 | `answers` | object | exactly the 12 question ids, each an integer 0–4 (booleans and strings rejected), else 422 `readiness_answers` |
 | `client_overall` | int 0–100 | optional; the browser's score, compared and logged on mismatch |
@@ -62,7 +62,7 @@ Unknown fields are rejected (422).
 ```json
 {
   "schema_version": "1",
-  "model_version": "2026-10.2",
+  "model_version": "2026-11.1",
   "privacy_notice_version": "2026-10-draft",
   "marketing_consent_version": "2026-10-v1",
   "retention_days": 365,

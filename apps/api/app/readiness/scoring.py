@@ -14,26 +14,32 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 
-MODEL_VERSION = "2026-10.2"
+MODEL_VERSION = "2026-11.1"
 
-DIMENSIONS: tuple[str, ...] = ("strategy", "data", "process", "technology", "people", "governance")
+DIMENSIONS: tuple[str, ...] = ("strategy", "infrastructure", "data", "governance", "talent", "organization")
 
 WEIGHTS: dict[str, float] = {
     "strategy": 15,
+    "infrastructure": 15,
     "data": 20,
-    "process": 15,
-    "technology": 15,
-    "people": 15,
     "governance": 20,
+    "talent": 15,
+    "organization": 15,
+}
+
+# Earlier model versions, kept so that stored submissions (leads.service_details) still render
+# their PDF report with the weights they were scored with. Never used for new scores.
+LEGACY_WEIGHTS: dict[str, dict[str, float]] = {
+    "2026-10.2": {"strategy": 15, "data": 20, "process": 15, "technology": 15, "people": 15, "governance": 20},
 }
 
 QUESTIONS: dict[str, tuple[str, str]] = {
     "strategy": ("strategy_goals", "strategy_use_cases"),
+    "infrastructure": ("tech_integration", "tech_environment"),
     "data": ("data_access", "data_quality"),
-    "process": ("process_definition", "process_repeatability"),
-    "technology": ("tech_integration", "tech_environment"),
-    "people": ("people_ownership", "people_change"),
     "governance": ("gov_data_protection", "gov_oversight"),
+    "talent": ("talent_skills", "talent_support"),
+    "organization": ("people_ownership", "people_change"),
 }
 
 QUESTION_ORDER: tuple[str, ...] = tuple(q for d in DIMENSIONS for q in QUESTIONS[d])
@@ -46,17 +52,20 @@ BAND_THRESHOLDS: tuple[tuple[str, int], ...] = (
     ("exploration", 0),
 )
 
+# Service per action. Legacy actions (process_mapping) stay so older stored results still render.
 ACTION_SERVICE: dict[str, str] = {
     "governance_first": "audit",
     "data_quality_first": "integrations",
     "integration_path": "integrations",
+    "expertise_first": "ai_managed",
     "ownership_first": "audit",
     "strategy_definition": "audit",
-    "data_foundation": "integrations",
-    "process_mapping": "automation",
     "tech_foundation": "integrations",
-    "people_enablement": "audit",
+    "data_foundation": "integrations",
     "governance_framework": "audit",
+    "talent_enablement": "audit",
+    "people_enablement": "audit",
+    "process_mapping": "automation",
     "discovery_workshop": "audit",
     "foundation_plan": "audit",
     "scoped_pilot": "ai_agents",
@@ -66,17 +75,18 @@ ACTION_SERVICE: dict[str, str] = {
 _BLOCKER_ACTION: dict[str, tuple[str, str]] = {
     "governance": ("governance_first", "governance"),
     "data_quality": ("data_quality_first", "data"),
-    "integration": ("integration_path", "technology"),
-    "organisation": ("ownership_first", "people"),
+    "integration": ("integration_path", "infrastructure"),
+    "expertise": ("expertise_first", "talent"),
+    "organisation": ("ownership_first", "organization"),
 }
 
 _GAP_ACTION: dict[str, str] = {
     "strategy": "strategy_definition",
+    "infrastructure": "tech_foundation",
     "data": "data_foundation",
-    "process": "process_mapping",
-    "technology": "tech_foundation",
-    "people": "people_enablement",
     "governance": "governance_framework",
+    "talent": "talent_enablement",
+    "organization": "people_enablement",
 }
 
 _BAND_ACTION: dict[str, str] = {
@@ -87,12 +97,19 @@ _BAND_ACTION: dict[str, str] = {
 }
 
 _USE_CASE_RULES: tuple[tuple[str, dict[str, int]], ...] = (
-    ("inquiry_triage", {"process": 50, "technology": 50}),
-    ("document_extraction", {"data": 25, "process": 50}),
+    ("inquiry_triage", {"infrastructure": 50, "organization": 50}),
+    ("document_extraction", {"data": 25, "infrastructure": 50}),
     ("knowledge_assistant", {"data": 50, "governance": 50}),
-    ("reply_drafting", {"process": 50, "governance": 50}),
+    ("reply_drafting", {"organization": 50, "governance": 50}),
     ("reporting_summary", {"data": 50}),
 )
+
+
+def weights_for(model_version: str) -> dict[str, float]:
+    """Weights of the current or a legacy model version (for re-rendering stored results)."""
+    if model_version == MODEL_VERSION:
+        return WEIGHTS
+    return LEGACY_WEIGHTS.get(model_version, WEIGHTS)
 
 
 @dataclass(frozen=True)
@@ -156,6 +173,8 @@ def find_blockers(answers: dict[str, int]) -> list[str]:
         blockers.append("data_quality")
     if answers["tech_integration"] <= 1:
         blockers.append("integration")
+    if answers["talent_support"] == 0:
+        blockers.append("expertise")
     if answers["people_ownership"] <= 1 or answers["people_change"] == 0:
         blockers.append("organisation")
     return blockers

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
@@ -59,6 +60,7 @@ export function ReadinessAssessment({
   advisorHref,
   privacyHref,
   locale,
+  workshops = [],
 }: {
   content: Content;
   ui: Ui;
@@ -68,6 +70,8 @@ export function ReadinessAssessment({
   advisorHref?: string;
   privacyHref: string;
   locale: Locale;
+  /** Domain hubs that list the published workshops and consultant-led assessments. */
+  workshops?: { href: string; label: string }[];
 }) {
   // A shared result (?r=<code>) is read during render; the page wraps this tool in <Suspense>.
   const shared = decodeAnswers(useSearchParams().get("r"));
@@ -188,6 +192,24 @@ export function ReadinessAssessment({
             }))}
         />
 
+        {workshops.length > 0 && (
+          <section aria-labelledby="readiness-workshops-title" className="panel p-5 sm:p-6" data-testid="readiness-workshops">
+            <h2 id="readiness-workshops-title" className="t-h3">
+              {content.workshops.title}
+            </h2>
+            <p className="mt-2 text-fg-muted">{content.workshops.text}</p>
+            <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+              {workshops.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className="link inline-flex min-h-11 items-center font-semibold">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         <InsightList
           id="readiness-use-cases"
           title={r.useCasesTitle}
@@ -206,7 +228,14 @@ export function ReadinessAssessment({
 
         <MethodologyNote
           title={r.methodologyTitle}
-          paragraphs={[r.methodology.scale, r.methodology.weights, r.methodology.bands, r.methodology.blockers, r.methodology.disclaimer]}
+          paragraphs={[
+            r.methodology.scale,
+            r.methodology.weights,
+            r.methodology.bands,
+            r.methodology.blockers,
+            `${r.methodology.limitationsTitle}: ${r.methodology.limitations.join(" ")}`,
+            r.methodology.disclaimer,
+          ]}
         />
 
         <ReadinessReport

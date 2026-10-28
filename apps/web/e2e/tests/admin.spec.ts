@@ -27,14 +27,14 @@ async function createReadinessSubmission(request: APIRequestContext, company: st
   const { token } = await (await request.get("/api/public/form-token")).json();
   await new Promise((resolve) => setTimeout(resolve, 3500));
   const ids = [
-    "strategy_goals", "strategy_use_cases", "data_access", "data_quality", "process_definition", "process_repeatability",
-    "tech_environment", "tech_integration", "people_ownership", "people_change", "gov_data_protection", "gov_oversight",
+    "strategy_goals", "strategy_use_cases", "tech_integration", "tech_environment", "data_access", "data_quality",
+    "gov_data_protection", "gov_oversight", "talent_skills", "talent_support", "people_ownership", "people_change",
   ];
   const response = await request.post("/api/public/readiness/submissions", {
     headers: { "X-Forwarded-For": `10.95.${Math.floor(Math.random() * 250) + 1}.${Math.floor(Math.random() * 250) + 1}` },
     data: {
       schema_version: "1",
-      model_version: "2026-10.2",
+      model_version: "2026-11.1",
       locale: "bg",
       answers: Object.fromEntries(ids.map((id) => [id, 1])),
       name: "E2E Готовност",

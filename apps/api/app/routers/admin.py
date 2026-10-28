@@ -366,7 +366,8 @@ def lead_readiness_report(lead_id: uuid.UUID, ctx: Admin, db: DbSession) -> Resp
     # Rebuilt from the stored result, so the report matches what the visitor saw even after a model change.
     try:
         result = ReadinessResult(**stored)
-        pdf = build_report(result, lead.locale, lead.company)
+        version = str(details.get("model_version", "2026-10.2"))
+        pdf = build_report(result, lead.locale, lead.company, model_version=version)
     except (TypeError, KeyError, ValueError, ReportUnavailable) as exc:
         logger.warning("readiness_report_failed", extra={"lead": lead.reference, "error": type(exc).__name__})
         raise ApiError(

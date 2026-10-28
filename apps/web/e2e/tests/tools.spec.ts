@@ -30,13 +30,18 @@ test("AI readiness assessment runs end to end in Bulgarian", async ({ page }) =>
   await expect(result.getByRole("heading", { name: "Три приоритетни действия" })).toBeVisible();
   await expect(result.getByRole("heading", { name: "План за първите 90 дни" })).toBeVisible();
   await expect(result.getByText("Как се изчислява оценката")).toBeVisible();
+  // Relevant workshops: the domain hubs that list the fixed-scope formats.
+  await expect(result.getByTestId("readiness-workshops").getByRole("link", { name: "AI стратегия и трансформация" })).toHaveAttribute(
+    "href",
+    "/bg/uslugi/ai-strategiya-i-transformatsiya",
+  );
   await expect(result.getByRole("link", { name: "Заяви консултация" })).toHaveAttribute("href", "/bg/kontakti?usluga=audit");
   await expect(result.getByRole("button", { name: "Изтегли PDF отчета" })).toBeVisible();
   await expect(result.getByRole("button", { name: "Изтегли обобщение (.txt)" })).toHaveCount(0);
 });
 
 test("a shared readiness link restores the result without a form", async ({ page }) => {
-  await page.goto("/en/tools/ai-readiness?r=444444444444");
+  await page.goto("/en/tools/ai-readiness?r=b444444444444");
   await expect(page.getByTestId("tool-score")).toHaveText("100");
   await expect(page.getByTestId("tool-level")).toHaveText("Scaling readiness");
   await expect(page.getByText("The result was loaded from a shared link.")).toBeVisible();
@@ -61,8 +66,41 @@ test("tool pages switch language with the localized slug", async ({ page }) => {
 
 test("blockers are shown even when the overall score is high", async ({ page }) => {
   // Everything at level 4 except data protection (1): governance blocker, overall still high.
-  await page.goto("/en/tools/ai-readiness?r=444444444414");
+  await page.goto("/en/tools/ai-readiness?r=b444444144444");
   await expect(page.getByTestId("readiness-blockers")).toContainText("Governance and data protection");
   await expect(page.getByRole("heading", { name: "Three priority actions" })).toBeVisible();
   await expect(page.getByText("Set rules for data and approval").first()).toBeVisible();
+});
+
+test("the methodology and limitations are published without taking the assessment", async ({ page }) => {
+  for (const [path, title, limitation, band] of [
+    ["/bg/instrumenti/ai-gotovnost", "Методология и ограничения", "няма външен бенчмарк", "Готовност за пилот"],
+    ["/en/tools/ai-readiness", "Methodology and limitations", "there is no external benchmark", "Pilot ready"],
+  ] as const) {
+    await page.goto(path);
+    const methodology = page.getByTestId("readiness-methodology");
+    await expect(methodology.getByRole("heading", { level: 2, name: title })).toBeVisible();
+    await expect(methodology).toContainText(limitation);
+    await expect(methodology.locator("[data-band]")).toHaveCount(4);
+    await expect(methodology.locator("[data-band='pilot_ready']")).toContainText(band);
+    await expect(methodology.locator("[data-band='pilot_ready']")).toContainText("50–74");
+    await expect(methodology.locator("tbody tr")).toHaveCount(6);
+  }
+});
+
+test("a link of the previous question set opens the form instead of a wrong result", async ({ page }) => {
+  await page.goto("/en/tools/ai-readiness?r=444444444444");
+  await expect(page.getByTestId("readiness-form")).toBeVisible();
+  await expect(page.getByTestId("readiness-result")).toHaveCount(0);
+});
+
+test("the basic result needs no contact details; sending it to the team is an explicit opt-in", async ({ page }) => {
+  await page.goto("/bg/instrumenti/ai-gotovnost?r=b333333333333");
+  const result = page.getByTestId("readiness-result");
+  await expect(result.getByTestId("tool-score")).toBeVisible();
+  await expect(result.getByRole("textbox")).toHaveCount(1); // only the optional company name for the PDF
+  const send = page.getByTestId("readiness-send");
+  await expect(send.getByRole("textbox")).toHaveCount(0); // the contact form stays closed until requested
+  await send.getByRole("button", { name: "Изпрати резултата на екипа" }).click();
+  await expect(send.getByLabel(/^Служебен имейл/)).toBeVisible();
 });

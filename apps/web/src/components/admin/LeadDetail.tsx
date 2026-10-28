@@ -261,7 +261,18 @@ function TeamPanel({ leadId, details }: { leadId: string; details: TeamDetails }
   );
 }
 
-const READINESS_DIMENSION_ORDER = ["strategy", "data", "process", "technology", "people", "governance"];
+// Model 2026-11.1 first, then the dimensions of submissions scored with model 2026-10.2.
+const READINESS_DIMENSION_ORDER = [
+  "strategy",
+  "infrastructure",
+  "data",
+  "governance",
+  "talent",
+  "organization",
+  "process",
+  "technology",
+  "people",
+];
 const dimensionRank = (key: string) => {
   const index = READINESS_DIMENSION_ORDER.indexOf(key);
   return index === -1 ? READINESS_DIMENSION_ORDER.length : index;

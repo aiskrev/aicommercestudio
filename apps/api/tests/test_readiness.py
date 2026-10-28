@@ -394,3 +394,83 @@ def test_readiness_leads_have_their_own_shorter_retention(client, make_lead, db)
     result = leads.purge_expired(db, lead_retention_days=730, audit_retention_days=1095, readiness_retention_days=365)
     assert result.leads_deleted == 1
     assert [lead.email for lead in db.scalars(select(Lead))] == ["contact@example.com"]
+
+
+# --- Model 2026-11.1 ---------------------------------------------------------------------------
+
+
+def test_six_requested_dimensions_and_weights():
+    from app.readiness.scoring import DIMENSIONS, QUESTIONS, WEIGHTS
+
+    assert DIMENSIONS == ("strategy", "infrastructure", "data", "governance", "talent", "organization")
+    assert sum(WEIGHTS.values()) == 100
+    assert all(len(QUESTIONS[d]) == 2 for d in DIMENSIONS) and len(QUESTION_ORDER) == 12
+
+
+def test_vectors_cover_every_band_threshold_from_both_sides():
+    bands = {v["expected"]["overall"]: v["expected"]["band"] for v in VECTORS["vectors"]}
+    expected = {0: "exploration", 24: "exploration", 25: "foundation", 49: "foundation", 50: "pilot_ready",
+                74: "pilot_ready", 75: "scaling", 100: "scaling"}
+    for overall, band in expected.items():
+        assert bands.get(overall) == band, overall
+
+
+def test_expertise_blocker_and_its_action():
+    result = score(answers(4, talent_support=0))
+    assert result.blockers == ["expertise"]
+    assert result.actions[0] == "expertise_first"
+    assert result.roadmap["d30"][0] == "expertise_first"
+
+
+def test_answers_of_the_previous_question_set_are_rejected(client):
+    old = {k: v for k, v in answers().items() if not k.startswith("talent_")}
+    old.update(process_definition=3, process_repeatability=3)
+    response = client.post(REPORT_URL, json=report_payload(answers=old))
+    assert response.status_code == 422
+    stale = client.post(REPORT_URL, json=report_payload(model_version="2026-10.2"))
+    assert stale.status_code == 422
+
+
+def test_admin_pdf_of_a_submission_scored_with_the_previous_model(admin_client, db):
+    """Leads stored before 2026-11.1 keep their dimensions, actions and weights in the PDF."""
+    lead_id = _lead_id(db, _submit(admin_client))
+    lead = db.get(Lead, lead_id)
+    lead.service_details = {
+        **lead.service_details,
+        "model_version": "2026-10.2",
+        "result": {
+            "overall": 42,
+            "band": "foundation",
+            "dimensions": {"strategy": 50, "data": 25, "process": 50, "technology": 38, "people": 50, "governance": 50},
+            "blockers": ["data_quality"],
+            "strengths": [],
+            "gaps": ["data", "technology"],
+            "actions": ["data_quality_first", "process_mapping", "foundation_plan"],
+            "use_cases": ["process_discovery"],
+            "roadmap": {
+                "d30": ["data_quality_first", "foundation_d30"],
+                "d60": ["foundation_d60"],
+                "d90": ["foundation_d90"],
+            },
+        },
+    }
+    db.commit()
+    detail = admin_client.get(f"/api/admin/leads/{lead_id}").json()["readiness"]
+    assert detail["model_version"] == "2026-10.2" and "process" in detail["dimensions"]
+    pdf = admin_client.get(f"/api/admin/leads/{lead_id}/readiness-report")
+    assert pdf.status_code == 200, pdf.text
+    assert pdf.content.startswith(b"%PDF-")
+
+
+def test_report_texts_cover_the_new_model_in_both_languages():
+    from app.readiness.scoring import ACTION_SERVICE, DIMENSIONS
+    from app.readiness.texts import TEXTS
+
+    for locale in ("bg", "en"):
+        texts = TEXTS[locale]
+        assert set(DIMENSIONS) <= set(texts["dimension_names"])
+        assert set(ACTION_SERVICE) <= set(texts["actions_texts"])
+        assert {"governance", "data_quality", "integration", "expertise", "organisation"} <= set(texts["blocker_texts"])
+        joined = " ".join(texts["methodology_paragraphs"]).lower()
+        assert ("самооценка" if locale == "bg" else "self-assessment") in joined
+        assert ("бенчмарк" not in joined) and ("benchmark" not in joined)

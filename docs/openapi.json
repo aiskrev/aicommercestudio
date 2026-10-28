@@ -8505,7 +8505,7 @@
           "model_version": {
             "type": "string",
             "title": "Model Version",
-            "default": "2026-10.2"
+            "default": "2026-11.1"
           },
           "privacy_notice_version": {
             "type": "string",

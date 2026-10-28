@@ -230,8 +230,8 @@ export const adminEn: AdminDictionary = {
     model: "Model version: {version}",
     download: "Download the PDF report",
     bands: { exploration: "Exploration", foundation: "Foundation building", pilot_ready: "Pilot ready", scaling: "Scaling readiness" },
-    dimensionNames: { strategy: "Strategy", data: "Data", process: "Processes", technology: "Technology", people: "People", governance: "Governance" } as Record<string, string>,
-    blockerNames: { governance: "Governance and data protection", data_quality: "Data quality", integration: "System access", organisation: "Team ownership" } as Record<string, string>,
+    dimensionNames: { strategy: "Strategy", infrastructure: "Infrastructure", data: "Data", governance: "Governance", talent: "Talent and skills", organization: "Organizational readiness", process: "Processes", technology: "Technology", people: "People" } as Record<string, string>,
+    blockerNames: { governance: "Governance and data protection", data_quality: "Data quality", integration: "System access", expertise: "Technical expertise", organisation: "Team ownership" } as Record<string, string>,
   },
   aiManaged: {
     title: "Client's AI system",

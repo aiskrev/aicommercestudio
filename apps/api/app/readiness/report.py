@@ -25,7 +25,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
-from app.readiness.scoring import ACTION_SERVICE, MODEL_VERSION, WEIGHTS, ReadinessResult
+from app.readiness.scoring import ACTION_SERVICE, MODEL_VERSION, ReadinessResult, weights_for
 from app.readiness.texts import TEXTS
 
 FONT_DIRS = (Path("/usr/share/fonts/truetype/dejavu"), Path("/usr/share/fonts/dejavu"))
@@ -137,7 +137,16 @@ def _numbered_canvas(texts: dict, regular: str, bold: str) -> type[Canvas]:
     return NumberedCanvas
 
 
-def build_report(result: ReadinessResult, locale: str, company: str | None = None, today: date | None = None) -> bytes:
+def build_report(
+    result: ReadinessResult,
+    locale: str,
+    company: str | None = None,
+    today: date | None = None,
+    model_version: str = MODEL_VERSION,
+) -> bytes:
+    """PDF of a result. `model_version` is the version the result was scored with (stored submissions
+    keep theirs), so the weights and labels match what the visitor saw."""
+    weights = weights_for(model_version)
     regular, bold = _register_fonts()
     texts = TEXTS["en" if locale == "en" else "bg"]
     s = _styles(regular, bold)
@@ -151,7 +160,7 @@ def build_report(result: ReadinessResult, locale: str, company: str | None = Non
         Spacer(1, 2 * mm),
         Paragraph(escape(texts["subtitle"]), s["subtitle"]),
     ]
-    meta = [f"{texts['generated']}: {(today or date.today()).isoformat()}", f"{texts['model']}: {MODEL_VERSION}"]
+    meta = [f"{texts['generated']}: {(today or date.today()).isoformat()}", f"{texts['model']}: {model_version}"]
     if company:
         meta.insert(0, f"{texts['prepared_for']}: <b>{escape(company)}</b>")
     story += [Spacer(1, 4 * mm), Paragraph(" · ".join(meta), s["muted"]), Spacer(1, 6 * mm)]
@@ -197,7 +206,7 @@ def build_report(result: ReadinessResult, locale: str, company: str | None = Non
         rows.append(
             [
                 Paragraph(escape(names[dimension]), s["body"]),
-                Paragraph(f"{int(WEIGHTS[dimension])}%", s["body"]),
+                Paragraph(f"{int(weights[dimension])}%", s["body"]),
                 Paragraph(str(value), s["body"]),
                 _bar(value),
             ]

@@ -66,8 +66,8 @@ describe("scores", () => {
 });
 
 describe("weights", () => {
-  it("are 15/20/15/15/15/20 and normalise to a sum of 1", () => {
-    expect(DIMENSION_WEIGHTS).toEqual({ strategy: 15, data: 20, process: 15, technology: 15, people: 15, governance: 20 });
+  it("are 15/15/20/20/15/15 and normalise to a sum of 1", () => {
+    expect(DIMENSION_WEIGHTS).toEqual({ strategy: 15, infrastructure: 15, data: 20, governance: 20, talent: 15, organization: 15 });
     const weights = normalisedWeights();
     expect(Object.values(weights).reduce((a, b) => a + b, 0)).toBeCloseTo(1, 12);
     expect(weights.data).toBeCloseTo(0.2, 12);
@@ -76,7 +76,7 @@ describe("weights", () => {
   it("do not depend on the unit they are written in", () => {
     const doubled = Object.fromEntries(Object.entries(DIMENSION_WEIGHTS).map(([k, v]) => [k, v * 2])) as typeof DIMENSION_WEIGHTS;
     expect(normalisedWeights(doubled)).toEqual(normalisedWeights());
-    expect(() => normalisedWeights({ strategy: 0, data: 0, process: 0, technology: 0, people: 0, governance: 0 })).toThrow();
+    expect(() => normalisedWeights({ strategy: 0, infrastructure: 0, data: 0, governance: 0, talent: 0, organization: 0 })).toThrow();
   });
 
   it("give each dimension exactly its weight of the overall score", () => {
@@ -139,21 +139,20 @@ describe("blockers", () => {
     expect(complete({ ...base, gov_data_protection: 2, gov_oversight: 1 }).blockers).not.toContain("governance");
   });
 
-  it("flags data quality, integration and organisation from their key answers", () => {
+  it("flags data quality, integration, expertise and organisation from their key answers", () => {
     expect(complete({ ...base, data_quality: 1 }).blockers).toEqual(["data_quality"]);
     expect(complete({ ...base, tech_integration: 0 }).blockers).toEqual(["integration"]);
+    expect(complete({ ...base, talent_support: 0 }).blockers).toEqual(["expertise"]);
+    expect(complete({ ...base, talent_support: 1 }).blockers).toEqual([]);
     expect(complete({ ...base, people_ownership: 1 }).blockers).toEqual(["organisation"]);
     expect(complete({ ...base, people_ownership: 2, people_change: 0 }).blockers).toEqual(["organisation"]);
     expect(complete(base).blockers).toEqual([]);
   });
 
   it("lists blockers in priority order", () => {
-    expect(complete({ ...base, people_ownership: 0, tech_integration: 0, data_quality: 0, gov_oversight: 0 }).blockers).toEqual([
-      "governance",
-      "data_quality",
-      "integration",
-      "organisation",
-    ]);
+    expect(
+      complete({ ...base, people_ownership: 0, talent_support: 0, tech_integration: 0, data_quality: 0, gov_oversight: 0 }).blockers,
+    ).toEqual(["governance", "data_quality", "integration", "expertise", "organisation"]);
   });
 });
 
@@ -173,8 +172,9 @@ describe("recommendations", () => {
   });
 
   it("addresses the weakest gaps first and skips dimensions a blocker already covers", () => {
-    expect(rankActions("foundation", [], ["process", "strategy"])).toEqual(["process_mapping", "strategy_definition", "foundation_plan"]);
-    expect(rankActions("foundation", ["data_quality"], ["data", "people"])).toEqual(["data_quality_first", "people_enablement", "foundation_plan"]);
+    expect(rankActions("foundation", [], ["talent", "strategy"])).toEqual(["talent_enablement", "strategy_definition", "foundation_plan"]);
+    expect(rankActions("foundation", ["data_quality"], ["data", "organization"])).toEqual(["data_quality_first", "people_enablement", "foundation_plan"]);
+    expect(rankActions("foundation", ["expertise"], ["talent", "infrastructure"])).toEqual(["expertise_first", "tech_foundation", "foundation_plan"]);
   });
 
   it("fills from the lowest-scoring dimensions when there are no gaps or blockers", () => {
@@ -184,18 +184,19 @@ describe("recommendations", () => {
   });
 
   it("reports strengths (≥ 75) and gaps (< 50, weakest first)", () => {
-    const result = complete({ ...all(2), ...only("governance", 4, 2), data_access: 0, data_quality: 0, process_definition: 1, process_repeatability: 1 });
+    const result = complete({ ...all(2), ...only("governance", 4, 2), data_access: 0, data_quality: 0, talent_skills: 1, talent_support: 1 });
     expect(result.strengths).toEqual(["governance"]);
-    expect(result.gaps).toEqual(["data", "process"]);
+    expect(result.gaps).toEqual(["data", "talent"]);
     expect(complete(all(1)).strengths).toEqual([]);
   });
 
   it("suggests use cases only where the dimensions support them", () => {
     const scores = (s: Partial<Record<ReadinessDimension, number>>) =>
-      ({ strategy: 0, data: 0, process: 0, technology: 0, people: 0, governance: 0, ...s }) as Record<ReadinessDimension, number>;
+      ({ strategy: 0, infrastructure: 0, data: 0, governance: 0, talent: 0, organization: 0, ...s }) as Record<ReadinessDimension, number>;
     expect(suitableUseCases(scores({}))).toEqual(["process_discovery"]);
-    expect(suitableUseCases(scores({ process: 50, technology: 50 }))).toEqual(["inquiry_triage"]);
-    expect(suitableUseCases(scores({ process: 75, technology: 75, data: 75, governance: 75 }))).toHaveLength(3);
+    expect(suitableUseCases(scores({ infrastructure: 50, organization: 50 }))).toEqual(["inquiry_triage"]);
+    expect(suitableUseCases(scores({ infrastructure: 49, organization: 50 }))).toEqual(["process_discovery"]);
+    expect(suitableUseCases(scores({ infrastructure: 75, organization: 75, data: 75, governance: 75 }))).toHaveLength(3);
   });
 
   it("puts blocker work into the first 30 days of the roadmap", () => {
@@ -211,8 +212,15 @@ describe("recommendations", () => {
 describe("share code", () => {
   it("round-trips answers and rejects anything else", () => {
     const answers = { ...all(2), people_ownership: 0 as const, gov_oversight: 4 as const };
+    expect(encodeAnswers(answers)).toMatch(/^b[0-4]{12}$/);
     expect(decodeAnswers(encodeAnswers(answers))).toEqual(answers);
-    for (const bad of [null, "", "1234", "01234012340x", "012340123405", "<script>alert</script>"]) expect(decodeAnswers(bad)).toBeNull();
+    for (const bad of [null, "", "1234", "b01234012340x", "b012340123405", "b0123401234", "<script>alert</script>"]) {
+      expect(decodeAnswers(bad)).toBeNull();
+    }
+  });
+
+  it("never decodes a link of the previous question set onto the new questions", () => {
+    expect(decodeAnswers("444444444444")).toBeNull(); // model 2026-10.2: 12 digits without a prefix
   });
 });
 
@@ -224,6 +232,28 @@ describe("readiness content", () => {
     expect(Object.keys(t.steps)).toEqual([...READINESS_DIMENSIONS]);
     expect(Object.keys(t.result.bands).sort()).toEqual(["exploration", "foundation", "pilot_ready", "scaling"]);
     expect(Object.keys(t.result.roadmap)).toHaveLength(12);
-    expect(Object.keys(t.result.blockers)).toHaveLength(4);
+    expect(Object.keys(t.result.blockers)).toHaveLength(5);
+    expect(t.result.methodology.limitations.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("keeps BG and EN aligned and labels the result as indicative", () => {
+    const bg = getContent("bg").readinessTool;
+    const en = getContent("en").readinessTool;
+    expect(Object.keys(en.result.actions)).toEqual(Object.keys(bg.result.actions));
+    expect(Object.keys(en.result.useCases)).toEqual(Object.keys(bg.result.useCases));
+    expect(en.result.methodology.limitations).toHaveLength(bg.result.methodology.limitations.length);
+    expect(JSON.stringify(en)).not.toMatch(/[\u0400-\u04FF]/);
+    expect(bg.result.methodology.disclaimer).toContain("ориентировъчна самооценка");
+    expect(en.result.methodology.disclaimer).toContain("indicative self-assessment");
+    expect(en.result.methodology.disclaimer).toContain("not a certified");
+  });
+
+  it("invents no external benchmarks or comparisons", () => {
+    for (const locale of ["bg", "en"] as const) {
+      const text = JSON.stringify(getContent(locale).readinessTool).toLowerCase();
+      for (const claim of ["industry average", "average company", "percentile", "better than", "по-добре от", "средно за", "средната фирма", "% от фирмите", "% of companies"]) {
+        expect(text, `${locale}: ${claim}`).not.toContain(claim);
+      }
+    }
   });
 });
