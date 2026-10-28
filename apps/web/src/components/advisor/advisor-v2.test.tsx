@@ -195,7 +195,8 @@ describe("advisor V2 (UI)", () => {
     await fillV1(user);
     await user.click(screen.getByRole("checkbox", { name: advisor.v2.toggle }));
     await user.click(screen.getByRole("button", { name: advisor.form.submit }));
-    expect(screen.getByLabelText(/Основна цел/)).toHaveFocus();
+    // Focus moves in requestAnimationFrame, so wait for it (CI machines are slower).
+    await waitFor(() => expect(screen.getByLabelText(/Основна цел/)).toHaveFocus());
     expect(posted()).toBeNull();
 
     await user.selectOptions(screen.getByLabelText(/Основна цел/), "save_time");
