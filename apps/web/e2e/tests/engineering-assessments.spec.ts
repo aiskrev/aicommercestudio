@@ -16,6 +16,8 @@ const humanPause = () => new Promise((resolve) => setTimeout(resolve, 3500));
 /** Answers every single-choice question on each step with the option `pick` chooses, then submits. */
 async function answerAll(page: Page, form: Locator, pick: "first" | "last", finish: string, next: string, before?: (step: number) => Promise<void>) {
   for (let step = 0; step < 20; step++) {
+    // Wait for the area to render before answering (slower CI machines otherwise answer the previous one).
+    await expect(form.getByText(new RegExp(`^(Област|Area) ${step + 1} (от|of) [0-9]+$`))).toBeVisible();
     if (before) await before(step);
     const groups = form.locator("fieldset:has(input[type=radio])");
     const count = await groups.count();
