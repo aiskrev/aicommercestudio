@@ -115,6 +115,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [INTERNATIONALIZATION.md](docs/INTERNATIONALIZATION.md) | BG/EN URLs, switcher, cookie, translations, SEO, API and admin languages |
 | [SEO_IMPLEMENTATION.md](docs/SEO_IMPLEMENTATION.md) | SEO checklist, keyword map (unverified), indexation rules, editorial guidelines |
 | [AI_ADVISOR.md](docs/AI_ADVISOR.md) | AI Business Automation Advisor: flow, architecture, safety controls, retention, demo |
+| [ASSESSMENT_PLATFORM_ARCHITECTURE.md](docs/ASSESSMENT_PLATFORM_ARCHITECTURE.md) | Deterministic assessment engine: definitions, scoring, rules, saved results, retention |
 | [TOOLS_PLATFORM.md](docs/TOOLS_PLATFORM.md) | Tool registry, flags, shared UI, analytics, AI team model |
 | [READINESS_REPORTS.md](docs/READINESS_REPORTS.md) | AI readiness: PDF report, submissions, admin view |
 | [TEAM_CONFIGURATOR.md](docs/TEAM_CONFIGURATOR.md) | Build your AI team: costs, saved links, PDF plan, consultations |

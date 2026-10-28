@@ -362,6 +362,38 @@ class TeamConfiguration(Base):
         return self.id.hex[:8].upper()
 
 
+class AssessmentResultRecord(Base):
+    """An opt-in saved assessment result (app/assessments). Holds the normalised answers (option
+    keys, booleans and numbers — no free text, no personal data), the server-computed result and the
+    definition version and algorithm it was scored with. Retrieved and deleted with a secret token;
+    only its SHA-256 hash is stored. Rows expire after ASSESSMENT_RETENTION_DAYS and are removed by
+    `python -m app.cli maintenance`.
+    """
+
+    __tablename__ = "assessment_results"
+    __table_args__ = (
+        CheckConstraint(_in_check("locale", LeadLocale), name="locale"),
+        Index("ix_assessment_results_expires_at", "expires_at"),
+        Index("ix_assessment_results_assessment_key", "assessment_key"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+    expires_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False)
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    assessment_key: Mapped[str] = mapped_column(String(48), nullable=False)
+    definition_version: Mapped[str] = mapped_column(String(16), nullable=False)
+    algorithm: Mapped[str] = mapped_column(String(32), nullable=False)
+    locale: Mapped[str] = mapped_column(String(2), nullable=False, server_default="bg")
+    fingerprint: Mapped[str] = mapped_column(String(16), nullable=False)
+    answers: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    result: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+
+    @property
+    def reference(self) -> str:
+        return self.id.hex[:8].upper()
+
+
 # --------------------------------------------------------------------------- AI operations (scaffold)
 # Tenancy foundation for the future AI Operations Portal (docs/AI_OPERATIONS_PORTAL.md). It holds
 # registry metadata only — no telemetry, no client credentials. Every tenant-owned row carries

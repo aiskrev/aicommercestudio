@@ -1153,6 +1153,252 @@
         }
       }
     },
+    "/api/public/assessments": {
+      "get": {
+        "tags": [
+          "assessments"
+        ],
+        "summary": "List Assessments",
+        "operationId": "list_assessments_api_public_assessments_get",
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "bg",
+                "en"
+              ],
+              "type": "string",
+              "default": "bg",
+              "title": "Locale"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentListOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/assessments/{key}": {
+      "get": {
+        "tags": [
+          "assessments"
+        ],
+        "summary": "Get Assessment",
+        "operationId": "get_assessment_api_public_assessments__key__get",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "bg",
+                "en"
+              ],
+              "type": "string",
+              "default": "bg",
+              "title": "Locale"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentDefinitionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/assessments/{key}/score": {
+      "post": {
+        "tags": [
+          "assessments"
+        ],
+        "summary": "Score answers on the server; with save=true also store the result and return a link token",
+        "operationId": "score_assessment_api_public_assessments__key__score_post",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssessmentScoreRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentResultOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/assessments/results/lookup": {
+      "post": {
+        "tags": [
+          "assessments"
+        ],
+        "summary": "Open a saved result with its link token (POST keeps the token out of URLs and logs)",
+        "operationId": "lookup_result_api_public_assessments_results_lookup_post",
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "bg",
+                "en"
+              ],
+              "type": "string",
+              "default": "bg",
+              "title": "Locale"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssessmentResultOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/assessments/results/delete": {
+      "post": {
+        "tags": [
+          "assessments"
+        ],
+        "summary": "Delete a saved result with its link token (idempotent)",
+        "operationId": "delete_result_api_public_assessments_results_delete_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/auth/login": {
       "post": {
         "tags": [
@@ -4624,6 +4870,281 @@
         ],
         "title": "AlternateSlugs"
       },
+      "AssessmentDefinitionOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "live",
+              "preview"
+            ],
+            "title": "Status"
+          },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "intro": {
+            "type": "string",
+            "title": "Intro"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          },
+          "dimensions": {
+            "items": {
+              "$ref": "#/components/schemas/TitledOut"
+            },
+            "type": "array",
+            "title": "Dimensions"
+          },
+          "questions": {
+            "items": {
+              "$ref": "#/components/schemas/QuestionOut"
+            },
+            "type": "array",
+            "title": "Questions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "version",
+          "status",
+          "locale",
+          "schema_version",
+          "title",
+          "intro",
+          "disclaimer",
+          "dimensions",
+          "questions"
+        ],
+        "title": "AssessmentDefinitionOut"
+      },
+      "AssessmentListOut": {
+        "properties": {
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AssessmentSummaryOut"
+            },
+            "type": "array",
+            "title": "Items"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "locale",
+          "items"
+        ],
+        "title": "AssessmentListOut"
+      },
+      "AssessmentResultOut": {
+        "properties": {
+          "assessment": {
+            "type": "string",
+            "title": "Assessment"
+          },
+          "definition_version": {
+            "type": "string",
+            "title": "Definition Version"
+          },
+          "algorithm": {
+            "type": "string",
+            "title": "Algorithm"
+          },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "overall": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Overall"
+          },
+          "band": {
+            "$ref": "#/components/schemas/TitledOut"
+          },
+          "dimensions": {
+            "items": {
+              "$ref": "#/components/schemas/DimensionScoreOut"
+            },
+            "type": "array",
+            "title": "Dimensions"
+          },
+          "recommendations": {
+            "items": {
+              "$ref": "#/components/schemas/TitledOut"
+            },
+            "type": "array",
+            "title": "Recommendations"
+          },
+          "answered": {
+            "type": "integer",
+            "title": "Answered"
+          },
+          "questions": {
+            "type": "integer",
+            "title": "Questions"
+          },
+          "fingerprint": {
+            "type": "string",
+            "title": "Fingerprint"
+          },
+          "extras": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Extras"
+          },
+          "disclaimer": {
+            "type": "string",
+            "title": "Disclaimer"
+          },
+          "saved": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SavedOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "assessment",
+          "definition_version",
+          "algorithm",
+          "locale",
+          "title",
+          "overall",
+          "band",
+          "dimensions",
+          "recommendations",
+          "answered",
+          "questions",
+          "fingerprint",
+          "extras",
+          "disclaimer"
+        ],
+        "title": "AssessmentResultOut"
+      },
+      "AssessmentScoreRequest": {
+        "properties": {
+          "schema_version": {
+            "type": "string",
+            "const": "1",
+            "title": "Schema Version"
+          },
+          "definition_version": {
+            "type": "string",
+            "maxLength": 16,
+            "pattern": "^\\d+\\.\\d+\\.\\d+$",
+            "title": "Definition Version"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "answers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Answers"
+          },
+          "save": {
+            "type": "boolean",
+            "title": "Save",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "schema_version",
+          "definition_version",
+          "answers"
+        ],
+        "title": "AssessmentScoreRequest",
+        "description": "Answers only: option keys, booleans and numbers. Weights, points or scores are rejected."
+      },
+      "AssessmentSummaryOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "live",
+              "preview"
+            ],
+            "title": "Status"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "intro": {
+            "type": "string",
+            "title": "Intro"
+          },
+          "questions": {
+            "type": "integer",
+            "title": "Questions"
+          },
+          "dimensions": {
+            "type": "integer",
+            "title": "Dimensions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "version",
+          "status",
+          "title",
+          "intro",
+          "questions",
+          "dimensions"
+        ],
+        "title": "AssessmentSummaryOut"
+      },
       "AssumptionOverrides": {
         "properties": {
           "day_rate": {
@@ -5073,6 +5594,37 @@
           "recent_activity"
         ],
         "title": "DashboardStats"
+      },
+      "DimensionScoreOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "score": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Score"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "description",
+          "score"
+        ],
+        "title": "DimensionScoreOut"
       },
       "DomainDetail": {
         "properties": {
@@ -7400,6 +7952,25 @@
         ],
         "title": "OptionDomain"
       },
+      "OptionOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "label"
+        ],
+        "title": "OptionOut"
+      },
       "OptionService": {
         "properties": {
           "key": {
@@ -7614,6 +8185,129 @@
           "none"
         ],
         "title": "Platform"
+      },
+      "QuestionOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "single_choice",
+              "multi_choice",
+              "scale",
+              "boolean",
+              "number"
+            ],
+            "title": "Type"
+          },
+          "dimension": {
+            "type": "string",
+            "title": "Dimension"
+          },
+          "required": {
+            "type": "boolean",
+            "title": "Required"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "help": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Help"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "options": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/OptionOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Options"
+          },
+          "max_selections": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Selections"
+          },
+          "min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min"
+          },
+          "max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max"
+          },
+          "integer": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Integer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "type",
+          "dimension",
+          "required",
+          "text",
+          "help",
+          "unit"
+        ],
+        "title": "QuestionOut"
       },
       "QuoteRequestCreate": {
         "properties": {
@@ -8108,6 +8802,22 @@
         ],
         "title": "RelatedResponse"
       },
+      "ResultTokenRequest": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 20,
+            "title": "Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "ResultTokenRequest"
+      },
       "RetentionPreview": {
         "properties": {
           "lead_retention_days": {
@@ -8155,6 +8865,16 @@
             "type": "integer",
             "title": "Team Configurations Due",
             "default": 0
+          },
+          "assessment_retention_days": {
+            "type": "integer",
+            "title": "Assessment Retention Days",
+            "default": 0
+          },
+          "assessment_results_due": {
+            "type": "integer",
+            "title": "Assessment Results Due",
+            "default": 0
           }
         },
         "type": "object",
@@ -8201,6 +8921,11 @@
           "team_configurations_deleted": {
             "type": "integer",
             "title": "Team Configurations Deleted",
+            "default": 0
+          },
+          "assessment_results_deleted": {
+            "type": "integer",
+            "title": "Assessment Results Deleted",
             "default": 0
           }
         },
@@ -8250,6 +8975,38 @@
           "role"
         ],
         "title": "RoleUpdate"
+      },
+      "SavedOut": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token",
+            "description": "Returned once, when the result is saved. Store it: it cannot be recovered."
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "reference",
+          "expires_at"
+        ],
+        "title": "SavedOut"
       },
       "ScenarioOut": {
         "properties": {
@@ -9713,6 +10470,30 @@
           "flexible"
         ],
         "title": "Timeline"
+      },
+      "TitledOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "description"
+        ],
+        "title": "TitledOut"
       },
       "ToolKey": {
         "type": "string",

@@ -29,6 +29,7 @@ from sqlalchemy.orm import Session
 
 from app import audit
 from app.advisor import service as advisor
+from app.assessments import service as assessment_service
 from app.catalogue import seed as catalogue
 from app.config import get_settings
 from app.db import get_sessionmaker
@@ -237,6 +238,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         )
         assessments = advisor.purge_expired(db, dry_run=args.dry_run)
         configurations = team.purge_expired(db, dry_run=args.dry_run)
+        saved_assessments = assessment_service.purge_expired(db, dry_run=args.dry_run)
         sessions_removed = 0
         if not args.dry_run:
             cutoff = utcnow() - timedelta(days=1)
@@ -251,6 +253,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         f"{prefix}: leads={result.leads_deleted} audit_entries={result.audit_entries_deleted} "
         f"advisor_assessments={assessments.due if args.dry_run else assessments.deleted} "
         f"team_configurations={configurations.due if args.dry_run else configurations.deleted} "
+        f"assessment_results={saved_assessments.due if args.dry_run else saved_assessments.deleted} "
         f"sessions={sessions_removed}"
     )
     return 0

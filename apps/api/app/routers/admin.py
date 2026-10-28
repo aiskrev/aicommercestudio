@@ -15,6 +15,7 @@ from app.advisor import service as advisor
 from app.ai.base import AIProviderError, LeadTriageInput
 from app.ai.factory import get_ai_provider
 from app.ai.policy import ActionType, evaluate
+from app.assessments import service as assessment_service
 from app.deps import Admin, AppSettings, DbSession
 from app.errors import ApiError
 from app.integrations import integration_status
@@ -235,6 +236,8 @@ def retention_preview(ctx: Admin, db: DbSession, settings: AppSettings, response
         advisor_assessments_due=advisor.count_expired(db),
         team_configuration_retention_days=settings.team_configuration_retention_days,
         team_configurations_due=team_service.count_expired(db),
+        assessment_retention_days=settings.assessment_retention_days,
+        assessment_results_due=assessment_service.count_expired(db),
     )
 
 
@@ -250,6 +253,7 @@ def retention_run(payload: RetentionRunIn, ctx: Admin, db: DbSession, settings: 
     )
     assessments = advisor.purge_expired(db)
     configurations = team_service.purge_expired(db)
+    saved_assessments = assessment_service.purge_expired(db)
     audit.record(
         db, "retention.run", actor=ctx.user, entity_type="system",
         details={
@@ -257,6 +261,7 @@ def retention_run(payload: RetentionRunIn, ctx: Admin, db: DbSession, settings: 
             "audit_entries_deleted": result.audit_entries_deleted,
             "advisor_assessments_deleted": assessments.deleted,
             "team_configurations_deleted": configurations.deleted,
+            "assessment_results_deleted": saved_assessments.deleted,
         },
         ip_hash=ctx.ip_hash,
     )
@@ -266,6 +271,7 @@ def retention_run(payload: RetentionRunIn, ctx: Admin, db: DbSession, settings: 
         audit_entries_deleted=result.audit_entries_deleted,
         advisor_assessments_deleted=assessments.deleted,
         team_configurations_deleted=configurations.deleted,
+        assessment_results_deleted=saved_assessments.deleted,
     )
 
 

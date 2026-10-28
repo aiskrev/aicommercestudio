@@ -1,0 +1,185 @@
+{
+  "key": "observability_reliability",
+  "version": "1.0.0",
+  "status": "preview",
+  "scoring": { "algorithm": "weighted-mean/1", "max_recommendations": 4 },
+  "extension": "observability_signals",
+  "dimensions": [
+    { "key": "signals", "weight": 30 },
+    { "key": "alerting", "weight": 25 },
+    { "key": "incidents", "weight": 25 },
+    { "key": "slo", "weight": 20 }
+  ],
+  "questions": [
+    {
+      "key": "telemetry", "type": "multi_choice", "dimension": "signals", "weight": 2, "cap": 6, "max_selections": 4,
+      "options": [
+        { "key": "logs", "points": 2 },
+        { "key": "metrics", "points": 2 },
+        { "key": "traces", "points": 2 },
+        { "key": "error_tracking", "points": 1 }
+      ]
+    },
+    {
+      "key": "log_retention_days", "type": "number", "dimension": "signals", "min": 0, "max": 3650, "integer": true,
+      "bands": [
+        { "at_least": 0, "points": 0 },
+        { "at_least": 7, "points": 2 },
+        { "at_least": 30, "points": 3 },
+        { "at_least": 90, "points": 4 }
+      ]
+    },
+    {
+      "key": "alert_routing", "type": "single_choice", "dimension": "alerting",
+      "options": [
+        { "key": "none", "points": 0 },
+        { "key": "email_only", "points": 1 },
+        { "key": "chat", "points": 2 },
+        { "key": "on_call_rotation", "points": 4 }
+      ]
+    },
+    { "key": "actionable_alerts", "type": "scale", "dimension": "alerting", "min": 0, "max": 4 },
+    {
+      "key": "incident_process", "type": "single_choice", "dimension": "incidents", "weight": 2,
+      "options": [
+        { "key": "none", "points": 0 },
+        { "key": "ad_hoc", "points": 1 },
+        { "key": "documented", "points": 3 },
+        { "key": "practiced", "points": 4 }
+      ]
+    },
+    { "key": "postmortems", "type": "boolean", "dimension": "incidents", "points_true": 4, "points_false": 0 },
+    {
+      "key": "slos", "type": "single_choice", "dimension": "slo", "weight": 2,
+      "options": [
+        { "key": "none", "points": 0 },
+        { "key": "informal", "points": 1 },
+        { "key": "some_services", "points": 3 },
+        { "key": "all_critical", "points": 4 }
+      ]
+    },
+    { "key": "status_communication", "type": "boolean", "dimension": "slo", "required": false, "points_true": 4, "points_false": 0 }
+  ],
+  "bands": [
+    { "key": "reactive", "min": 0 },
+    { "key": "basic", "min": 40 },
+    { "key": "proactive", "min": 65 },
+    { "key": "reliable", "min": 85 }
+  ],
+  "rules": [
+    { "key": "no_routing", "priority": 1, "when": { "kind": "answer_in", "question": "alert_routing", "options": ["none", "email_only"] }, "recommendation": "on_call_routing" },
+    { "key": "signal_gap", "priority": 1, "when": { "kind": "dimension_below", "dimension": "signals", "value": 50 }, "recommendation": "central_telemetry" },
+    { "key": "no_process", "priority": 2, "when": { "kind": "answer_in", "question": "incident_process", "options": ["none", "ad_hoc"] }, "recommendation": "incident_runbook" },
+    { "key": "slo_gap", "priority": 3, "when": { "kind": "dimension_below", "dimension": "slo", "value": 50 }, "recommendation": "define_slos" },
+    {
+      "key": "noisy", "priority": 4,
+      "when": { "kind": "all", "conditions": [
+        { "kind": "dimension_at_least", "dimension": "signals", "value": 75 },
+        { "kind": "dimension_below", "dimension": "alerting", "value": 50 }
+      ] },
+      "recommendation": "reduce_alert_noise"
+    },
+    { "key": "good_base", "priority": 5, "when": { "kind": "band_in", "bands": ["proactive", "reliable"] }, "recommendation": "reliability_review" },
+    { "key": "start", "priority": 6, "when": { "kind": "band_in", "bands": ["reactive"] }, "recommendation": "observability_workshop" }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на наблюдаемостта и надеждността",
+      "intro": "Осем въпроса дали откривате проблемите преди клиентите: телеметрия, известия, инциденти и цели за надеждност.",
+      "disclaimer": "Ориентировъчна самооценка по вашите отговори. Не е одит и не замества преглед на реалните системи.",
+      "dimensions": {
+        "signals": { "title": "Телеметрия", "description": "Журнали, метрики и трасиране, събрани на едно място и пазени достатъчно дълго." },
+        "alerting": { "title": "Известия", "description": "Известията стигат до правилния човек и изискват действие." },
+        "incidents": { "title": "Инциденти", "description": "Описан и упражняван процес за реакция и анализ след инцидент." },
+        "slo": { "title": "Цели за надеждност", "description": "Измерими цели за наличност и производителност и комуникация при проблеми." }
+      },
+      "questions": {
+        "telemetry": {
+          "text": "Какво събирате централизирано?",
+          "help": "Изберете всички, които важат.",
+          "options": { "logs": "Журнали", "metrics": "Метрики", "traces": "Трасиране на заявки", "error_tracking": "Проследяване на грешки" }
+        },
+        "log_retention_days": { "text": "Колко дни пазите журналите?", "help": "0, ако не ги пазите централно.", "unit": "дни" },
+        "alert_routing": {
+          "text": "Как стигат известията до екипа?",
+          "options": { "none": "Нямаме известия", "email_only": "Само по имейл", "chat": "В чат канал", "on_call_rotation": "До дежурен по график" }
+        },
+        "actionable_alerts": { "text": "Каква част от известията наистина изискват действие?", "help": "0 — почти никои, 4 — почти всички.", "unit": "0 = почти никои, 4 = почти всички" },
+        "incident_process": {
+          "text": "Имате ли процес за реакция при инцидент?",
+          "options": { "none": "Не", "ad_hoc": "Действаме според ситуацията", "documented": "Описан процес", "practiced": "Описан и упражняван процес" }
+        },
+        "postmortems": { "text": "Правите ли анализ след всеки сериозен инцидент?" },
+        "slos": {
+          "text": "Имате ли измерими цели за надеждност (SLO)?",
+          "options": { "none": "Не", "informal": "Неформални очаквания", "some_services": "За част от услугите", "all_critical": "За всички критични услуги" }
+        },
+        "status_communication": { "text": "Информирате ли клиентите за проблеми (страница за статус или съобщения)?", "help": "Пропуснете, ако не е приложимо." }
+      },
+      "bands": {
+        "reactive": { "title": "Реактивно ниво", "description": "Проблемите се откриват основно от клиентите; реакцията зависи от отделни хора." },
+        "basic": { "title": "Основно ниво", "description": "Има телеметрия и известия, но с пропуски в покритието, шума или процеса." },
+        "proactive": { "title": "Проактивно ниво", "description": "Повечето проблеми се откриват рано; остава да се формализират целите и анализът." },
+        "reliable": { "title": "Надеждно ниво", "description": "Наблюдаемостта и процесът са зрели; фокусът е върху непрекъснато подобрение." }
+      },
+      "recommendations": {
+        "on_call_routing": { "title": "Насочете известията към дежурен", "description": "Известие по имейл лесно се пропуска; дежурството с ясни отговорности скъсява реакцията." },
+        "central_telemetry": { "title": "Съберете телеметрията на едно място", "description": "Журналите, метриките и трасирането заедно правят причините видими." },
+        "incident_runbook": { "title": "Опишете процеса при инцидент", "description": "Кой реагира, как се ескалира и как се комуникира — описано, преди да е нужно." },
+        "define_slos": { "title": "Определете цели за надеждност", "description": "Измеримите цели показват кога системата е достатъчно добра и къде да се инвестира." },
+        "reduce_alert_noise": { "title": "Намалете шума в известията", "description": "Известие без нужда от действие учи екипа да ги пренебрегва." },
+        "reliability_review": { "title": "Периодичен преглед на надеждността", "description": "Следващата стъпка е редовен преглед на инцидентите, целите и покритието." },
+        "observability_workshop": { "title": "Работна среща за наблюдаемостта", "description": "Кратък преглед на системите помага да се избере първата стъпка." }
+      }
+    },
+    "en": {
+      "title": "Observability & Reliability Assessment",
+      "intro": "Eight questions on whether you find problems before your customers do: telemetry, alerting, incidents and reliability targets.",
+      "disclaimer": "An indicative self-assessment based on your answers. It is not an audit and does not replace a review of the actual systems.",
+      "dimensions": {
+        "signals": { "title": "Telemetry", "description": "Logs, metrics and traces collected in one place and kept long enough." },
+        "alerting": { "title": "Alerting", "description": "Alerts reach the right person and call for action." },
+        "incidents": { "title": "Incidents", "description": "A documented, practised process for responding to and reviewing incidents." },
+        "slo": { "title": "Reliability targets", "description": "Measurable availability and performance targets, and communication during problems." }
+      },
+      "questions": {
+        "telemetry": {
+          "text": "What do you collect centrally?",
+          "help": "Select all that apply.",
+          "options": { "logs": "Logs", "metrics": "Metrics", "traces": "Request tracing", "error_tracking": "Error tracking" }
+        },
+        "log_retention_days": { "text": "How many days do you keep logs?", "help": "0 if you do not keep them centrally.", "unit": "days" },
+        "alert_routing": {
+          "text": "How do alerts reach the team?",
+          "options": { "none": "We have no alerts", "email_only": "By e-mail only", "chat": "In a chat channel", "on_call_rotation": "To an on-call person by rota" }
+        },
+        "actionable_alerts": { "text": "How many of your alerts actually require action?", "help": "0 — almost none, 4 — almost all.", "unit": "0 = almost none, 4 = almost all" },
+        "incident_process": {
+          "text": "Do you have an incident response process?",
+          "options": { "none": "No", "ad_hoc": "We act as the situation requires", "documented": "A documented process", "practiced": "A documented, practised process" }
+        },
+        "postmortems": { "text": "Do you review every serious incident afterwards?" },
+        "slos": {
+          "text": "Do you have measurable reliability targets (SLOs)?",
+          "options": { "none": "No", "informal": "Informal expectations", "some_services": "For some services", "all_critical": "For all critical services" }
+        },
+        "status_communication": { "text": "Do you inform customers about problems (a status page or notices)?", "help": "Skip this if it does not apply." }
+      },
+      "bands": {
+        "reactive": { "title": "Reactive", "description": "Problems are mostly found by customers; the response depends on individual people." },
+        "basic": { "title": "Basic", "description": "Telemetry and alerts exist, with gaps in coverage, noise or process." },
+        "proactive": { "title": "Proactive", "description": "Most problems are found early; targets and reviews still need to be formalised." },
+        "reliable": { "title": "Reliable", "description": "Observability and process are mature; the focus is on continuous improvement." }
+      },
+      "recommendations": {
+        "on_call_routing": { "title": "Route alerts to an on-call person", "description": "An e-mail alert is easy to miss; on-call with clear ownership shortens the response." },
+        "central_telemetry": { "title": "Collect telemetry in one place", "description": "Logs, metrics and traces together make causes visible." },
+        "incident_runbook": { "title": "Document the incident process", "description": "Who responds, how to escalate and how to communicate — written down before it is needed." },
+        "define_slos": { "title": "Define reliability targets", "description": "Measurable targets show when the system is good enough and where to invest." },
+        "reduce_alert_noise": { "title": "Reduce alert noise", "description": "Alerts that need no action teach the team to ignore them." },
+        "reliability_review": { "title": "Review reliability regularly", "description": "The next step is a regular review of incidents, targets and coverage." },
+        "observability_workshop": { "title": "Observability workshop", "description": "A short review of your systems helps choose the first step." }
+      }
+    }
+  }
+}

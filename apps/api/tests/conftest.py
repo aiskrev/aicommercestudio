@@ -36,6 +36,8 @@ os.environ.update(
         "ADMIN_BOOTSTRAP_EMAIL": "",
         "ADMIN_BOOTSTRAP_PASSWORD": "",
         "LOG_LEVEL": "WARNING",
+        # Assessment definitions in "preview" are tested end to end; production keeps them off.
+        "ASSESSMENTS_PREVIEW_ENABLED": "true",
     }
 )
 
@@ -59,7 +61,8 @@ TABLES = [
     "entity_relations", "entity_translations", "family_services", "services", "service_families",
     "service_domains", "catalogue_entities",
     "ops_agents", "ops_memberships", "ops_workspaces", "ops_organizations",
-    "advisor_assessments", "team_configurations", "ai_action_requests", "audit_logs", "lead_notes", "leads",
+    "advisor_assessments", "team_configurations", "assessment_results",
+    "ai_action_requests", "audit_logs", "lead_notes", "leads",
     "admin_sessions", "admin_users",
 ]
 
