@@ -1,0 +1,2044 @@
+{
+ "schema_version": 1,
+ "locales": [
+  "bg",
+  "en"
+ ],
+ "domains": [
+  {
+   "key": "ai_strategy",
+   "code": "A",
+   "band": "ai",
+   "icon": "target",
+   "position": 0,
+   "status": "published",
+   "contact_service": "audit",
+   "related": [
+    "advisory_enablement",
+    "ai_agents_automation",
+    "ai_applications",
+    "ai_governance"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "ai-strategiya-i-transformatsiya",
+     "name": "AI стратегия и трансформация",
+     "summary": "Къде си струва AI, в какъв ред и с какви контроли — преди да инвестирате във внедряване.",
+     "body": "Тук решаваме къде изобщо си струва да се изгражда AI, в какъв ред и при какви контроли — преди да има разходи за внедряване. Резултатът е план, който инженерен екип може да изпълни, а не презентация.",
+     "cta_label": "Заявете оценка на AI готовността",
+     "seo_title": "AI стратегия и план за внедряване на изкуствен интелект",
+     "seo_description": "Оценка на готовността, приоритизиране на случаи на употреба и поетапен план за внедряване на AI — с ясни критерии за приемане и човешки контрол.",
+     "primary_keyword": "AI стратегия"
+    },
+    "en": {
+     "slug": "ai-strategy-and-transformation",
+     "name": "AI Strategy & Transformation",
+     "summary": "Where AI is worth building, in what order and under which controls — before you invest in implementation.",
+     "body": "This domain decides where AI is worth building at all, in what order, and under which controls, before any money goes into implementation. The output is a plan that engineering can execute, not a slide deck.",
+     "cta_label": "Request an AI readiness assessment",
+     "seo_title": "AI strategy and an implementation roadmap for your business",
+     "seo_description": "Readiness assessment, use-case prioritisation and a phased AI roadmap with acceptance criteria and human approval points — before you invest in implementation.",
+     "primary_keyword": "AI strategy"
+    }
+   }
+  },
+  {
+   "key": "ai_agents_automation",
+   "code": "B",
+   "band": "ai",
+   "icon": "bot",
+   "position": 1,
+   "status": "published",
+   "contact_service": "automation",
+   "related": [
+    "data_integration",
+    "ai_applications",
+    "ai_governance",
+    "managed_operations"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "ai-agenti-i-biznes-avtomatizatsiya",
+     "name": "AI агенти и бизнес автоматизация",
+     "summary": "Агенти и автоматизирани процеси във вашите системи — с проверка на правата и човешко одобрение.",
+     "body": "Изграждаме агенти и автоматизирани работни процеси, които действат във вашите системи. Всяко действие с външен ефект минава през детерминистична проверка на правата и — където правилата го изискват — през човешко одобрение. Не изграждаме автономни системи с неограничени правомощия.",
+     "cta_label": "Опишете процеса за автоматизация",
+     "seo_title": "AI агенти и бизнес автоматизация с човешки контрол",
+     "seo_description": "Проектиране и внедряване на AI агенти и автоматизирани работни процеси в CRM, имейл, helpdesk и ERP — с одобрение на действията и журнал.",
+     "primary_keyword": "AI агенти и бизнес автоматизация"
+    },
+    "en": {
+     "slug": "ai-agents-and-business-automation",
+     "name": "AI Agents & Business Automation",
+     "summary": "Agents and automated workflows inside your systems — with permission checks and human approval.",
+     "body": "This domain builds agents and automated workflows that act inside your systems. Every action with an external effect goes through a deterministic permission check and, where the rules require it, a human approval. It does not build autonomous systems with unbounded authority.",
+     "cta_label": "Describe the process you want to automate",
+     "seo_title": "AI agents and business automation with human approval",
+     "seo_description": "Design and delivery of AI agents and automated workflows across CRM, e-mail, helpdesk and ERP — with permission checks, approval points and an audit trail.",
+     "primary_keyword": "AI agents and business automation"
+    }
+   }
+  },
+  {
+   "key": "ai_applications",
+   "code": "C",
+   "band": "ai",
+   "icon": "sparkles",
+   "position": 2,
+   "status": "published",
+   "contact_service": "ai_tools",
+   "related": [
+    "data_integration",
+    "ai_governance",
+    "cloud_platform",
+    "managed_operations"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "ai-prilozheniya-i-sistemi-za-znaniya",
+     "name": "AI приложения и системи за знания",
+     "summary": "AI асистенти и функции върху вашите документи и данни — с източници, права и измерено качество.",
+     "body": "Изграждаме AI приложения, които отговарят от вашите собствени документи и данни — с посочени източници, спазени права за достъп и измерено качество. Това включва вътрешни асистенти, анализ на документи и AI функции в съществуващи продукти.",
+     "cta_label": "Обсъдете AI приложение за вашите данни",
+     "seo_title": "AI приложения и асистенти върху вашите документи (RAG)",
+     "seo_description": "Вътрешни AI асистенти, анализ на документи и AI функции в продукти — с отговори с източник, контрол на достъпа и измерено качество.",
+     "primary_keyword": "AI приложения"
+    },
+    "en": {
+     "slug": "ai-applications-and-knowledge-systems",
+     "name": "AI Applications & Knowledge Systems",
+     "summary": "AI assistants and features on your own documents and data — with sources, permissions and measured quality.",
+     "body": "This domain builds AI applications that answer from your own documents and data, with sources, permissions and measured quality. It covers internal assistants, document analysis, and AI features inside existing products.",
+     "cta_label": "Discuss an AI application for your data",
+     "seo_title": "AI applications and knowledge assistants on your documents",
+     "seo_description": "Internal AI assistants, document analysis and AI product features built on your own data — with cited sources, access control and measured quality.",
+     "primary_keyword": "AI applications"
+    }
+   }
+  },
+  {
+   "key": "ai_governance",
+   "code": "H",
+   "band": "ai",
+   "icon": "shield",
+   "position": 3,
+   "status": "published",
+   "contact_service": "audit",
+   "related": [
+    "ai_agents_automation",
+    "ai_applications",
+    "managed_operations",
+    "ai_strategy"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "ai-upravlenie-sigurnost-i-nadezhdnost",
+     "name": "AI управление, сигурност и надеждност",
+     "summary": "Проверими контроли около AI системите: права, данни, оценка на качеството и реакция при проблем.",
+     "body": "Поставяме около AI системите контроли, които бизнесът, клиентите и одиторите му могат да проверят: кой какво може да прави, кои данни до кой модел стигат, как се оценява качеството и какво става, когато нещо се обърка. Това е инженерно управление, а не правен съвет.",
+     "cta_label": "Заявете преглед на риска на AI система",
+     "seo_title": "Управление и сигурност на AI системи: риск, данни, контрол",
+     "seo_description": "Преглед на риска, одобрения и права, защита на данните, защита от инжектиране на инструкции и оценка на качеството на AI системи — без правни обещания.",
+     "primary_keyword": "сигурност на AI системи"
+    },
+    "en": {
+     "slug": "ai-governance-security-and-assurance",
+     "name": "AI Governance, Security & Assurance",
+     "summary": "Controls around AI systems that can be checked: permissions, data, quality evaluation and incident handling.",
+     "body": "This domain puts controls around AI systems that a business, its customers and its auditors can check: who may do what, which data reaches which model, how quality is evaluated, and what happens when something goes wrong. It is engineering governance, not legal advice.",
+     "cta_label": "Request an AI system risk review",
+     "seo_title": "AI governance and security: risk, data protection, controls",
+     "seo_description": "Risk review, approval and permission design, data protection, prompt-injection defences and evaluation for AI systems — engineering controls, not legal advice.",
+     "primary_keyword": "AI governance"
+    }
+   }
+  },
+  {
+   "key": "commerce_engineering",
+   "code": "D",
+   "band": "engineering",
+   "icon": "store",
+   "position": 0,
+   "status": "published",
+   "contact_service": "audit",
+   "related": [
+    "data_integration",
+    "ai_agents_automation",
+    "managed_operations",
+    "advisory_enablement"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "inzhenering-za-elektronna-targoviya",
+     "name": "Инженеринг за електронна търговия",
+     "summary": "Стабилност, скорост, видимост в търсачките, измерване и интеграции за Shopify и WooCommerce.",
+     "body": "Техническата основа на онлайн магазините: стабилност, скорост, видимост в търсачките, измерване и интеграции за Shopify и WooCommerce. Това е първоначалното ядро на студиото и мястото, където AI функциите за търговия намират приложение.",
+     "cta_label": "Заявете технически одит на магазина",
+     "seo_title": "Инженеринг за онлайн магазини: стабилност, скорост и растеж",
+     "seo_description": "Поддръжка, производителност, техническо SEO, анализи и интеграции за Shopify и WooCommerce — един технически партньор за магазина и данните.",
+     "primary_keyword": "инженеринг за онлайн магазини"
+    },
+    "en": {
+     "slug": "commerce-engineering",
+     "name": "Commerce Engineering",
+     "summary": "Stability, speed, search visibility, measurement and integrations for Shopify and WooCommerce stores.",
+     "body": "This domain is the technical foundation of online stores: stability, speed, search visibility, measurement and integrations for Shopify and WooCommerce. It is the original core of the studio, and it is where AI features for commerce are applied.",
+     "cta_label": "Request a technical store audit",
+     "seo_title": "Commerce engineering for Shopify and WooCommerce stores",
+     "seo_description": "Maintenance, performance, technical SEO, analytics and integrations for online stores — one technical partner for the store, its data and its AI features.",
+     "primary_keyword": "commerce engineering"
+    }
+   }
+  },
+  {
+   "key": "cloud_platform",
+   "code": "E",
+   "band": "engineering",
+   "icon": "layers",
+   "position": 1,
+   "status": "published",
+   "contact_service": "integrations",
+   "related": [
+    "devops_sre",
+    "ai_governance",
+    "managed_operations",
+    "data_integration"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "oblachen-i-platformen-inzhenering",
+     "name": "Облачен и платформен инженеринг",
+     "summary": "Облачна инфраструктура като код: среди, контейнери, бази данни, тайни, архиви и разходи.",
+     "body": "Проектираме и изграждаме инфраструктурата, върху която работят приложенията и AI натоварванията: контейнери, управлявани бази данни, мрежи, идентичност, тайни и контрол на разходите — в избрания от вас облак или при хостинг доставчик в ЕС, описано като код и предадено с документация. Това е самостоятелна инженерна услуга, а не добавка към AI.",
+     "cta_label": "Обсъдете облачна среда за вашето приложение",
+     "seo_title": "Облачна инфраструктура и платформен инженеринг (IaC)",
+     "seo_description": "Проектиране и изграждане на облачни среди: инфраструктура като код, контейнери, управлявани бази данни, тайни, архиви и контрол на разходите в ЕС.",
+     "primary_keyword": "облачна инфраструктура"
+    },
+    "en": {
+     "slug": "cloud-and-platform-engineering",
+     "name": "Cloud & Platform Engineering",
+     "summary": "Cloud infrastructure as code: environments, containers, databases, secrets, backups and cost control.",
+     "body": "This domain designs and builds the infrastructure that applications and AI workloads run on: containers, managed databases, networking, identity, secrets and cost control on your chosen cloud or an EU hosting provider, all described as code and handed over with documentation. It is a substantial engineering offering in its own right, not an accessory to AI.",
+     "cta_label": "Discuss a cloud platform for your application",
+     "seo_title": "Cloud and platform engineering with infrastructure as code",
+     "seo_description": "Design and build of cloud environments: infrastructure as code, containers, managed databases, secrets, tested backups and cost control, EU-hosted by default.",
+     "primary_keyword": "cloud and platform engineering"
+    }
+   }
+  },
+  {
+   "key": "devops_sre",
+   "code": "F",
+   "band": "engineering",
+   "icon": "activity",
+   "position": 2,
+   "status": "published",
+   "contact_service": "integrations",
+   "related": [
+    "cloud_platform",
+    "managed_operations",
+    "ai_governance",
+    "ai_applications"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "devops-sre-i-nablyudaemost",
+     "name": "DevOps, SRE и наблюдаемост",
+     "summary": "Повторяема доставка на софтуер и видимо поведение в реална работа: конвейери, мониторинг, инциденти.",
+     "body": "Правим доставката на софтуер повторяема, а поведението в реална работа — видимо: конвейери, безопасни версии, мониторинг, известия и практика при инциденти. SRE тук означава цели за ниво на услугата (SLO), бюджети за грешки и прегледи без търсене на виновни — в мащаба на вашия екип. Това не е център за денонощни операции.",
+     "cta_label": "Заявете преглед на доставката и наблюдаемостта",
+     "seo_title": "DevOps, SRE и наблюдаемост: CI/CD, мониторинг и надеждност",
+     "seo_description": "CI/CD конвейери, безопасни версии, логове, метрики и трасиране с OpenTelemetry, SLO и процедура при инциденти — приложени в мащаба на вашия екип.",
+     "primary_keyword": "DevOps, SRE и наблюдаемост"
+    },
+    "en": {
+     "slug": "devops-sre-and-observability",
+     "name": "DevOps, SRE & Observability",
+     "summary": "Repeatable software delivery and visible production behaviour: pipelines, monitoring, incident practice.",
+     "body": "This domain makes software delivery repeatable and production behaviour visible: pipelines, release safety, monitoring, alerting and incident practice. SRE here means service-level objectives, error budgets and blameless reviews, applied at the scale of your team. It is not a 24/7 operations centre.",
+     "cta_label": "Request a delivery and observability review",
+     "seo_title": "DevOps, SRE and observability: CI/CD and monitoring",
+     "seo_description": "CI/CD pipelines, safe releases, logs, metrics, OpenTelemetry tracing, SLOs and an incident practice — sized for your team and documented in your repository.",
+     "primary_keyword": "DevOps, SRE and observability"
+    }
+   }
+  },
+  {
+   "key": "data_integration",
+   "code": "G",
+   "band": "engineering",
+   "icon": "database",
+   "position": 3,
+   "status": "published",
+   "contact_service": "integrations",
+   "related": [
+    "ai_agents_automation",
+    "ai_applications",
+    "commerce_engineering",
+    "managed_operations"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "inzhenering-na-danni-i-integratsii",
+     "name": "Инженеринг на данни и интеграции",
+     "summary": "Свързани системи и използваеми данни: API интеграции, синхронизация, потоци и модели на данни.",
+     "body": "Свързваме системи и правим данните им използваеми: API интеграции, задачи за синхронизация, потоци от събития и аналитични модели на данни — с ясни отговорници и обработка на грешки. От това зависят агентите, асистентите и отчетите.",
+     "cta_label": "Опишете системите, които трябва да се свържат",
+     "seo_title": "Инженеринг на данни и системни интеграции за бизнеса",
+     "seo_description": "Свързване на онлайн магазин, CRM, ERP и счетоводство, синхронизация на данни, конвейери и модели на данни за отчети и AI — с обработка на грешки.",
+     "primary_keyword": "инженеринг на данни"
+    },
+    "en": {
+     "slug": "data-and-integration-engineering",
+     "name": "Data & Integration Engineering",
+     "summary": "Connected systems and usable data: API integrations, synchronisation, event flows and data models.",
+     "body": "This domain connects systems and makes their data usable: API integrations, sync jobs, event flows and analytical data models with clear ownership and error handling. Agents, assistants and reporting depend on it.",
+     "cta_label": "Describe the systems you need connected",
+     "seo_title": "Data and integration engineering for business systems",
+     "seo_description": "Connecting store, CRM, ERP and accounting, data synchronisation, pipelines and data models for reporting and AI — with retries, error queues and monitoring.",
+     "primary_keyword": "data and integration engineering"
+    }
+   }
+  },
+  {
+   "key": "managed_operations",
+   "code": "I",
+   "band": "operations",
+   "icon": "gauge",
+   "position": 0,
+   "status": "published",
+   "contact_service": "ai_managed",
+   "related": [
+    "devops_sre",
+    "ai_governance",
+    "ai_agents_automation",
+    "commerce_engineering"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "upravlyavani-ai-i-platformeni-operatsii",
+     "name": "Управлявани AI и платформени операции",
+     "summary": "Текущата работа на изграденото: наблюдение, поддръжка, оценка, разходи и инциденти — по писмен обхват.",
+     "body": "Поемаме текущата работа на вече изграденото — от нас или от други: наблюдение, поддръжка, оценка, контрол на разходите, реакция при инциденти и постоянно подобрение, по писмено договорен обхват. Данните идват от вашите системи, след като достъпът е договорен. Нищо не се отчита, преди реално да е свързано.",
+     "cta_label": "Заявете AI оценка",
+     "seo_title": "Управлявани AI системи и платформени операции",
+     "seo_description": "Текуща работа на AI агенти, приложения, магазини и облачни среди: наблюдение, оценка, разходи, инциденти и подобрения — по договорен обхват.",
+     "primary_keyword": "управлявани AI системи"
+    },
+    "en": {
+     "slug": "managed-ai-and-platform-operations",
+     "name": "Managed AI & Platform Operations",
+     "summary": "Ongoing operation of what has been built: monitoring, maintenance, evaluation, cost and incidents.",
+     "body": "This domain is the ongoing operation of what has been built, by us or by others: monitoring, maintenance, evaluation, cost control, incident response and continuous improvement, under a written scope. Data comes from your systems once access is agreed. Nothing is reported before it is actually connected.",
+     "cta_label": "Request an AI assessment",
+     "seo_title": "Managed AI systems and platform operations",
+     "seo_description": "Ongoing operation of AI agents, applications, stores and cloud environments: monitoring, evaluation, cost, incidents and improvements — under an agreed scope.",
+     "primary_keyword": "managed AI systems"
+    }
+   }
+  },
+  {
+   "key": "advisory_enablement",
+   "code": "J",
+   "band": "operations",
+   "icon": "clipboard",
+   "position": 1,
+   "status": "published",
+   "contact_service": "audit",
+   "related": [
+    "ai_strategy",
+    "commerce_engineering",
+    "ai_agents_automation",
+    "ai_governance"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "konsultatsii-otsenki-i-obuchenie",
+     "name": "Консултации, оценки и обучение",
+     "summary": "Кратка работа с фиксиран обхват, която води до решения: одити, прегледи на архитектура и обучение.",
+     "body": "Кратка работа с фиксиран обхват, която води до решения и изгражда умения във вашия екип: одити, прегледи на архитектура, второ мнение и практическо обучение. Това е препоръчителната първа стъпка преди повечето внедрявания.",
+     "cta_label": "Заявете технически одит",
+     "seo_title": "Технически консултации, одити и обучение за AI и DevOps",
+     "seo_description": "Технически одити, преглед на архитектура и код, работни срещи и практическо обучение на екипи за AI, интеграции и DevOps — като първа стъпка преди внедряване.",
+     "primary_keyword": "технически консултации"
+    },
+    "en": {
+     "slug": "advisory-assessments-and-enablement",
+     "name": "Advisory, Assessments & Enablement",
+     "summary": "Short, fixed-scope work that produces decisions: audits, architecture reviews and hands-on enablement.",
+     "body": "This domain covers short, fixed-scope work that produces decisions and capability in your own team: audits, architecture reviews, second opinions and hands-on enablement. It is the recommended first step before most implementations.",
+     "cta_label": "Request a technical audit",
+     "seo_title": "Technical advisory, audits and enablement for AI and DevOps",
+     "seo_description": "Technical audits, architecture and code reviews, workshops and hands-on team enablement for AI, integrations and DevOps — the first step before implementation.",
+     "primary_keyword": "technical advisory"
+    }
+   }
+  }
+ ],
+ "families": [
+  {
+   "key": "ai_strategy.readiness",
+   "domain": "ai_strategy",
+   "delivery_status": "available",
+   "position": 0,
+   "status": "published",
+   "services": [
+    "audit"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Оценка на AI готовността",
+     "summary": "Готовност на данните, процесите, екипа, риска и инфраструктурата. Онлайн самооценката (12 въпроса, 6 измерения) се следва от експертен преглед.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "AI readiness assessment",
+     "summary": "Data, process, team, risk and infrastructure readiness. The online self-assessment (12 questions, 6 dimensions) is followed by an expert review.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_strategy.discovery",
+   "domain": "ai_strategy",
+   "delivery_status": "available",
+   "position": 1,
+   "status": "published",
+   "services": [
+    "audit"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Откриване и приоритизиране на случаи на употреба",
+     "summary": "Инвентаризация на процесите, оценка на стойност и сложност, точки за човешко одобрение, решение „изграждане или покупка“.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Use-case discovery and prioritisation",
+     "summary": "Process inventory, value and complexity scoring, human-approval points, build or buy.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_strategy.roadmap",
+   "domain": "ai_strategy",
+   "delivery_status": "custom",
+   "position": 2,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "AI пътна карта и портфолио",
+     "summary": "Поетапен план, зависимости, отговорник за всяка инициатива, критерии за приемане, дневник на решенията.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "AI roadmap and portfolio",
+     "summary": "Phased plan, dependencies, an owner per initiative, acceptance criteria, a decision log.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_strategy.operating_model",
+   "domain": "ai_strategy",
+   "delivery_status": "custom",
+   "position": 3,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Оперативен модел за AI",
+     "summary": "Роли, политика за одобрение, процес за промени, критерии за избор на доставчици и модели.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Operating model for AI",
+     "summary": "Roles, approval policy, change process, vendor and model selection criteria.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_agents_automation.task_agents",
+   "domain": "ai_agents_automation",
+   "delivery_status": "available",
+   "position": 0,
+   "status": "published",
+   "services": [
+    "ai_agents"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Агенти за конкретни задачи",
+     "summary": "Квалификация на запитвания, чернови на отговори към клиенти, обработка на входящи документи, насрочване на срещи, проучвания, обобщени отчети — десетте роли от библиотеката с AI агенти.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Task agents",
+     "summary": "Lead qualification, customer support drafts, document intake, scheduling, research briefs, reporting summaries — the ten roles of the AI Agent Library.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_agents_automation.workflow_automation",
+   "domain": "ai_agents_automation",
+   "delivery_status": "available",
+   "position": 1,
+   "status": "published",
+   "services": [
+    "automation"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Автоматизация на работни процеси",
+     "summary": "Тригери, маршрутизиране, трансформация на данни, повторни опити, опашки за грешки, идемпотентни записи.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Workflow automation",
+     "summary": "Triggers, routing, data transformation, retries, error queues, idempotent writes.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_agents_automation.multi_agent",
+   "domain": "ai_agents_automation",
+   "delivery_status": "available",
+   "position": 2,
+   "status": "published",
+   "services": [
+    "ai_agents"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Координация на няколко агента",
+     "summary": "Роли на координатор и надзорник на одобренията, пътища за ескалация. Обхватът се определя за всеки проект.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Multi-agent coordination",
+     "summary": "Coordinator and approval-supervisor roles, escalation paths. Scoped per project.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_agents_automation.human_in_the_loop",
+   "domain": "ai_agents_automation",
+   "delivery_status": "available",
+   "position": 3,
+   "status": "published",
+   "services": [
+    "automation"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Дизайн с човешко одобрение",
+     "summary": "Точки на одобрение според риска, преглед на извадки, интерфейс за одобрение, одитна следа.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Human-in-the-loop design",
+     "summary": "Approval points by risk, sample review, approval UI, audit trail.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_agents_automation.agent_tools",
+   "domain": "ai_agents_automation",
+   "delivery_status": "available",
+   "position": 4,
+   "status": "published",
+   "services": [],
+   "via": [
+    "data_integration"
+   ],
+   "translations": {
+    "bg": {
+     "name": "Инструменти за агенти върху вашите API",
+     "summary": "Дефиниции на инструменти върху вашите API с акаунти с минимално необходимите права.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Agent tools on your APIs",
+     "summary": "Tool definitions over your APIs with least-privilege credentials.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_applications.rag",
+   "domain": "ai_applications",
+   "delivery_status": "available",
+   "position": 0,
+   "status": "published",
+   "services": [
+    "ai_tools"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Асистенти с извличане от документи (RAG)",
+     "summary": "Зареждане, разделяне на части, ембединги, хибридно търсене, извличане според правата за достъп, отговори с източник, „без източник — без отговор“.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Retrieval-augmented assistants (RAG)",
+     "summary": "Ingestion, chunking, embeddings, hybrid search, access-aware retrieval, cited answers, “no source, no answer”.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_applications.documents",
+   "domain": "ai_applications",
+   "delivery_status": "available",
+   "position": 1,
+   "status": "published",
+   "services": [
+    "ai_tools"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Анализ на документи и извличане на данни",
+     "summary": "Класификация, извличане на полета с ниво на увереност, правила за валидиране, опашки за човешки преглед.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Document analysis and extraction",
+     "summary": "Classification, field extraction with confidence, validation rules, human review queues.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_applications.product_features",
+   "domain": "ai_applications",
+   "delivery_status": "available",
+   "position": 2,
+   "status": "published",
+   "services": [
+    "ai_tools"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "AI функции в продукти",
+     "summary": "Обобщаване, чернови, класификация и търсене във вашето приложение, включвани чрез флагове за функционалност.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "AI features in products",
+     "summary": "Summarisation, drafting, classification and search inside your application, behind feature flags.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_applications.evaluation",
+   "domain": "ai_applications",
+   "delivery_status": "custom",
+   "position": 3,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Оценка и инженеринг на качеството",
+     "summary": "Тестови набори, метрики за извличането и отговорите, регресионни проверки в CI.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Evaluation and quality engineering",
+     "summary": "Test sets, retrieval and answer metrics, regression gates in CI.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_applications.adaptation",
+   "domain": "ai_applications",
+   "delivery_status": "custom",
+   "position": 4,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Адаптиране на модели",
+     "summary": "Първо дизайн на инструкциите и инструментите; дообучение само при доказана нужда и достатъчно данни.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Model adaptation",
+     "summary": "Prompt and tool design first; fine-tuning only with a demonstrated need and sufficient data.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "commerce_engineering.maintenance",
+   "domain": "commerce_engineering",
+   "delivery_status": "available",
+   "position": 0,
+   "status": "published",
+   "services": [
+    "maintenance"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Поддръжка и стабилност на магазина",
+     "summary": "Обновления, архиви, наблюдение на достъпността и грешките, ред в приложенията и плъгините, поправки по сигурността.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Store maintenance and stability",
+     "summary": "Updates, backups, uptime and error monitoring, plugin and app hygiene, security patches.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "commerce_engineering.performance",
+   "domain": "commerce_engineering",
+   "delivery_status": "available",
+   "position": 1,
+   "status": "published",
+   "services": [
+    "maintenance",
+    "audit"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Инженеринг на производителността",
+     "summary": "Core Web Vitals, бюджети за изображения и скриптове, оптимизация на темата, кеширане — в рамките на поддръжката и одита.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Performance engineering",
+     "summary": "Core Web Vitals, image and script budgets, theme optimisation, caching — within maintenance and the audit.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "commerce_engineering.seo",
+   "domain": "commerce_engineering",
+   "delivery_status": "available",
+   "position": 2,
+   "status": "published",
+   "services": [
+    "seo"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Техническо и e-commerce SEO",
+     "summary": "Обхождане, структурирани данни, филтрирана навигация, многоезичност, миграции.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Technical and e-commerce SEO",
+     "summary": "Crawlability, structured data, faceted navigation, internationalisation, migrations.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "commerce_engineering.analytics",
+   "domain": "commerce_engineering",
+   "delivery_status": "available",
+   "position": 3,
+   "status": "published",
+   "services": [
+    "analytics"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Анализи и конверсии",
+     "summary": "GA4 и сървърни събития, фунии, дизайн на експерименти, качество на данните.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Analytics and conversion",
+     "summary": "GA4 and server-side events, funnels, experiment design, data quality.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "commerce_engineering.integrations",
+   "domain": "commerce_engineering",
+   "delivery_status": "available",
+   "position": 4,
+   "status": "published",
+   "services": [
+    "integrations"
+   ],
+   "via": [
+    "data_integration"
+   ],
+   "translations": {
+    "bg": {
+     "name": "Интеграции за търговия",
+     "summary": "ERP, складови наличности, счетоводство, куриери и онлайн пазари (marketplaces).",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Commerce integrations",
+     "summary": "ERP, inventory, accounting, couriers and marketplaces.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "commerce_engineering.replatforming",
+   "domain": "commerce_engineering",
+   "delivery_status": "custom",
+   "position": 5,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Смяна на платформа и headless",
+     "summary": "Планове за миграция, пренасочвания, миграция на данни, архитектура на headless витрина.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Replatforming and headless",
+     "summary": "Migration plans, redirects, data migration, headless storefront architecture.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "commerce_engineering.ai_for_commerce",
+   "domain": "commerce_engineering",
+   "delivery_status": "available",
+   "position": 6,
+   "status": "published",
+   "services": [],
+   "via": [
+    "ai_agents_automation",
+    "ai_applications"
+   ],
+   "translations": {
+    "bg": {
+     "name": "AI за търговия",
+     "summary": "Чернови на продуктово съдържание, асистенти за търсене и препоръки, агенти за обслужване на клиенти.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "AI for commerce",
+     "summary": "Product content drafts, search and recommendation assistants, support agents.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "cloud_platform.landing_zone",
+   "domain": "cloud_platform",
+   "delivery_status": "custom",
+   "position": 0,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Основа на облака и среди",
+     "summary": "Акаунти и проекти, мрежи, идентичност и достъп, разделяне на средите (разработка, тестова, производствена).",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Landing zone and environments",
+     "summary": "Accounts and projects, networks, identity and access, environment separation (dev, staging, prod).",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "cloud_platform.iac",
+   "domain": "cloud_platform",
+   "delivery_status": "custom",
+   "position": 1,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Инфраструктура като код",
+     "summary": "Terraform или инструментите на доставчика, модули, управление на състоянието, процес за преглед на промените.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Infrastructure as code",
+     "summary": "Terraform or the provider's IaC, modules, state handling, review workflow.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "cloud_platform.containers",
+   "domain": "cloud_platform",
+   "delivery_status": "custom",
+   "position": 2,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Контейнери и среда за изпълнение",
+     "summary": "Docker образи, Compose за малки системи, управлявани услуги за контейнери или Kubernetes, където е обосновано.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Containers and runtime",
+     "summary": "Docker images, Compose for small estates, managed container services or Kubernetes where justified.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "cloud_platform.data_services",
+   "domain": "cloud_platform",
+   "delivery_status": "custom",
+   "position": 3,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Услуги за данни",
+     "summary": "Управляван PostgreSQL, обектно хранилище, архиви и тестове за възстановяване, криптиране на съхраняваните данни.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Data platform services",
+     "summary": "Managed PostgreSQL, object storage, backups and restore tests, encryption at rest.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "cloud_platform.secrets",
+   "domain": "cloud_platform",
+   "delivery_status": "custom",
+   "position": 4,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Тайни и идентичност",
+     "summary": "Мениджър на тайни, ротация, идентичност на натоварванията, роли с минимално необходимите права.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Secrets and identity",
+     "summary": "Secrets manager, rotation, workload identity, least-privilege roles.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "cloud_platform.ai_hosting",
+   "domain": "cloud_platform",
+   "delivery_status": "custom",
+   "position": 5,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Хостинг на AI натоварвания",
+     "summary": "Шлюзове към API на модели, частна мрежова връзка към доставчиците, GPU капацитет само където е нужен, съхранение на данните в ЕС.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "AI workload hosting",
+     "summary": "Model API gateways, private networking to providers, GPU capacity only where required, EU data residency.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "cloud_platform.cost",
+   "domain": "cloud_platform",
+   "delivery_status": "custom",
+   "position": 6,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Управление на разходите",
+     "summary": "Етикетиране на ресурсите, бюджети и известия, прегледи за оразмеряване.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Cost management",
+     "summary": "Tagging, budgets and alerts, rightsizing reviews.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "cloud_platform.migration",
+   "domain": "cloud_platform",
+   "delivery_status": "custom",
+   "position": 7,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Миграция",
+     "summary": "Пренасяне и подобряване на съществуващи приложения, планове за превключване, връщане назад.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Migration",
+     "summary": "Lift-and-improve of existing applications, cut-over plans, rollback.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "devops_sre.cicd",
+   "domain": "devops_sre",
+   "delivery_status": "custom",
+   "position": 0,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "CI/CD конвейери",
+     "summary": "Компилиране, тестове, сканиране за сигурност, временни среди за преглед, промотиране, връщане назад.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "CI/CD pipelines",
+     "summary": "Build, test, security scanning, preview environments, promotion, rollback.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "devops_sre.release",
+   "domain": "devops_sre",
+   "delivery_status": "custom",
+   "position": 1,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Инженеринг на версиите",
+     "summary": "Миграции като контролирана стъпка, флагове за функционалност, canary или blue-green внедряване, където е обосновано.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Release engineering",
+     "summary": "Migrations as a gated step, feature flags, canary or blue-green where justified.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "devops_sre.observability",
+   "domain": "devops_sre",
+   "delivery_status": "custom",
+   "position": 2,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Наблюдаемост",
+     "summary": "Структурирани логове, метрики, трасиране с OpenTelemetry, табла, синтетични проверки.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Observability",
+     "summary": "Structured logs, metrics, OpenTelemetry tracing, dashboards, synthetic checks.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "devops_sre.alerting",
+   "domain": "devops_sre",
+   "delivery_status": "custom",
+   "position": 3,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Известия и дежурства",
+     "summary": "Известия, базирани на SLO, маршрутизиране, наръчници, ескалация. Персоналът за дежурства се договаря отделно.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Alerting and on-call design",
+     "summary": "SLO-based alerts, routing, runbooks, escalation. On-call staffing is agreed separately.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "devops_sre.reliability",
+   "domain": "devops_sre",
+   "delivery_status": "custom",
+   "position": 4,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Инженеринг на надеждността",
+     "summary": "SLO и бюджети за грешки, натоварващи тестове и тестове за отказ, прегледи на капацитета.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Reliability engineering",
+     "summary": "SLOs and error budgets, load and failure testing, capacity reviews.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "devops_sre.incidents",
+   "domain": "devops_sre",
+   "delivery_status": "custom",
+   "position": 5,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Практика при инциденти",
+     "summary": "Процедура при инциденти, прегледи след инцидент, списък с превантивни задачи.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Incident practice",
+     "summary": "Incident procedure, post-incident reviews, preventive backlog.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "devops_sre.llm_observability",
+   "domain": "devops_sre",
+   "delivery_status": "custom",
+   "position": 6,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Наблюдаемост на езикови модели",
+     "summary": "Трасиране на извикванията към модели и инструменти, следене на токени и разходи, време за отговор, скриване на чувствителни данни.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "LLM observability",
+     "summary": "Tracing of model and tool calls, token and cost tracking, latency, redaction.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "data_integration.api",
+   "domain": "data_integration",
+   "delivery_status": "available",
+   "position": 0,
+   "status": "published",
+   "services": [
+    "integrations"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "API интеграции",
+     "summary": "REST и GraphQL, webhooks, удостоверяване, лимити на заявките, повторни опити, идемпотентност, опашки за грешки.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "API integrations",
+     "summary": "REST and GraphQL, webhooks, authentication, rate limits, retries, idempotency, error queues.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "data_integration.sync",
+   "domain": "data_integration",
+   "delivery_status": "available",
+   "position": 1,
+   "status": "published",
+   "services": [
+    "integrations"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Синхронизация между системи",
+     "summary": "Продукти, наличности, поръчки, клиенти и фактури между магазин, ERP, CRM и счетоводство.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "System synchronisation",
+     "summary": "Product, stock, order, customer and invoice sync between store, ERP, CRM and accounting.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "data_integration.events",
+   "domain": "data_integration",
+   "delivery_status": "custom",
+   "position": 2,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Събития и работни потоци",
+     "summary": "Опашки, планирани задачи, прихващане на промени (CDC), където системата го поддържа.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Event and workflow plumbing",
+     "summary": "Queues, scheduled jobs, change data capture where supported.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "data_integration.pipelines",
+   "domain": "data_integration",
+   "delivery_status": "custom",
+   "position": 3,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Конвейери и модели на данни",
+     "summary": "Извличане, почистване и моделиране за отчети и AI; проверки на качеството на данните.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Data pipelines and models",
+     "summary": "Extraction, cleaning and modelling for reporting and AI; data-quality checks.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "data_integration.analytical_stores",
+   "domain": "data_integration",
+   "delivery_status": "custom",
+   "position": 4,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Аналитични хранилища",
+     "summary": "Хранилище за данни или отчетна база върху PostgreSQL, връзки към BI инструменти.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Analytical stores",
+     "summary": "A warehouse or PostgreSQL-based reporting store, BI connections.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "data_integration.data_for_ai",
+   "domain": "data_integration",
+   "delivery_status": "available",
+   "position": 5,
+   "status": "published",
+   "services": [],
+   "via": [
+    "ai_applications"
+   ],
+   "translations": {
+    "bg": {
+     "name": "Данни за AI",
+     "summary": "Подготовка на документи и записи, метаданни за правата за достъп, конвейери за ембединги.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Data for AI",
+     "summary": "Document and record preparation, permission metadata, embeddings pipelines.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_governance.risk_review",
+   "domain": "ai_governance",
+   "delivery_status": "custom",
+   "position": 0,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Преглед на риска и случаите на употреба",
+     "summary": "Класификация на случаите на употреба по въздействие, изисквания за одобрение, задължения за документиране — заедно с вашите юристи.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "AI risk and use-case review",
+     "summary": "Classification of use cases by impact, approval requirements, documentation duties — with your legal counsel.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_governance.approvals",
+   "domain": "ai_governance",
+   "delivery_status": "custom",
+   "position": 1,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Дизайн на одобренията и правата",
+     "summary": "Детерминистична проверка на правата около изхода на модела, матрици за човешко одобрение, одитна следа. В проектите за AI агенти е част от изпълнението.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Approval and permission design",
+     "summary": "Deterministic authorisation around model output, human approval matrices, audit trails. Part of delivery in AI agent projects.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_governance.data_protection",
+   "domain": "ai_governance",
+   "delivery_status": "custom",
+   "position": 2,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Инженеринг за защита на данните",
+     "summary": "Минимизиране, скриване на чувствителни данни, срокове за съхранение, местоположение на данните, изисквания към договорите за обработка с доставчиците.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Data protection engineering",
+     "summary": "Data minimisation, redaction, retention, residency, DPA requirements for providers.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_governance.security",
+   "domain": "ai_governance",
+   "delivery_status": "custom",
+   "position": 3,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Сигурност на AI системи",
+     "summary": "Защита от инжектиране на инструкции (prompt injection), граници на правата на инструментите, работа с тайни, модели на заплахите.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Security engineering for AI",
+     "summary": "Prompt-injection defences, tool permission boundaries, secret handling, threat models.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_governance.evaluation",
+   "domain": "ai_governance",
+   "delivery_status": "custom",
+   "position": 4,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Оценка и проверка на качеството",
+     "summary": "Тестови набори, целенасочени опити за пробив в договорен обхват, доклади от оценката, регресионни проверки.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Evaluation and assurance",
+     "summary": "Test sets, red-team style probing within agreed scope, evaluation reports, regression gates.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "ai_governance.policy",
+   "domain": "ai_governance",
+   "delivery_status": "custom",
+   "position": 5,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Политики и документация",
+     "summary": "Политика за използване на AI, регистър на моделите и данните, процедура при инциденти.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Policy and documentation",
+     "summary": "AI usage policy, model and data inventory, incident procedure.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "managed_operations.managed_ai",
+   "domain": "managed_operations",
+   "delivery_status": "available",
+   "position": 0,
+   "status": "published",
+   "services": [
+    "ai_managed"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Управлявани AI системи",
+     "summary": "Осемте области на работа от страницата за AI Managed Services: надеждност, видимост на изпълнението, разходи и токени, оценка на качеството, човешки преглед, реакция при инциденти, оптимизация, управление.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Managed AI systems",
+     "summary": "The eight operating areas on the AI Managed Services page: reliability, execution visibility, cost and tokens, quality evaluation, human review, incident response, optimisation, governance.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "managed_operations.store_operations",
+   "domain": "managed_operations",
+   "delivery_status": "available",
+   "position": 1,
+   "status": "published",
+   "services": [
+    "maintenance"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Операции на онлайн магазини",
+     "summary": "Поддръжка, обновления, наблюдение и архиви — услугата за поддръжка на онлайн магазини.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Store operations",
+     "summary": "Maintenance, updates, monitoring and backups — the e-commerce maintenance service.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "managed_operations.platform_operations",
+   "domain": "managed_operations",
+   "delivery_status": "custom",
+   "position": 2,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Платформени операции",
+     "summary": "Поправки, архиви и тестове за възстановяване, прегледи на капацитета и разходите за облачни среди.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Platform operations",
+     "summary": "Patching, backups and restore tests, capacity and cost reviews for cloud environments.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "managed_operations.integration_health",
+   "domain": "managed_operations",
+   "delivery_status": "custom",
+   "position": 3,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Състояние на интеграциите",
+     "summary": "Наблюдение на конекторите, опашките за грешки и проверките на качеството на данните.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Integration health",
+     "summary": "Monitoring of connectors, error queues and data-quality checks.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "managed_operations.reporting",
+   "domain": "managed_operations",
+   "delivery_status": "available",
+   "position": 4,
+   "status": "published",
+   "services": [
+    "ai_managed"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Отчети",
+     "summary": "Месечни отчети от свързаните данни и тримесечни прегледи.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Reporting",
+     "summary": "Monthly reports from connected data and quarterly reviews.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "managed_operations.portal",
+   "domain": "managed_operations",
+   "delivery_status": "planned",
+   "position": 5,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Клиентски портал за операциите",
+     "summary": "Организации, регистър на системите, инциденти, отчети, а по-късно и телеметрия.",
+     "prerequisite": "Изолация на данните на ниво база данни (RLS), клиентски акаунти с многофакторно удостоверяване и договор за обработка на данни."
+    },
+    "en": {
+     "name": "Client operations portal",
+     "summary": "Organisations, system registry, incidents, reports, and later telemetry.",
+     "prerequisite": "Database-level tenant isolation (RLS), client accounts with MFA, and a data processing agreement."
+    }
+   }
+  },
+  {
+   "key": "advisory_enablement.audits",
+   "domain": "advisory_enablement",
+   "delivery_status": "available",
+   "position": 0,
+   "status": "published",
+   "services": [
+    "audit"
+   ],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Технически одити",
+     "summary": "Технически одит на онлайн магазин, AI готовност, преглед на интеграциите и данните.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Technical audits",
+     "summary": "E-commerce technical audit, AI readiness, integration and data review.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "advisory_enablement.reviews",
+   "domain": "advisory_enablement",
+   "delivery_status": "custom",
+   "position": 1,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Прегледи на архитектура и код",
+     "summary": "Второ мнение за дизайни, оферти на доставчици и кодови бази.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Architecture and code reviews",
+     "summary": "Second opinion on designs, vendor proposals and code bases.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "advisory_enablement.self_service",
+   "domain": "advisory_enablement",
+   "delivery_status": "available",
+   "position": 2,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Онлайн самооценки",
+     "summary": "AI готовност, откриване на възможности за автоматизация, ROI калкулатор, конструктор на AI решения, AI екип и AI съветник — безплатни и онлайн.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Self-service assessments",
+     "summary": "AI readiness, Opportunity Finder, ROI calculator, Solution Builder, AI team and the Advisor — free and online.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "advisory_enablement.workshops",
+   "domain": "advisory_enablement",
+   "delivery_status": "custom",
+   "position": 3,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Работни срещи",
+     "summary": "Откриване на случаи на употреба, дизайн на одобренията, архитектурни сесии.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Workshops",
+     "summary": "Use-case discovery, approval design, architecture sessions.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "advisory_enablement.training",
+   "domain": "advisory_enablement",
+   "delivery_status": "custom",
+   "position": 4,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Обучение на екипи",
+     "summary": "Практически занимания за разработчици и оператори: дизайн на инструкции и инструменти, оценка, RAG, CI/CD за AI.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Enablement and training",
+     "summary": "Hands-on sessions for developers and operators: prompt and tool design, evaluation, RAG, CI/CD for AI.",
+     "prerequisite": null
+    }
+   }
+  },
+  {
+   "key": "advisory_enablement.due_diligence",
+   "domain": "advisory_enablement",
+   "delivery_status": "custom",
+   "position": 5,
+   "status": "published",
+   "services": [],
+   "via": [],
+   "translations": {
+    "bg": {
+     "name": "Техническа проверка (due diligence)",
+     "summary": "Преглед на продукт или доставчик преди покупка или инвестиция.",
+     "prerequisite": null
+    },
+    "en": {
+     "name": "Technical due diligence",
+     "summary": "A review of a product or vendor before purchase or investment.",
+     "prerequisite": null
+    }
+   }
+  }
+ ],
+ "services": [
+  {
+   "key": "ai_agents",
+   "primary_domain": "ai_agents_automation",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "ai_agents",
+   "icon": "bot",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 0,
+   "status": "published",
+   "related": [
+    "automation",
+    "integrations",
+    "ai_managed"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "razrabotka-na-ai-agenti",
+     "name": "Разработка на AI агенти за обслужване, операции и вътрешни процеси",
+     "short_name": "Разработка на AI агенти",
+     "summary": "Агенти, които изпълняват задачи на няколко стъпки през вашите системи — с ясни граници, инструменти и човешко одобрение за действията с ефект.",
+     "body": "AI агентът не е просто чатбот: той чете данни, планира следващата стъпка и използва инструменти като CRM, магазина или пощата. Проектираме агенти с тясна, ясно описана задача, минимални права и точки за човешко одобрение — така помагат, без да поемат неконтролиран риск.",
+     "seo_title": "Разработка на AI агенти с човешки контрол",
+     "seo_description": "Разработка на AI агенти за малки и средни фирми: обслужване на клиенти, обработка на поръчки и вътрешни задачи — с правила, журнали и човешко одобрение.",
+     "primary_keyword": "разработка на AI агенти"
+    },
+    "en": {
+     "slug": "ai-agent-development",
+     "name": "AI agent development for customer service, operations and internal work",
+     "short_name": "AI agent development",
+     "summary": "Agents that carry out multi-step tasks through your systems — with clear limits, defined tools and human approval for actions that matter.",
+     "body": "An AI agent is more than a chatbot: it reads data, plans the next step and uses tools such as your CRM, store or inbox. We design agents with a narrow, clearly described job, minimal permissions and human approval points — so they help without taking on uncontrolled risk.",
+     "seo_title": "AI agent development with human oversight",
+     "seo_description": "AI agent development for small and mid-sized companies: customer service, order handling and internal tasks — with rules, audit logs and human approval built in.",
+     "primary_keyword": "AI agent development"
+    }
+   }
+  },
+  {
+   "key": "automation",
+   "primary_domain": "ai_agents_automation",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "automation",
+   "icon": "workflow",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 1,
+   "status": "published",
+   "related": [
+    "ai_tools",
+    "ai_managed",
+    "integrations"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "avtomatizatsiya-na-procesi",
+     "name": "Автоматизация на бизнес процеси с AI — с човешки контрол там, където е нужен",
+     "short_name": "AI автоматизация на процеси",
+     "summary": "Класификация на запитвания, CRM процеси, обработка на документи и интеграции между системите — с човешко одобрение там, където е нужно.",
+     "body": "Много малки и средни бизнеси губят часове всяка седмица в копиране на данни, сортиране на имейли и ръчни отчети. Автоматизираме повтарящите се стъпки и оставяме решенията с по-висок риск на хората.",
+     "seo_title": "Автоматизация на бизнес процеси с AI и човешки контрол",
+     "seo_description": "Автоматизация на бизнес процеси с AI: класификация на запитвания, обработка на документи, CRM процеси и отчети — с одобрение от човек за чувствителните стъпки.",
+     "primary_keyword": "автоматизация на бизнес процеси"
+    },
+    "en": {
+     "slug": "business-process-automation",
+     "name": "AI business process automation — with human oversight where it matters",
+     "short_name": "AI workflow automation",
+     "summary": "Inquiry classification, CRM workflows, document processing and system integrations — with human approval where needed.",
+     "body": "Many small and mid-sized businesses lose hours every week copying data, sorting emails and building reports by hand. We automate the repetitive steps and leave higher-risk decisions to people.",
+     "seo_title": "AI business process automation with human oversight",
+     "seo_description": "AI business process automation: inquiry classification, document processing, CRM workflows and reporting — with human approval for the sensitive steps.",
+     "primary_keyword": "business process automation"
+    }
+   }
+  },
+  {
+   "key": "ai_tools",
+   "primary_domain": "ai_applications",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "ai_tools",
+   "icon": "sparkles",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 0,
+   "status": "published",
+   "related": [
+    "automation",
+    "ai_managed",
+    "integrations"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "ai-instrumenti-za-biznesa",
+     "name": "AI разработка по поръчка: асистенти, RAG и AI инструменти за бизнеса",
+     "short_name": "AI разработка по поръчка",
+     "summary": "AI асистенти, генериране на продуктови описания, вътрешни бази знания и RAG решения, вградени в работните ви процеси.",
+     "body": "Езиковите модели могат да спестят много часове работа, но само когато са свързани с вашите данни, процеси и правила. Разработваме практични AI инструменти с ясно дефинирана задача, контрол на качеството и защита на данните.",
+     "seo_title": "AI инструменти по поръчка: асистенти, RAG и анализ",
+     "seo_description": "AI инструменти по поръчка за малки и средни бизнеси: асистенти за клиенти, RAG върху вашите документи, продуктови описания и анализ на документи с контрол на качеството.",
+     "primary_keyword": "AI инструменти по поръчка"
+    },
+    "en": {
+     "slug": "custom-ai-tools",
+     "name": "Custom AI engineering: assistants, RAG and AI tools for your business",
+     "short_name": "Custom AI engineering",
+     "summary": "AI assistants, product description generation, internal knowledge bases and RAG solutions built into your workflows.",
+     "body": "Language models can save many hours of work — but only when they are connected to your data, processes and rules. We build practical AI tools with a clearly defined task, quality control and data protection.",
+     "seo_title": "Custom AI tools: assistants, RAG and document analysis",
+     "seo_description": "Custom AI tools for small and mid-sized businesses: customer assistants, RAG over your documents, product descriptions and document analysis with quality control.",
+     "primary_keyword": "custom AI tools"
+    }
+   }
+  },
+  {
+   "key": "maintenance",
+   "primary_domain": "commerce_engineering",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "maintenance",
+   "icon": "wrench",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 0,
+   "status": "published",
+   "related": [
+    "integrations",
+    "seo",
+    "audit"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "poddrazhka-na-online-magazini",
+     "name": "Техническа поддръжка на онлайн магазини на Shopify и WooCommerce",
+     "short_name": "Поддръжка на онлайн магазини",
+     "summary": "Shopify и WooCommerce поддръжка, мониторинг, производителност и сигурност — за да работи магазинът стабилно всеки ден.",
+     "body": "Онлайн магазинът е жива система: обновления на платформата, нови приложения и плъгини, интеграции и промени в каталога постоянно създават риск от грешки. Поемаме техническата грижа, за да може екипът ви да се фокусира върху продажбите.",
+     "seo_title": "Поддръжка на онлайн магазин — Shopify и WooCommerce",
+     "seo_description": "Поддръжка на онлайн магазин на Shopify или WooCommerce: безопасни обновления, мониторинг, скорост, сигурност и архиви. Месечен пакет или еднократна помощ.",
+     "primary_keyword": "поддръжка на онлайн магазин"
+    },
+    "en": {
+     "slug": "ecommerce-maintenance",
+     "name": "Technical maintenance for Shopify and WooCommerce stores",
+     "short_name": "E-commerce maintenance",
+     "summary": "Shopify and WooCommerce maintenance, monitoring, performance and security — so your store runs reliably every day.",
+     "body": "An online store is a living system: platform updates, new apps and plugins, integrations and catalog changes constantly create the risk of errors. We take care of the technical side so your team can focus on selling.",
+     "seo_title": "Online store maintenance for Shopify and WooCommerce",
+     "seo_description": "Online store maintenance for Shopify and WooCommerce: safe updates, monitoring, speed, security and backups. A monthly plan or one-off help.",
+     "primary_keyword": "online store maintenance"
+    }
+   }
+  },
+  {
+   "key": "seo",
+   "primary_domain": "commerce_engineering",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "seo",
+   "icon": "trending",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 1,
+   "status": "published",
+   "related": [
+    "analytics",
+    "maintenance",
+    "audit"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "seo-optimizatsiya",
+     "name": "SEO оптимизация на онлайн магазини: техническо SEO, категории и продукти",
+     "short_name": "SEO и органичен растеж",
+     "summary": "Технически SEO одити, оптимизация на категории и продукти, структурирани данни и Core Web Vitals с измерим напредък.",
+     "body": "Органичният трафик е един от най-устойчивите канали за продажби, но в онлайн магазините лесно се губи — заради дублирано съдържание, бавни страници, слаби категории или технически грешки. Подхождаме към SEO като инженерна задача с ясни приоритети и измерване.",
+     "seo_title": "SEO оптимизация на онлайн магазин и техническо SEO",
+     "seo_description": "SEO оптимизация на онлайн магазин: индексиране, канонични адреси, SEO на категории и продукти, Core Web Vitals и месечни отчети без обещания за позиции.",
+     "primary_keyword": "SEO оптимизация на онлайн магазин"
+    },
+    "en": {
+     "slug": "seo-optimization",
+     "name": "SEO for online stores: technical SEO, categories and products",
+     "short_name": "SEO and organic growth",
+     "summary": "Technical SEO audits, category and product optimization, structured data and Core Web Vitals with measurable progress.",
+     "body": "Organic traffic is one of the most durable sales channels, but online stores lose it easily — through duplicate content, slow pages, weak categories or technical errors. We treat SEO as an engineering task with clear priorities and measurement.",
+     "seo_title": "E-commerce SEO and technical SEO for online stores",
+     "seo_description": "E-commerce SEO for online stores: indexing, canonical URLs, category and product SEO, Core Web Vitals and monthly reporting — without ranking promises.",
+     "primary_keyword": "e-commerce SEO"
+    }
+   }
+  },
+  {
+   "key": "analytics",
+   "primary_domain": "commerce_engineering",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "analytics",
+   "icon": "chart",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 2,
+   "status": "published",
+   "related": [
+    "seo",
+    "automation",
+    "audit"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "analizi-i-konversii",
+     "name": "Анализи и оптимизация на конверсиите за онлайн магазини",
+     "short_name": "Анализи и конверсии",
+     "summary": "Табла за продажби, анализ на фунията и изоставените колички, GA4 и препоръки за подобряване на клиентския път.",
+     "body": "Повечето онлайн магазини събират много данни, но малко от тях се превръщат в решения. Изграждаме ясни отчети и анализи, които показват къде губите клиенти и кои промени имат най-голям потенциал.",
+     "seo_title": "Оптимизация на конверсиите и e-commerce анализи с GA4",
+     "seo_description": "Оптимизация на конверсиите за онлайн магазини: коректно измерване в GA4, анализ на фунията и изоставените колички, табла за продажби и приоритизирани тестове.",
+     "primary_keyword": "оптимизация на конверсиите"
+    },
+    "en": {
+     "slug": "analytics-and-conversion",
+     "name": "E-commerce analytics and conversion rate optimization",
+     "short_name": "Analytics and conversion",
+     "summary": "Sales dashboards, funnel and abandoned-cart analysis, GA4 and recommendations for improving the customer journey.",
+     "body": "Most online stores collect plenty of data, but little of it turns into decisions. We build clear reports and analyses that show where you lose customers and which changes have the greatest potential.",
+     "seo_title": "Conversion rate optimization and e-commerce analytics with GA4",
+     "seo_description": "Conversion rate optimization for online stores: accurate GA4 measurement, funnel and abandoned-cart analysis, sales dashboards and prioritized tests.",
+     "primary_keyword": "conversion rate optimization"
+    }
+   }
+  },
+  {
+   "key": "integrations",
+   "primary_domain": "data_integration",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "integrations",
+   "icon": "plug",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 0,
+   "status": "published",
+   "related": [
+    "maintenance",
+    "automation",
+    "audit"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "api-integratsii-oblak-i-sigurnost",
+     "name": "AI интеграции, системи за данни и облачна инфраструктура",
+     "short_name": "AI интеграции и данни",
+     "summary": "REST API и webhook интеграции, свързване на Shopify и WooCommerce с CRM и ERP, облачно внедряване, мониторинг и защита.",
+     "body": "Когато системите не обменят данни надеждно, екипът компенсира с ръчна работа, а клиентите усещат грешките. Проектираме и изграждаме интеграции и инфраструктура, които са наблюдаеми, сигурни и лесни за поддръжка.",
+     "seo_title": "API интеграции за онлайн магазини, CRM и ERP",
+     "seo_description": "API интеграции между онлайн магазин, CRM, ERP и склад: синхронизация на продукти, наличности и поръчки, webhooks, мониторинг и защитено управление на достъпа.",
+     "primary_keyword": "API интеграции"
+    },
+    "en": {
+     "slug": "api-integrations-cloud-security",
+     "name": "AI integrations, data systems and cloud infrastructure",
+     "short_name": "AI integrations & data systems",
+     "summary": "REST API and webhook integrations, connecting Shopify and WooCommerce with CRM and ERP, cloud deployment, monitoring and protection.",
+     "body": "When systems do not exchange data reliably, the team compensates with manual work and customers feel the errors. We design and build integrations and infrastructure that are observable, secure and easy to maintain.",
+     "seo_title": "API integrations for online stores, CRM and ERP",
+     "seo_description": "API integrations between your online store, CRM, ERP and warehouse: product, stock and order sync, webhooks, monitoring and secure access management.",
+     "primary_keyword": "API integrations"
+    }
+   }
+  },
+  {
+   "key": "ai_managed",
+   "primary_domain": "managed_operations",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "ai_managed",
+   "icon": "activity",
+   "custom_page": true,
+   "is_entry_offer": false,
+   "position": 0,
+   "status": "published",
+   "related": [
+    "ai_tools",
+    "automation",
+    "integrations"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "ai-managed-services",
+     "name": "AI Managed Services — Управление и поддръжка на AI агенти",
+     "short_name": "AI Managed Services и оптимизация",
+     "summary": "Наблюдение, поддръжка, оценка на качеството, сигурност и оптимизация на разходите за AI агенти и автоматизации, които вече работят.",
+     "body": "Изграждането на AI агент е само началото. Ние се грижим той да работи надеждно, сигурно и ефективно всеки ден — с наблюдение, контролирани промени, оценка на качеството и ясни отчети.",
+     "seo_title": "Поддръжка и мониторинг на AI агенти",
+     "seo_description": "AI Managed Services: наблюдение, поддръжка, оценка на качеството, сигурност и контрол на разходите за AI агенти, RAG асистенти и AI автоматизации — по индивидуална оферта.",
+     "primary_keyword": "поддръжка и мониторинг на AI агенти"
+    },
+    "en": {
+     "slug": "ai-managed-services",
+     "name": "AI Managed Services — AI Agent Operations & Optimization",
+     "short_name": "AI Managed Services & optimisation",
+     "summary": "Monitoring, maintenance, quality evaluation, security and cost optimization for AI agents and automations that are already in production.",
+     "body": "Building an AI agent is only the beginning. We help keep your AI systems reliable, secure, observable and effective — with monitoring, controlled changes, quality evaluation and clear reporting.",
+     "seo_title": "AI Agent Monitoring & Managed Services",
+     "seo_description": "AI Managed Services: monitoring, maintenance, quality evaluation, security and cost control for AI agents, RAG assistants and AI-driven automations — custom quotes.",
+     "primary_keyword": "AI agent monitoring"
+    }
+   }
+  },
+  {
+   "key": "audit",
+   "primary_domain": "advisory_enablement",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "audit",
+   "icon": "clipboard",
+   "custom_page": false,
+   "is_entry_offer": true,
+   "position": 0,
+   "status": "published",
+   "related": [
+    "maintenance",
+    "seo",
+    "ai_tools"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "tehnicheski-odit",
+     "name": "AI стратегия и готовност: технически одит на процесите, данните и магазина",
+     "short_name": "AI стратегия и готовност",
+     "summary": "Структурирана оценка на магазина, данните и процесите, която завършва с приоритизиран план за подобрения.",
+     "body": "Одитът е добра първа стъпка, когато не е ясно откъде да започнете. В рамките на предварително договорен обхват преглеждаме магазина, интеграциите, данните и процесите ви, а вие получавате конкретен, приоритизиран план за действие.",
+     "seo_title": "Технически одит на онлайн магазин и AI готовност",
+     "seo_description": "Технически одит на онлайн магазин: производителност, SEO основи, сигурност, интеграции, данни и възможности за AI — с приоритизиран план и оценка на усилието.",
+     "primary_keyword": "технически одит на онлайн магазин"
+    },
+    "en": {
+     "slug": "technical-audit",
+     "name": "AI strategy & readiness: a technical audit of your processes, data and store",
+     "short_name": "AI strategy & readiness",
+     "summary": "A structured assessment of your store, data and processes that ends with a prioritized improvement plan.",
+     "body": "An audit is a good first step when it is unclear where to start. Within an agreed scope we review your store, integrations, data and processes, and you receive a concrete, prioritized action plan.",
+     "seo_title": "Technical audit of an online store and AI readiness",
+     "seo_description": "A technical audit of your online store: performance, SEO basics, security, integrations, data and AI opportunities — with a prioritized plan and effort estimates.",
+     "primary_keyword": "technical audit of an online store"
+    }
+   }
+  }
+ ]
+}

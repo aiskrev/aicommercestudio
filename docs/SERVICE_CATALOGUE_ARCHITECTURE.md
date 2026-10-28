@@ -1,6 +1,9 @@
 # Service catalogue architecture
 
-**Status:** design only. No migration, model, endpoint or page has been changed. Baseline: branch
+**Status:** design, with the first slice implemented. Step S1 (the web export,
+`lib/catalogue-seed.ts`) is done. Step S2/S3 is done for V1: migration `0009` (seven tables) and
+the idempotent `catalogue-seed`. No endpoint or page uses the catalogue yet, and no release or role
+exists. Baseline: branch
 `feature/domain-hubs` @ `2a6866a` (the ten domain hubs, built on `main` @ `52bf6e1`; Alembic head
 `0008`).
 

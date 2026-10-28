@@ -1,8 +1,10 @@
 # Database schema v2: service catalogue
 
-**Status:** design only. No migration exists yet. The current schema is documented in
-[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) (head `0008`) and is unchanged by this document, except for
-the additive column in §3.15. The rationale, conflicts and roll-out are in
+**Status:** the V1 slice is implemented in migration `0009`: `catalogue_entities`,
+`service_domains`, `service_families`, `services` (services only), `family_services`,
+`entity_translations` and `entity_relations` (three relation kinds). See
+[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md#service-catalogue-migration-0009). The rest of this
+document is still a design, including the additive column in §3.15. The rationale, conflicts and roll-out are in
 [SERVICE_CATALOGUE_ARCHITECTURE.md](SERVICE_CATALOGUE_ARCHITECTURE.md). The API is in
 [API_ARCHITECTURE_V2.md](API_ARCHITECTURE_V2.md).
 
@@ -371,8 +373,9 @@ No full texts go into `details`. The texts of what was public are in the release
 
 | Revision | Content | Downgrade |
 | --- | --- | --- |
-| `0009` | the 14 catalogue tables with every constraint and index above; no data | drops the 14 tables |
-| `0010` | `admin_users.role` (NOT NULL, server default `'admin'`, CHECK) | drops the column |
+| `0009` (**created**) | V1 slice: the seven tables listed in the status note, with their constraints; no data | drops the seven tables |
+| next | the remaining tables (content items, engagements, tools, technologies, slug history, releases), the other offering types and their columns, the other relation kinds | drops what it added |
+| next | `admin_users.role` (NOT NULL, server default `'admin'`, CHECK) | drops the column |
 
 Data is loaded by the CLI importer, not by migrations (SERVICE_CATALOGUE_ARCHITECTURE §12, S3).
 Tests to add to `test_migrations_and_retention.py`:

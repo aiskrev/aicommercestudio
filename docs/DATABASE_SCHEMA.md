@@ -15,6 +15,7 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0005` | AI agent development: `ai_agents` added to the `service` / `submitted_service` CHECKs. No existing row changes. |
 | `0006` | `leads.marketing_consent_version` varchar(32) null — wording version of a given marketing consent (contact form and AI readiness submissions). Nullable, no default; downgrade drops the column. |
 | `0007` | `team_configurations`: saved AI team configurations (enumerated JSONB, schema/model/assumptions versions, visitor rate overrides, SHA-256 `token_hash` unique, `locale` CHECK, `expires_at` index, `lead_id` FK `ON DELETE CASCADE`). New table only; downgrade drops it. |
+| `0009` | Service catalogue V1: `catalogue_entities` (supertype: `entity_type`, stable `key`, `status` draft/published/archived, `revision`), `service_domains`, `service_families`, `services` (subtypes sharing the entity id through the composite FK `(id, entity_type)`), `family_services`, `entity_translations` (per locale; slug unique per `(locale, route_namespace)`), `entity_relations` (typed edges with an allowed-combination CHECK). New tables only, no data; `leads` unchanged and not referenced. Downgrade drops the seven tables. See [Service catalogue](#service-catalogue-migration-0009). |
 | `0008` | AI operations scaffold: `ops_organizations` (slug unique, status/region, `is_demo`), `ops_workspaces` (unique `(organization_id, slug)` and `(id, organization_id)`), `ops_memberships` (user × organisation × role CHECK, unique pair), `ops_agents` (registry metadata; composite FK `(workspace_id, organization_id)` → workspaces so an agent cannot sit in another tenant's workspace). New tables only; downgrade drops them. See AI_OPERATIONS_PORTAL.md. |
 
 Apply: automatic on container start (`RUN_MIGRATIONS_ON_START=true`), or manually
@@ -121,6 +122,7 @@ Append-only activity log. `details` must never contain raw personal data.
 | `admin.created`, `admin.password_reset`, `seed.synthetic_data`, `seed.synthetic_purged` | CLI operations |
 | `ops.organization_created` | CLI `ops-create-org` / `ops-seed-demo` (actor `cli`) |
 | `ops.workspace_created`, `ops.agent_created`, `ops.agent_updated` | AI operations registry writes (`details.organization_id`; agent updates list changed field names) |
+| `catalogue.seeded`, `catalogue.purged` | service catalogue seed with changes (`created` / `updated` counts per type, `schema_version`) or purge (`entities`); actor `cli` |
 | `ops.member_added`, `ops.member_role_changed`, `ops.member_removed` | organisation membership changes (`user_id`, roles) |
 
 ## ai_action_requests
@@ -236,6 +238,62 @@ Ops writes are audited in `audit_logs` (`ops.*` actions) with `details.organizat
 Retention: contract lifecycle; there is no automatic purge, and `ops-purge-demo` removes demo
 organisations.
 
+## Service catalogue (migration 0009)
+
+First bounded slice of [DATABASE_SCHEMA_V2.md](DATABASE_SCHEMA_V2.md). Models are in
+`app/models.py` (`CatalogueEntity`, `CatalogueDomain`, `CatalogueFamily`, `CatalogueService`,
+`FamilyService`, `EntityTranslation`, `EntityRelation`). The seed, its validation and the
+integrity check are in `app/catalogue/`.
+
+| Table | Key columns | Integrity |
+| --- | --- | --- |
+| `catalogue_entities` | `entity_type` (domain, family, service), `key`, `status`, `revision`, `first_published_at`, `archived_at`, `created_by_id` / `updated_by_id` | unique `(entity_type, key)` and `(id, entity_type)`; key format (family keys qualified, e.g. `devops_sre.cicd`); `archived_at` set exactly when archived |
+| `service_domains` | `code` A–J, `band`, `icon`, `position`, `contact_service_id` → `services` | unique code; unique `(band, position)` deferrable; FK `(id, entity_type)` → entity (CASCADE) |
+| `service_families` | `domain_id`, `delivery_status`, `position` | unique `(domain_id, position)` deferrable; domain FK RESTRICT |
+| `services` | `offering_type` (V1: `service`), `primary_domain_id`, `delivery_status`, `lead_category`, `icon`, `custom_page`, `is_entry_offer`, `position` | `lead_category` ∈ ServiceKey except `other`, unique; a service needs a primary domain and a lead category |
+| `family_services` | `family_id`, `service_id`, `position` | PK pair; service FK RESTRICT |
+| `entity_translations` | `entity_id`, `locale`, `route_namespace`, `slug`, `name`, `short_name`, `summary`, `body`, `cta_label`, `prerequisite`, `seo_title`, `seo_description`, `primary_keyword` | PK `(entity_id, locale)`; unique `(locale, route_namespace, slug)` and `(locale, lower(primary_keyword))` (partial); slug format |
+| `entity_relations` | `from_entity_id`/`from_type`, `kind`, `to_entity_id`/`to_type`, `position` | composite FKs to `(id, entity_type)`; CHECK: `related` service→service, `cross_sell` domain→domain, `delivered_through` family→domain |
+
+**Not in V1** (later migrations, SCHEMA_V2 §3): content items, engagement models, tools,
+technologies and industries, assessments, workshops and managed offerings, slug history, releases,
+`admin_users.role`.
+
+**Source and seeding.** The web content stays the source of truth. `apps/web/src/lib/catalogue-seed.ts`
+generates `catalogue-seed.json`; the API keeps an identical copy, `app/catalogue/seed_v1.json`,
+and `scripts/test.ps1` compares the hashes. `python -m app.cli catalogue-seed`:
+
+* validates the document (Pydantic, then the cross-reference rules);
+* reconciles the database in one transaction: entities matched by `(entity_type, key)`, with new
+  ids that are deterministic (`uuid5`);
+* updates changed rows in place and increments `revision` once per changed entity;
+* **never deletes**: entities missing from the document are reported and left as they are.
+
+A repeated run changes nothing. `--dry-run` rolls back. `python -m app.cli seed` runs it on every
+container start.
+
+**Existing service references.** `leads.service` / `submitted_service` keep their ServiceKey
+values and CHECKs, with no foreign key to the catalogue. The seed refuses a document in which any
+ServiceKey except `other` has no catalogue service (`services.lead_category`, unique).
+`catalogue-check` verifies:
+
+* every published domain and service has BG and EN content with a slug;
+* every published domain has a contact service;
+* every lead category maps to a published service.
+
+**Rollback.** Applied on a copy of the local development database (277 leads), 2026-10-28: lead,
+note, admin, assessment and configuration data were unchanged after the upgrade, after the seed and
+after the downgrade.
+
+| Situation | Action | Effect |
+| --- | --- | --- |
+| Bad catalogue content | fix the web content, regenerate and copy the seed, run `catalogue-seed` | rows corrected in place, revision +1 |
+| Remove the catalogue data, keep the schema | `python -m app.cli catalogue-purge --yes` | catalogue rows deleted (audited `catalogue.purged`); rebuild with `catalogue-seed` |
+| Remove the schema | `alembic downgrade 0008` | the seven tables are dropped; no other table is touched; `alembic upgrade head` + `catalogue-seed` restore it |
+
+Before rolling back the schema in production, the API image must be one without the catalogue
+seed in `app.cli seed`. Otherwise the next container start upgrades again.
+
 ## Retention & erasure
 
 | Data | Rule | Mechanism |
@@ -256,3 +314,6 @@ organisations.
   `[СИНТЕТИЧНИ ДАННИ]`, `source=synthetic_seed`; three of them are quote requests) and one pending
   synthetic AI action. Idempotent. Refused in production by configuration validation.
 * `python -m app.cli purge-synthetic` removes all synthetic leads and synthetic AI actions (real leads untouched).
+* in every environment: the service catalogue (`catalogue-seed`, idempotent; see
+  [Service catalogue](#service-catalogue-migration-0009)). A seed that fails validation makes
+  `seed` exit with 1.
