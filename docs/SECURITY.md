@@ -37,6 +37,11 @@ of them (`tests/test_admin_auth.py::PROTECTED`). The two report downloads have t
 the organisation and a permission from `app/ops/rbac.py`, and is covered by authorisation and
 tenant-isolation tests (`tests/test_ops_portal.py`).
 
+**Public company contact** — the phone and e-mail shown on the site are approved business data in
+`apps/web/src/lib/company.ts`, separate from lead e-mail fields, admin accounts, synthetic seed data
+and SMTP settings. No personal address is published, no SMTP credentials are configured, and the
+site sends no e-mail to that mailbox. The planned mailbox domain is not active yet.
+
 **CORS** — explicit allow-list (`CORS_ORIGINS`), credentials only for listed origins; `*` refused in production.
 
 **Rate limiting** — sliding window, in memory. Behind the production reverse proxy the client IP is

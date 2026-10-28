@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { ContactFormWithParams } from "@/components/contact/ContactFormWithParams";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
+import { ContactDetails } from "@/components/sections/ContactDetails";
 import { Icon } from "@/components/ui/Icon";
 import { Container, Eyebrow } from "@/components/ui/primitives";
 import { localizePath } from "@/i18n/config";
@@ -11,7 +12,6 @@ import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { contactFormProps } from "@/lib/contact-form-props";
 import { buildMetadata } from "@/lib/seo";
-import { site } from "@/lib/site";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/kontakti">) {
   const locale = await resolveLocale(params);
@@ -66,28 +66,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
                 <h2 id="direct-title" className="text-lg font-semibold">
                   {dict.contact.directTitle}
                 </h2>
-                {site.contactEmail || site.contactPhone ? (
-                  <ul className="mt-4 grid gap-2">
-                    {site.contactEmail && (
-                      <li>
-                        <a href={`mailto:${site.contactEmail}`} className="inline-flex items-center gap-2 text-brand">
-                          <Icon name="mail" className="h-4 w-4" />
-                          {site.contactEmail}
-                        </a>
-                      </li>
-                    )}
-                    {site.contactPhone && (
-                      <li>
-                        <a href={`tel:${site.contactPhone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-brand">
-                          <Icon name="phone" className="h-4 w-4" />
-                          {site.contactPhone}
-                        </a>
-                      </li>
-                    )}
-                  </ul>
-                ) : (
-                  <p className="mt-3 text-fg-muted">{dict.contact.directPending}</p>
-                )}
+                <ContactDetails labels={dict.contactDetails} className="mt-4" />
               </section>
 
               <section className="flex gap-3 rounded-2xl border border-line-subtle p-5" aria-labelledby="privacy-note-title">

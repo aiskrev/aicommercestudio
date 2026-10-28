@@ -51,6 +51,7 @@ const EN_SEGMENTS: Record<string, string> = {
 /** Second-level segments (e.g. `/statii/tema/<topic>`). */
 const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
   statii: { tema: "topic" },
+  "za-nas": { osnovatel: "founder" },
   // Tool slugs (lib/tools.ts → TOOL_SLUGS). Only implemented tools have pages.
   instrumenti: { "ai-gotovnost": "ai-readiness", "ai-ekip": "ai-team", "roi-kalkulator": "roi-calculator", "avtomatizatsii": "automation-finder", "ai-reshenie": "solution-builder" },
   // Agent library pages (lib/agent-library.ts → AGENT_SLUGS).

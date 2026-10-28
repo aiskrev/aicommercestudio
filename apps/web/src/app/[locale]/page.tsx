@@ -9,6 +9,7 @@ import { SystemMap } from "@/components/home/SystemMap";
 import { ToolsPreview } from "@/components/home/ToolsPreview";
 import { UseCaseLedger } from "@/components/home/UseCaseLedger";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { FounderPortrait } from "@/components/sections/Founder";
 import { Faq } from "@/components/sections/Faq";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
@@ -42,7 +43,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">) {
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
-  const { home, advisor, tools } = getContent(locale);
+  const { home, advisor, tools, founder } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const linkFor = (link: HomeLink) =>
@@ -119,6 +120,28 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               );
             })}
           </p>
+        </div>
+      </Section>
+
+      {/* 3b --------------------------------------------------------------- founder (executive introduction) */}
+      <Section labelledBy="founder-title" className="border-t border-line-subtle">
+        <div className="grid items-center gap-8 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:gap-12 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)]">
+          <FounderPortrait alt={founder.portraitAlt} sizes="(min-width: 1024px) 17rem, (min-width: 768px) 15rem, 12rem" className="aspect-[4/5] w-48 md:w-full" />
+          <div className="min-w-0">
+            <Eyebrow>{founder.home.eyebrow}</Eyebrow>
+            <h2 id="founder-title" className="t-h2 mt-4">
+              {founder.name}
+            </h2>
+            <p className="mt-2 font-medium text-fg-secondary">{founder.title}</p>
+            <div className="measure mt-5 grid gap-4 leading-relaxed text-fg-muted">
+              {founder.home.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+            <ButtonLink href={href(routes.founder)} variant="ghost" icon="arrowRight" className="mt-6">
+              {founder.home.cta}
+            </ButtonLink>
+          </div>
         </div>
       </Section>
 

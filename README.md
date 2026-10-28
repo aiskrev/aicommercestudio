@@ -34,6 +34,7 @@ cd D:\Projects\AI-Commerce-Studio
 
 - Website: http://localhost:3000 (redirects to http://localhost:3000/bg; English: http://localhost:3000/en)
 - AI Managed Services: http://localhost:3000/bg/uslugi/ai-managed-services · http://localhost:3000/en/services/ai-managed-services
+- Founder & CEO profile: http://localhost:3000/bg/za-nas/osnovatel · http://localhost:3000/en/about/founder (company contact details: `apps/web/src/lib/company.ts`)
 - Admin: http://localhost:3000/admin (credentials are in `.env`: `ADMIN_BOOTSTRAP_EMAIL` / `ADMIN_BOOTSTRAP_PASSWORD`)
 - API docs (development only): http://localhost:8000/api/docs
 

@@ -293,6 +293,7 @@ size).
 | 1 | Hero — positioning, CTAs (AI solutions; readiness → AI Automation Advisor), `SystemMap` | default + grid | asymmetric split |
 | 2 | Capabilities (`CredibilityStrip`) | raised strip | label + 3 × 2 index |
 | 3 | What we build (`BuildBento`) + engineering-foundation links | default, spacious | bento |
+| 3b | Founder & CEO introduction (`FounderPortrait`, name, title, two paragraphs, "Meet the Founder") | default, top hairline | portrait + text split; secondary weight (ghost CTA) so it never competes with the hero CTAs |
 | 4 | How we work — 5 stages (`ProcessSteps` horizontal) | raised | timeline |
 | 5 | Interactive tools (`ToolsPreview`) | default, spacious | product window + live tool cards |
 | 6 | Solution architecture — "AI suggests. People decide." (`HeroWorkflow` + `ControlLanes`) | deep, spacious | statement + diagram split |
@@ -306,6 +307,13 @@ Honesty rules for the homepage:
 * Diagrams are captioned as illustrative.
 * Product previews use labelled demo data. There are no fabricated analytics.
 * A tool that is not live is shown as "in preparation", without a link (registry: `lib/tools.ts`).
+
+**Founder profile** (`/za-nas/osnovatel`): split hero with the approved portrait
+(`components/sections/Founder.tsx`, `next/image`, 4:5 crop, `object-top`), five titled paragraphs
+(not a timeline or skills list), the three-line closing statement in display type, services and
+consultation CTAs, then the contact card. Contact details everywhere use
+`components/sections/ContactDetails.tsx` (visible labels, descriptive accessible names, no
+icon-only links). There are no badges, counters, logos or certification walls.
 
 ## Composition rules
 

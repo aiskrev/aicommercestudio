@@ -19,7 +19,7 @@ Every destination appears once per navigation area (header, mobile sheet, footer
 | Tools | Инструменти | Tools | **new** hub `/bg/instrumenti` ↔ `/en/tools` |
 | Industries | За кого | Industries | `/bg/za-kogo` ↔ `/en/industries` — kept: segments include businesses already running an AI agent |
 | Insights | Статии | Insights | `/bg/statii` ↔ `/en/insights` |
-| About ▾ | За нас | About | panel: Who we are (`/za-nas`), How we work (`/proces`) |
+| About ▾ | За нас | About | panel: Who we are (`/za-nas`), How we work (`/proces`). The founder profile (`/za-nas/osnovatel` ↔ `/about/founder`) is linked from the homepage, the About page and three domain hubs, not from the menu. |
 | CTA | Заяви консултация | Book a consultation | `/bg/kontakti` ↔ `/en/contact` |
 
 Mobile: one sheet with the same groups (AI services, E-commerce foundation, All services, the

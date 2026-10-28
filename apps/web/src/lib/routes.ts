@@ -11,6 +11,7 @@ export const routes = {
   agent: (slug: string) => `/ai-agenti/${slug}`,
   industries: "/za-kogo",
   about: "/za-nas",
+  founder: "/za-nas/osnovatel",
   process: "/proces",
   contact: "/kontakti",
   insights: "/statii",

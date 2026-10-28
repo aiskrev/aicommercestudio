@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import type { FaqItem } from "@/content/types";
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
+import { company } from "@/lib/company";
 import { absoluteUrl, site } from "@/lib/site";
 
 /** Canonical route paths of one page per locale (each with that locale's slug). */
@@ -87,18 +88,48 @@ export function buildMetadata({
 }
 
 export const organizationId = `${site.url}/#organization`;
+export const founderId = `${site.url}/#founder`;
 
-/** Organization data limited to verified facts: name, URL and (if configured) contact details. */
+/**
+ * Organization data limited to approved facts: brand, legal entity, URL, founder and the approved
+ * contact details (lib/company.ts). The e-mail is approved company content; its delivery is not
+ * yet verified (no claim about that is made here). No address, registration number or sameAs.
+ */
 export function organizationJsonLd(locale: Locale) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": organizationId,
     name: site.name,
+    legalName: company.legalName,
     url: site.url,
     areaServed: site.areaServed[locale],
-    ...(site.contactEmail ? { email: site.contactEmail } : {}),
-    ...(site.contactPhone ? { telephone: site.contactPhone } : {}),
+    email: company.contactEmail,
+    telephone: company.phoneE164,
+    founder: { "@id": founderId },
+  };
+}
+
+/** The founder (Person) for the founder profile page; facts from the approved profile only. */
+export function founderJsonLd(
+  person: { name: string; latinName: string; jobTitle: string; image: string; path: string; knowsAbout: string[] },
+  locale: Locale,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": founderId,
+    name: person.latinName,
+    ...(person.name !== person.latinName ? { alternateName: person.name } : {}),
+    jobTitle: person.jobTitle,
+    worksFor: { "@type": "Organization", name: company.legalName },
+    affiliation: { "@id": organizationId },
+    image: absoluteUrl(person.image),
+    url: absoluteUrl(person.path),
+    knowsAbout: person.knowsAbout,
+    email: company.contactEmail,
+    telephone: company.phoneE164,
+    inLanguage: localeMeta[locale].htmlLang,
   };
 }
 

@@ -1,6 +1,6 @@
 # Implementation status
 
-Last updated: 2026-10-27. Environment: Windows 11 Pro, Docker Desktop, images `python:3.13-slim`,
+Last updated: 2026-10-28. Environment: Windows 11 Pro, Docker Desktop, images `python:3.13-slim`,
 `node:24-alpine`, `postgres:17-alpine`, `mcr.microsoft.com/playwright:v1.64.1-noble`.
 
 ## Current state: `main` @ `565d0b1` (2026-10-27)
@@ -16,6 +16,31 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/founder-profile` (from `main` @ `5948322`, not merged, 2026-10-28): the Founder & CEO
+profile and the company contact integration. It adds the homepage founder introduction, the
+profile page `/bg/za-nas/osnovatel` ↔ `/en/about/founder` with the approved portrait (`next/image`),
+a leadership card on About, short founder references on three domain hubs, and `Person` JSON-LD.
+`Organization` JSON-LD gains `legalName` and `founder`. The approved company phone and e-mail come
+from one source (`apps/web/src/lib/company.ts`) and are shown on the contact page, in the footer and
+on the profile. There is no API or database change.
+
+| Check | Result |
+| --- | --- |
+| `.\scripts\test.ps1 -Suite web` | passed (typecheck, lint, **528** unit tests, 36 files; new: `lib/company.test.ts`, `components/sections/founder.test.tsx`) |
+| e2e (production build, no-host-ports override, the `test.ps1` staff-account steps) | **106 passed** (9 new in `founder.spec.ts`). An earlier run had one 429 on the admin login because the same API process had served a previous run within 15 minutes; after restarting the API the full suite passed (TESTING.md → Notes) |
+| `.\scripts\test.ps1 -Suite api` | not re-run (no API change); docs sync check passed |
+
+Not verified, and not claimed by the site:
+
+* Ownership, DNS and hosting of `ai-ecomstudio.site`, and TLS for it.
+* The `contact@ai-ecomstudio.site` mailbox, inbound and outbound delivery, MX, SPF, DKIM and DMARC.
+* SMTP for that mailbox. None is configured, and no test e-mail was sent.
+* Production origins. `SITE_URL` and the canonical origin stay as configured; the planned domain is
+  not used as a canonical origin.
+
+Company registration number, VAT number, address and social profiles are not published, because
+none were provided.
+
 Branch `feature/catalogue-admin-extras` (from `main` @ `d17d741`, not merged, 2026-10-28):
 domain family editing in the admin catalogue, deleting never-published drafts, the "Staff and roles"
 admin page (`/api/admin/staff`), and role-based Playwright flows with editor and viewer accounts
@@ -23,8 +48,8 @@ created by `test.ps1`. No migration (head stays `0010`).
 
 | Check | Result |
 | --- | --- |
-| `.\scripts	est.ps1 -Suite api` | **444 passed**, Ruff clean, docs and OpenAPI in sync |
-| `.\scripts	est.ps1 -Suite web` | passed (typecheck, lint, **515** unit tests); the admin component tests ran 3× without failures after making the request mock safe for components that unmount late (the likely cause of the earlier one-off failure) |
+| `.\scripts\test.ps1 -Suite api` | **444 passed**, Ruff clean, docs and OpenAPI in sync |
+| `.\scripts\test.ps1 -Suite web` | passed (typecheck, lint, **515** unit tests); the admin component tests ran 3× without failures after making the request mock safe for components that unmount late (the likely cause of the earlier one-off failure) |
 | e2e (production build, no-host-ports override, the `test.ps1` staff-account steps) | **97 passed** (3 new in `catalogue-roles.spec.ts`) |
 
 Branch `feature/catalogue-api-admin` (on top of `docs/service-catalogue-architecture`, not merged,
@@ -35,8 +60,8 @@ restore (`/api/admin/catalogue/*`, `/admin/catalogue`).
 
 | Check | Result |
 | --- | --- |
-| `.\scripts	est.ps1 -Suite api` | **431 passed**, Ruff clean, docs and OpenAPI in sync, seed copies identical |
-| `.\scripts	est.ps1 -Suite web` | passed (typecheck, lint, **509** unit tests). One run outside the suite had one intermittent failure that could not be reproduced in 6 further runs. |
+| `.\scripts\test.ps1 -Suite api` | **431 passed**, Ruff clean, docs and OpenAPI in sync, seed copies identical |
+| `.\scripts\test.ps1 -Suite web` | passed (typecheck, lint, **509** unit tests). One run outside the suite had one intermittent failure that could not be reproduced in 6 further runs. |
 | e2e (production build, no-host-ports override) | **94 passed** (2 new in `catalogue.spec.ts`) |
 | Local dev database (0009 → 0010) | the bootstrap seed published the 19 entries on start. The first e2e run showed that they lacked the new capabilities: the backfill now completes such entries from the seed, which is covered by a test. The dev database was repaired once with `catalogue-seed --reconcile`. |
 
@@ -349,7 +374,7 @@ Not verified: the reduced-motion rendering was reviewed in CSS but not visually 
 
 ## Exact next actions
 
-1. Fill in real company details, contact e-mail/phone (`PUBLIC_CONTACT_EMAIL`, `PUBLIC_CONTACT_PHONE`) and have the legal drafts reviewed.
+1. Publish the company's registration details when available (the contact phone and e-mail are approved; see "Founder profile and company contact"), activate and verify the planned domain and mailbox, and have the legal drafts reviewed.
 2. Verify the SEO keyword map in Keyword Planner / Search Console ([SEO_IMPLEMENTATION.md](SEO_IMPLEMENTATION.md) §6).
 3. Choose hosting, set production `.env`, deploy with `infra/docker-compose.prod.yml` behind Caddy, schedule `app.cli maintenance` and backups.
 4. Configure SMTP for lead notifications.

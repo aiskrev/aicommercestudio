@@ -7,6 +7,8 @@ import type { DomainContent } from "@/content/types";
 export const domains: DomainContent[] = [
   {
     key: "ai_strategy",
+    founderNote:
+      "Our strategy work draws on our founder Aleksandar Iskrev's experience in enterprise architecture and AI platform engineering.",
     slug: "ai-strategy-and-transformation",
     name: "AI Strategy & Transformation",
     summary: "Where AI is worth building, in what order and under which controls — before you invest in implementation.",
@@ -267,6 +269,8 @@ export const domains: DomainContent[] = [
   },
   {
     key: "cloud_platform",
+    founderNote:
+      "Our platform engineering builds on Aleksandar Iskrev's work across Microsoft Azure, AWS, Kubernetes and software-defined infrastructure.",
     slug: "cloud-and-platform-engineering",
     name: "Cloud & Platform Engineering",
     summary: "Cloud infrastructure as code: environments, containers, databases, secrets, backups and cost control.",
@@ -557,6 +561,8 @@ export const domains: DomainContent[] = [
   },
   {
     key: "managed_operations",
+    founderNote:
+      "Our approach to operations reflects Aleksandar Iskrev's background in site reliability engineering and mission-critical infrastructure.",
     slug: "managed-ai-and-platform-operations",
     name: "Managed AI & Platform Operations",
     summary: "Ongoing operation of what has been built: monitoring, maintenance, evaluation, cost and incidents.",

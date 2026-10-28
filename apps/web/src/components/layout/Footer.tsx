@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { Logo } from "@/components/layout/Logo";
-import { Icon } from "@/components/ui/Icon";
+import { ContactDetails } from "@/components/sections/ContactDetails";
 import { ButtonLink, Container } from "@/components/ui/primitives";
 import { serviceByKey } from "@/content";
 import type { ServiceKey } from "@/content/types";
@@ -47,26 +47,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
           <ButtonLink href={href(routes.contact)} variant="secondary" icon="arrowRight">
             {dict.nav.cta}
           </ButtonLink>
-          {(site.contactEmail || site.contactPhone) && (
-            <ul className="grid gap-2 text-sm lg:text-right">
-              {site.contactEmail && (
-                <li>
-                  <a href={`mailto:${site.contactEmail}`} className="inline-flex items-center gap-2 text-fg-secondary hover:text-fg">
-                    <Icon name="mail" className="h-4 w-4 text-brand" />
-                    {site.contactEmail}
-                  </a>
-                </li>
-              )}
-              {site.contactPhone && (
-                <li>
-                  <a href={`tel:${site.contactPhone.replace(/\s/g, "")}`} className="inline-flex items-center gap-2 text-fg-secondary hover:text-fg">
-                    <Icon name="phone" className="h-4 w-4 text-brand" />
-                    {site.contactPhone}
-                  </a>
-                </li>
-              )}
-            </ul>
-          )}
+          <ContactDetails labels={dict.contactDetails} align="end" />
         </div>
       </Container>
 
