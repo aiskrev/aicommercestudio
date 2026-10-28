@@ -222,6 +222,7 @@ describe("engine assessment wizard", () => {
     await user.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByRole("alert")).toHaveTextContent(enEngineeringTool.wizard.errorSummary);
     expect(screen.getByText(enEngineeringTool.wizard.required)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("radio", { name: "No" })).toHaveFocus());
 
     await user.click(screen.getByRole("radio", { name: "No" }));
     await user.click(screen.getByRole("button", { name: "Next" }));
