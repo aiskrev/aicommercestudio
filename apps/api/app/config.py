@@ -67,6 +67,9 @@ class Settings(BaseSettings):
     advisor_global_rate_limit: int = Field(default=120, ge=1)
     # Per-attempt timeout for the AI provider; at most one retry (~2× worst case).
     advisor_timeout_seconds: float = Field(default=45.0, ge=5, le=120)
+    # Spending guard: at most this many AI-provider assessments per UTC day (0 = no cap). Beyond it the
+    # advisor answers with the demo engine, labelled as such. In memory, per API instance.
+    advisor_ai_daily_limit: int = Field(default=0, ge=0)
     # Unlinked assessments are deleted after this many days; linked ones follow the lead.
     advisor_retention_days: int = Field(default=30, ge=1, le=365)
 
