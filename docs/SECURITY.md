@@ -37,6 +37,16 @@ of them (`tests/test_admin_auth.py::PROTECTED`). The two report downloads have t
 the organisation and a permission from `app/ops/rbac.py`, and is covered by authorisation and
 tenant-isolation tests (`tests/test_ops_portal.py`).
 
+**Assessment engine** — scores are computed only on the server, by versioned pure functions over
+typed definitions loaded from the repository (no `eval`, no rules from the database, no LLM in any
+score). Requests carry answers only: unknown fields such as `weights` are rejected, answer values are
+limited to option keys, booleans, numbers and short lists, and requests are rate limited per client
+and globally (saving has its own lower limit). Anonymous scoring stores nothing; an opt-in saved
+result holds no personal data or free text, is reachable only with a 256-bit token whose SHA-256
+hash is stored, can be deleted by the visitor with that token, and expires after
+`ASSESSMENT_RETENTION_DAYS` (purged by `app.cli maintenance`). A saved result is re-scored with its own
+definition version before it is shown; a mismatch is logged and the result is not served.
+
 **Catalogue revalidation** — `POST /api/catalogue-revalidate` (web) only marks cached catalogue
 data stale. It requires `X-Revalidate-Secret` equal to `CATALOGUE_REVALIDATE_SECRET` (compared in
 constant time on SHA-256 digests), answers 404 when the variable is unset or shorter than 16

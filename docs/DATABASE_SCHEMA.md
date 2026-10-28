@@ -15,6 +15,7 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0005` | AI agent development: `ai_agents` added to the `service` / `submitted_service` CHECKs. No existing row changes. |
 | `0006` | `leads.marketing_consent_version` varchar(32) null — wording version of a given marketing consent (contact form and AI readiness submissions). Nullable, no default; downgrade drops the column. |
 | `0007` | `team_configurations`: saved AI team configurations (enumerated JSONB, schema/model/assumptions versions, visitor rate overrides, SHA-256 `token_hash` unique, `locale` CHECK, `expires_at` index, `lead_id` FK `ON DELETE CASCADE`). New table only; downgrade drops it. |
+| `0011` | `assessment_results`: opt-in saved assessment results (key, definition version, algorithm, locale, normalised answers and server result as JSONB, fingerprint, SHA-256 `token_hash` unique, `expires_at` and `assessment_key` indexes, `locale` CHECK). New table only; downgrade drops it. |
 | `0010` | Catalogue publishing and staff roles. `admin_users.role` (`admin`/`editor`/`viewer`, NOT NULL, server default `admin`, CHECK): existing accounts keep full rights. `catalogue_entities.published_revision`, `published_at`, `published_by_id`, `published_snapshot` (JSONB read model), with a CHECK that a published domain or service has a snapshot. Data step: 0009 rows that were `published` without a snapshot become `draft`, and the bootstrap seed publishes them again. `services`: offering types `assessment` and `workshop`, `duration_min_days` / `duration_max_days` (numeric(4,1), assessments and workshops only). `content_items` + `content_item_translations` (capabilities and deliverables, aligned between BG and EN). Downgrade drops all of it; assessment and workshop rows are deleted with their entities. |
 | `0009` | Service catalogue V1: `catalogue_entities` (supertype: `entity_type`, stable `key`, `status` draft/published/archived, `revision`), `service_domains`, `service_families`, `services` (subtypes sharing the entity id through the composite FK `(id, entity_type)`), `family_services`, `entity_translations` (per locale; slug unique per `(locale, route_namespace)`), `entity_relations` (typed edges with an allowed-combination CHECK). New tables only, no data; `leads` unchanged and not referenced. Downgrade drops the seven tables. See [Service catalogue](#service-catalogue-migration-0009). |
 | `0008` | AI operations scaffold: `ops_organizations` (slug unique, status/region, `is_demo`), `ops_workspaces` (unique `(organization_id, slug)` and `(id, organization_id)`), `ops_memberships` (user × organisation × role CHECK, unique pair), `ops_agents` (registry metadata; composite FK `(workspace_id, organization_id)` → workspaces so an agent cannot sit in another tenant's workspace). New tables only; downgrade drops them. See AI_OPERATIONS_PORTAL.md. |
@@ -179,6 +180,22 @@ no personal data and no free text.
 | config | jsonb | context, departments, chosen agents, per-agent settings (team members only), deployment, operations |
 | overrides | jsonb | visitor rate overrides (bounded by the API) |
 | lead_id | uuid FK → leads.id **ON DELETE CASCADE**, nullable | the consultation lead; index `ix_team_configurations_lead_id` |
+
+## assessment_results
+
+Opt-in saved results of the assessment engine ([ASSESSMENT_PLATFORM_ARCHITECTURE.md](ASSESSMENT_PLATFORM_ARCHITECTURE.md)).
+No personal data and no free text.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| id | uuid PK | reference = first 8 hex chars, upper case |
+| created_at, expires_at | timestamptz | `+ ASSESSMENT_RETENTION_DAYS` (default 90); index `ix_assessment_results_expires_at`; purged by `app.cli maintenance` |
+| token_hash | varchar(64) NOT NULL, UNIQUE | SHA-256 of the secret link token (lookup and deletion) |
+| assessment_key, definition_version, algorithm | varchar | what the result was scored with; index `ix_assessment_results_assessment_key` |
+| locale | varchar(2), default `bg` | CHECK `ck_assessment_results_locale` |
+| fingerprint | varchar(16) | SHA-256 prefix of key, version, algorithm and answers (non-personal) |
+| answers | jsonb | normalised answers: option keys, booleans, numbers |
+| result | jsonb | `ScoreResult.summary()`: overall, band, dimension scores, recommendation keys, extras |
 
 ## AI operations scaffold (`ops_*`, migration 0008)
 

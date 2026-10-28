@@ -16,6 +16,30 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/assessment-engine` (from `main` @ `8b1c40b`, not merged, 2026-10-28): the reusable
+deterministic assessment engine ([ASSESSMENT_PLATFORM_ARCHITECTURE.md](ASSESSMENT_PLATFORM_ARCHITECTURE.md)).
+
+* **Definitions:** typed, versioned JSON definitions validated at start-up, with five answer types.
+* **Scoring:** the exact-arithmetic algorithm `weighted-mean/1`, result bands, and typed
+  recommendation rules (no `eval`, no LLM).
+* **Extensions:** extension points registered in code.
+* **Localization:** BG/EN texts.
+* **Persistence:** opt-in saved results (`assessment_results`, migration **`0011`**), with a hashed
+  link token, lookup, deletion by the visitor, expiry, and purge in `app.cli maintenance` and the
+  admin retention run.
+* **API:** `/api/public/assessments`, rate limited.
+* **Definitions shipped:** two, in `preview`: DevOps Delivery Maturity and Observability &
+  Reliability, served only with `ASSESSMENTS_PREVIEW_ENABLED`.
+
+There is no web change: the tools stay "Coming soon". The readiness assessment keeps its own model;
+the engine reproduces its golden vectors.
+
+| Check | Result |
+| --- | --- |
+| `.\scripts\test.ps1 -Suite api` | **478 passed** (34 new in `test_assessments.py`), Ruff clean, docs and OpenAPI in sync, vector and seed copies identical |
+| Migration on a copy of the local dev database (368 leads, 88 catalogue entities, 84 team configurations) | 0010 → 0011 → 0010 → 0011: those counts are unchanged after every step; `alembic check` reports no drift. The copy was dropped afterwards; the dev database itself is still at `0010` (it migrates on the next stack start with `RUN_MIGRATIONS_ON_START`). |
+| Web suites | not re-run (no web change) |
+
 Branch `feature/tools-hub-v2` (from `main` @ `9d08ee9`, not merged, 2026-10-28): the bilingual
 Interactive Tools Hub (TOOLS_PLATFORM.md → "Tools and availability").
 

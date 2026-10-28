@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.assessments.registry import registry as assessment_registry
 from app.config import Settings, get_settings
 from app.errors import error_body
 from app.i18n import Locale, error_message, request_locale, validation_message
@@ -22,6 +23,7 @@ from app.routers import (
     admin_catalogue,
     admin_staff,
     advisor,
+    assessments,
     catalogue,
     health,
     ops,
@@ -69,6 +71,9 @@ def _translate_error(error: dict[str, Any], locale: Locale = "bg") -> dict[str, 
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings.log_level)
+    # Load and validate every assessment definition now: a broken definition stops the start-up
+    # (and CI) instead of failing in a visitor's request.
+    assessment_registry()
 
     app = FastAPI(
         title=settings.app_name,
@@ -123,6 +128,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(advisor.router)
     app.include_router(readiness.router)
     app.include_router(team.router)
+    app.include_router(assessments.router)
     app.include_router(admin_auth.router)
     app.include_router(admin.router)
     app.include_router(admin_catalogue.router)

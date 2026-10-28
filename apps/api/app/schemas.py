@@ -453,6 +453,8 @@ class RetentionPreview(BaseModel):
     advisor_assessments_due: int = 0
     team_configuration_retention_days: int = 0
     team_configurations_due: int = 0
+    assessment_retention_days: int = 0
+    assessment_results_due: int = 0
 
 
 class RetentionRunIn(StrictModel):
@@ -464,6 +466,7 @@ class RetentionRunOut(BaseModel):
     audit_entries_deleted: int
     advisor_assessments_deleted: int = 0
     team_configurations_deleted: int = 0
+    assessment_results_deleted: int = 0
 
 
 class IntegrationStatus(BaseModel):

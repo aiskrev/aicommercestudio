@@ -97,6 +97,18 @@ class Settings(BaseSettings):
     # Leads created from the configurator are deleted after this many days without activity.
     team_lead_retention_days: int = Field(default=365, ge=30, le=3650)
 
+    # Assessment engine (app/assessments): scoring, opt-in saved results, lookup and deletion.
+    assessment_rate_limit: int = Field(default=30, ge=1)
+    assessment_save_rate_limit: int = Field(default=10, ge=1)
+    assessment_lookup_rate_limit: int = Field(default=30, ge=1)
+    assessment_rate_window_seconds: int = Field(default=600, ge=1)
+    assessment_global_rate_limit: int = Field(default=600, ge=1)
+    # Saved results are deleted after this many days (or earlier by the visitor with the link token).
+    assessment_retention_days: int = Field(default=90, ge=1, le=365)
+    # Serve definitions with status "preview" (staging and tests). Off in production: unfinished
+    # assessments stay "Coming soon" on the website and are not reachable through the API.
+    assessments_preview_enabled: bool = False
+
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None

@@ -245,6 +245,19 @@ limits and errors: [READINESS_REPORTS.md](READINESS_REPORTS.md#api).
 Admins download a consultation's plan from `GET /api/admin/leads/{id}/team-report`. Fields, limits,
 cost model and errors: [TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md#api).
 
+## Public: assessment engine
+
+Deterministic questionnaire assessments ([ASSESSMENT_PLATFORM_ARCHITECTURE.md](ASSESSMENT_PLATFORM_ARCHITECTURE.md)).
+Definitions with status `preview` are served only when `ASSESSMENTS_PREVIEW_ENABLED=true`.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/public/assessments` | the definitions that may be served (`?locale=bg\|en`) |
+| GET | `/api/public/assessments/{key}` | localized questions, options and ranges (no points or weights); 404 `assessment_not_found` |
+| POST | `/api/public/assessments/{key}/score` | `{schema_version, definition_version, locale, answers, save}` → localized result; with `save: true` also a secret link token (only its SHA-256 hash is stored; expires). 409 `assessment_version_outdated` (current version in `errors[0].message`), 422 `assessment_invalid_answers` (`errors[].field` = `answers.<question>`, `type` = missing_required, unknown_question, invalid_type, invalid_option, out_of_range, too_many_selections, duplicate_selection, inconsistent) |
+| POST | `/api/public/assessments/results/lookup` | `{token}` → the saved result, re-scored with its own definition version; 404 `assessment_result_not_found` |
+| POST | `/api/public/assessments/results/delete` | `{token}` → 204; deletes the saved result (idempotent) |
+
 ## Public: service catalogue (read-only)
 
 Published content only. Responses are built from the publication snapshots of published domains and
@@ -300,7 +313,7 @@ Admin responses are `Cache-Control: no-store`.
 | GET | `/api/admin/audit` | Paginated audit search → `{items,total,page,page_size}`. Query: `action`, `action_prefix` (e.g. `lead.`), `entity_type`, `entity_id`, `actor` (substring), `created_from`, `created_to`, `page`, `page_size` ≤ 200 |
 | GET | `/api/admin/system/status` | environment, AI provider, e-mail enabled, retention, integration flags (never secrets) |
 | GET | `/api/admin/retention` | Preview: `lead_retention_days`, `audit_retention_days`, `leads_due`, `audit_entries_due`, `lead_cutoff`, `audit_cutoff`, `advisor_retention_days`, `advisor_assessments_due`, `team_configuration_retention_days`, `team_configurations_due`. Changes nothing. |
-| POST | `/api/admin/retention/run` | Body must be `{"confirm": true}` (else 422). Deletes expired leads/notes (readiness and team leads use their own retention), old audit entries, expired unlinked advisor assessments and saved team configurations; audited as `retention.run` → `{"leads_deleted","audit_entries_deleted","advisor_assessments_deleted","team_configurations_deleted"}` |
+| POST | `/api/admin/retention/run` | Body must be `{"confirm": true}` (else 422). Deletes expired leads/notes (readiness and team leads use their own retention), old audit entries, expired unlinked advisor assessments, saved team configurations and expired saved assessment results; audited as `retention.run` → `{"leads_deleted","audit_entries_deleted","advisor_assessments_deleted","team_configurations_deleted","assessment_results_deleted"}` |
 
 ## Admin: leads
 

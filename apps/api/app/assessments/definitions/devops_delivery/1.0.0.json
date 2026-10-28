@@ -1,0 +1,192 @@
+{
+  "key": "devops_delivery",
+  "version": "1.0.0",
+  "status": "preview",
+  "scoring": { "algorithm": "weighted-mean/1", "max_recommendations": 4 },
+  "dimensions": [
+    { "key": "build_test", "weight": 30 },
+    { "key": "release", "weight": 30 },
+    { "key": "change_risk", "weight": 20 },
+    { "key": "recovery", "weight": 20 }
+  ],
+  "questions": [
+    {
+      "key": "ci_pipeline", "type": "single_choice", "dimension": "build_test",
+      "options": [
+        { "key": "none", "points": 0 },
+        { "key": "manual_scripts", "points": 1 },
+        { "key": "ci_on_main", "points": 3 },
+        { "key": "ci_every_change", "points": 4 }
+      ]
+    },
+    { "key": "automated_tests", "type": "scale", "dimension": "build_test", "weight": 2, "min": 0, "max": 4 },
+    {
+      "key": "deploy_method", "type": "single_choice", "dimension": "release",
+      "options": [
+        { "key": "manual", "points": 0 },
+        { "key": "scripted", "points": 2 },
+        { "key": "pipeline_approval", "points": 3 },
+        { "key": "pipeline_auto", "points": 4 }
+      ]
+    },
+    {
+      "key": "deploy_frequency", "type": "number", "dimension": "release", "min": 0, "max": 1000, "integer": true,
+      "bands": [
+        { "at_least": 0, "points": 0 },
+        { "at_least": 1, "points": 1 },
+        { "at_least": 4, "points": 2 },
+        { "at_least": 20, "points": 4 }
+      ]
+    },
+    {
+      "key": "environments", "type": "multi_choice", "dimension": "release", "cap": 3, "max_selections": 4,
+      "options": [
+        { "key": "development", "points": 1 },
+        { "key": "staging", "points": 1 },
+        { "key": "preview_per_change", "points": 1 },
+        { "key": "infrastructure_as_code", "points": 1 }
+      ]
+    },
+    { "key": "change_review", "type": "boolean", "dimension": "change_risk", "points_true": 4, "points_false": 0 },
+    {
+      "key": "rollback", "type": "single_choice", "dimension": "recovery",
+      "options": [
+        { "key": "none", "points": 0 },
+        { "key": "manual_restore", "points": 1 },
+        { "key": "redeploy_previous", "points": 3 },
+        { "key": "automated", "points": 4 }
+      ]
+    },
+    {
+      "key": "recovery_time", "type": "single_choice", "dimension": "recovery", "required": false,
+      "options": [
+        { "key": "days", "points": 0 },
+        { "key": "hours", "points": 2 },
+        { "key": "under_hour", "points": 4 }
+      ]
+    }
+  ],
+  "bands": [
+    { "key": "initial", "min": 0 },
+    { "key": "developing", "min": 40 },
+    { "key": "established", "min": 65 },
+    { "key": "advanced", "min": 85 }
+  ],
+  "rules": [
+    { "key": "ci_gap", "priority": 1, "when": { "kind": "dimension_below", "dimension": "build_test", "value": 50 }, "recommendation": "automate_build_and_tests" },
+    { "key": "manual_deploys", "priority": 2, "when": { "kind": "answer_in", "question": "deploy_method", "options": ["manual", "scripted"] }, "recommendation": "pipeline_deployments" },
+    { "key": "no_rollback", "priority": 2, "when": { "kind": "answer_in", "question": "rollback", "options": ["none", "manual_restore"] }, "recommendation": "rollback_plan" },
+    { "key": "review_gap", "priority": 3, "when": { "kind": "dimension_below", "dimension": "change_risk", "value": 50 }, "recommendation": "require_reviews" },
+    { "key": "unknown_recovery", "priority": 4, "when": { "kind": "answer_missing", "question": "recovery_time" }, "recommendation": "measure_recovery" },
+    { "key": "good_base", "priority": 5, "when": { "kind": "band_in", "bands": ["established", "advanced"] }, "recommendation": "optimise_flow" },
+    { "key": "start", "priority": 6, "when": { "kind": "band_in", "bands": ["initial"] }, "recommendation": "delivery_workshop" }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Зрелост на DevOps доставката",
+      "intro": "Осем въпроса за това как кодът стига от разработчика до продукция: изграждане, тестове, пускане и връщане назад.",
+      "disclaimer": "Ориентировъчна самооценка по вашите отговори. Не е одит и не замества преглед на реалните процеси и системи.",
+      "dimensions": {
+        "build_test": { "title": "Изграждане и тестове", "description": "Автоматично изграждане и тестове при всяка промяна." },
+        "release": { "title": "Пускане", "description": "Как и колко често промените стигат до продукция и през какви среди минават." },
+        "change_risk": { "title": "Контрол на промените", "description": "Преглед на промените, преди да бъдат пуснати." },
+        "recovery": { "title": "Възстановяване", "description": "Връщане назад и време за възстановяване при проблем." }
+      },
+      "questions": {
+        "ci_pipeline": {
+          "text": "Как се изгражда и проверява кодът?",
+          "options": { "none": "Ръчно, на компютъра на разработчика", "manual_scripts": "Със скриптове, пускани ръчно", "ci_on_main": "CI при промени в основния клон", "ci_every_change": "CI при всяка промяна, преди сливане" }
+        },
+        "automated_tests": { "text": "Каква част от критичните потоци е покрита с автоматични тестове?", "help": "0 — няма тестове, 4 — всички критични потоци.", "unit": "0 = няма, 4 = всички" },
+        "deploy_method": {
+          "text": "Как се пускат промените в продукция?",
+          "options": { "manual": "Ръчно (копиране, конзола)", "scripted": "Със скрипт, пуснат ръчно", "pipeline_approval": "Автоматично, след ръчно одобрение", "pipeline_auto": "Автоматично, след успешни проверки" }
+        },
+        "deploy_frequency": { "text": "Колко пускания в продукция правите месечно?", "help": "Приблизително число за последните няколко месеца.", "unit": "на месец" },
+        "environments": {
+          "text": "Кои от тези имате?",
+          "help": "Изберете всички, които важат.",
+          "options": { "development": "Среда за разработка", "staging": "Тестова среда, близка до продукция", "preview_per_change": "Временна среда за всяка промяна", "infrastructure_as_code": "Средите са описани като код" }
+        },
+        "change_review": { "text": "Задължителен ли е преглед от друг човек преди пускане?" },
+        "rollback": {
+          "text": "Как връщате предишна версия при проблем?",
+          "options": { "none": "Нямаме начин", "manual_restore": "Ръчно възстановяване", "redeploy_previous": "Повторно пускане на предишната версия", "automated": "Автоматично връщане назад" }
+        },
+        "recovery_time": {
+          "text": "Колко време обикновено отнема възстановяването след проблем?",
+          "help": "Пропуснете, ако не го измервате.",
+          "options": { "days": "Дни", "hours": "Часове", "under_hour": "Под час" }
+        }
+      },
+      "bands": {
+        "initial": { "title": "Начално ниво", "description": "Доставката зависи от ръчни стъпки и отделни хора; всяко пускане е риск." },
+        "developing": { "title": "В развитие", "description": "Има автоматизация, но с пропуски, които забавят пусканията или увеличават риска." },
+        "established": { "title": "Изградена практика", "description": "Пусканията са автоматизирани и контролирани; остават подобрения в скоростта и възстановяването." },
+        "advanced": { "title": "Напреднало ниво", "description": "Честите и безопасни пускания са норма; фокусът е върху оптимизация на потока." }
+      },
+      "recommendations": {
+        "automate_build_and_tests": { "title": "Автоматизирайте изграждането и тестовете", "description": "CI при всяка промяна и автоматични тестове за критичните потоци са основата за всичко останало." },
+        "pipeline_deployments": { "title": "Пускайте през pipeline", "description": "Заменете ръчните стъпки с повторяем pipeline, за да е всяко пускане еднакво и проследимо." },
+        "rollback_plan": { "title": "Подгответе връщане назад", "description": "Опишете и тествайте как се връща предишна версия, преди да е нужно." },
+        "require_reviews": { "title": "Въведете преглед на промените", "description": "Задължителен преглед от втори човек намалява грешките в продукция." },
+        "measure_recovery": { "title": "Измервайте времето за възстановяване", "description": "Без данни за възстановяването е трудно да прецените риска от промените." },
+        "optimise_flow": { "title": "Оптимизирайте потока", "description": "Следващата стъпка е по-кратко време от промяна до продукция и по-малко ръчни одобрения." },
+        "delivery_workshop": { "title": "Работна среща за доставката", "description": "Кратък общ преглед на процеса помага да се избере първата стъпка с най-голям ефект." }
+      }
+    },
+    "en": {
+      "title": "DevOps Delivery Maturity",
+      "intro": "Eight questions about how code gets from a developer to production: builds, tests, releases and rollbacks.",
+      "disclaimer": "An indicative self-assessment based on your answers. It is not an audit and does not replace a review of the actual processes and systems.",
+      "dimensions": {
+        "build_test": { "title": "Build and test", "description": "Automatic builds and tests for every change." },
+        "release": { "title": "Release", "description": "How and how often changes reach production, and through which environments." },
+        "change_risk": { "title": "Change control", "description": "Reviewing changes before they are released." },
+        "recovery": { "title": "Recovery", "description": "Rolling back and the time it takes to recover from a problem." }
+      },
+      "questions": {
+        "ci_pipeline": {
+          "text": "How is code built and checked?",
+          "options": { "none": "Manually, on a developer's machine", "manual_scripts": "With scripts run by hand", "ci_on_main": "CI on changes to the main branch", "ci_every_change": "CI on every change, before merging" }
+        },
+        "automated_tests": { "text": "How much of your critical flows is covered by automated tests?", "help": "0 — no tests, 4 — all critical flows.", "unit": "0 = none, 4 = all" },
+        "deploy_method": {
+          "text": "How do changes reach production?",
+          "options": { "manual": "Manually (copying files, console)", "scripted": "With a script run by hand", "pipeline_approval": "Automatically, after a manual approval", "pipeline_auto": "Automatically, after passing checks" }
+        },
+        "deploy_frequency": { "text": "How many production releases do you make per month?", "help": "A rough number for the last few months.", "unit": "per month" },
+        "environments": {
+          "text": "Which of these do you have?",
+          "help": "Select all that apply.",
+          "options": { "development": "A development environment", "staging": "A staging environment close to production", "preview_per_change": "A temporary environment per change", "infrastructure_as_code": "Environments defined as code" }
+        },
+        "change_review": { "text": "Is a review by another person required before a release?" },
+        "rollback": {
+          "text": "How do you return to the previous version when something goes wrong?",
+          "options": { "none": "We have no way to", "manual_restore": "Manual restore", "redeploy_previous": "Redeploy the previous version", "automated": "Automatic rollback" }
+        },
+        "recovery_time": {
+          "text": "How long does recovering from a problem usually take?",
+          "help": "Skip this if you do not measure it.",
+          "options": { "days": "Days", "hours": "Hours", "under_hour": "Under an hour" }
+        }
+      },
+      "bands": {
+        "initial": { "title": "Initial", "description": "Delivery depends on manual steps and individual people; every release is a risk." },
+        "developing": { "title": "Developing", "description": "There is automation, with gaps that slow releases down or add risk." },
+        "established": { "title": "Established", "description": "Releases are automated and controlled; speed and recovery can still improve." },
+        "advanced": { "title": "Advanced", "description": "Frequent, safe releases are the norm; the focus is on optimising the flow." }
+      },
+      "recommendations": {
+        "automate_build_and_tests": { "title": "Automate builds and tests", "description": "CI on every change and automated tests for critical flows are the foundation for everything else." },
+        "pipeline_deployments": { "title": "Release through a pipeline", "description": "Replace manual steps with a repeatable pipeline so every release is the same and traceable." },
+        "rollback_plan": { "title": "Prepare a rollback", "description": "Describe and test how to return to the previous version before you need it." },
+        "require_reviews": { "title": "Introduce change reviews", "description": "A required review by a second person reduces errors in production." },
+        "measure_recovery": { "title": "Measure recovery time", "description": "Without recovery data it is hard to judge the risk of changes." },
+        "optimise_flow": { "title": "Optimise the flow", "description": "The next step is a shorter time from change to production and fewer manual approvals." },
+        "delivery_workshop": { "title": "Delivery workshop", "description": "A short joint review of the process helps choose the first step with the biggest effect." }
+      }
+    }
+  }
+}
