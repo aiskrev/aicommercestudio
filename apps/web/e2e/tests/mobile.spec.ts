@@ -160,6 +160,8 @@ test("the AI readiness assessment can be completed on a phone", async ({ page })
   await page.goto("/bg/instrumenti/ai-gotovnost");
   const form = page.getByTestId("readiness-form");
   for (let step = 0; step < 6; step++) {
+    // Wait for the step to render before answering (slower CI machines otherwise answer the previous one).
+    await expect(form.getByText(`Стъпка ${step + 1} от 6`)).toBeVisible();
     for (const group of await form.getByRole("group").all()) await group.getByRole("radio").nth(3).check();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, `step ${step + 1}`).toBeLessThanOrEqual(0);
@@ -175,8 +177,9 @@ test("the AI readiness assessment can be completed on a phone", async ({ page })
 test("the DevOps delivery assessment can be completed on a phone without horizontal scrolling", async ({ page }) => {
   await page.goto("/bg/instrumenti/zrelost-na-devops-dostavkata");
   const form = page.getByTestId("engine-form");
-  await expect(form.getByText("Област 1 от 11")).toBeVisible();
   for (let step = 0; step < 11; step++) {
+    // Wait for the area to render before answering (slower CI machines otherwise answer the previous one).
+    await expect(form.getByText(`Област ${step + 1} от 11`)).toBeVisible();
     const groups = form.locator("fieldset:has(input[type=radio])");
     const count = await groups.count();
     for (let i = 0; i < count; i++) {
