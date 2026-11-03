@@ -12,8 +12,8 @@ Foundations for the business assessment and solution-design tools. Hub: `/bg/ins
 | Build your AI team (agent configurator with architecture diagram) | `team` | live | `/bg/instrumenti/ai-ekip` ↔ `/en/tools/ai-team` | `tool_team` (on) |
 | AI ROI calculator | `roi` | live | `/bg/instrumenti/roi-kalkulator` ↔ `/en/tools/roi-calculator` | `tool_roi` (on) |
 | Automation Opportunity Finder (questionnaire) | `finder` | live | `/bg/instrumenti/avtomatizatsii` ↔ `/en/tools/automation-finder` | `tool_finder` (on) |
-| AI solution builder (architecture + roadmap) | `solution` | live | `/bg/instrumenti/ai-reshenie` ↔ `/en/tools/solution-builder` | `tool_solution` (on) |
-| AI agent library (10 static agent pages) | `agents` | live | `/bg/ai-agenti` ↔ `/en/ai-agents` | `tool_agents` (on) |
+| AI solution builder (composition rules, reference architecture, roadmap, optional enquiry) | `solution` | live | `/bg/instrumenti/ai-reshenie` ↔ `/en/tools/solution-builder` | `tool_solution` (on) |
+| AI agent library (12 static archetype pages) | `agents` | live | `/bg/ai-agenti` ↔ `/en/ai-agents` | `tool_agents` (on) |
 | Cloud & Platform Maturity Assessment (engine, 10 areas) | `cloud_maturity` | live | `/bg/instrumenti/zrelost-na-oblak-i-platforma` ↔ `/en/tools/cloud-platform-maturity` | `tool_cloud` (on) |
 | DevOps Delivery Maturity (engine, 11 areas, unscored metrics) | `devops_maturity` | live | `/bg/instrumenti/zrelost-na-devops-dostavkata` ↔ `/en/tools/devops-delivery-maturity` | `tool_devops` (on) |
 | Observability & Reliability Assessment (engine, 11 areas) | `observability` | live | `/bg/instrumenti/nablyudaemost-i-nadezhdnost` ↔ `/en/tools/observability-reliability` | `tool_observability` (on) |

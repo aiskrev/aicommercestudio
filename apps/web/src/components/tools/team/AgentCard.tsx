@@ -2,6 +2,7 @@ import { fill } from "@/components/tools/team/TeamControls";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { cx } from "@/components/ui/primitives";
 import type { teamTool } from "@/content/bg/tool-team";
+import type { LibraryKey } from "@/lib/agent-library";
 import { AGENTS, type AgentKey, minimumCheckpoint } from "@/lib/ai-team";
 
 type Content = typeof teamTool;
@@ -18,6 +19,9 @@ export const AGENT_ICONS: Record<AgentKey, IconName> = {
   workflow_coordinator: "workflow",
   approval_supervisor: "shield",
 };
+
+/** Icons of every library archetype (the team roles plus the library-only ones). */
+export const LIBRARY_ICONS: Record<LibraryKey, IconName> = { ...AGENT_ICONS, proposal_generation: "clipboard", catalog_assistant: "store" };
 
 const COMPLEXITY_BADGE = { low: "badge-success", medium: "badge-accent", high: "badge-warning" } as const;
 

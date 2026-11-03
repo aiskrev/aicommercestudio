@@ -18,8 +18,7 @@ import type { ServiceKey } from "@/content/types";
 import { type Locale, isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
-import { AGENT_KEYS } from "@/lib/ai-team";
-import { AGENT_SLUGS } from "@/lib/agent-library";
+import { AGENT_SLUGS, LIBRARY_KEYS } from "@/lib/agent-library";
 import { ACTION_SERVICE } from "@/lib/readiness";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
@@ -250,8 +249,9 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
               ui={tools.ui}
               services={services}
               contactHref={href(contactWithService("ai_agents"))}
+              privacyHref={href(routes.privacy)}
               libraryHref={hrefs.agents}
-              agentHrefs={hrefs.agents ? Object.fromEntries(AGENT_KEYS.map((a) => [a, href(routes.agent(AGENT_SLUGS[a].bg))])) : undefined}
+              agentHrefs={hrefs.agents ? Object.fromEntries(LIBRARY_KEYS.map((a) => [a, href(routes.agent(AGENT_SLUGS[a].bg))])) : undefined}
               locale={locale}
             />
           </Suspense>

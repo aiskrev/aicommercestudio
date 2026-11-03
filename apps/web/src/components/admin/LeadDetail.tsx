@@ -14,6 +14,7 @@ import { fmt } from "@/i18n/admin";
 import { adminFetch, ApiError } from "@/lib/admin-api";
 import {
   type AiManagedDetails,
+  type AiManagedQualification,
   type AuditEntry,
   LEAD_STATUSES,
   type LeadDetail as Lead,
@@ -22,6 +23,7 @@ import {
   type LeadTriage,
   type LinkedAssessment,
   type ReadinessDetails,
+  type SolutionDetails,
   type TeamDetails,
 } from "@/lib/admin-types";
 import { formatDateTime } from "@/lib/format";
@@ -130,6 +132,8 @@ export function LeadDetail({ id }: { id: string }) {
           </Panel>
 
           {data.ai_managed && <AiManagedPanel details={data.ai_managed} />}
+          {data.ai_managed_qualification && <QualificationPanel qualification={data.ai_managed_qualification} />}
+          {data.solution && <SolutionPanel details={data.solution} />}
           {data.readiness && <ReadinessPanel leadId={data.id} details={data.readiness} />}
           {data.team && <TeamPanel leadId={data.id} details={data.team} />}
           {data.advisor_assessment && <LinkedAssessmentPanel linked={data.advisor_assessment} />}
@@ -201,6 +205,18 @@ function AiManagedPanel({ details }: { details: AiManagedDetails }) {
             {labels.locale[details.communication_language] ?? details.communication_language}
           </Info>
         </dl>
+        {QUALIFICATION_ANSWERS.some(([key]) => details[key]) && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t.answers}</p>
+            <dl className="mt-3 grid gap-4 sm:grid-cols-2" data-testid="ai-qualification-answers">
+              {QUALIFICATION_ANSWERS.filter(([key]) => details[key]).map(([key, label, options]) => (
+                <Info key={key} label={ai.qualification[label]}>
+                  {(ai.qualification[options] as Record<string, string>)[details[key]!] ?? details[key]}
+                </Info>
+              ))}
+            </dl>
+          </div>
+        )}
         {details.additional_notes && (
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t.notes}</p>
@@ -209,6 +225,79 @@ function AiManagedPanel({ details }: { details: AiManagedDetails }) {
             </p>
           </div>
         )}
+      </div>
+    </Panel>
+  );
+}
+
+const QUALIFICATION_ANSWERS = [
+  ["desired_level", "desiredLevel", "desiredLevelOptions"],
+  ["production_status", "productionStatus", "productionStatusOptions"],
+  ["technical_owner", "technicalOwner", "technicalOwnerOptions"],
+  ["access_readiness", "accessReadiness", "accessReadinessOptions"],
+  ["test_environment", "testEnvironment", "testEnvironmentOptions"],
+  ["data_sensitivity", "dataSensitivity", "dataSensitivityOptions"],
+  ["change_frequency", "changeFrequency", "changeFrequencyOptions"],
+  ["response_needs", "responseNeeds", "responseNeedsOptions"],
+] as const;
+
+/** Rule-based triage of an AI Managed inquiry: suggested level, onboarding readiness and why. */
+function QualificationPanel({ qualification: q }: { qualification: AiManagedQualification }) {
+  const { t: dict } = useAdminI18n();
+  const t = dict.aiManaged;
+  const names = (keys: string[], map: Record<string, string>) => keys.map((k) => map[k] ?? k).join(", ") || "—";
+  return (
+    <Panel title={t.qualificationTitle}>
+      <div className="grid gap-4 text-sm" data-testid="ai-qualification-triage">
+        <p className="text-xs text-slate-400">{t.qualificationNote}</p>
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <Info label={t.suggestedLevel}>
+            <span data-level={q.suggested_level}>{t.levels[q.suggested_level]}</span>{" "}
+            <span className="text-xs text-slate-400">({fmt(t.points, { points: q.points })})</span>
+          </Info>
+          <Info label={t.readiness}>
+            <span data-readiness={q.readiness}>{t.readinessNames[q.readiness]}</span>
+          </Info>
+          <Info label={t.desiredLevel}>
+            {q.desired_level && q.desired_level !== "unsure" ? (t.levels as Record<string, string>)[q.desired_level] ?? q.desired_level : "—"}
+            {q.matches_desired !== null && <span className="text-xs text-slate-400"> ({q.matches_desired ? t.matchesDesired.yes : t.matchesDesired.no})</span>}
+          </Info>
+          <Info label={t.reasons}>{names(q.reasons, t.reasonNames as Record<string, string>)}</Info>
+          <Info label={t.blockers}>{names(q.blockers, t.blockerNames as Record<string, string>)}</Info>
+        </dl>
+      </div>
+    </Panel>
+  );
+}
+
+/** AI solution builder enquiry: the enumerated design the server validated. */
+function SolutionPanel({ details: d }: { details: SolutionDetails }) {
+  const { t: dict, labels, locale } = useAdminI18n();
+  const t = dict.solution;
+  const s = labels.solution;
+  const list = (values: string[], name: (key: string) => string) => values.map(name).join(", ") || "—";
+  const builder = locale === "en" ? `/en/tools/solution-builder?s=${d.code}` : `/bg/instrumenti/ai-reshenie?s=${d.code}`;
+  return (
+    <Panel title={t.title}>
+      <div className="grid gap-4 text-sm" data-testid="solution-details">
+        <p className="text-xs text-slate-400">{t.note}</p>
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <Info label={t.workflow}>{d.workflow ? s.workflow(d.workflow) : "—"}</Info>
+          <Info label={t.objective}>{d.objective ? s.objective(d.objective) : "—"}</Info>
+          <Info label={t.agents}>{list(d.agents, s.agent)}</Info>
+          <Info label={t.capabilities}>{list(d.capabilities, s.capability)}</Info>
+          <Info label={t.integrations}>{list(d.integrations, s.integration)}</Info>
+          <Info label={t.sensitivity}>{d.sensitivity ? s.sensitivity(d.sensitivity) : "—"}</Info>
+          <Info label={t.approval}>{d.approval ? s.checkpoint(d.approval) : "—"}</Info>
+          <Info label={t.approvalPoints}>{d.approval_points.length}</Info>
+          <Info label={t.deployment}>{d.deployment ? s.deployment(d.deployment) : "—"}</Info>
+          <Info label={t.complexity}>{d.complexity ? s.complexity(d.complexity) : "—"}</Info>
+          <Info label={t.residency}>{d.residency ? t.yes : t.no}</Info>
+          <Info label={t.redaction}>{d.redaction ? t.yes : t.no}</Info>
+        </dl>
+        <a href={builder} target="_blank" rel="noreferrer" className="text-sm font-medium text-cyan-300 hover:underline">
+          {t.open}
+        </a>
       </div>
     </Panel>
   );

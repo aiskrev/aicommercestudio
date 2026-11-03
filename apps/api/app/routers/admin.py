@@ -26,6 +26,7 @@ from app.schemas import (
     AIActionDecision,
     AIActionOut,
     AiManagedDetails,
+    AiManagedQualificationOut,
     AuditLogOut,
     AuditPage,
     DashboardStats,
@@ -41,10 +42,12 @@ from app.schemas import (
     RetentionPreview,
     RetentionRunIn,
     RetentionRunOut,
+    SolutionDetailsOut,
     SystemStatus,
     TeamDetailsOut,
 )
 from app.services import ai_actions, leads
+from app.services.ai_managed_qualification import qualify
 from app.team import service as team_service
 from app.team.report import build_team_report
 
@@ -69,7 +72,19 @@ def _ai_managed_details(lead: Lead) -> AiManagedDetails | None:
     if details.get("kind") != "ai_managed":
         return None
     try:
-        return AiManagedDetails.model_validate({k: v for k, v in details.items() if k != "kind"})
+        return AiManagedDetails.model_validate({k: v for k, v in details.items() if k not in ("kind", "qualification")})
+    except ValidationError:
+        logger.warning("lead_service_details_invalid", extra={"lead": lead.reference})
+        return None
+
+
+def _ai_managed_qualification(lead: Lead, details: AiManagedDetails | None) -> AiManagedQualificationOut | None:
+    """Stored triage, or one computed from the validated answers for inquiries stored before it existed."""
+    if details is None:
+        return None
+    stored = (lead.service_details or {}).get("qualification")
+    try:
+        return AiManagedQualificationOut.model_validate(stored or qualify(details.model_dump(mode="json")))
     except ValidationError:
         logger.warning("lead_service_details_invalid", extra={"lead": lead.reference})
         return None
@@ -126,8 +141,24 @@ def _team_details(db: DbSession, lead: Lead) -> TeamDetailsOut | None:
         return None
 
 
+def _solution_details(lead: Lead) -> SolutionDetailsOut | None:
+    """Validated solution-builder enquiry details, or None (other leads, unexpected data)."""
+    details = lead.service_details or {}
+    if details.get("kind") != "solution":
+        return None
+    try:
+        return SolutionDetailsOut.model_validate(
+            {**{k: v for k, v in details.items() if k in SolutionDetailsOut.model_fields and k != "complexity"},
+             "complexity": (details.get("complexity") or {}).get("band")}
+        )
+    except ValidationError:
+        logger.warning("lead_service_details_invalid", extra={"lead": lead.reference})
+        return None
+
+
 def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
     base = LeadSummaryOut.model_validate(lead).model_dump()
+    ai_managed = _ai_managed_details(lead)
     return LeadDetailOut(
         **base,
         phone=lead.phone,
@@ -145,9 +176,11 @@ def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
         website_url=lead.website_url,
         notes=[_note_out(n) for n in lead.notes],
         advisor_assessment=advisor.summary_for_lead(db, lead.id),
-        ai_managed=_ai_managed_details(lead),
+        ai_managed=ai_managed,
+        ai_managed_qualification=_ai_managed_qualification(lead, ai_managed),
         readiness=_readiness_details(lead),
         team=_team_details(db, lead),
+        solution=_solution_details(lead),
     )
 
 
@@ -287,6 +320,8 @@ def list_leads(
     service: ServiceKey | None = None,
     inquiry_type: InquiryType | None = None,
     locale: LeadLocale | None = None,
+    ams_level: Literal["essential", "managed", "advanced"] | None = None,
+    ams_readiness: Literal["ready", "needs_preparation", "not_ready", "unknown"] | None = None,
     q: Annotated[str | None, Query(max_length=100)] = None,
     created_from: datetime | None = None,
     created_to: datetime | None = None,
@@ -300,6 +335,8 @@ def list_leads(
         service=service,
         inquiry_type=inquiry_type,
         locale=locale,
+        ams_level=ams_level,
+        ams_readiness=ams_readiness,
         q=q or None,
         created_from=created_from,
         created_to=created_to,

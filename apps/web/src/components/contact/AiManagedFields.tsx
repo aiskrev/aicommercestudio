@@ -6,12 +6,29 @@ import { Alert, cx } from "@/components/ui/primitives";
 import type { Dictionary } from "@/i18n";
 import {
   AI_OPTIONS,
+  AI_QUALIFICATION,
+  type AiQualificationField,
   type ContactErrors,
   type ContactField,
   type ContactValues,
   LIMITS,
   toggleOption,
 } from "@/lib/contact-validation";
+
+type QualificationLabels = Dictionary["aiManagedForm"]["qualification"];
+/** Optional qualification questions in display order: field, label key, options key. */
+type TextKey = { [K in keyof QualificationLabels]: QualificationLabels[K] extends string ? K : never }[keyof QualificationLabels];
+type OptionsKey = Exclude<keyof QualificationLabels, TextKey>;
+const QUALIFICATION_FIELDS: [AiQualificationField, TextKey, OptionsKey][] = [
+  ["ai_desired_level", "desiredLevel", "desiredLevelOptions"],
+  ["ai_production_status", "productionStatus", "productionStatusOptions"],
+  ["ai_technical_owner", "technicalOwner", "technicalOwnerOptions"],
+  ["ai_access_readiness", "accessReadiness", "accessReadinessOptions"],
+  ["ai_test_environment", "testEnvironment", "testEnvironmentOptions"],
+  ["ai_data_sensitivity", "dataSensitivity", "dataSensitivityOptions"],
+  ["ai_change_frequency", "changeFrequency", "changeFrequencyOptions"],
+  ["ai_response_needs", "responseNeeds", "responseNeedsOptions"],
+];
 
 /**
  * AI Managed Services section of the inquiry form. Collects only descriptive information about the
@@ -36,6 +53,7 @@ export function AiManagedFields({
   validateOnBlur: (field: ContactField) => void;
   describedBy: (field: ContactField, hint?: string) => string | undefined;
 }) {
+  const q = labels.qualification;
   return (
     <div className="grid gap-6 rounded-2xl border border-brand-strong/20 bg-brand-strong/[0.03] p-4 sm:p-5" data-testid="ai-managed-fields">
       <div>
@@ -162,6 +180,26 @@ export function AiManagedFields({
         {errors.ai_communication_language && (
           <p className="field-error">{errors.ai_communication_language}</p>
         )}
+      </fieldset>
+
+      <fieldset className="grid gap-5 rounded-xl border border-line-subtle p-4" data-testid="ai-qualification">
+        <legend className="px-1 text-sm font-semibold text-fg">{q.title}</legend>
+        <p className="-mt-1 text-sm text-fg-muted">{q.intro}</p>
+        <div className="grid gap-5 sm:grid-cols-2">
+          {QUALIFICATION_FIELDS.map(([field, label, optionsKey]) => (
+            <Field key={field} id={field} label={`${q[label]} (${optionalLabel})`} error={errors[field]}>
+              <Select
+                id={field}
+                value={values[field]}
+                placeholder={q.placeholder}
+                options={AI_QUALIFICATION[field].options.map((key) => [key, (q[optionsKey] as Record<string, string>)[key]])}
+                invalid={Boolean(errors[field])}
+                describedBy={describedBy(field)}
+                onChange={(value) => update(field, value)}
+              />
+            </Field>
+          ))}
+        </div>
       </fieldset>
 
       <Field id="ai_additional_notes" label={`${labels.additionalNotes} (${optionalLabel})`} error={errors.ai_additional_notes}>

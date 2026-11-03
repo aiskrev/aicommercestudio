@@ -162,7 +162,7 @@ test.describe("AI Managed Services", () => {
       ["/en/services/ai-managed-services", "Custom quote"],
     ] as const) {
       expect((await page.goto(path))?.status(), path).toBe(200);
-      for (const key of ["monitor", "care", "optimize"]) {
+      for (const key of ["essential", "managed", "advanced"]) {
         const card = page.getByTestId(`package-${key}`);
         await expect(card, `${path} ${key}`).toBeVisible();
         await expect(card).toContainText(priceLabel);

@@ -51,6 +51,24 @@ export function adminLabels(locale: Locale) {
       agentsCount: ai.agentsCountOptions as Record<string, string>,
       hosting: ai.hostingOptions as Record<string, string>,
       interest: ai.supportInterestOptions as Record<string, string>,
+      qualification: ai.qualification,
+    },
+    solution: {
+      workflow: (key: string) => {
+        const c = getContent(locale);
+        return (c.teamTool.result.workflows as Record<string, { title: string }>)[key]?.title ?? (c.agentLibrary.workflows as Record<string, { title: string }>)[key]?.title ?? key;
+      },
+      agent: (key: string) => {
+        const c = getContent(locale);
+        return (c.teamTool.agents as Record<string, { name: string }>)[key]?.name ?? (c.agentLibrary.agents as Record<string, { name: string }>)[key]?.name ?? key;
+      },
+      objective: (key: string) => (getContent(locale).solutionTool.objectives as Record<string, { title: string }>)[key]?.title ?? key,
+      capability: (key: string) => (getContent(locale).solutionTool.capabilities as Record<string, { title: string }>)[key]?.title ?? key,
+      integration: (key: string) => (getContent(locale).agentLibrary.categories as Record<string, { title: string }>)[key]?.title ?? key,
+      sensitivity: (key: string) => (getContent(locale).solutionTool.security.sensitivity.options as Record<string, { title: string }>)[key]?.title ?? key,
+      checkpoint: (key: string) => (getContent(locale).teamTool.checkpoints as Record<string, { title: string }>)[key]?.title ?? key,
+      deployment: (key: string) => (getContent(locale).teamTool.teamStep.deployment.options as Record<string, { title: string }>)[key]?.title ?? key,
+      complexity: (key: string) => (getContent(locale).teamTool.complexity as Record<string, string>)[key] ?? key,
     },
   };
 }

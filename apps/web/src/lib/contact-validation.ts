@@ -29,6 +29,15 @@ export interface ContactValues {
   ai_support_interests: string[];
   ai_communication_language: string;
   ai_additional_notes: string;
+  // Optional qualification answers (AI Managed Services v2; any may stay empty).
+  ai_desired_level: string;
+  ai_production_status: string;
+  ai_technical_owner: string;
+  ai_access_readiness: string;
+  ai_test_environment: string;
+  ai_data_sensitivity: string;
+  ai_change_frequency: string;
+  ai_response_needs: string;
 }
 
 export type ContactField = keyof ContactValues;
@@ -68,6 +77,19 @@ export const QUOTE_OPTIONS = {
 
 /** Option keys for AI Managed Services inquiries (mirror the API enums). */
 export const AI_MANAGED_SERVICE = "ai_managed";
+/** Optional qualification questions: form field → API field → allowed values (mirror the API enums). */
+export const AI_QUALIFICATION = {
+  ai_desired_level: { api: "desired_level", options: ["essential", "managed", "advanced", "unsure"] },
+  ai_production_status: { api: "production_status", options: ["production", "pilot", "development"] },
+  ai_technical_owner: { api: "technical_owner", options: ["yes", "no"] },
+  ai_access_readiness: { api: "access_readiness", options: ["read_access", "needs_approval", "not_possible", "unknown"] },
+  ai_test_environment: { api: "test_environment", options: ["yes", "no", "unknown"] },
+  ai_data_sensitivity: { api: "data_sensitivity", options: ["public_internal", "personal", "special"] },
+  ai_change_frequency: { api: "change_frequency", options: ["rarely", "monthly", "weekly", "unknown"] },
+  ai_response_needs: { api: "response_needs", options: ["business_hours", "faster", "unsure"] },
+} as const;
+export type AiQualificationField = keyof typeof AI_QUALIFICATION;
+
 export const AI_OPTIONS = {
   sector: [
     "ecommerce",
@@ -151,6 +173,14 @@ export const emptyContactValues = (service = "", inquiry_type: InquiryKind = "co
   ai_support_interests: [],
   ai_communication_language: "",
   ai_additional_notes: "",
+  ai_desired_level: "",
+  ai_production_status: "",
+  ai_technical_owner: "",
+  ai_access_readiness: "",
+  ai_test_environment: "",
+  ai_data_sensitivity: "",
+  ai_change_frequency: "",
+  ai_response_needs: "",
 });
 
 function fill(template: string, n: number): string {
@@ -227,6 +257,9 @@ function validateAiManaged(values: ContactValues, m: ValidationMessages): Contac
   if (provider.length > LIMITS.aiProvider.max) errors.ai_provider = fill(m.maxLength, LIMITS.aiProvider.max);
   else if (LINK_RE.test(provider)) errors.ai_provider = m.noLinks;
   else if (looksLikeSecret(provider)) errors.ai_provider = m.secrets;
+  for (const [field, { options }] of Object.entries(AI_QUALIFICATION) as [AiQualificationField, (typeof AI_QUALIFICATION)[AiQualificationField]][]) {
+    if (values[field] && !(options as readonly string[]).includes(values[field])) errors[field] = m.select;
+  }
   const notes = values.ai_additional_notes.trim();
   if (notes.length > LIMITS.aiNotes.max) errors.ai_additional_notes = fill(m.maxLength, LIMITS.aiNotes.max);
   else if (looksLikeSecret(notes)) errors.ai_additional_notes = m.secrets;
@@ -251,6 +284,9 @@ export function toPayload(values: ContactValues, formToken: string, locale = "bg
             support_interests: values.ai_support_interests,
             communication_language: values.ai_communication_language,
             additional_notes: values.ai_additional_notes.trim(),
+            ...Object.fromEntries(
+              (Object.keys(AI_QUALIFICATION) as AiQualificationField[]).map((field) => [AI_QUALIFICATION[field].api, values[field] || null]),
+            ),
           },
         }
       : {};

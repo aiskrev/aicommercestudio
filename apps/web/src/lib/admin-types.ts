@@ -36,6 +36,9 @@ export interface LeadSummary {
   locale: LeadLocale;
   created_at: string;
   updated_at: string;
+  /** AI Managed Services triage (null for other leads). */
+  ams_level?: AmsLevel | null;
+  ams_readiness?: AmsReadiness | null;
 }
 
 /** Descriptive AI-system information from an AI Managed Services inquiry (never credentials). */
@@ -48,6 +51,47 @@ export interface AiManagedDetails {
   support_interests: string[];
   communication_language: LeadLocale;
   additional_notes: string;
+  desired_level?: string | null;
+  production_status?: string | null;
+  technical_owner?: string | null;
+  access_readiness?: string | null;
+  test_environment?: string | null;
+  data_sensitivity?: string | null;
+  change_frequency?: string | null;
+  response_needs?: string | null;
+}
+
+export type AmsLevel = "essential" | "managed" | "advanced";
+export type AmsReadiness = "ready" | "needs_preparation" | "not_ready" | "unknown";
+
+/** Admin-only triage of an AI Managed Services inquiry (never shown to the visitor). */
+export interface AiManagedQualification {
+  version: string;
+  suggested_level: AmsLevel;
+  points: number;
+  reasons: string[];
+  readiness: AmsReadiness;
+  blockers: string[];
+  desired_level: string | null;
+  matches_desired: boolean | null;
+}
+
+/** Design attached to an AI solution builder enquiry (enumerated keys). */
+export interface SolutionDetails {
+  model_version: string;
+  code: string;
+  objective: string | null;
+  workflow: string | null;
+  capabilities: string[];
+  integrations: string[];
+  sensitivity: string | null;
+  approval: string | null;
+  deployment: string | null;
+  residency: boolean;
+  redaction: boolean;
+  agents: string[];
+  complexity: string | null;
+  approval_points: string[];
 }
 
 export interface LeadNote {
@@ -75,6 +119,9 @@ export interface LeadDetail extends LeadSummary {
   notes: LeadNote[];
   advisor_assessment?: LinkedAssessment | null;
   ai_managed?: AiManagedDetails | null;
+  ai_managed_qualification?: AiManagedQualification | null;
+  /** AI solution builder enquiry (source solution_builder). */
+  solution?: SolutionDetails | null;
   /** AI readiness assessment submission (source readiness_assessment). */
   readiness?: ReadinessDetails | null;
   /** AI team configurator consultation (source team_configurator). */

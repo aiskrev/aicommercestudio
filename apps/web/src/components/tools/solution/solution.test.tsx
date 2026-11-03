@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { AgentLibraryBrowser, type LibraryCard } from "@/components/agents/AgentLibraryBrowser";
 import { SolutionBuilder } from "@/components/tools/solution/SolutionBuilder";
 import { getContent } from "@/content";
-import { LIBRARY } from "@/lib/agent-library";
+import { LIBRARY, agentText } from "@/lib/agent-library";
 import { registerAnalyticsSink, type ToolEvent } from "@/lib/analytics";
 import { EMPTY_SOLUTION, WORKFLOW_DEFAULTS, encodeSolution } from "@/lib/solution";
 
@@ -39,6 +39,7 @@ function renderBuilder(locale: "en" | "bg" = "en") {
       ui={content.tools.ui}
       services={services}
       contactHref={`/${locale}/contact`}
+      privacyHref={`/${locale}/privacy`}
       libraryHref={`/${locale}/ai-agents`}
       agentHrefs={{ customer_support: `/${locale}/ai-agents/customer-support-agent` }}
       locale={locale}
@@ -120,11 +121,23 @@ describe("AI solution builder", () => {
     await next(user);
 
     const diagram = screen.getByTestId("solution-diagram");
-    expect(within(diagram).getAllByRole("listitem").filter((li) => li.hasAttribute("data-layer"))).toHaveLength(7);
-    const vector = within(diagram).getByRole("button", { name: t.components["retrieval:vector_index"].title });
+    // trigger → input → orchestration → AI and rules → review → output (monitoring spans them).
+    expect(within(diagram).getAllByRole("listitem").filter((li) => li.hasAttribute("data-stage")).map((li) => li.dataset.stage)).toEqual([
+      "trigger",
+      "input",
+      "orchestration",
+      "ai_rules",
+      "review",
+      "output",
+    ]);
+    const vector = within(diagram).getByRole("button", { name: new RegExp(t.components["input:vector_index"].title.replace(/[()]/g, "\\$&")) });
     await user.click(vector);
     expect(vector).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("region", { name: t.result.detailsLabel })).toHaveTextContent(t.components["retrieval:vector_index"].text);
+    expect(screen.getByRole("region", { name: t.result.detailsLabel })).toHaveTextContent(t.components["input:vector_index"].text);
+    // Where a person approves is visible on the components themselves, in text.
+    const gate = within(diagram).getByRole("button", { name: new RegExp(t.components["review:gate"].title) });
+    expect(gate).toHaveTextContent(t.approvalMarks.before);
+    expect(screen.getByText(t.result.diagramNote)).toBeInTheDocument();
     expect(within(screen.getByTestId("solution-diagram-table")).getByText(team.agents.customer_support.name, { selector: "th" })).toBeInTheDocument();
 
     await next(user, t.generate);
@@ -134,6 +147,9 @@ describe("AI solution builder", () => {
     expect(within(screen.getByTestId("solution-roadmap")).getAllByRole("listitem").filter((li) => li.dataset.phase)).toHaveLength(4);
     expect(screen.getByRole("link", { name: t.result.openAgent })).toHaveAttribute("href", "/en/ai-agents/customer-support-agent");
     expect(screen.getByRole("link", { name: t.leadCapture.cta })).toHaveAttribute("href", "/en/contact");
+    const approvals = screen.getByTestId("solution-approvals");
+    expect(within(approvals).getAllByRole("listitem").map((li) => li.dataset.component)).toEqual(["review:gate", "output:support_resolution"]);
+    expect(screen.getByTestId("solution-consultation")).toHaveTextContent(t.enquiry.title);
     expect(screen.getByText(t.result.disclaimer)).toBeInTheDocument();
 
     off();
@@ -164,6 +180,7 @@ describe("AI solution builder", () => {
       sensitivity: "regulated",
       approval: "every_action",
       deployment: "on_premise",
+      residency: true,
     });
     window.history.replaceState(null, "", `/?s=${code}`);
     renderBuilder("bg");
@@ -171,6 +188,93 @@ describe("AI solution builder", () => {
     expect(screen.getByText(bg.tools.ui.linkRestored)).toBeInTheDocument();
     expect(screen.getByTestId("solution-complexity")).toHaveTextContent(bg.teamTool.complexity.high);
     expect(within(screen.getByTestId("solution-integrations")).getAllByText(bg.solutionTool.result.gated)).toHaveLength(2);
+  });
+
+  it("rejects an unsafe shared design (regulated data outside the EU/EEA)", () => {
+    const code = encodeSolution({
+      ...EMPTY_SOLUTION,
+      objective: "fewer_errors",
+      workflow: "document_intake",
+      ...WORKFLOW_DEFAULTS.document_intake,
+      sensitivity: "regulated",
+      approval: "every_action",
+      deployment: "on_premise",
+    });
+    window.history.replaceState(null, "", `/?s=${code}`);
+    renderBuilder();
+    expect(screen.getByTestId("solution-form")).toBeInTheDocument();
+    expect(screen.queryByText(ui.linkRestored)).not.toBeInTheDocument();
+  });
+
+  it("rejects incompatible compositions on the step where they are fixed", async () => {
+    const user = userEvent.setup();
+    renderBuilder();
+    await user.click(screen.getByRole("radio", { name: card(t.objectives.knowledge_access.title) }));
+    await next(user);
+    await user.click(screen.getByRole("radio", { name: card(team.result.workflows.knowledge_answers.title) }));
+    await next(user);
+    // The process needs retrieval: without it the step does not continue.
+    await user.click(screen.getByRole("checkbox", { name: card(t.capabilities.rag.title) }));
+    await user.click(screen.getByRole("checkbox", { name: card(t.capabilities.classification.title) }));
+    await next(user);
+    const errors = screen.getByTestId("solution-composition-errors");
+    expect(errors.querySelector("[data-rule]")?.getAttribute("data-rule")).toBe("workflow_capability");
+    expect(screen.getByRole("heading", { name: t.steps.capabilities.title })).toBeInTheDocument();
+    await user.click(screen.getByRole("checkbox", { name: card(t.capabilities.rag.title) }));
+    await next(user);
+    // RAG without any source to search.
+    await user.click(screen.getByRole("checkbox", { name: card(en.agentLibrary.categories.document_storage.title) }));
+    await next(user);
+    expect(screen.getByTestId("solution-composition-errors").querySelector("[data-rule]")?.getAttribute("data-rule")).toBe("rag_needs_source");
+    expect(screen.getByRole("heading", { name: t.steps.integrations.title })).toBeInTheDocument();
+    await user.click(screen.getByRole("checkbox", { name: card(en.agentLibrary.categories.document_storage.title) }));
+    await next(user);
+    // Regulated data must stay in the EU/EEA.
+    await user.click(screen.getByRole("radio", { name: card(t.security.sensitivity.options.regulated.title) }));
+    await user.click(screen.getByRole("radio", { name: card(team.checkpoints.every_action.title) }));
+    await user.click(screen.getByRole("radio", { name: team.teamStep.deployment.options.managed_cloud.title }));
+    await next(user);
+    expect(screen.getByTestId("solution-composition-errors")).toHaveTextContent(t.composition.regulated_needs_residency);
+    await user.click(screen.getByRole("checkbox", { name: card(t.security.residency.label) }));
+    await next(user);
+    expect(screen.getByTestId("solution-diagram")).toBeInTheDocument();
+  });
+
+  it("sends the design with an optional enquiry: enumerated code only, privacy acknowledgement required", async () => {
+    const user = userEvent.setup();
+    const calls: { url: string; body?: Record<string, unknown> }[] = [];
+    const fetchMock = vi.fn(async (url: string, init?: RequestInit) => {
+      calls.push({ url, body: init?.body ? JSON.parse(String(init.body)) : undefined });
+      if (url.includes("form-token")) return new Response(JSON.stringify({ token: "tok" }), { status: 200 });
+      return new Response(JSON.stringify({ reference: "ABC123", message: "ok" }), { status: 201 });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const code = encodeSolution({
+      ...EMPTY_SOLUTION,
+      objective: "faster_response",
+      workflow: "support_resolution",
+      ...WORKFLOW_DEFAULTS.support_resolution,
+      sensitivity: "internal",
+      approval: "before_external",
+      deployment: "managed_cloud",
+    });
+    window.history.replaceState(null, "", `/?s=${code}`);
+    renderBuilder();
+    const section = screen.getByTestId("solution-consultation");
+    await user.click(within(section).getByRole("button", { name: t.enquiry.open }));
+    await user.click(within(section).getByRole("button", { name: t.enquiry.submit }));
+    expect(within(section).getByText(t.enquiry.privacyRequired)).toBeInTheDocument();
+    expect(calls.some((c) => c.url.includes("enquiries"))).toBe(false);
+    await user.type(within(section).getByLabelText(new RegExp(t.enquiry.name)), "Maria Petrova");
+    await user.type(within(section).getByLabelText(new RegExp(t.enquiry.email)), "maria@example.com");
+    await user.type(within(section).getByLabelText(new RegExp(t.enquiry.company)), "Example Ltd");
+    await user.click(within(section).getByTestId("consult-privacy"));
+    expect(within(section).getByTestId("consult-marketing")).not.toBeChecked();
+    await user.click(within(section).getByRole("button", { name: t.enquiry.submit }));
+    await waitFor(() => expect(within(section).getByRole("status")).toHaveTextContent("ABC123"));
+    const sent = calls.find((c) => c.url.includes("/api/public/solution/enquiries"))!;
+    expect(sent.body).toMatchObject({ code, locale: "en", privacy_acknowledged: true, marketing_consent: false, form_token: "tok" });
+    vi.unstubAllGlobals();
   });
 
   it("ignores an invalid share code", () => {
@@ -186,9 +290,9 @@ describe("agent library browser", () => {
   const cards: LibraryCard[] = LIBRARY.map((entry) => ({
     key: entry.key,
     href: `/en/ai-agents/${entry.key}`,
-    name: team.agents[entry.key].name,
-    short: team.agents[entry.key].short,
-    purpose: team.agents[entry.key].purpose,
+    name: agentText(en, entry.key).name,
+    short: agentText(en, entry.key).short,
+    purpose: agentText(en, entry.key).purpose,
     departments: entry.departments.map((d) => team.departments.options[d].title),
     approval: team.checkpoints[entry.approval].title,
     complexityLabel: team.complexity[entry.complexity],
@@ -210,6 +314,8 @@ describe("agent library browser", () => {
     expect(visible()).toHaveLength(LIBRARY.length);
     expect(screen.getByRole("link", { name: team.agents.scheduling.name })).toHaveAttribute("href", "/en/ai-agents/scheduling");
     expect(screen.getByTestId("library-count")).toHaveTextContent(`${LIBRARY.length} of ${LIBRARY.length}`);
+    expect(LIBRARY.length).toBe(12);
+    expect(screen.getByRole("link", { name: en.agentLibrary.agents.catalog_assistant.name })).toHaveAttribute("href", "/en/ai-agents/catalog_assistant");
   });
 
   it("filters by risk, integration and text, and resets", async () => {

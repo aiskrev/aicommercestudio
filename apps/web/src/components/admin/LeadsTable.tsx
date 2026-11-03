@@ -17,7 +17,7 @@ import { routes } from "@/lib/routes";
 import { useAdminData } from "@/lib/use-admin-data";
 
 const PAGE_SIZE = 20;
-type FilterKey = "status" | "service" | "inquiry_type" | "locale" | "from" | "to" | "q" | "sort" | "page";
+type FilterKey = "status" | "service" | "inquiry_type" | "locale" | "ams_level" | "ams_readiness" | "from" | "to" | "q" | "sort" | "page";
 
 /** Local calendar date (YYYY-MM-DD) → ISO instant at the start or end of that day in the browser's zone. */
 function dayBoundary(date: string, end: boolean): string {
@@ -36,6 +36,8 @@ export function LeadsTable() {
   const service = searchParams.get("service") ?? "";
   const inquiryType = searchParams.get("inquiry_type") ?? "";
   const leadLocale = searchParams.get("locale") ?? "";
+  const amsLevel = searchParams.get("ams_level") ?? "";
+  const amsReadiness = searchParams.get("ams_readiness") ?? "";
   const from = searchParams.get("from") ?? "";
   const to = searchParams.get("to") ?? "";
   const q = searchParams.get("q") ?? "";
@@ -48,6 +50,8 @@ export function LeadsTable() {
   if (service) query.set("service", service);
   if (inquiryType) query.set("inquiry_type", inquiryType);
   if (leadLocale) query.set("locale", leadLocale);
+  if (amsLevel) query.set("ams_level", amsLevel);
+  if (amsReadiness) query.set("ams_readiness", amsReadiness);
   if (from) query.set("created_from", dayBoundary(from, false));
   if (to) query.set("created_to", dayBoundary(to, true));
   if (q) query.set("q", q);
@@ -160,6 +164,32 @@ export function LeadsTable() {
               </option>
             ))}
           </select>
+          <select
+            aria-label={dict.aiManaged.filterLevel}
+            className="field"
+            value={amsLevel}
+            onChange={(e) => setFilters({ ams_level: e.target.value })}
+          >
+            <option value="">{dict.aiManaged.filterLevel}</option>
+            {Object.entries(dict.aiManaged.levels).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select
+            aria-label={dict.aiManaged.filterReadiness}
+            className="field"
+            value={amsReadiness}
+            onChange={(e) => setFilters({ ams_readiness: e.target.value })}
+          >
+            <option value="">{dict.aiManaged.filterReadiness}</option>
+            {Object.entries(dict.aiManaged.readinessNames).map(([key, label]) => (
+              <option key={key} value={key}>
+                {label}
+              </option>
+            ))}
+          </select>
           <label className="flex items-center gap-2 text-sm text-slate-400">
             <span className="shrink-0">{t.from}</span>
             <input
@@ -242,7 +272,15 @@ export function LeadsTable() {
                         {lead.source === "synthetic_seed" && <span className="ml-2 text-amber-300/80">{t.syntheticTag}</span>}
                       </p>
                     </td>
-                    <td className="px-5 py-4 text-slate-300">{labels.service[lead.service] ?? lead.service}</td>
+                    <td className="px-5 py-4 text-slate-300">
+                      {labels.service[lead.service] ?? lead.service}
+                      {lead.ams_level && (
+                        <span className="mt-1 block text-xs text-slate-400" data-testid="lead-ams-level">
+                          {dict.aiManaged.levels[lead.ams_level]}
+                          {lead.ams_readiness ? ` · ${dict.aiManaged.readinessNames[lead.ams_readiness]}` : ""}
+                        </span>
+                      )}
+                    </td>
                     <td className="px-5 py-4 font-mono text-xs uppercase text-slate-300" title={labels.locale[lead.locale]}>
                       {lead.locale}
                     </td>

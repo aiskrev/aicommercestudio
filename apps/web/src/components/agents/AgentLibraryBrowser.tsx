@@ -3,18 +3,18 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { AGENT_ICONS } from "@/components/tools/team/AgentCard";
+import { LIBRARY_ICONS } from "@/components/tools/team/AgentCard";
 import { fill } from "@/components/tools/team/TeamControls";
 import { Icon } from "@/components/ui/Icon";
 import { Button, cx } from "@/components/ui/primitives";
 import type { agentLibrary } from "@/content/bg/agent-library";
-import { INTEGRATION_CATEGORIES, type IntegrationCategory, type LibraryFilter, type RiskLevel, filterLibrary } from "@/lib/agent-library";
-import { type AgentKey, type Complexity, DEPARTMENTS, type Department } from "@/lib/ai-team";
+import { INTEGRATION_CATEGORIES, type IntegrationCategory, type LibraryFilter, type LibraryKey, type RiskLevel, filterLibrary } from "@/lib/agent-library";
+import { type Complexity, DEPARTMENTS, type Department } from "@/lib/ai-team";
 
 type Content = typeof agentLibrary;
 
 export interface LibraryCard {
-  key: AgentKey;
+  key: LibraryKey;
   href: string;
   name: string;
   short: string;
@@ -111,7 +111,7 @@ export function AgentLibraryBrowser({
                 <article className="card card-interactive relative flex h-full flex-col p-6" data-agent={entry.key}>
                   <div className="flex items-start justify-between gap-3">
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] border border-line-default text-brand" aria-hidden="true">
-                      <Icon name={AGENT_ICONS[entry.key]} className="h-5 w-5" />
+                      <Icon name={LIBRARY_ICONS[entry.key]} className="h-5 w-5" />
                     </span>
                     <span className="flex flex-wrap justify-end gap-1.5">
                       <span className={cx("badge", RISK_BADGE[entry.risk])}>

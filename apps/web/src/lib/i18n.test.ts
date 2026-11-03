@@ -7,6 +7,7 @@ import { en } from "@/i18n/dictionaries/en";
 import { adminLabels } from "@/lib/admin-labels";
 import {
   AI_MANAGED_SERVICE,
+  AI_QUALIFICATION,
   AI_OPTIONS,
   type ContactValues,
   emptyContactValues,
@@ -138,5 +139,29 @@ describe("AI Managed Services form", () => {
     const other = toPayload(aiValues({ service: "seo" }), "tok", "bg") as Record<string, unknown>;
     expect(other.ai_managed).toBeUndefined();
     expect(other.locale).toBe("bg");
+  });
+
+  it("keeps the qualification questions optional, validates their values and maps them to the API fields", () => {
+    // The existing flow: no qualification answers, every one sent as null.
+    expect(validateContact(aiValues(), en.validation, services)).toEqual({});
+    const empty = (toPayload(aiValues(), "tok", "en") as { ai_managed: Record<string, unknown> }).ai_managed;
+    for (const { api } of Object.values(AI_QUALIFICATION)) expect(empty[api], api).toBeNull();
+    const answered = aiValues({ ai_desired_level: "managed", ai_production_status: "production", ai_response_needs: "business_hours" });
+    expect(validateContact(answered, en.validation, services)).toEqual({});
+    expect((toPayload(answered, "tok", "en") as { ai_managed: Record<string, unknown> }).ai_managed).toMatchObject({
+      desired_level: "managed",
+      production_status: "production",
+      response_needs: "business_hours",
+      technical_owner: null,
+    });
+    expect(validateContact(aiValues({ ai_test_environment: "maybe" }), en.validation, services).ai_test_environment).toBe(en.validation.select);
+    // Every option has a label in both languages.
+    for (const dict of [bg, en]) {
+      const q = dict.aiManagedForm.qualification as unknown as Record<string, Record<string, string>>;
+      for (const [field, { options }] of Object.entries(AI_QUALIFICATION)) {
+        const key = `${field.replace(/^ai_/, "").replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())}Options`;
+        for (const option of options) expect(q[key]?.[option], `${key}.${option}`).toBeTruthy();
+      }
+    }
   });
 });

@@ -24,9 +24,16 @@ from app.models import (
     ServiceKey,
     utcnow,
 )
-from app.schemas import LeadCreate, LeadUpdate, QuoteRequestCreate
+from app.schemas import AiManagedDetails, LeadCreate, LeadUpdate, QuoteRequestCreate
+from app.services.ai_managed_qualification import qualify
 
 OPEN_STATUSES = (LeadStatus.NEW, LeadStatus.CONTACTED, LeadStatus.QUALIFIED, LeadStatus.PROPOSAL)
+
+
+def _ai_managed_details(details: AiManagedDetails) -> dict:
+    """Stored AI Managed answers plus the admin triage computed from them (filterable in the admin list)."""
+    answers = details.model_dump(mode="json")
+    return {"kind": "ai_managed", **answers, "qualification": qualify(answers)}
 
 
 def create_lead(
@@ -50,7 +57,7 @@ def create_lead(
         website_url=data.website_url if is_quote else None,
         locale=data.locale.value,
         service_details=(
-            {"kind": "ai_managed", **data.ai_managed.model_dump(mode="json")} if data.ai_managed is not None else None
+            _ai_managed_details(data.ai_managed) if data.ai_managed is not None else None
         ),
         name=data.name,
         company=data.company,
@@ -95,6 +102,8 @@ def create_lead(
 @dataclass(frozen=True)
 class LeadFilters:
     status: LeadStatus | None = None
+    ams_level: str | None = None
+    ams_readiness: str | None = None
     service: ServiceKey | None = None
     inquiry_type: InquiryType | None = None
     locale: LeadLocale | None = None
@@ -127,6 +136,10 @@ def _filtered(filters: LeadFilters) -> Select[tuple[Lead]]:
                 Lead.email.ilike(pattern, escape="\\"),
             )
         )
+    if filters.ams_level:
+        stmt = stmt.where(Lead.service_details["qualification"]["suggested_level"].astext == filters.ams_level)
+    if filters.ams_readiness:
+        stmt = stmt.where(Lead.service_details["qualification"]["readiness"].astext == filters.ams_readiness)
     if filters.created_from:
         stmt = stmt.where(Lead.created_at >= filters.created_from)
     if filters.created_to:
@@ -330,6 +343,7 @@ class RetentionResult:
 
 READINESS_SOURCE = "readiness_assessment"
 TEAM_SOURCE = "team_configurator"
+SOLUTION_SOURCE = "solution_builder"
 ASSESSMENT_SOURCE = "engineering_assessment"
 
 

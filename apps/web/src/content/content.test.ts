@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { getContent } from "@/content";
+import { LEVEL_DIMENSIONS } from "@/content/bg/ai-managed";
 import { locales } from "@/i18n/config";
 
 // Must stay in sync with ServiceKey in apps/api/app/models.py (minus "other").
@@ -85,9 +86,27 @@ describe.each(locales)("content integrity (%s)", (locale) => {
     const offered = JSON.stringify([packages.items, packages.comparison]);
     expect(offered).not.toMatch(/unlimited|неограничен|24\/7|SLA|uptime|€|лв\.|\$\d/i);
     for (const item of packages.items) expect(item.includes.length).toBeGreaterThan(3);
-    expect(packages.items.map((p) => p.key)).toEqual(["monitor", "care", "optimize"]);
+    expect(packages.items.map((p) => p.key)).toEqual(["essential", "managed", "advanced"]);
+    expect(packages.items.map((p) => p.name)).toEqual(["Essential Monitoring & Advisory", "Managed AI Operations", "Advanced AI Reliability & Optimization"]);
+    expect(packages.proposedNote).toBeTruthy();
     expect(packages.noSlaNote).toMatch(/SLA/);
     expect(packages.priceLabel).toBe(locale === "bg" ? "По индивидуална оферта" : "Custom quote");
+  });
+
+  it("AI Managed Services defines every level on every dimension and separates current from planned capability", () => {
+    const { levels, availability, packages } = content.aiManaged;
+    for (const pkg of packages.items) {
+      for (const dimension of LEVEL_DIMENSIONS) {
+        expect(levels.dimensions[dimension], dimension).toBeTruthy();
+        expect(levels.items[pkg.key][dimension].length, `${pkg.key} ${dimension}`).toBeGreaterThan(0);
+      }
+    }
+    expect(availability.current.length).toBeGreaterThan(3);
+    expect(availability.planned.length).toBeGreaterThan(2);
+    // No prices, round-the-clock staffing, service-level or uptime guarantees, live monitoring or named integrations.
+    const text = JSON.stringify([levels, availability]);
+    expect(text).not.toMatch(/unlimited(?! changes)|неограничен(?! обем)|24\/7|SLA|uptime|99[.,]\d|€|лв\.|\$\d|\d+\s?(ч|h|hours|часа|минути|minutes)/i);
+    expect(text).not.toMatch(/Datadog|Grafana|Langfuse|New Relic|PagerDuty/);
   });
 
   it("AI Managed Services explains eight operating areas and presents the portal as planned, without data", () => {

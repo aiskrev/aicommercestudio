@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 
 import { ReportView } from "@/components/tools/assessment/ReportView";
+import { ConsultationForm } from "@/components/tools/ConsultationForm";
 import { ChoiceQuestion, MethodologyNote, ResultBasis, ResultSummary, StepNav, StepProgress, StrengthsGaps, ToolState } from "@/components/tools/ToolUi";
 import { Alert, Badge, Button, ButtonLink, cx } from "@/components/ui/primitives";
 import type { engineeringTool } from "@/content/bg/tool-engineering";
@@ -29,7 +30,6 @@ import {
   toPayload,
 } from "@/lib/assessment-api";
 import type { DomainKey } from "@/lib/domains";
-import { fetchFormToken } from "@/lib/public-api";
 import type { ToolKey } from "@/lib/tools";
 
 type Content = typeof engineeringTool;
@@ -697,165 +697,28 @@ function Consultation({
   contactHref: string;
   privacyHref: string;
 }) {
-  const [open, setOpen] = useState(false);
-  const [values, setValues] = useState({ name: "", email: "", company: "", message: "", privacy: false, marketing: false, website: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [status, setStatus] = useState<{ tone: "error" | "success"; text: string } | null>(null);
-  const [sending, setSending] = useState(false);
-  const [formToken, setFormToken] = useState("");
-
-  useEffect(() => {
-    if (open && !formToken) fetchFormToken().then(setFormToken);
-  }, [open, formToken]);
-
-  async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!token) return;
-    const found: Record<string, string> = {};
-    if (values.name.trim().length < 2) found.name = c.required;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) found.email = c.invalidEmail;
-    if (values.company.trim().length < 2) found.company = c.required;
-    if (!values.privacy) found.privacy = c.privacyRequired;
-    setErrors(found);
-    if (Object.keys(found).length) return;
-    setSending(true);
-    const response = await requestConsultation(
-      token,
-      {
-        name: values.name.trim(),
-        email: values.email.trim(),
-        company: values.company.trim(),
-        message: values.message.trim(),
-        privacy_acknowledged: values.privacy,
-        marketing_consent: values.marketing,
-        website: values.website,
-      },
-      formToken,
-      locale,
-    );
-    setSending(false);
-    fetchFormToken().then(setFormToken);
-    if (response.ok) setStatus({ tone: "success", text: fill(c.sent, { ref: response.reference }) });
-    else setStatus({ tone: "error", text: response.kind === "conflict" ? c.exists : response.kind === "rate_limited" ? c.rateLimited : c.failed });
-  }
-
-  const field = (key: "name" | "email" | "company", label: string, type = "text", autoComplete?: string) => (
-    <div className="grid gap-1.5">
-      <label htmlFor={`consult-${key}`} className="field-label">
-        {label} <span className="field-required" aria-hidden="true">*</span>
-      </label>
-      <input
-        id={`consult-${key}`}
-        type={type}
-        autoComplete={autoComplete}
-        className="field"
-        value={values[key]}
-        aria-invalid={errors[key] ? true : undefined}
-        aria-describedby={errors[key] ? `consult-${key}-error` : undefined}
-        onChange={(e) => setValues((v) => ({ ...v, [key]: e.target.value }))}
-      />
-      {errors[key] && (
-        <p id={`consult-${key}-error`} className="field-error">
-          {errors[key]}
-        </p>
-      )}
-    </div>
-  );
-
   return (
-    <section aria-labelledby="engine-consult-title" className="tool-frame grid gap-4 p-6 sm:p-8 print:hidden" data-testid="engine-consultation">
-      <h2 id="engine-consult-title" className="t-h3-lg">
-        {c.title}
-      </h2>
-      <p className="max-w-2xl text-fg-muted">{c.text}</p>
-      {!token ? (
-        <div className="grid gap-3">
-          <p className="text-sm text-fg-muted">{c.needsSave}</p>
-          <div>
-            <ButtonLink href={contactHref} variant="secondary" icon="arrowRight">
-              {c.contact}
-            </ButtonLink>
+    <ConsultationForm
+      id="engine"
+      content={c}
+      privacyHref={privacyHref}
+      unavailable={
+        token ? undefined : (
+          <div className="grid gap-3">
+            <p className="text-sm text-fg-muted">{c.needsSave}</p>
+            <div>
+              <ButtonLink href={contactHref} variant="secondary" icon="arrowRight">
+                {c.contact}
+              </ButtonLink>
+            </div>
           </div>
-        </div>
-      ) : status?.tone === "success" ? (
-        <Alert tone="success" role="status">
-          {status.text}
-        </Alert>
-      ) : !open ? (
-        <div>
-          <Button icon="arrowRight" onClick={() => setOpen(true)}>
-            {c.open}
-          </Button>
-        </div>
-      ) : (
-        <form onSubmit={submit} noValidate className="grid gap-4" data-testid="engine-consultation-form">
-          {status && (
-            <Alert tone="error" role="alert">
-              {status.text}
-            </Alert>
-          )}
-          <div className="grid gap-4 sm:grid-cols-2">
-            {field("name", c.name, "text", "name")}
-            {field("email", c.email, "email", "email")}
-            {field("company", c.company, "text", "organization")}
-          </div>
-          <div className="grid gap-1.5">
-            <label htmlFor="consult-message" className="field-label">
-              {c.message}
-            </label>
-            <textarea
-              id="consult-message"
-              className="field min-h-24"
-              maxLength={1000}
-              value={values.message}
-              onChange={(e) => setValues((v) => ({ ...v, message: e.target.value }))}
-            />
-          </div>
-          <div className="hidden" aria-hidden="true">
-            <label htmlFor="consult-website">Website</label>
-            <input id="consult-website" tabIndex={-1} autoComplete="off" value={values.website} onChange={(e) => setValues((v) => ({ ...v, website: e.target.value }))} />
-          </div>
-          <div className="grid gap-1.5">
-            <label className="flex cursor-pointer items-start gap-3 text-sm text-fg-secondary">
-              <input
-                type="checkbox"
-                className="checkbox mt-0.5"
-                checked={values.privacy}
-                aria-invalid={errors.privacy ? true : undefined}
-                aria-describedby={errors.privacy ? "consult-privacy-error" : undefined}
-                onChange={(e) => setValues((v) => ({ ...v, privacy: e.target.checked }))}
-                data-testid="consult-privacy"
-              />
-              <span>
-                {c.privacy}{" "}
-                <Link href={privacyHref} className="link">
-                  {c.privacyLink}
-                </Link>
-              </span>
-            </label>
-            {errors.privacy && (
-              <p id="consult-privacy-error" className="field-error">
-                {errors.privacy}
-              </p>
-            )}
-          </div>
-          <label className="flex cursor-pointer items-start gap-3 text-sm text-fg-secondary">
-            <input
-              type="checkbox"
-              className="checkbox mt-0.5"
-              checked={values.marketing}
-              onChange={(e) => setValues((v) => ({ ...v, marketing: e.target.checked }))}
-              data-testid="consult-marketing"
-            />
-            <span>{c.marketing}</span>
-          </label>
-          <div>
-            <Button type="submit" loading={sending} loadingLabel={c.submitting}>
-              {c.submit}
-            </Button>
-          </div>
-        </form>
-      )}
-    </section>
+        )
+      }
+      send={async (input, formToken) => {
+        const response = await requestConsultation(token!, input, formToken, locale);
+        if (response.ok) return response;
+        return { ok: false, message: response.kind === "conflict" ? c.exists : response.kind === "rate_limited" ? c.rateLimited : c.failed };
+      }}
+    />
   );
 }

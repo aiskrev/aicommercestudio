@@ -10,12 +10,12 @@ test("the agent library lists, filters and links every agent in Bulgarian", asyn
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Библиотека с AI агенти");
   await expect(page.getByText("Каталог за планиране.", { exact: false })).toBeVisible();
   const cards = page.getByTestId("library-cards").locator("article");
-  await expect(cards).toHaveCount(10);
+  await expect(cards).toHaveCount(12);
   await page.getByLabel("Риск").selectOption("high");
   await expect(cards).toHaveCount(2);
-  await expect(page.getByTestId("library-count")).toHaveText("2 от 10 агента");
+  await expect(page.getByTestId("library-count")).toHaveText("2 от 12 агента");
   await page.getByRole("button", { name: "Изчисти филтрите" }).click();
-  await expect(cards).toHaveCount(10);
+  await expect(cards).toHaveCount(12);
 
   await page.getByRole("link", { name: "Агент за обработка на документи" }).click();
   await expect(page).toHaveURL(/\/bg\/ai-agenti\/obrabotka-na-dokumenti$/);
@@ -65,7 +65,9 @@ test("the solution builder designs an architecture and a phased plan in English"
   await next();
 
   const diagram = page.getByTestId("solution-diagram");
-  await expect(diagram.locator("[data-layer]")).toHaveCount(7);
+  await expect(diagram.locator("[data-stage]")).toHaveCount(6);
+  await expect(diagram.locator("[data-stage]").first()).toHaveAttribute("data-stage", "trigger");
+  await expect(diagram.locator("[data-approval=before]").first()).toContainText("Human approval");
   await diagram.getByRole("button", { name: "Knowledge index (RAG)" }).click();
   await expect(page.getByRole("region", { name: "Selected component" })).toContainText("Searches approved documents");
   await form.getByRole("button", { name: "Generate the plan" }).click();
@@ -75,7 +77,8 @@ test("the solution builder designs an architecture and a phased plan in English"
   await expect(page.getByTestId("solution-complexity")).toHaveText("Medium");
   await expect(page.getByTestId("solution-roadmap").locator("[data-phase]")).toHaveCount(4);
   await expect(page.getByTestId("solution-integrations")).toContainText("OAuth with a limited scope");
-  await expect(result.getByText("A design tool: the diagram is illustrative.", { exact: false })).toBeVisible();
+  await expect(result.getByText("A design tool: the diagram is a reference architecture, not a running system.", { exact: false })).toBeVisible();
+  await expect(page.getByTestId("solution-approvals").locator("[data-component]")).toHaveCount(2);
   await expect(page.getByRole("button", { name: "Download summary (.txt)" })).toBeVisible();
 });
 
@@ -89,6 +92,71 @@ test("a shared design opens straight on the plan; an invalid code is ignored", a
 
   await page.goto("/en/tools/solution-builder?s=1.nonsense");
   await expect(page.getByTestId("solution-form")).toBeVisible();
+});
+
+test("library-only archetypes have every profile field and open their own workflow in the builder", async ({ page }) => {
+  await page.goto("/en/ai-agents/ecommerce-catalog-assistant");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("E-commerce catalog assistant");
+  for (const id of ["agent-prerequisites", "agent-risks", "agent-approvals"]) {
+    await expect(page.getByTestId(id).getByRole("listitem").first()).toBeVisible();
+  }
+  await expect(page.getByText("Minimum: Approval before external actions")).toBeVisible();
+  await expect(page.getByText("It is not in \"Build your AI team\"", { exact: false })).toBeVisible();
+  await page.locator("header").getByRole("link", { name: "Превключи на български" }).first().click();
+  await expect(page).toHaveURL(/\/bg\/ai-agenti\/produkten-katalog$/);
+  await page.goto("/bg/ai-agenti/izgotvyane-na-oferti");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Асистент за изготвяне на оферти");
+  await page.getByRole("link", { name: "Използвайте в конструктора на решение" }).first().click();
+  await expect(page).toHaveURL(/\/bg\/instrumenti\/ai-reshenie\?w=proposal_drafting$/);
+});
+
+test("incompatible and unsafe compositions are rejected in the builder and by the API", async ({ page, request }) => {
+  await page.goto("/en/tools/solution-builder");
+  const form = page.getByTestId("solution-form");
+  const next = () => form.getByRole("button", { name: "Next" }).click();
+  await form.getByRole("radio", { name: /^Access to knowledge/ }).check();
+  await next();
+  await form.getByRole("radio", { name: /^Answers from internal knowledge/ }).check();
+  await next();
+  await form.getByRole("checkbox", { name: /^Knowledge retrieval \(RAG\)/ }).uncheck();
+  await next();
+  await expect(page.getByTestId("solution-composition-errors")).toContainText("cannot work without");
+  await expect(page.getByRole("heading", { name: "AI capabilities" })).toBeVisible();
+  await form.getByRole("checkbox", { name: /^Knowledge retrieval \(RAG\)/ }).check();
+  await next();
+  await form.getByRole("checkbox", { name: /^Documents and knowledge/ }).uncheck();
+  await next();
+  await expect(page.getByTestId("solution-composition-errors")).toContainText("RAG has nothing to search");
+
+  // The enquiry endpoint applies the same rules: an approval below the floor or regulated data outside the EU/EEA.
+  const meta = { name: "E2E Rules", email: "e2e.rules@example.com", company: "Example Ltd", privacy_acknowledged: true, locale: "en" };
+  const { token } = await (await request.get("/api/public/form-token")).json();
+  await page.waitForTimeout(3500); // the form token is valid only after a human-like pause
+  for (const code of [SUPPORT_CODE.replace(".before_external.", ".none."), "2.fewer_errors.document_intake.125.15.regulated.every_action.on_premise.00"]) {
+    const response = await request.post("/api/public/solution/enquiries", {
+      data: { ...meta, model_version: "2026-11.1", code, form_token: token },
+      headers: { "X-Forwarded-For": `10.96.0.${Math.floor(Math.random() * 200) + 1}` },
+    });
+    expect(response.status(), code).toBe(422);
+    expect((await response.json()).code).toBe("solution_invalid");
+  }
+});
+
+test("a design can be sent with an optional enquiry", async ({ page }) => {
+  test.setTimeout(60_000);
+  await page.goto(`/en/tools/solution-builder?s=${SUPPORT_CODE}`);
+  const section = page.getByTestId("solution-consultation");
+  await section.getByRole("button", { name: "Send an enquiry" }).click();
+  await section.getByLabel(/^Name/).fill("E2E Solution");
+  await section.getByLabel(/^Work email/).fill("e2e.solution@example.com");
+  await section.getByLabel(/^Company/).fill(`E2E Solution ${Date.now()}`);
+  await section.getByTestId("consult-privacy").check();
+  await expect(section.getByTestId("consult-marketing")).not.toBeChecked();
+  await page.waitForTimeout(3500);
+  const response = page.waitForResponse((r) => r.url().endsWith("/api/public/solution/enquiries") && r.request().method() === "POST");
+  await section.getByRole("button", { name: "Send the enquiry" }).click();
+  expect((await response).status()).toBe(201);
+  await expect(section.getByRole("status")).toContainText("Enquiry reference");
 });
 
 test.describe("on a phone", () => {

@@ -1162,6 +1162,47 @@
         }
       }
     },
+    "/api/public/solution/enquiries": {
+      "post": {
+        "tags": [
+          "solution"
+        ],
+        "summary": "Optional enquiry with a solution design attached (creates a lead; marketing consent is separate)",
+        "operationId": "solution_enquiry_api_public_solution_enquiries_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SolutionEnquiryCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SolutionEnquiryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/public/assessments": {
       "get": {
         "tags": [
@@ -1983,6 +2024,49 @@
                 }
               ],
               "title": "Locale"
+            }
+          },
+          {
+            "name": "ams_level",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "essential",
+                    "managed",
+                    "advanced"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ams Level"
+            }
+          },
+          {
+            "name": "ams_readiness",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "ready",
+                    "needs_preparation",
+                    "not_ready",
+                    "unknown"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ams Readiness"
             }
           },
           {
@@ -5119,6 +5203,16 @@
         "type": "object",
         "title": "AgentUpdate"
       },
+      "AiAccessReadiness": {
+        "type": "string",
+        "enum": [
+          "read_access",
+          "needs_approval",
+          "not_possible",
+          "unknown"
+        ],
+        "title": "AiAccessReadiness"
+      },
       "AiAgentsCount": {
         "type": "string",
         "enum": [
@@ -5129,6 +5223,35 @@
           "unknown"
         ],
         "title": "AiAgentsCount"
+      },
+      "AiChangeFrequency": {
+        "type": "string",
+        "enum": [
+          "rarely",
+          "monthly",
+          "weekly",
+          "unknown"
+        ],
+        "title": "AiChangeFrequency"
+      },
+      "AiDataSensitivity": {
+        "type": "string",
+        "enum": [
+          "public_internal",
+          "personal",
+          "special"
+        ],
+        "title": "AiDataSensitivity"
+      },
+      "AiDesiredLevel": {
+        "type": "string",
+        "enum": [
+          "essential",
+          "managed",
+          "advanced",
+          "unsure"
+        ],
+        "title": "AiDesiredLevel"
       },
       "AiHosting": {
         "type": "string",
@@ -5192,6 +5315,86 @@
             "maxLength": 2000,
             "title": "Additional Notes",
             "default": ""
+          },
+          "desired_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiDesiredLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "production_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiProductionStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "technical_owner": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiYesNo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "access_readiness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiAccessReadiness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "test_environment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiTestEnvironment"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data_sensitivity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiDataSensitivity"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "change_frequency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiChangeFrequency"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "response_needs": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiResponseNeeds"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -5205,6 +5408,102 @@
         ],
         "title": "AiManagedDetails",
         "description": "Descriptive information about a client's AI system (AI Managed Services inquiries).\n\nNever credentials, keys, customer records or documents: free text is checked for secrets.\nStored in `leads.service_details` (JSONB, `{\"kind\": \"ai_managed\", ...}`)."
+      },
+      "AiManagedQualificationOut": {
+        "properties": {
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "suggested_level": {
+            "type": "string",
+            "enum": [
+              "essential",
+              "managed",
+              "advanced"
+            ],
+            "title": "Suggested Level"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "readiness": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "needs_preparation",
+              "not_ready",
+              "unknown"
+            ],
+            "title": "Readiness"
+          },
+          "blockers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Blockers"
+          },
+          "desired_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desired Level"
+          },
+          "matches_desired": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Matches Desired"
+          }
+        },
+        "type": "object",
+        "required": [
+          "version",
+          "suggested_level",
+          "points",
+          "reasons",
+          "readiness",
+          "blockers"
+        ],
+        "title": "AiManagedQualificationOut",
+        "description": "Admin-only triage of an AI Managed Services inquiry (app/services/ai_managed_qualification.py)."
+      },
+      "AiProductionStatus": {
+        "type": "string",
+        "enum": [
+          "production",
+          "pilot",
+          "development"
+        ],
+        "title": "AiProductionStatus"
+      },
+      "AiResponseNeeds": {
+        "type": "string",
+        "enum": [
+          "business_hours",
+          "faster",
+          "unsure"
+        ],
+        "title": "AiResponseNeeds"
       },
       "AiSector": {
         "type": "string",
@@ -5247,6 +5546,23 @@
           "other"
         ],
         "title": "AiSystemType"
+      },
+      "AiTestEnvironment": {
+        "type": "string",
+        "enum": [
+          "yes",
+          "no",
+          "unknown"
+        ],
+        "title": "AiTestEnvironment"
+      },
+      "AiYesNo": {
+        "type": "string",
+        "enum": [
+          "yes",
+          "no"
+        ],
+        "title": "AiYesNo"
       },
       "AlternateSlugs": {
         "properties": {
@@ -7956,6 +8272,28 @@
             "format": "date-time",
             "title": "Updated At"
           },
+          "ams_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ams Level"
+          },
+          "ams_readiness": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ams Readiness"
+          },
           "phone": {
             "anyOf": [
               {
@@ -8094,6 +8432,16 @@
               }
             ]
           },
+          "ai_managed_qualification": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiManagedQualificationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "readiness": {
             "anyOf": [
               {
@@ -8108,6 +8456,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/TeamDetailsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "solution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SolutionDetailsOut"
               },
               {
                 "type": "null"
@@ -8301,6 +8659,28 @@
             "type": "string",
             "format": "date-time",
             "title": "Updated At"
+          },
+          "ams_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ams Level"
+          },
+          "ams_readiness": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ams Readiness"
           }
         },
         "type": "object",
@@ -10743,6 +11123,234 @@
           "expires_at"
         ],
         "title": "SessionOut"
+      },
+      "SolutionDetailsOut": {
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Objective"
+          },
+          "workflow": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow"
+          },
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Capabilities",
+            "default": []
+          },
+          "integrations": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Integrations",
+            "default": []
+          },
+          "sensitivity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sensitivity"
+          },
+          "approval": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approval"
+          },
+          "deployment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deployment"
+          },
+          "residency": {
+            "type": "boolean",
+            "title": "Residency",
+            "default": false
+          },
+          "redaction": {
+            "type": "boolean",
+            "title": "Redaction",
+            "default": false
+          },
+          "agents": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Agents",
+            "default": []
+          },
+          "complexity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complexity"
+          },
+          "approval_points": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Approval Points",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_version",
+          "code"
+        ],
+        "title": "SolutionDetailsOut",
+        "description": "The design of a solution-builder enquiry as the admin sees it (enumerated keys; labels client-side)."
+      },
+      "SolutionEnquiryCreate": {
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_.-]+$",
+            "title": "Code"
+          },
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email",
+            "title": "Email"
+          },
+          "company": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Company"
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Message",
+            "default": ""
+          },
+          "privacy_acknowledged": {
+            "type": "boolean",
+            "title": "Privacy Acknowledged"
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "default": false
+          },
+          "website": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Website",
+            "default": ""
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "model_version",
+          "code",
+          "name",
+          "email",
+          "company",
+          "privacy_acknowledged"
+        ],
+        "title": "SolutionEnquiryCreate",
+        "description": "Optional enquiry with a solution design attached. Creates a lead; the plan never needs it."
+      },
+      "SolutionEnquiryOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "received",
+            "title": "Status",
+            "default": "received"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "message"
+        ],
+        "title": "SolutionEnquiryOut"
       },
       "StaffOut": {
         "properties": {
