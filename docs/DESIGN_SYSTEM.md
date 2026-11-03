@@ -1,4 +1,10 @@
-# UI design system v2.1 — "Engineering editorial"
+# UI design system v3 — "Enterprise systems" (on v2.1 "Engineering editorial")
+
+> **v3 (2026-11-03, redesign v4 of the public site):** electric-blue brand with a cyan AI accent,
+> darker navy surfaces, dark-only public pages, a calmer type scale, text-size utilities instead of
+> arbitrary pixel sizes, a feature panel, and a new homepage narrative. Token names, primitives,
+> routes, forms, SEO and the admin behaviour are unchanged. Audit and plan:
+> [REDESIGN_AUDIT_V4.md](REDESIGN_AUDIT_V4.md); details under [Changes in v3](#changes-in-v3).
 
 > **v2.1 (2026-10-27): consolidation, no redesign.** It moves the remaining hard-coded colours to
 > semantic tokens and makes token use enforceable by tests. It also adds a `Tabs` primitive, fixes
@@ -33,12 +39,12 @@ A product-minded AI engineering company, not an "AI agency" template:
 
 | Token (Tailwind name) | Value | Use | Contrast |
 | --- | --- | --- | --- |
-| `surface-deep` | `#05080d` | near-black band (`tone="deep"`) | — |
-| `surface-page` / `ink-950` | `#080f19` | page background | — |
-| `surface-1` | `#0d1724` | cards, raised sections (`tone="raised"`) | — |
-| `surface-2` | `#111c2b` | icon wells, nested panels | — |
-| `surface-3` | `#192a3d` | active states | — |
-| `surface-light` | `#f4f1ea` | warm paper sections (`tone="light"`) | — |
+| `surface-deep` | `#040a13` | near-black band (`tone="deep"`) | — |
+| `surface-page` / `ink-950` | `#06101d` | page background | — |
+| `surface-1` | `#0c1929` | cards, raised sections (`tone="raised"`) | — |
+| `surface-2` | `#101f32` | icon wells, nested panels | — |
+| `surface-3` | `#172a42` | active states | — |
+| `surface-light` | `#f4f1ea` | warm paper (`tone="light"`); **not used on public pages since v3** (kept for compatibility) | — |
 | `surface-light-2` | `#ebe6dc` | nested blocks on paper | — |
 | `surface-paper-card` | `#fbfaf6` | `.card` on paper | — |
 | `fg` | `#f4f7fb` | headings, primary text | ≥ 13:1 |
@@ -46,8 +52,10 @@ A product-minded AI engineering company, not an "AI agency" template:
 | `fg-muted` | `#a9b9c9` | supporting text | 7.3:1 on `surface-3` |
 | `fg-subtle` | `#8798ab` | captions, metadata | 4.9:1 on `surface-3`, 6.5:1 on page |
 | `fg-placeholder` | `#8698ac` | input placeholders | 6.5:1 on page |
-| `brand` / `brand-strong` / `brand-soft` | `#69d9df` / `#45c7ce` / `#a8ebee` | links, accents, primary button; badge text | 8.7:1 on `surface-3` |
-| `brand-2` | `#83a9f9` | AI-specific elements only | 6.3:1 on `surface-3` |
+| `brand` / `brand-strong` / `brand-soft` | `#60a5fa` / `#3b82f6` / `#93c5fd` | links, accents, focus ring, eyebrows, lines; badge text | ≥ 4.5:1 on `surface-3` (asserted by the token test) |
+| `brand-fill` / `on-brand-fill` | `#2563eb` / `#fff` | primary action fill and its text | ≈ 5.2:1 |
+| `brand-2` | `#22d3ee` | AI-specific elements only (cyan) | ≥ 4.5:1 on `surface-3` |
+| `divider` | blue-grey 10 % | section dividers, panel tints | — |
 | `warning` | `#f2c46d` | human approval, alerts | ≥ 8.9:1 |
 | `success` / `danger` | `#5fd4a0` / `#f47a8a` | status, field errors | ≥ 5.5:1 |
 | `ink` / `ink-muted` / `brand-ink` | `#14232d` / `#45606e` / `#0c6670` | text on paper | 14.2 / 5.9 / 5.9:1 (≥ 5.4:1 on `surface-light-2`) |
@@ -55,7 +63,7 @@ A product-minded AI engineering company, not an "AI agency" template:
 | `line-subtle` / `line-default` / `line-strong` | 12 % / 20 % / `#5a6e85` | hairlines, borders, field borders | `line-strong` 3.4:1 on `surface-1` |
 | `line-hover` | `#71859c` | field border on hover | 4.8:1 on `surface-1` (non-text) |
 | `on-brand` | `#06121c` | text on the primary button | 11.3:1 on `brand`, ≥ 10.5:1 on both hover stops |
-| `brand-glow-a` / `brand-glow-b` | `#8fe5ea` / `#93c5fd` | primary-button hover gradient stops | — |
+| `brand-glow-a` / `brand-glow-b` | `#1d4ed8` / `#1e40af` | primary-button hover gradient stops (white text ≥ 6.7:1) | — |
 | `on-success` / `on-warning` / `on-danger` / `on-info` | `#c9f2df` / `#fbe8c2` / `#ffd4da` / `#d2f5f6` | text on status tints (badges, alerts, status chips) | ≥ 11.9:1 on their tint over `surface-1` |
 | `danger-fill` / `danger-fill-hover` / `on-danger-fill` | `#c4384f` / `#b02f45` / `#fff` | destructive button | 5.2:1 / 6.3:1 (was 4.3:1 / 3.5:1); fill 3.7:1 against the page |
 | `surface-paper-field` | `#fff` | fields, badges and secondary buttons on paper | — |
@@ -98,9 +106,9 @@ Fluid sizes are CSS variables on `:root` (`--type-*`), consumed by the `t-*` cla
 
 | Role | Face | Size / weight | Class |
 | --- | --- | --- | --- |
-| Display (hero H1) | Manrope 700 | `--type-display` clamp(2.35 → 4.15 rem), lh 1.02, −0.03em | `t-display` |
-| Page H1 | Manrope 700 | `--type-h1` clamp(2.15 → 3.6 rem) | `t-h1` |
-| Section H2 | Manrope 700 | `--type-h2` clamp(1.8 → 3 rem) | `t-h2` |
+| Display (hero H1) | Manrope 700 | `--type-display` clamp(2.1 → 3.35 rem), lh 1.06, −0.028em | `t-display` |
+| Page H1 | Manrope 700 | `--type-h1` clamp(2 → 3.05 rem) | `t-h1` |
+| Section H2 | Manrope 700 | `--type-h2` clamp(1.7 → 2.55 rem) | `t-h2` |
 | Large H3 / sub-section | Inter 600 | `--type-h3-lg` clamp(1.3 → 1.75 rem) | `t-h3-lg` |
 | H3 | Inter 600 | `--type-h3` 19 px | `t-h3` |
 | Lead | Inter 400 | `--type-lead` clamp(17 → 20 px), lh 1.65 | `t-lead` |
@@ -112,6 +120,9 @@ Fluid sizes are CSS variables on `:root` (`--type-*`), consumed by the `t-*` cla
 * Manrope's Bulgarian localized glyphs (`locl`) are off for every Manrope usage; small headings use
   Inter (better Cyrillic spacing at 16–20 px).
 * Every page heading uses the scale — no one-off `text-3xl font-semibold` headings.
+* Text sizes outside the heading scale are theme utilities (v3): `text-lead-sm` 17 px, `text-body-sm` 15 px,
+  `text-nav` 14.5 px, `text-caption` 13 px, `text-micro` 12 px. Arbitrary `text-[NNpx]` values are not used
+  in public components.
 
 ### Layout and rhythm
 
@@ -170,7 +181,8 @@ Used by `contact/FormField.tsx`, `contact/AiManagedFields.tsx`, `contact/Contact
 
 ### Surfaces (`globals.css`)
 
-`card`, `card-interactive`, `card-accent`, `card-quiet` (hairline only), `panel`, `surface-deep`,
+`card`, `card-interactive`, `card-accent`, `card-quiet` (hairline only), `feature-panel` (v3: the one large
+offering of a section, brand hairline and top tint — never a grid of equal panels), `panel`, `surface-deep`,
 `surface-light` (re-maps headings, `t-*`, cards, badges, fields, buttons and the focus ring to the
 paper palette), `section-alt`, `grid-backdrop`.
 
@@ -285,19 +297,20 @@ size).
 
 ## Homepage composition
 
-`app/[locale]/page.tsx`, content in `content/{bg,en}/home.ts` (EN typed against BG):
+`app/[locale]/page.tsx`, content in `content/{bg,en}/home.ts` (EN typed against BG). Redesign v4:
 
 | # | Section | Tone | Composition |
 | --- | --- | --- | --- |
-| 1 | Hero — engineering and business value (AI · cloud · platforms · commerce), CTAs: **Book a consultation** (contact) and **Assess your AI readiness** (AI Automation Advisor), `SystemMap` | default + grid | asymmetric split |
-| 2 | What we offer — four capability groups (`OfferGroups`: AI, Cloud and data, Platforms and operations, Commerce), each with the problem it solves and links to its domain hubs; "All services" | default, spacious | 2 × 2 cards; the ten hubs, never the individual services |
-| 3 | Which tool first (`ToolsPreview`, the Advisor marked **Start here**) | raised, spacious | product window + live tool cards |
-| 4 | After launch — AI Managed Services (the three packages from `ai-managed.ts`, "by individual quote"; CTAs: the service page and `#ams-inquiry`) | default | text + `card-accent` package list |
-| 5 | Methodology — 5 stages (`ProcessSteps` horizontal) | raised | timeline |
-| 6 | Solution architecture — "AI suggests. People decide." (`HeroWorkflow` + `ControlLanes`) | deep, spacious | statement + diagram split |
-| 7 | Who builds it — founder introduction (`FounderPortrait`, ghost CTA) + `CredibilityStrip` ("Expertise you can check", technologies and practices, no logos or numbers) | default + surface strip | portrait + text split, then the strip |
-| 8 | FAQ | raised | sticky `EditorialSplit` |
-| 9 | Final CTA (`CtaBand emphasis`: contact + Advisor) | — | full-bleed statement |
+| 1 | Hero — engineering and business value, CTAs **Book a consultation** and **Assess your AI readiness**, `SystemMap` (copy unchanged, owner decision D-3) | default + grid | asymmetric split, smaller display type |
+| 2 | Capability narrative (`CapabilityAreas`): AI Business Automation (full-width `feature-panel`), Commerce and Platform Engineering, AI Managed Services — problem, approach, capabilities, kind of result, then the domain hubs (all ten, once) | default | one feature panel + two cards |
+| 3 | The AI Automation Advisor as a product: what you provide / what you get / where a person decides / your data (`dl`), the product window (`ToolsPreview`, Advisor marked **Start here**) and the other live tools as one compact row | raised | facts strip + product window |
+| 4 | AI Managed Services: build / operate / improve / govern contrast, CTAs, the operating lifecycle (`ManagedLifecycle`: six stages linked to the service page, captioned as an illustration), the proposed levels as a compact strip | default | text + diagram split, strip below |
+| 5 | Engineering credibility: "AI suggests. People decide." (`HeroWorkflow` + `ControlLanes`), then `CredibilityStrip` | deep, spacious + strip | statement + diagram |
+| 6 | Delivery model — 5 stages (`ProcessSteps` horizontal) | default | timeline |
+| 7 | Example solution patterns (`SolutionPatterns`): three fictional, labelled reference scenarios, links to scenarios, patterns and workshops | raised | three cards + links |
+| 8 | Founder introduction (unchanged) | default | portrait + text |
+| 9 | FAQ | raised | sticky `EditorialSplit` |
+| 10 | Final CTA (`CtaBand emphasis`) | — | full-bleed statement |
 
 The "What we build" bento and the use-case ledger were removed from the homepage: the capability
 groups replace the bento (they lead to the ten domains instead of six services), and the use cases
@@ -391,3 +404,26 @@ the concept diagram, use cases or FAQ, which catalogue entries do not have.
   * the logo, wordmark and favicon (owner decision);
   * typography scale, spacing, motion tokens, the interaction system and reduced-motion handling;
   * all routes, translations, SEO metadata and the admin, Advisor and Managed Services behaviour.
+
+## Changes in v3
+
+* **Brand colour:** electric blue replaces teal (`brand` `#60a5fa` for text, lines and focus;
+  `brand-fill` `#2563eb` with white text for primary actions). Cyan (`brand-2` `#22d3ee`) marks AI
+  elements. The frozen logo's cyan → blue → violet gradient is unchanged and now matches the palette.
+* **Surfaces:** darker navy page and raised levels. The warm paper tone is no longer used on public
+  pages (owner decision D-2). Its four sections (AI solutions principles, AMS problems, service checks,
+  About values) use the raised tone with dark-palette text.
+* **Type:** smaller display, H1 and H2 scale, so a Bulgarian hero headline fits in about four lines at
+  1440 px. 106 arbitrary `text-[NNpx]` values in 46 public files became theme utilities.
+* **Header:** navigation labels never wrap (the Bulgarian „За кого“ wrapped at 1440 px). Tighter item
+  padding below `xl`.
+* **Footer:** five groups (AI services, e-commerce foundation, resources, company, legal); the tagline
+  uses the type scale.
+* **Homepage:** see Homepage composition. New components `CapabilityAreas`, `ManagedLifecycle`,
+  `SolutionPatterns`; `OfferGroups` retired; `ToolsPreview` gained `compact`.
+* **Admin:** not restyled. Shared primitives make two visible changes there: the primary button is
+  blue with white text, and the page surfaces are slightly darker. Layout, density, tables, filters and
+  workflows are unchanged.
+* **Enforcement:** the token test gained the new pairs (`on-brand-fill` on `brand-fill` and both hover
+  stops, `brand` and `brand-2` on `surface-3`, `brand-fill` and `brand` against the page). The reduced-motion
+  e2e (`motion.spec.ts`) still covers the homepage.
