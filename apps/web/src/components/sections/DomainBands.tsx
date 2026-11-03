@@ -25,7 +25,7 @@ export function DomainBands({ locale, labels }: { locale: Locale; labels: Dictio
           <div key={band}>
             <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-6">
               <h3 className="shrink-0 text-[1.0625rem] font-semibold text-fg">{labels.bands[band].title}</h3>
-              <p className="text-[15px] text-fg-muted">{labels.bands[band].lead}</p>
+              <p className="text-body-sm text-fg-muted">{labels.bands[band].lead}</p>
             </div>
             <ul className="mt-6 grid gap-4 md:grid-cols-2">
               {domains.map((definition) => {
@@ -52,7 +52,7 @@ export function DomainBands({ locale, labels }: { locale: Locale; labels: Dictio
                           <StatusChip status={status} label={labels.status[status]} className="mt-2" />
                         </div>
                       </div>
-                      <p className="mt-4 text-[15px] leading-relaxed text-fg-muted">{domain.summary}</p>
+                      <p className="mt-4 text-body-sm leading-relaxed text-fg-muted">{domain.summary}</p>
                       {services.length > 0 && (
                         <ul className="mt-auto flex flex-wrap gap-x-4 gap-y-1.5 pt-4 text-sm" aria-label={labels.servicesTitle}>
                           {services.map((key) => {

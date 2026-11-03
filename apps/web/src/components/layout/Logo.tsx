@@ -40,7 +40,7 @@ export function Logo({ href, gradientId }: { href: string; gradientId?: string }
       aria-label={`${site.name} — ${getDictionary(splitLocale(href)?.locale ?? defaultLocale).ui.logoHome}`}
     >
       <LogoMark gradientId={gradientId} />
-      <span className="whitespace-nowrap font-display text-[15px] font-semibold tracking-tight text-fg">
+      <span className="whitespace-nowrap font-display text-body-sm font-semibold tracking-tight text-fg">
         A.I. Commerce <span className="logo-gradient-text">Studio</span>
       </span>
     </Link>

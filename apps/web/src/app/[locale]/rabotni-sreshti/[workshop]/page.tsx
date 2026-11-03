@@ -118,7 +118,7 @@ export default async function WorkshopPage({ params }: PageProps<"/[locale]/rabo
               <p className="t-index">
                 {String(index + 1).padStart(2, "0")} · {step.title}
               </p>
-              <p className="mt-2 text-[15px] leading-relaxed text-fg-secondary">{step.text}</p>
+              <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{step.text}</p>
             </li>
           ))}
         </ol>

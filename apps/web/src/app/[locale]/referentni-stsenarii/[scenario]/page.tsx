@@ -150,7 +150,7 @@ export default async function ScenarioPage({ params }: PageProps<"/[locale]/refe
               <p className="t-index">
                 {String(index + 1).padStart(2, "0")} · {phase.title}
               </p>
-              <p className="mt-2 text-[15px] leading-relaxed text-fg-secondary">{phase.text}</p>
+              <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{phase.text}</p>
             </li>
           ))}
         </ol>

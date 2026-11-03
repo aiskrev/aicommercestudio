@@ -36,7 +36,7 @@ export function ServiceCard({
       </Heading>
       <p className="mt-2 leading-relaxed text-fg-muted">{service.summary}</p>
       {showCapabilities && (
-        <ul className={cx("mt-5 grid gap-1.5 border-t border-line-subtle pt-4 text-[14.5px] text-fg-secondary")}>
+        <ul className={cx("mt-5 grid gap-1.5 border-t border-line-subtle pt-4 text-nav text-fg-secondary")}>
           {service.capabilities.slice(0, 3).map((capability) => (
             <li key={capability.title} className="flex items-start gap-2.5">
               <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-[2px] bg-brand" aria-hidden="true" />

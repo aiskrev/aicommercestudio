@@ -82,7 +82,7 @@ export function AgentCard({
       </div>
 
       <h3 className="t-h3 mt-4">{text.name}</h3>
-      <p className="mt-1 text-[15px] leading-relaxed text-fg-muted">{text.short}</p>
+      <p className="mt-1 text-body-sm leading-relaxed text-fg-muted">{text.short}</p>
 
       {reasons.length > 0 && (
         <ul className="mt-3 grid gap-1 text-sm text-brand-soft">

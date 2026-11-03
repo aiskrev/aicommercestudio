@@ -50,7 +50,7 @@ function Block({ title, children, className }: { title: string; children: ReactN
   return (
     <section className={cx("min-w-0 border-t border-line-subtle pt-5", className)}>
       <h2 className="t-label">{title}</h2>
-      <div className="mt-3 text-[15px] leading-relaxed text-fg-secondary">{children}</div>
+      <div className="mt-3 text-body-sm leading-relaxed text-fg-secondary">{children}</div>
     </section>
   );
 }

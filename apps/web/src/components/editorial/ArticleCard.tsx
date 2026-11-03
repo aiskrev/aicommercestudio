@@ -30,7 +30,7 @@ export function ArticleCard({
 }) {
   const Heading = headingLevel === 2 ? "h2" : "h3";
   const meta = (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[12px] text-fg-muted">
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-micro text-fg-muted">
       <span className="text-brand">{getDictionary(locale).ui.articleTypes[article.type]}</span>
       {categoryName && (
         <>
@@ -58,7 +58,7 @@ export function ArticleCard({
         <div className="min-w-0">
           {meta}
           <Heading className="t-h3 mt-2 leading-snug transition-colors group-focus-within:text-brand group-hover:text-brand">{link}</Heading>
-          <p className="mt-1.5 line-clamp-2 text-[15px] leading-relaxed text-fg-muted">{article.description}</p>
+          <p className="mt-1.5 line-clamp-2 text-body-sm leading-relaxed text-fg-muted">{article.description}</p>
         </div>
         <Icon name="arrowRight" className="arrow-nudge hidden h-5 w-5 text-brand sm:block" />
       </article>
@@ -74,9 +74,9 @@ export function ArticleCard({
     >
       {meta}
       <Heading className={cx("mt-4 leading-snug", variant === "featured" ? "t-h3-lg" : "t-h3 text-xl")}>{link}</Heading>
-      <p className={cx("mt-3 flex-1 leading-relaxed text-fg-muted", variant === "featured" && "text-[17px]")}>{article.description}</p>
+      <p className={cx("mt-3 flex-1 leading-relaxed text-fg-muted", variant === "featured" && "text-lead-sm")}>{article.description}</p>
       {variant === "featured" && article.keyPoints.length > 0 && (
-        <ul className="mt-5 grid gap-1.5 border-t border-line-subtle pt-5 text-[15px] text-fg-secondary">
+        <ul className="mt-5 grid gap-1.5 border-t border-line-subtle pt-5 text-body-sm text-fg-secondary">
           {article.keyPoints.slice(0, 3).map((point) => (
             <li key={point} className="flex gap-2">
               <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-[2px] bg-brand" aria-hidden="true" />

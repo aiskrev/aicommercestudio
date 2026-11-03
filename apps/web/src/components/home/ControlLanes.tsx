@@ -21,11 +21,11 @@ export function ControlLanes({ lanes }: { lanes: { tone: Tone; title: string; it
         const t = TONE[lane.tone];
         return (
           <li key={lane.title} className={cx("rounded-[var(--radius-lg)] border bg-surface-1 p-5", t.border)}>
-            <h3 className="flex items-center gap-2.5 text-[15px] font-semibold text-fg">
+            <h3 className="flex items-center gap-2.5 text-body-sm font-semibold text-fg">
               <Icon name={t.glyph} className={cx("h-4.5 w-4.5", t.icon)} />
               {lane.title}
             </h3>
-            <ul className="mt-3 grid gap-1.5 text-[15px] text-fg-secondary">
+            <ul className="mt-3 grid gap-1.5 text-body-sm text-fg-secondary">
               {lane.items.map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span className={cx("mt-2 h-1.5 w-1.5 shrink-0 rounded-full", t.dot)} aria-hidden="true" />

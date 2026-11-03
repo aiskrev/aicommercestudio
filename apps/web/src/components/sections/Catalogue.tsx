@@ -41,7 +41,7 @@ export function OfferingCard({
           {entry.shortName ?? entry.name}
         </Link>
       </Heading>
-      <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{entry.summary}</p>
+      <p className="mt-2 text-body-sm leading-relaxed text-fg-muted">{entry.summary}</p>
       {(domainName || entry.duration) && (
         <dl className="mt-auto grid gap-1 pt-5 text-sm">
           {domainName && (

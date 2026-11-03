@@ -37,7 +37,7 @@ export function PillGroup<T extends string>({
           <label
             key={option.value}
             className={cx(
-              "relative inline-flex min-h-11 cursor-pointer items-center rounded-full border px-4 py-2 text-[15px] transition-colors",
+              "relative inline-flex min-h-11 cursor-pointer items-center rounded-full border px-4 py-2 text-body-sm transition-colors",
               "has-[:checked]:border-brand has-[:checked]:bg-brand/[0.12] has-[:checked]:text-fg",
               "border-line-default bg-surface-page text-fg-secondary hover:border-line-strong",
               error && value === undefined && "border-danger/60",

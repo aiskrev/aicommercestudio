@@ -232,7 +232,7 @@ export function TeamArchitecture({
           <>
             <p className="t-label">{t.lanes[selectedNode.lane]}</p>
             <h3 className="t-h3 mt-1">{describe(selectedNode).label}</h3>
-            {describe(selectedNode).text && <p className="mt-1.5 text-[15px] leading-relaxed text-fg-muted">{describe(selectedNode).text}</p>}
+            {describe(selectedNode).text && <p className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{describe(selectedNode).text}</p>}
             <p className="mt-4 text-sm font-semibold text-fg">{t.connections}</p>
             <ul className="mt-2 grid gap-1 text-sm text-fg-secondary">
               {connections(selectedNode.id).map((line) => (

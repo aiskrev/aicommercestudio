@@ -64,7 +64,7 @@ export default async function ScenariosPage({ params }: PageProps<"/[locale]/ref
                             {s.title}
                           </Link>
                         </h3>
-                        <p className="mt-1.5 text-[15px] leading-relaxed text-fg-muted">{s.summary}</p>
+                        <p className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{s.summary}</p>
                         <p className="mt-auto pt-5 text-sm font-medium text-brand">{t.open}</p>
                       </article>
                     </li>

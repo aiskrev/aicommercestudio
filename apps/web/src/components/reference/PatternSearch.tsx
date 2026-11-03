@@ -50,7 +50,7 @@ export function PatternSearch({ cards, labels }: {
                       {card.title}
                     </Link>
                   </h2>
-                  <p className="mt-1.5 text-[15px] leading-relaxed text-fg-muted">{card.summary}</p>
+                  <p className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{card.summary}</p>
                   <p className="mt-auto pt-5 text-sm font-medium text-brand">{labels.open}</p>
                 </article>
               </li>

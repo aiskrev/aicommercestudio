@@ -30,12 +30,12 @@ export function ProcessTimeline({
     >
       {steps.map((step, index) => (
         <li key={step.title} className="relative flex gap-5 lg:block">
-          <span className="relative z-10 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-brand/45 bg-surface-page font-mono text-[13px] font-medium text-brand shadow-[0_0_0_6px_var(--surface-page)]">
+          <span className="relative z-10 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-brand/45 bg-surface-page font-mono text-caption font-medium text-brand shadow-[0_0_0_6px_var(--surface-page)]">
             {String(index + 1).padStart(2, "0")}
           </span>
           <div className="pt-1.5 lg:mt-5 lg:pt-0">
             <h3 className="t-h3">{step.title}</h3>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-fg-muted">{step.description}</p>
+            <p className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{step.description}</p>
           </div>
         </li>
       ))}

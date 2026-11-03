@@ -54,7 +54,7 @@ function Node({ step, index, accent = false, className }: { step: Step; index: n
         className,
       )}
     >
-      <p className="font-mono text-[11px] text-fg-subtle">{String(index + 1).padStart(2, "0")}</p>
+      <p className="font-mono text-micro text-fg-subtle">{String(index + 1).padStart(2, "0")}</p>
       <p className="mt-0.5 text-sm font-semibold leading-snug text-fg">{step.title}</p>
     </div>
   );

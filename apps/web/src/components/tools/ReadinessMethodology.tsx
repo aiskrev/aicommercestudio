@@ -20,7 +20,7 @@ export function ReadinessMethodology({ content }: { content: typeof readinessToo
         <div className="grid content-start gap-4 leading-relaxed text-fg-secondary">
           <p>{m.scale}</p>
           <p>{m.weights}</p>
-          <table className="w-full text-left text-[15px]">
+          <table className="w-full text-left text-body-sm">
             <tbody>
               {READINESS_DIMENSIONS.map((dimension) => (
                 <tr key={dimension} className="border-b border-line-subtle">
@@ -46,7 +46,7 @@ export function ReadinessMethodology({ content }: { content: typeof readinessToo
                       {page.rangeLabel.replace("{min}", String(min)).replace("{max}", String(max))}
                     </span>
                   </dt>
-                  <dd className="mt-1.5 text-[15px] leading-relaxed text-fg-muted">{content.result.bands[band].description}</dd>
+                  <dd className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{content.result.bands[band].description}</dd>
                 </div>
               ))}
             </dl>

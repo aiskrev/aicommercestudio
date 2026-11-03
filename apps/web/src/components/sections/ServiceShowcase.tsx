@@ -62,7 +62,7 @@ export function ServiceShowcase({
                       </Link>
                     </Heading>
                     <p className="mt-2 leading-relaxed text-fg-muted">{service.summary}</p>
-                    <ul className="mt-5 grid gap-1.5 text-[14.5px] text-fg-secondary">
+                    <ul className="mt-5 grid gap-1.5 text-nav text-fg-secondary">
                       {service.capabilities.slice(0, 3).map((capability) => (
                         <li key={capability.title} className="flex items-start gap-2.5">
                           <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-[2px] bg-brand" aria-hidden="true" />
@@ -98,7 +98,7 @@ export function ServiceShowcase({
                         {service.shortTitle}
                       </Link>
                     </Heading>
-                    <p className="mt-1 text-[15px] leading-relaxed text-fg-muted">{service.summary}</p>
+                    <p className="mt-1 text-body-sm leading-relaxed text-fg-muted">{service.summary}</p>
                   </div>
                   <Icon name="arrowRight" className="arrow-nudge mt-1 h-5 w-5 text-fg-subtle group-hover:text-brand group-focus-within:text-brand" />
                 </article>
@@ -115,7 +115,7 @@ function GroupLabel({ heading: Tag, copy }: { heading: "h2" | "h3"; copy: GroupC
   return (
     <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-6">
       <Tag className="shrink-0 whitespace-nowrap text-[1.0625rem] font-semibold text-fg">{copy.title}</Tag>
-      <p className="text-[15px] text-fg-muted">{copy.lead}</p>
+      <p className="text-body-sm text-fg-muted">{copy.lead}</p>
     </div>
   );
 }

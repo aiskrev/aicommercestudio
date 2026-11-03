@@ -25,8 +25,8 @@ export function CredibilityStrip({
             <li key={group.title} className="flex gap-3">
               <Icon name={group.icon} className="mt-0.5 h-5 w-5 shrink-0 text-brand" />
               <span className="min-w-0">
-                <span className="block text-[14.5px] font-semibold leading-snug text-fg">{group.title}</span>
-                <span className="mt-0.5 block text-[13px] leading-snug text-fg-muted">{group.items.join(" · ")}</span>
+                <span className="block text-nav font-semibold leading-snug text-fg">{group.title}</span>
+                <span className="mt-0.5 block text-caption leading-snug text-fg-muted">{group.items.join(" · ")}</span>
               </span>
             </li>
           ))}

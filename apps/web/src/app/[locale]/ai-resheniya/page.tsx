@@ -58,7 +58,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
         <AdvisorPromo promo={advisor.promo} href={href(routes.advisor)} className="mt-10" />
       </Section>
 
-      <Section labelledBy="ai-principles" tone="light">
+      <Section labelledBy="ai-principles" tone="raised">
         <SectionHeading id="ai-principles" title={page.principlesTitle} />
         <FeatureMatrix items={page.principles} className="mt-10" />
       </Section>
@@ -114,7 +114,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
                 </span>
                 <span className="min-w-0">
                   <span className="t-h3 block transition-colors group-hover:text-brand">{service.shortTitle}</span>
-                  <span className="mt-1 block text-[15px] leading-relaxed text-fg-muted">{service.summary}</span>
+                  <span className="mt-1 block text-body-sm leading-relaxed text-fg-muted">{service.summary}</span>
                 </span>
                 <Icon name="arrowRight" className="arrow-nudge mt-1 h-5 w-5 text-fg-subtle group-hover:text-brand group-focus-visible:text-brand" />
               </Link>

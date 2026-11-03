@@ -86,11 +86,11 @@ function FooterColumn({
 }) {
   return (
     <div>
-      <h2 className="text-[13px] font-semibold text-fg-muted">{title}</h2>
+      <h2 className="text-caption font-semibold text-fg-muted">{title}</h2>
       <ul className={`mt-4 grid gap-x-8 gap-y-2.5 ${columns === 2 ? "sm:grid-cols-2" : ""}`}>
         {links.map((link) => (
           <li key={link.href}>
-            <Link href={link.href} className="text-[15px] text-fg-secondary transition-colors hover:text-brand">
+            <Link href={link.href} className="text-body-sm text-fg-secondary transition-colors hover:text-brand">
               {link.label}
             </Link>
           </li>

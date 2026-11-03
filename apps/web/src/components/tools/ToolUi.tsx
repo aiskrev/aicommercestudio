@@ -75,7 +75,7 @@ export function ChoiceQuestion({
               key={option}
               htmlFor={optionId}
               className={cx(
-                "flex min-h-11 cursor-pointer items-start gap-3 rounded-[var(--radius-md)] border px-3.5 py-3 text-[15px] leading-snug transition-colors",
+                "flex min-h-11 cursor-pointer items-start gap-3 rounded-[var(--radius-md)] border px-3.5 py-3 text-body-sm leading-snug transition-colors",
                 value === index
                   ? "border-brand bg-brand/[0.08] text-fg"
                   : "border-line-default bg-surface-page text-fg-secondary hover:border-line-strong",
@@ -338,7 +338,7 @@ export function StrengthsGaps({
     <div className="grid gap-4 md:grid-cols-2">
       {columns.map((column) => (
         <section key={column.id} aria-labelledby={column.id} className="card p-5 sm:p-6">
-          <h2 id={column.id} className="flex items-center gap-2 text-[15px] font-semibold text-fg">
+          <h2 id={column.id} className="flex items-center gap-2 text-body-sm font-semibold text-fg">
             <Icon
               name={column.tone === "good" ? "check" : "alert"}
               className={cx("h-4.5 w-4.5", column.tone === "good" ? "text-success" : "text-warning")}
@@ -377,7 +377,7 @@ export function InsightList({ id, title, items }: { id: string; title: string; i
         {items.map((item) => (
           <li key={item.key} className="card p-5">
             <h3 className="t-h3">{item.title}</h3>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-fg-muted">{item.text}</p>
+            <p className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{item.text}</p>
           </li>
         ))}
       </ul>
@@ -406,7 +406,7 @@ export function PhasedRoadmap({
             <p className="t-index">
               {String(index + 1).padStart(2, "0")} · {phase.label}
             </p>
-            <ul className="mt-3 grid gap-2 text-[15px] leading-relaxed text-fg-secondary">
+            <ul className="mt-3 grid gap-2 text-body-sm leading-relaxed text-fg-secondary">
               {phase.items.map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-[2px] bg-brand" aria-hidden="true" />
@@ -456,7 +456,7 @@ export function MethodologyNote({ title, paragraphs }: { title: string; paragrap
         {title}
         <Icon name="chevronDown" className="h-4 w-4 shrink-0 text-brand transition-transform group-open:rotate-180" />
       </summary>
-      <div className="mt-3 grid gap-2.5 text-[15px] leading-relaxed text-fg-muted">
+      <div className="mt-3 grid gap-2.5 text-body-sm leading-relaxed text-fg-muted">
         {paragraphs.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}

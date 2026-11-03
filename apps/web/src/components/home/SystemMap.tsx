@@ -48,8 +48,8 @@ export function SystemMap({ content }: { content: SystemMapContent }) {
                 <Icon name="users" className="h-4 w-4" />
               </span>
               <span className="min-w-0">
-                <span className="block text-[14px] font-semibold text-warning">{content.gate.title}</span>
-                <span className="mt-0.5 block text-[13px] leading-snug text-fg-secondary">{content.gate.description}</span>
+                <span className="block text-sm font-semibold text-warning">{content.gate.title}</span>
+                <span className="mt-0.5 block text-caption leading-snug text-fg-secondary">{content.gate.description}</span>
               </span>
             </div>
             <Connector />
@@ -77,7 +77,7 @@ export function SystemMap({ content }: { content: SystemMapContent }) {
         </span>
       </div>
 
-      <p className="mt-4 flex items-start gap-2.5 rounded-[var(--radius-md)] border border-success/30 bg-success/[0.06] px-3.5 py-2.5 text-[13px] leading-snug text-fg-secondary">
+      <p className="mt-4 flex items-start gap-2.5 rounded-[var(--radius-md)] border border-success/30 bg-success/[0.06] px-3.5 py-2.5 text-caption leading-snug text-fg-secondary">
         <Icon name="activity" className="mt-0.5 h-4 w-4 shrink-0 text-success" />
         {content.operations}
       </p>
@@ -109,13 +109,13 @@ function Layer({
         <span className="t-index text-fg-subtle" aria-hidden="true">
           {String(index).padStart(2, "0")}
         </span>
-        <span className="text-[14px] font-semibold text-fg">{title}</span>
+        <span className="text-sm font-semibold text-fg">{title}</span>
       </p>
       <ul className="mt-2 flex flex-wrap gap-1.5">
         {items.map((item) => (
           <li
             key={item}
-            className="inline-flex items-center gap-1.5 rounded-[6px] border border-line-subtle bg-surface-page px-2 py-1 text-[12.5px] leading-none text-fg-secondary"
+            className="inline-flex items-center gap-1.5 rounded-[6px] border border-line-subtle bg-surface-page px-2 py-1 text-micro leading-none text-fg-secondary"
           >
             <span className={cx("h-1.5 w-1.5 shrink-0 rounded-full", dot)} aria-hidden="true" />
             {item}

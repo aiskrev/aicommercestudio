@@ -115,7 +115,7 @@ export function TeamResult({
                 </span>
                 <div className="min-w-0">
                   <h3 className="t-h3">{name(agent)}</h3>
-                  <p className="mt-1 text-[15px] leading-relaxed text-fg-muted">{content.agents[agent].purpose}</p>
+                  <p className="mt-1 text-body-sm leading-relaxed text-fg-muted">{content.agents[agent].purpose}</p>
                 </div>
               </div>
               <dl className="mt-4 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
@@ -272,7 +272,7 @@ export function TeamResult({
               <p className="t-index">
                 {String(index + 1).padStart(2, "0")} · {r.phases[phase.key].title}
               </p>
-              <p className="mt-2 text-[15px] leading-relaxed text-fg-secondary">{r.phases[phase.key].goal}</p>
+              <p className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{r.phases[phase.key].goal}</p>
               <ul className="mt-3 grid gap-1.5 text-sm">
                 {phase.agents.map((agent) => (
                   <li key={agent} className="flex items-start gap-2 text-fg">

@@ -577,7 +577,7 @@ export function ContactForm({
 /** Numbered divider that groups related fields (visual only; fields keep their own labels). */
 function FormGroup({ index, label }: { index: number; label: string }) {
   return (
-    <p className="-mb-1 flex items-center gap-3 text-[13px] font-semibold text-fg-muted" aria-hidden="true">
+    <p className="-mb-1 flex items-center gap-3 text-caption font-semibold text-fg-muted" aria-hidden="true">
       <span className="font-mono text-brand">{String(index).padStart(2, "0")}</span>
       {label}
       <span className="h-px flex-1 bg-line-subtle" />

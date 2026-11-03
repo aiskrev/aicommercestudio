@@ -85,11 +85,11 @@ export function OfferingPage({ entry, locale, dict }: { entry: CatalogueDetail; 
           >
             <div className="bg-surface-1 p-5">
               <dt className="t-label">{labels.formatTitle}</dt>
-              <dd className="mt-2 text-[15px] text-fg-secondary">{labels.types[entry.offeringType]}</dd>
+              <dd className="mt-2 text-body-sm text-fg-secondary">{labels.types[entry.offeringType]}</dd>
             </div>
             <div className="bg-surface-1 p-5">
               <dt className="t-label">{labels.domainLabel}</dt>
-              <dd className="mt-2 text-[15px]">
+              <dd className="mt-2 text-body-sm">
                 <Link href={domainHref} className="link font-semibold">
                   {domain.name}
                 </Link>
@@ -97,7 +97,7 @@ export function OfferingPage({ entry, locale, dict }: { entry: CatalogueDetail; 
             </div>
             <div className="bg-surface-1 p-5">
               <dt className="t-label">{entry.duration ? labels.durationLabel : dict.service.firstStepLabel}</dt>
-              <dd className="mt-2 text-[15px] text-fg-secondary">
+              <dd className="mt-2 text-body-sm text-fg-secondary">
                 {entry.duration ? formatDuration(entry.duration, locale) : dict.service.firstStep}
               </dd>
             </div>
@@ -107,7 +107,7 @@ export function OfferingPage({ entry, locale, dict }: { entry: CatalogueDetail; 
 
       {/* ------------------------------------------------------------ body + capabilities */}
       <Section labelledBy={entry.capabilities.length > 0 ? "offering-capabilities-title" : undefined}>
-        <div className="max-w-3xl space-y-4 text-[17px] leading-relaxed text-fg-secondary">
+        <div className="max-w-3xl space-y-4 text-lead-sm leading-relaxed text-fg-secondary">
           {paragraphs.map((text) => (
             <p key={text}>{text}</p>
           ))}

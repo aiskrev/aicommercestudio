@@ -1,21 +1,16 @@
 @import "tailwindcss";
 
 /* =============================================================================
-   A.I. Commerce Studio — design system v2 ("Engineering editorial")
+   A.I. Commerce Studio — design system v3 ("Enterprise systems", on v2 "Engineering editorial")
    Full reference: docs/DESIGN_SYSTEM.md
 
-   Surfaces: deep navy page, near-black "deep" band, raised navy panels, warm off-white paper.
-   One controlled accent (teal/cyan), one secondary (blue) for diagrams. No glow blobs, no neon.
+   Surfaces: very dark navy page, near-black "deep" band, two raised navy levels. Public pages use
+   dark surfaces only (the warm paper surface is kept for compatibility, not used on public pages).
+   Accents: electric blue (`brand`: text, lines, focus; `brand-fill`: primary actions), cyan
+   (`brand-2`) for AI elements, amber for human approval, green for outcomes. No glow blobs, no neon.
 
-   Contrast (WCAG 2.2), text on the darkest surface it is used on:
-     fg            #f4f7fb  ≥ 13:1      fg-secondary #d3dee8 ≥ 10:1
-     fg-muted      #a9b9c9  7.3:1 (s3)  fg-subtle    #8798ab  4.9:1 (s3), 6.5:1 (page)
-     brand         #69d9df  8.7:1 (s3)  brand-2      #83a9f9  6.3:1 (s3)
-     paper #f4f1ea: ink #14232d 14.2:1, ink-muted #45606e 5.9:1, brand-ink #0c6670 5.9:1
-     paper-2 #ebe6dc: ink-muted 5.4:1, brand-ink 5.4:1
-     primary button: #06121c on #69d9df = 11.3:1
-   Non-text (≥ 3:1): field border line-strong #5a6e85 3.4:1 on surface-1, ink-line #7a8a93 3.2:1
-   on paper; focus ring brand 11.5:1 on page, brand-ink 5.9:1 on paper.
+   Contrast (WCAG 2.2) is asserted by components/ui/design-tokens.test.ts and listed in
+   docs/DESIGN_SYSTEM.md.
 
    Compatibility: Tailwind's `slate`, `cyan`, `blue` and `violet` scales are re-tuned below to the
    brand neutrals and accents, so existing utility classes follow the identity. New code uses the
@@ -24,7 +19,7 @@
 
 @theme {
   /* Surfaces (dark) — legacy aliases kept for existing utilities */
-  --color-ink-950: #080f19;
+  --color-ink-950: #06101d;
   --color-ink-900: #0b1520;
   --color-ink-850: #0e1926;
   --color-ink-800: #111c2b;
@@ -33,11 +28,11 @@
   --color-line: #5a6e85;
 
   /* Semantic colour */
-  --color-surface-deep: #05080d;
-  --color-surface-page: #080f19;
-  --color-surface-1: #0d1724;
-  --color-surface-2: #111c2b;
-  --color-surface-3: #192a3d;
+  --color-surface-deep: #040a13;
+  --color-surface-page: #06101d;
+  --color-surface-1: #0c1929;
+  --color-surface-2: #101f32;
+  --color-surface-3: #172a42;
   --color-surface-light: #f4f1ea;
   --color-surface-light-2: #ebe6dc;
   --color-surface-paper-card: #fbfaf6;
@@ -46,10 +41,10 @@
   --color-fg-muted: #a9b9c9;
   --color-fg-subtle: #8798ab;
   --color-fg-placeholder: #8698ac;
-  --color-brand: #69d9df;
-  --color-brand-strong: #45c7ce;
-  --color-brand-soft: #a8ebee;
-  --color-brand-2: #83a9f9;
+  --color-brand: #60a5fa;
+  --color-brand-strong: #3b82f6;
+  --color-brand-soft: #93c5fd;
+  --color-brand-2: #22d3ee;
   --color-brand-ink: #0c6670;
   --color-ink: #14232d;
   --color-ink-muted: #45606e;
@@ -63,15 +58,20 @@
   /* Text and fills on status tints, and other component colours that used to be hard-coded in the
      component layer (v2.1). Contrast is listed in docs/DESIGN_SYSTEM.md. */
   --color-on-brand: #06121c;
+  /* Primary action fill (buttons): deeper blue so white text passes AA at every state. */
+  --color-brand-fill: #2563eb;
+  --color-on-brand-fill: #ffffff;
+  /* Section dividers and the faint top tint of feature panels. */
+  --color-divider: rgb(148 178 214 / 0.1);
   --color-on-success: #c9f2df;
   --color-on-warning: #fbe8c2;
   --color-on-danger: #ffd4da;
-  --color-on-info: #d2f5f6;
+  --color-on-info: #dbeafe;
   --color-danger-fill: #c4384f;
   --color-danger-fill-hover: #b02f45;
   --color-on-danger-fill: #ffffff;
-  --color-brand-glow-a: #8fe5ea;
-  --color-brand-glow-b: #93c5fd;
+  --color-brand-glow-a: #1d4ed8;
+  --color-brand-glow-b: #1e40af;
   --color-line-hover: #71859c;
   --color-surface-paper-field: #ffffff;
   --color-window-chrome: #3c4d60;
@@ -112,6 +112,19 @@
   --font-display: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono-face), ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
 
+  /* Text sizes outside the heading scale (utilities text-body-sm, text-nav, text-caption, text-micro,
+     text-lead-sm) replace the former arbitrary text-[NNpx] values. */
+  --text-lead-sm: 1.0625rem;
+  --text-lead-sm--line-height: 1.6;
+  --text-body-sm: 0.9375rem;
+  --text-body-sm--line-height: 1.6;
+  --text-nav: 0.90625rem;
+  --text-nav--line-height: 1.4;
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.5;
+  --text-micro: 0.75rem;
+  --text-micro--line-height: 1.45;
+
   /* Layout: containers (max-w-*) and fluid section rhythm (py-section*, gap-section*) */
   --container-reading: 44rem;
   --container-narrow: 60rem;
@@ -130,7 +143,7 @@
 
   /* Elevation: depth from borders first, shadows are quiet. */
   --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 30px 60px -30px rgb(0 0 0 / 0.65);
-  --shadow-lift: 0 18px 40px -26px rgb(0 0 0 / 0.85), 0 10px 30px -24px rgb(105 217 223 / 0.3);
+  --shadow-lift: 0 18px 40px -26px rgb(0 0 0 / 0.85), 0 10px 30px -24px rgb(96 165 250 / 0.28);
   --shadow-paper: 0 1px 2px rgb(20 35 45 / 0.06), 0 14px 32px -22px rgb(20 35 45 / 0.28);
 
   /* Motion */
@@ -185,9 +198,9 @@
     --container: 76rem;
 
     /* Type scale (fluid, 360 → 1440 px). Display + section headings: Manrope; the rest: Inter. */
-    --type-display: clamp(2.35rem, 1.5rem + 3.1vw, 4.15rem);
-    --type-h1: clamp(2.15rem, 1.6rem + 2.4vw, 3.6rem);
-    --type-h2: clamp(1.8rem, 1.35rem + 1.8vw, 3rem);
+    --type-display: clamp(2.1rem, 1.5rem + 2.4vw, 3.35rem);
+    --type-h1: clamp(2rem, 1.55rem + 1.9vw, 3.05rem);
+    --type-h2: clamp(1.7rem, 1.35rem + 1.45vw, 2.55rem);
     --type-h3-lg: clamp(1.3rem, 1.15rem + 0.6vw, 1.75rem);
     --type-h3: 1.1875rem;
     --type-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
@@ -263,9 +276,9 @@
   .t-display {
     font-family: var(--font-display);
     font-size: var(--type-display);
-    line-height: 1.02;
+    line-height: 1.06;
     font-weight: 700;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.028em;
     color: var(--text-primary);
     font-feature-settings: "locl" 0;
   }
@@ -438,15 +451,15 @@
   @media (max-width: 30rem) {
     .btn-md, .btn-lg { white-space: normal; text-align: center; }
   }
-  /* Primary: brand cyan at rest; on hover the fill interpolates towards the logo's light azure
-     (@property --btn-a/--btn-b). Text #06121c stays ≥ 10:1 on every stop. */
+  /* Primary: electric blue fill with white text; on hover the fill deepens along a gradient
+     (@property --btn-a/--btn-b). White stays ≥ 5:1 on every stop. */
   .btn-primary {
-    --btn-a: var(--color-brand);
-    --btn-b: var(--color-brand);
-    color: var(--color-on-brand);
-    background-color: var(--color-brand);
+    --btn-a: var(--color-brand-fill);
+    --btn-b: var(--color-brand-fill);
+    color: var(--color-on-brand-fill);
+    background-color: var(--color-brand-fill);
     background-image: linear-gradient(100deg, var(--btn-a), var(--btn-b));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 8px 24px -14px color-mix(in oklab, var(--color-brand) 80%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.18), 0 8px 24px -14px color-mix(in oklab, var(--color-brand-fill) 80%, transparent);
   }
   .btn-secondary {
     color: var(--text-primary);
@@ -467,9 +480,9 @@
       --btn-a: var(--color-brand-glow-a);
       --btn-b: var(--color-brand-glow-b);
       box-shadow:
-        inset 0 1px 0 rgb(255 255 255 / 0.45),
-        0 12px 28px -14px rgb(96 165 250 / 0.75),
-        0 0 0 1px rgb(147 197 253 / 0.45);
+        inset 0 1px 0 rgb(255 255 255 / 0.2),
+        0 12px 28px -14px color-mix(in oklab, var(--color-brand-fill) 75%, transparent),
+        0 0 0 1px color-mix(in oklab, var(--color-brand) 45%, transparent);
     }
     .btn-secondary:hover:not(:disabled, [aria-busy="true"]) {
       border-color: color-mix(in oklab, var(--color-brand) 55%, transparent);

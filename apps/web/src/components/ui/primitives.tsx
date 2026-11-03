@@ -386,7 +386,7 @@ export function FeatureIndex({
   );
 }
 
-/** Hairline matrix for the light editorial surface (`<Section tone="light">`). */
+/** Hairline matrix for the light editorial surface (`<Section tone="raised">`). */
 export function FeatureMatrix({
   items,
   className,
@@ -397,19 +397,19 @@ export function FeatureMatrix({
   return (
     <ul
       className={cx(
-        "grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-ink/15 bg-ink/15 sm:grid-cols-2 lg:grid-cols-3",
+        "grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line-subtle bg-line-subtle sm:grid-cols-2 lg:grid-cols-3",
         className,
       )}
     >
       {items.map((item) => (
-        <li key={item.title} className="bg-surface-light p-6 sm:p-7">
+        <li key={item.title} className="bg-surface-1 p-6 sm:p-7">
           {item.icon && (
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-ink text-brand" aria-hidden="true">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--radius-md)] bg-surface-2 text-brand" aria-hidden="true">
               <Icon name={item.icon} className="h-5 w-5" />
             </span>
           )}
           <h3 className={cx("t-h3", item.icon && "mt-4")}>{item.title}</h3>
-          <p className="mt-1.5 leading-relaxed text-ink-muted">{item.description}</p>
+          <p className="mt-1.5 leading-relaxed text-fg-muted">{item.description}</p>
         </li>
       ))}
     </ul>

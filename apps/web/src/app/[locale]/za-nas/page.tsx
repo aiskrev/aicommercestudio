@@ -43,7 +43,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/za-nas"
         </EditorialSplit>
       </Section>
 
-      <Section tone="light">
+      <Section tone="raised">
         <FeatureMatrix items={page.principles} />
       </Section>
 
