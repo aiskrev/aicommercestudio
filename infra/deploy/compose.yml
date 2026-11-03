@@ -1,0 +1,137 @@
+# Production stack on the VPS: runs immutable images built by GitHub Actions; nothing is built here.
+# Installed as /opt/ai-commerce-studio/compose.yml and driven only through infra/deploy/acs-deploy.
+#   .env          secrets and runtime settings (chmod 600, never in Git; see production.env.example)
+#   release.env   ACS_RELEASE=sha-<40 hex>, the release that is running
+# Migrations are not part of starting the API: they run only in the `migrate` job (profile "migrate").
+# Budget for the 4 GB server: db 768 MB + api 640 MB + web 640 MB, the rest for the host and page cache.
+
+name: ai-commerce-studio
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-api-env: &api-env
+  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-acs}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-acs}
+  APP_ENV: production
+  ENABLE_API_DOCS: "false"
+  SEED_SAMPLE_DATA: "false"
+  RUN_MIGRATIONS_ON_START: "false"
+
+x-hardening: &hardening
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+
+services:
+  db:
+    logging: *logging
+    image: postgres:17-alpine
+    restart: unless-stopped
+    stop_grace_period: 60s
+    mem_limit: 768m
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-acs}
+      POSTGRES_USER: ${POSTGRES_USER:-acs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    command:
+      - postgres
+      - -c
+      - shared_buffers=192MB
+      - -c
+      - effective_cache_size=1GB
+      - -c
+      - work_mem=8MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - max_connections=40
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-off job, started only by `acs-deploy migrate` after an explicit approval.
+  migrate:
+    profiles: ["migrate"]
+    logging: *logging
+    <<: *hardening
+    image: ${ACS_REGISTRY:-ghcr.io/aiskrev}/aicommercestudio-api:${ACS_RELEASE:?Set ACS_RELEASE in release.env}
+    restart: "no"
+    mem_limit: 640m
+    env_file: .env
+    environment:
+      <<: *api-env
+    command: ["sh", "-c", "alembic upgrade head && python -m app.cli seed"]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - data
+
+  api:
+    logging: *logging
+    <<: *hardening
+    image: ${ACS_REGISTRY:-ghcr.io/aiskrev}/aicommercestudio-api:${ACS_RELEASE:?Set ACS_RELEASE in release.env}
+    restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: 640m
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m
+    env_file: .env
+    environment:
+      <<: *api-env
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - data
+      - app
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health/ready', timeout=3).status == 200 else 1)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  web:
+    logging: *logging
+    <<: *hardening
+    image: ${ACS_REGISTRY:-ghcr.io/aiskrev}/aicommercestudio-web:${ACS_RELEASE:?Set ACS_RELEASE in release.env}
+    restart: unless-stopped
+    stop_grace_period: 30s
+    mem_limit: 640m
+    environment:
+      API_INTERNAL_URL: http://api:8000
+      CATALOGUE_REVALIDATE_SECRET: ${CATALOGUE_REVALIDATE_SECRET:-}
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${ACS_WEB_PORT:-3000}:3000"
+    networks:
+      - app
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+networks:
+  # The database has no route to the Internet and no published port.
+  data:
+    internal: true
+  app:
+
+volumes:
+  pgdata:

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Forced command for the `acsdeploy` SSH key, installed as /usr/local/sbin/acs-deploy-gate.
+# authorized_keys: restrict,command="/usr/local/sbin/acs-deploy-gate" ssh-ed25519 ...
+# The key can do only what is listed here: no shell, no forwarding, no root, no Docker socket.
+# sudoers allows acsdeploy exactly: /usr/local/sbin/acs-deploy with these arguments.
+set -euo pipefail
+
+command=${SSH_ORIGINAL_COMMAND:-}
+if [[ $command =~ ^(deploy|migrate)\ sha-[0-9a-f]{40}$ ]] || [[ $command =~ ^(rollback|status)$ ]]; then
+  # shellcheck disable=SC2086 # the pattern above leaves only safe, space-separated words
+  exec sudo -n /usr/local/sbin/acs-deploy $command
+fi
+echo "command not allowed" >&2
+exit 126

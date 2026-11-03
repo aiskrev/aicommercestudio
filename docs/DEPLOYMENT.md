@@ -1,8 +1,10 @@
 # Production deployment (prepared, not executed)
 
-Nothing in this document has been executed: no server, domain, DNS record, certificate or paid
-resource was created. It describes how to deploy the existing Docker setup to one Linux server
-behind a TLS-terminating reverse proxy. Decisions marked **(owner)** need the business owner.
+The application has not been deployed. The target server exists and is hardened; the current
+image-based procedure (GHCR images, separate migration job, Cloudflare in front) is in
+[`infra/deploy/README.md`](../infra/deploy/README.md) and takes precedence over the build-on-server
+commands below. This document still holds the checklists, secrets handling, backup plan and restore
+steps. Decisions marked **(owner)** need the business owner.
 
 ## 1. Target architecture
 
@@ -21,8 +23,8 @@ Internet ──443──► Caddy (host, automatic HTTPS, HSTS, X-Forwarded-For)
 * One API instance (rate limits and lockout counters are in memory + DB). Horizontal scaling needs
   Redis for the limiter first (see ROADMAP).
 
-Minimum server: 2 vCPU, 4 GB RAM, 40 GB SSD, Ubuntu 24.04 LTS or Debian 12, Docker Engine + Compose
-plugin, EU region **(owner: provider choice, DPA)**.
+Minimum server: 2 vCPU, 4 GB RAM, 40 GB SSD, Ubuntu 24.04 LTS or later or Debian 12, Docker Engine +
+Compose plugin, EU region **(owner: DPA)**.
 
 ## 2. Production Docker configuration
 
@@ -166,7 +168,5 @@ Each release:
 
 ## 10. Not covered / to decide
 
-* Hosting provider, domain, uptime-monitor and off-site storage accounts **(owner)**.
+* Uptime-monitor and off-site storage accounts **(owner)**.
 * Real e-mail sending (SMTP) and the Anthropic provider remain disabled until configured and approved.
-* No CDN/WAF; add one if traffic or abuse requires it.
-* No container image registry or CI/CD pipeline; images are built on the server from a Git tag.
