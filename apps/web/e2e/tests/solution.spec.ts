@@ -142,6 +142,10 @@ test("incompatible and unsafe compositions are rejected in the builder and by th
   }
 });
 
+test.describe("the optional enquiry", () => {
+  // Own client address: the enquiry shares the per-IP contact rate limit with the other specs.
+  test.use({ extraHTTPHeaders: { "X-Forwarded-For": `10.96.1.${Math.floor(Math.random() * 200) + 1}` } });
+
 test("a design can be sent with an optional enquiry", async ({ page }) => {
   test.setTimeout(60_000);
   await page.goto(`/en/tools/solution-builder?s=${SUPPORT_CODE}`);
@@ -157,6 +161,7 @@ test("a design can be sent with an optional enquiry", async ({ page }) => {
   await section.getByRole("button", { name: "Send the enquiry" }).click();
   expect((await response).status()).toBe(201);
   await expect(section.getByRole("status")).toContainText("Enquiry reference");
+});
 });
 
 test.describe("on a phone", () => {
