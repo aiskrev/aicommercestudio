@@ -197,7 +197,10 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
   describe("sitemap and robots policy", () => {
     it("omits draft legal pages and thin topic pages", () => {
       expect(content.legal.isDraft).toBe(true);
-      for (const path of [routes.privacy, routes.cookies, routes.terms]) expect(sitemapPaths).not.toContain(url(path));
+      for (const path of [routes.privacy, routes.terms]) expect(sitemapPaths).not.toContain(url(path));
+      // The cookie information is final (reviewed): indexed and listed.
+      expect(content.legal.cookiesDraft).toBe(false);
+      expect(sitemapPaths).toContain(url(routes.cookies));
       for (const category of content.editorialCategories) {
         const path = url(routes.insightsCategory(category.slug));
         if (isIndexableCategory(locale, category.key)) expect(sitemapPaths).toContain(path);

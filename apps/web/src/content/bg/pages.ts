@@ -171,7 +171,7 @@ export const about = {
   ] satisfies TitledText[],
   companyTitle: "Информация за дружеството",
   companyNote:
-    "A.I. Commerce Studio е цифровата платформа и технологичната марка на Iskrev Consulting Ltd. Сайтът е в подготвителен етап; регистрационните данни на дружеството ще бъдат публикувани след тяхното финализиране.",
+    "A.I. Commerce Studio е цифровата платформа и технологичната марка на Iskrev Consulting Ltd.",
 };
 
 export const processPage = {
