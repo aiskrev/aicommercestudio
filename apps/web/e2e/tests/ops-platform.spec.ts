@@ -36,6 +36,7 @@ test.describe("staff Ops platform on the demo organisation", () => {
     const stamp = Date.now();
     await signIn(page);
     await page.goto("/admin/operations?tab=registry");
+    await expect(page.getByTestId("ops-registry")).toBeVisible();
     await expect(page.getByTestId("ops-demo-notice")).toBeVisible();
     await expect(page.getByTestId("ops-tabs").getByRole("tab")).toHaveCount(7);
 
@@ -54,8 +55,11 @@ test.describe("staff Ops platform on the demo organisation", () => {
     await expect(detail).toContainText("Approved");
 
     // Evaluations: the synthetic template, locked and run — marked as simulated.
+    // Wait for the new tab before using its controls (the previous tab's picker has the same test id).
     await page.getByTestId("ops-tabs").getByRole("tab", { name: "Evaluations" }).click();
+    await expect(page.getByTestId("ops-evaluations")).toBeVisible();
     await page.getByTestId("ops-agent-picker").selectOption({ label: "Sample knowledge assistant" });
+    await expect(page.getByTestId("ops-agent-picker").locator("option:checked")).toHaveText("Sample knowledge assistant");
     await page.getByRole("button", { name: "Add the synthetic support template" }).click();
     await page.getByRole("button", { name: "Lock this version" }).click();
     const versionSelect = page.getByTestId("ops-run-version");
@@ -67,12 +71,14 @@ test.describe("staff Ops platform on the demo organisation", () => {
 
     // Observability: synthetic records for the demo organisation, never shown as live.
     await page.getByTestId("ops-tabs").getByRole("tab", { name: "Observability" }).click();
+    await expect(page.getByTestId("ops-observability")).toBeVisible();
     await page.getByRole("button", { name: "Generate synthetic sample records" }).click();
     await expect(page.getByTestId("ops-freshness")).toContainText("Not live");
     await expect(page.getByTestId("ops-freshness")).toContainText("synthetic");
 
     // Incidents: record one and move it through the first step.
     await page.getByTestId("ops-tabs").getByRole("tab", { name: "Incidents" }).click();
+    await expect(page.getByTestId("ops-incidents")).toBeVisible();
     const form = page.getByTestId("ops-new-incident");
     await form.getByLabel("Title").fill(`E2E incident ${stamp}`);
     await form.getByRole("button", { name: "Record" }).click();
