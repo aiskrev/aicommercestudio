@@ -127,7 +127,8 @@ Verify after go-live: `curl -I https://example.bg` (HSTS, CSP, `X-Frame-Options:
 
 Before the first deployment:
 
-- [ ] Legal texts reviewed; `LEGAL_TEXTS_ARE_DRAFTS = false`; company details and contact data filled in **(owner)**
+- [x] Cookie information reviewed and published (`COOKIE_POLICY_IS_DRAFT = false`, cookie notice live)
+- [ ] Privacy policy and terms reviewed; `LEGAL_TEXTS_ARE_DRAFTS = false`; company details and contact data filled in **(owner)**
 - [ ] Privacy policy lists processors (hosting, e-mail, AI provider if enabled) and backup retention **(owner)**
 - [ ] DPA signed with the hosting provider (and Anthropic / SMTP provider if enabled) **(owner)**
 - [ ] Server hardened (SSH keys, firewall 22/80/443, automatic security updates)

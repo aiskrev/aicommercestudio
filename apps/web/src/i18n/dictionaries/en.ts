@@ -37,9 +37,15 @@ export const en: Dictionary = {
     privacy: "Privacy",
     cookies: "Cookies",
     terms: "Terms of use",
-    draftNote: "Legal texts are drafts under review.",
-    provisional: "A.I. Commerce Studio is a platform of Iskrev Consulting Ltd. Company registration details will be published.",
+    draftNote: "The privacy policy and the terms of use are under review.",
+    provisional: "A.I. Commerce Studio is a platform of Iskrev Consulting Ltd.",
     rights: "All rights reserved.",
+  },
+  cookieNotice: {
+    label: "Cookie notice",
+    text: "We use only necessary cookies: for the language you choose and for the security of the administration area. We use no analytics, advertising or tracking cookies.",
+    more: "Learn more",
+    accept: "Got it",
   },
   common: {
     home: "Home",

@@ -171,7 +171,7 @@ build paths from fixed segment maps (no open redirect).
 | Retention | `LEAD_RETENTION_DAYS` (730), `AUDIT_RETENTION_DAYS` (1095), `ADVISOR_RETENTION_DAYS` (30, unlinked assessments), `READINESS_RETENTION_DAYS` (365, readiness leads), `TEAM_LEAD_RETENTION_DAYS` (365, team consultation leads), `TEAM_CONFIGURATION_RETENTION_DAYS` (90, unlinked saved team links); `app.cli maintenance`. Ops tenancy data follows the contract lifecycle (no automatic purge). |
 | Erasure | admin "Изтрий запитването" deletes lead + notes; audit keeps no personal data |
 | Access control | individual admin accounts, sessions, audit trail |
-| Cookies | strictly necessary admin cookies plus the functional `acs_locale` language preference (set only on an explicit switch); no consent banner needed; documented on `/bg/biskvitki` and `/en/cookies` |
+| Cookies | strictly necessary admin cookies, the functional `acs_locale` language preference (set only on an explicit switch) and `acs_cookie_notice` (remembers that the notice was closed, 12 months). Since 2026-11-03 an informational cookie notice (`components/layout/CookieNotice.tsx`, BG/EN, rendered on the client so pages stay static) links to the cookie information, which is final after legal review and indexed (`COOKIE_POLICY_IS_DRAFT = false`). No optional cookies exist, so the notice offers no consent choice |
 | Third parties | none on public pages (verified by e2e); e-mail and AI providers disabled by default |
 | Processors | when enabling SMTP or an AI provider: sign a DPA, list them in the privacy policy, check data transfers |
 

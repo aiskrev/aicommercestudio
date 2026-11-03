@@ -18,7 +18,7 @@ Statuses: **accepted** (in force, implemented), **accepted · design** (agreed, 
 | ADR-04 | In-memory rate limiter for one API instance; Redis before scaling out (P1) | accepted (limit known) | ARCHITECTURE.md, IMPLEMENTATION_DEPENDENCIES_V2.md |
 | ADR-05 | Client-only tools where possible; the API only for PDFs, saved links and hand-offs | accepted | ARCHITECTURE.md, TOOLS_PLATFORM.md |
 | ADR-06 | Content in typed TypeScript modules, not a CMS | accepted | ARCHITECTURE.md |
-| ADR-07 | No analytics or third-party scripts (no consent banner needed) | accepted | ARCHITECTURE.md, SECURITY.md |
+| ADR-07 | No analytics or third-party scripts; an informational cookie notice (no consent choice, since no optional cookies exist) since 2026-11-03 | accepted | ARCHITECTURE.md, SECURITY.md |
 | ADR-08 | Bulgarian route segments as folder names; English URLs rewritten by the proxy; BG and EN slugs of a page must differ | accepted | INTERNATIONALIZATION.md |
 
 ## Service catalogue and content

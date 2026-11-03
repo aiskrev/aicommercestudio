@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/biskvitk
     title: document.title,
     description: document.metaDescription,
     path: routes.cookies,
-    noindex: legal.isDraft,
+    noindex: legal.cookiesDraft,
   });
 }
 
@@ -27,7 +27,7 @@ export default async function CookiesPage({ params }: PageProps<"/[locale]/biskv
   return (
     <LegalPage
       document={document}
-      draftNotice={legal.draftNotice}
+      draftNotice={legal.cookiesDraft ? legal.draftNotice : undefined}
       updatedLabel={dict.common.updated}
       breadcrumbs={[
         { name: dict.common.home, path: localizePath(locale, routes.home) },

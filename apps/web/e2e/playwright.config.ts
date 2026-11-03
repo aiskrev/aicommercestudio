@@ -6,6 +6,12 @@ import { defineConfig, devices } from "@playwright/test";
  * or locally: E2E_BASE_URL=http://localhost:3000 npx playwright test
  */
 const runId = Math.floor(Math.random() * 250) + 1;
+const baseURL = process.env.E2E_BASE_URL ?? "http://localhost:3000";
+// The cookie notice is closed for every spec except cookie-notice.spec.ts, so it never covers controls.
+const noticeClosed = {
+  cookies: [{ name: "acs_cookie_notice", value: "1", domain: new URL(baseURL).hostname, path: "/", expires: -1, httpOnly: false, secure: false, sameSite: "Lax" as const }],
+  origins: [],
+};
 
 export default defineConfig({
   testDir: "./tests",
@@ -15,7 +21,8 @@ export default defineConfig({
   timeout: 45_000,
   reporter: [["list"], ["html", { open: "never", outputFolder: "playwright-report" }]],
   use: {
-    baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3000",
+    baseURL,
+    storageState: noticeClosed,
     locale: "bg-BG",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
