@@ -7431,6 +7431,22 @@
             "type": "array",
             "title": "Domains"
           },
+          "track": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "configuration",
+                  "engineering",
+                  "ai"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track"
+          },
           "because": {
             "items": {
               "type": "string"

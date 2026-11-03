@@ -88,37 +88,68 @@ grouped by 30/60/90 days.
 **Versioning.** 1.0.0 (8 questions, preview) stays in the repository, so results saved with it
 re-render. New requests use 1.1.0. A client still on 1.0.0 gets 409 `assessment_version_outdated`.
 
-## 2a. Observability & Reliability (`observability_reliability` 1.1.0)
+## 2a. Observability & Reliability (`observability_reliability` 1.2.0)
 
-It uses the same eight questions as 1.0.0, in four areas weighted 30/25/25/20:
+22 questions in 11 areas:
 
-* signals: what is collected centrally, and log retention;
-* alerting: routing, and how many alerts are actionable;
-* incidents: the process, and reviews;
-* SLOs: targets, and status communication.
+* golden signals and service health;
+* metrics, logs and traces;
+* OpenTelemetry instrumentation;
+* SLIs, SLOs and error budgets;
+* alert quality;
+* incident response and on-call;
+* runbooks and escalation;
+* capacity and performance;
+* dependency visibility;
+* change failure analysis;
+* disaster recovery and resilience testing.
 
-1.1.0 makes it live and gives the rules kinds, horizons and domains:
+The result shows maturity per area and:
 
-* 3 risks (30 days): no alerts, no incident process, blind spots when signals score below 25;
-* 2 quick wins (30 days): on-call routing, reducing alert noise;
-* 4 recommendations (central telemetry, an incident runbook, SLOs, and a workshop for the
-  reactive band), capped at 6;
-* 2 target states (90 days): a reliability review, and error budgets with a release policy.
+* **critical gaps** (5 risks): no alerts, telemetry blind spots, no incident process, untested
+  recovery, invisible external dependencies;
+* **quick wins** (5);
+* **recommendations** per area below 50, capped at 10;
+* a **reference telemetry architecture**: OpenTelemetry SDKs → collector with sampling and
+  personal-data filtering → stores → SLO alerts correlated by trace id;
+* **example SLIs/SLOs**, labelled "illustrative only" and "not recommended values";
+* **target states**: an error-budget policy and regular failure exercises.
 
-The `observability_signals` extension still rejects an on-call rota without collected telemetry,
-and still reports the missing core signals.
+The disclaimer says the assessment measures no availability or reliability and confirms no SLO
+achievement. 1.1.0 and 1.0.0 stay, so saved results re-render. The `observability_signals`
+extension (`telemetry`, `alert_routing`) still applies.
 
 ## 2b. Five further assessments (1.0.0, live)
 
 | Assessment | Areas (5 × 2 questions) | Context (unscored) |
 | --- | --- | --- |
-| E-commerce Architecture (`ecommerce_architecture`) | platform and extensions, speed and technical SEO, integrations, data and measurement, security and operations | platform (Shopify, WooCommerce, Magento, custom, other) |
-| Data Integration (`data_integration`) | sources and ownership, integration patterns, data quality, monitoring and errors, access and security | systems (ERP, CRM, store, accounting, warehouse, BI) |
+| E-commerce Architecture (`ecommerce_architecture`, **11 areas, 23 questions**) | storefront and performance, maintainability, catalogue and inventory, orders and fulfilment, payment boundaries, search, analytics and consent, SEO and structured data, support and personalisation, ERP/CRM/WMS integrations, resilience and releases | platform (Shopify, WooCommerce, Magento, custom, other) |
+| Data & Integration Readiness (`data_integration`, **11 areas, 23 questions**) | ownership and governance, source-system inventory, quality and completeness, API readiness, events, ETL/ELT pipelines, schema evolution and contracts, identity and access, privacy and retention, RAG suitability, lineage and monitoring | systems (ERP, CRM, store, accounting, warehouse, BI) |
 | Responsible AI Governance (`ai_governance`) | inventory and accountability, risk assessment, personal data and providers, human oversight, transparency and quality | where AI is used (internal, customers, decisions about people, products) |
 | AI Operations Readiness (`ai_ops_readiness`) | monitoring, output quality, model and prompt changes, incidents, cost and limits | AI systems (assistant, RAG, agents, extraction) |
 | FinOps & AI Cost (`finops`) | visibility and allocation, budgets and forecasting, optimisation, AI model costs, accountability | spend (AWS, Azure, GCP, AI APIs, SaaS, hosting) |
 
-Each has:
+**Finding tracks.** A new optional rule field, `track`, labels how a finding would be addressed:
+platform configuration, traditional engineering, or a use case suitable for AI. It is shown as a badge
+in the result and in the report.
+
+* **E-commerce.** Uses the tracks throughout. AI cases appear only when their prerequisites hold:
+  * support drafts need the order context;
+  * product content needs one product data source;
+  * semantic search needs search that is already tuned.
+
+  Otherwise a "foundations first" note is shown. The assessment never asks for payment details
+  (the card-data question asks only *who* handles card data), never claims access to the store or
+  measures its speed, and promises no conversion uplift.
+* **Data & Integration.**
+  * Integration patterns: an API layer, outbox with an event bus, and ELT.
+  * Remediation priorities: quick wins plus recommendations.
+  * RAG appears as a pilot only when documents and access are ready (`rag` ≥ 67 and `access` ≥ 50).
+    Otherwise it says "RAG is not the next step yet".
+  * An always-present caveat says when RAG does *not* fit.
+  * Quality answers are labelled as self-assessed, not measured, and no data upload exists.
+
+The three other assessments each have:
 
 * 3–4 risks and 3–4 quick wins (30 days);
 * one recommendation per area below 50 (60 days, capped at 6);

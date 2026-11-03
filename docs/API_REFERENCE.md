@@ -270,7 +270,8 @@ Definitions with status `preview` are served only when `ASSESSMENTS_PREVIEW_ENAB
 | POST | `/api/public/assessments/results/consultation` → 201 | optional: `{token, locale, name, email, company, message?, privacy_acknowledged: true, marketing_consent (default false), website (honeypot), form_token}` → `{reference, message}`; creates a lead (`source = engineering_assessment`) linked to the saved result. 409 `assessment_consultation_exists`, 400 `form_token_invalid` / `spam_suspected`; contact-form rate limit |
 
 Results include `dimensions[].level` (maturity per area), `recommendations[]` with `kind` (`recommendation`,
-`risk`, `quick_win`, `target_state`, `pattern`, `context`), `horizon` (30 \| 60 \| 90 \| null), `domains` and
+`risk`, `quick_win`, `target_state`, `pattern`, `context`), `horizon` (30 \| 60 \| 90 \| null), `domains`, `track`
+(`configuration` \| `engineering` \| `ai` \| null) and
 `because` (the inputs or thresholds that triggered the finding), plus `roadmap`, `domains` and `inputs`
 (each answer with its `evidence`: `practice`, `metric` or `context`).
 

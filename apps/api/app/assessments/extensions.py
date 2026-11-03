@@ -36,7 +36,9 @@ class ObservabilitySignals(AssessmentExtension):
     CORE_SIGNALS = ("logs", "metrics", "traces")
 
     def validate(self, definition: AssessmentDefinition, answers: Answers) -> list[AnswerError]:
-        if answers.get("alert_routing") == "on_call_rotation" and not answers.get("telemetry"):
+        # "none" (offered from 1.2.0 on) means nothing is collected centrally.
+        collected = [s for s in answers.get("telemetry") or () if s != "none"]
+        if answers.get("alert_routing") == "on_call_rotation" and not collected:
             return [AnswerError("alert_routing", "inconsistent")]
         return []
 

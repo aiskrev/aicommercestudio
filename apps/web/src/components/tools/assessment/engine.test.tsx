@@ -107,6 +107,7 @@ const result: AssessmentResultView = {
       kind: "pattern",
       horizon: 90,
       domains: ["devops_sre"],
+      track: "engineering",
       because: ["Trunk-based development and branching: 33/100, below the 75 threshold"],
     },
   ],
@@ -250,6 +251,9 @@ describe("engine assessment wizard", () => {
     expect(within(risks).getByText("“Are changes reviewed before merging?”: No")).toBeInTheDocument();
     expect(within(risks).getByText("30 days")).toBeInTheDocument();
     expect(screen.getByTestId("engine-findings-pattern")).toHaveTextContent("trunk-based");
+    // How a finding would be addressed is shown as a label (configuration, engineering or AI).
+    expect(within(screen.getByTestId("engine-findings-pattern")).getByText(enEngineeringTool.result.tracks.engineering)).toBeInTheDocument();
+    expect(within(screen.getByTestId("engine-findings-risk")).queryByText(enEngineeringTool.result.tracks.engineering)).toBeNull();
     expect(screen.getByTestId("engine-roadmap")).toHaveTextContent(enEngineeringTool.result.backlog);
     const metrics = screen.getByTestId("engine-metrics");
     expect(metrics).toHaveTextContent("Not verified by us and not scored.");

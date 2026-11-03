@@ -197,3 +197,22 @@ test("the DevOps delivery assessment can be completed on a phone without horizon
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });
+
+test("the observability assessment can be completed on a phone without horizontal scrolling", async ({ page }) => {
+  await page.goto("/en/tools/observability-reliability");
+  const form = page.getByTestId("engine-form");
+  for (let step = 0; step < 11; step++) {
+    // Wait for the area to render before answering (slower CI machines otherwise answer the previous one).
+    await expect(form.getByText(`Area ${step + 1} of 11`)).toBeVisible();
+    if (step === 1) await form.getByRole("checkbox", { name: "Logs" }).check();
+    const groups = form.locator("fieldset:has(input[type=radio])");
+    for (let i = 0; i < (await groups.count()); i++) await groups.nth(i).getByRole("radio").nth(2).check();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, `area ${step + 1}`).toBeLessThanOrEqual(0);
+    await form.getByRole("button", { name: step === 10 ? "See the result" : "Next" }).click();
+  }
+  const result = page.getByTestId("engine-result");
+  await expect(result.getByRole("heading", { level: 2, name: "Your result" })).toBeVisible();
+  await expect(result.getByTestId("tool-score")).toHaveText(/^\d+$/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+});

@@ -83,6 +83,7 @@ TEXTS: dict[str, dict[str, Any]] = {
             "pattern": "Примерни архитектурни модели",
             "context": "Бележки за вашия контекст",
         },
+        "tracks": {"configuration": "настройка на платформата", "engineering": "инженеринг", "ai": "подходящо за AI"},
         "roadmap": "Ориентировъчна пътна карта",
         "roadmap_note": "Последователност, не график: сроковете зависят от екипа и обхвата и не са оферта.",
         "horizon": "{days} дни",
@@ -127,6 +128,7 @@ TEXTS: dict[str, dict[str, Any]] = {
             "pattern": "Example architecture patterns",
             "context": "Notes for your context",
         },
+        "tracks": {"configuration": "platform configuration", "engineering": "engineering", "ai": "suitable for AI"},
         "roadmap": "Indicative roadmap",
         "roadmap_note": "A sequence, not a schedule: timing depends on your team and scope, and it is not a quote.",
         "horizon": "{days} days",
@@ -142,6 +144,14 @@ TEXTS: dict[str, dict[str, Any]] = {
         "footer": "{brand} · This report contains only the answers you chose and the server's calculations.",
     },
 }
+
+
+def _label(finding: dict[str, Any], t: dict[str, Any]) -> list[str]:
+    parts = [t["horizon"].format(days=finding["horizon"])] if finding["horizon"] else []
+    if finding.get("track"):
+        parts.append(t["tracks"][finding["track"]])
+    return parts
+
 
 KIND_ORDER = ("risk", "quick_win", "recommendation", "target_state", "pattern", "context")
 
@@ -197,7 +207,7 @@ def build_document(
             Finding(
                 clean(f["title"], 200),
                 clean(f["description"]),
-                clean(t["horizon"].format(days=f["horizon"]), 40) if f["horizon"] else "",
+                clean(" · ".join(_label(f, t)), 80),
                 tuple(clean(b, 300) for b in f["because"]),
             )
             for f in items

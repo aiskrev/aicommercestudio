@@ -16,6 +16,14 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/assessments-depth` (from `feature/remaining-assessments`, 2026-11-03): the briefs for
+Observability & Reliability, E-commerce Architecture and Data & Integration Readiness in full —
+11 areas each (observability 1.2.0 with a reference telemetry architecture and illustrative SLOs;
+e-commerce and data rewritten before release), a new optional finding `track` (configuration /
+engineering / AI), RAG readiness with caveats. The DevOps brief was already complete (1.1.0). No
+migration. Results: API **563 passed**, Ruff clean, docs and OpenAPI in sync; web **603** unit tests,
+typecheck and lint clean; e2e **138 passed** (desktop and mobile).
+
 Branch `feature/remaining-assessments` (from `main` @ `79670e2`, 2026-11-03): the last five "Coming soon"
 tools are live as engine assessments (E-commerce Architecture, Data Integration, Responsible AI
 Governance, AI Operations Readiness, FinOps & AI Cost; 11 questions in 5 areas each, explained findings,

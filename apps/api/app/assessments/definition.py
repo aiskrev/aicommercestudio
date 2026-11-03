@@ -30,6 +30,9 @@ SERVICE_DOMAINS: tuple[str, ...] = (
     "advisory_enablement",
 )
 FindingKind = Literal["recommendation", "risk", "quick_win", "target_state", "pattern", "context"]
+# How a finding would be addressed: configuration of an existing platform, traditional engineering,
+# or a use case where AI is suitable. Optional; shown as a label, never scored.
+FindingTrack = Literal["configuration", "engineering", "ai"]
 Evidence = Literal["practice", "metric", "context"]
 KEY = Annotated[str, Field(pattern=r"^[a-z][a-z0-9_]{0,47}$")]
 VERSION_PATTERN = r"^\d+\.\d+\.\d+$"
@@ -202,6 +205,7 @@ class Rule(Frozen):
     kind: FindingKind = "recommendation"
     horizon: Literal[30, 60, 90] | None = None
     domains: tuple[KEY, ...] = Field(default=(), max_length=3)
+    track: FindingTrack | None = None
 
 
 # --------------------------------------------------------------------------- structure

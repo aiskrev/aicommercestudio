@@ -177,6 +177,8 @@ class FindingOut(TitledOut):
     kind: Literal["recommendation", "risk", "quick_win", "target_state", "pattern", "context"]
     horizon: Literal[30, 60, 90] | None
     domains: list[str]
+    # How it would be addressed: platform configuration, traditional engineering or an AI use case.
+    track: Literal["configuration", "engineering", "ai"] | None = None
     # The inputs or score thresholds that triggered this finding (empty only without answers).
     because: list[str]
 
