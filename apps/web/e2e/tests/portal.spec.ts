@@ -52,12 +52,15 @@ test.describe("client portal (enabled test stack only)", () => {
   test("invitation, activation with TOTP, sign-in, read-only dashboard, isolation and sign-out", async ({ page, request, playwright }) => {
     test.setTimeout(150_000);
     const probe = await request.get("/api/portal/me");
+    // `-Suite portal` sets E2E_REQUIRE_PORTAL: there a switched-off portal is a failure, not a skip.
+    if (process.env.E2E_REQUIRE_PORTAL) expect(probe.status(), "the portal must be switched on for this suite").not.toBe(404);
     test.skip(probe.status() === 404, "the client portal is switched off (CLIENT_PORTAL_ENABLED=false)");
 
     // Staff side: invite a client user into the non-demo test organisation.
     const headers = await staffSession(request);
     const orgs = (await (await request.get("/api/ops/organizations")).json()) as { id: string; slug: string; is_demo: boolean }[];
     const org = orgs.find((o) => o.slug === "e2e-portal");
+    if (process.env.E2E_REQUIRE_PORTAL) expect(org, "organisation e2e-portal").toBeTruthy();
     test.skip(!org, "organisation e2e-portal not created for this run");
     const demo = orgs.find((o) => o.is_demo);
     const clientEmail = `client.${Date.now()}@example.com`;

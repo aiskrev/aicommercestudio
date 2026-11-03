@@ -2,9 +2,11 @@
 .SYNOPSIS
   Runs the test suites inside Docker (no local Python/Node required).
 .PARAMETER Suite
-  api | web | e2e | audit | all (default: all except audit)
+  api | web | e2e | portal | audit | all (default: all except portal and audit)
+  portal: the client portal browser e2e on a stack started with the portal switched ON
+  (docker-compose.portal-e2e.yml, test only); the stack is switched back to the default afterwards.
 #>
-param([ValidateSet("api", "web", "e2e", "audit", "all")][string]$Suite = "all")
+param([ValidateSet("api", "web", "e2e", "portal", "audit", "all")][string]$Suite = "all")
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
@@ -54,6 +56,7 @@ if ($Suite -in @("api", "web", "all")) {
 if ($Suite -in @("api", "all")) {
     Invoke-Suite "API tests (pytest)" { docker compose --profile test run --rm --build api-tests }
     Invoke-Suite "API lint (ruff)" { docker compose --profile test run --rm api-tests ruff check --no-cache . }
+    Invoke-Suite "API formatting (ruff format --check)" { docker compose --profile test run --rm api-tests ruff format --check . }
     # docs/openapi.json, the route list in docs/API_REFERENCE.md and the README's document index must match the code.
     Invoke-Suite "API docs in sync" { docker compose --profile test run --rm --no-deps -v "${root}:/repo:ro" api-tests python scripts/docs_sync.py }
 }
@@ -77,6 +80,20 @@ if ($Suite -in @("e2e", "all")) {
         # Labelled demo organisation (sample registry data) owned by the bootstrap admin, for the Ops platform flows.
         docker compose exec -T api sh -c 'python -m app.cli ops-seed-demo --owner-email "$ADMIN_BOOTSTRAP_EMAIL"' | Out-Null
         docker compose --profile test run --rm --build -e E2E_STAFF_PASSWORD=$staffPassword e2e
+    }
+}
+if ($Suite -eq "portal") {
+    Invoke-Suite "Client portal e2e (portal switched on, test stack only)" {
+        $portal = @("-f", "docker-compose.yml", "-f", "docker-compose.portal-e2e.yml")
+        docker compose @portal up --build -d --wait
+        docker compose @portal exec -T api sh -c 'python -m app.cli ops-seed-demo --owner-email "$ADMIN_BOOTSTRAP_EMAIL"' | Out-Null
+        # A non-demo organisation for the invitation (demo organisations have no client access); exists after a first run.
+        docker compose @portal exec -T api sh -c 'python -m app.cli ops-create-org --slug e2e-portal --name "E2E Portal Organisation" --owner-email "$ADMIN_BOOTSTRAP_EMAIL"' | Out-Null
+        # --no-deps: running against the default file alone would recreate the API with the portal off.
+        docker compose @portal --profile test run --rm --build --no-deps -e E2E_REQUIRE_PORTAL=1 e2e npx playwright test tests/portal.spec.ts
+        $result = $LASTEXITCODE
+        docker compose up -d --wait | Out-Null  # back to the default configuration (portal off)
+        $global:LASTEXITCODE = $result
     }
 }
 if ($Suite -eq "audit") {

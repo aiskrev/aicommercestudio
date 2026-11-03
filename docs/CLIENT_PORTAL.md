@@ -83,13 +83,15 @@ header, no organisation id in any request, BG/EN parity).
      Ops APIs answer 401 to the client session;
   7. sign-out revokes the session.
 
-  It skips itself while the portal is off, so CI (portal off) reports it as skipped. To run it, start
-  a **local test stack** with `CLIENT_PORTAL_ENABLED=true` for the API (a Compose override), create a
-  non-demo organisation `e2e-portal`, then run the spec:
+  It skips itself in the default e2e suite (portal off). It runs in its own suite and CI job
+  (`e2e-portal`), which:
+  * switch the portal on in a throwaway **test stack** (`docker-compose.portal-e2e.yml`);
+  * create the non-demo organisation `e2e-portal`;
+  * fail instead of skipping (`E2E_REQUIRE_PORTAL=1`);
+  * switch the stack back to the default afterwards.
 
   ```powershell
-  docker compose exec -T api sh -c 'python -m app.cli ops-create-org --slug e2e-portal --name "E2E Portal Organisation" --owner-email "$ADMIN_BOOTSTRAP_EMAIL"'
-  docker compose --profile test run --rm --no-deps e2e npx playwright test tests/portal.spec.ts
+  .\scripts\test.ps1 -Suite portal
   ```
 
   Switching the portal on in a test stack is not a release: the repository default stays off.
