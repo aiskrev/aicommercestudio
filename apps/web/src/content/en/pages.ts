@@ -177,7 +177,7 @@ export const about: typeof bgAbout = {
   ],
   companyTitle: "Company information",
   companyNote:
-    "A.I. Commerce Studio is the digital platform and technology brand of Iskrev Consulting Ltd. The website is in a preparatory stage; the company's registration details will be published once they are finalised.",
+    "A.I. Commerce Studio is the digital platform and technology brand of Iskrev Consulting Ltd.",
 };
 
 export const processPage: typeof bgProcessPage = {

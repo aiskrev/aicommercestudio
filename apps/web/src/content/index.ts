@@ -7,6 +7,7 @@ import { founder } from "@/content/bg/founder";
 import { home } from "@/content/bg/home";
 import {
   cookiePolicy,
+  COOKIE_POLICY_IS_DRAFT,
   LEGAL_TEXTS_ARE_DRAFTS,
   legalDraftNotice,
   privacyPolicy,
@@ -93,7 +94,14 @@ const bg = {
   editorialCategories,
   caseStudies: publishableCaseStudies(),
   keywordMap,
-  legal: { privacyPolicy, cookiePolicy, termsOfUse, draftNotice: legalDraftNotice, isDraft: LEGAL_TEXTS_ARE_DRAFTS },
+  legal: {
+    privacyPolicy,
+    cookiePolicy,
+    termsOfUse,
+    draftNotice: legalDraftNotice,
+    isDraft: LEGAL_TEXTS_ARE_DRAFTS,
+    cookiesDraft: COOKIE_POLICY_IS_DRAFT,
+  },
 };
 
 export type SiteContent = typeof bg;
@@ -135,6 +143,7 @@ const en: SiteContent = {
     termsOfUse: enTermsOfUse,
     draftNotice: enLegalDraftNotice,
     isDraft: LEGAL_TEXTS_ARE_DRAFTS,
+    cookiesDraft: COOKIE_POLICY_IS_DRAFT,
   },
 };
 

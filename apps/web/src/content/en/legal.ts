@@ -5,7 +5,7 @@ import type { LegalDocument } from "@/content/types";
  * reviewed by a qualified lawyer before the site is published. The Bulgarian version prevails
  * unless the reviewed texts state otherwise.
  */
-export { LEGAL_TEXTS_ARE_DRAFTS } from "@/content/bg/legal";
+export { COOKIE_POLICY_IS_DRAFT, LEGAL_TEXTS_ARE_DRAFTS } from "@/content/bg/legal";
 
 export const legalDraftNotice =
   "Draft: this text is a template. It must be completed with the company's details and reviewed by a lawyer before publication.";
@@ -122,7 +122,7 @@ export const cookiePolicy: LegalDocument = {
   title: "Cookie information",
   metaDescription:
     "Which cookies the A.I. Commerce Studio website uses. Public pages use no tracking or marketing cookies.",
-  updated: "2026-10-25",
+  updated: "2026-11-03",
   intro:
     "We respect your privacy. The website uses no analytics, advertising or tracking cookies and loads no third-party scripts.",
   sections: [
@@ -130,15 +130,16 @@ export const cookiePolicy: LegalDocument = {
       heading: "1. Cookies we use",
       paragraphs: ["Only the following cookies are used:"],
       bullets: [
-        "acs_locale — remembers the language (Bulgarian or English) you explicitly chose with the language switcher; set only when you choose and valid for up to [12 months]. It contains no personal data.",
-        "acs_session — a secure (HttpOnly) cookie for an administrator's session, only in the administration area; valid for up to [8 hours] or until logout.",
+        "acs_locale — remembers the language (Bulgarian or English) you explicitly chose with the language switcher; set only when you choose and valid for up to 12 months. It contains no personal data.",
+        "acs_cookie_notice — remembers that you closed the cookie notice so that it is not shown again; valid for up to 12 months. It contains no personal data.",
+        "acs_session — a secure (HttpOnly) cookie for an administrator's session, only in the administration area; valid for up to 8 hours or until logout, and the session ends after 60 minutes of inactivity.",
         "acs_csrf — a security token against cross-site request forgery (CSRF) in the administration area; valid for the same period.",
       ],
     },
     {
-      heading: "2. Why there is no consent banner",
+      heading: "2. Cookie notice",
       paragraphs: [
-        "Strictly necessary cookies and the cookie for a language you chose do not require consent. Because the website uses no other cookies, we do not show a consent banner.",
+        "On your first visit we show a short notice that explains which cookies we use, with a link to this page. Strictly necessary cookies and the cookie for a language you chose do not require consent, so the notice is informational and offers no choice about optional cookies.",
         "If you hide the \"Request a quote\" bar on a mobile device, your browser remembers this for the current session only (sessionStorage); the information is not sent to the server.",
       ],
     },

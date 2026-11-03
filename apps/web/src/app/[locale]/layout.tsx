@@ -3,6 +3,7 @@ import "../globals.css";
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Manrope } from "next/font/google";
 
+import { CookieNotice } from "@/components/layout/CookieNotice";
 import { Footer } from "@/components/layout/Footer";
 import { StickyQuoteBar } from "@/components/editorial/StickyQuoteBar";
 import { Header } from "@/components/layout/Header";
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#080f19",
+  themeColor: "#06101d",
   colorScheme: "dark",
 };
 
@@ -70,6 +71,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           {children}
         </main>
         <Footer locale={locale} dict={dict} />
+        <CookieNotice labels={dict.cookieNotice} href={href(routes.cookies)} />
         <StickyQuoteBar
           href={href(`${routes.contact}?tip=oferta`)}
           label={dict.quoteBar.label}
