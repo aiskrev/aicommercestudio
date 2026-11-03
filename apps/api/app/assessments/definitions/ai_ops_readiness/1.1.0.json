@@ -1,0 +1,1937 @@
+{
+  "key": "ai_ops_readiness",
+  "version": "1.1.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 10
+  },
+  "dimensions": [
+    {
+      "key": "inventory",
+      "weight": 8
+    },
+    {
+      "key": "ownership",
+      "weight": 8
+    },
+    {
+      "key": "environments",
+      "weight": 8
+    },
+    {
+      "key": "versioning",
+      "weight": 9
+    },
+    {
+      "key": "evaluation",
+      "weight": 9
+    },
+    {
+      "key": "observability",
+      "weight": 9
+    },
+    {
+      "key": "cost",
+      "weight": 8
+    },
+    {
+      "key": "permissions",
+      "weight": 9
+    },
+    {
+      "key": "incidents",
+      "weight": 8
+    },
+    {
+      "key": "privacy",
+      "weight": 8
+    },
+    {
+      "key": "portability",
+      "weight": 8
+    },
+    {
+      "key": "support",
+      "weight": 8
+    }
+  ],
+  "questions": [
+    {
+      "key": "ai_context",
+      "type": "multi_choice",
+      "dimension": "inventory",
+      "required": false,
+      "evidence": "context",
+      "options": [
+        {
+          "key": "assistant",
+          "points": 0
+        },
+        {
+          "key": "rag",
+          "points": 0
+        },
+        {
+          "key": "agents",
+          "points": 0
+        },
+        {
+          "key": "extraction",
+          "points": 0
+        }
+      ],
+      "cap": 1,
+      "max_selections": 4
+    },
+    {
+      "key": "op_inventory",
+      "type": "single_choice",
+      "dimension": "inventory",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "complete",
+          "points": 2
+        },
+        {
+          "key": "live",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_criticality",
+      "type": "single_choice",
+      "dimension": "inventory",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "rated",
+          "points": 2
+        },
+        {
+          "key": "tiered",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_owner",
+      "type": "single_choice",
+      "dimension": "ownership",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "builder",
+          "points": 1
+        },
+        {
+          "key": "named",
+          "points": 2
+        },
+        {
+          "key": "raci",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_reviews",
+      "type": "single_choice",
+      "dimension": "ownership",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "incidents",
+          "points": 1
+        },
+        {
+          "key": "monthly",
+          "points": 2
+        },
+        {
+          "key": "metrics",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_envs",
+      "type": "single_choice",
+      "dimension": "environments",
+      "options": [
+        {
+          "key": "single",
+          "points": 0
+        },
+        {
+          "key": "two",
+          "points": 1
+        },
+        {
+          "key": "three",
+          "points": 2
+        },
+        {
+          "key": "isolated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_test_data",
+      "type": "single_choice",
+      "dimension": "environments",
+      "options": [
+        {
+          "key": "production",
+          "points": 0
+        },
+        {
+          "key": "copies",
+          "points": 1
+        },
+        {
+          "key": "masked",
+          "points": 2
+        },
+        {
+          "key": "synthetic",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_versions",
+      "type": "single_choice",
+      "dimension": "versioning",
+      "options": [
+        {
+          "key": "live_edits",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "versioned",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_pinning",
+      "type": "single_choice",
+      "dimension": "versioning",
+      "options": [
+        {
+          "key": "latest",
+          "points": 0
+        },
+        {
+          "key": "sometimes",
+          "points": 1
+        },
+        {
+          "key": "pinned",
+          "points": 2
+        },
+        {
+          "key": "pinned_tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_eval_sets",
+      "type": "single_choice",
+      "dimension": "evaluation",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "all",
+          "points": 2
+        },
+        {
+          "key": "maintained",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_eval_gate",
+      "type": "single_choice",
+      "dimension": "evaluation",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "advisory",
+          "points": 1
+        },
+        {
+          "key": "manual",
+          "points": 2
+        },
+        {
+          "key": "gate",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_monitoring",
+      "type": "single_choice",
+      "dimension": "observability",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "logs",
+          "points": 1
+        },
+        {
+          "key": "alerts",
+          "points": 2
+        },
+        {
+          "key": "dashboards",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_tracing",
+      "type": "single_choice",
+      "dimension": "observability",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "yes",
+          "points": 2
+        },
+        {
+          "key": "privacy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_cost_tracking",
+      "type": "single_choice",
+      "dimension": "cost",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "invoice",
+          "points": 1
+        },
+        {
+          "key": "per_feature",
+          "points": 2
+        },
+        {
+          "key": "per_unit",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_cost_limits",
+      "type": "single_choice",
+      "dimension": "cost",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "provider",
+          "points": 1
+        },
+        {
+          "key": "app",
+          "points": 2
+        },
+        {
+          "key": "alerts",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_tool_scope",
+      "type": "single_choice",
+      "dimension": "permissions",
+      "options": [
+        {
+          "key": "broad",
+          "points": 0
+        },
+        {
+          "key": "unknown",
+          "points": 1
+        },
+        {
+          "key": "scoped",
+          "points": 2
+        },
+        {
+          "key": "least",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_tool_approval",
+      "type": "single_choice",
+      "dimension": "permissions",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "sometimes",
+          "points": 1
+        },
+        {
+          "key": "always",
+          "points": 2
+        },
+        {
+          "key": "tiered",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_kill_switch",
+      "type": "single_choice",
+      "dimension": "incidents",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "deploy",
+          "points": 1
+        },
+        {
+          "key": "switch",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_fallback",
+      "type": "single_choice",
+      "dimension": "incidents",
+      "options": [
+        {
+          "key": "breaks",
+          "points": 0
+        },
+        {
+          "key": "error",
+          "points": 1
+        },
+        {
+          "key": "fallback",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_log_privacy",
+      "type": "single_choice",
+      "dimension": "privacy",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "yes",
+          "points": 1
+        },
+        {
+          "key": "masked",
+          "points": 2
+        },
+        {
+          "key": "minimised",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_retention",
+      "type": "single_choice",
+      "dimension": "privacy",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "defined",
+          "points": 1
+        },
+        {
+          "key": "enforced",
+          "points": 2
+        },
+        {
+          "key": "vendor_too",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_abstraction",
+      "type": "single_choice",
+      "dimension": "portability",
+      "options": [
+        {
+          "key": "hard",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "abstracted",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_exit",
+      "type": "single_choice",
+      "dimension": "portability",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "scramble",
+          "points": 1
+        },
+        {
+          "key": "plan",
+          "points": 2
+        },
+        {
+          "key": "rehearsed",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_support",
+      "type": "single_choice",
+      "dimension": "support",
+      "options": [
+        {
+          "key": "nobody",
+          "points": 0
+        },
+        {
+          "key": "builder",
+          "points": 1
+        },
+        {
+          "key": "team",
+          "points": 2
+        },
+        {
+          "key": "sla",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "op_escalation",
+      "type": "single_choice",
+      "dimension": "support",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "documented",
+          "points": 2
+        },
+        {
+          "key": "practised",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_live_edits",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_versions",
+        "options": [
+          "live_edits"
+        ]
+      },
+      "recommendation": "risk_live_edits",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_broad_tools",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_tool_scope",
+        "options": [
+          "broad",
+          "unknown"
+        ]
+      },
+      "recommendation": "risk_broad_tools",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations",
+        "ai_agents_automation",
+        "ai_governance"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_no_kill_switch",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_kill_switch",
+        "options": [
+          "none",
+          "deploy"
+        ]
+      },
+      "recommendation": "risk_no_kill_switch",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_production_data_in_test",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_test_data",
+        "options": [
+          "production",
+          "copies"
+        ]
+      },
+      "recommendation": "risk_production_data_in_test",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations",
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "risk_unbounded_cost",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_cost_limits",
+        "options": [
+          "none"
+        ]
+      },
+      "recommendation": "risk_unbounded_cost",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations",
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "risk_no_owner",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_owner",
+        "options": [
+          "none",
+          "builder"
+        ]
+      },
+      "recommendation": "risk_no_owner",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "qw_pin_models",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_pinning",
+        "options": [
+          "latest",
+          "sometimes"
+        ]
+      },
+      "recommendation": "qw_pin_models",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_spend_cap",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_cost_limits",
+        "options": [
+          "none",
+          "provider"
+        ]
+      },
+      "recommendation": "qw_spend_cap",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_kill_switch",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_kill_switch",
+        "options": [
+          "none",
+          "deploy"
+        ]
+      },
+      "recommendation": "qw_kill_switch",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "qw_test_set",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "op_eval_sets",
+        "options": [
+          "none",
+          "some"
+        ]
+      },
+      "recommendation": "qw_test_set",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_applications"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_inventory",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "inventory",
+        "value": 50
+      },
+      "recommendation": "rec_inventory",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_ownership",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "ownership",
+        "value": 50
+      },
+      "recommendation": "rec_ownership",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "rec_environments",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "environments",
+        "value": 50
+      },
+      "recommendation": "rec_environments",
+      "horizon": 60,
+      "domains": [
+        "managed_operations",
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_versioning",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "versioning",
+        "value": 50
+      },
+      "recommendation": "rec_versioning",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_evaluation",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "evaluation",
+        "value": 50
+      },
+      "recommendation": "rec_evaluation",
+      "horizon": 60,
+      "domains": [
+        "ai_applications",
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_observability",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "observability",
+        "value": 50
+      },
+      "recommendation": "rec_observability",
+      "horizon": 60,
+      "domains": [
+        "managed_operations",
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_cost",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "cost",
+        "value": 50
+      },
+      "recommendation": "rec_cost",
+      "horizon": 60,
+      "domains": [
+        "managed_operations",
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_permissions",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "permissions",
+        "value": 50
+      },
+      "recommendation": "rec_permissions",
+      "horizon": 60,
+      "domains": [
+        "managed_operations",
+        "ai_governance"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_incidents",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "incidents",
+        "value": 50
+      },
+      "recommendation": "rec_incidents",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_privacy",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "privacy",
+        "value": 50
+      },
+      "recommendation": "rec_privacy",
+      "horizon": 60,
+      "domains": [
+        "managed_operations",
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_portability",
+      "priority": 15,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "portability",
+        "value": 50
+      },
+      "recommendation": "rec_portability",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_support",
+      "priority": 15,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "support",
+        "value": 50
+      },
+      "recommendation": "rec_support",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "pattern_production_checklist",
+      "priority": 20,
+      "when": {
+        "kind": "overall_at_least",
+        "value": 0
+      },
+      "recommendation": "pattern_production_checklist",
+      "kind": "pattern",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "pattern_managed_boundaries",
+      "priority": 21,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "dimension_below",
+            "dimension": "support",
+            "value": 50
+          },
+          {
+            "kind": "dimension_below",
+            "dimension": "observability",
+            "value": 50
+          },
+          {
+            "kind": "dimension_below",
+            "dimension": "incidents",
+            "value": 50
+          }
+        ]
+      },
+      "recommendation": "pattern_managed_boundaries",
+      "kind": "pattern",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "ts_continuous_operations",
+      "priority": 30,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "evaluation",
+            "value": 75
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "observability",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "ts_continuous_operations",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "ctx_agents",
+      "priority": 31,
+      "when": {
+        "kind": "answer_in",
+        "question": "ai_context",
+        "options": [
+          "agents"
+        ]
+      },
+      "recommendation": "ctx_agents",
+      "kind": "context",
+      "domains": [
+        "managed_operations",
+        "ai_agents_automation"
+      ]
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на готовността за AI операции",
+      "intro": "25 въпроса в 12 области: от опис и отговорности до версии, оценки, наблюдение, разходи, права на агентите, инциденти, поверителност, независимост от доставчика и поддръжка.",
+      "disclaimer": "Самооценка по вашите отговори. Не се свързваме с вашите системи и не показваме реално състояние или телеметрия. Всяка препоръка сочи правилото и отговора, от които идва. Не е одит и не е правен съвет.",
+      "dimensions": {
+        "inventory": {
+          "title": "Опис на агенти и приложения",
+          "description": "Кои AI агенти и LLM приложения работят и къде."
+        },
+        "ownership": {
+          "title": "Собственост и отговорност",
+          "description": "Кой отговаря за работата на всяка система."
+        },
+        "environments": {
+          "title": "Разделение на средите",
+          "description": "Разработка, тест и продукция поотделно."
+        },
+        "versioning": {
+          "title": "Версии на промпти и модели",
+          "description": "Версии, преглед и връщане назад."
+        },
+        "evaluation": {
+          "title": "Покритие с оценки",
+          "description": "Тестови набори и автоматична оценка."
+        },
+        "observability": {
+          "title": "Наблюдение в работа",
+          "description": "Грешки, латентност, откази и проследимост."
+        },
+        "cost": {
+          "title": "Разходи и токени",
+          "description": "Проследяване на разхода по функция и лимити."
+        },
+        "permissions": {
+          "title": "Права на инструментите и одобрения",
+          "description": "Какво могат агентите и кога одобрява човек."
+        },
+        "incidents": {
+          "title": "Инциденти и връщане назад",
+          "description": "Бързо изключване, резервен режим и връщане."
+        },
+        "privacy": {
+          "title": "Съхранение и поверителност",
+          "description": "Лични данни в журналите и срокове."
+        },
+        "portability": {
+          "title": "Независимост от доставчика",
+          "description": "Може ли да смените модел или доставчик."
+        },
+        "support": {
+          "title": "Поддръжка и ескалация",
+          "description": "Кой реагира и как се ескалира."
+        }
+      },
+      "questions": {
+        "ai_context": {
+          "text": "Какви AI системи работят при вас?",
+          "help": "Изберете всичко приложимо. Не променя оценката.",
+          "options": {
+            "assistant": "Асистент или чатбот",
+            "rag": "Търсене в документи (RAG)",
+            "agents": "Агенти, които изпълняват действия",
+            "extraction": "Извличане на данни от документи"
+          }
+        },
+        "op_inventory": {
+          "text": "Има ли списък на агентите и приложенията в работа?",
+          "options": {
+            "none": "Не",
+            "partial": "Частичен",
+            "complete": "Пълен",
+            "live": "Пълен, с версии и зависимости"
+          }
+        },
+        "op_criticality": {
+          "text": "Знаете ли колко критична е всяка система?",
+          "options": {
+            "none": "Не",
+            "informal": "Неформално",
+            "rated": "Оценена",
+            "tiered": "Оценена, с нива на поддръжка"
+          }
+        },
+        "op_owner": {
+          "text": "Има ли отговорник за работата на всяка система?",
+          "options": {
+            "none": "Не",
+            "builder": "Който я е направил",
+            "named": "Посочен",
+            "raci": "Посочен, с описани отговорности"
+          }
+        },
+        "op_reviews": {
+          "text": "Преглежда ли се работата на системите редовно?",
+          "options": {
+            "none": "Не",
+            "incidents": "След инциденти",
+            "monthly": "Месечно",
+            "metrics": "Редовно, по показатели"
+          }
+        },
+        "op_envs": {
+          "text": "Разделени ли са разработка, тест и продукция?",
+          "options": {
+            "single": "Една обща среда",
+            "two": "Разработка и продукция",
+            "three": "Три среди",
+            "isolated": "Три среди с отделни ключове и данни"
+          }
+        },
+        "op_test_data": {
+          "text": "С какви данни се тества?",
+          "options": {
+            "production": "Реални лични данни",
+            "copies": "Копия на реални данни",
+            "masked": "Маскирани данни",
+            "synthetic": "Синтетични или маскирани, по правило"
+          }
+        },
+        "op_versions": {
+          "text": "Как се променят промпти и модели?",
+          "options": {
+            "live_edits": "Директно в работа",
+            "manual": "Ръчно, с бележки",
+            "versioned": "Версионирани, с преглед",
+            "tested": "Версионирани, тествани, с връщане назад"
+          }
+        },
+        "op_pinning": {
+          "text": "Фиксирана ли е версията на модела?",
+          "options": {
+            "latest": "Ползваме „най-новия“",
+            "sometimes": "Понякога",
+            "pinned": "Фиксирана",
+            "pinned_tested": "Фиксирана, смяната минава през оценка"
+          }
+        },
+        "op_eval_sets": {
+          "text": "Има ли тестови набори за всяка система?",
+          "options": {
+            "none": "Не",
+            "some": "За някои",
+            "all": "За всички",
+            "maintained": "За всички, обновявани от реални случаи"
+          }
+        },
+        "op_eval_gate": {
+          "text": "Спира ли лошата оценка пускането?",
+          "options": {
+            "none": "Не",
+            "advisory": "Само показва резултат",
+            "manual": "Ръчно решение",
+            "gate": "Автоматично спира"
+          }
+        },
+        "op_monitoring": {
+          "text": "Следите ли грешки, латентност и откази на модела?",
+          "options": {
+            "none": "Не",
+            "logs": "Има логове, не се следят",
+            "alerts": "Известия за грешки",
+            "dashboards": "Табла и известия за всичко това"
+          }
+        },
+        "op_tracing": {
+          "text": "Може ли да проследите отговор до входа, инструментите и източниците?",
+          "options": {
+            "none": "Не",
+            "partial": "Частично",
+            "yes": "Да",
+            "privacy": "Да, със защита на личните данни"
+          }
+        },
+        "op_cost_tracking": {
+          "text": "Следите ли разхода за токени и заявки?",
+          "options": {
+            "none": "Не",
+            "invoice": "Само по фактурата",
+            "per_feature": "По функции",
+            "per_unit": "По функции и на единица"
+          }
+        },
+        "op_cost_limits": {
+          "text": "Има ли лимити и известия за разхода?",
+          "options": {
+            "none": "Не",
+            "provider": "Само лимит при доставчика",
+            "app": "Лимити и в приложението",
+            "alerts": "Лимити и известия при отклонение"
+          }
+        },
+        "op_tool_scope": {
+          "text": "Какви права имат агентите към системите?",
+          "options": {
+            "broad": "Широки, като на човек",
+            "unknown": "Не сме проверявали",
+            "scoped": "Ограничени по задача",
+            "least": "Минимални, с отделни сервизни акаунти"
+          }
+        },
+        "op_tool_approval": {
+          "text": "Одобрява ли човек действията с външен ефект?",
+          "options": {
+            "never": "Не",
+            "sometimes": "Понякога",
+            "always": "Винаги",
+            "tiered": "По нива на риск"
+          }
+        },
+        "op_kill_switch": {
+          "text": "Може ли бързо да спрете агент или функция?",
+          "options": {
+            "none": "Не",
+            "deploy": "С ново внедряване",
+            "switch": "С превключвател",
+            "tested": "С превключвател, тестван"
+          }
+        },
+        "op_fallback": {
+          "text": "Какво става, ако моделът не отговаря?",
+          "options": {
+            "breaks": "Функцията спира",
+            "error": "Показва се грешка",
+            "fallback": "Резервен режим",
+            "tested": "Тестван резервен режим"
+          }
+        },
+        "op_log_privacy": {
+          "text": "Пазят ли се лични данни в журналите?",
+          "options": {
+            "unknown": "Не знаем",
+            "yes": "Да, без ограничения",
+            "masked": "Маскирани",
+            "minimised": "Минимизирани, със срок"
+          }
+        },
+        "op_retention": {
+          "text": "Има ли срок за журналите и данните на агентите?",
+          "options": {
+            "none": "Не",
+            "defined": "Определен",
+            "enforced": "Прилага се",
+            "vendor_too": "Прилага се, и при доставчика"
+          }
+        },
+        "op_abstraction": {
+          "text": "Зависи ли кодът от конкретен доставчик на модели?",
+          "options": {
+            "hard": "Силно",
+            "some": "Частично",
+            "abstracted": "Има слой за доставчика",
+            "tested": "Има слой и тествана алтернатива"
+          }
+        },
+        "op_exit": {
+          "text": "Ако доставчик спре модел, какво става?",
+          "options": {
+            "unknown": "Не знаем",
+            "scramble": "Импровизираме",
+            "plan": "Има план",
+            "rehearsed": "Има план и упражнена миграция"
+          }
+        },
+        "op_support": {
+          "text": "Кой реагира при проблем?",
+          "options": {
+            "nobody": "Никой конкретно",
+            "builder": "Който я е направил, когато може",
+            "team": "Екип в работно време",
+            "sla": "Екип с договорени срокове"
+          }
+        },
+        "op_escalation": {
+          "text": "Има ли път за ескалация, включително към доставчиците?",
+          "options": {
+            "none": "Не",
+            "informal": "Неформален",
+            "documented": "Описан",
+            "practised": "Описан и упражняван"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_live_edits": {
+          "title": "Промени директно в работа",
+          "description": "Промяна без версия и тест може тихо да влоши всички отговори."
+        },
+        "risk_broad_tools": {
+          "title": "Агенти с широки права",
+          "description": "Агент с правата на човек може да направи всичко, което и човекът — включително при манипулация."
+        },
+        "risk_no_kill_switch": {
+          "title": "Няма бързо изключване",
+          "description": "При вредно поведение спирането отнема време, през което проблемът продължава."
+        },
+        "risk_production_data_in_test": {
+          "title": "Реални лични данни при тестове",
+          "description": "Тестовите среди рядко са защитени като продукцията."
+        },
+        "risk_unbounded_cost": {
+          "title": "Неограничени разходи",
+          "description": "Цикъл или злоупотреба могат да изразходват бюджета за часове."
+        },
+        "risk_no_owner": {
+          "title": "Няма отговорник за работата",
+          "description": "Системата зависи от наличността на човека, който я е направил."
+        },
+        "qw_pin_models": {
+          "title": "Фиксирайте версията на модела",
+          "description": "Използвайте конкретна версия вместо „най-новата“, за да няма промени без оценка."
+        },
+        "qw_spend_cap": {
+          "title": "Лимит и известие за разхода",
+          "description": "Дневен лимит в приложението и известие при отклонение."
+        },
+        "qw_kill_switch": {
+          "title": "Превключвател за спиране",
+          "description": "Превключвател без ново внедряване за всеки агент и AI функция."
+        },
+        "qw_test_set": {
+          "title": "Тестов набор за всяка система",
+          "description": "30–50 реални примера с очаквани отговори, пускани при всяка промяна."
+        },
+        "rec_inventory": {
+          "title": "Опис и критичност",
+          "description": "Списък на системите с версии, зависимости и ниво на критичност."
+        },
+        "rec_ownership": {
+          "title": "Ясна отговорност",
+          "description": "Отговорник и описани отговорности за всяка система, с редовен преглед."
+        },
+        "rec_environments": {
+          "title": "Отделни среди",
+          "description": "Три среди с отделни ключове и синтетични или маскирани тестови данни."
+        },
+        "rec_versioning": {
+          "title": "Версии и връщане назад",
+          "description": "Версионирани промпти, фиксирани модели и тест преди смяна."
+        },
+        "rec_evaluation": {
+          "title": "Оценките като праг за пускане",
+          "description": "Тестови набори за всяка система и автоматичен праг при пускане."
+        },
+        "rec_observability": {
+          "title": "Наблюдение в работа",
+          "description": "Табла и известия за грешки, латентност и откази, с проследимост."
+        },
+        "rec_cost": {
+          "title": "Контрол на разходите",
+          "description": "Разход по функция и на единица, лимити и известия."
+        },
+        "rec_permissions": {
+          "title": "Минимални права и одобрения",
+          "description": "Сервизни акаунти с минимални права и одобрение по нива на риск."
+        },
+        "rec_incidents": {
+          "title": "Изключване и резервен режим",
+          "description": "Тестван превключвател и резервен режим за всяка система."
+        },
+        "rec_privacy": {
+          "title": "Поверителност в журналите",
+          "description": "Минимизирани лични данни и срокове, приложени и при доставчика."
+        },
+        "rec_portability": {
+          "title": "Независимост от доставчика",
+          "description": "Слой за доставчика и тествана алтернатива."
+        },
+        "rec_support": {
+          "title": "Поддръжка и ескалация",
+          "description": "Екип с договорени срокове и упражняван път за ескалация."
+        },
+        "pattern_production_checklist": {
+          "title": "Минимален списък за готовност за продукция",
+          "description": "Отговорник; фиксирана версия на модела; тестов набор и праг за пускане; наблюдение на грешки и откази; лимит на разхода; минимални права на агентите и одобрение при външен ефект; превключвател за спиране и резервен режим; срок за журналите; път за ескалация. Рисковете по-горе показват кое липсва."
+        },
+        "pattern_managed_boundaries": {
+          "title": "Препоръчани граници на управлявана услуга",
+          "description": "Подходящо за външна поддръжка: наблюдение и известия, реакция при инциденти, оценки при промени и отчети за разходите. Остава при вас: бизнес решенията, одобренията с външен ефект, данните и отговорността към клиентите."
+        },
+        "ts_continuous_operations": {
+          "title": "Непрекъснато подобрение",
+          "description": "Цикъл: данни от работа → оценка → промяна → наблюдение, с отчет към отговорника."
+        },
+        "ctx_agents": {
+          "title": "Агентите изискват повече контрол",
+          "description": "Агентите изпълняват действия: правата, одобренията и бързото спиране са по-важни, отколкото при асистент, който само отговаря."
+        }
+      }
+    },
+    "en": {
+      "title": "AI Operations Readiness Assessment",
+      "intro": "25 questions across 12 areas: from inventory and accountability to versioning, evaluations, observability, cost, agent permissions, incidents, privacy, vendor portability and support.",
+      "disclaimer": "A self-assessment based on your answers. We do not connect to your systems and show no real health or telemetry. Every recommendation points to the rule and answer it comes from. Not an audit and not legal advice.",
+      "dimensions": {
+        "inventory": {
+          "title": "Agent and application inventory",
+          "description": "Which AI agents and LLM apps run and where."
+        },
+        "ownership": {
+          "title": "Owners and operational accountability",
+          "description": "Who is accountable for running each system."
+        },
+        "environments": {
+          "title": "Environment separation",
+          "description": "Development, test and production kept apart."
+        },
+        "versioning": {
+          "title": "Prompt and model versioning",
+          "description": "Versions, review and rollback."
+        },
+        "evaluation": {
+          "title": "Evaluation coverage",
+          "description": "Test sets and automated evaluation."
+        },
+        "observability": {
+          "title": "Runtime observability",
+          "description": "Errors, latency, refusals and traceability."
+        },
+        "cost": {
+          "title": "Cost and token usage",
+          "description": "Spend tracking per feature, and limits."
+        },
+        "permissions": {
+          "title": "Tool permissions and approvals",
+          "description": "What agents may do and when a person approves."
+        },
+        "incidents": {
+          "title": "Incident response and rollback",
+          "description": "A quick switch-off, fallback and rollback."
+        },
+        "privacy": {
+          "title": "Data retention and privacy",
+          "description": "Personal data in logs, and retention."
+        },
+        "portability": {
+          "title": "Vendor portability",
+          "description": "Whether you can switch model or vendor."
+        },
+        "support": {
+          "title": "Operational support and escalation",
+          "description": "Who responds and how it escalates."
+        }
+      },
+      "questions": {
+        "ai_context": {
+          "text": "What AI systems do you run?",
+          "help": "Select all that apply. It does not change the score.",
+          "options": {
+            "assistant": "An assistant or chatbot",
+            "rag": "Document search (RAG)",
+            "agents": "Agents that take actions",
+            "extraction": "Data extraction from documents"
+          }
+        },
+        "op_inventory": {
+          "text": "Is there a list of agents and apps in production?",
+          "options": {
+            "none": "No",
+            "partial": "Partial",
+            "complete": "Complete",
+            "live": "Complete, with versions and dependencies"
+          }
+        },
+        "op_criticality": {
+          "text": "Do you know how critical each system is?",
+          "options": {
+            "none": "No",
+            "informal": "Informally",
+            "rated": "Rated",
+            "tiered": "Rated, with support tiers"
+          }
+        },
+        "op_owner": {
+          "text": "Is there an owner for running each system?",
+          "options": {
+            "none": "No",
+            "builder": "Whoever built it",
+            "named": "Named",
+            "raci": "Named, with documented responsibilities"
+          }
+        },
+        "op_reviews": {
+          "text": "Is system operation reviewed regularly?",
+          "options": {
+            "none": "No",
+            "incidents": "After incidents",
+            "monthly": "Monthly",
+            "metrics": "Regularly, against metrics"
+          }
+        },
+        "op_envs": {
+          "text": "Are development, test and production separated?",
+          "options": {
+            "single": "One shared environment",
+            "two": "Development and production",
+            "three": "Three environments",
+            "isolated": "Three environments with separate keys and data"
+          }
+        },
+        "op_test_data": {
+          "text": "What data is used for testing?",
+          "options": {
+            "production": "Real personal data",
+            "copies": "Copies of real data",
+            "masked": "Masked data",
+            "synthetic": "Synthetic or masked, by rule"
+          }
+        },
+        "op_versions": {
+          "text": "How are prompts and models changed?",
+          "options": {
+            "live_edits": "Directly in production",
+            "manual": "By hand, with notes",
+            "versioned": "Versioned, reviewed",
+            "tested": "Versioned, tested, with rollback"
+          }
+        },
+        "op_pinning": {
+          "text": "Is the model version pinned?",
+          "options": {
+            "latest": "We use the 'latest' alias",
+            "sometimes": "Sometimes",
+            "pinned": "Pinned",
+            "pinned_tested": "Pinned; changes go through evaluation"
+          }
+        },
+        "op_eval_sets": {
+          "text": "Is there a test set for each system?",
+          "options": {
+            "none": "No",
+            "some": "For some",
+            "all": "For all",
+            "maintained": "For all, refreshed from real cases"
+          }
+        },
+        "op_eval_gate": {
+          "text": "Does a poor evaluation block a release?",
+          "options": {
+            "none": "No",
+            "advisory": "It only reports",
+            "manual": "A manual decision",
+            "gate": "It blocks automatically"
+          }
+        },
+        "op_monitoring": {
+          "text": "Do you monitor errors, latency and model refusals?",
+          "options": {
+            "none": "No",
+            "logs": "There are logs, not watched",
+            "alerts": "Alerts on errors",
+            "dashboards": "Dashboards and alerts for all of it"
+          }
+        },
+        "op_tracing": {
+          "text": "Can you trace an answer to its input, tools and sources?",
+          "options": {
+            "none": "No",
+            "partial": "Partly",
+            "yes": "Yes",
+            "privacy": "Yes, with personal data protected"
+          }
+        },
+        "op_cost_tracking": {
+          "text": "Do you track token and request spend?",
+          "options": {
+            "none": "No",
+            "invoice": "Only from the invoice",
+            "per_feature": "Per feature",
+            "per_unit": "Per feature and per unit"
+          }
+        },
+        "op_cost_limits": {
+          "text": "Are there spending limits and alerts?",
+          "options": {
+            "none": "No",
+            "provider": "Only a vendor limit",
+            "app": "Limits in the app too",
+            "alerts": "Limits and anomaly alerts"
+          }
+        },
+        "op_tool_scope": {
+          "text": "What permissions do agents have on systems?",
+          "options": {
+            "broad": "Broad, like a person's",
+            "unknown": "We have not checked",
+            "scoped": "Scoped per task",
+            "least": "Least privilege, separate service accounts"
+          }
+        },
+        "op_tool_approval": {
+          "text": "Does a person approve actions with an external effect?",
+          "options": {
+            "never": "No",
+            "sometimes": "Sometimes",
+            "always": "Always",
+            "tiered": "By risk level"
+          }
+        },
+        "op_kill_switch": {
+          "text": "Can you stop an agent or feature quickly?",
+          "options": {
+            "none": "No",
+            "deploy": "With a new deployment",
+            "switch": "With a switch",
+            "tested": "With a tested switch"
+          }
+        },
+        "op_fallback": {
+          "text": "What happens if the model does not respond?",
+          "options": {
+            "breaks": "The feature breaks",
+            "error": "An error is shown",
+            "fallback": "A fallback mode",
+            "tested": "A tested fallback"
+          }
+        },
+        "op_log_privacy": {
+          "text": "Is personal data kept in logs?",
+          "options": {
+            "unknown": "We do not know",
+            "yes": "Yes, without limits",
+            "masked": "Masked",
+            "minimised": "Minimised, with a retention period"
+          }
+        },
+        "op_retention": {
+          "text": "Is there a retention period for logs and agent data?",
+          "options": {
+            "none": "No",
+            "defined": "Defined",
+            "enforced": "Enforced",
+            "vendor_too": "Enforced, at the vendor too"
+          }
+        },
+        "op_abstraction": {
+          "text": "Does the code depend on one model vendor?",
+          "options": {
+            "hard": "Heavily",
+            "some": "Partly",
+            "abstracted": "There is a vendor layer",
+            "tested": "There is a layer and a tested alternative"
+          }
+        },
+        "op_exit": {
+          "text": "If a vendor retires a model, what happens?",
+          "options": {
+            "unknown": "We do not know",
+            "scramble": "We improvise",
+            "plan": "There is a plan",
+            "rehearsed": "There is a plan and a rehearsed migration"
+          }
+        },
+        "op_support": {
+          "text": "Who responds to a problem?",
+          "options": {
+            "nobody": "Nobody in particular",
+            "builder": "Whoever built it, when available",
+            "team": "A team in business hours",
+            "sla": "A team with agreed response times"
+          }
+        },
+        "op_escalation": {
+          "text": "Is there an escalation path, including to vendors?",
+          "options": {
+            "none": "No",
+            "informal": "Informal",
+            "documented": "Documented",
+            "practised": "Documented and practised"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_live_edits": {
+          "title": "Changes straight into production",
+          "description": "An unversioned, untested change can silently degrade every answer."
+        },
+        "risk_broad_tools": {
+          "title": "Agents with broad permissions",
+          "description": "An agent with a person's permissions can do anything that person can — including when manipulated."
+        },
+        "risk_no_kill_switch": {
+          "title": "No quick switch-off",
+          "description": "When behaviour turns harmful, stopping takes time while the problem continues."
+        },
+        "risk_production_data_in_test": {
+          "title": "Real personal data in testing",
+          "description": "Test environments are rarely protected like production."
+        },
+        "risk_unbounded_cost": {
+          "title": "Unbounded spend",
+          "description": "A loop or abuse can burn the budget within hours."
+        },
+        "risk_no_owner": {
+          "title": "No operational owner",
+          "description": "The system depends on whoever built it being available."
+        },
+        "qw_pin_models": {
+          "title": "Pin the model version",
+          "description": "Use a specific version instead of 'latest', so nothing changes without evaluation."
+        },
+        "qw_spend_cap": {
+          "title": "A spending cap and alert",
+          "description": "A daily cap in the application and an alert on anomalies."
+        },
+        "qw_kill_switch": {
+          "title": "A switch-off toggle",
+          "description": "A toggle that needs no deployment for every agent and AI feature."
+        },
+        "qw_test_set": {
+          "title": "A test set for each system",
+          "description": "30–50 real examples with expected answers, run on every change."
+        },
+        "rec_inventory": {
+          "title": "Inventory and criticality",
+          "description": "A list of systems with versions, dependencies and criticality."
+        },
+        "rec_ownership": {
+          "title": "Clear accountability",
+          "description": "An owner and documented responsibilities for each system, reviewed regularly."
+        },
+        "rec_environments": {
+          "title": "Separate environments",
+          "description": "Three environments with separate keys and synthetic or masked test data."
+        },
+        "rec_versioning": {
+          "title": "Versions and rollback",
+          "description": "Versioned prompts, pinned models and a test before switching."
+        },
+        "rec_evaluation": {
+          "title": "Evaluations as a release gate",
+          "description": "Test sets for every system and an automatic release gate."
+        },
+        "rec_observability": {
+          "title": "Runtime observability",
+          "description": "Dashboards and alerts for errors, latency and refusals, with tracing."
+        },
+        "rec_cost": {
+          "title": "Cost control",
+          "description": "Spend per feature and per unit, limits and alerts."
+        },
+        "rec_permissions": {
+          "title": "Least privilege and approvals",
+          "description": "Least-privilege service accounts and risk-tiered approval."
+        },
+        "rec_incidents": {
+          "title": "Switch-off and fallback",
+          "description": "A tested switch and a fallback for every system."
+        },
+        "rec_privacy": {
+          "title": "Privacy in logs",
+          "description": "Minimised personal data and retention enforced at the vendor too."
+        },
+        "rec_portability": {
+          "title": "Vendor portability",
+          "description": "A vendor layer and a tested alternative."
+        },
+        "rec_support": {
+          "title": "Support and escalation",
+          "description": "A team with agreed response times and a practised escalation path."
+        },
+        "pattern_production_checklist": {
+          "title": "Minimum production-readiness checklist",
+          "description": "An owner; a pinned model version; a test set and a release gate; monitoring of errors and refusals; a spending cap; least-privilege agents with approval for external effects; a switch-off and a fallback; log retention; an escalation path. The risks above show what is missing."
+        },
+        "pattern_managed_boundaries": {
+          "title": "Recommended managed service boundaries",
+          "description": "Suitable for an external team: monitoring and alerts, incident response, evaluations on change and cost reports. Stays with you: business decisions, approvals with an external effect, the data and accountability to customers."
+        },
+        "ts_continuous_operations": {
+          "title": "Continuous improvement",
+          "description": "A loop: production data → evaluation → change → monitoring, reported to the owner."
+        },
+        "ctx_agents": {
+          "title": "Agents need more control",
+          "description": "Agents take actions: permissions, approvals and a quick stop matter more than for an assistant that only answers."
+        }
+      }
+    }
+  }
+}

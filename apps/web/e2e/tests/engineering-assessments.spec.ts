@@ -203,7 +203,9 @@ test("responsible AI governance in Bulgarian: not legal advice, explained risks"
   await expect(result.getByTestId("tool-score")).toHaveText("0");
   await expect(result.getByTestId("engine-findings-risk")).toContainText("Решения за хора без човешки контрол");
   await expect(result.getByTestId("engine-findings-context")).toContainText("не определя задълженията ви");
-  await expect(result).toContainText("не е правен съвет");
+  await expect(result).toContainText("Не е правен съвет, не е правен одит");
+  await expect(result.getByTestId("engine-findings-pattern")).toContainText("Примерни документи за управление");
+  await expect(result.getByTestId("engine-findings-pattern")).toContainText("Примерен процес за преглед и одобрение");
 });
 
 test("all five new assessments are served by the API in both languages", async ({ request }) => {
@@ -212,7 +214,7 @@ test("all five new assessments are served by the API in both languages", async (
       const response = await request.get(`/api/public/assessments/${key}?locale=${locale}`);
       expect(response.status(), `${key} ${locale}`).toBe(200);
       const body = await response.json();
-      expect(body.questions.length, key).toBe(key === "ecommerce_architecture" || key === "data_integration" ? 23 : 11);
+      expect(body.questions.length, key).toBe(key === "ecommerce_architecture" || key === "data_integration" ? 23 : 25);
       expect(JSON.stringify(body)).not.toContain('"points"');
     }
   }

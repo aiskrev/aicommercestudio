@@ -119,15 +119,18 @@ The disclaimer says the assessment measures no availability or reliability and c
 achievement. 1.1.0 and 1.0.0 stay, so saved results re-render. The `observability_signals`
 extension (`telemetry`, `alert_routing`) still applies.
 
-## 2b. Five further assessments (1.0.0, live)
+## 2b. Five further assessments
 
-| Assessment | Areas (5 × 2 questions) | Context (unscored) |
+| Assessment | Areas (2 questions each) | Context (unscored) |
 | --- | --- | --- |
 | E-commerce Architecture (`ecommerce_architecture`, **11 areas, 23 questions**) | storefront and performance, maintainability, catalogue and inventory, orders and fulfilment, payment boundaries, search, analytics and consent, SEO and structured data, support and personalisation, ERP/CRM/WMS integrations, resilience and releases | platform (Shopify, WooCommerce, Magento, custom, other) |
 | Data & Integration Readiness (`data_integration`, **11 areas, 23 questions**) | ownership and governance, source-system inventory, quality and completeness, API readiness, events, ETL/ELT pipelines, schema evolution and contracts, identity and access, privacy and retention, RAG suitability, lineage and monitoring | systems (ERP, CRM, store, accounting, warehouse, BI) |
-| Responsible AI Governance (`ai_governance`) | inventory and accountability, risk assessment, personal data and providers, human oversight, transparency and quality | where AI is used (internal, customers, decisions about people, products) |
-| AI Operations Readiness (`ai_ops_readiness`) | monitoring, output quality, model and prompt changes, incidents, cost and limits | AI systems (assistant, RAG, agents, extraction) |
-| FinOps & AI Cost (`finops`) | visibility and allocation, budgets and forecasting, optimisation, AI model costs, accountability | spend (AWS, Azure, GCP, AI APIs, SaaS, hosting) |
+| Responsible AI Governance (`ai_governance` **1.1.0, 12 areas, 25 questions**) | AI system inventory, data classification, third-party model and vendor risk, privacy and data handling, threat modelling, prompt injection and exfiltration controls, human oversight and approval boundaries, evaluations and model quality, traceability, incident response, model and version change management, retention and deletion | where AI is used (internal, customers, decisions about people, products); optional |
+| AI Operations Readiness (`ai_ops_readiness` **1.1.0, 12 areas, 25 questions**) | agent and app inventory, owners and accountability, environment separation, prompt and model versioning, evaluation coverage, runtime observability, cost and token monitoring, tool permissions and approvals, incident response and rollback, retention and privacy, vendor portability, support and escalation | AI systems (assistant, RAG, agents, extraction); optional |
+| FinOps & AI Cost (`finops` **1.1.0, 12 areas, 25 questions**) | allocation and tagging, budget ownership, forecasting and variance, reserved and committed capacity, Kubernetes and compute efficiency, waste detection, model selection and usage governance, token and request accounting, caching and batching, provider cost visibility, budget alerts and quotas, optimisation approvals | spend (AWS, Azure, GCP, Kubernetes, AI APIs, SaaS); optional |
+
+The 1.0.0 versions of the last three (5 areas, 11 questions) stay in the registry so that saved results
+still re-render; new scoring uses 1.1.0. In 1.1.0 the context question is optional.
 
 **Finding tracks.** A new optional rule field, `track`, labels how a finding would be addressed:
 platform configuration, traditional engineering, or a use case suitable for AI. It is shown as a badge
@@ -149,16 +152,48 @@ in the result and in the report.
   * An always-present caveat says when RAG does *not* fit.
   * Quality answers are labelled as self-assessed, not measured, and no data upload exists.
 
-The three other assessments each have:
+The three 12-area assessments (1.1.0) each have:
 
-* 3–4 risks and 3–4 quick wins (30 days);
-* one recommendation per area below 50 (60 days, capped at 6);
-* 1–2 target states (90 days);
-* context notes where relevant.
+* 4–6 risks and 4–6 quick wins (30 days);
+* one recommendation per area below 50 (60 days, capped at 10);
+* reference patterns;
+* a target state (90 days);
+* context notes.
+
+**Responsible AI Governance.**
+
+* **Outputs.** The result contains:
+  * a gap analysis: area scores, with a control maturity level per area;
+  * a risk-prioritised remediation checklist: risks, then quick wins, then per-area recommendations;
+  * example governance documents: templates, explicitly not legal documents;
+  * a suggested review and approval workflow, shown while oversight or change management is below 75;
+  * links to the related security and engineering services.
+* **Limits.** The assessment is educational. It is not legal advice and not a legal audit, and it does
+  not confirm compliance with the AI Act, GDPR or any other law. The note on stricter requirements says
+  that the assessment does not determine obligations.
+
+**AI Operations Readiness.**
+
+* **Outputs.** The result contains:
+  * maturity per area;
+  * an operational risk register: risks, each with its rule basis;
+  * a minimum production-readiness checklist;
+  * recommended managed service boundaries: what an external team can run and what stays with the
+    client. This part is shown while support, observability or incidents score below 50;
+  * a phased plan: the 30/60/90 roadmap.
+* **Limits.** There is no connection to client systems and no telemetry. Every finding names the rule
+  and the answer behind it.
+
+**FinOps & AI Cost.**
+
+* **Outputs.** Maturity, control gaps, optimisation recommendations and a roadmap.
+* **Limits.**
+  * It contains only choice questions: no prices, no currency, no amounts, no example cost formula.
+  * It calculates no savings and has no billing access.
+  * An always-present note says it is not the ROI calculator.
 
 Every finding is explained by its trigger. The texts say the result is not an audit and not legal
-advice. The AI governance note on stricter requirements says explicitly that the assessment does not
-determine obligations. FinOps contains no savings forecasts.
+advice.
 
 ## 3. Shared engine features (backward compatible)
 
@@ -193,6 +228,10 @@ The result has:
 * related service domains and the disclaimer;
 * "Save and create the report" (opt-in), the HTML report view, the PDF download and deletion;
 * an optional consultation.
+
+All ten assessment tools share one result layout. Its parts are strengths and gaps, the methodology
+version and basis (`ResultBasis`), the calculation note, and the services and workshops. See
+[ASSESSMENT_COVERAGE.md](ASSESSMENT_COVERAGE.md).
 
 Texts are in `content/{bg,en}/tool-engineering.ts`.
 

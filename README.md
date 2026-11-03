@@ -117,7 +117,8 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [AI_ADVISOR.md](docs/AI_ADVISOR.md) | AI Business Automation Advisor: flow, architecture, safety controls, retention, demo |
 | [AI_ADVISOR_V2.md](docs/AI_ADVISOR_V2.md) | Advisor V2: versioned contract, enumerated context, deterministic insights with provenance, compatibility |
 | [ASSESSMENT_PLATFORM_ARCHITECTURE.md](docs/ASSESSMENT_PLATFORM_ARCHITECTURE.md) | Deterministic assessment engine: definitions, scoring, rules, saved results, retention |
-| [ENGINEERING_ASSESSMENTS.md](docs/ENGINEERING_ASSESSMENTS.md) | Cloud & Platform and DevOps Delivery maturity assessments: domains, rules, metrics evidence, roadmap |
+| [ENGINEERING_ASSESSMENTS.md](docs/ENGINEERING_ASSESSMENTS.md) | The eight engine assessments (cloud, DevOps, observability, e-commerce, data, AI governance, AI operations, FinOps): domains, rules, metrics evidence, roadmap |
+| [ASSESSMENT_COVERAGE.md](docs/ASSESSMENT_COVERAGE.md) | Coverage matrix of the ten assessment tools: shared results layout, backend, UI, report, tests and missing capabilities |
 | [REPORTS.md](docs/REPORTS.md) | Report documents: HTML view and PDF architecture, access by token, limits, optional consultation |
 | [TOOLS_PLATFORM.md](docs/TOOLS_PLATFORM.md) | Tool registry, flags, shared UI, analytics, AI team model |
 | [READINESS_REPORTS.md](docs/READINESS_REPORTS.md) | AI readiness: PDF report, submissions, admin view |

@@ -4,9 +4,10 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 
 import { ReportView } from "@/components/tools/assessment/ReportView";
-import { ChoiceQuestion, ResultSummary, StepNav, StepProgress, ToolState } from "@/components/tools/ToolUi";
+import { ChoiceQuestion, MethodologyNote, ResultBasis, ResultSummary, StepNav, StepProgress, StrengthsGaps, ToolState } from "@/components/tools/ToolUi";
 import { Alert, Badge, Button, ButtonLink, cx } from "@/components/ui/primitives";
 import type { engineeringTool } from "@/content/bg/tool-engineering";
+import type { tools } from "@/content/bg/tools";
 import type { Locale } from "@/i18n/config";
 import { trackToolEvent } from "@/lib/analytics";
 import {
@@ -48,6 +49,10 @@ interface Props {
   contactHref: string;
   privacyHref: string;
   retentionDays: number;
+  /** The methodology disclosure shared by every assessment result (version, heuristic or measured). */
+  basis: (typeof tools)["ui"]["basis"];
+  /** Domain hubs that list the workshops and consultant-led assessments. */
+  workshops?: { href: string; label: string }[];
 }
 
 /**
@@ -55,7 +60,18 @@ interface Props {
  * API, one area per step; the server scores the answers. The result is shown immediately — saving
  * (for the report and PDF) and a consultation are separate, optional actions.
  */
-export function EngineAssessment({ assessment, tool, content, locale, domainLinks, contactHref, privacyHref, retentionDays }: Props) {
+export function EngineAssessment({
+  assessment,
+  tool,
+  content,
+  locale,
+  domainLinks,
+  contactHref,
+  privacyHref,
+  retentionDays,
+  basis,
+  workshops = [],
+}: Props) {
   const t = content.wizard;
   const [definition, setDefinition] = useState<AssessmentDefinitionView | null | undefined>(undefined);
   const [step, setStep] = useState(0);
@@ -159,6 +175,8 @@ export function EngineAssessment({ assessment, tool, content, locale, domainLink
         contactHref={contactHref}
         privacyHref={privacyHref}
         retentionDays={retentionDays}
+        basis={basis}
+        workshops={workshops}
         answers={toPayload(definition.questions, draft)}
         assessment={assessment}
         tool={tool}
@@ -364,6 +382,8 @@ function EngineResult({
   contactHref,
   privacyHref,
   retentionDays,
+  basis,
+  workshops,
   answers,
   assessment,
   tool,
@@ -378,6 +398,8 @@ function EngineResult({
   contactHref: string;
   privacyHref: string;
   retentionDays: number;
+  basis: Props["basis"];
+  workshops: { href: string; label: string }[];
   answers: Record<string, AnswerValue>;
   assessment: AssessmentKey;
   tool: Props["tool"];
@@ -394,6 +416,9 @@ function EngineResult({
   const metrics = result.inputs.filter((i) => i.evidence === "metric");
   const evidence = (result.extras.metrics_evidence as keyof typeof r.metrics.evidence | undefined) ?? undefined;
   const services = result.domains.map((d) => domainLinks[d]).filter(Boolean) as { href: string; label: string }[];
+  // Display grouping only (the thresholds are stated in the methodology note); scores are untouched.
+  const strengths = result.dimensions.filter((d) => d.score >= 75).map((d) => d.title);
+  const gaps = result.dimensions.filter((d) => d.score < 50).map((d) => d.title);
 
   async function save() {
     setBusy("save");
@@ -461,6 +486,13 @@ function EngineResult({
         />
         <p className="mt-6 text-sm text-fg-muted">{r.selfReported}</p>
       </div>
+
+      <StrengthsGaps
+        columns={[
+          { id: "engine-strengths", title: r.strengths, tone: "good", items: strengths, empty: r.noStrengths },
+          { id: "engine-gaps", title: r.gaps, tone: "attention", items: gaps, empty: r.noGaps },
+        ]}
+      />
 
       {metrics.length > 0 || evidence ? (
         <section aria-labelledby="engine-metrics-title" className="grid gap-3" data-testid="engine-metrics">
@@ -564,9 +596,35 @@ function EngineResult({
         </section>
       )}
 
+      {workshops.length > 0 && (
+        <section aria-labelledby="engine-workshops-title" className="panel p-5 sm:p-6" data-testid="engine-workshops">
+          <h2 id="engine-workshops-title" className="t-h3">
+            {r.workshops.title}
+          </h2>
+          <p className="mt-2 text-fg-muted">{r.workshops.text}</p>
+          <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
+            {workshops.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="link inline-flex min-h-11 items-center font-semibold">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <Alert tone="info" role="note">
         {result.disclaimer}
       </Alert>
+
+      <ResultBasis text={basis} version={result.definition_version} basis={evidence === "measured" ? "measured" : "heuristic"} />
+      <MethodologyNote
+        title={r.methodologyTitle}
+        paragraphs={r.methodology.map((p) =>
+          fill(p, { assessment: result.title, version: result.definition_version, algorithm: result.algorithm }),
+        )}
+      />
 
       <section aria-labelledby="engine-report-title" className="tool-frame grid gap-4 p-6 sm:p-8 print:hidden" data-testid="engine-report">
         <h2 id="engine-report-title" className="t-h3-lg">

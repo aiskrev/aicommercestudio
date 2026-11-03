@@ -96,6 +96,8 @@ describe("AI readiness assessment", () => {
     const result = await screen.findByTestId("readiness-result");
     expect(within(result).getByTestId("tool-score")).toHaveTextContent(/^\d+$/);
     expect(within(result).getByRole("link", { name: readinessTool.leadCapture.cta })).toHaveAttribute("href", "/en/contact?service=audit");
+    expect(within(result).getByTestId("tool-basis")).toHaveAttribute("data-basis", "heuristic");
+    expect(within(result).getByTestId("tool-version")).toHaveTextContent(`Methodology version ${READINESS_MODEL_VERSION}`);
     unregister();
 
     expect(events.map((e) => e.name)).toEqual([

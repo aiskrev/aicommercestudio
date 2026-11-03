@@ -1,0 +1,1903 @@
+{
+  "key": "finops",
+  "version": "1.1.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 10
+  },
+  "dimensions": [
+    {
+      "key": "allocation",
+      "weight": 9
+    },
+    {
+      "key": "ownership",
+      "weight": 8
+    },
+    {
+      "key": "forecasting",
+      "weight": 8
+    },
+    {
+      "key": "commitments",
+      "weight": 8
+    },
+    {
+      "key": "compute",
+      "weight": 8
+    },
+    {
+      "key": "waste",
+      "weight": 8
+    },
+    {
+      "key": "model_governance",
+      "weight": 9
+    },
+    {
+      "key": "token_accounting",
+      "weight": 9
+    },
+    {
+      "key": "caching",
+      "weight": 8
+    },
+    {
+      "key": "provider_visibility",
+      "weight": 8
+    },
+    {
+      "key": "alerts",
+      "weight": 9
+    },
+    {
+      "key": "approvals",
+      "weight": 9
+    }
+  ],
+  "questions": [
+    {
+      "key": "spend_context",
+      "type": "multi_choice",
+      "dimension": "allocation",
+      "required": false,
+      "evidence": "context",
+      "options": [
+        {
+          "key": "aws",
+          "points": 0
+        },
+        {
+          "key": "azure",
+          "points": 0
+        },
+        {
+          "key": "gcp",
+          "points": 0
+        },
+        {
+          "key": "kubernetes",
+          "points": 0
+        },
+        {
+          "key": "ai_apis",
+          "points": 0
+        },
+        {
+          "key": "saas",
+          "points": 0
+        }
+      ],
+      "cap": 1,
+      "max_selections": 6
+    },
+    {
+      "key": "fo_tags",
+      "type": "single_choice",
+      "dimension": "allocation",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partly",
+          "points": 1
+        },
+        {
+          "key": "mostly",
+          "points": 2
+        },
+        {
+          "key": "fully",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_shared",
+      "type": "single_choice",
+      "dimension": "allocation",
+      "options": [
+        {
+          "key": "not",
+          "points": 0
+        },
+        {
+          "key": "guess",
+          "points": 1
+        },
+        {
+          "key": "rule",
+          "points": 2
+        },
+        {
+          "key": "measured",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_owner",
+      "type": "single_choice",
+      "dimension": "ownership",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "finance",
+          "points": 1
+        },
+        {
+          "key": "teams",
+          "points": 2
+        },
+        {
+          "key": "shared",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_reviews",
+      "type": "single_choice",
+      "dimension": "ownership",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "invoice",
+          "points": 1
+        },
+        {
+          "key": "monthly",
+          "points": 2
+        },
+        {
+          "key": "weekly",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_forecast",
+      "type": "single_choice",
+      "dimension": "forecasting",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "rough",
+          "points": 1
+        },
+        {
+          "key": "model",
+          "points": 2
+        },
+        {
+          "key": "unit",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_variance",
+      "type": "single_choice",
+      "dimension": "forecasting",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "large",
+          "points": 1
+        },
+        {
+          "key": "monthly",
+          "points": 2
+        },
+        {
+          "key": "automatic",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_commitments",
+      "type": "single_choice",
+      "dimension": "commitments",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "analysed",
+          "points": 2
+        },
+        {
+          "key": "managed",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_commit_risk",
+      "type": "single_choice",
+      "dimension": "commitments",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "aware",
+          "points": 1
+        },
+        {
+          "key": "limits",
+          "points": 2
+        },
+        {
+          "key": "tracked",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_rightsizing",
+      "type": "single_choice",
+      "dimension": "compute",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "oversized",
+          "points": 1
+        },
+        {
+          "key": "reviewed",
+          "points": 2
+        },
+        {
+          "key": "automated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_autoscaling",
+      "type": "single_choice",
+      "dimension": "compute",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "some",
+          "points": 2
+        },
+        {
+          "key": "most",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_idle",
+      "type": "single_choice",
+      "dimension": "waste",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "reports",
+          "points": 2
+        },
+        {
+          "key": "policy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_envs",
+      "type": "single_choice",
+      "dimension": "waste",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "scheduled",
+          "points": 2
+        },
+        {
+          "key": "ephemeral",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_model_rules",
+      "type": "single_choice",
+      "dimension": "model_governance",
+      "options": [
+        {
+          "key": "biggest",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "documented",
+          "points": 2
+        },
+        {
+          "key": "evaluated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_model_access",
+      "type": "single_choice",
+      "dimension": "model_governance",
+      "options": [
+        {
+          "key": "anyone",
+          "points": 0
+        },
+        {
+          "key": "teams",
+          "points": 1
+        },
+        {
+          "key": "approved",
+          "points": 2
+        },
+        {
+          "key": "quotas",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_tokens",
+      "type": "single_choice",
+      "dimension": "token_accounting",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "total",
+          "points": 1
+        },
+        {
+          "key": "per_feature",
+          "points": 2
+        },
+        {
+          "key": "per_request",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_attribution",
+      "type": "single_choice",
+      "dimension": "token_accounting",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "estimate",
+          "points": 1
+        },
+        {
+          "key": "tagged",
+          "points": 2
+        },
+        {
+          "key": "metered",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_cache",
+      "type": "single_choice",
+      "dimension": "caching",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "considered",
+          "points": 1
+        },
+        {
+          "key": "some",
+          "points": 2
+        },
+        {
+          "key": "measured",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_batch",
+      "type": "single_choice",
+      "dimension": "caching",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "considered",
+          "points": 1
+        },
+        {
+          "key": "some",
+          "points": 2
+        },
+        {
+          "key": "default",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_providers",
+      "type": "single_choice",
+      "dimension": "provider_visibility",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "invoices",
+          "points": 1
+        },
+        {
+          "key": "monthly",
+          "points": 2
+        },
+        {
+          "key": "dashboard",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_saas",
+      "type": "single_choice",
+      "dimension": "provider_visibility",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "list",
+          "points": 1
+        },
+        {
+          "key": "usage",
+          "points": 2
+        },
+        {
+          "key": "reclaimed",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_alerts",
+      "type": "single_choice",
+      "dimension": "alerts",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "total",
+          "points": 1
+        },
+        {
+          "key": "per_owner",
+          "points": 2
+        },
+        {
+          "key": "anomaly",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_quotas",
+      "type": "single_choice",
+      "dimension": "alerts",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "provider",
+          "points": 1
+        },
+        {
+          "key": "some",
+          "points": 2
+        },
+        {
+          "key": "all",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_approval_flow",
+      "type": "single_choice",
+      "dimension": "approvals",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "reviewed",
+          "points": 2
+        },
+        {
+          "key": "tracked",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_cost_in_design",
+      "type": "single_choice",
+      "dimension": "approvals",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "after",
+          "points": 1
+        },
+        {
+          "key": "major",
+          "points": 2
+        },
+        {
+          "key": "always",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_no_allocation",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_tags",
+        "options": [
+          "none"
+        ]
+      },
+      "recommendation": "risk_no_allocation",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "risk_no_alerts",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_alerts",
+        "options": [
+          "none"
+        ]
+      },
+      "recommendation": "risk_no_alerts",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "risk_unrestricted_models",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_model_access",
+        "options": [
+          "anyone"
+        ]
+      },
+      "recommendation": "risk_unrestricted_models",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations",
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "risk_ai_unaccounted",
+      "priority": 2,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "spend_context",
+            "options": [
+              "ai_apis"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "fo_tokens",
+            "options": [
+              "none",
+              "total"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_ai_unaccounted",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations",
+        "cloud_platform"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_commitment_lockin",
+      "priority": 3,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "fo_commitments",
+            "options": [
+              "ad_hoc"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "fo_commit_risk",
+            "options": [
+              "none",
+              "aware"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_commitment_lockin",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_tags",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_tags",
+        "options": [
+          "none",
+          "partly"
+        ]
+      },
+      "recommendation": "qw_tags",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_budget_alerts",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_alerts",
+        "options": [
+          "none",
+          "total"
+        ]
+      },
+      "recommendation": "qw_budget_alerts",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_idle_envs",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_envs",
+        "options": [
+          "none",
+          "manual"
+        ]
+      },
+      "recommendation": "qw_idle_envs",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_model_quotas",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_model_access",
+        "options": [
+          "anyone",
+          "teams"
+        ]
+      },
+      "recommendation": "qw_model_quotas",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_feature_tags",
+      "priority": 6,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_tokens",
+        "options": [
+          "none",
+          "total"
+        ]
+      },
+      "recommendation": "qw_feature_tags",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_allocation",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "allocation",
+        "value": 50
+      },
+      "recommendation": "rec_allocation",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_ownership",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "ownership",
+        "value": 50
+      },
+      "recommendation": "rec_ownership",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform",
+        "advisory_enablement"
+      ]
+    },
+    {
+      "key": "rec_forecasting",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "forecasting",
+        "value": 50
+      },
+      "recommendation": "rec_forecasting",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_commitments",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "commitments",
+        "value": 50
+      },
+      "recommendation": "rec_commitments",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_compute",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "compute",
+        "value": 50
+      },
+      "recommendation": "rec_compute",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform",
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_waste",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "waste",
+        "value": 50
+      },
+      "recommendation": "rec_waste",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_model_governance",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "model_governance",
+        "value": 50
+      },
+      "recommendation": "rec_model_governance",
+      "horizon": 60,
+      "domains": [
+        "managed_operations",
+        "ai_applications"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_token_accounting",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "token_accounting",
+        "value": 50
+      },
+      "recommendation": "rec_token_accounting",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_caching",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "caching",
+        "value": 50
+      },
+      "recommendation": "rec_caching",
+      "horizon": 60,
+      "domains": [
+        "ai_applications",
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_provider_visibility",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "provider_visibility",
+        "value": 50
+      },
+      "recommendation": "rec_provider_visibility",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_alerts",
+      "priority": 15,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "alerts",
+        "value": 50
+      },
+      "recommendation": "rec_alerts",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform",
+        "managed_operations"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_approvals",
+      "priority": 15,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "approvals",
+        "value": 50
+      },
+      "recommendation": "rec_approvals",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "ts_unit_economics",
+      "priority": 30,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "allocation",
+            "value": 75
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "token_accounting",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "ts_unit_economics",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "ctx_not_roi",
+      "priority": 31,
+      "when": {
+        "kind": "overall_at_least",
+        "value": 0
+      },
+      "recommendation": "ctx_not_roi",
+      "kind": "context"
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на FinOps и разходите за AI",
+      "intro": "25 въпроса в 12 области: разпределение, собственост, прогноза, ангажименти, ефективност, излишни разходи, модели, токени, кеширане, видимост, известия и одобрения. Без цени и без прогнози за спестявания.",
+      "disclaimer": "Самооценка по вашите отговори. Не използваме ценоразписи на доставчици, не изчисляваме спестявания и нямаме достъп до сметките ви. Не е одит, не е финансов и не е правен съвет.",
+      "dimensions": {
+        "allocation": {
+          "title": "Разпределение и етикети",
+          "description": "Разходи по продукт, екип и клиент."
+        },
+        "ownership": {
+          "title": "Собственост върху бюджета",
+          "description": "Кой отговаря за всеки бюджет."
+        },
+        "forecasting": {
+          "title": "Прогноза и отклонения",
+          "description": "Прогноза и обяснение на отклоненията."
+        },
+        "commitments": {
+          "title": "Резервиран и ангажиран капацитет",
+          "description": "Как се решава за резервации и ангажименти."
+        },
+        "compute": {
+          "title": "Ефективност на Kubernetes и изчисленията",
+          "description": "Заявки и лимити спрямо реалното натоварване."
+        },
+        "waste": {
+          "title": "Откриване на излишни разходи",
+          "description": "Неизползвани ресурси и среди."
+        },
+        "model_governance": {
+          "title": "Избор и използване на модели",
+          "description": "Правила кой модел за какво се използва."
+        },
+        "token_accounting": {
+          "title": "Отчитане на токени и заявки",
+          "description": "Разход по функция, клиент и заявка."
+        },
+        "caching": {
+          "title": "Кеширане и пакетна обработка",
+          "description": "Кеширане на промпти и пакетна обработка, където е уместно."
+        },
+        "provider_visibility": {
+          "title": "Видимост на разходите при доставчиците",
+          "description": "Данни за разходите от всички доставчици на едно място."
+        },
+        "alerts": {
+          "title": "Известия за бюджета и квоти",
+          "description": "Известия и твърди лимити."
+        },
+        "approvals": {
+          "title": "Одобрение на оптимизации",
+          "description": "Как се одобряват промени за намаляване на разходите."
+        }
+      },
+      "questions": {
+        "spend_context": {
+          "text": "Къде са основните ви разходи?",
+          "help": "Изберете всичко приложимо. Не променя оценката.",
+          "options": {
+            "aws": "AWS",
+            "azure": "Microsoft Azure",
+            "gcp": "Google Cloud",
+            "kubernetes": "Kubernetes",
+            "ai_apis": "AI API (модели)",
+            "saas": "SaaS абонаменти"
+          }
+        },
+        "fo_tags": {
+          "text": "Може ли да разпределите разходите по продукт, екип или клиент?",
+          "options": {
+            "none": "Не",
+            "partly": "Частично",
+            "mostly": "Повечето",
+            "fully": "Изцяло, с наложени етикети"
+          }
+        },
+        "fo_shared": {
+          "text": "Как се разпределят споделените разходи?",
+          "options": {
+            "not": "Не се разпределят",
+            "guess": "Приблизително",
+            "rule": "По правило",
+            "measured": "По измерено използване"
+          }
+        },
+        "fo_owner": {
+          "text": "Има ли отговорник за всеки бюджет?",
+          "options": {
+            "none": "Не",
+            "finance": "Само финансите",
+            "teams": "Екипите",
+            "shared": "Екипите и финансите заедно"
+          }
+        },
+        "fo_reviews": {
+          "text": "Колко често собствениците преглеждат разходите?",
+          "options": {
+            "never": "Никога",
+            "invoice": "При фактурата",
+            "monthly": "Месечно",
+            "weekly": "Седмично, с табла"
+          }
+        },
+        "fo_forecast": {
+          "text": "Прогнозирате ли разходите?",
+          "options": {
+            "none": "Не",
+            "rough": "Приблизително",
+            "model": "С модел по растеж",
+            "unit": "По разход на единица"
+          }
+        },
+        "fo_variance": {
+          "text": "Обяснявате ли отклоненията от прогнозата?",
+          "options": {
+            "none": "Не",
+            "large": "Само големите",
+            "monthly": "Месечно",
+            "automatic": "С автоматично откриване на аномалии"
+          }
+        },
+        "fo_commitments": {
+          "text": "Как се решава за резервации и ангажименти?",
+          "options": {
+            "never": "Не ползваме, без анализ",
+            "ad_hoc": "При нужда",
+            "analysed": "По анализ на използването",
+            "managed": "По анализ, с редовен преглед на покритието"
+          }
+        },
+        "fo_commit_risk": {
+          "text": "Отчитате ли риска от неизползван ангажимент?",
+          "options": {
+            "none": "Не",
+            "aware": "Знаем за него",
+            "limits": "Има правила за срок и обем",
+            "tracked": "Правила и проследяване"
+          }
+        },
+        "fo_rightsizing": {
+          "text": "Съответстват ли заявените ресурси на реалното натоварване?",
+          "options": {
+            "unknown": "Не знаем",
+            "oversized": "Повечето са надоразмерени",
+            "reviewed": "Преглеждат се редовно",
+            "automated": "Автоматично преоразмеряване"
+          }
+        },
+        "fo_autoscaling": {
+          "text": "Мащабира ли се капацитетът според натоварването?",
+          "options": {
+            "none": "Не",
+            "manual": "Ръчно",
+            "some": "Автоматично за част",
+            "most": "Автоматично за повечето, с графици"
+          }
+        },
+        "fo_idle": {
+          "text": "Как откривате неизползваните ресурси?",
+          "options": {
+            "never": "Не търсим",
+            "manual": "Ръчно, понякога",
+            "reports": "Редовни отчети",
+            "policy": "Автоматични правила"
+          }
+        },
+        "fo_envs": {
+          "text": "Спират ли тестовите среди извън работно време?",
+          "options": {
+            "none": "Не",
+            "manual": "Понякога, ръчно",
+            "scheduled": "По график",
+            "ephemeral": "Създават се само при нужда"
+          }
+        },
+        "fo_model_rules": {
+          "text": "Има ли правила кой модел за какво се използва?",
+          "options": {
+            "biggest": "Ползваме най-големия навсякъде",
+            "informal": "Неформално",
+            "documented": "Описани",
+            "evaluated": "Описани, по оценка на качеството и разхода"
+          }
+        },
+        "fo_model_access": {
+          "text": "Кой може да използва платени модели?",
+          "options": {
+            "anyone": "Всеки, без ограничения",
+            "teams": "Екипите, без лимити",
+            "approved": "Одобрени употреби",
+            "quotas": "Одобрени употреби с квоти"
+          }
+        },
+        "fo_tokens": {
+          "text": "Знаете ли разхода за токени по функция?",
+          "options": {
+            "none": "Не",
+            "total": "Само общо",
+            "per_feature": "По функции",
+            "per_request": "По функция и заявка"
+          }
+        },
+        "fo_attribution": {
+          "text": "Може ли да припишете AI разхода на клиент или продукт?",
+          "options": {
+            "none": "Не",
+            "estimate": "Приблизително",
+            "tagged": "С етикети на заявките",
+            "metered": "Измерено и в отчетите"
+          }
+        },
+        "fo_cache": {
+          "text": "Използвате ли кеширане на промпти и отговори?",
+          "options": {
+            "none": "Не",
+            "considered": "Обмисляме",
+            "some": "За част от функциите",
+            "measured": "Където е уместно, с измерен ефект"
+          }
+        },
+        "fo_batch": {
+          "text": "Използвате ли пакетна обработка за неспешни задачи?",
+          "options": {
+            "none": "Не",
+            "considered": "Обмисляме",
+            "some": "Понякога",
+            "default": "По подразбиране за неспешните задачи"
+          }
+        },
+        "fo_providers": {
+          "text": "Виждате ли разходите от всички доставчици на едно място?",
+          "options": {
+            "none": "Не",
+            "invoices": "Само фактурите поотделно",
+            "monthly": "Месечен сборен отчет",
+            "dashboard": "Общо табло с ежедневни данни"
+          }
+        },
+        "fo_saas": {
+          "text": "Следите ли SaaS лицензите и използването им?",
+          "options": {
+            "none": "Не",
+            "list": "Има списък",
+            "usage": "Списък и използване",
+            "reclaimed": "Неизползваните се освобождават"
+          }
+        },
+        "fo_alerts": {
+          "text": "Има ли известия при превишаване на бюджета?",
+          "options": {
+            "none": "Не",
+            "total": "Само за общия бюджет",
+            "per_owner": "По собственик",
+            "anomaly": "По собственик и при аномалии"
+          }
+        },
+        "fo_quotas": {
+          "text": "Има ли твърди лимити (квоти) за AI и облачни ресурси?",
+          "options": {
+            "none": "Не",
+            "provider": "Само при доставчика",
+            "some": "За част",
+            "all": "За всички, с преглед"
+          }
+        },
+        "fo_approval_flow": {
+          "text": "Как се одобряват промени за намаляване на разходите?",
+          "options": {
+            "none": "Не се правят",
+            "ad_hoc": "Без процес",
+            "reviewed": "С преглед на ефекта върху качеството и надеждността",
+            "tracked": "С преглед и проследен резултат"
+          }
+        },
+        "fo_cost_in_design": {
+          "text": "Оценява ли се разходът преди технически решения?",
+          "options": {
+            "never": "Никога",
+            "after": "След факта",
+            "major": "Преди големи решения",
+            "always": "Винаги"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_no_allocation": {
+          "title": "Разходи без собственик",
+          "description": "Без разпределение никой не вижда своя разход и никой не го намалява."
+        },
+        "risk_no_alerts": {
+          "title": "Изненади във фактурата",
+          "description": "Без известия грешка или пик се вижда чак във фактурата."
+        },
+        "risk_unrestricted_models": {
+          "title": "Неограничен достъп до платени модели",
+          "description": "Без одобрени употреби и квоти разходът за модели расте неконтролируемо."
+        },
+        "risk_ai_unaccounted": {
+          "title": "AI разход без отчитане",
+          "description": "Без разход по функция не знаете коя AI функция си струва."
+        },
+        "risk_commitment_lockin": {
+          "title": "Ангажименти без анализ",
+          "description": "Резервации, направени без анализ на използването, могат да останат неизползвани."
+        },
+        "qw_tags": {
+          "title": "Задължителни етикети",
+          "description": "Три етикета (продукт, екип, среда), наложени чрез политика."
+        },
+        "qw_budget_alerts": {
+          "title": "Бюджети и известия по собственик",
+          "description": "Бюджет за всеки собственик с известие при 80% и 100%."
+        },
+        "qw_idle_envs": {
+          "title": "Графици за тестовите среди",
+          "description": "Спирайте тестовите среди извън работно време."
+        },
+        "qw_model_quotas": {
+          "title": "Квоти за платените модели",
+          "description": "Одобрени употреби и квоти по екип."
+        },
+        "qw_feature_tags": {
+          "title": "Етикет на функцията към всяка AI заявка",
+          "description": "Добавете функция и клиент към всяка заявка, за да видите разхода по тях."
+        },
+        "rec_allocation": {
+          "title": "Разпределение на разходите",
+          "description": "Наложени етикети и правила за споделените разходи."
+        },
+        "rec_ownership": {
+          "title": "Собственици на бюджетите",
+          "description": "Екипите отговарят за своите бюджети и ги преглеждат редовно."
+        },
+        "rec_forecasting": {
+          "title": "Прогноза и отклонения",
+          "description": "Прогноза по разход на единица и автоматично откриване на аномалии."
+        },
+        "rec_commitments": {
+          "title": "Решения за ангажименти по анализ",
+          "description": "Резервации само след анализ на използването, с правила за срок и обем."
+        },
+        "rec_compute": {
+          "title": "Ефективни изчисления",
+          "description": "Преоразмеряване по реалното натоварване и автоматично мащабиране."
+        },
+        "rec_waste": {
+          "title": "Откриване на излишното",
+          "description": "Автоматични правила за неизползвани ресурси и среди."
+        },
+        "rec_model_governance": {
+          "title": "Правила за моделите",
+          "description": "Модел според задачата, избран по оценка на качеството и разхода."
+        },
+        "rec_token_accounting": {
+          "title": "Отчитане на AI разхода",
+          "description": "Разход по функция, клиент и заявка в общите отчети."
+        },
+        "rec_caching": {
+          "title": "Кеширане и пакетна обработка",
+          "description": "Кеширане на повтарящите се части и пакетна обработка на неспешните задачи, с измерен ефект."
+        },
+        "rec_provider_visibility": {
+          "title": "Една картина на разходите",
+          "description": "Общо табло за облак, AI и SaaS с ежедневни данни."
+        },
+        "rec_alerts": {
+          "title": "Известия и квоти",
+          "description": "Известия по собственик и при аномалии и квоти за всички ресурси."
+        },
+        "rec_approvals": {
+          "title": "Одобрение на оптимизациите",
+          "description": "Преглед на ефекта върху качеството и надеждността и проследен резултат."
+        },
+        "ts_unit_economics": {
+          "title": "Разход на единица",
+          "description": "Разход на клиент, поръчка или AI заявка, следен заедно с бизнес показателите."
+        },
+        "ctx_not_roi": {
+          "title": "Това не е калкулатор на ефекта",
+          "description": "Оценката е за практиките по управление на разходите. Не използва ценоразписи, не изчислява спестявания и няма достъп до сметките ви. За бизнес случай използвайте ROI калкулатора."
+        }
+      }
+    },
+    "en": {
+      "title": "FinOps & AI Cost Assessment",
+      "intro": "25 questions across 12 areas: allocation, ownership, forecasting, commitments, efficiency, waste, models, tokens, caching, visibility, alerts and approvals. No prices and no savings forecasts.",
+      "disclaimer": "A self-assessment based on your answers. We use no provider price lists, calculate no savings and have no access to your billing accounts. Not an audit, not financial and not legal advice.",
+      "dimensions": {
+        "allocation": {
+          "title": "Cost allocation and tagging",
+          "description": "Spend by product, team and customer."
+        },
+        "ownership": {
+          "title": "Budget ownership",
+          "description": "Who owns each budget."
+        },
+        "forecasting": {
+          "title": "Forecasting and variance",
+          "description": "Forecasts and explaining variances."
+        },
+        "commitments": {
+          "title": "Reserved and committed capacity",
+          "description": "How reservations and commitments are decided."
+        },
+        "compute": {
+          "title": "Kubernetes and compute efficiency",
+          "description": "Requests and limits against real load."
+        },
+        "waste": {
+          "title": "Cloud waste detection",
+          "description": "Idle resources and environments."
+        },
+        "model_governance": {
+          "title": "Model selection and usage governance",
+          "description": "Rules on which model is used for what."
+        },
+        "token_accounting": {
+          "title": "Token and request accounting",
+          "description": "Spend per feature, customer and request."
+        },
+        "caching": {
+          "title": "Inference caching and batching",
+          "description": "Prompt caching and batch processing where appropriate."
+        },
+        "provider_visibility": {
+          "title": "Provider cost visibility",
+          "description": "Spend data from all providers in one place."
+        },
+        "alerts": {
+          "title": "Budget alerts and quotas",
+          "description": "Alerts and hard limits."
+        },
+        "approvals": {
+          "title": "Cost optimisation approvals",
+          "description": "How cost-reducing changes are approved."
+        }
+      },
+      "questions": {
+        "spend_context": {
+          "text": "Where is most of your spend?",
+          "help": "Select all that apply. It does not change the score.",
+          "options": {
+            "aws": "AWS",
+            "azure": "Microsoft Azure",
+            "gcp": "Google Cloud",
+            "kubernetes": "Kubernetes",
+            "ai_apis": "AI APIs (models)",
+            "saas": "SaaS subscriptions"
+          }
+        },
+        "fo_tags": {
+          "text": "Can you allocate spend by product, team or customer?",
+          "options": {
+            "none": "No",
+            "partly": "Partly",
+            "mostly": "Most of it",
+            "fully": "Fully, with enforced tags"
+          }
+        },
+        "fo_shared": {
+          "text": "How are shared costs split?",
+          "options": {
+            "not": "They are not",
+            "guess": "Roughly",
+            "rule": "By a rule",
+            "measured": "By measured usage"
+          }
+        },
+        "fo_owner": {
+          "text": "Is there an owner for each budget?",
+          "options": {
+            "none": "No",
+            "finance": "Finance only",
+            "teams": "The teams",
+            "shared": "Teams and finance together"
+          }
+        },
+        "fo_reviews": {
+          "text": "How often do owners review spend?",
+          "options": {
+            "never": "Never",
+            "invoice": "At invoice time",
+            "monthly": "Monthly",
+            "weekly": "Weekly, with dashboards"
+          }
+        },
+        "fo_forecast": {
+          "text": "Do you forecast spend?",
+          "options": {
+            "none": "No",
+            "rough": "Roughly",
+            "model": "With a growth model",
+            "unit": "By unit cost"
+          }
+        },
+        "fo_variance": {
+          "text": "Do you explain variances from the forecast?",
+          "options": {
+            "none": "No",
+            "large": "Only large ones",
+            "monthly": "Monthly",
+            "automatic": "With automatic anomaly detection"
+          }
+        },
+        "fo_commitments": {
+          "text": "How are reservations and commitments decided?",
+          "options": {
+            "never": "We do not, without analysis",
+            "ad_hoc": "When needed",
+            "analysed": "From a usage analysis",
+            "managed": "From analysis, with regular coverage reviews"
+          }
+        },
+        "fo_commit_risk": {
+          "text": "Do you account for the risk of an unused commitment?",
+          "options": {
+            "none": "No",
+            "aware": "We are aware of it",
+            "limits": "There are rules on term and size",
+            "tracked": "Rules and tracking"
+          }
+        },
+        "fo_rightsizing": {
+          "text": "Do requested resources match real load?",
+          "options": {
+            "unknown": "We do not know",
+            "oversized": "Most are oversized",
+            "reviewed": "Reviewed regularly",
+            "automated": "Automatic rightsizing"
+          }
+        },
+        "fo_autoscaling": {
+          "text": "Does capacity scale with load?",
+          "options": {
+            "none": "No",
+            "manual": "By hand",
+            "some": "Automatically for some",
+            "most": "Automatically for most, with schedules"
+          }
+        },
+        "fo_idle": {
+          "text": "How do you find idle resources?",
+          "options": {
+            "never": "We do not look",
+            "manual": "By hand, sometimes",
+            "reports": "Regular reports",
+            "policy": "Automated policies"
+          }
+        },
+        "fo_envs": {
+          "text": "Are test environments stopped outside working hours?",
+          "options": {
+            "none": "No",
+            "manual": "Sometimes, by hand",
+            "scheduled": "On a schedule",
+            "ephemeral": "Created only when needed"
+          }
+        },
+        "fo_model_rules": {
+          "text": "Are there rules on which model is used for what?",
+          "options": {
+            "biggest": "We use the largest everywhere",
+            "informal": "Informally",
+            "documented": "Documented",
+            "evaluated": "Documented, from quality and cost evaluation"
+          }
+        },
+        "fo_model_access": {
+          "text": "Who may use paid models?",
+          "options": {
+            "anyone": "Anyone, without limits",
+            "teams": "Teams, without limits",
+            "approved": "Approved uses",
+            "quotas": "Approved uses with quotas"
+          }
+        },
+        "fo_tokens": {
+          "text": "Do you know token spend per feature?",
+          "options": {
+            "none": "No",
+            "total": "Only in total",
+            "per_feature": "Per feature",
+            "per_request": "Per feature and request"
+          }
+        },
+        "fo_attribution": {
+          "text": "Can you attribute AI spend to a customer or product?",
+          "options": {
+            "none": "No",
+            "estimate": "Roughly",
+            "tagged": "With request tags",
+            "metered": "Metered and in reports"
+          }
+        },
+        "fo_cache": {
+          "text": "Do you use prompt and response caching?",
+          "options": {
+            "none": "No",
+            "considered": "We are considering it",
+            "some": "For some features",
+            "measured": "Where appropriate, with a measured effect"
+          }
+        },
+        "fo_batch": {
+          "text": "Do you use batch processing for non-urgent work?",
+          "options": {
+            "none": "No",
+            "considered": "We are considering it",
+            "some": "Sometimes",
+            "default": "By default for non-urgent work"
+          }
+        },
+        "fo_providers": {
+          "text": "Do you see spend from all providers in one place?",
+          "options": {
+            "none": "No",
+            "invoices": "Only separate invoices",
+            "monthly": "A monthly combined report",
+            "dashboard": "A shared dashboard with daily data"
+          }
+        },
+        "fo_saas": {
+          "text": "Do you track SaaS licences and their use?",
+          "options": {
+            "none": "No",
+            "list": "There is a list",
+            "usage": "A list and usage",
+            "reclaimed": "Unused ones are reclaimed"
+          }
+        },
+        "fo_alerts": {
+          "text": "Are there alerts when a budget is exceeded?",
+          "options": {
+            "none": "No",
+            "total": "Only for the total budget",
+            "per_owner": "Per owner",
+            "anomaly": "Per owner and on anomalies"
+          }
+        },
+        "fo_quotas": {
+          "text": "Are there hard limits (quotas) for AI and cloud resources?",
+          "options": {
+            "none": "No",
+            "provider": "Only at the provider",
+            "some": "For some",
+            "all": "For all, reviewed"
+          }
+        },
+        "fo_approval_flow": {
+          "text": "How are cost-reducing changes approved?",
+          "options": {
+            "none": "They are not made",
+            "ad_hoc": "Without a process",
+            "reviewed": "With a review of quality and reliability impact",
+            "tracked": "With a review and a tracked result"
+          }
+        },
+        "fo_cost_in_design": {
+          "text": "Is cost estimated before technical decisions?",
+          "options": {
+            "never": "Never",
+            "after": "After the fact",
+            "major": "Before major decisions",
+            "always": "Always"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_no_allocation": {
+          "title": "Spend without an owner",
+          "description": "Without allocation nobody sees their own spend and nobody reduces it."
+        },
+        "risk_no_alerts": {
+          "title": "Surprises on the invoice",
+          "description": "Without alerts a mistake or spike shows up only on the invoice."
+        },
+        "risk_unrestricted_models": {
+          "title": "Unrestricted paid model access",
+          "description": "Without approved uses and quotas, model spend grows uncontrolled."
+        },
+        "risk_ai_unaccounted": {
+          "title": "AI spend without accounting",
+          "description": "Without per-feature spend you do not know which AI feature is worth it."
+        },
+        "risk_commitment_lockin": {
+          "title": "Commitments without analysis",
+          "description": "Reservations made without a usage analysis can go unused."
+        },
+        "qw_tags": {
+          "title": "Mandatory tags",
+          "description": "Three tags (product, team, environment), enforced by policy."
+        },
+        "qw_budget_alerts": {
+          "title": "Budgets and alerts per owner",
+          "description": "A budget per owner with alerts at 80% and 100%."
+        },
+        "qw_idle_envs": {
+          "title": "Schedules for test environments",
+          "description": "Stop test environments outside working hours."
+        },
+        "qw_model_quotas": {
+          "title": "Quotas for paid models",
+          "description": "Approved uses and quotas per team."
+        },
+        "qw_feature_tags": {
+          "title": "A feature tag on every AI request",
+          "description": "Add the feature and customer to every request so spend can be split by them."
+        },
+        "rec_allocation": {
+          "title": "Cost allocation",
+          "description": "Enforced tags and rules for shared costs."
+        },
+        "rec_ownership": {
+          "title": "Budget owners",
+          "description": "Teams own their budgets and review them regularly."
+        },
+        "rec_forecasting": {
+          "title": "Forecasts and variances",
+          "description": "Unit-cost forecasts and automatic anomaly detection."
+        },
+        "rec_commitments": {
+          "title": "Commitment decisions from analysis",
+          "description": "Reservations only after a usage analysis, with rules on term and size."
+        },
+        "rec_compute": {
+          "title": "Efficient compute",
+          "description": "Rightsizing to real load and autoscaling."
+        },
+        "rec_waste": {
+          "title": "Finding waste",
+          "description": "Automated policies for idle resources and environments."
+        },
+        "rec_model_governance": {
+          "title": "Model rules",
+          "description": "A model per task, chosen from quality and cost evaluation."
+        },
+        "rec_token_accounting": {
+          "title": "AI spend accounting",
+          "description": "Spend per feature, customer and request in shared reports."
+        },
+        "rec_caching": {
+          "title": "Caching and batching",
+          "description": "Cache repeated parts and batch non-urgent work, with a measured effect."
+        },
+        "rec_provider_visibility": {
+          "title": "One view of spend",
+          "description": "A shared dashboard for cloud, AI and SaaS with daily data."
+        },
+        "rec_alerts": {
+          "title": "Alerts and quotas",
+          "description": "Alerts per owner and on anomalies, and quotas for all resources."
+        },
+        "rec_approvals": {
+          "title": "Approving optimisations",
+          "description": "Review the impact on quality and reliability and track the result."
+        },
+        "ts_unit_economics": {
+          "title": "Unit economics",
+          "description": "Cost per customer, order or AI request, tracked alongside business metrics."
+        },
+        "ctx_not_roi": {
+          "title": "This is not an ROI calculator",
+          "description": "The assessment covers cost-management practices. It uses no price lists, calculates no savings and has no access to your billing. For a business case, use the ROI calculator."
+        }
+      }
+    }
+  }
+}

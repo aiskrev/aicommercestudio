@@ -1,0 +1,1946 @@
+{
+  "key": "ai_governance",
+  "version": "1.1.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 10
+  },
+  "dimensions": [
+    {
+      "key": "inventory",
+      "weight": 9
+    },
+    {
+      "key": "classification",
+      "weight": 8
+    },
+    {
+      "key": "vendors",
+      "weight": 8
+    },
+    {
+      "key": "privacy",
+      "weight": 9
+    },
+    {
+      "key": "threat_modeling",
+      "weight": 8
+    },
+    {
+      "key": "injection",
+      "weight": 9
+    },
+    {
+      "key": "oversight",
+      "weight": 9
+    },
+    {
+      "key": "evaluation",
+      "weight": 8
+    },
+    {
+      "key": "traceability",
+      "weight": 8
+    },
+    {
+      "key": "incidents",
+      "weight": 8
+    },
+    {
+      "key": "change",
+      "weight": 8
+    },
+    {
+      "key": "retention",
+      "weight": 8
+    }
+  ],
+  "questions": [
+    {
+      "key": "use_context",
+      "type": "multi_choice",
+      "dimension": "inventory",
+      "required": false,
+      "evidence": "context",
+      "options": [
+        {
+          "key": "internal",
+          "points": 0
+        },
+        {
+          "key": "customers",
+          "points": 0
+        },
+        {
+          "key": "decisions",
+          "points": 0
+        },
+        {
+          "key": "products",
+          "points": 0
+        }
+      ],
+      "cap": 1,
+      "max_selections": 4
+    },
+    {
+      "key": "ag_inventory",
+      "type": "single_choice",
+      "dimension": "inventory",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "complete",
+          "points": 2
+        },
+        {
+          "key": "maintained",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_owner",
+      "type": "single_choice",
+      "dimension": "inventory",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "it_only",
+          "points": 1
+        },
+        {
+          "key": "named",
+          "points": 2
+        },
+        {
+          "key": "policy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "dc_rules",
+      "type": "single_choice",
+      "dimension": "classification",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "documented",
+          "points": 2
+        },
+        {
+          "key": "applied",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "dc_ai_rules",
+      "type": "single_choice",
+      "dimension": "classification",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "verbal",
+          "points": 1
+        },
+        {
+          "key": "written",
+          "points": 2
+        },
+        {
+          "key": "technical",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "vd_assessment",
+      "type": "single_choice",
+      "dimension": "vendors",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "checklist",
+          "points": 2
+        },
+        {
+          "key": "reviewed",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "vd_contracts",
+      "type": "single_choice",
+      "dimension": "vendors",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "dpa",
+          "points": 2
+        },
+        {
+          "key": "full",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "pv_personal",
+      "type": "single_choice",
+      "dimension": "privacy",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "uncontrolled",
+          "points": 1
+        },
+        {
+          "key": "rules",
+          "points": 2
+        },
+        {
+          "key": "minimised",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "pv_assessment",
+      "type": "single_choice",
+      "dimension": "privacy",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "template",
+          "points": 2
+        },
+        {
+          "key": "always",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "tm_reviews",
+      "type": "single_choice",
+      "dimension": "threat_modeling",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "before_launch",
+          "points": 2
+        },
+        {
+          "key": "on_change",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "tm_scope",
+      "type": "single_choice",
+      "dimension": "threat_modeling",
+      "options": [
+        {
+          "key": "nothing",
+          "points": 0
+        },
+        {
+          "key": "infra",
+          "points": 1
+        },
+        {
+          "key": "ai_specific",
+          "points": 2
+        },
+        {
+          "key": "full",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "pi_controls",
+      "type": "single_choice",
+      "dimension": "injection",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "prompt",
+          "points": 1
+        },
+        {
+          "key": "separation",
+          "points": 2
+        },
+        {
+          "key": "layered",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "pi_exfiltration",
+      "type": "single_choice",
+      "dimension": "injection",
+      "options": [
+        {
+          "key": "unrestricted",
+          "points": 0
+        },
+        {
+          "key": "unknown",
+          "points": 1
+        },
+        {
+          "key": "limited",
+          "points": 2
+        },
+        {
+          "key": "blocked",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ov_approval",
+      "type": "single_choice",
+      "dimension": "oversight",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "sometimes",
+          "points": 1
+        },
+        {
+          "key": "required",
+          "points": 2
+        },
+        {
+          "key": "tiered",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ov_boundaries",
+      "type": "single_choice",
+      "dimension": "oversight",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "implicit",
+          "points": 1
+        },
+        {
+          "key": "documented",
+          "points": 2
+        },
+        {
+          "key": "enforced",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ev_tests",
+      "type": "single_choice",
+      "dimension": "evaluation",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "spot",
+          "points": 1
+        },
+        {
+          "key": "test_set",
+          "points": 2
+        },
+        {
+          "key": "criteria",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ev_monitoring",
+      "type": "single_choice",
+      "dimension": "evaluation",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "complaints",
+          "points": 1
+        },
+        {
+          "key": "sampling",
+          "points": 2
+        },
+        {
+          "key": "continuous",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "tr_logging",
+      "type": "single_choice",
+      "dimension": "traceability",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "logged",
+          "points": 2
+        },
+        {
+          "key": "reviewed",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "tr_explain",
+      "type": "single_choice",
+      "dimension": "traceability",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partly",
+          "points": 1
+        },
+        {
+          "key": "sources",
+          "points": 2
+        },
+        {
+          "key": "full",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ir_process",
+      "type": "single_choice",
+      "dimension": "incidents",
+      "options": [
+        {
+          "key": "nothing",
+          "points": 0
+        },
+        {
+          "key": "fix",
+          "points": 1
+        },
+        {
+          "key": "process",
+          "points": 2
+        },
+        {
+          "key": "practised",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ir_reporting",
+      "type": "single_choice",
+      "dimension": "incidents",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "email",
+          "points": 1
+        },
+        {
+          "key": "in_app",
+          "points": 2
+        },
+        {
+          "key": "tracked",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cm_changes",
+      "type": "single_choice",
+      "dimension": "change",
+      "options": [
+        {
+          "key": "live",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "reviewed",
+          "points": 2
+        },
+        {
+          "key": "approved",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cm_register",
+      "type": "single_choice",
+      "dimension": "change",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "yes",
+          "points": 2
+        },
+        {
+          "key": "linked",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "rt_policy",
+      "type": "single_choice",
+      "dimension": "retention",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "defined",
+          "points": 1
+        },
+        {
+          "key": "some",
+          "points": 2
+        },
+        {
+          "key": "enforced",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "rt_vendor",
+      "type": "single_choice",
+      "dimension": "retention",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "all",
+          "points": 2
+        },
+        {
+          "key": "controlled",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_shadow_ai",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "ag_inventory",
+        "options": [
+          "none"
+        ]
+      },
+      "recommendation": "risk_shadow_ai",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "risk_personal_data",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "pv_personal",
+        "options": [
+          "unknown",
+          "uncontrolled"
+        ]
+      },
+      "recommendation": "risk_personal_data",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "risk_exfiltration",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "pi_exfiltration",
+        "options": [
+          "unrestricted",
+          "unknown"
+        ]
+      },
+      "recommendation": "risk_exfiltration",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance",
+        "ai_agents_automation"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_decisions_without_oversight",
+      "priority": 1,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "use_context",
+            "options": [
+              "decisions"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "ov_approval",
+            "options": [
+              "never",
+              "sometimes"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_decisions_without_oversight",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance",
+        "ai_agents_automation"
+      ]
+    },
+    {
+      "key": "risk_live_changes",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "cm_changes",
+        "options": [
+          "live"
+        ]
+      },
+      "recommendation": "risk_live_changes",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance",
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "qw_inventory",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "ag_inventory",
+        "options": [
+          "none",
+          "partial"
+        ]
+      },
+      "recommendation": "qw_inventory",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_data_rules",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "dc_ai_rules",
+        "options": [
+          "none",
+          "verbal"
+        ]
+      },
+      "recommendation": "qw_data_rules",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_approval_boundaries",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "ov_boundaries",
+        "options": [
+          "none",
+          "implicit"
+        ]
+      },
+      "recommendation": "qw_approval_boundaries",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance",
+        "ai_agents_automation"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_report_channel",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "ir_reporting",
+        "options": [
+          "none",
+          "email"
+        ]
+      },
+      "recommendation": "qw_report_channel",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_retention",
+      "priority": 6,
+      "when": {
+        "kind": "answer_in",
+        "question": "rt_policy",
+        "options": [
+          "none",
+          "defined"
+        ]
+      },
+      "recommendation": "qw_retention",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_inventory",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "inventory",
+        "value": 50
+      },
+      "recommendation": "rec_inventory",
+      "horizon": 60,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_classification",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "classification",
+        "value": 50
+      },
+      "recommendation": "rec_classification",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "data_integration"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_vendors",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "vendors",
+        "value": 50
+      },
+      "recommendation": "rec_vendors",
+      "horizon": 60,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_privacy",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "privacy",
+        "value": 50
+      },
+      "recommendation": "rec_privacy",
+      "horizon": 60,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_threat_modeling",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "threat_modeling",
+        "value": 50
+      },
+      "recommendation": "rec_threat_modeling",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_injection",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "injection",
+        "value": 50
+      },
+      "recommendation": "rec_injection",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "ai_applications"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_oversight",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "oversight",
+        "value": 50
+      },
+      "recommendation": "rec_oversight",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "ai_agents_automation"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_evaluation",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "evaluation",
+        "value": 50
+      },
+      "recommendation": "rec_evaluation",
+      "horizon": 60,
+      "domains": [
+        "ai_applications"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_traceability",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "traceability",
+        "value": 50
+      },
+      "recommendation": "rec_traceability",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_incidents",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "incidents",
+        "value": 50
+      },
+      "recommendation": "rec_incidents",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "managed_operations"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_change",
+      "priority": 15,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "change",
+        "value": 50
+      },
+      "recommendation": "rec_change",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_retention",
+      "priority": 15,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "retention",
+        "value": 50
+      },
+      "recommendation": "rec_retention",
+      "horizon": 60,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "pattern_governance_documents",
+      "priority": 20,
+      "when": {
+        "kind": "overall_at_least",
+        "value": 0
+      },
+      "recommendation": "pattern_governance_documents",
+      "kind": "pattern",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "advisory_enablement"
+      ]
+    },
+    {
+      "key": "pattern_review_workflow",
+      "priority": 21,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "dimension_below",
+            "dimension": "oversight",
+            "value": 75
+          },
+          {
+            "kind": "dimension_below",
+            "dimension": "change",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "pattern_review_workflow",
+      "kind": "pattern",
+      "horizon": 60,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "ts_governance_board",
+      "priority": 30,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "inventory",
+            "value": 75
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "oversight",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "ts_governance_board",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "ctx_ai_act",
+      "priority": 31,
+      "when": {
+        "kind": "answer_in",
+        "question": "use_context",
+        "options": [
+          "decisions",
+          "products"
+        ]
+      },
+      "recommendation": "ctx_ai_act",
+      "kind": "context",
+      "domains": [
+        "ai_governance"
+      ]
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на отговорното управление на AI",
+      "intro": "25 въпроса в 12 области: от опис и класификация на данните до prompt injection, човешки контрол, проследимост, промени и срокове. Резултатът е анализ на пропуските, приоритизиран списък за поправка и примерни документи.",
+      "disclaimer": "Образователна самооценка по вашите отговори. Не е правен съвет, не е правен одит и не удостоверява съответствие с AI Act, GDPR или друг закон. Не се свързваме с вашите системи.",
+      "dimensions": {
+        "inventory": {
+          "title": "Опис на AI системите",
+          "description": "Кои AI системи и инструменти се ползват и кой отговаря."
+        },
+        "classification": {
+          "title": "Класификация на данните",
+          "description": "Какви данни могат да стигат до AI и по какви правила."
+        },
+        "vendors": {
+          "title": "Риск от доставчици на модели",
+          "description": "Оценка и договори с доставчиците на модели и платформи."
+        },
+        "privacy": {
+          "title": "Поверителност и обработка на данни",
+          "description": "Минимизиране, основания и права на хората."
+        },
+        "threat_modeling": {
+          "title": "Моделиране на заплахи",
+          "description": "Систематичен преглед на заплахите за всяка AI система."
+        },
+        "injection": {
+          "title": "Prompt injection и изтичане на данни",
+          "description": "Защити срещу манипулация на входа и изтичане на данни."
+        },
+        "oversight": {
+          "title": "Човешки контрол и граници на одобрение",
+          "description": "Кога човек одобрява и какво AI не може да прави само."
+        },
+        "evaluation": {
+          "title": "Оценка и качество на моделите",
+          "description": "Тестови набори, критерии и наблюдение на качеството."
+        },
+        "traceability": {
+          "title": "Проследимост и одит",
+          "description": "Журнал на входа, източниците и решенията."
+        },
+        "incidents": {
+          "title": "Реакция при инциденти",
+          "description": "Какво става, когато AI сгреши или бъде злоупотребен."
+        },
+        "change": {
+          "title": "Управление на промени в модели и версии",
+          "description": "Как се одобряват смени на модел, промпт или доставчик."
+        },
+        "retention": {
+          "title": "Срокове за съхранение и изтриване",
+          "description": "Колко се пазят промпти, отговори и журнали."
+        }
+      },
+      "questions": {
+        "use_context": {
+          "text": "Къде използвате AI?",
+          "help": "Изберете всичко приложимо. Не променя оценката.",
+          "options": {
+            "internal": "Вътрешни задачи (текстове, обобщения)",
+            "customers": "Комуникация с клиенти",
+            "decisions": "Решения за хора (наемане, кредит, достъп)",
+            "products": "В продукти, които продавате"
+          }
+        },
+        "ag_inventory": {
+          "text": "Има ли опис на AI системите и инструментите?",
+          "options": {
+            "none": "Не",
+            "partial": "Частичен",
+            "complete": "Пълен",
+            "maintained": "Пълен, поддържан, с отговорници"
+          }
+        },
+        "ag_owner": {
+          "text": "Има ли бизнес отговорник за всяка AI система?",
+          "options": {
+            "none": "Не",
+            "it_only": "Само ИТ",
+            "named": "Посочен отговорник",
+            "policy": "Отговорник и вътрешна политика"
+          }
+        },
+        "dc_rules": {
+          "text": "Класифицирани ли са данните (публични, вътрешни, поверителни, лични)?",
+          "options": {
+            "none": "Не",
+            "informal": "Неформално",
+            "documented": "Описани класове",
+            "applied": "Класовете се прилагат и към AI"
+          }
+        },
+        "dc_ai_rules": {
+          "text": "Има ли правила кои класове данни могат да се въвеждат в AI?",
+          "options": {
+            "none": "Не",
+            "verbal": "Устни указания",
+            "written": "Писани правила",
+            "technical": "Писани правила и технически ограничения"
+          }
+        },
+        "vd_assessment": {
+          "text": "Оценяват ли се доставчиците на модели преди използване?",
+          "options": {
+            "none": "Не",
+            "ad_hoc": "Понякога",
+            "checklist": "С въпросник",
+            "reviewed": "С въпросник и преглед на сигурността"
+          }
+        },
+        "vd_contracts": {
+          "text": "Какви договори има с доставчиците?",
+          "options": {
+            "none": "Само общи условия",
+            "some": "Договори с част от тях",
+            "dpa": "Договор за обработка с всички",
+            "full": "Договори, местоположение и срокове на данните проверени"
+          }
+        },
+        "pv_personal": {
+          "text": "Стигат ли лични данни до AI системите?",
+          "options": {
+            "unknown": "Не знаем",
+            "uncontrolled": "Да, без правила",
+            "rules": "Само по правила",
+            "minimised": "Минимизирани или анонимизирани"
+          }
+        },
+        "pv_assessment": {
+          "text": "Правите ли оценка на въздействието за чувствителните случаи?",
+          "options": {
+            "none": "Не",
+            "ad_hoc": "Понякога",
+            "template": "С шаблон",
+            "always": "Винаги, с преглед"
+          }
+        },
+        "tm_reviews": {
+          "text": "Правите ли моделиране на заплахите за AI системите?",
+          "options": {
+            "none": "Не",
+            "informal": "Неформално",
+            "before_launch": "Преди пускане",
+            "on_change": "Преди пускане и при промени"
+          }
+        },
+        "tm_scope": {
+          "text": "Какво покрива прегледът?",
+          "options": {
+            "nothing": "Няма преглед",
+            "infra": "Само инфраструктурата",
+            "ai_specific": "И специфични за AI заплахи",
+            "full": "Специфични за AI заплахи, данни и инструменти на агентите"
+          }
+        },
+        "pi_controls": {
+          "text": "Какви защити има срещу prompt injection?",
+          "options": {
+            "none": "Не",
+            "prompt": "Само инструкции в промпта",
+            "separation": "Отделяне на данните от инструкциите и проверка на изхода",
+            "layered": "Многослойни: отделяне, проверка, ограничени инструменти и тестове"
+          }
+        },
+        "pi_exfiltration": {
+          "text": "Може ли AI да изпрати данни навън (връзки, имейли, API)?",
+          "options": {
+            "unrestricted": "Да, без ограничения",
+            "unknown": "Не сме проверявали",
+            "limited": "Само към одобрени места",
+            "blocked": "Не, без одобрение от човек"
+          }
+        },
+        "ov_approval": {
+          "text": "Одобрява ли човек действията на AI с външен ефект?",
+          "options": {
+            "never": "Не",
+            "sometimes": "Понякога",
+            "required": "Винаги",
+            "tiered": "По нива на риск, описани писмено"
+          }
+        },
+        "ov_boundaries": {
+          "text": "Описано ли е какво AI никога не прави само?",
+          "options": {
+            "none": "Не",
+            "implicit": "Подразбира се",
+            "documented": "Описано",
+            "enforced": "Описано и технически наложено"
+          }
+        },
+        "ev_tests": {
+          "text": "Проверява ли се качеството преди пускане?",
+          "options": {
+            "none": "Не",
+            "spot": "Случайни проверки",
+            "test_set": "Тестов набор",
+            "criteria": "Тестов набор с критерии за пускане"
+          }
+        },
+        "ev_monitoring": {
+          "text": "Следи ли се качеството в работа?",
+          "options": {
+            "none": "Не",
+            "complaints": "По оплаквания",
+            "sampling": "Редовни проверки на извадка",
+            "continuous": "Непрекъснато, с известия"
+          }
+        },
+        "tr_logging": {
+          "text": "Записват ли се входът, източниците и решенията на AI?",
+          "options": {
+            "none": "Не",
+            "partial": "Частично",
+            "logged": "Да",
+            "reviewed": "Да, със защита на личните данни и преглед"
+          }
+        },
+        "tr_explain": {
+          "text": "Може ли да обясните конкретен отговор или решение?",
+          "options": {
+            "none": "Не",
+            "partly": "Частично",
+            "sources": "Да, по източниците",
+            "full": "Да, с версия на модела, промпта и източниците"
+          }
+        },
+        "ir_process": {
+          "text": "Какво правите при вреден или грешен резултат?",
+          "options": {
+            "nothing": "Нищо определено",
+            "fix": "Поправяме при оплакване",
+            "process": "Процес за докладване",
+            "practised": "Процес, бързо изключване и упражнения"
+          }
+        },
+        "ir_reporting": {
+          "text": "Може ли потребител да докладва проблем с AI?",
+          "options": {
+            "none": "Не",
+            "email": "По имейл",
+            "in_app": "В интерфейса",
+            "tracked": "В интерфейса, проследено до решение"
+          }
+        },
+        "cm_changes": {
+          "text": "Как се сменят модел, промпт или доставчик?",
+          "options": {
+            "live": "Директно в работа",
+            "informal": "С неформално съгласуване",
+            "reviewed": "С преглед и версия",
+            "approved": "С преглед, тест, одобрение и връщане назад"
+          }
+        },
+        "cm_register": {
+          "text": "Записвате ли кои версии работят кога?",
+          "options": {
+            "none": "Не",
+            "partial": "Частично",
+            "yes": "Да",
+            "linked": "Да, свързано с инцидентите и оценките"
+          }
+        },
+        "rt_policy": {
+          "text": "Има ли срок за съхранение на промпти, отговори и журнали?",
+          "options": {
+            "none": "Не",
+            "defined": "Определен, не се прилага",
+            "some": "Прилага се частично",
+            "enforced": "Прилага се, с автоматично изтриване"
+          }
+        },
+        "rt_vendor": {
+          "text": "Знаете ли колко пазят данните доставчиците?",
+          "options": {
+            "unknown": "Не",
+            "some": "За част от тях",
+            "all": "За всички",
+            "controlled": "За всички, с минимален срок или изключено съхранение"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_shadow_ai": {
+          "title": "Неконтролирано използване на AI",
+          "description": "Без опис не знаете какви данни излизат и къде."
+        },
+        "risk_personal_data": {
+          "title": "Лични данни без правила",
+          "description": "Лични данни, изпратени към AI без правила и договор, са риск за поверителността."
+        },
+        "risk_exfiltration": {
+          "title": "Възможно изтичане на данни",
+          "description": "AI, който може да изпраща данни навън без одобрение, е основният път за изтичане при prompt injection."
+        },
+        "risk_decisions_without_oversight": {
+          "title": "Решения за хора без човешки контрол",
+          "description": "AI, който влияе на решения за хора без човешко одобрение, е случай с висок риск."
+        },
+        "risk_live_changes": {
+          "title": "Промени директно в работа",
+          "description": "Смяна на модел или промпт без преглед може тихо да промени поведението."
+        },
+        "qw_inventory": {
+          "title": "Опис на AI системите",
+          "description": "Таблица: система → цел → данни → доставчик → отговорник."
+        },
+        "qw_data_rules": {
+          "title": "Правило за данните към AI",
+          "description": "Една страница: кои данни никога не се въвеждат в AI инструменти."
+        },
+        "qw_approval_boundaries": {
+          "title": "Писмени граници на AI",
+          "description": "Списък с действия, които винаги изискват човешко одобрение."
+        },
+        "qw_report_channel": {
+          "title": "Канал за докладване на проблеми",
+          "description": "Бутон или формуляр за докладване на грешен или вреден отговор."
+        },
+        "qw_retention": {
+          "title": "Срок за съхранение на журналите",
+          "description": "Определете и приложете срок за промпти и отговори; изключете ненужното съхранение при доставчика."
+        },
+        "rec_inventory": {
+          "title": "Опис и отговорности",
+          "description": "Регистър на AI системите с отговорник за всяка."
+        },
+        "rec_classification": {
+          "title": "Класове данни за AI",
+          "description": "Класификация, приложена и към AI инструментите, с технически ограничения."
+        },
+        "rec_vendors": {
+          "title": "Оценка на доставчиците",
+          "description": "Въпросник за сигурност и договор за обработка с всеки доставчик."
+        },
+        "rec_privacy": {
+          "title": "Поверителност при AI",
+          "description": "Минимизиране на личните данни и оценка на въздействието за чувствителните случаи."
+        },
+        "rec_threat_modeling": {
+          "title": "Моделиране на заплахите",
+          "description": "Преглед преди пускане и при промени, включително заплахи, специфични за AI."
+        },
+        "rec_injection": {
+          "title": "Защити срещу prompt injection",
+          "description": "Отделяне на данните от инструкциите, проверка на изхода и ограничени инструменти."
+        },
+        "rec_oversight": {
+          "title": "Граници на одобрение",
+          "description": "Нива на риск с писмени правила кога одобрява човек."
+        },
+        "rec_evaluation": {
+          "title": "Оценка на качеството",
+          "description": "Тестови набори с критерии за пускане и наблюдение в работа."
+        },
+        "rec_traceability": {
+          "title": "Проследимост",
+          "description": "Журнал на входа, източниците и версиите, със защита на личните данни."
+        },
+        "rec_incidents": {
+          "title": "Реакция при инциденти с AI",
+          "description": "Процес за докладване, бързо изключване и упражнения."
+        },
+        "rec_change": {
+          "title": "Управление на промените",
+          "description": "Преглед, тест, одобрение и връщане назад при смяна на модел или промпт."
+        },
+        "rec_retention": {
+          "title": "Срокове и изтриване",
+          "description": "Срокове за всички журнали и минимално съхранение при доставчиците."
+        },
+        "pattern_governance_documents": {
+          "title": "Примерни документи за управление (шаблони, не правни документи)",
+          "description": "Политика за използване на AI; регистър на AI системите; шаблон за оценка на риска и въздействието; описание на системата (system card); наръчник при инцидент с AI; въпросник за доставчици. Адаптирайте ги към вашата организация с юрист."
+        },
+        "pattern_review_workflow": {
+          "title": "Примерен процес за преглед и одобрение",
+          "description": "Заявка за нов AI случай → класификация на риска → преглед (сигурност, поверителност, бизнес отговорник) → одобрение с условия → наблюдение и периодичен преглед → спиране, когато вече не е нужен."
+        },
+        "ts_governance_board": {
+          "title": "Редовен преглед на AI портфолиото",
+          "description": "Тримесечен преглед на системите, рисковете и инцидентите с бизнеса, сигурността и юрист."
+        },
+        "ctx_ai_act": {
+          "title": "Може да попадате в по-строги изисквания",
+          "description": "Решения за хора и AI в продукти могат да попаднат в категории с повече задължения. Тази оценка не определя задълженията ви и не удостоверява съответствие; за това е нужен юрист."
+        }
+      }
+    },
+    "en": {
+      "title": "Responsible AI Governance Assessment",
+      "intro": "25 questions across 12 areas: from inventory and data classification to prompt injection, human oversight, traceability, change and retention. The result is a gap analysis, a prioritised remediation checklist and example documents.",
+      "disclaimer": "An educational self-assessment based on your answers. Not legal advice, not a legal audit, and it does not confirm compliance with the AI Act, GDPR or any other law. We do not connect to your systems.",
+      "dimensions": {
+        "inventory": {
+          "title": "AI system inventory",
+          "description": "Which AI systems and tools are used and who is accountable."
+        },
+        "classification": {
+          "title": "Data classification",
+          "description": "What data may reach AI and under which rules."
+        },
+        "vendors": {
+          "title": "Third-party model and vendor risk",
+          "description": "Assessment of and agreements with model and platform vendors."
+        },
+        "privacy": {
+          "title": "Privacy and data handling",
+          "description": "Minimisation, legal bases and people's rights."
+        },
+        "threat_modeling": {
+          "title": "Security threat modelling",
+          "description": "A systematic review of threats for each AI system."
+        },
+        "injection": {
+          "title": "Prompt injection and exfiltration controls",
+          "description": "Controls against input manipulation and data exfiltration."
+        },
+        "oversight": {
+          "title": "Human oversight and approval boundaries",
+          "description": "When a person approves and what AI may not do alone."
+        },
+        "evaluation": {
+          "title": "Evaluations and model quality",
+          "description": "Test sets, criteria and quality monitoring."
+        },
+        "traceability": {
+          "title": "Traceability and auditability",
+          "description": "A log of inputs, sources and decisions."
+        },
+        "incidents": {
+          "title": "Incident response",
+          "description": "What happens when AI is wrong or misused."
+        },
+        "change": {
+          "title": "Model and version change management",
+          "description": "How model, prompt or vendor changes are approved."
+        },
+        "retention": {
+          "title": "Retention and deletion",
+          "description": "How long prompts, answers and logs are kept."
+        }
+      },
+      "questions": {
+        "use_context": {
+          "text": "Where do you use AI?",
+          "help": "Select all that apply. It does not change the score.",
+          "options": {
+            "internal": "Internal tasks (texts, summaries)",
+            "customers": "Customer communication",
+            "decisions": "Decisions about people (hiring, credit, access)",
+            "products": "In products you sell"
+          }
+        },
+        "ag_inventory": {
+          "text": "Is there an inventory of AI systems and tools?",
+          "options": {
+            "none": "No",
+            "partial": "Partial",
+            "complete": "Complete",
+            "maintained": "Complete, maintained, with owners"
+          }
+        },
+        "ag_owner": {
+          "text": "Is there a business owner for each AI system?",
+          "options": {
+            "none": "No",
+            "it_only": "IT only",
+            "named": "A named owner",
+            "policy": "An owner and an internal policy"
+          }
+        },
+        "dc_rules": {
+          "text": "Is data classified (public, internal, confidential, personal)?",
+          "options": {
+            "none": "No",
+            "informal": "Informally",
+            "documented": "Documented classes",
+            "applied": "Classes are applied to AI too"
+          }
+        },
+        "dc_ai_rules": {
+          "text": "Are there rules on which data classes may be entered into AI?",
+          "options": {
+            "none": "No",
+            "verbal": "Verbal guidance",
+            "written": "Written rules",
+            "technical": "Written rules and technical restrictions"
+          }
+        },
+        "vd_assessment": {
+          "text": "Are model vendors assessed before use?",
+          "options": {
+            "none": "No",
+            "ad_hoc": "Sometimes",
+            "checklist": "With a questionnaire",
+            "reviewed": "With a questionnaire and a security review"
+          }
+        },
+        "vd_contracts": {
+          "text": "What agreements are in place with vendors?",
+          "options": {
+            "none": "Only general terms",
+            "some": "Agreements with some",
+            "dpa": "A processing agreement with all",
+            "full": "Agreements, with data location and retention checked"
+          }
+        },
+        "pv_personal": {
+          "text": "Does personal data reach AI systems?",
+          "options": {
+            "unknown": "We do not know",
+            "uncontrolled": "Yes, without rules",
+            "rules": "Only under rules",
+            "minimised": "Minimised or anonymised"
+          }
+        },
+        "pv_assessment": {
+          "text": "Do you carry out impact assessments for sensitive cases?",
+          "options": {
+            "none": "No",
+            "ad_hoc": "Sometimes",
+            "template": "With a template",
+            "always": "Always, reviewed"
+          }
+        },
+        "tm_reviews": {
+          "text": "Do you threat-model your AI systems?",
+          "options": {
+            "none": "No",
+            "informal": "Informally",
+            "before_launch": "Before launch",
+            "on_change": "Before launch and on change"
+          }
+        },
+        "tm_scope": {
+          "text": "What does the review cover?",
+          "options": {
+            "nothing": "There is no review",
+            "infra": "Infrastructure only",
+            "ai_specific": "AI-specific threats too",
+            "full": "AI-specific threats, data and agent tools"
+          }
+        },
+        "pi_controls": {
+          "text": "What controls exist against prompt injection?",
+          "options": {
+            "none": "No",
+            "prompt": "Instructions in the prompt only",
+            "separation": "Separating data from instructions and checking output",
+            "layered": "Layered: separation, checks, limited tools and tests"
+          }
+        },
+        "pi_exfiltration": {
+          "text": "Can AI send data out (links, e-mails, APIs)?",
+          "options": {
+            "unrestricted": "Yes, without limits",
+            "unknown": "We have not checked",
+            "limited": "Only to approved destinations",
+            "blocked": "No, not without human approval"
+          }
+        },
+        "ov_approval": {
+          "text": "Does a person approve AI actions with an external effect?",
+          "options": {
+            "never": "No",
+            "sometimes": "Sometimes",
+            "required": "Always",
+            "tiered": "By written risk levels"
+          }
+        },
+        "ov_boundaries": {
+          "text": "Is it documented what AI never does alone?",
+          "options": {
+            "none": "No",
+            "implicit": "It is implied",
+            "documented": "Documented",
+            "enforced": "Documented and technically enforced"
+          }
+        },
+        "ev_tests": {
+          "text": "Is quality checked before release?",
+          "options": {
+            "none": "No",
+            "spot": "Spot checks",
+            "test_set": "A test set",
+            "criteria": "A test set with release criteria"
+          }
+        },
+        "ev_monitoring": {
+          "text": "Is quality monitored in production?",
+          "options": {
+            "none": "No",
+            "complaints": "Through complaints",
+            "sampling": "Regular sample reviews",
+            "continuous": "Continuously, with alerts"
+          }
+        },
+        "tr_logging": {
+          "text": "Are AI inputs, sources and decisions logged?",
+          "options": {
+            "none": "No",
+            "partial": "Partly",
+            "logged": "Yes",
+            "reviewed": "Yes, with personal data protected, and reviewed"
+          }
+        },
+        "tr_explain": {
+          "text": "Can you explain a specific answer or decision?",
+          "options": {
+            "none": "No",
+            "partly": "Partly",
+            "sources": "Yes, through its sources",
+            "full": "Yes, with model, prompt version and sources"
+          }
+        },
+        "ir_process": {
+          "text": "What do you do about a harmful or wrong output?",
+          "options": {
+            "nothing": "Nothing defined",
+            "fix": "We fix it on complaint",
+            "process": "A reporting process",
+            "practised": "A process, a quick switch-off and exercises"
+          }
+        },
+        "ir_reporting": {
+          "text": "Can a user report a problem with AI?",
+          "options": {
+            "none": "No",
+            "email": "By e-mail",
+            "in_app": "In the interface",
+            "tracked": "In the interface, tracked to resolution"
+          }
+        },
+        "cm_changes": {
+          "text": "How are model, prompt or vendor changed?",
+          "options": {
+            "live": "Directly in production",
+            "informal": "With informal agreement",
+            "reviewed": "With a review and a version",
+            "approved": "With a review, test, approval and rollback"
+          }
+        },
+        "cm_register": {
+          "text": "Do you record which versions run when?",
+          "options": {
+            "none": "No",
+            "partial": "Partly",
+            "yes": "Yes",
+            "linked": "Yes, linked to incidents and evaluations"
+          }
+        },
+        "rt_policy": {
+          "text": "Is there a retention period for prompts, answers and logs?",
+          "options": {
+            "none": "No",
+            "defined": "Defined, not enforced",
+            "some": "Partly enforced",
+            "enforced": "Enforced, with automatic deletion"
+          }
+        },
+        "rt_vendor": {
+          "text": "Do you know how long vendors keep data?",
+          "options": {
+            "unknown": "No",
+            "some": "For some",
+            "all": "For all",
+            "controlled": "For all, with minimal or disabled retention"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_shadow_ai": {
+          "title": "Uncontrolled use of AI",
+          "description": "Without an inventory you do not know what data leaves and where."
+        },
+        "risk_personal_data": {
+          "title": "Personal data without rules",
+          "description": "Personal data sent to AI without rules or an agreement is a privacy risk."
+        },
+        "risk_exfiltration": {
+          "title": "Possible data exfiltration",
+          "description": "AI that can send data out without approval is the main exfiltration path for prompt injection."
+        },
+        "risk_decisions_without_oversight": {
+          "title": "Decisions about people without oversight",
+          "description": "AI that influences decisions about people without human approval is a high-risk case."
+        },
+        "risk_live_changes": {
+          "title": "Changes straight into production",
+          "description": "Changing a model or prompt without review can silently change behaviour."
+        },
+        "qw_inventory": {
+          "title": "An AI system register",
+          "description": "A table: system → purpose → data → vendor → owner."
+        },
+        "qw_data_rules": {
+          "title": "A rule for data sent to AI",
+          "description": "One page: which data is never entered into AI tools."
+        },
+        "qw_approval_boundaries": {
+          "title": "Written AI boundaries",
+          "description": "A list of actions that always require human approval."
+        },
+        "qw_report_channel": {
+          "title": "A channel to report problems",
+          "description": "A button or form to report a wrong or harmful answer."
+        },
+        "qw_retention": {
+          "title": "A retention period for logs",
+          "description": "Set and enforce a period for prompts and answers; disable unnecessary vendor retention."
+        },
+        "rec_inventory": {
+          "title": "Inventory and accountability",
+          "description": "A register of AI systems with an owner for each."
+        },
+        "rec_classification": {
+          "title": "Data classes for AI",
+          "description": "Classification applied to AI tools too, with technical restrictions."
+        },
+        "rec_vendors": {
+          "title": "Vendor assessment",
+          "description": "A security questionnaire and a processing agreement with every vendor."
+        },
+        "rec_privacy": {
+          "title": "Privacy for AI",
+          "description": "Personal data minimisation and impact assessments for sensitive cases."
+        },
+        "rec_threat_modeling": {
+          "title": "Threat modelling",
+          "description": "A review before launch and on change, including AI-specific threats."
+        },
+        "rec_injection": {
+          "title": "Prompt-injection controls",
+          "description": "Separate data from instructions, check outputs and limit tools."
+        },
+        "rec_oversight": {
+          "title": "Approval boundaries",
+          "description": "Risk levels with written rules for when a person approves."
+        },
+        "rec_evaluation": {
+          "title": "Quality evaluation",
+          "description": "Test sets with release criteria and production monitoring."
+        },
+        "rec_traceability": {
+          "title": "Traceability",
+          "description": "A log of inputs, sources and versions, with personal data protected."
+        },
+        "rec_incidents": {
+          "title": "AI incident response",
+          "description": "A reporting process, a quick switch-off and exercises."
+        },
+        "rec_change": {
+          "title": "Change management",
+          "description": "Review, test, approval and rollback when changing a model or prompt."
+        },
+        "rec_retention": {
+          "title": "Retention and deletion",
+          "description": "Periods for all logs and minimal retention at vendors."
+        },
+        "pattern_governance_documents": {
+          "title": "Example governance documents (templates, not legal documents)",
+          "description": "An AI use policy; an AI system register; a risk and impact assessment template; a system card; an AI incident playbook; a vendor questionnaire. Adapt them to your organisation with a lawyer."
+        },
+        "pattern_review_workflow": {
+          "title": "Suggested review and approval workflow",
+          "description": "A request for a new AI use case → risk classification → review (security, privacy, business owner) → approval with conditions → monitoring and periodic re-review → retirement when no longer needed."
+        },
+        "ts_governance_board": {
+          "title": "A regular AI portfolio review",
+          "description": "A quarterly review of systems, risks and incidents with the business, security and a lawyer."
+        },
+        "ctx_ai_act": {
+          "title": "You may fall under stricter requirements",
+          "description": "Decisions about people and AI in products can fall into categories with more obligations. This assessment does not determine your obligations or confirm compliance; a lawyer does."
+        }
+      }
+    }
+  }
+}

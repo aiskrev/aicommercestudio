@@ -12,6 +12,7 @@ import {
   MethodologyNote,
   PhasedRoadmap,
   RecommendationList,
+  ResultBasis,
   ResultSummary,
   StepNav,
   StepProgress,
@@ -37,6 +38,7 @@ import {
   decodeAnswers,
   encodeAnswers,
   missingAnswers,
+  READINESS_MODEL_VERSION,
   scoreReadiness,
 } from "@/lib/readiness";
 import { useStepFlow } from "@/lib/use-step-flow";
@@ -226,6 +228,7 @@ export function ReadinessAssessment({
           }))}
         />
 
+        <ResultBasis text={ui.basis} version={READINESS_MODEL_VERSION} basis="heuristic" />
         <MethodologyNote
           title={r.methodologyTitle}
           paragraphs={[
