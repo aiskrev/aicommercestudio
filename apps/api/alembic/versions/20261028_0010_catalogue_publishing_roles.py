@@ -68,7 +68,9 @@ def upgrade() -> None:
         "UPDATE catalogue_entities SET status = 'draft' "
         "WHERE status = 'published' AND entity_type IN ('domain', 'service')"
     )
-    op.create_check_constraint("ck_catalogue_entities_published_snapshot", "catalogue_entities", PUBLISHED_SNAPSHOT_CHECK)
+    op.create_check_constraint(
+        "ck_catalogue_entities_published_snapshot", "catalogue_entities", PUBLISHED_SNAPSHOT_CHECK
+    )
 
     op.drop_constraint("ck_services_offering_type", "services", type_="check")
     op.create_check_constraint(
@@ -134,10 +136,10 @@ def downgrade() -> None:
         "DELETE FROM entity_relations WHERE from_entity_id IN (SELECT id FROM services "
         "WHERE offering_type <> 'service') OR to_entity_id IN (SELECT id FROM services WHERE offering_type <> 'service')"
     )
-    op.execute("DELETE FROM family_services WHERE service_id IN (SELECT id FROM services WHERE offering_type <> 'service')")
     op.execute(
-        "DELETE FROM catalogue_entities WHERE id IN (SELECT id FROM services WHERE offering_type <> 'service')"
+        "DELETE FROM family_services WHERE service_id IN (SELECT id FROM services WHERE offering_type <> 'service')"
     )
+    op.execute("DELETE FROM catalogue_entities WHERE id IN (SELECT id FROM services WHERE offering_type <> 'service')")
     op.drop_constraint("ck_services_duration", "services", type_="check")
     op.drop_column("services", "duration_max_days")
     op.drop_column("services", "duration_min_days")

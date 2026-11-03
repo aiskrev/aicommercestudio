@@ -106,9 +106,7 @@ def upgrade() -> None:
         sa.Column("purpose", sa.String(300), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
-        sa.CheckConstraint(
-            "status IN ('planned', 'active', 'paused', 'retired')", name="ck_ops_agents_status"
-        ),
+        sa.CheckConstraint("status IN ('planned', 'active', 'paused', 'retired')", name="ck_ops_agents_status"),
         sa.ForeignKeyConstraint(
             ["organization_id"],
             ["ops_organizations.id"],

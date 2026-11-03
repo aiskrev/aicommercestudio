@@ -220,9 +220,7 @@ def _saved(db: DbSession, token: str, locale: str):
     dependencies=[_limit("report", "assessment_report_rate_limit")],
     summary="Report of a saved result: PDF, or the same document as JSON for the HTML view",
 )
-def result_report(
-    payload: ResultReportRequest, db: DbSession, locale: Locale = Query(default="bg")
-) -> Response:
+def result_report(payload: ResultReportRequest, db: DbSession, locale: Locale = Query(default="bg")) -> Response:
     """Only the result the token opens is ever rendered (the token is the access right). Expired,
     unknown and tampered results are 404. The file name carries no reference, token or name."""
     row, definition, answers, result = _saved(db, payload.token, locale)

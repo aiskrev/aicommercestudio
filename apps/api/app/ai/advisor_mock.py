@@ -660,9 +660,7 @@ def build_demo_assessment(data: AdvisorPromptInput) -> dict[str, Any]:
 
     opportunities = [o for p in patterns for o in p.opportunities]
     if ToolKey.SPREADSHEETS in data.tools and primary.key != "reporting":
-        opportunities.append(
-            _opp(text["spreadsheet_title"], text["spreadsheet_description"], "integration", "medium")
-        )
+        opportunities.append(_opp(text["spreadsheet_title"], text["spreadsheet_description"], "integration", "medium"))
 
     integrations = [
         {"system": s, "purpose": purpose, "access": access}
@@ -671,9 +669,7 @@ def build_demo_assessment(data: AdvisorPromptInput) -> dict[str, Any]:
         for s, purpose, access in [entry]
     ]
     if not integrations:
-        integrations = [
-            {"system": text["storage_system"], "purpose": text["storage_purpose"], "access": "read_write"}
-        ]
+        integrations = [{"system": text["storage_system"], "purpose": text["storage_purpose"], "access": "read_write"}]
 
     approvals = _dedupe([a for p in patterns for a in p.approvals], "decision")[:5]
     if any(i["access"] != "read" for i in integrations):
@@ -698,16 +694,18 @@ def build_demo_assessment(data: AdvisorPromptInput) -> dict[str, Any]:
 
     complexity = _complexity(data, patterns, text)
     # Deep copy: callers may mutate the result, and the templates above are shared module state.
-    return copy.deepcopy({
-        "problem_summary": summary,
-        "opportunities": _dedupe(opportunities, "title")[:6],
-        "proposed_workflow": primary.workflow,
-        "integrations": integrations[:8],
-        "human_approvals": approvals,
-        "data_protection": _dedupe(tpl.data_protection + [d for p in patterns for d in p.data_protection])[:6],
-        "risks": _dedupe([r for p in patterns for r in p.risks] + tpl.risks, "risk")[:6],
-        "complexity": complexity,
-        "phases": tpl.phases[complexity["level"]],
-        "clarification_questions": _dedupe(questions)[:8],
-        "next_steps": tpl.next_steps,
-    })
+    return copy.deepcopy(
+        {
+            "problem_summary": summary,
+            "opportunities": _dedupe(opportunities, "title")[:6],
+            "proposed_workflow": primary.workflow,
+            "integrations": integrations[:8],
+            "human_approvals": approvals,
+            "data_protection": _dedupe(tpl.data_protection + [d for p in patterns for d in p.data_protection])[:6],
+            "risks": _dedupe([r for p in patterns for r in p.risks] + tpl.risks, "risk")[:6],
+            "complexity": complexity,
+            "phases": tpl.phases[complexity["level"]],
+            "clarification_questions": _dedupe(questions)[:8],
+            "next_steps": tpl.next_steps,
+        }
+    )

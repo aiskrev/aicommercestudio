@@ -134,7 +134,9 @@ def upgrade() -> None:
         sa.Column("decision_comment", sa.Text(), nullable=True),
         sa.CheckConstraint(f"status IN ({AI_STATUSES})", name="ck_ai_action_requests_status"),
         sa.ForeignKeyConstraint(
-            ["decided_by_id"], ["admin_users.id"], name="fk_ai_action_requests_decided_by_id_admin_users",
+            ["decided_by_id"],
+            ["admin_users.id"],
+            name="fk_ai_action_requests_decided_by_id_admin_users",
             ondelete="SET NULL",
         ),
         sa.PrimaryKeyConstraint("id", name="pk_ai_action_requests"),

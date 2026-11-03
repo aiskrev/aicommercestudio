@@ -146,12 +146,18 @@ def upgrade() -> None:
         sa.CheckConstraint("number >= 1", name="number"),
     )
     op.create_foreign_key(
-        "fk_ops_agent_versions_based_on", "ops_agent_versions", "ops_agent_versions",
-        ["based_on_id", "organization_id"], ["id", "organization_id"],
+        "fk_ops_agent_versions_based_on",
+        "ops_agent_versions",
+        "ops_agent_versions",
+        ["based_on_id", "organization_id"],
+        ["id", "organization_id"],
     )
     op.create_foreign_key(
-        "fk_ops_agent_versions_rollback", "ops_agent_versions", "ops_agent_versions",
-        ["rollback_of_id", "organization_id"], ["id", "organization_id"],
+        "fk_ops_agent_versions_rollback",
+        "ops_agent_versions",
+        "ops_agent_versions",
+        ["rollback_of_id", "organization_id"],
+        ["id", "organization_id"],
     )
 
     # ---------------------------------------------------------------- evaluations
@@ -209,8 +215,11 @@ def upgrade() -> None:
         sa.CheckConstraint("passed >= 0 AND failed >= 0 AND total = passed + failed", name="counts"),
     )
     op.create_foreign_key(
-        "fk_ops_agent_versions_eval_run", "ops_agent_versions", "ops_eval_runs",
-        ["evaluation_run_id", "organization_id"], ["id", "organization_id"],
+        "fk_ops_agent_versions_eval_run",
+        "ops_agent_versions",
+        "ops_eval_runs",
+        ["evaluation_run_id", "organization_id"],
+        ["id", "organization_id"],
     )
     op.create_table(
         "ops_eval_results",
@@ -272,8 +281,11 @@ def upgrade() -> None:
         sa.UniqueConstraint("organization_id", "external_id", name="uq_ops_runs_org_external_id"),
         sa.CheckConstraint(_in("status", ["succeeded", "failed", "timeout", "cancelled"]), name="status"),
         sa.CheckConstraint(
-            _in("error_category", ["provider_error", "rate_limit", "timeout", "tool_error", "validation",
-                                   "policy_block", "other"], nullable=True),
+            _in(
+                "error_category",
+                ["provider_error", "rate_limit", "timeout", "tool_error", "validation", "policy_block", "other"],
+                nullable=True,
+            ),
             name="error_category",
         ),
         sa.CheckConstraint(_in("source", ["synthetic", "manual_import"]), name="source"),
@@ -395,8 +407,19 @@ def upgrade() -> None:
         sa.UniqueConstraint("organization_id", "number", name="uq_ops_changes_org_number"),
         sa.UniqueConstraint("id", "organization_id", name="uq_ops_changes_id_org"),
         sa.CheckConstraint(
-            _in("status", ["draft", "risk_review", "evaluation", "human_approval", "approved", "rejected",
-                           "released", "reviewed"]),
+            _in(
+                "status",
+                [
+                    "draft",
+                    "risk_review",
+                    "evaluation",
+                    "human_approval",
+                    "approved",
+                    "rejected",
+                    "released",
+                    "reviewed",
+                ],
+            ),
             name="status",
         ),
         sa.CheckConstraint(_in("risk", ["low", "medium", "high"]), name="risk"),

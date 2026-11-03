@@ -409,8 +409,16 @@ def test_six_requested_dimensions_and_weights():
 
 def test_vectors_cover_every_band_threshold_from_both_sides():
     bands = {v["expected"]["overall"]: v["expected"]["band"] for v in VECTORS["vectors"]}
-    expected = {0: "exploration", 24: "exploration", 25: "foundation", 49: "foundation", 50: "pilot_ready",
-                74: "pilot_ready", 75: "scaling", 100: "scaling"}
+    expected = {
+        0: "exploration",
+        24: "exploration",
+        25: "foundation",
+        49: "foundation",
+        50: "pilot_ready",
+        74: "pilot_ready",
+        75: "scaling",
+        100: "scaling",
+    }
     for overall, band in expected.items():
         assert bands.get(overall) == band, overall
 

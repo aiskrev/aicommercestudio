@@ -46,35 +46,110 @@ TEXTS: dict[str, dict[str, Any]] = {
             "governance": "Управление и контрол",
         },
         "bands": {
-            "exploration": ("Проучване", "AI все още е идея. Първо изберете бизнес цел и един процес, после подредете данните и отговорностите."),
-            "foundation": ("Изграждане на основи", "Има отделни предпоставки, но липсват ключови основи. Затворете пропуските, преди да инвестирате в разработка."),
-            "pilot_ready": ("Готовност за пилот", "Основите позволяват ограничен пилотен проект с ясна задача, тестове и човешко одобрение."),
-            "scaling": ("Готовност за мащабиране", "Стратегията, данните и контролът позволяват повече от един случай на употреба — с общи правила и наблюдение."),
+            "exploration": (
+                "Проучване",
+                "AI все още е идея. Първо изберете бизнес цел и един процес, после подредете данните и отговорностите.",
+            ),
+            "foundation": (
+                "Изграждане на основи",
+                "Има отделни предпоставки, но липсват ключови основи. Затворете пропуските, преди да инвестирате в разработка.",
+            ),
+            "pilot_ready": (
+                "Готовност за пилот",
+                "Основите позволяват ограничен пилотен проект с ясна задача, тестове и човешко одобрение.",
+            ),
+            "scaling": (
+                "Готовност за мащабиране",
+                "Стратегията, данните и контролът позволяват повече от един случай на употреба — с общи правила и наблюдение.",
+            ),
         },
         "blocker_texts": {
-            "expertise": ("Техническата експертиза", "Няма достъп до хора, които да изградят и поддържат решението. Без такава подкрепа пилотът няма кой да го доведе до работа."),
-            "governance": ("Контролът и защитата на данните", "Не е ясно какви данни ще обработва AI и кой одобрява действията му. Без това не пускайте AI до клиенти или лични данни."),
-            "data_quality": ("Качеството на данните", "Данните са непълни или противоречиви. AI ще повтаря грешките им, затова ги подредете преди разработката."),
-            "integration": ("Достъпът до системите", "Системите не позволяват надеждна връзка. Решението ще изисква ръчни стъпки, докато не се осигури интеграция."),
-            "organisation": ("Отговорността в екипа", "Няма човек с време и правомощия да води инициативата. Без отговорник пилотите рядко стигат до реална работа."),
+            "expertise": (
+                "Техническата експертиза",
+                "Няма достъп до хора, които да изградят и поддържат решението. Без такава подкрепа пилотът няма кой да го доведе до работа.",
+            ),
+            "governance": (
+                "Контролът и защитата на данните",
+                "Не е ясно какви данни ще обработва AI и кой одобрява действията му. Без това не пускайте AI до клиенти или лични данни.",
+            ),
+            "data_quality": (
+                "Качеството на данните",
+                "Данните са непълни или противоречиви. AI ще повтаря грешките им, затова ги подредете преди разработката.",
+            ),
+            "integration": (
+                "Достъпът до системите",
+                "Системите не позволяват надеждна връзка. Решението ще изисква ръчни стъпки, докато не се осигури интеграция.",
+            ),
+            "organisation": (
+                "Отговорността в екипа",
+                "Няма човек с време и правомощия да води инициативата. Без отговорник пилотите рядко стигат до реална работа.",
+            ),
         },
         "actions_texts": {
-            "expertise_first": ("Осигурете техническа подкрепа", "Определете кой ще изгради, интегрира и поддържа решението — вътрешен човек или партньор с ясен обхват."),
-            "talent_enablement": ("Развийте уменията на екипа", "Кратко практическо обучение по реални задачи и ясни правила кое може да се прави с AI и кое не."),
-            "governance_first": ("Определете правилата за данни и одобрение", "Опишете кои лични данни ще се обработват, при какви договори, и кои действия изискват човешко одобрение и журнал."),
-            "data_quality_first": ("Подредете качеството на данните", "Изберете водеща система за всяка данна, премахнете дублиранията и определете отговорник за поддръжката им."),
-            "integration_path": ("Осигурете достъп до системите", "Проверете кои системи имат API и какви ограничени права са нужни; където няма, планирайте интеграция или междинно решение."),
-            "ownership_first": ("Определете отговорник", "Назначете човек с време и правомощия, който познава процеса и решава кога решението е готово за работа."),
-            "strategy_definition": ("Свържете AI с бизнес цел", "Изберете една измерима цел и оценете идеите по полза, сложност и риск, за да определите първия случай."),
-            "data_foundation": ("Направете данните достъпни", "Съберете данните за избрания случай в система с API или редовен експорт, вместо в разпръснати файлове."),
-            "process_mapping": ("Опишете един процес стъпка по стъпка", "Картографирайте стъпките, изключенията и обема — това е основата на всяка автоматизация или агент."),
-            "tech_foundation": ("Подгответе техническата среда", "Тестова среда, контрол на промените и наблюдение намаляват риска при първото внедряване."),
-            "people_enablement": ("Подгответе екипа за промяната", "Отделете време за тестване, обяснете какво ще прави AI и какво остава за хората, и съберете обратна връзка."),
-            "governance_framework": ("Укрепете контрола", "Добавете правила за одобрение, журнал на действията и периодичен преглед на риска."),
-            "discovery_workshop": ("Проведете разговор за възможностите", "Кратко структурирано проучване на процесите и данните, което завършва с един избран случай и план."),
-            "foundation_plan": ("Изградете основите по план", "Приоритизиран план за данните, процесите и отговорностите, преди да започне разработката."),
-            "scoped_pilot": ("Пуснете ограничен пилот", "Една задача, ясни критерии за успех, тестове с реални примери и човешко одобрение за действията с ефект."),
-            "scale_operations": ("Мащабирайте с наблюдение", "Общи правила, наблюдение на качеството и разходите и процес за промени при повече случаи на употреба."),
+            "expertise_first": (
+                "Осигурете техническа подкрепа",
+                "Определете кой ще изгради, интегрира и поддържа решението — вътрешен човек или партньор с ясен обхват.",
+            ),
+            "talent_enablement": (
+                "Развийте уменията на екипа",
+                "Кратко практическо обучение по реални задачи и ясни правила кое може да се прави с AI и кое не.",
+            ),
+            "governance_first": (
+                "Определете правилата за данни и одобрение",
+                "Опишете кои лични данни ще се обработват, при какви договори, и кои действия изискват човешко одобрение и журнал.",
+            ),
+            "data_quality_first": (
+                "Подредете качеството на данните",
+                "Изберете водеща система за всяка данна, премахнете дублиранията и определете отговорник за поддръжката им.",
+            ),
+            "integration_path": (
+                "Осигурете достъп до системите",
+                "Проверете кои системи имат API и какви ограничени права са нужни; където няма, планирайте интеграция или междинно решение.",
+            ),
+            "ownership_first": (
+                "Определете отговорник",
+                "Назначете човек с време и правомощия, който познава процеса и решава кога решението е готово за работа.",
+            ),
+            "strategy_definition": (
+                "Свържете AI с бизнес цел",
+                "Изберете една измерима цел и оценете идеите по полза, сложност и риск, за да определите първия случай.",
+            ),
+            "data_foundation": (
+                "Направете данните достъпни",
+                "Съберете данните за избрания случай в система с API или редовен експорт, вместо в разпръснати файлове.",
+            ),
+            "process_mapping": (
+                "Опишете един процес стъпка по стъпка",
+                "Картографирайте стъпките, изключенията и обема — това е основата на всяка автоматизация или агент.",
+            ),
+            "tech_foundation": (
+                "Подгответе техническата среда",
+                "Тестова среда, контрол на промените и наблюдение намаляват риска при първото внедряване.",
+            ),
+            "people_enablement": (
+                "Подгответе екипа за промяната",
+                "Отделете време за тестване, обяснете какво ще прави AI и какво остава за хората, и съберете обратна връзка.",
+            ),
+            "governance_framework": (
+                "Укрепете контрола",
+                "Добавете правила за одобрение, журнал на действията и периодичен преглед на риска.",
+            ),
+            "discovery_workshop": (
+                "Проведете разговор за възможностите",
+                "Кратко структурирано проучване на процесите и данните, което завършва с един избран случай и план.",
+            ),
+            "foundation_plan": (
+                "Изградете основите по план",
+                "Приоритизиран план за данните, процесите и отговорностите, преди да започне разработката.",
+            ),
+            "scoped_pilot": (
+                "Пуснете ограничен пилот",
+                "Една задача, ясни критерии за успех, тестове с реални примери и човешко одобрение за действията с ефект.",
+            ),
+            "scale_operations": (
+                "Мащабирайте с наблюдение",
+                "Общи правила, наблюдение на качеството и разходите и процес за промени при повече случаи на употреба.",
+            ),
         },
         "services": {
             "audit": "AI стратегия и готовност",
@@ -84,12 +159,30 @@ TEXTS: dict[str, dict[str, Any]] = {
             "ai_managed": "AI Managed Services и оптимизация",
         },
         "use_case_texts": {
-            "inquiry_triage": ("Класифициране на запитвания", "Входящите имейли и форми се разпределят по тип и приоритет и стигат до правилния човек."),
-            "document_extraction": ("Извличане на данни от документи", "Полета от фактури, поръчки и договори се подготвят за въвеждане след проверка."),
-            "knowledge_assistant": ("Асистент за вътрешни знания", "Отговаря на служителите по процедури и документация, с посочени източници."),
-            "reply_drafting": ("Чернови на отговори с одобрение", "AI подготвя отговор на клиент, а служител го одобрява преди изпращане."),
-            "reporting_summary": ("Обобщения на отчети", "Седмично обобщение на продажби и запитвания с връзки към изходните данни."),
-            "process_discovery": ("Описване на процесите", "Преди AI — изберете и опишете процеса, в който ще има най-голяма полза."),
+            "inquiry_triage": (
+                "Класифициране на запитвания",
+                "Входящите имейли и форми се разпределят по тип и приоритет и стигат до правилния човек.",
+            ),
+            "document_extraction": (
+                "Извличане на данни от документи",
+                "Полета от фактури, поръчки и договори се подготвят за въвеждане след проверка.",
+            ),
+            "knowledge_assistant": (
+                "Асистент за вътрешни знания",
+                "Отговаря на служителите по процедури и документация, с посочени източници.",
+            ),
+            "reply_drafting": (
+                "Чернови на отговори с одобрение",
+                "AI подготвя отговор на клиент, а служител го одобрява преди изпращане.",
+            ),
+            "reporting_summary": (
+                "Обобщения на отчети",
+                "Седмично обобщение на продажби и запитвания с връзки към изходните данни.",
+            ),
+            "process_discovery": (
+                "Описване на процесите",
+                "Преди AI — изберете и опишете процеса, в който ще има най-голяма полза.",
+            ),
         },
         "phases": {"d30": "Дни 1–30", "d60": "Дни 31–60", "d90": "Дни 61–90"},
         "roadmap_items": {
@@ -153,35 +246,110 @@ TEXTS: dict[str, dict[str, Any]] = {
             "governance": "Governance",
         },
         "bands": {
-            "exploration": ("Exploration", "AI is still an idea. First choose a business goal and one process, then sort out data and responsibilities."),
-            "foundation": ("Foundation building", "Some prerequisites exist, but key foundations are missing. Close the gaps before investing in development."),
-            "pilot_ready": ("Pilot ready", "The foundations support a limited pilot with a clear task, tests and human approval."),
-            "scaling": ("Scaling readiness", "Strategy, data and governance support more than one use case — with shared rules and monitoring."),
+            "exploration": (
+                "Exploration",
+                "AI is still an idea. First choose a business goal and one process, then sort out data and responsibilities.",
+            ),
+            "foundation": (
+                "Foundation building",
+                "Some prerequisites exist, but key foundations are missing. Close the gaps before investing in development.",
+            ),
+            "pilot_ready": (
+                "Pilot ready",
+                "The foundations support a limited pilot with a clear task, tests and human approval.",
+            ),
+            "scaling": (
+                "Scaling readiness",
+                "Strategy, data and governance support more than one use case — with shared rules and monitoring.",
+            ),
         },
         "blocker_texts": {
-            "expertise": ("Technical expertise", "There is no access to people who can build and maintain the solution. Without that support, nobody can take a pilot into real work."),
-            "governance": ("Governance and data protection", "It isn't clear which data AI would process or who approves its actions. Until it is, keep AI away from customers and personal data."),
-            "data_quality": ("Data quality", "The data is incomplete or contradictory. AI would repeat its errors, so sort it out before development."),
-            "integration": ("Access to systems", "Your systems don't allow a reliable connection. A solution would need manual steps until an integration is in place."),
-            "organisation": ("Ownership in the team", "No one has the time and authority to lead the initiative. Without an owner, pilots rarely make it into real work."),
+            "expertise": (
+                "Technical expertise",
+                "There is no access to people who can build and maintain the solution. Without that support, nobody can take a pilot into real work.",
+            ),
+            "governance": (
+                "Governance and data protection",
+                "It isn't clear which data AI would process or who approves its actions. Until it is, keep AI away from customers and personal data.",
+            ),
+            "data_quality": (
+                "Data quality",
+                "The data is incomplete or contradictory. AI would repeat its errors, so sort it out before development.",
+            ),
+            "integration": (
+                "Access to systems",
+                "Your systems don't allow a reliable connection. A solution would need manual steps until an integration is in place.",
+            ),
+            "organisation": (
+                "Ownership in the team",
+                "No one has the time and authority to lead the initiative. Without an owner, pilots rarely make it into real work.",
+            ),
         },
         "actions_texts": {
-            "expertise_first": ("Secure technical support", "Decide who will build, integrate and maintain the solution — an internal person or a partner with a clear scope."),
-            "talent_enablement": ("Build the team's skills", "Short hands-on training on real tasks, and clear rules on what may and may not be done with AI."),
-            "governance_first": ("Set rules for data and approval", "Describe which personal data will be processed, under which agreements, and which actions need human approval and logging."),
-            "data_quality_first": ("Fix data quality", "Choose a leading system for each kind of data, remove duplicates and name an owner for keeping it current."),
-            "integration_path": ("Secure access to your systems", "Check which systems have APIs and which limited permissions are needed; where there are none, plan an integration or an interim solution."),
-            "ownership_first": ("Name an owner", "Appoint someone with time and authority who knows the process and decides when the solution is ready for real work."),
-            "strategy_definition": ("Tie AI to a business goal", "Pick one measurable goal and rate ideas by benefit, effort and risk to choose the first use case."),
-            "data_foundation": ("Make the data accessible", "Bring the data for the chosen use case into a system with an API or a regular export, rather than scattered files."),
-            "process_mapping": ("Document one process step by step", "Map the steps, exceptions and volume — the foundation for any automation or agent."),
-            "tech_foundation": ("Prepare the technical setup", "A test environment, change control and monitoring reduce the risk of the first deployment."),
-            "people_enablement": ("Prepare the team for change", "Set aside time for testing, explain what AI will do and what stays with people, and collect feedback."),
-            "governance_framework": ("Strengthen governance", "Add approval rules, an action log and periodic risk reviews."),
-            "discovery_workshop": ("Hold a discovery conversation", "A short, structured look at your processes and data that ends with one chosen use case and a plan."),
-            "foundation_plan": ("Build the foundations to a plan", "A prioritised plan for data, processes and responsibilities before development starts."),
-            "scoped_pilot": ("Run a scoped pilot", "One task, clear success criteria, tests with real examples and human approval for actions with impact."),
-            "scale_operations": ("Scale with monitoring", "Shared rules, quality and cost monitoring and a change process as you add use cases."),
+            "expertise_first": (
+                "Secure technical support",
+                "Decide who will build, integrate and maintain the solution — an internal person or a partner with a clear scope.",
+            ),
+            "talent_enablement": (
+                "Build the team's skills",
+                "Short hands-on training on real tasks, and clear rules on what may and may not be done with AI.",
+            ),
+            "governance_first": (
+                "Set rules for data and approval",
+                "Describe which personal data will be processed, under which agreements, and which actions need human approval and logging.",
+            ),
+            "data_quality_first": (
+                "Fix data quality",
+                "Choose a leading system for each kind of data, remove duplicates and name an owner for keeping it current.",
+            ),
+            "integration_path": (
+                "Secure access to your systems",
+                "Check which systems have APIs and which limited permissions are needed; where there are none, plan an integration or an interim solution.",
+            ),
+            "ownership_first": (
+                "Name an owner",
+                "Appoint someone with time and authority who knows the process and decides when the solution is ready for real work.",
+            ),
+            "strategy_definition": (
+                "Tie AI to a business goal",
+                "Pick one measurable goal and rate ideas by benefit, effort and risk to choose the first use case.",
+            ),
+            "data_foundation": (
+                "Make the data accessible",
+                "Bring the data for the chosen use case into a system with an API or a regular export, rather than scattered files.",
+            ),
+            "process_mapping": (
+                "Document one process step by step",
+                "Map the steps, exceptions and volume — the foundation for any automation or agent.",
+            ),
+            "tech_foundation": (
+                "Prepare the technical setup",
+                "A test environment, change control and monitoring reduce the risk of the first deployment.",
+            ),
+            "people_enablement": (
+                "Prepare the team for change",
+                "Set aside time for testing, explain what AI will do and what stays with people, and collect feedback.",
+            ),
+            "governance_framework": (
+                "Strengthen governance",
+                "Add approval rules, an action log and periodic risk reviews.",
+            ),
+            "discovery_workshop": (
+                "Hold a discovery conversation",
+                "A short, structured look at your processes and data that ends with one chosen use case and a plan.",
+            ),
+            "foundation_plan": (
+                "Build the foundations to a plan",
+                "A prioritised plan for data, processes and responsibilities before development starts.",
+            ),
+            "scoped_pilot": (
+                "Run a scoped pilot",
+                "One task, clear success criteria, tests with real examples and human approval for actions with impact.",
+            ),
+            "scale_operations": (
+                "Scale with monitoring",
+                "Shared rules, quality and cost monitoring and a change process as you add use cases.",
+            ),
         },
         "services": {
             "audit": "AI strategy & readiness",
@@ -191,12 +359,30 @@ TEXTS: dict[str, dict[str, Any]] = {
             "ai_managed": "AI Managed Services & optimisation",
         },
         "use_case_texts": {
-            "inquiry_triage": ("Inquiry triage", "Incoming e-mails and forms are sorted by type and priority and reach the right person."),
-            "document_extraction": ("Data extraction from documents", "Fields from invoices, orders and contracts are prepared for entry after a check."),
-            "knowledge_assistant": ("Internal knowledge assistant", "Answers staff questions on procedures and documentation, citing sources."),
-            "reply_drafting": ("Reply drafts with approval", "AI drafts a reply to a customer; a team member approves it before it is sent."),
-            "reporting_summary": ("Report summaries", "A weekly summary of sales and inquiries with links back to the source data."),
-            "process_discovery": ("Process mapping", "Before AI — choose and document the process where the benefit is greatest."),
+            "inquiry_triage": (
+                "Inquiry triage",
+                "Incoming e-mails and forms are sorted by type and priority and reach the right person.",
+            ),
+            "document_extraction": (
+                "Data extraction from documents",
+                "Fields from invoices, orders and contracts are prepared for entry after a check.",
+            ),
+            "knowledge_assistant": (
+                "Internal knowledge assistant",
+                "Answers staff questions on procedures and documentation, citing sources.",
+            ),
+            "reply_drafting": (
+                "Reply drafts with approval",
+                "AI drafts a reply to a customer; a team member approves it before it is sent.",
+            ),
+            "reporting_summary": (
+                "Report summaries",
+                "A weekly summary of sales and inquiries with links back to the source data.",
+            ),
+            "process_discovery": (
+                "Process mapping",
+                "Before AI — choose and document the process where the benefit is greatest.",
+            ),
         },
         "phases": {"d30": "Days 1–30", "d60": "Days 31–60", "d90": "Days 61–90"},
         "roadmap_items": {

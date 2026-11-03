@@ -789,9 +789,7 @@ class CatalogueService(Base):
     lead_category: Mapped[str | None] = mapped_column(String(32), nullable=True)
     icon: Mapped[str | None] = mapped_column(String(32), nullable=True)
     custom_page: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=text("false"))
-    is_entry_offer: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=False, server_default=text("false")
-    )
+    is_entry_offer: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=text("false"))
     position: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     # Assessments and workshops only: an indicative duration band in working days (no prices).
     duration_min_days: Mapped[Decimal | None] = mapped_column(Numeric(4, 1), nullable=True)
