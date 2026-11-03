@@ -45,7 +45,7 @@ Results:
 
 * API: **744 passed**, Ruff clean, docs and OpenAPI in sync, golden-vector copies identical.
 * Web: **740** unit tests passed; typecheck and lint clean.
-* e2e: **164 passed** across desktop and mobile. The new enquiry and inquiry tests each use their own client address, because the contact rate limit is per IP.
+* e2e: full run 163 passed, 1 failed. The failure was the enquiry test hitting the per-IP contact rate limit. After it got its own client address, `solution.spec.ts`, `managed-services-v2.spec.ts` and `contact.spec.ts` were re-run: **16 passed**. The GitHub CI run covers the full suite.
 
 Branch `feature/assessments-consistency` (from `main` @ `59ff0d6`, 2026-11-03): changes on this branch:
 
