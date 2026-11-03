@@ -15,6 +15,10 @@ security and governance, continuous improvement and incident handling.
 > eight areas, each with what the client receives and what their system must provide) and **AI Operations Portal — in
 > development** (`#ams-portal`, six planned modules shown as *Planned*, no data).
 
+> **v2 (2026-11-03):** three proposed service levels on 13 dimensions, current vs planned capability,
+> optional qualification questions and an admin triage — see [AI_MANAGED_SERVICES_V2.md](AI_MANAGED_SERVICES_V2.md).
+> The package keys `monitor` / `care` / `optimize` below became `essential` / `managed` / `advanced`.
+
 ## Where it lives
 
 | What | Bulgarian | English |

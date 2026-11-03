@@ -19,7 +19,7 @@ import {
   cx,
 } from "@/components/ui/primitives";
 import { domainByKey, getContent, serviceByKey, serviceRoutePaths } from "@/content";
-import type { OperationsKey, PackageCell } from "@/content/bg/ai-managed";
+import { LEVEL_DIMENSIONS, type OperationsKey, type PackageCell } from "@/content/bg/ai-managed";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { contactFormProps } from "@/lib/contact-form-props";
@@ -385,6 +385,10 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
       {/* 10. packages */}
       <Section labelledBy="ams-packages" alt>
         <SectionHeading id="ams-packages" title={page.packages.title} lead={page.packages.lead} />
+        <p className="mt-6 flex max-w-3xl gap-2 text-sm text-fg-muted" data-testid="levels-proposed-note">
+          <Icon name="info" className="mt-0.5 h-4 w-4 shrink-0" />
+          {page.packages.proposedNote}
+        </p>
         <ul className="mt-10 grid gap-5 lg:grid-cols-3">
           {page.packages.items.map((pkg, index) => (
             <li
@@ -445,6 +449,70 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
             {page.packages.noSlaNote}
           </p>
         </div>
+      </Section>
+
+      {/* 10b. every level on every dimension */}
+      <Section labelledBy="ams-levels">
+        <SectionHeading id="ams-levels" title={page.levels.title} lead={page.levels.lead} />
+        <p className="mt-6 max-w-3xl text-sm text-fg-muted">{page.levels.proposedNote}</p>
+        <div className="mt-10 grid gap-4">
+          {page.packages.items.map((pkg, index) => (
+            <details key={pkg.key} className="accordion group card p-0" data-testid={`level-${pkg.key}`} open={index === 0}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 sm:px-7 [&::-webkit-details-marker]:hidden">
+                <span>
+                  <span className="block font-display text-xl font-bold text-fg">{pkg.name}</span>
+                  <span className="mt-1 block text-sm text-fg-muted">{pkg.audience}</span>
+                </span>
+                <Icon name="chevronDown" className="h-5 w-5 shrink-0 text-brand transition-transform group-open:rotate-180" />
+              </summary>
+              <dl className="grid gap-x-10 gap-y-6 border-t border-line-subtle px-5 py-6 sm:px-7 md:grid-cols-2">
+                {LEVEL_DIMENSIONS.map((dimension) => (
+                  <div key={dimension} className="min-w-0" data-dimension={dimension}>
+                    <dt className="t-label">{page.levels.dimensions[dimension]}</dt>
+                    <dd className="mt-2">
+                      <ul className="grid gap-1.5 text-[15px] text-fg-secondary">
+                        {page.levels.items[pkg.key][dimension].map((item) => (
+                          <li key={item} className="flex gap-2.5">
+                            <span className={cx("mt-2 h-1.5 w-1.5 shrink-0 rounded-[2px]", dimension === "excluded" ? "bg-danger" : "bg-brand")} aria-hidden="true" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </details>
+          ))}
+        </div>
+      </Section>
+
+      {/* 10c. current and planned capability */}
+      <Section labelledBy="ams-availability" alt>
+        <SectionHeading id="ams-availability" title={page.availability.title} lead={page.availability.lead} />
+        <div className="mt-10 grid gap-8 lg:grid-cols-2">
+          <div className="card p-6 sm:p-7" data-testid="capability-current">
+            <h3 className="t-h3-lg">{page.availability.currentTitle}</h3>
+            <CheckList items={page.availability.current} className="mt-5" />
+          </div>
+          <div className="card border-dashed p-6 sm:p-7" data-testid="capability-planned">
+            <h3 className="t-h3-lg">
+              {page.availability.plannedTitle} <span className="badge align-middle">{page.portal.badge}</span>
+            </h3>
+            <ul className="mt-5 grid gap-3">
+              {page.availability.planned.map((item) => (
+                <li key={item} className="flex gap-3 text-fg-secondary">
+                  <Icon name="clock" className="mt-1 h-4 w-4 shrink-0 text-fg-subtle" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p className="mt-6 flex max-w-3xl gap-2 text-sm text-fg-muted">
+          <Icon name="info" className="mt-0.5 h-4 w-4 shrink-0" />
+          {page.availability.note}
+        </p>
       </Section>
 
       {/* 11. scope and exclusions */}

@@ -1,37 +1,41 @@
 import type { ServiceKey } from "@/content/types";
-import { INTEGRATION_CATEGORIES, type IntegrationCategory } from "@/lib/agent-library";
 import {
-  AGENTS,
-  AGENT_KEYS,
-  type AgentKey,
-  CHECKPOINTS,
-  type Checkpoint,
-  type Complexity,
-  DEPLOYMENTS,
-  type Deployment,
-  PHASE_WEEKS,
-  type SecurityKey,
-  WORKFLOWS,
-  type WorkflowKey,
-  addAgent,
-} from "@/lib/ai-team";
+  INTEGRATION_CATEGORIES,
+  type IntegrationCategory,
+  LIBRARY_KEYS,
+  LIBRARY_WORKFLOWS,
+  type LibraryKey,
+  type LibraryWorkflowKey,
+  archetype,
+  libraryWorkflow,
+  withDependencies,
+} from "@/lib/agent-library";
+import { CHECKPOINTS, type Checkpoint, type Complexity, DEPLOYMENTS, type Deployment, PHASE_WEEKS, type SecurityKey } from "@/lib/ai-team";
 
 /**
  * AI Solution Builder — a design tool (pure, deterministic, no network, nothing deployed).
- * Agents come from the shared library (lib/ai-team.ts → lib/agent-library.ts); every derived item
- * carries a reason. Method: docs/SOLUTION_BUILDER.md.
+ * Agents come from the agent library (lib/agent-library.ts); every derived item carries a reason.
+ * The composition rules (compositionIssues) reject incompatible or unsafe designs; the API ports them
+ * (apps/api/app/solution/model.py) and both are tested against the same golden vectors
+ * (solution.vectors.json). Change the rules in both places and bump SOLUTION_MODEL_VERSION together.
+ * Method: docs/SOLUTION_BUILDER.md.
  */
 
-export const SOLUTION_SCHEMA_VERSION = "1";
-export const SOLUTION_MODEL_VERSION = "2026-10.1";
+/** Share code format. "1" codes (before business rules and the library-only workflows) still decode. */
+export const SOLUTION_SCHEMA_VERSION = "2";
+const ACCEPTED_SCHEMAS = ["1", "2"];
+/** Must equal MODEL_VERSION in apps/api/app/solution/model.py. */
+export const SOLUTION_MODEL_VERSION = "2026-11.1";
 
 export const OBJECTIVES = ["reduce_handling_time", "faster_response", "grow_revenue", "fewer_errors", "scale_capacity", "knowledge_access"] as const;
 export type Objective = (typeof OBJECTIVES)[number];
 
-/** The workflow templates of the team model. */
-export const SOLUTION_WORKFLOWS: WorkflowKey[] = WORKFLOWS.map((w) => w.key);
+/** The team workflows plus the workflows of the library-only archetypes. */
+export const SOLUTION_WORKFLOWS: LibraryWorkflowKey[] = LIBRARY_WORKFLOWS.map((w) => w.key);
+export type SolutionWorkflow = LibraryWorkflowKey;
 
-export const CAPABILITIES = ["rag", "extraction", "classification", "generation", "decision_support", "tool_execution", "orchestration"] as const;
+/** New values are appended: the share code stores their index. */
+export const CAPABILITIES = ["rag", "extraction", "classification", "generation", "decision_support", "tool_execution", "orchestration", "business_rules"] as const;
 export type Capability = (typeof CAPABILITIES)[number];
 
 export const SENSITIVITIES = ["public", "internal", "personal", "regulated"] as const;
@@ -42,7 +46,7 @@ export { INTEGRATION_CATEGORIES, type IntegrationCategory };
 /** A proposed system: enumerated values only (no free text, no credentials — never). */
 export interface SolutionConfig {
   objective?: Objective;
-  workflow?: WorkflowKey;
+  workflow?: SolutionWorkflow;
   capabilities: Capability[];
   integrations: IntegrationCategory[];
   sensitivity?: Sensitivity;
@@ -58,52 +62,56 @@ export const EMPTY_SOLUTION: SolutionConfig = { capabilities: [], integrations: 
 
 // ------------------------------------------------------------------------------- suggestions
 
-/** Starting points for a workflow; the visitor can change all of them. */
-export const WORKFLOW_DEFAULTS: Record<WorkflowKey, { capabilities: Capability[]; integrations: IntegrationCategory[] }> = {
+/** Starting points for a workflow; the visitor can change all of them. Every default is a valid composition. */
+export const WORKFLOW_DEFAULTS: Record<SolutionWorkflow, { capabilities: Capability[]; integrations: IntegrationCategory[] }> = {
   lead_to_meeting: { capabilities: ["classification", "generation", "tool_execution"], integrations: ["crm", "email_calendar"] },
   support_resolution: { capabilities: ["rag", "classification", "generation"], integrations: ["helpdesk", "document_storage"] },
   document_intake: { capabilities: ["extraction", "classification", "tool_execution"], integrations: ["document_storage", "erp"] },
   content_pipeline: { capabilities: ["rag", "generation"], integrations: ["internal_apis", "document_storage"] },
   insight_reporting: { capabilities: ["decision_support", "generation"], integrations: ["databases", "crm"] },
   knowledge_answers: { capabilities: ["rag", "generation"], integrations: ["document_storage"] },
+  proposal_drafting: { capabilities: ["rag", "generation", "business_rules"], integrations: ["crm", "document_storage"] },
+  catalog_enrichment: { capabilities: ["classification", "generation", "tool_execution", "business_rules"], integrations: ["erp", "document_storage"] },
 };
 
-/** Workflows whose output reaches customers or partners. */
-export const EXTERNAL_WORKFLOWS: ReadonlySet<WorkflowKey> = new Set(["lead_to_meeting", "support_resolution", "content_pipeline"]);
+/** Workflows whose output reaches customers, partners or the public. */
+export const EXTERNAL_WORKFLOWS: ReadonlySet<SolutionWorkflow> = new Set(["lead_to_meeting", "support_resolution", "content_pipeline", "proposal_drafting", "catalog_enrichment"]);
 
-/** What starts each workflow and what it produces (texts in content: triggers / outputs). */
-export const WORKFLOW_TRIGGER: Record<WorkflowKey, "inbound_message" | "new_record" | "document_upload" | "schedule" | "user_question"> = {
+export const TRIGGERS = ["inbound_message", "new_record", "document_upload", "schedule", "user_question"] as const;
+export type Trigger = (typeof TRIGGERS)[number];
+
+/** What starts each workflow (texts in content: components "trigger:*"). */
+export const WORKFLOW_TRIGGER: Record<SolutionWorkflow, Trigger> = {
   lead_to_meeting: "new_record",
   support_resolution: "inbound_message",
   document_intake: "document_upload",
   content_pipeline: "schedule",
   insight_reporting: "schedule",
   knowledge_answers: "user_question",
+  proposal_drafting: "new_record",
+  catalog_enrichment: "new_record",
 };
 
-// ------------------------------------------------------------------------------- validation
+/** The capability a workflow cannot work without (it is the job of its core agent). */
+export const WORKFLOW_CAPABILITY: Record<SolutionWorkflow, Capability> = {
+  lead_to_meeting: "classification",
+  support_resolution: "rag",
+  document_intake: "extraction",
+  content_pipeline: "generation",
+  insight_reporting: "decision_support",
+  knowledge_answers: "rag",
+  proposal_drafting: "generation",
+  catalog_enrichment: "generation",
+};
 
-export type SolutionStep = "objective" | "workflow" | "capabilities" | "integrations" | "security";
-export const SOLUTION_STEPS: SolutionStep[] = ["objective", "workflow", "capabilities", "integrations", "security"];
-
-export function stepIssues(config: SolutionConfig, step: SolutionStep): string[] {
-  switch (step) {
-    case "objective":
-      return config.objective ? [] : ["objective"];
-    case "workflow":
-      return config.workflow ? [] : ["workflow"];
-    case "capabilities":
-      return config.capabilities.length > 0 ? [] : ["capabilities"];
-    case "integrations":
-      return [];
-    case "security":
-      return [!config.sensitivity && "sensitivity", !config.approval && "approval", !config.deployment && "deployment"].filter(Boolean) as string[];
-  }
-}
-
-export function isComplete(config: SolutionConfig): boolean {
-  return SOLUTION_STEPS.every((step) => stepIssues(config, step).length === 0);
-}
+/** Categories that can receive writes from a tool-executing agent (databases stay read-only). */
+export const WRITABLE: ReadonlySet<IntegrationCategory> = new Set(["crm", "erp", "email_calendar", "helpdesk", "document_storage", "internal_apis"]);
+/** Sources a knowledge index can be built from. */
+const KNOWLEDGE_SOURCES: ReadonlySet<IntegrationCategory> = new Set(["document_storage", "databases", "internal_apis"]);
+/** Where documents arrive from. */
+const DOCUMENT_SOURCES: ReadonlySet<IntegrationCategory> = new Set(["document_storage", "email_calendar", "helpdesk"]);
+/** Records a recommendation can be based on. */
+const DATA_SOURCES: ReadonlySet<IntegrationCategory> = new Set(["databases", "crm", "erp"]);
 
 // ------------------------------------------------------------------------------- approval
 
@@ -146,7 +154,7 @@ export function normaliseSolution(config: SolutionConfig): SolutionConfig {
 
 export type AgentReason = "workflow" | "capability" | "dependency" | "approval";
 
-const CAPABILITY_AGENT: Partial<Record<Capability, AgentKey>> = {
+const CAPABILITY_AGENT: Partial<Record<Capability, LibraryKey>> = {
   rag: "knowledge_assistant",
   extraction: "document_processing",
   decision_support: "reporting_insights",
@@ -154,71 +162,178 @@ const CAPABILITY_AGENT: Partial<Record<Capability, AgentKey>> = {
 };
 
 /** Agents of the proposed system with the reason each is there (library order). */
-export function proposedAgents(config: SolutionConfig): { agent: AgentKey; reason: AgentReason }[] {
-  const reasons = new Map<AgentKey, AgentReason>();
-  const add = (agent: AgentKey, reason: AgentReason) => {
+export function proposedAgents(config: SolutionConfig): { agent: LibraryKey; reason: AgentReason }[] {
+  const reasons = new Map<LibraryKey, AgentReason>();
+  const add = (agent: LibraryKey, reason: AgentReason) => {
     if (!reasons.has(agent)) reasons.set(agent, reason);
   };
-  if (config.workflow) for (const agent of WORKFLOWS.find((w) => w.key === config.workflow)!.chain) add(agent, "workflow");
-  for (const capability of config.capabilities) {
-    const agent = CAPABILITY_AGENT[capability];
+  if (config.workflow) for (const agent of libraryWorkflow(config.workflow).chain) add(agent, "workflow");
+  for (const capability of CAPABILITIES) {
+    const agent = config.capabilities.includes(capability) ? CAPABILITY_AGENT[capability] : undefined;
     if (agent) add(agent, "capability");
   }
-  for (const agent of [...reasons.keys()]) for (const dep of addAgent([], agent)) add(dep, "dependency");
-  const workers = [...reasons.keys()].filter((a) => AGENTS[a].role === "task");
+  for (const agent of [...reasons.keys()]) for (const dep of withDependencies([], agent)) add(dep, "dependency");
+  const workers = [...reasons.keys()].filter((a) => archetype(a).role === "task");
   if ((config.approval === "before_external" || config.approval === "every_action") && workers.length >= 2) add("approval_supervisor", "approval");
-  return AGENT_KEYS.filter((a) => reasons.has(a)).map((agent) => ({ agent, reason: reasons.get(agent)! }));
+  return LIBRARY_KEYS.filter((a) => reasons.has(a)).map((agent) => ({ agent, reason: reasons.get(agent)! }));
+}
+
+/** Task agents of a design (what a coordinator would coordinate). */
+const taskAgents = (config: SolutionConfig) => proposedAgents(config).filter(({ agent }) => archetype(agent).role === "task");
+
+// ------------------------------------------------------------------------------- composition rules
+
+/**
+ * Rules a composition must pass before a plan is generated. Each one rejects a design that cannot
+ * work (a capability with nothing to work on) or that is unsafe (approval below the floor, regulated
+ * data without EU/EEA residency). They never change the design; the visitor fixes it.
+ */
+export const COMPOSITION_RULES = [
+  "workflow_capability",
+  "orchestration_needs_agents",
+  "rag_needs_source",
+  "extraction_needs_documents",
+  "decision_support_needs_data",
+  "tool_execution_needs_target",
+  "regulated_needs_residency",
+  "approval_below_minimum",
+] as const;
+export type CompositionRule = (typeof COMPOSITION_RULES)[number];
+
+export type SolutionStep = "objective" | "workflow" | "capabilities" | "integrations" | "security";
+export const SOLUTION_STEPS: SolutionStep[] = ["objective", "workflow", "capabilities", "integrations", "security"];
+
+/** The step where the visitor fixes each rule. */
+export const RULE_STEP: Record<CompositionRule, SolutionStep> = {
+  workflow_capability: "capabilities",
+  orchestration_needs_agents: "capabilities",
+  rag_needs_source: "integrations",
+  extraction_needs_documents: "integrations",
+  decision_support_needs_data: "integrations",
+  tool_execution_needs_target: "integrations",
+  regulated_needs_residency: "security",
+  approval_below_minimum: "security",
+};
+
+/** Broken composition rules (rule order). Works on the raw configuration, so a tampered approval is reported, not raised. */
+export function compositionIssues(config: SolutionConfig): CompositionRule[] {
+  const caps = new Set(config.capabilities);
+  const ints = config.integrations;
+  const any = (set: ReadonlySet<IntegrationCategory>) => ints.some((i) => set.has(i));
+  const broken: Record<CompositionRule, boolean> = {
+    workflow_capability: Boolean(config.workflow) && !caps.has(WORKFLOW_CAPABILITY[config.workflow!]),
+    orchestration_needs_agents: caps.has("orchestration") && taskAgents(config).length < 2,
+    rag_needs_source: caps.has("rag") && !any(KNOWLEDGE_SOURCES),
+    extraction_needs_documents: caps.has("extraction") && !any(DOCUMENT_SOURCES),
+    decision_support_needs_data: caps.has("decision_support") && !any(DATA_SOURCES),
+    tool_execution_needs_target: caps.has("tool_execution") && !any(WRITABLE),
+    regulated_needs_residency: config.sensitivity === "regulated" && !config.residency,
+    approval_below_minimum: Boolean(config.approval) && CHECKPOINTS.indexOf(config.approval!) < CHECKPOINTS.indexOf(minimumApproval(config).checkpoint),
+  };
+  return COMPOSITION_RULES.filter((rule) => broken[rule]);
+}
+
+/** Required inputs and composition rules of one step (keys map to content errors / composition texts). */
+export function stepIssues(config: SolutionConfig, step: SolutionStep): string[] {
+  const required = (() => {
+    switch (step) {
+      case "objective":
+        return config.objective ? [] : ["objective"];
+      case "workflow":
+        return config.workflow ? [] : ["workflow"];
+      case "capabilities":
+        return config.capabilities.length > 0 ? [] : ["capabilities"];
+      case "integrations":
+        return [];
+      case "security":
+        return [!config.sensitivity && "sensitivity", !config.approval && "approval", !config.deployment && "deployment"].filter(Boolean) as string[];
+    }
+  })();
+  return [...required, ...compositionIssues(config).filter((rule) => RULE_STEP[rule] === step)];
+}
+
+export function isComplete(config: SolutionConfig): boolean {
+  return SOLUTION_STEPS.every((step) => stepIssues(config, step).length === 0);
 }
 
 // ------------------------------------------------------------------------------- architecture
 
-export const LAYERS = ["trigger", "orchestration", "agents", "retrieval", "tools", "approval", "outputs", "monitoring"] as const;
-export type Layer = (typeof LAYERS)[number];
+/** The reference flow: trigger → input → orchestration → AI and rules → human review → output, with monitoring across it. */
+export const STAGES = ["trigger", "input", "orchestration", "ai_rules", "review", "output", "monitoring"] as const;
+export type Stage = (typeof STAGES)[number];
 
 export type ComponentKey =
-  | `trigger:${(typeof WORKFLOW_TRIGGER)[WorkflowKey]}`
+  | `trigger:${Trigger}`
+  | "input:vector_index"
+  | "input:data_access"
+  | `input:${IntegrationCategory}`
   | "orchestration:coordinator"
   | "orchestration:workflow_engine"
-  | `agent:${AgentKey}`
-  | "retrieval:vector_index"
-  | "retrieval:data_access"
-  | `tool:${IntegrationCategory}`
-  | "approval:gate"
-  | "approval:sample_review"
-  | `output:${WorkflowKey}`
+  | `agent:${LibraryKey}`
+  | "rules:output_validation"
+  | "rules:business_rules"
+  | "rules:redaction"
+  | "review:gate"
+  | "review:sample_review"
+  | `output:${SolutionWorkflow}`
+  | `action:${IntegrationCategory}`
   | "monitoring:audit_log"
   | "monitoring:quality"
   | "monitoring:cost";
 
+/** Where a person is involved: "before" = approves before it takes effect, "sample" = reviews a sample afterwards. */
+export type HumanApproval = "before" | "sample";
+
 export interface ArchitectureComponent {
   key: ComponentKey;
-  layer: Layer;
-  /** For tools: read or read and write. */
+  stage: Stage;
+  /** For connectors and actions: read or read and write. */
   access?: "read" | "read_write";
+  approval?: HumanApproval;
 }
 
-/** Categories that can receive writes from a tool-executing agent (databases stay read-only). */
-export const WRITABLE: ReadonlySet<IntegrationCategory> = new Set(["crm", "erp", "email_calendar", "helpdesk", "document_storage", "internal_apis"]);
+const gated = (c: SolutionConfig) => c.approval === "before_external" || c.approval === "every_action";
 
+/** A reference architecture — a description of components, never a running system. */
 export function architecture(config: SolutionConfig): ArchitectureComponent[] {
   const c = normaliseSolution(config);
   const out: ArchitectureComponent[] = [];
-  if (c.workflow) out.push({ key: `trigger:${WORKFLOW_TRIGGER[c.workflow]}`, layer: "trigger" });
-  out.push({ key: c.capabilities.includes("orchestration") ? "orchestration:coordinator" : "orchestration:workflow_engine", layer: "orchestration" });
-  for (const { agent } of proposedAgents(c)) {
-    if (agent !== "workflow_coordinator") out.push({ key: `agent:${agent}`, layer: "agents" });
-  }
-  if (c.capabilities.includes("rag")) out.push({ key: "retrieval:vector_index", layer: "retrieval" });
-  if (c.integrations.some((i) => i === "databases" || i === "document_storage")) out.push({ key: "retrieval:data_access", layer: "retrieval" });
   const writes = c.capabilities.includes("tool_execution");
+  const human: HumanApproval | undefined = gated(c) ? "before" : c.approval === "sample_review" ? "sample" : undefined;
+
+  if (c.workflow) out.push({ key: `trigger:${WORKFLOW_TRIGGER[c.workflow]}`, stage: "trigger" });
+  if (c.capabilities.includes("rag")) out.push({ key: "input:vector_index", stage: "input" });
+  if (c.integrations.some((i) => i === "databases" || i === "document_storage")) out.push({ key: "input:data_access", stage: "input" });
   for (const integration of c.integrations) {
-    out.push({ key: `tool:${integration}`, layer: "tools", access: writes && WRITABLE.has(integration) ? "read_write" : "read" });
+    out.push({ key: `input:${integration}`, stage: "input", access: writes && WRITABLE.has(integration) ? "read_write" : "read" });
   }
-  if (c.approval === "before_external" || c.approval === "every_action") out.push({ key: "approval:gate", layer: "approval" });
-  else if (c.approval === "sample_review") out.push({ key: "approval:sample_review", layer: "approval" });
-  if (c.workflow) out.push({ key: `output:${c.workflow}`, layer: "outputs" });
-  out.push({ key: "monitoring:audit_log", layer: "monitoring" }, { key: "monitoring:quality", layer: "monitoring" }, { key: "monitoring:cost", layer: "monitoring" });
+  out.push({ key: c.capabilities.includes("orchestration") ? "orchestration:coordinator" : "orchestration:workflow_engine", stage: "orchestration" });
+  for (const { agent } of proposedAgents(c)) {
+    if (agent !== "workflow_coordinator") out.push({ key: `agent:${agent}`, stage: "ai_rules" });
+  }
+  if (c.redaction) out.push({ key: "rules:redaction", stage: "ai_rules" });
+  if (c.capabilities.includes("business_rules")) out.push({ key: "rules:business_rules", stage: "ai_rules" });
+  out.push({ key: "rules:output_validation", stage: "ai_rules" });
+  if (gated(c)) out.push({ key: "review:gate", stage: "review", approval: "before" });
+  else if (c.approval === "sample_review") out.push({ key: "review:sample_review", stage: "review", approval: "sample" });
+  if (c.workflow) {
+    // Output for people outside the company waits for approval at the gate; with "every action" all output does.
+    const external = EXTERNAL_WORKFLOWS.has(c.workflow);
+    const approval = c.approval === "every_action" || (gated(c) && external) ? "before" : c.approval === "sample_review" ? "sample" : undefined;
+    out.push({ key: `output:${c.workflow}`, stage: "output", approval });
+  }
+  if (writes) {
+    for (const integration of c.integrations.filter((i) => WRITABLE.has(i))) {
+      out.push({ key: `action:${integration}`, stage: "output", access: "read_write", approval: human });
+    }
+  }
+  out.push({ key: "monitoring:audit_log", stage: "monitoring" }, { key: "monitoring:quality", stage: "monitoring" }, { key: "monitoring:cost", stage: "monitoring" });
   return out;
+}
+
+/** Every component a person approves or reviews, in flow order. */
+export function humanApprovalPoints(config: SolutionConfig): ArchitectureComponent[] {
+  return architecture(config).filter((c) => c.approval);
 }
 
 // ------------------------------------------------------------------------------- assessment
@@ -238,6 +353,7 @@ export const CAPABILITY_POINTS: Record<Capability, number> = {
   decision_support: 2,
   tool_execution: 3,
   orchestration: 3,
+  business_rules: 1,
 };
 export const INTEGRATION_POINTS: Record<IntegrationCategory, number> = {
   crm: 1,
@@ -270,12 +386,15 @@ export function assessComplexity(config: SolutionConfig): { band: Complexity; po
   return { band: SOLUTION_BANDS.find((b) => points >= b.min)!.band, points, factors };
 }
 
+/** Workflows that read content written by people outside the company. */
+const UNTRUSTED_INPUT: ReadonlySet<SolutionWorkflow> = new Set(["support_resolution", "document_intake", "lead_to_meeting", "catalog_enrichment"]);
+
 /** Security considerations (keys and texts shared with the AI team plan). */
 export function securityConsiderations(config: SolutionConfig): SecurityKey[] {
   const c = normaliseSolution(config);
   const out: SecurityKey[] = ["least_privilege", "secrets", "audit_log", "provider_terms"];
   if (c.sensitivity === "personal" || c.sensitivity === "regulated") out.push("personal_data");
-  if (c.workflow && ["support_resolution", "document_intake", "lead_to_meeting"].includes(c.workflow)) out.push("untrusted_input");
+  if (c.workflow && UNTRUSTED_INPUT.has(c.workflow)) out.push("untrusted_input");
   if (c.capabilities.includes("tool_execution") || (c.workflow && EXTERNAL_WORKFLOWS.has(c.workflow))) out.push("external_actions");
   if (c.capabilities.includes("rag")) out.push("document_permissions");
   if (c.sensitivity === "regulated") out.push("regulated_data");
@@ -296,14 +415,14 @@ const OAUTH: ReadonlySet<IntegrationCategory> = new Set(["crm", "email_calendar"
 export function integrationRequirements(config: SolutionConfig): IntegrationRequirement[] {
   const c = normaliseSolution(config);
   return architecture(c)
-    .filter((comp) => comp.layer === "tools")
+    .filter((comp) => comp.stage === "input" && comp.access)
     .map((comp) => {
-      const category = comp.key.slice("tool:".length) as IntegrationCategory;
+      const category = comp.key.slice("input:".length) as IntegrationCategory;
       return {
         category,
         access: comp.access!,
         auth: OAUTH.has(category) ? "oauth" : "service_account",
-        gated: comp.access === "read_write" && (c.approval === "before_external" || c.approval === "every_action"),
+        gated: comp.access === "read_write" && gated(c),
       };
     });
 }
@@ -314,7 +433,7 @@ export interface SolutionPhase {
   key: PhaseKey;
   /** Indicative weeks; null for the ongoing operate phase. */
   weeks: [number, number] | null;
-  agents: AgentKey[];
+  agents: LibraryKey[];
   integrations: IntegrationCategory[];
 }
 
@@ -327,8 +446,8 @@ export function roadmap(config: SolutionConfig): SolutionPhase[] {
   const c = normaliseSolution(config);
   const agents = proposedAgents(c).map((a) => a.agent);
   const band = assessComplexity(c).band;
-  const core = c.workflow ? WORKFLOWS.find((w) => w.key === c.workflow)!.core : agents[0];
-  const pilotAgents = core ? addAgent([], core) : [];
+  const core = c.workflow ? libraryWorkflow(c.workflow).core : agents[0];
+  const pilotAgents = core ? withDependencies([], core) : [];
   const readIntegrations = c.integrations.slice(0, 2);
   const rest = agents.filter((a) => !pilotAgents.includes(a));
   const restIntegrations = c.integrations.filter((i) => !readIntegrations.includes(i));
@@ -347,7 +466,7 @@ export function relatedServices(config: SolutionConfig): ServiceKey[] {
   const c = normaliseSolution(config);
   const out: ServiceKey[] = ["ai_agents"];
   if (c.integrations.length > 0) out.push("integrations");
-  if (c.capabilities.includes("tool_execution")) out.push("automation");
+  if (c.capabilities.includes("tool_execution") || c.capabilities.includes("business_rules")) out.push("automation");
   if (c.capabilities.includes("rag") || c.capabilities.includes("generation")) out.push("ai_tools");
   out.push("ai_managed");
   if (c.sensitivity === "regulated" || assessComplexity(c).band === "high") out.push("audit");
@@ -359,7 +478,7 @@ export function relatedServices(config: SolutionConfig): ServiceKey[] {
 const pick = <T extends string>(list: readonly T[], value: unknown): T | undefined =>
   typeof value === "string" && (list as readonly string[]).includes(value) ? (value as T) : undefined;
 
-/** Versioned, enumerated share code (`?s=`): `1.<objective>.<workflow>.<caps>.<integrations>.<sensitivity>.<approval>.<deployment>.<flags>`. */
+/** Versioned, enumerated share code (`?s=`): `2.<objective>.<workflow>.<caps>.<integrations>.<sensitivity>.<approval>.<deployment>.<flags>`. */
 export function encodeSolution(config: SolutionConfig): string {
   const c = normaliseSolution(config);
   const idx = <T extends string>(list: readonly T[], values: T[]) => values.map((v) => list.indexOf(v)).join("") || "-";
@@ -376,20 +495,29 @@ export function encodeSolution(config: SolutionConfig): string {
   ].join(".");
 }
 
-export function decodeSolution(code: string | null | undefined): SolutionConfig | null {
+/** The configuration a code describes, before any rule is applied (null when it is malformed). */
+export function parseSolutionCode(code: string | null | undefined): SolutionConfig | null {
   if (!code || code.length > 200) return null;
   const parts = code.split(".");
-  if (parts.length !== 9 || parts[0] !== SOLUTION_SCHEMA_VERSION || !/^[01]{2}$/.test(parts[8])) return null;
+  if (parts.length !== 9 || !ACCEPTED_SCHEMAS.includes(parts[0]) || !/^[01]{2}$/.test(parts[8])) return null;
   const fromIdx = <T extends string>(list: readonly T[], raw: string): T[] | null => {
     if (raw === "-") return [];
     if (!/^\d+$/.test(raw)) return null;
     const values = [...raw].map((d) => list[Number(d)]);
-    return values.every(Boolean) ? values : null;
+    return values.every(Boolean) && new Set(values).size === values.length ? values : null;
   };
   const capabilities = fromIdx(CAPABILITIES, parts[3]);
   const integrations = fromIdx(INTEGRATION_CATEGORIES, parts[4]);
   if (!capabilities || !integrations) return null;
-  const config = normaliseSolution({
+  const fields: [string, readonly string[]][] = [
+    [parts[1], OBJECTIVES],
+    [parts[2], SOLUTION_WORKFLOWS],
+    [parts[5], SENSITIVITIES],
+    [parts[6], CHECKPOINTS],
+    [parts[7], DEPLOYMENTS],
+  ];
+  if (fields.some(([value, list]) => value !== "" && !list.includes(value))) return null;
+  return {
     objective: pick(OBJECTIVES, parts[1]),
     workflow: pick(SOLUTION_WORKFLOWS, parts[2]),
     capabilities,
@@ -399,6 +527,13 @@ export function decodeSolution(code: string | null | undefined): SolutionConfig 
     deployment: pick(DEPLOYMENTS, parts[7]),
     residency: parts[8][0] === "1",
     redaction: parts[8][1] === "1",
-  });
+  };
+}
+
+/** A complete design that passes every composition rule, or null (malformed, incomplete, incompatible or unsafe). */
+export function decodeSolution(code: string | null | undefined): SolutionConfig | null {
+  const raw = parseSolutionCode(code);
+  if (!raw || compositionIssues(raw).length > 0) return null;
+  const config = normaliseSolution(raw);
   return isComplete(config) ? config : null;
 }

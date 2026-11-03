@@ -26,10 +26,11 @@ if ($Suite -in @("api", "web", "all")) {
         $global:LASTEXITCODE = [int]($api -ne $web)
     }
     # The AI team model and its PDF texts are shared the same way (vectors + texts snapshot).
-    Invoke-Suite "AI team vectors and texts (API = web copy)" {
+    Invoke-Suite "AI team and solution builder vectors and texts (API = web copy)" {
         $pairs = @(
             @("apps/api/tests/fixtures/team_vectors.json", "apps/web/src/lib/team.vectors.json"),
-            @("apps/api/app/team/texts.json", "apps/web/src/lib/team-texts.json")
+            @("apps/api/app/team/texts.json", "apps/web/src/lib/team-texts.json"),
+            @("apps/api/tests/fixtures/solution_vectors.json", "apps/web/src/lib/solution.vectors.json")
         )
         $diff = $pairs | Where-Object { (Get-FileHash $_[0]).Hash -ne (Get-FileHash $_[1]).Hash }
         foreach ($pair in $diff) { Write-Host "$($pair[0]) differs from $($pair[1])" -ForegroundColor Red }

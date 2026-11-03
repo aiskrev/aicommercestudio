@@ -55,7 +55,7 @@ test.describe("public website", () => {
 
     await page.goto("/en");
     const managed = page.locator("section[aria-labelledby='managed-title']");
-    await expect(managed.getByTestId("managed-packages")).toContainText("AI Monitor");
+    await expect(managed.getByTestId("managed-packages")).toContainText("Essential Monitoring & Advisory");
     await managed.getByRole("link", { name: "Request an assessment" }).click();
     await expect(page).toHaveURL(/\/en\/services\/ai-managed-services#ams-inquiry$/);
     await expect(page.locator("#ams-inquiry")).toBeVisible();

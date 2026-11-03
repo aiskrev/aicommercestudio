@@ -9,8 +9,7 @@ import {
   topicRoutePaths,
 } from "@/content";
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
-import { AGENT_KEYS } from "@/lib/ai-team";
-import { AGENT_SLUGS } from "@/lib/agent-library";
+import { AGENT_SLUGS, LIBRARY_KEYS } from "@/lib/agent-library";
 import { getCatalogue } from "@/lib/catalogue";
 import { isDomainPublished } from "@/lib/domains";
 import { routes } from "@/lib/routes";
@@ -84,7 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         })),
       // Agent library: index and one static page per agent role.
       ...(isToolAvailable(toolByKey("agents"))
-        ? [routes.agentLibrary, ...AGENT_KEYS.map((key) => routes.agent(AGENT_SLUGS[key].bg))].map((path) => ({
+        ? [routes.agentLibrary, ...LIBRARY_KEYS.map((key) => routes.agent(AGENT_SLUGS[key].bg))].map((path) => ({
             url: url(path),
             lastModified: CONTENT_REVISED,
             changeFrequency: "monthly" as const,

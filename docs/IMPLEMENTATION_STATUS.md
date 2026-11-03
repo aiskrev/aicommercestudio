@@ -16,6 +16,37 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/solution-builder-managed-v2` (from `main` @ `a371f5f`, 2026-11-03): changes on this branch:
+
+* **Agent library.** It now has 12 archetypes: the 10 team roles plus a Proposal Generation Assistant
+  and an E-commerce Catalog Assistant, which exist only in the library and the builder. Each archetype
+  defines purpose, inputs and outputs, prerequisites, integrations, risks, approvals and complexity.
+  The team configurator, its API port and its pricing are unchanged.
+* **Solution Builder.** Model `2026-11.1`, share code schema 2; schema-1 links still open.
+  * It adds a business-rules capability and two workflows.
+  * It uses the reference flow trigger → input → orchestration → AI and rules → human review →
+    output, with monitoring across it, and always includes output validation.
+  * Human-approval points are visible.
+  * Eight composition rules reject incompatible or unsafe designs, in the browser and on the server.
+  * An optional enquiry (`POST /api/public/solution/enquiries`) attaches the server-validated design
+    to a lead, shown in the admin.
+  * See [SOLUTION_BUILDER.md](SOLUTION_BUILDER.md).
+* **AI Managed Services v2.** See [AI_MANAGED_SERVICES_V2.md](AI_MANAGED_SERVICES_V2.md).
+  * Three proposed service levels: Essential Monitoring & Advisory, Managed AI Operations, and Advanced
+    AI Reliability & Optimization. Each is described on 13 dimensions, with a comparison.
+  * Current and planned capability are kept apart.
+  * Eight optional qualification questions are added to the intake.
+  * An admin triage records the suggested level, readiness and reasons, with list filters.
+  * No prices, 24/7, SLA, uptime, named integrations or live monitoring are claimed. Existing lead
+    flows and validation are unchanged.
+* No migration: the new data lives in `leads.service_details` (JSONB).
+
+Results:
+
+* API: **744 passed**, Ruff clean, docs and OpenAPI in sync, golden-vector copies identical.
+* Web: **740** unit tests passed; typecheck and lint clean.
+* e2e: full run **162 passed, 2 failed**. Both failures were in the new tests themselves: a shared per-IP rate limit and a form token used too quickly. After fixing them, the two specs were re-run: **12 passed**.
+
 Branch `feature/assessments-consistency` (from `main` @ `59ff0d6`, 2026-11-03): changes on this branch:
 
 * Responsible AI Governance, AI Operations Readiness and FinOps & AI Cost are now at 1.1.0, with

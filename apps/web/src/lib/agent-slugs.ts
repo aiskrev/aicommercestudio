@@ -5,8 +5,10 @@
 export const AGENT_SLUGS = {
   lead_qualification: { bg: "kvalifikatsiya-na-zapitvaniya", en: "lead-qualification-agent" },
   sales_research: { bg: "prouchvane-na-klienti", en: "sales-research-agent" },
+  proposal_generation: { bg: "izgotvyane-na-oferti", en: "proposal-generation-assistant" },
   customer_support: { bg: "obsluzhvane-na-klienti", en: "customer-support-agent" },
   content_operations: { bg: "sadarzhanie", en: "content-operations-agent" },
+  catalog_assistant: { bg: "produkten-katalog", en: "ecommerce-catalog-assistant" },
   document_processing: { bg: "obrabotka-na-dokumenti", en: "document-processing-agent" },
   knowledge_assistant: { bg: "asistent-za-vatreshni-znaniya", en: "knowledge-assistant" },
   scheduling: { bg: "sreshti-i-grafitsi", en: "scheduling-agent" },

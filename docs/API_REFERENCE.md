@@ -148,10 +148,21 @@ Response: `{"status": "received", "reference": "3B78AEBC", "message": "…", "in
 | support_interests | 1+ of `monitoring, maintenance, security, cost_optimization, quality_evaluation, incident_support, full_managed` |
 | communication_language | `bg` or `en` |
 | additional_notes | optional, ≤ 2000 chars, no credentials |
+| desired_level | optional: `essential, managed, advanced, unsure` |
+| production_status | optional: `production, pilot, development` |
+| technical_owner | optional: `yes, no` |
+| access_readiness | optional: `read_access, needs_approval, not_possible, unknown` |
+| test_environment | optional: `yes, no, unknown` |
+| data_sensitivity | optional: `public_internal, personal, special` |
+| change_frequency | optional: `rarely, monthly, weekly, unknown` |
+| response_needs | optional: `business_hours, faster, unsure` |
 | unknown fields | rejected (e.g. `api_key`) |
 
+The eight qualification fields (AI Managed Services v2) are optional, so older clients keep working.
 Field errors inside `ai_managed` are reported with flat names (`ai_system_types`, `ai_provider`, …).
-Stored in `leads.service_details` as `{"kind": "ai_managed", ...}`; never returned by public endpoints.
+Stored in `leads.service_details` as `{"kind": "ai_managed", ..., "qualification": {...}}`. The
+`qualification` object is the admin triage (suggested level, readiness, reasons), computed on the server
+([AI_MANAGED_SERVICES_V2.md](AI_MANAGED_SERVICES_V2.md)). Neither is ever returned by public endpoints.
 
 ### `POST /api/public/quote-requests` → 201 — request for a written quote
 
@@ -254,6 +265,16 @@ limits and errors: [READINESS_REPORTS.md](READINESS_REPORTS.md#api).
 Admins download a consultation's plan from `GET /api/admin/leads/{id}/team-report`. Fields, limits,
 cost model and errors: [TEAM_CONFIGURATOR.md](TEAM_CONFIGURATOR.md#api).
 
+## Public: AI solution builder
+
+The builder runs in the browser and calls no API. Only an explicit enquiry does.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| POST | `/api/public/solution/enquiries` → 201 | optional: `{model_version, code, locale, name, email, company, message?, privacy_acknowledged: true, marketing_consent (default false), website (honeypot), form_token}` → `{status, reference, message}`. `code` is the enumerated share code (`^[a-z0-9_.-]+$`, ≤ 200). The server decodes it and checks the composition rules itself. 422 `solution_invalid` (`errors[].type` = the broken rule, `malformed` or `incomplete`; nothing is stored), 422 `solution_model` for a stale `model_version`, 400 `form_token_invalid` / `spam_suspected`; contact-form rate limit. Creates a lead (`service = ai_agents`, `source = solution_builder`) with the design derived on the server. |
+
+Rules, vectors and the admin view: [SOLUTION_BUILDER.md](SOLUTION_BUILDER.md#api).
+
 ## Public: assessment engine
 
 Deterministic questionnaire assessments ([ASSESSMENT_PLATFORM_ARCHITECTURE.md](ASSESSMENT_PLATFORM_ARCHITECTURE.md)).
@@ -336,7 +357,7 @@ Admin responses are `Cache-Control: no-store`.
 
 | Method | Path | Description |
 | --- | --- | --- |
-| GET | `/api/admin/leads` | Query: `status`, `service`, `inquiry_type`, `locale` (`bg`/`en`), `q` (name/company/e-mail, ≤ 100), `created_from`, `created_to` (ISO 8601), `sort` = `newest`/`oldest`, `page`, `page_size` ≤ 100. Items include `locale`. |
+| GET | `/api/admin/leads` | Query: `status`, `service`, `inquiry_type`, `locale` (`bg`/`en`), `ams_level` (`essential`/`managed`/`advanced`), `ams_readiness` (`ready`/`needs_preparation`/`not_ready`/`unknown`; the stored AI Managed triage, see [AI_MANAGED_SERVICES_V2.md](AI_MANAGED_SERVICES_V2.md)), `q` (name/company/e-mail, ≤ 100), `created_from`, `created_to` (ISO 8601), `sort` = `newest`/`oldest`, `page`, `page_size` ≤ 100. Items include `locale`, `ams_level` and `ams_readiness`. |
 | GET | `/api/admin/leads/{id}` | Full lead incl. consents, quote fields, `submitted_service`, `locale`, `ai_managed` details (or `null`), notes, linked `advisor_assessment` (or `null`). Audited as `lead.viewed` (once per admin per 15 min). |
 | PATCH | `/api/admin/leads/{id}` | `{"status"?, "service"?, "expected_status"?}` — at least one of status/service. Row-locked; with `expected_status` a stale update returns 409 `status_conflict`. Audits `lead.status_changed` / `lead.service_changed` with `from`/`to`. `submitted_service` is never changed. |
 | POST | `/api/admin/leads/{id}/notes` | `{"body": "..."}` (1–4000) → 201, audited |

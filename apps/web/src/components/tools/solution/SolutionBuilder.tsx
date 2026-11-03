@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
+import { ConsultationForm } from "@/components/tools/ConsultationForm";
 import { type ComponentText, SolutionDiagram } from "@/components/tools/solution/SolutionDiagram";
 import { PillGroup, SelectCard, fill } from "@/components/tools/team/TeamControls";
 import { ToolActions } from "@/components/tools/ToolActions";
-import { MethodologyNote, StepNav, StepProgress, ToolLeadCapture, ToolState } from "@/components/tools/ToolUi";
+import { MethodologyNote, StepNav, StepProgress, ToolState } from "@/components/tools/ToolUi";
 import { Alert, Button, cx } from "@/components/ui/primitives";
 import type { agentLibrary } from "@/content/bg/agent-library";
 import type { solutionTool } from "@/content/bg/tool-solution";
@@ -16,12 +17,15 @@ import type { tools } from "@/content/bg/tools";
 import type { ServiceKey } from "@/content/types";
 import type { Locale } from "@/i18n/config";
 import { type ToolEvent, trackToolEvent } from "@/lib/analytics";
-import { type AgentKey, CHECKPOINTS, type Checkpoint, DEPLOYMENTS, type WorkflowKey } from "@/lib/ai-team";
+import { type LibraryKey, agentText, workflowText } from "@/lib/agent-library";
+import { CHECKPOINTS, type Checkpoint, DEPLOYMENTS } from "@/lib/ai-team";
 import {
   CAPABILITIES,
   type Capability,
   type ComplexityFactor,
   type ComponentKey,
+  COMPOSITION_RULES,
+  type CompositionRule,
   EMPTY_SOLUTION,
   INTEGRATION_CATEGORIES,
   type IntegrationCategory,
@@ -30,12 +34,16 @@ import {
   SOLUTION_STEPS,
   SOLUTION_WORKFLOWS,
   type SolutionConfig,
+  type SolutionWorkflow,
+  WORKFLOW_CAPABILITY,
   WORKFLOW_DEFAULTS,
   allowedApprovals,
   architecture,
   assessComplexity,
+  compositionIssues,
   decodeSolution,
   encodeSolution,
+  humanApprovalPoints,
   integrationRequirements,
   minimumApproval,
   normaliseSolution,
@@ -46,6 +54,7 @@ import {
   securityConsiderations,
   stepIssues,
 } from "@/lib/solution";
+import { submitSolutionEnquiry } from "@/lib/solution-api";
 import { useStepFlow } from "@/lib/use-step-flow";
 
 type Content = typeof solutionTool;
@@ -56,6 +65,8 @@ type ServiceLinks = Partial<Record<ServiceKey, { href: string; label: string }>>
 
 /** Five input steps, then the architecture review; the plan is the result. */
 const STEPS = [...SOLUTION_STEPS, "review"] as const;
+
+const isRule = (key: string): key is CompositionRule => (COMPOSITION_RULES as readonly string[]).includes(key);
 
 /** Options as a fieldset of selectable cards with one error message. */
 function CardGroup({ id, legend, error, hint, children, columns = true }: { id: string; legend: string; error?: string; hint?: ReactNode; children: ReactNode; columns?: boolean }) {
@@ -80,6 +91,7 @@ export function SolutionBuilder({
   ui,
   services,
   contactHref,
+  privacyHref,
   libraryHref,
   agentHrefs,
   locale,
@@ -90,8 +102,9 @@ export function SolutionBuilder({
   ui: Ui;
   services: ServiceLinks;
   contactHref: string;
+  privacyHref: string;
   libraryHref?: string;
-  agentHrefs?: Partial<Record<AgentKey, string>>;
+  agentHrefs?: Partial<Record<LibraryKey, string>>;
   locale: Locale;
 }) {
   // A shared design (?s=<code>) or a workflow from the agent library (?w=<workflow>) is read during
@@ -112,7 +125,7 @@ export function SolutionBuilder({
   const solution = useMemo(() => normaliseSolution(config), [config]);
   const flow = useStepFlow({
     steps: STEPS.length,
-    validate: (step) => (STEPS[step] === "review" ? [] : stepIssues(solution, STEPS[step] as (typeof SOLUTION_STEPS)[number])),
+    validate: (step) => (STEPS[step] === "review" ? compositionIssues(solution) : stepIssues(solution, STEPS[step] as (typeof SOLUTION_STEPS)[number])),
     onStart: () => track("tool_started"),
     onStepComplete: (step) => track("step_completed", { step: step + 1, totalSteps: STEPS.length }),
     initialComplete: restored,
@@ -139,7 +152,7 @@ export function SolutionBuilder({
     setConfig((current) => ({ ...current, ...patch }));
   }
 
-  function chooseWorkflow(workflow: WorkflowKey) {
+  function chooseWorkflow(workflow: SolutionWorkflow) {
     flow.touch();
     flow.clearError("workflow");
     // A new workflow replaces the suggested capabilities and integrations; the visitor can change them.
@@ -167,21 +180,25 @@ export function SolutionBuilder({
   // ------------------------------------------------------------------------------- labels
 
   const r = content.result;
-  const agentName = (agent: AgentKey) => team.agents[agent].name;
+  const texts = { teamTool: team, agentLibrary: library };
+  const agent = (key: LibraryKey) => agentText(texts, key);
+  const agentName = (key: LibraryKey) => agent(key).name;
+  const workflow = (key: SolutionWorkflow) => workflowText(texts, key);
   const categoryName = (category: IntegrationCategory) => library.categories[category].title;
   const checkpointName = (checkpoint: Checkpoint) => team.checkpoints[checkpoint].title;
   const describe = (key: ComponentKey): ComponentText => {
     const [kind, value] = key.split(":") as [string, string];
-    if (kind === "agent") return { title: agentName(value as AgentKey), text: team.agents[value as AgentKey].purpose };
-    if (kind === "tool") {
+    if (kind === "agent") return { title: agentName(value as LibraryKey), text: agent(value as LibraryKey).purpose };
+    if (kind === "input" && (INTEGRATION_CATEGORIES as readonly string[]).includes(value)) {
       const access = architecture(solution).find((c) => c.key === key)?.access ?? "read";
       return { title: categoryName(value as IntegrationCategory), text: library.categories[value as IntegrationCategory].text, meta: content.toolAccess[access] };
     }
+    if (kind === "action") return { title: categoryName(value as IntegrationCategory), text: content.actionText, meta: content.toolAccess.read_write };
     if (kind === "output") {
-      const workflow = team.result.workflows[value as WorkflowKey];
-      return { title: workflow.outcome, text: workflow.title };
+      const w = workflow(value as SolutionWorkflow);
+      return { title: w.outcome, text: w.title };
     }
-    if (key === "approval:gate" && solution.approval) {
+    if (key === "review:gate" && solution.approval) {
       return { ...content.components[key], meta: checkpointName(solution.approval) };
     }
     return content.components[key as keyof Content["components"]];
@@ -200,10 +217,16 @@ export function SolutionBuilder({
         return fill(r.factors.deployment, { name: team.teamStep.deployment.options[factor.deployment].title });
     }
   };
+  const ruleText = (rule: CompositionRule) =>
+    fill(content.composition[rule], {
+      workflow: solution.workflow ? workflow(solution.workflow).title : "",
+      capability: solution.workflow ? content.capabilities[WORKFLOW_CAPABILITY[solution.workflow]].title : "",
+    });
   const diagramLabels = {
     title: r.diagramTitle,
     note: r.diagramNote,
-    layers: content.layers,
+    stages: content.stages,
+    approvalMarks: content.approvalMarks,
     notUsed: r.notUsed,
     hint: r.hint,
     detailsLabel: r.detailsLabel,
@@ -219,11 +242,12 @@ export function SolutionBuilder({
     const requirements = integrationRequirements(solution);
     const security = securityConsiderations(solution);
     const phases = roadmap(solution);
+    const approvals = humanApprovalPoints(solution);
     const serviceKeys = relatedServices(solution).filter((key) => services[key]);
     const objective = solution.objective ? content.objectives[solution.objective] : null;
     const summary = fill(r.summary, {
       objective: objective?.title ?? "",
-      workflow: solution.workflow ? team.result.workflows[solution.workflow].title : "",
+      workflow: solution.workflow ? workflow(solution.workflow).title : "",
       agents: agents.length,
       integrations: solution.integrations.length,
       approval: solution.approval ? checkpointName(solution.approval) : "",
@@ -238,7 +262,13 @@ export function SolutionBuilder({
         `${r.complexityTitle}: ${team.complexity[complexity.band]} (${fill(r.pointsLabel, { points: complexity.points })})`,
         "",
         `${r.responsibilitiesTitle}:`,
-        ...architecture(solution).map((c) => `- ${content.layers[c.layer]}: ${describe(c.key).title}${describe(c.key).meta ? ` (${describe(c.key).meta})` : ""}`),
+        ...architecture(solution).map(
+          (c) =>
+            `- ${content.stages[c.stage]}: ${describe(c.key).title}${describe(c.key).meta ? ` (${describe(c.key).meta})` : ""}${c.approval ? ` — ${content.approvalMarks[c.approval]}` : ""}`,
+        ),
+        "",
+        `${r.approvalsTitle}:`,
+        ...(approvals.length > 0 ? approvals.map((c) => `- ${describe(c.key).title}: ${content.approvalMarks[c.approval!]}`) : [`- ${r.noApprovals}`]),
         "",
         `${r.integrationsTitle}:`,
         ...(requirements.length > 0
@@ -297,24 +327,45 @@ export function SolutionBuilder({
 
         <SolutionDiagram id="solution-result-diagram" components={architecture(solution)} describe={describe} labels={diagramLabels} />
 
+        <section aria-labelledby="solution-approvals">
+          <h2 id="solution-approvals" className="t-h3-lg">
+            {r.approvalsTitle}
+          </h2>
+          <p className="mt-2 max-w-3xl text-fg-muted">{r.approvalsLead}</p>
+          {approvals.length > 0 ? (
+            <ul className="mt-6 grid gap-3 md:grid-cols-2" data-testid="solution-approvals">
+              {approvals.map((c) => (
+                <li key={c.key} className="rounded-[var(--radius-md)] border border-line-subtle p-4" data-component={c.key} data-approval={c.approval}>
+                  <p className="font-semibold text-fg">{describe(c.key).title}</p>
+                  <p className="mt-1 text-sm text-fg-muted">
+                    {content.stages[c.stage]} · {content.approvalMarks[c.approval!]}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mt-4 text-fg-muted">{r.noApprovals}</p>
+          )}
+        </section>
+
         <section aria-labelledby="solution-responsibilities">
           <h2 id="solution-responsibilities" className="t-h3-lg">
             {r.responsibilitiesTitle}
           </h2>
           <ul className="mt-6 grid gap-3 md:grid-cols-2">
-            {agents.map(({ agent, reason }) => (
-              <li key={agent} className="card p-5" data-agent={agent}>
+            {agents.map(({ agent: key, reason }) => (
+              <li key={key} className="card p-5" data-agent={key}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="t-h3">{agentName(agent)}</h3>
+                  <h3 className="t-h3">{agentName(key)}</h3>
                   <span className="badge">{content.agentReasons[reason]}</span>
                 </div>
-                <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{team.agents[agent].purpose}</p>
+                <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{agent(key).purpose}</p>
                 <p className="mt-3 text-sm">
                   <span className="text-fg-subtle">{r.agentOversight}: </span>
-                  <span className="text-fg-secondary">{team.agents[agent].oversight}</span>
+                  <span className="text-fg-secondary">{agent(key).oversight}</span>
                 </p>
-                {agentHrefs?.[agent] && (
-                  <Link href={agentHrefs[agent]!} className="link mt-3 inline-block text-sm">
+                {agentHrefs?.[key] && (
+                  <Link href={agentHrefs[key]!} className="link mt-3 inline-block text-sm">
                     {r.openAgent}
                   </Link>
                 )}
@@ -459,12 +510,27 @@ export function SolutionBuilder({
           shareUrl={() => `${window.location.origin}${window.location.pathname}?s=${encodeSolution(solution)}`}
           onExport={(format) => track("export_requested", { format })}
         />
-        <ToolLeadCapture
-          title={content.leadCapture.title}
-          text={content.leadCapture.text}
-          primary={{ href: contactHref, label: content.leadCapture.cta }}
-          secondary={libraryHref ? { href: libraryHref, label: content.leadCapture.secondary } : undefined}
+        <ConsultationForm
+          id="solution"
+          content={content.enquiry}
+          privacyHref={privacyHref}
+          send={async (input, formToken) => {
+            const result = await submitSolutionEnquiry(solution, input, formToken, locale);
+            if (result.ok) return result;
+            const e = content.enquiry;
+            return { ok: false, message: result.kind === "rejected" ? e.rejected : result.kind === "rate_limited" ? e.rateLimited : e.failed };
+          }}
         />
+        <p className="flex flex-wrap gap-x-6 gap-y-2 text-sm print:hidden">
+          <Link href={contactHref} className="link">
+            {content.leadCapture.cta}
+          </Link>
+          {libraryHref && (
+            <Link href={libraryHref} className="link">
+              {content.leadCapture.secondary}
+            </Link>
+          )}
+        </p>
         <div className="print:hidden">
           <Button variant="ghost" onClick={restart}>
             {ui.restart}
@@ -484,6 +550,11 @@ export function SolutionBuilder({
   const minimum = minimumApproval(solution);
   const allowed = allowedApprovals(solution);
   const heading = step === "review" ? { title: content.reviewStep, description: content.reviewDescription } : content.steps[step];
+  const rules = flow.errors.filter(isRule);
+  const ruleError = (target: (typeof SOLUTION_STEPS)[number] | "review") => {
+    const shown = rules.filter((rule) => target === "review" || stepIssues(solution, target).includes(rule));
+    return shown.length > 0 ? shown.map(ruleText).join(" ") : undefined;
+  };
 
   return (
     <div className="grid gap-6">
@@ -506,7 +577,20 @@ export function SolutionBuilder({
           </div>
           {flow.errors.length > 0 && (
             <Alert tone="error" role="alert">
-              {e.summary}
+              {rules.length > 0 ? (
+                <span data-testid="solution-composition-errors">
+                  <span className="block font-semibold">{content.compositionTitle}</span>
+                  <span className="mt-1 grid gap-1">
+                    {rules.map((rule) => (
+                      <span key={rule} className="block" data-rule={rule}>
+                        {ruleText(rule)}
+                      </span>
+                    ))}
+                  </span>
+                </span>
+              ) : (
+                e.summary
+              )}
             </Alert>
           )}
 
@@ -529,23 +613,23 @@ export function SolutionBuilder({
 
           {step === "workflow" && (
             <CardGroup id="solution-workflow" legend={content.steps.workflow.title} error={errors.has("workflow") ? e.workflow : undefined}>
-              {SOLUTION_WORKFLOWS.map((workflow) => (
+              {SOLUTION_WORKFLOWS.map((key) => (
                 <SelectCard
-                  key={workflow}
+                  key={key}
                   type="radio"
                   name="solution-workflow"
-                  value={workflow}
-                  checked={solution.workflow === workflow}
-                  onChange={() => chooseWorkflow(workflow)}
-                  title={team.result.workflows[workflow].title}
-                  text={`${team.result.workflows[workflow].trigger} → ${team.result.workflows[workflow].outcome}`}
+                  value={key}
+                  checked={solution.workflow === key}
+                  onChange={() => chooseWorkflow(key)}
+                  title={workflow(key).title}
+                  text={`${workflow(key).trigger} → ${workflow(key).outcome}`}
                 />
               ))}
             </CardGroup>
           )}
 
           {step === "capabilities" && (
-            <CardGroup id="solution-capabilities" legend={content.steps.capabilities.title} error={errors.has("capabilities") ? e.capabilities : undefined}>
+            <CardGroup id="solution-capabilities" legend={content.steps.capabilities.title} error={errors.has("capabilities") ? e.capabilities : ruleError("capabilities")}>
               {CAPABILITIES.map((capability: Capability) => (
                 <SelectCard
                   key={capability}
@@ -566,6 +650,7 @@ export function SolutionBuilder({
             <CardGroup
               id="solution-integrations"
               legend={content.steps.integrations.title}
+              error={ruleError("integrations")}
               hint={
                 <Alert tone="warning" role="note" className="mb-4">
                   {content.integrationsNote}
@@ -651,7 +736,7 @@ export function SolutionBuilder({
                 onChange={(deployment) => update({ deployment }, ["deployment"])}
                 error={errors.has("deployment") ? e.deployment : undefined}
               />
-              <div className="grid gap-2 sm:grid-cols-2">
+              <CardGroup id="solution-data-rules" legend={content.security.dataRules} error={ruleError("security")}>
                 <SelectCard
                   type="checkbox"
                   name="solution-residency"
@@ -672,11 +757,16 @@ export function SolutionBuilder({
                   text={content.security.redaction.hint}
                   badge={redactionRequired(solution) ? <span className="badge badge-accent">{content.security.redaction.forced}</span> : undefined}
                 />
-              </div>
+              </CardGroup>
             </div>
           )}
 
           {step === "review" && <SolutionDiagram id="solution-review-diagram" components={architecture(solution)} describe={describe} labels={diagramLabels} titleHidden />}
+          {step === "review" && ruleError("review") && (
+            <p className="field-error" data-testid="solution-review-error">
+              {ruleError("review")}
+            </p>
+          )}
         </div>
         <StepNav isFirst={flow.isFirst} isLast={flow.isLast} labels={{ ...ui, finish: content.generate }} onBack={flow.back} />
       </form>

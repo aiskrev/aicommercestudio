@@ -118,6 +118,56 @@ class AiSupportInterest(enum.StrEnum):
     FULL_MANAGED = "full_managed"
 
 
+class AiDesiredLevel(enum.StrEnum):
+    ESSENTIAL = "essential"
+    MANAGED = "managed"
+    ADVANCED = "advanced"
+    UNSURE = "unsure"
+
+
+class AiProductionStatus(enum.StrEnum):
+    PRODUCTION = "production"
+    PILOT = "pilot"
+    DEVELOPMENT = "development"
+
+
+class AiYesNo(enum.StrEnum):
+    YES = "yes"
+    NO = "no"
+
+
+class AiAccessReadiness(enum.StrEnum):
+    READ_ACCESS = "read_access"
+    NEEDS_APPROVAL = "needs_approval"
+    NOT_POSSIBLE = "not_possible"
+    UNKNOWN = "unknown"
+
+
+class AiTestEnvironment(enum.StrEnum):
+    YES = "yes"
+    NO = "no"
+    UNKNOWN = "unknown"
+
+
+class AiDataSensitivity(enum.StrEnum):
+    PUBLIC_INTERNAL = "public_internal"
+    PERSONAL = "personal"
+    SPECIAL = "special"
+
+
+class AiChangeFrequency(enum.StrEnum):
+    RARELY = "rarely"
+    MONTHLY = "monthly"
+    WEEKLY = "weekly"
+    UNKNOWN = "unknown"
+
+
+class AiResponseNeeds(enum.StrEnum):
+    BUSINESS_HOURS = "business_hours"
+    FASTER = "faster"
+    UNSURE = "unsure"
+
+
 class AiManagedDetails(StrictModel):
     """Descriptive information about a client's AI system (AI Managed Services inquiries).
 
@@ -133,6 +183,15 @@ class AiManagedDetails(StrictModel):
     support_interests: list[AiSupportInterest] = Field(min_length=1, max_length=len(AiSupportInterest))
     communication_language: LeadLocale
     additional_notes: str = Field(default="", max_length=2000)
+    # Qualification (optional, so older clients and the existing flow keep working).
+    desired_level: AiDesiredLevel | None = None
+    production_status: AiProductionStatus | None = None
+    technical_owner: AiYesNo | None = None
+    access_readiness: AiAccessReadiness | None = None
+    test_environment: AiTestEnvironment | None = None
+    data_sensitivity: AiDataSensitivity | None = None
+    change_frequency: AiChangeFrequency | None = None
+    response_needs: AiResponseNeeds | None = None
 
     @field_validator("system_types", "support_interests")
     @classmethod
@@ -313,6 +372,9 @@ class LeadSummaryOut(BaseModel):
     locale: str
     created_at: datetime
     updated_at: datetime
+    # AI Managed Services triage (None for other leads).
+    ams_level: str | None = None
+    ams_readiness: str | None = None
 
 
 class ReadinessDetailsOut(BaseModel):
@@ -326,6 +388,38 @@ class ReadinessDetailsOut(BaseModel):
     dimensions: dict[str, int]
     blockers: list[str]
     actions: list[str]
+
+
+class AiManagedQualificationOut(BaseModel):
+    """Admin-only triage of an AI Managed Services inquiry (app/services/ai_managed_qualification.py)."""
+
+    version: str
+    suggested_level: Literal["essential", "managed", "advanced"]
+    points: int
+    reasons: list[str]
+    readiness: Literal["ready", "needs_preparation", "not_ready", "unknown"]
+    blockers: list[str]
+    desired_level: str | None = None
+    matches_desired: bool | None = None
+
+
+class SolutionDetailsOut(BaseModel):
+    """The design of a solution-builder enquiry as the admin sees it (enumerated keys; labels client-side)."""
+
+    model_version: str
+    code: str
+    objective: str | None = None
+    workflow: str | None = None
+    capabilities: list[str] = []
+    integrations: list[str] = []
+    sensitivity: str | None = None
+    approval: str | None = None
+    deployment: str | None = None
+    residency: bool = False
+    redaction: bool = False
+    agents: list[str] = []
+    complexity: str | None = None
+    approval_points: list[str] = []
 
 
 class TeamDetailsOut(BaseModel):
@@ -364,10 +458,13 @@ class LeadDetailOut(LeadSummaryOut):
     advisor_assessment: AdvisorAssessmentSummary | None = None
     # AI Managed Services inquiry details (validated on input; None for other services and older leads).
     ai_managed: AiManagedDetails | None = None
+    ai_managed_qualification: AiManagedQualificationOut | None = None
     # AI readiness assessment submission (source readiness_assessment); None otherwise.
     readiness: ReadinessDetailsOut | None = None
     # AI team configurator consultation (source team_configurator); None otherwise.
     team: TeamDetailsOut | None = None
+    # AI solution builder enquiry (source solution_builder); None otherwise.
+    solution: SolutionDetailsOut | None = None
 
 
 class LeadPage(BaseModel):

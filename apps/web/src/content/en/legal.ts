@@ -181,7 +181,7 @@ export const termsOfUse: LegalDocument = {
       heading: "3. Prices, plans and service levels",
       paragraphs: [
         "No binding prices are published on the website. The price, scope and timelines of each service are set in a written quote once the needs are clear.",
-        "The descriptions of the AI Monitor, AI Care and AI Optimize plans are illustrative. Response times, availability, support hours and other service levels are agreed only in a written contract; the website contains no guarantees about them.",
+        "The descriptions of the proposed Essential Monitoring & Advisory, Managed AI Operations and Advanced AI Reliability & Optimization levels are illustrative. Response times, availability, support hours and other service levels are agreed only in a written contract; the website contains no guarantees about them.",
       ],
     },
     {

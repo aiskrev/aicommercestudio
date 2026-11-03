@@ -4,15 +4,14 @@ import type { ReactNode } from "react";
 
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
-import { AGENT_ICONS } from "@/components/tools/team/AgentCard";
+import { LIBRARY_ICONS } from "@/components/tools/team/AgentCard";
 import { fill } from "@/components/tools/team/TeamControls";
 import { Icon } from "@/components/ui/Icon";
 import { Alert, ButtonLink, Container, Eyebrow, Section, cx } from "@/components/ui/primitives";
 import { getContent } from "@/content";
 import { isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
-import { AGENT_SLUGS, type RiskLevel, agentBySlug, libraryEntry } from "@/lib/agent-library";
-import { AGENT_KEYS, WORKFLOWS } from "@/lib/ai-team";
+import { AGENT_SLUGS, LIBRARY_KEYS, type LibraryKey, type RiskLevel, agentBySlug, agentText, libraryEntry, libraryWorkflow, workflowText } from "@/lib/agent-library";
 import { resolveLocale } from "@/lib/params";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
@@ -24,7 +23,7 @@ const RISK_BADGE: Record<RiskLevel, string> = { low: "badge-success", medium: "b
 
 export function generateStaticParams({ params }: { params: { locale: string } }) {
   if (!isLocale(params.locale) || !isToolAvailable(toolByKey("agents"))) return [];
-  return AGENT_KEYS.map((key) => ({ agent: AGENT_SLUGS[key].bg }));
+  return LIBRARY_KEYS.map((key) => ({ agent: AGENT_SLUGS[key].bg }));
 }
 
 function resolveAgent(slug: string) {
@@ -37,11 +36,12 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/ai-agent
   const { agent: slug } = await params;
   const key = resolveAgent(slug);
   if (!key) return {};
-  const { agentLibrary, teamTool } = getContent(locale);
+  const content = getContent(locale);
+  const agent = agentText(content, key);
   return buildMetadata({
     locale,
-    title: `${teamTool.agents[key].name} — ${agentLibrary.title}`,
-    description: teamTool.agents[key].purpose,
+    title: `${agent.name} — ${content.agentLibrary.title}`,
+    description: agent.purpose,
     path: routes.agent(slug),
   });
 }
@@ -68,21 +68,23 @@ function Bullets({ items }: { items: string[] }) {
   );
 }
 
-/** One agent of the library: every catalogue attribute plus illustrative example workflows. */
+/** One archetype of the library: every catalogue attribute plus illustrative example workflows. */
 export default async function AgentPage({ params }: PageProps<"/[locale]/ai-agenti/[agent]">) {
   const locale = await resolveLocale(params);
   const { agent: slug } = await params;
   const key = resolveAgent(slug);
   if (!key) notFound();
 
-  const { agentLibrary: t, teamTool } = getContent(locale);
+  const content = getContent(locale);
+  const { agentLibrary: t, teamTool } = content;
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const hrefs = toolHrefs(locale);
   const entry = libraryEntry(key);
-  const agent = teamTool.agents[key];
+  const agent = agentText(content, key);
+  const profile = t.profiles[key];
   const d = t.detail;
-  const agentHref = (other: typeof key) => href(routes.agent(AGENT_SLUGS[other].bg));
+  const agentHref = (other: LibraryKey) => href(routes.agent(AGENT_SLUGS[other].bg));
   const builderHref = hrefs.solution && entry.workflows.length > 0 ? `${hrefs.solution}?w=${entry.workflows[0]}` : hrefs.solution;
 
   return (
@@ -101,7 +103,7 @@ export default async function AgentPage({ params }: PageProps<"/[locale]/ai-agen
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <div className="mt-5 flex items-start gap-4">
             <span className="mt-1 hidden h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default text-brand sm:inline-flex" aria-hidden="true">
-              <Icon name={AGENT_ICONS[key]} className="h-6 w-6" />
+              <Icon name={LIBRARY_ICONS[key]} className="h-6 w-6" />
             </span>
             <h1 className="t-h1 max-w-4xl">{agent.name}</h1>
           </div>
@@ -121,12 +123,13 @@ export default async function AgentPage({ params }: PageProps<"/[locale]/ai-agen
                 {d.useInBuilder}
               </ButtonLink>
             )}
-            {hrefs.team && (
+            {hrefs.team && entry.inTeam && (
               <Link href={hrefs.team} className="link">
                 {d.useInTeam}
               </Link>
             )}
           </div>
+          {!entry.inTeam && <p className="mt-4 max-w-3xl text-sm text-fg-muted">{d.libraryOnly}</p>}
         </Container>
       </div>
 
@@ -146,12 +149,26 @@ export default async function AgentPage({ params }: PageProps<"/[locale]/ai-agen
             <p className="font-medium text-fg">{fill(d.approvalMinimum, { checkpoint: teamTool.checkpoints[entry.approval].title })}</p>
             <p className="mt-1 text-fg-muted">{teamTool.checkpoints[entry.approval].text}</p>
             <p className="mt-3">{agent.oversight}</p>
+            <p className="mt-4 text-sm font-medium text-fg">{d.approvalPoints}</p>
+            <div className="mt-2" data-testid="agent-approvals">
+              <Bullets items={profile.approvals} />
+            </div>
           </Block>
           <Block title={d.inputs}>
             <Bullets items={agent.inputs} />
           </Block>
           <Block title={d.outputs}>
             <Bullets items={agent.outputs} />
+          </Block>
+          <Block title={d.prerequisites}>
+            <div data-testid="agent-prerequisites">
+              <Bullets items={profile.prerequisites} />
+            </div>
+          </Block>
+          <Block title={d.risks}>
+            <div data-testid="agent-risks">
+              <Bullets items={profile.risks} />
+            </div>
           </Block>
           <Block title={d.dataSources}>
             {entry.dataSources.length > 0 ? <Bullets items={entry.dataSources.map((i) => teamTool.integrations[i])} /> : <p>{d.noDataSources}</p>}
@@ -185,7 +202,7 @@ export default async function AgentPage({ params }: PageProps<"/[locale]/ai-agen
                     <span key={other}>
                       {index > 0 && ", "}
                       <Link href={agentHref(other)} className="link">
-                        {teamTool.agents[other].name}
+                        {agentText(content, other).name}
                       </Link>
                     </span>
                   ))
@@ -205,8 +222,8 @@ export default async function AgentPage({ params }: PageProps<"/[locale]/ai-agen
         {entry.role !== "task" && <p className="mt-6 text-fg-muted">{d.anyWorkflow}</p>}
         <ul className="mt-6 grid gap-4 md:grid-cols-2" data-testid="agent-workflows">
           {entry.workflows.map((workflowKey) => {
-            const workflow = teamTool.result.workflows[workflowKey];
-            const chain = WORKFLOWS.find((w) => w.key === workflowKey)!.chain;
+            const workflow = workflowText(content, workflowKey);
+            const chain = libraryWorkflow(workflowKey).chain;
             return (
               <li key={workflowKey} className="card p-5">
                 <h3 className="t-h3">{workflow.title}</h3>
@@ -215,7 +232,7 @@ export default async function AgentPage({ params }: PageProps<"/[locale]/ai-agen
                   {chain.map((step) => (
                     <li key={step} className={cx("flex items-center gap-2", step === key ? "font-semibold text-fg" : "text-fg-secondary")}>
                       <Icon name="chevronRight" className="h-3.5 w-3.5 shrink-0 text-brand" />
-                      {step === key ? teamTool.agents[step].name : <Link href={agentHref(step)} className="hover:text-fg">{teamTool.agents[step].name}</Link>}
+                      {step === key ? agentText(content, step).name : <Link href={agentHref(step)} className="hover:text-fg">{agentText(content, step).name}</Link>}
                     </li>
                   ))}
                   <li className="flex items-center gap-2 text-fg-muted">

@@ -1,0 +1,2579 @@
+{
+ "model_version": "2026-11.1",
+ "vectors": [
+  {
+   "code": "2.faster_response.support_resolution.023.35.personal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.faster_response.support_resolution.023.35.personal.before_external.managed_cloud.01",
+    "summary": {
+     "objective": "faster_response",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "classification",
+      "generation"
+     ],
+     "integrations": [
+      "helpdesk",
+      "document_storage"
+     ],
+     "sensitivity": "personal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "managed_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 8
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "1.faster_response.support_resolution.023.35.personal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.faster_response.support_resolution.023.35.personal.before_external.managed_cloud.01",
+    "summary": {
+     "objective": "faster_response",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "classification",
+      "generation"
+     ],
+     "integrations": [
+      "helpdesk",
+      "document_storage"
+     ],
+     "sensitivity": "personal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "managed_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 8
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.faster_response.support_resolution.023.35.personal.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.faster_response.support_resolution.0023.35.personal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": false,
+    "issues": null,
+    "minimum_approval": null,
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.faster_response.support_resolution.09.35.personal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": false,
+    "issues": null,
+    "minimum_approval": null,
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.faster_response.support_resolution.023.35.personal.before_external..01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.fewer_errors.document_intake.125.15.regulated.every_action.on_premise.10",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "every_action",
+    "valid": true,
+    "code": "2.fewer_errors.document_intake.125.15.regulated.every_action.on_premise.11",
+    "summary": {
+     "objective": "fewer_errors",
+     "workflow": "document_intake",
+     "capabilities": [
+      "extraction",
+      "classification",
+      "tool_execution"
+     ],
+     "integrations": [
+      "erp",
+      "document_storage"
+     ],
+     "sensitivity": "regulated",
+     "approval": "every_action",
+     "minimum_approval": "every_action",
+     "deployment": "on_premise",
+     "residency": true,
+     "redaction": true,
+     "agents": [
+      "document_processing",
+      "reporting_insights",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "high",
+      "points": 17
+     },
+     "approval_points": [
+      "review:gate",
+      "output:document_intake",
+      "action:erp",
+      "action:document_storage"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.fewer_errors.document_intake.125.15.regulated.every_action.on_premise.00",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "regulated_needs_residency"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.proposal_drafting.037.15.personal.before_external.customer_cloud.11",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.grow_revenue.proposal_drafting.037.15.personal.before_external.customer_cloud.11",
+    "summary": {
+     "objective": "grow_revenue",
+     "workflow": "proposal_drafting",
+     "capabilities": [
+      "rag",
+      "generation",
+      "business_rules"
+     ],
+     "integrations": [
+      "erp",
+      "document_storage"
+     ],
+     "sensitivity": "personal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "customer_cloud",
+     "residency": true,
+     "redaction": true,
+     "agents": [
+      "sales_research",
+      "proposal_generation",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 11
+     },
+     "approval_points": [
+      "review:gate",
+      "output:proposal_drafting"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.scale_capacity.catalog_enrichment.2357.15.internal.before_external.managed_cloud.00",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.scale_capacity.catalog_enrichment.2357.15.internal.before_external.managed_cloud.00",
+    "summary": {
+     "objective": "scale_capacity",
+     "workflow": "catalog_enrichment",
+     "capabilities": [
+      "classification",
+      "generation",
+      "tool_execution",
+      "business_rules"
+     ],
+     "integrations": [
+      "erp",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "managed_cloud",
+     "residency": false,
+     "redaction": false,
+     "agents": [
+      "catalog_assistant"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 10
+     },
+     "approval_points": [
+      "review:gate",
+      "output:catalog_enrichment",
+      "action:erp",
+      "action:document_storage"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.knowledge_access.knowledge_answers.06.5.internal.sample_review.managed_cloud.00",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "orchestration_needs_agents"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "3.x",
+   "expected": {
+    "parsed": false,
+    "issues": null,
+    "minimum_approval": null,
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "",
+   "expected": {
+    "parsed": false,
+    "issues": null,
+    "minimum_approval": null,
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.01346.1.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "rag_needs_source",
+     "extraction_needs_documents"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.catalog_enrichment.01.1235.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.24.36.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "decision_support_needs_data"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.content_pipeline.17.3.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.knowledge_answers.1246.034.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.catalog_enrichment.46.06.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.3567.025.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.content_pipeline.0357.356.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.04.01234.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.scale_capacity.knowledge_answers.04.01234.internal.before_external.on_premise.01",
+    "summary": {
+     "objective": "scale_capacity",
+     "workflow": "knowledge_answers",
+     "capabilities": [
+      "rag",
+      "decision_support"
+     ],
+     "integrations": [
+      "crm",
+      "erp",
+      "email_calendar",
+      "helpdesk",
+      "databases"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "on_premise",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "knowledge_assistant",
+      "reporting_insights",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "high",
+      "points": 15
+     },
+     "approval_points": [
+      "review:gate"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.grow_revenue.catalog_enrichment.1356.012356.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.157.23456.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.content_pipeline.27.014.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.1246.34.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.catalog_enrichment.05.14.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.036.2.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "rag_needs_source"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.content_pipeline.4.16.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.5.01236.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.catalog_enrichment.346.136.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.1247.026.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.content_pipeline.0156.024.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.0.-.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "rag_needs_source"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.catalog_enrichment.035.0.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "rag_needs_source",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.37.35.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.content_pipeline.2.6.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.036.1.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "orchestration_needs_agents",
+     "rag_needs_source"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.catalog_enrichment.02.1.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "rag_needs_source",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.34.04.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.content_pipeline.14.01456.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.knowledge_answers.2456.34.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.catalog_enrichment.236.13.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "orchestration_needs_agents",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.236.5.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.content_pipeline.124.346.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.knowledge_answers.57.36.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.catalog_enrichment.035.2.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "rag_needs_source",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.04567.6.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "decision_support_needs_data"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.content_pipeline.247.6.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "decision_support_needs_data",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.127.0145.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.catalog_enrichment.1.01.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "extraction_needs_documents",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.3.5.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.content_pipeline.0.125.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.knowledge_answers.027.-.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "rag_needs_source"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.catalog_enrichment.015.-.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "rag_needs_source",
+     "extraction_needs_documents",
+     "tool_execution_needs_target",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.046.15.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.reduce_handling_time.support_resolution.046.15.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "decision_support",
+      "orchestration"
+     ],
+     "integrations": [
+      "erp",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "reporting_insights",
+      "workflow_coordinator",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 12
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.grow_revenue.content_pipeline.256.0.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "orchestration_needs_agents",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.0126.06.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "extraction_needs_documents"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.catalog_enrichment.16.346.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.025.2345.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.grow_revenue.support_resolution.025.2345.internal.before_external.on_premise.01",
+    "summary": {
+     "objective": "grow_revenue",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "classification",
+      "tool_execution"
+     ],
+     "integrations": [
+      "email_calendar",
+      "helpdesk",
+      "databases",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "on_premise",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 14
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution",
+      "action:email_calendar",
+      "action:helpdesk",
+      "action:document_storage"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.content_pipeline.246.234.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.-.-.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.catalog_enrichment.0145.01235.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.7.356.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.content_pipeline.5.23.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.7.6.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.catalog_enrichment.124.06.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "extraction_needs_documents",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.57.3.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.content_pipeline.6.12346.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "orchestration_needs_agents",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.02567.05.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "orchestration_needs_agents"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.catalog_enrichment.034.1245.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.27.02346.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.content_pipeline.245.036.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.knowledge_answers.147.135.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.catalog_enrichment.07.356.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.5.16.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.content_pipeline.247.2.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "decision_support_needs_data",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.12567.123.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.catalog_enrichment.4.-.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "decision_support_needs_data",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.26.02356.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.content_pipeline.0134.2.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "rag_needs_source",
+     "decision_support_needs_data",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.0.26.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.reduce_handling_time.knowledge_answers.0.26.internal.before_external.managed_cloud.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "knowledge_answers",
+     "capabilities": [
+      "rag"
+     ],
+     "integrations": [
+      "email_calendar",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "managed_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "knowledge_assistant"
+     ],
+     "complexity": {
+      "band": "low",
+      "points": 6
+     },
+     "approval_points": [
+      "review:gate"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.catalog_enrichment.1357.1456.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.0145.236.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "decision_support_needs_data"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.content_pipeline.-.136.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.0123.256.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.scale_capacity.knowledge_answers.0123.256.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "scale_capacity",
+     "workflow": "knowledge_answers",
+     "capabilities": [
+      "rag",
+      "extraction",
+      "classification",
+      "generation"
+     ],
+     "integrations": [
+      "email_calendar",
+      "document_storage",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "document_processing",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 12
+     },
+     "approval_points": [
+      "review:gate"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.catalog_enrichment.234.01.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.025.15.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.scale_capacity.support_resolution.025.15.internal.before_external.on_premise.01",
+    "summary": {
+     "objective": "scale_capacity",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "classification",
+      "tool_execution"
+     ],
+     "integrations": [
+      "erp",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "on_premise",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 13
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution",
+      "action:erp",
+      "action:document_storage"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.scale_capacity.content_pipeline.367.01356.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "orchestration_needs_agents",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.23.1245.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.catalog_enrichment.14.5.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "decision_support_needs_data",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.01.136.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.reduce_handling_time.support_resolution.01.136.internal.before_external.on_premise.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "extraction"
+     ],
+     "integrations": [
+      "erp",
+      "helpdesk",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "on_premise",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "document_processing",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 14
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.grow_revenue.content_pipeline.2567.013.regulated.none.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "orchestration_needs_agents",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.knowledge_answers.06.03.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "orchestration_needs_agents",
+     "rag_needs_source"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.catalog_enrichment.0267.5.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.14567.3.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "decision_support_needs_data"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.content_pipeline.045.5.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "decision_support_needs_data",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.5.-.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "tool_execution_needs_target"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.catalog_enrichment.04.1346.regulated.none.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.14.123.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "sample_review",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.grow_revenue.content_pipeline.0245.01.regulated.none.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability",
+     "rag_needs_source",
+     "regulated_needs_residency",
+     "approval_below_minimum"
+    ],
+    "minimum_approval": "every_action",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.4567.023.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [
+     "workflow_capability"
+    ],
+    "minimum_approval": "before_external",
+    "valid": false,
+    "code": null,
+    "summary": null
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.0.026.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.reduce_handling_time.support_resolution.0.026.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag"
+     ],
+     "integrations": [
+      "crm",
+      "email_calendar",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 8
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.037.04.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.grow_revenue.support_resolution.037.04.internal.before_external.managed_cloud.01",
+    "summary": {
+     "objective": "grow_revenue",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "generation",
+      "business_rules"
+     ],
+     "integrations": [
+      "crm",
+      "databases"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "managed_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "low",
+      "points": 7
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.015.136.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.grow_revenue.support_resolution.015.136.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "grow_revenue",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "extraction",
+      "tool_execution"
+     ],
+     "integrations": [
+      "erp",
+      "helpdesk",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "document_processing",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "high",
+      "points": 15
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution",
+      "action:erp",
+      "action:helpdesk",
+      "action:internal_apis"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.05.26.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.reduce_handling_time.support_resolution.05.26.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "tool_execution"
+     ],
+     "integrations": [
+      "email_calendar",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 10
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution",
+      "action:email_calendar",
+      "action:internal_apis"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.02.4.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.reduce_handling_time.support_resolution.02.4.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "classification"
+     ],
+     "integrations": [
+      "databases"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "low",
+      "points": 6
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.0237.126.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.scale_capacity.support_resolution.0237.126.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "scale_capacity",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "classification",
+      "generation",
+      "business_rules"
+     ],
+     "integrations": [
+      "erp",
+      "email_calendar",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 13
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.013457.15.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.reduce_handling_time.support_resolution.013457.15.internal.before_external.managed_cloud.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "extraction",
+      "generation",
+      "decision_support",
+      "tool_execution",
+      "business_rules"
+     ],
+     "integrations": [
+      "erp",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "managed_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "document_processing",
+      "knowledge_assistant",
+      "reporting_insights",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "high",
+      "points": 15
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution",
+      "action:erp",
+      "action:document_storage"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.03456.0236.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.reduce_handling_time.support_resolution.03456.0236.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "generation",
+      "decision_support",
+      "tool_execution",
+      "orchestration"
+     ],
+     "integrations": [
+      "crm",
+      "email_calendar",
+      "helpdesk",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "reporting_insights",
+      "workflow_coordinator",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "high",
+      "points": 18
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution",
+      "action:crm",
+      "action:email_calendar",
+      "action:helpdesk",
+      "action:internal_apis"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.057.24.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.grow_revenue.support_resolution.057.24.internal.before_external.managed_cloud.01",
+    "summary": {
+     "objective": "grow_revenue",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "tool_execution",
+      "business_rules"
+     ],
+     "integrations": [
+      "email_calendar",
+      "databases"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "managed_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 9
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution",
+      "action:email_calendar"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.support_resolution.0123.156.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.reduce_handling_time.support_resolution.0123.156.internal.before_external.on_premise.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "extraction",
+      "classification",
+      "generation"
+     ],
+     "integrations": [
+      "erp",
+      "document_storage",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "on_premise",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "document_processing",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "high",
+      "points": 16
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.grow_revenue.support_resolution.027.126.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.grow_revenue.support_resolution.027.126.internal.before_external.managed_cloud.01",
+    "summary": {
+     "objective": "grow_revenue",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "classification",
+      "business_rules"
+     ],
+     "integrations": [
+      "erp",
+      "email_calendar",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "managed_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 11
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.0246.02345.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.reduce_handling_time.knowledge_answers.0246.02345.internal.before_external.on_premise.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "knowledge_answers",
+     "capabilities": [
+      "rag",
+      "classification",
+      "decision_support",
+      "orchestration"
+     ],
+     "integrations": [
+      "crm",
+      "email_calendar",
+      "helpdesk",
+      "databases",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "on_premise",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "knowledge_assistant",
+      "reporting_insights",
+      "workflow_coordinator",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "high",
+      "points": 17
+     },
+     "approval_points": [
+      "review:gate"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.026.256.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.scale_capacity.support_resolution.026.256.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "scale_capacity",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "classification",
+      "orchestration"
+     ],
+     "integrations": [
+      "email_calendar",
+      "document_storage",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "workflow_coordinator",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 12
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.01256.25.internal.before_external.managed_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.reduce_handling_time.knowledge_answers.01256.25.internal.before_external.managed_cloud.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "knowledge_answers",
+     "capabilities": [
+      "rag",
+      "extraction",
+      "classification",
+      "tool_execution",
+      "orchestration"
+     ],
+     "integrations": [
+      "email_calendar",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "managed_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "document_processing",
+      "knowledge_assistant",
+      "workflow_coordinator",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 13
+     },
+     "approval_points": [
+      "review:gate",
+      "action:email_calendar",
+      "action:document_storage"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.07.235.internal.before_external.on_premise.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.scale_capacity.knowledge_answers.07.235.internal.before_external.on_premise.01",
+    "summary": {
+     "objective": "scale_capacity",
+     "workflow": "knowledge_answers",
+     "capabilities": [
+      "rag",
+      "business_rules"
+     ],
+     "integrations": [
+      "email_calendar",
+      "helpdesk",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "on_premise",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "knowledge_assistant"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 9
+     },
+     "approval_points": [
+      "review:gate"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.reduce_handling_time.knowledge_answers.0247.16.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "sample_review",
+    "valid": true,
+    "code": "2.reduce_handling_time.knowledge_answers.0247.16.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "reduce_handling_time",
+     "workflow": "knowledge_answers",
+     "capabilities": [
+      "rag",
+      "classification",
+      "decision_support",
+      "business_rules"
+     ],
+     "integrations": [
+      "erp",
+      "internal_apis"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "sample_review",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "knowledge_assistant",
+      "reporting_insights",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 13
+     },
+     "approval_points": [
+      "review:gate"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.scale_capacity.support_resolution.056.245.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.scale_capacity.support_resolution.056.245.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "scale_capacity",
+     "workflow": "support_resolution",
+     "capabilities": [
+      "rag",
+      "tool_execution",
+      "orchestration"
+     ],
+     "integrations": [
+      "email_calendar",
+      "databases",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "customer_support",
+      "knowledge_assistant",
+      "workflow_coordinator",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 13
+     },
+     "approval_points": [
+      "review:gate",
+      "output:support_resolution",
+      "action:email_calendar",
+      "action:document_storage"
+     ]
+    }
+   }
+  },
+  {
+   "code": "2.scale_capacity.knowledge_answers.0457.45.internal.before_external.customer_cloud.01",
+   "expected": {
+    "parsed": true,
+    "issues": [],
+    "minimum_approval": "before_external",
+    "valid": true,
+    "code": "2.scale_capacity.knowledge_answers.0457.45.internal.before_external.customer_cloud.01",
+    "summary": {
+     "objective": "scale_capacity",
+     "workflow": "knowledge_answers",
+     "capabilities": [
+      "rag",
+      "decision_support",
+      "tool_execution",
+      "business_rules"
+     ],
+     "integrations": [
+      "databases",
+      "document_storage"
+     ],
+     "sensitivity": "internal",
+     "approval": "before_external",
+     "minimum_approval": "before_external",
+     "deployment": "customer_cloud",
+     "residency": false,
+     "redaction": true,
+     "agents": [
+      "knowledge_assistant",
+      "reporting_insights",
+      "approval_supervisor"
+     ],
+     "complexity": {
+      "band": "medium",
+      "points": 12
+     },
+     "approval_points": [
+      "review:gate",
+      "action:document_storage"
+     ]
+    }
+   }
+  }
+ ]
+}

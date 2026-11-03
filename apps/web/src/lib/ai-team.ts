@@ -417,7 +417,11 @@ export type CheckpointReason = "role" | "external" | "sensitive";
 
 /** Lowest allowed checkpoint for an agent and why (external actions and sensitive data raise it). */
 export function minimumCheckpoint(agent: AgentKey): { checkpoint: Checkpoint; reason: CheckpointReason } {
-  const def = AGENTS[agent];
+  return checkpointFor(AGENTS[agent]);
+}
+
+/** The checkpoint rule for any agent definition (the library's own archetypes use it too). */
+export function checkpointFor(def: Pick<AgentDefinition, "minCheckpoint" | "external" | "sensitivity">): { checkpoint: Checkpoint; reason: CheckpointReason } {
   let checkpoint = def.minCheckpoint;
   let reason: CheckpointReason = "role";
   const raise = (to: Checkpoint, why: CheckpointReason) => {

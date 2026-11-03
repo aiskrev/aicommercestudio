@@ -7,7 +7,7 @@ import { Alert, PageHero, Section } from "@/components/ui/primitives";
 import { getContent } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
-import { AGENT_SLUGS, LIBRARY } from "@/lib/agent-library";
+import { AGENT_SLUGS, LIBRARY, agentText } from "@/lib/agent-library";
 import { resolveLocale } from "@/lib/params";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
@@ -20,20 +20,21 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/ai-agent
   return buildMetadata({ locale, title: agentLibrary.metaTitle, description: agentLibrary.metaDescription, path: routes.agentLibrary });
 }
 
-/** Agent library: a static catalogue of agent roles (derived from lib/ai-team.ts) with client-side filters. */
+/** Agent library: a static catalogue of agent archetypes (lib/agent-library.ts) with client-side filters. */
 export default async function AgentLibraryPage({ params }: PageProps<"/[locale]/ai-agenti">) {
   const locale = await resolveLocale(params);
   if (!isToolAvailable(toolByKey("agents"))) notFound();
-  const { agentLibrary, teamTool } = getContent(locale);
+  const content = getContent(locale);
+  const { agentLibrary, teamTool } = content;
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const hrefs = toolHrefs(locale);
   const cards: LibraryCard[] = LIBRARY.map((entry) => ({
     key: entry.key,
     href: href(routes.agent(AGENT_SLUGS[entry.key].bg)),
-    name: teamTool.agents[entry.key].name,
-    short: teamTool.agents[entry.key].short,
-    purpose: teamTool.agents[entry.key].purpose,
+    name: agentText(content, entry.key).name,
+    short: agentText(content, entry.key).short,
+    purpose: agentText(content, entry.key).purpose,
     departments: entry.departments.map((d) => teamTool.departments.options[d].title),
     approval: teamTool.checkpoints[entry.approval].title,
     complexityLabel: teamTool.complexity[entry.complexity],

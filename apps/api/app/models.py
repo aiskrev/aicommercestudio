@@ -222,6 +222,19 @@ class Lead(Base):
     def reference(self) -> str:
         return self.id.hex[:8].upper()
 
+    def _qualification(self) -> dict[str, Any]:
+        details = self.service_details or {}
+        return (details.get("qualification") or {}) if details.get("kind") == "ai_managed" else {}
+
+    @property
+    def ams_level(self) -> str | None:
+        """Suggested AI Managed Services level (admin triage), or None."""
+        return self._qualification().get("suggested_level")
+
+    @property
+    def ams_readiness(self) -> str | None:
+        return self._qualification().get("readiness")
+
 
 class LeadNote(Base):
     __tablename__ = "lead_notes"

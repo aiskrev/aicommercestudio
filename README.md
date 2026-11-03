@@ -124,8 +124,9 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [READINESS_REPORTS.md](docs/READINESS_REPORTS.md) | AI readiness: PDF report, submissions, admin view |
 | [TEAM_CONFIGURATOR.md](docs/TEAM_CONFIGURATOR.md) | Build your AI team: costs, saved links, PDF plan, consultations |
 | [ROI_AND_FINDER.md](docs/ROI_AND_FINDER.md) | ROI calculator and Automation Opportunity Finder: formulas and policy |
-| [SOLUTION_BUILDER.md](docs/SOLUTION_BUILDER.md) | AI Solution Builder and AI Agent Library |
+| [SOLUTION_BUILDER.md](docs/SOLUTION_BUILDER.md) | AI Solution Builder and AI Agent Library: 12 archetypes, composition rules, reference architecture, optional enquiry |
 | [AI_MANAGED_SERVICES.md](docs/AI_MANAGED_SERVICES.md) | AI Managed Services: page, packages, intake form, storage, admin, limits |
+| [AI_MANAGED_SERVICES_V2.md](docs/AI_MANAGED_SERVICES_V2.md) | AI Managed Services v2: proposed service levels, current vs planned capability, qualification form, admin categorisation |
 | [AI_MANAGED_SERVICES_PRICING.md](docs/AI_MANAGED_SERVICES_PRICING.md) | Internal, hypothetical pricing guidance (not published) |
 | [AI_OPERATIONS_PORTAL.md](docs/AI_OPERATIONS_PORTAL.md) | Portal architecture (data model, API, tenancy, RBAC, telemetry, roadmap) and the staff-only scaffold |
 | [AI_OPERATIONS_ARCHITECTURE.md](docs/AI_OPERATIONS_ARCHITECTURE.md) | Earlier console concept (superseded by AI_OPERATIONS_PORTAL.md) |

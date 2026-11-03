@@ -603,7 +603,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
       "A monthly summary: health, incidents, quality and costs",
       "A list of recommendations and controlled changes",
     ],
-    engagement: ["Monthly AI Monitor, AI Care or AI Optimize plan", "One-off assessment of an existing AI agent"],
+    engagement: ["A monthly service level: from periodic reviews to managed operations", "One-off assessment of an existing AI agent"],
     faqs: [
       {
         question: "How is this different from building an AI tool?",
