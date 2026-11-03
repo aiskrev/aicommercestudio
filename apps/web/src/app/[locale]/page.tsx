@@ -1,10 +1,12 @@
 import Link from "next/link";
 
+import { CapabilityAreas } from "@/components/home/CapabilityAreas";
 import { ControlLanes } from "@/components/home/ControlLanes";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { HeroWorkflow } from "@/components/home/HeroWorkflow";
-import { OfferGroups } from "@/components/home/OfferGroups";
+import { ManagedLifecycle } from "@/components/home/ManagedLifecycle";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
+import { SolutionPatterns } from "@/components/home/SolutionPatterns";
 import { SystemMap } from "@/components/home/SystemMap";
 import { ToolsPreview } from "@/components/home/ToolsPreview";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -18,6 +20,7 @@ import { domainByKey, getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { isDomainPublished } from "@/lib/domains";
+import { SCENARIO_SLUGS } from "@/lib/reference";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { toolHrefs, toolMinutes } from "@/lib/tools";
@@ -36,25 +39,31 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">) {
 }
 
 /**
- * Homepage. It answers four questions in order: what we offer (hero + four capability groups that
- * lead to the ten domain hubs), which tool to try first (tools, the Advisor marked "Start here"),
- * what happens after launch (AI Managed Services), and how we work and who does it (methodology,
- * human-approval controls, the founder and the verifiable capabilities), then FAQ and the final CTA.
- * Consultation and assessment CTAs sit in the hero, the managed section and the final band.
- * Everything is a server component; motion comes from the shared interaction system (CSS).
+ * Homepage (docs/DESIGN_SYSTEM.md → Homepage composition, redesign v4). In order: hero; three
+ * capability areas with unequal weight that link the ten domain hubs; the AI Automation Advisor as a
+ * product (with the other live tools); AI Managed Services as an operating lifecycle; engineering
+ * credibility (human-approval architecture and the practices we can be checked on); the delivery
+ * model; example solution patterns (fictional, labelled — no fabricated proof); the founder; FAQ;
+ * the final CTA. Everything is a server component; motion comes from the shared CSS system.
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
-  const { home, advisor, tools, founder, aiManaged } = getContent(locale);
+  const { home, advisor, tools, founder, aiManaged, reference } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const managedHref = href(routes.service(serviceByKey(locale, "ai_managed").slug));
-  const offerGroups = home.offer.groups.map((group) => ({
-    ...group,
-    domains: group.domains.filter(isDomainPublished).map((key) => {
+  const areas = home.offer.areas.map((area) => ({
+    ...area,
+    domains: area.domains.filter(isDomainPublished).map((key) => {
       const domain = domainByKey(locale, key);
       return { key, name: domain.name, href: href(routes.service(domain.slug)) };
     }),
+  }));
+  const patterns = home.proof.scenarios.map((key) => ({
+    key,
+    title: reference.scenarioTexts[key].title,
+    summary: reference.scenarioTexts[key].summary,
+    href: href(routes.scenario(SCENARIO_SLUGS[key].bg)),
   }));
 
   return (
@@ -65,7 +74,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <div className="relative overflow-hidden">
         <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
-        <Container className="relative grid items-center gap-10 pb-14 pt-10 sm:gap-12 sm:pt-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14 lg:pb-24 lg:pt-20">
+        <Container className="relative grid items-center gap-10 pb-12 pt-10 sm:gap-12 sm:pt-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14 lg:pb-16 lg:pt-16">
           <div className="min-w-0">
             <Eyebrow>{home.hero.eyebrow}</Eyebrow>
             <h1 className="t-display mt-6">
@@ -93,8 +102,8 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </Container>
       </div>
 
-      {/* 2 ---------------------------------------------------------------- what we offer: four capability groups */}
-      <Section labelledBy="offer-title" density="spacious">
+      {/* 2 ---------------------------------------------------------------- capability narrative: three areas */}
+      <Section labelledBy="offer-title">
         <SectionHeading
           id="offer-title"
           eyebrow={home.offer.eyebrow}
@@ -106,13 +115,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </ButtonLink>
           }
         />
-        <div className="mt-12">
-          <OfferGroups groups={offerGroups} />
+        <div className="mt-stack">
+          <CapabilityAreas areas={areas} labels={home.offer.labels} />
         </div>
       </Section>
 
-      {/* 3 ---------------------------------------------------------------- which tool to try first */}
-      <Section labelledBy="tools-title" tone="raised" density="spacious">
+      {/* 3 ---------------------------------------------------------------- the AI Automation Advisor as a product */}
+      <Section labelledBy="tools-title" tone="raised">
         <SectionHeading
           id="tools-title"
           eyebrow={home.tools.eyebrow}
@@ -124,20 +133,36 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </ButtonLink>
           }
         />
-        <div className="mt-12">
-          <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} minutes={toolMinutes()} showcase={advisor.showcase} startBadge={home.tools.startBadge} />
+        <dl className="mt-stack grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line-subtle bg-line-subtle sm:grid-cols-2 lg:grid-cols-4" data-testid="advisor-facts">
+          {home.tools.facts.map((fact) => (
+            <div key={fact.title} className="bg-surface-1 p-5">
+              <dt className="t-label">{fact.title}</dt>
+              <dd className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{fact.text}</dd>
+            </div>
+          ))}
+        </dl>
+        <div className="mt-6">
+          <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} minutes={toolMinutes()} showcase={advisor.showcase} startBadge={home.tools.startBadge} compact />
         </div>
       </Section>
 
-      {/* 4 ---------------------------------------------------------------- after launch: AI Managed Services */}
+      {/* 4 ---------------------------------------------------------------- AI Managed Services: operating lifecycle */}
       <Section labelledBy="managed-title">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-14">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-14">
           <div className="min-w-0">
             <Eyebrow>{home.managed.eyebrow}</Eyebrow>
             <h2 id="managed-title" className="t-h2 reveal mt-4">
               {home.managed.title}
             </h2>
             <p className="t-lead mt-5 max-w-xl">{home.managed.lead}</p>
+            <dl className="mt-8 grid border-t border-line-subtle">
+              {home.managed.contrast.map((item) => (
+                <div key={item.title} className="grid gap-1 border-b border-line-subtle py-3 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-4">
+                  <dt className="font-semibold text-fg">{item.title}</dt>
+                  <dd className="text-body-sm leading-relaxed text-fg-muted">{item.text}</dd>
+                </div>
+              ))}
+            </dl>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href={managedHref} icon="arrowRight">
                 {home.managed.primaryCta}
@@ -147,54 +172,34 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               </ButtonLink>
             </div>
           </div>
-          <div className="card card-accent min-w-0 p-6 sm:p-8" data-testid="managed-packages">
-            <p className="t-label">{aiManaged.packages.title}</p>
-            <ul className="mt-4 grid gap-px overflow-hidden rounded-[var(--radius-md)] border border-line-subtle bg-line-subtle">
-              {aiManaged.packages.items.map((item) => (
-                <li key={item.key} className="flex items-start gap-3 bg-surface-1 p-4">
-                  <Icon name="activity" className="mt-0.5 h-4.5 w-4.5 shrink-0 text-brand" />
-                  <span className="min-w-0">
-                    <span className="block font-semibold text-fg">{item.name}</span>
-                    <span className="mt-0.5 block text-sm leading-relaxed text-fg-muted">{item.summary}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 text-sm text-fg-muted">
-              {aiManaged.packages.priceLabel}. {aiManaged.packages.lead}
-            </p>
-          </div>
+          <ManagedLifecycle content={home.managed.lifecycle} serviceHref={managedHref} />
+        </div>
+        <div className="mt-10 border-t border-line-subtle pt-6" data-testid="managed-packages">
+          <p className="t-label">{aiManaged.packages.title}</p>
+          <ul className="mt-4 grid gap-4 md:grid-cols-3">
+            {aiManaged.packages.items.map((item) => (
+              <li key={item.key} className="min-w-0">
+                <p className="font-semibold text-fg">{item.name}</p>
+                <p className="mt-1 text-body-sm leading-relaxed text-fg-muted">{item.summary}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-sm text-fg-subtle">
+            {aiManaged.packages.priceLabel}. {aiManaged.packages.lead}
+          </p>
         </div>
       </Section>
 
-      {/* 5 ---------------------------------------------------------------- methodology: how we work */}
-      <Section labelledBy="process-title" tone="raised">
-        <SectionHeading
-          id="process-title"
-          eyebrow={home.process.eyebrow}
-          title={home.process.title}
-          lead={home.process.lead}
-          action={
-            <ButtonLink href={href(routes.process)} variant="ghost" icon="arrowRight">
-              {home.process.linkLabel}
-            </ButtonLink>
-          }
-        />
-        <div className="mt-14">
-          <ProcessSteps steps={home.process.steps} layout="horizontal" />
-        </div>
-      </Section>
-
-      {/* 6 ---------------------------------------------------------------- solution architecture / orchestration */}
+      {/* 5 ---------------------------------------------------------------- engineering credibility: control architecture + practices */}
       <Section labelledBy="orchestration-title" tone="deep" density="spacious">
         <div className="max-w-4xl">
           <Eyebrow>{home.orchestration.eyebrow}</Eyebrow>
-          <h2 id="orchestration-title" className="t-display reveal mt-5 text-[clamp(2.1rem,1.4rem+2.6vw,3.6rem)]">
+          <h2 id="orchestration-title" className="t-h1 reveal mt-5">
             {home.orchestration.title}
           </h2>
           <p className="t-lead mt-6 max-w-3xl">{home.orchestration.lead}</p>
         </div>
-        <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-10">
+        <div className="mt-stack grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-10">
           <HeroWorkflow content={home.orchestration.workflow} />
           <div className="min-w-0">
             <ControlLanes
@@ -211,8 +216,44 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
       </Section>
 
-      {/* 7 ---------------------------------------------------------------- who builds it: founder + verifiable capabilities */}
-      <Section labelledBy="founder-title" className="border-t border-line-subtle">
+      <CredibilityStrip label={home.capabilities.title} lead={home.capabilities.lead} groups={home.capabilities.groups} />
+
+      {/* 6 ---------------------------------------------------------------- delivery model */}
+      <Section labelledBy="process-title">
+        <SectionHeading
+          id="process-title"
+          title={home.process.title}
+          lead={home.process.lead}
+          action={
+            <ButtonLink href={href(routes.process)} variant="ghost" icon="arrowRight">
+              {home.process.linkLabel}
+            </ButtonLink>
+          }
+        />
+        <div className="mt-stack">
+          <ProcessSteps steps={home.process.steps} layout="horizontal" />
+        </div>
+      </Section>
+
+      {/* 7 ---------------------------------------------------------------- proof: example solution patterns (fictional, labelled) */}
+      <Section labelledBy="proof-title" tone="raised">
+        <SectionHeading id="proof-title" eyebrow={home.proof.eyebrow} title={home.proof.title} lead={home.proof.lead} />
+        <div className="mt-stack">
+          <SolutionPatterns
+            items={patterns}
+            fictionalLabel={reference.scenarios.detail.fictionalLabel}
+            readLabel={reference.scenarios.open}
+            links={[
+              { href: href(routes.scenarios), label: home.proof.links.scenarios },
+              { href: href(routes.patterns), label: home.proof.links.patterns },
+              { href: href(routes.workshops), label: home.proof.links.workshops },
+            ]}
+          />
+        </div>
+      </Section>
+
+      {/* 8 ---------------------------------------------------------------- who builds it: founder */}
+      <Section labelledBy="founder-title">
         <div className="grid items-center gap-8 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:gap-12 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)]">
           <FounderPortrait alt={founder.portraitAlt} sizes="(min-width: 1024px) 17rem, (min-width: 768px) 15rem, 12rem" className="aspect-[4/5] w-48 md:w-full" />
           <div className="min-w-0">
@@ -233,15 +274,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
       </Section>
 
-      <CredibilityStrip label={home.capabilities.title} lead={home.capabilities.lead} groups={home.capabilities.groups} />
-
       {/* 8 ---------------------------------------------------------------- FAQ */}
       <Section labelledBy="faq-title" tone="raised">
         <EditorialSplit
           sticky
           aside={
             <>
-              <SectionHeading id="faq-title" eyebrow={home.faq.eyebrow} title={home.faq.title} />
+              <SectionHeading id="faq-title" title={home.faq.title} />
               <p className="mt-6 text-fg-muted">
                 {dict.common.moreQuestions}{" "}
                 <Link href={href(routes.contact)} className="link">

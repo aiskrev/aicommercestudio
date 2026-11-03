@@ -11,9 +11,13 @@ test.describe("public website", () => {
     await expect(page.getByRole("link", { name: "Оценете AI готовността си" })).toHaveAttribute("href", "/bg/ai-automation-advisor");
     await expect(page.getByTestId("system-map")).toBeVisible();
     const offer = page.locator("section[aria-labelledby='offer-title']");
-    await expect(offer.locator("article")).toHaveCount(4);
-    await expect(offer.getByRole("heading", { level: 3 })).toHaveText(["AI", "Облак и данни", "Платформи и експлоатация", "Електронна търговия"]);
+    await expect(offer.locator("article")).toHaveCount(3);
+    await expect(offer.getByRole("heading", { level: 3 })).toHaveText(["AI бизнес автоматизация", "Инженеринг на търговия и платформи", "AI Managed Services"]);
     await expect(offer.locator("article a")).toHaveCount(10); // the ten domain hubs, not every service
+    // AI Managed Services lifecycle and the fictional, labelled solution patterns.
+    await expect(page.getByTestId("managed-lifecycle").getByRole("link")).toHaveCount(6);
+    await expect(page.getByTestId("solution-patterns").locator("[data-scenario]")).toHaveCount(3);
+    await expect(page.getByTestId("solution-patterns")).toContainText("Измислен сценарий");
     await expect(page.locator("html")).toHaveAttribute("lang", "bg");
   });
 
@@ -22,7 +26,7 @@ test.describe("public website", () => {
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Engineering");
     await expect(page.locator("main").getByRole("link", { name: "Book a consultation" }).first()).toHaveAttribute("href", "/en/contact");
     await expect(page.getByRole("link", { name: "Assess your AI readiness" })).toHaveAttribute("href", "/en/ai-automation-advisor");
-    for (const id of ["offer-title", "tools-title", "managed-title", "process-title", "orchestration-title", "founder-title", "credibility-title", "faq-title"]) {
+    for (const id of ["offer-title", "tools-title", "managed-title", "orchestration-title", "credibility-title", "process-title", "proof-title", "founder-title", "faq-title"]) {
       await expect(page.locator(`[id="${id}"]`)).toBeVisible();
     }
     await expect(page.locator("section[aria-labelledby='process-title'] ol > li")).toHaveCount(5);
