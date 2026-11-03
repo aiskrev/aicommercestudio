@@ -74,7 +74,15 @@ describe.each(locales)("content integrity (%s)", (locale) => {
     expect(text).not.toMatch(/we guarantee (growth|first place|rankings|results)/i);
   });
 
-  it("marks legal texts as drafts", () => {
+  it("publishes the reviewed cookie information without placeholders, listing every cookie", () => {
+    const cookies = content.legal.cookiePolicy;
+    expect(content.legal.cookiesDraft).toBe(false);
+    const texts = [cookies.title, cookies.intro, ...cookies.sections.flatMap((x) => [x.heading, ...x.paragraphs, ...(x.bullets ?? [])])];
+    for (const text of texts) expect(text, "no [placeholder] left").not.toMatch(/\[[^\]]+\]/);
+    for (const name of ["acs_locale", "acs_cookie_notice", "acs_session", "acs_csrf"]) expect(JSON.stringify(cookies)).toContain(name);
+  });
+
+  it("marks the remaining legal texts as drafts", () => {
     expect(content.legal.draftNotice).toMatch(locale === "bg" ? /Чернова/ : /Draft/);
     for (const doc of [content.legal.privacyPolicy, content.legal.cookiePolicy, content.legal.termsOfUse]) {
       expect(doc.sections.length).toBeGreaterThan(2);

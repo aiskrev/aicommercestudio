@@ -82,7 +82,8 @@ serves customers; they are a reason not to expect traffic from it.
 | Page type | Indexed | In sitemap | Rule |
 | --- | --- | --- | --- |
 | Home, hubs, services, articles, about, process, contact | yes | yes | — |
-| Legal pages (`/bg/poveritelnost`, `/bg/biskvitki`, `/bg/obshti-usloviya`, `/en/privacy`, `/en/cookies`, `/en/terms`) | **no** (`noindex, follow`) | no | while `LEGAL_TEXTS_ARE_DRAFTS = true` in `content/bg/legal.ts` (re-exported for English) — set to `false` after legal review |
+| Privacy and terms (`/bg/poveritelnost`, `/bg/obshti-usloviya`, `/en/privacy`, `/en/terms`) | **no** (`noindex, follow`) | no | while `LEGAL_TEXTS_ARE_DRAFTS = true` in `content/bg/legal.ts` (re-exported for English) — set to `false` after legal review |
+| Cookie information (`/bg/biskvitki`, `/en/cookies`) | yes | yes | final since 2026-11-03 (`COOKIE_POLICY_IS_DRAFT = false`) |
 | Topic pages `/bg/statii/tema/<slug>`, `/en/insights/topic/<slug>` | only with ≥ 2 articles | only when indexed | `MIN_ARTICLES_FOR_INDEXED_CATEGORY` in `content/index.ts`; currently only *Автоматизация* qualifies |
 | Case studies `/bg/proekti`, `/en/case-studies` | — | — | 404 until a publishable case study exists |
 | Planned tool intros ("Coming soon") `/bg/instrumenti/<slug>` ↔ `/en/tools/<slug>` | **no** (`noindex, follow`) | no | Until the tool is live (`lib/tools.ts`); self-canonical and reciprocal hreflang so the language switch works; the URL is kept when the tool launches |
@@ -146,7 +147,7 @@ real-device testing, and a CDN with HTTP/2+ and long-lived caching for `/_next/s
 ## 6. Next actions (owner)
 
 1. Verify the keyword map in Keyword Planner and Search Console (§2).
-2. After legal review set `LEGAL_TEXTS_ARE_DRAFTS = false` — legal pages become indexable automatically.
+2. After legal review of the privacy policy and the terms set `LEGAL_TEXTS_ARE_DRAFTS = false` — they become indexable automatically (the cookie information already is).
 3. Company contact data is approved and central (`lib/company.ts`; `PUBLIC_CONTACT_*` can override it per build). Add an address, registration number or `sameAs` only with approved values. The e-mail in structured data does not mean the mailbox is live (see IMPLEMENTATION_STATUS).
 4. Submit `sitemap.xml` in Search Console; monitor coverage and the Core Web Vitals report.
 5. Add articles to reach ≥ 2 per topic so topic pages become indexable.
