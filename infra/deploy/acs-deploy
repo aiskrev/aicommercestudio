@@ -113,6 +113,7 @@ cmd_rollback() {
 }
 
 cmd_status() {
+  [ -f "$ROOT/release.env" ] || { echo "release: none"; return 0; }
   echo "release: $(current_release)"
   compose ps --format 'table {{.Service}}\t{{.Status}}'
 }

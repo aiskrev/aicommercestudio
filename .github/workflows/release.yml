@@ -1,13 +1,26 @@
-# Builds a release from main: every quality gate first, then immutable images in GHCR.
-# Started by hand only, so a push to main never releases anything. Images are tagged sha-<commit>
-# and never overwritten; the VPS pulls them and builds nothing.
+# Builds a release from main: every quality gate first, then immutable images in GHCR, then, only if
+# chosen and approved, the deployment. Started by hand only, so a push to main never releases anything.
+# Images are tagged sha-<commit> and never overwritten; the VPS pulls them and builds nothing.
 #
-# Repository variables (Settings → Secrets and variables → Actions → Variables):
-#   SITE_URL, PUBLIC_CONTACT_DOMAIN, PUBLIC_CONTACT_EMAIL. The web image bakes them in at build time.
+# Repository variables: SITE_URL, PUBLIC_CONTACT_DOMAIN, PUBLIC_CONTACT_EMAIL (baked into the web image).
+# Environment `production` (required reviewer, branch main):
+#   variables DEPLOY_SSH_HOST, DEPLOY_KNOWN_HOSTS
+#   secrets   DEPLOY_SSH_KEY, CF_ACCESS_CLIENT_ID, CF_ACCESS_CLIENT_SECRET
+# The runner reaches the server through Cloudflare Tunnel with an Access service token, so no inbound
+# port is opened for it. On the server the key can only run acs-deploy-gate (infra/deploy/README.md).
 name: Release
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: What to do after the images are built
+        type: choice
+        default: build-only
+        options:
+          - build-only
+          - deploy
+          - migrate-and-deploy
 
 permissions:
   contents: read
@@ -80,3 +93,77 @@ jobs:
             PUBLIC_CONTACT_EMAIL=${{ vars.PUBLIC_CONTACT_EMAIL }}
           cache-from: type=gha,scope=${{ matrix.image }}
           cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+
+  deploy:
+    name: Deploy to production
+    needs: images
+    if: github.ref == 'refs/heads/main' && inputs.action != 'build-only'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: ${{ vars.SITE_URL }}
+    env:
+      RELEASE: sha-${{ github.sha }}
+      TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+      TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+    steps:
+      - name: Install cloudflared from Cloudflare's signed repository
+        run: |
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-public-v2.gpg | sudo tee /usr/share/keyrings/cloudflare-public-v2.gpg > /dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-public-v2.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list > /dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y -q cloudflared
+
+      - name: Configure SSH through the tunnel
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_SSH_HOST: ${{ vars.DEPLOY_SSH_HOST }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          {
+            echo "Host deploy"
+            echo "  HostName $DEPLOY_SSH_HOST"
+            echo "  User acsdeploy"
+            echo "  IdentityFile ~/.ssh/deploy_key"
+            echo "  IdentitiesOnly yes"
+            echo "  StrictHostKeyChecking yes"
+            echo "  BatchMode yes"
+            echo "  ProxyCommand cloudflared access ssh --hostname %h"
+          } > ~/.ssh/config
+
+      - name: Check the connection
+        run: ssh deploy status
+
+      - name: Apply migrations (backup first)
+        if: inputs.action == 'migrate-and-deploy'
+        run: ssh deploy migrate "$RELEASE"
+
+      - name: Deploy the release
+        run: ssh deploy deploy "$RELEASE"
+
+      - name: Verify from outside
+        id: verify
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          for _ in 1 2 3 4 5 6; do
+            curl -fsS --max-time 10 "$SITE_URL/api/health/ready" > /dev/null && exit 0
+            sleep 10
+          done
+          echo "::error::$SITE_URL/api/health/ready did not answer"
+          exit 1
+
+      # Only here: acs-deploy already returns by itself when its own health check fails, and a failed
+      # migration leaves the running release as it was.
+      - name: Return to the previous release
+        if: failure() && steps.verify.outcome == 'failure'
+        run: ssh deploy rollback || echo "::warning::rollback did not run; check the server"
+
+      - name: Remove the key
+        if: always()
+        run: rm -f ~/.ssh/deploy_key

@@ -42,6 +42,12 @@ acsdeploy ALL=(root) NOPASSWD: /usr/local/sbin/acs-deploy
 
 The gate accepts only `deploy <release>`, `migrate <release>`, `rollback` and `status`.
 
+GitHub Actions reaches the server through Cloudflare Tunnel: `cloudflared` on the server makes an
+outbound connection, `deploy-ssh.ai-commercestudio.com` is protected by Cloudflare Access with a
+service token, and the runner connects with `cloudflared access ssh`. No inbound port is opened for
+GitHub, and the Hetzner firewall keeps SSH limited to the owner's address. The deployment job needs
+the approval of the reviewer in the `production` environment and runs only from `main`.
+
 ## Client address behind Cloudflare
 
 The API trusts the right-most `X-Forwarded-For` entry, so Caddy sends exactly one value. It honours

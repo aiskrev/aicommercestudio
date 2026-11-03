@@ -170,5 +170,3 @@ Each release:
 
 * Uptime-monitor and off-site storage accounts **(owner)**.
 * Real e-mail sending (SMTP) and the Anthropic provider remain disabled until configured and approved.
-* The deployment step from GitHub Actions: the Hetzner firewall allows SSH from one address only, so
-  how the runner reaches the server is still to be decided **(owner)**.
