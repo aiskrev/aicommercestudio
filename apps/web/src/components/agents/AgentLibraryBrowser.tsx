@@ -127,7 +127,7 @@ export function AgentLibraryBrowser({
                       {card.name}
                     </Link>
                   </h2>
-                  <p className="mt-1.5 text-[15px] leading-relaxed text-fg-muted">{card.short}</p>
+                  <p className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{card.short}</p>
                   <dl className="mt-4 grid gap-2 text-sm">
                     <div>
                       <dt className="sr-only">{t.department}</dt>

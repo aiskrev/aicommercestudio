@@ -46,7 +46,7 @@ export function ToolIntro({
       <PageHero eyebrow={tool.category} title={tool.title} lead={tool.description}>
         <div className="mt-8 flex max-w-2xl flex-col gap-3 rounded-[var(--radius-lg)] border border-dashed border-line-strong p-5 sm:flex-row sm:items-start" data-testid="tool-coming-soon">
           <span className="badge badge-outline shrink-0">{badge}</span>
-          <p className="text-[15px] leading-relaxed text-fg-secondary">{labels.statusText}</p>
+          <p className="text-body-sm leading-relaxed text-fg-secondary">{labels.statusText}</p>
         </div>
       </PageHero>
 

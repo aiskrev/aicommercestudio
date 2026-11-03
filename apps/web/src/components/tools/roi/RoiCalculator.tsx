@@ -124,7 +124,7 @@ function WorkedSteps({ content, inputs, result, locale }: { content: Content; in
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-fg [&::-webkit-details-marker]:hidden">
         {content.worked.title}
       </summary>
-      <ol className="mt-3 grid gap-2 font-mono text-[13.5px] leading-relaxed text-fg-secondary">
+      <ol className="mt-3 grid gap-2 font-mono text-caption leading-relaxed text-fg-secondary">
         {workedSteps(inputs, result).map((step) => (
           <li key={step.key} data-step={step.key}>
             {fill(

@@ -42,13 +42,13 @@ export function HeroWorkflow({ content }: { content: WorkflowContent }) {
           <span className="h-2.5 w-2.5 rounded-full bg-window-chrome" />
         </div>
         <p className="t-label min-w-0 truncate">{content.label}</p>
-        <span className="shrink-0 whitespace-nowrap rounded-[5px] border border-warning/40 bg-warning/10 px-2 py-0.5 font-mono text-[11px] font-medium text-warning">
+        <span className="shrink-0 whitespace-nowrap rounded-[5px] border border-warning/40 bg-warning/10 px-2 py-0.5 font-mono text-micro font-medium text-warning">
           {content.demo}
         </span>
       </div>
 
       <div className="px-5 pb-5 pt-4 sm:px-6">
-        <p id="hero-workflow-title" className="text-[15px] font-semibold text-fg">
+        <p id="hero-workflow-title" className="text-body-sm font-semibold text-fg">
           {content.title}
         </p>
 
@@ -84,7 +84,7 @@ export function HeroWorkflow({ content }: { content: WorkflowContent }) {
                     {step.status && (
                       <span
                         className={cx(
-                          "font-mono text-[11px]",
+                          "font-mono text-micro",
                           isApproval ? "text-warning" : "text-fg-muted",
                         )}
                       >
@@ -93,14 +93,14 @@ export function HeroWorkflow({ content }: { content: WorkflowContent }) {
                     )}
                   </div>
                   {/* Phones: titles and status only, so the CTA above stays close to the fold. */}
-                  <p className="mt-0.5 hidden text-[13px] leading-snug text-fg-muted sm:block">{step.detail}</p>
+                  <p className="mt-0.5 hidden text-caption leading-snug text-fg-muted sm:block">{step.detail}</p>
                   {step.code && (
-                    <p className="mt-2 hidden truncate rounded-[5px] bg-surface-page px-2 py-1 font-mono text-[11.5px] text-brand sm:block">
+                    <p className="mt-2 hidden truncate rounded-[5px] bg-surface-page px-2 py-1 font-mono text-micro text-brand sm:block">
                       {step.code}
                     </p>
                   )}
                   {step.output && (
-                    <dl className="mt-2 hidden grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 rounded-[5px] bg-surface-page px-2.5 py-1.5 font-mono text-[11.5px] sm:grid">
+                    <dl className="mt-2 hidden grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-0.5 rounded-[5px] bg-surface-page px-2.5 py-1.5 font-mono text-micro sm:grid">
                       {step.output.map(([key, value]) => (
                         <div key={key} className="contents">
                           <dt className="text-fg-subtle">{key}</dt>

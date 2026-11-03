@@ -76,7 +76,7 @@ export function DomainHub({
             <h1 className="t-h1 mt-6">{domain.name}</h1>
             <p className="t-lead mt-6 max-w-2xl">{domain.positioning}</p>
             {domain.founderNote && (
-              <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-fg-muted">
+              <p className="mt-4 max-w-2xl text-body-sm leading-relaxed text-fg-muted">
                 {domain.founderNote}{" "}
                 <Link href={href(routes.founder)} className="link whitespace-nowrap">
                   {labels.founderLink}
@@ -113,7 +113,7 @@ export function DomainHub({
             {domain.problems.map((problem) => (
               <li key={problem} className="flex items-start gap-4 border-b border-line-subtle py-5">
                 <Icon name="alert" className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
-                <p className="text-[17px] leading-relaxed text-fg-secondary">{problem}</p>
+                <p className="text-lead-sm leading-relaxed text-fg-secondary">{problem}</p>
               </li>
             ))}
           </ul>
@@ -206,7 +206,7 @@ export function DomainHub({
                       <Icon name="layers" className="h-5 w-5 shrink-0 text-brand" />
                       {labels.engagementModels[model].title}
                     </p>
-                    <p className="mt-1 pl-8 text-[15px] leading-relaxed text-fg-muted">
+                    <p className="mt-1 pl-8 text-body-sm leading-relaxed text-fg-muted">
                       {targets.length > 0 ? (
                         <>
                           {labels.viaLabel}{" "}
@@ -269,7 +269,7 @@ export function DomainHub({
                     {target.name}
                   </Link>
                 </h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{target.summary}</p>
+                <p className="mt-2 text-body-sm leading-relaxed text-fg-muted">{target.summary}</p>
                 <Icon name="arrowRight" className="arrow-nudge mt-auto h-5 w-5 pt-1 text-fg-subtle group-hover:text-brand" />
               </article>
             </li>

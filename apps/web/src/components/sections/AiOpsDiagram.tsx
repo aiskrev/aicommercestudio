@@ -44,8 +44,8 @@ export function AiOpsDiagram({
                   <Icon name={ICONS[index] ?? "check"} className="h-4.5 w-4.5" />
                 </span>
                 <div className={cx("min-w-0", !vertical && "lg:mt-1")}>
-                  <p className="text-[15px] font-semibold text-fg">{step.title}</p>
-                  <p className="mt-0.5 text-[13.5px] leading-snug text-fg-muted">{step.description}</p>
+                  <p className="text-body-sm font-semibold text-fg">{step.title}</p>
+                  <p className="mt-0.5 text-caption leading-snug text-fg-muted">{step.description}</p>
                 </div>
               </div>
               {!last && (

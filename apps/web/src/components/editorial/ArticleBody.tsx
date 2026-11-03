@@ -23,7 +23,7 @@ export function ArticleBody({
   relatedLabel: string;
 }) {
   return (
-    <div className="prose-content text-[17px] text-fg-secondary">
+    <div className="prose-content text-lead-sm text-fg-secondary">
       {sections.map((section, index) => (
         <div key={section.heading}>
           <section className="mt-12 first:mt-0" aria-labelledby={`section-${index}`}>
@@ -36,7 +36,7 @@ export function ArticleBody({
             {section.bullets && <CheckList items={section.bullets} className="mt-5" />}
             {section.table && (
               <div className="mt-6 overflow-x-auto rounded-2xl border border-line-subtle">
-                <table className="w-full min-w-[560px] text-left text-[15px]">
+                <table className="w-full min-w-[560px] text-left text-body-sm">
                   <caption className="px-4 pt-4 text-left text-sm font-semibold text-fg-secondary">
                     {section.table.caption}
                   </caption>

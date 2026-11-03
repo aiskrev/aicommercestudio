@@ -127,7 +127,7 @@ export function TeamCosts({
 
           <details className="accordion rounded-[var(--radius-lg)] border border-line-subtle bg-surface-1 px-5 py-4">
             <summary className="cursor-pointer font-semibold text-fg">{content.result.methodologyTitle}</summary>
-            <ul className="mt-3 grid gap-2 text-[15px] leading-relaxed text-fg-muted">
+            <ul className="mt-3 grid gap-2 text-body-sm leading-relaxed text-fg-muted">
               {c.formulas.map((formula) => (
                 <li key={formula}>{formula}</li>
               ))}

@@ -202,11 +202,11 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
             </div>
             <div className="bg-surface-1 p-5">
               <dt className="t-label">{dict.service.deliverables}</dt>
-              <dd className="mt-2 text-[15px] text-fg-secondary">{service.deliverables[0]}</dd>
+              <dd className="mt-2 text-body-sm text-fg-secondary">{service.deliverables[0]}</dd>
             </div>
             <div className="bg-surface-1 p-5">
               <dt className="t-label">{dict.service.firstStepLabel}</dt>
-              <dd className="mt-2 text-[15px] text-fg-secondary">{dict.service.firstStep}</dd>
+              <dd className="mt-2 text-body-sm text-fg-secondary">{dict.service.firstStep}</dd>
             </div>
           </dl>
         </Container>
@@ -221,7 +221,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
             {service.signals.map((signal) => (
               <li key={signal} className="flex items-start gap-4 border-b border-line-subtle py-5">
                 <Icon name="alert" className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
-                <p className="text-[17px] leading-relaxed text-fg-secondary">{signal}</p>
+                <p className="text-lead-sm leading-relaxed text-fg-secondary">{signal}</p>
               </li>
             ))}
           </ul>
@@ -283,18 +283,18 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         </ul>
       </Section>
 
-      {/* ------------------------------------------------------------ technical checks (light) */}
-      <Section labelledBy="checks-title" tone="light">
+      {/* ------------------------------------------------------------ technical checks */}
+      <Section labelledBy="checks-title" tone="raised">
         <SectionHeading id="checks-title" eyebrow={dict.service.checksEyebrow} title={service.headings.checks} />
-        <ul className="mt-12 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-ink/15 bg-ink/15 md:grid-cols-2">
+        <ul className="mt-12 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line-subtle bg-line-subtle md:grid-cols-2">
           {service.checks.map((check) => (
-            <li key={check.title} className="flex gap-4 bg-surface-light p-6">
-              <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-ink text-brand" aria-hidden="true">
+            <li key={check.title} className="flex gap-4 bg-surface-1 p-6">
+              <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-surface-2 text-brand" aria-hidden="true">
                 <Icon name="check" className="h-4 w-4" />
               </span>
               <div>
                 <h3 className="t-h3">{check.title}</h3>
-                <p className="mt-1.5 leading-relaxed text-ink-muted">{check.description}</p>
+                <p className="mt-1.5 leading-relaxed text-fg-muted">{check.description}</p>
               </div>
             </li>
           ))}

@@ -36,7 +36,7 @@ export function WorkshopCards({
                 {item.label}
               </Link>
             </h3>
-            <p className="mt-1.5 text-[15px] leading-relaxed text-fg-muted">{item.summary}</p>
+            <p className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{item.summary}</p>
           </article>
         </li>
       ))}

@@ -179,21 +179,21 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
       </Section>
 
       {/* 4. problems we solve */}
-      <Section labelledBy="ams-problems" tone="light">
+      <Section labelledBy="ams-problems" tone="raised">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] lg:items-end">
           <SectionHeading id="ams-problems" title={page.problems.title} />
-          <p className="border-l-2 border-brand-ink pl-5 text-lg font-semibold leading-relaxed text-ink">{page.problems.keyMessage}</p>
+          <p className="border-l-2 border-brand pl-5 text-lg font-semibold leading-relaxed text-fg">{page.problems.keyMessage}</p>
         </div>
         <p className="t-lead mt-8 max-w-3xl">{page.problems.lead}</p>
-        <ul className="mt-10 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-ink/15 bg-ink/15 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-10 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line-subtle bg-line-subtle sm:grid-cols-2 lg:grid-cols-3">
           {page.problems.causes.map((cause) => (
-            <li key={cause.title} className="bg-surface-light p-5">
-              <p className="font-semibold text-ink">{cause.title}</p>
-              <p className="mt-1 text-[14.5px] leading-relaxed text-ink-muted">{cause.description}</p>
+            <li key={cause.title} className="bg-surface-1 p-5">
+              <p className="font-semibold text-fg">{cause.title}</p>
+              <p className="mt-1 text-nav leading-relaxed text-fg-muted">{cause.description}</p>
             </li>
           ))}
         </ul>
-        <p className="mt-6 max-w-3xl text-sm text-ink-muted">{page.problems.disclaimer}</p>
+        <p className="mt-6 max-w-3xl text-sm text-fg-muted">{page.problems.disclaimer}</p>
       </Section>
 
       {/* operating areas: what we do, what you receive, what your system needs */}
@@ -208,17 +208,17 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
                 </span>
                 <div className="min-w-0">
                   <h3 className="font-semibold text-fg">{item.title}</h3>
-                  <p className="mt-1 text-[15px] leading-relaxed text-fg-muted">{item.description}</p>
+                  <p className="mt-1 text-body-sm leading-relaxed text-fg-muted">{item.description}</p>
                 </div>
               </div>
               <dl className="contents">
                 <div className="border-t border-line-subtle pt-3 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
                   <dt className="t-label">{page.operations.deliverableLabel}</dt>
-                  <dd className="mt-1.5 text-[15px] leading-relaxed text-fg-secondary">{item.deliverable}</dd>
+                  <dd className="mt-1.5 text-body-sm leading-relaxed text-fg-secondary">{item.deliverable}</dd>
                 </div>
                 <div className="border-t border-line-subtle pt-3 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
                   <dt className="t-label">{page.operations.requiresLabel}</dt>
-                  <dd className="mt-1.5 text-[15px] leading-relaxed text-fg-secondary">{item.requires}</dd>
+                  <dd className="mt-1.5 text-body-sm leading-relaxed text-fg-secondary">{item.requires}</dd>
                 </div>
               </dl>
             </li>
@@ -274,7 +274,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
           {page.quality.items.map((item) => (
             <li key={item.title} className="border-t border-line-subtle py-5">
               <p className="font-semibold text-fg">{item.title}</p>
-              <p className="mt-1 text-[15px] leading-relaxed text-fg-muted">{item.description}</p>
+              <p className="mt-1 text-body-sm leading-relaxed text-fg-muted">{item.description}</p>
             </li>
           ))}
         </ul>
@@ -339,7 +339,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
             <li key={step.title} className="border-t border-line-subtle py-5">
               <span className="font-mono text-sm text-brand">{String(index + 1).padStart(2, "0")}</span>
               <p className="mt-2 font-semibold text-fg">{step.title}</p>
-              <p className="mt-1 text-[14.5px] leading-relaxed text-fg-muted">{step.description}</p>
+              <p className="mt-1 text-nav leading-relaxed text-fg-muted">{step.description}</p>
             </li>
           ))}
         </ol>
@@ -397,7 +397,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
               data-testid={`package-${pkg.key}`}
             >
               <p className="font-display text-[1.7rem] font-bold tracking-[-0.02em] text-fg">{pkg.name}</p>
-              <p className="mt-2 text-[14.5px] text-fg-muted">{pkg.audience}</p>
+              <p className="mt-2 text-nav text-fg-muted">{pkg.audience}</p>
               <p className="mt-4 text-fg-secondary">{pkg.summary}</p>
               <p className="mt-5 border-y border-line-subtle py-3 font-mono text-sm text-brand">{page.packages.priceLabel}</p>
               <CheckList items={pkg.includes} className="mt-5 flex-1 text-sm" />
@@ -411,7 +411,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
         <div className="card mt-10 overflow-x-auto">
           <table className="w-full min-w-[36rem] text-left text-sm">
             <caption className="px-5 pt-5 text-left text-lg font-semibold text-fg">{page.packages.comparisonTitle}</caption>
-            <thead className="border-b border-line-default text-[13px] text-fg-muted">
+            <thead className="border-b border-line-default text-caption text-fg-muted">
               <tr>
                 <th scope="col" className="px-5 py-4 font-medium">
                   {page.packages.comparisonFeature}
@@ -470,7 +470,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
                   <div key={dimension} className="min-w-0" data-dimension={dimension}>
                     <dt className="t-label">{page.levels.dimensions[dimension]}</dt>
                     <dd className="mt-2">
-                      <ul className="grid gap-1.5 text-[15px] text-fg-secondary">
+                      <ul className="grid gap-1.5 text-body-sm text-fg-secondary">
                         {page.levels.items[pkg.key][dimension].map((item) => (
                           <li key={item} className="flex gap-2.5">
                             <span className={cx("mt-2 h-1.5 w-1.5 shrink-0 rounded-[2px]", dimension === "excluded" ? "bg-danger" : "bg-brand")} aria-hidden="true" />
@@ -554,7 +554,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
             <p className="t-lead mt-4">{page.cta.lead}</p>
             <div className="mt-8 border-l-2 border-brand pl-5">
               <p className="font-semibold text-fg">{page.form.title}</p>
-              <p className="mt-2 text-[15px] text-fg-muted">{page.form.lead}</p>
+              <p className="mt-2 text-body-sm text-fg-muted">{page.form.lead}</p>
             </div>
             <ButtonLink href={href(routes.contact)} variant="ghost" className="mt-6">
               {page.cta.secondary}

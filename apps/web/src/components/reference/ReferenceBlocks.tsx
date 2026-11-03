@@ -82,7 +82,7 @@ export function TextBlock({ title, children, testId }: { title: string; children
   return (
     <section className="min-w-0 border-t border-line-subtle pt-5" data-testid={testId}>
       <h2 className="t-label">{title}</h2>
-      <div className="mt-3 text-[15px] leading-relaxed text-fg-secondary">{children}</div>
+      <div className="mt-3 text-body-sm leading-relaxed text-fg-secondary">{children}</div>
     </section>
   );
 }

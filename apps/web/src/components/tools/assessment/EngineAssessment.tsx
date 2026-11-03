@@ -313,7 +313,7 @@ function QuestionField({
               <label
                 key={o.key}
                 className={cx(
-                  "flex min-h-11 cursor-pointer items-start gap-3 rounded-[var(--radius-md)] border px-3.5 py-3 text-[15px] leading-snug",
+                  "flex min-h-11 cursor-pointer items-start gap-3 rounded-[var(--radius-md)] border px-3.5 py-3 text-body-sm leading-snug",
                   checked ? "border-brand bg-brand/[0.08] text-fg" : "border-line-default bg-surface-page text-fg-secondary",
                 )}
               >

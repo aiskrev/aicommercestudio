@@ -72,7 +72,7 @@ export function TeamPlanDetails({
               <h2 id="team-flows-title" className="t-h3-lg">
                 {content.dataFlows.title}
               </h2>
-              <ul className="mt-6 grid gap-2 text-[15px] text-fg-secondary md:grid-cols-2" data-testid="team-data-flows">
+              <ul className="mt-6 grid gap-2 text-body-sm text-fg-secondary md:grid-cols-2" data-testid="team-data-flows">
                 {plan.data_flows.map((flow, index) => (
                   <li key={`${flow.agent}-${flow.integration}-${flow.kind}-${index}`} className="flex items-start gap-2.5">
                     <span className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${flow.kind === "read" ? "bg-brand-2" : "bg-brand"}`} aria-hidden="true" />

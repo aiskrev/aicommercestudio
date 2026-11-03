@@ -28,9 +28,9 @@ export function ProcessSteps({ steps, layout = "vertical" }: { steps: ProcessSte
             </span>
             <div className="lg:mt-6">
               <h3 className="t-h3">{step.title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{step.description}</p>
+              <p className="mt-2 text-body-sm leading-relaxed text-fg-muted">{step.description}</p>
               {step.outputs && (
-                <ul className="mt-4 grid gap-1.5 text-[14px] text-fg-secondary">
+                <ul className="mt-4 grid gap-1.5 text-sm text-fg-secondary">
                   {step.outputs.map((output) => (
                     <li key={output} className="flex items-start gap-2">
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-[2px] bg-brand" aria-hidden="true" />

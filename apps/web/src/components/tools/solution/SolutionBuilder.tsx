@@ -359,7 +359,7 @@ export function SolutionBuilder({
                   <h3 className="t-h3">{agentName(key)}</h3>
                   <span className="badge">{content.agentReasons[reason]}</span>
                 </div>
-                <p className="mt-2 text-[15px] leading-relaxed text-fg-muted">{agent(key).purpose}</p>
+                <p className="mt-2 text-body-sm leading-relaxed text-fg-muted">{agent(key).purpose}</p>
                 <p className="mt-3 text-sm">
                   <span className="text-fg-subtle">{r.agentOversight}: </span>
                   <span className="text-fg-secondary">{agent(key).oversight}</span>
@@ -440,7 +440,7 @@ export function SolutionBuilder({
             {complexity.factors.map((factor) => {
               const label = factorLabel(factor);
               return (
-                <div key={label} className="flex items-baseline justify-between gap-4 border-b border-line-subtle pb-2 text-[15px]">
+                <div key={label} className="flex items-baseline justify-between gap-4 border-b border-line-subtle pb-2 text-body-sm">
                   <dt className="text-fg-secondary">{label}</dt>
                   <dd className="font-mono text-sm text-fg">+{factor.points}</dd>
                 </div>
@@ -464,7 +464,7 @@ export function SolutionBuilder({
                   {String(index + 1).padStart(2, "0")} · {r.phases[phase.key].title}
                 </p>
                 <p className="mt-1 text-sm text-fg-subtle">{weeks(phase.weeks)}</p>
-                <p className="mt-3 text-[15px] leading-relaxed text-fg-secondary">{r.phases[phase.key].text}</p>
+                <p className="mt-3 text-body-sm leading-relaxed text-fg-secondary">{r.phases[phase.key].text}</p>
                 {phase.agents.length > 0 && (
                   <p className="mt-3 text-sm">
                     <span className="text-fg-subtle">{r.phaseAgents}: </span>
