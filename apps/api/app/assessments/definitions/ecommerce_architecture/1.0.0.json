@@ -1,0 +1,1014 @@
+{
+  "key": "ecommerce_architecture",
+  "version": "1.0.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 6
+  },
+  "dimensions": [
+    {
+      "key": "platform",
+      "weight": 20
+    },
+    {
+      "key": "performance",
+      "weight": 20
+    },
+    {
+      "key": "integrations",
+      "weight": 20
+    },
+    {
+      "key": "data",
+      "weight": 20
+    },
+    {
+      "key": "operations",
+      "weight": 20
+    }
+  ],
+  "questions": [
+    {
+      "key": "platform_context",
+      "type": "multi_choice",
+      "dimension": "platform",
+      "evidence": "context",
+      "options": [
+        {
+          "key": "shopify",
+          "points": 0
+        },
+        {
+          "key": "woocommerce",
+          "points": 0
+        },
+        {
+          "key": "magento",
+          "points": 0
+        },
+        {
+          "key": "custom",
+          "points": 0
+        },
+        {
+          "key": "other",
+          "points": 0
+        }
+      ],
+      "cap": 1,
+      "max_selections": 5
+    },
+    {
+      "key": "ec_extensions",
+      "type": "single_choice",
+      "dimension": "platform",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "outdated",
+          "points": 1
+        },
+        {
+          "key": "maintained",
+          "points": 2
+        },
+        {
+          "key": "curated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ec_customisation",
+      "type": "single_choice",
+      "dimension": "platform",
+      "options": [
+        {
+          "key": "core_edits",
+          "points": 0
+        },
+        {
+          "key": "mixed",
+          "points": 1
+        },
+        {
+          "key": "child_theme",
+          "points": 2
+        },
+        {
+          "key": "versioned",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ec_speed",
+      "type": "single_choice",
+      "dimension": "performance",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "slow",
+          "points": 1
+        },
+        {
+          "key": "ok",
+          "points": 2
+        },
+        {
+          "key": "fast",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ec_seo",
+      "type": "single_choice",
+      "dimension": "performance",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "basic",
+          "points": 1
+        },
+        {
+          "key": "structured",
+          "points": 2
+        },
+        {
+          "key": "monitored",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ec_sync",
+      "type": "single_choice",
+      "dimension": "integrations",
+      "options": [
+        {
+          "key": "manual",
+          "points": 0
+        },
+        {
+          "key": "files",
+          "points": 1
+        },
+        {
+          "key": "api_partial",
+          "points": 2
+        },
+        {
+          "key": "api_monitored",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ec_failures",
+      "type": "single_choice",
+      "dimension": "integrations",
+      "options": [
+        {
+          "key": "unnoticed",
+          "points": 0
+        },
+        {
+          "key": "noticed_late",
+          "points": 1
+        },
+        {
+          "key": "alerts",
+          "points": 2
+        },
+        {
+          "key": "retries",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ec_tracking",
+      "type": "single_choice",
+      "dimension": "data",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "consistent",
+          "points": 2
+        },
+        {
+          "key": "server_side",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ec_consent",
+      "type": "single_choice",
+      "dimension": "data",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "banner",
+          "points": 1
+        },
+        {
+          "key": "respected",
+          "points": 2
+        },
+        {
+          "key": "reviewed",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ec_updates",
+      "type": "single_choice",
+      "dimension": "operations",
+      "options": [
+        {
+          "key": "rarely",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "scheduled",
+          "points": 2
+        },
+        {
+          "key": "staged",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ec_monitoring",
+      "type": "single_choice",
+      "dimension": "operations",
+      "options": [
+        {
+          "key": "customers",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "uptime",
+          "points": 2
+        },
+        {
+          "key": "checkout",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_unknown_extensions",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "ec_extensions",
+        "options": [
+          "unknown",
+          "outdated"
+        ]
+      },
+      "recommendation": "risk_unknown_extensions",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "commerce_engineering"
+      ]
+    },
+    {
+      "key": "risk_core_edits",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "ec_customisation",
+        "options": [
+          "core_edits"
+        ]
+      },
+      "recommendation": "risk_core_edits",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "commerce_engineering"
+      ]
+    },
+    {
+      "key": "risk_no_backups",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "ec_updates",
+        "options": [
+          "rarely"
+        ]
+      },
+      "recommendation": "risk_no_backups",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "commerce_engineering",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "risk_consent",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "ec_consent",
+        "options": [
+          "none",
+          "banner"
+        ]
+      },
+      "recommendation": "risk_consent",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "qw_measure_speed",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "ec_speed",
+        "options": [
+          "unknown",
+          "slow"
+        ]
+      },
+      "recommendation": "qw_measure_speed",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "commerce_engineering"
+      ]
+    },
+    {
+      "key": "qw_uptime",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "ec_monitoring",
+        "options": [
+          "customers",
+          "manual"
+        ]
+      },
+      "recommendation": "qw_uptime",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "commerce_engineering",
+        "devops_sre"
+      ]
+    },
+    {
+      "key": "qw_integration_alerts",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "ec_failures",
+        "options": [
+          "unnoticed",
+          "noticed_late"
+        ]
+      },
+      "recommendation": "qw_integration_alerts",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "data_integration"
+      ]
+    },
+    {
+      "key": "rec_platform",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "platform",
+        "value": 50
+      },
+      "recommendation": "rec_platform",
+      "horizon": 60,
+      "domains": [
+        "commerce_engineering"
+      ]
+    },
+    {
+      "key": "rec_performance",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "performance",
+        "value": 50
+      },
+      "recommendation": "rec_performance",
+      "horizon": 60,
+      "domains": [
+        "commerce_engineering"
+      ]
+    },
+    {
+      "key": "rec_integrations",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "integrations",
+        "value": 50
+      },
+      "recommendation": "rec_integrations",
+      "horizon": 60,
+      "domains": [
+        "data_integration",
+        "commerce_engineering"
+      ]
+    },
+    {
+      "key": "rec_data",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "data",
+        "value": 50
+      },
+      "recommendation": "rec_data",
+      "horizon": 60,
+      "domains": [
+        "commerce_engineering",
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "rec_operations",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "operations",
+        "value": 50
+      },
+      "recommendation": "rec_operations",
+      "horizon": 60,
+      "domains": [
+        "commerce_engineering",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "ts_composable",
+      "priority": 20,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "platform",
+            "value": 75
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "integrations",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "ts_composable",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "commerce_engineering",
+        "data_integration"
+      ]
+    },
+    {
+      "key": "ts_performance_budget",
+      "priority": 21,
+      "when": {
+        "kind": "dimension_at_least",
+        "dimension": "performance",
+        "value": 75
+      },
+      "recommendation": "ts_performance_budget",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "commerce_engineering"
+      ]
+    },
+    {
+      "key": "ctx_hosted_platform",
+      "priority": 30,
+      "when": {
+        "kind": "answer_in",
+        "question": "platform_context",
+        "options": [
+          "shopify"
+        ]
+      },
+      "recommendation": "ctx_hosted_platform",
+      "kind": "context"
+    },
+    {
+      "key": "ctx_self_hosted",
+      "priority": 30,
+      "when": {
+        "kind": "answer_in",
+        "question": "platform_context",
+        "options": [
+          "woocommerce",
+          "magento",
+          "custom"
+        ]
+      },
+      "recommendation": "ctx_self_hosted",
+      "kind": "context",
+      "domains": [
+        "commerce_engineering"
+      ]
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на архитектурата на онлайн магазин",
+      "intro": "11 въпроса в 5 области: платформа, скорост и SEO, интеграции, данни и операции. Резултатът показва рискове, бързи подобрения и пътна карта за 30/60/90 дни с обяснение защо.",
+      "disclaimer": "Самооценка по вашите отговори. Не се свързваме с вашите системи и не сканираме нищо. Резултатът не е одит, не е правен съвет и не е проверен от независима страна.",
+      "dimensions": {
+        "platform": {
+          "title": "Платформа и разширения",
+          "description": "Доколко платформата, темата и разширенията са поддържани и разширяеми."
+        },
+        "performance": {
+          "title": "Скорост и техническо SEO",
+          "description": "Време за зареждане, Core Web Vitals и индексиране."
+        },
+        "integrations": {
+          "title": "Интеграции",
+          "description": "Как магазинът обменя данни с ERP, склад, куриери, плащания и CRM."
+        },
+        "data": {
+          "title": "Данни и измерване",
+          "description": "Проследяване, съгласие и надеждност на данните за продажбите."
+        },
+        "operations": {
+          "title": "Сигурност и операции",
+          "description": "Обновявания, резервни копия, тестова среда и наблюдение."
+        }
+      },
+      "questions": {
+        "platform_context": {
+          "text": "На каква платформа е магазинът?",
+          "help": "Използва се само за бележки към резултата и не променя оценката.",
+          "options": {
+            "shopify": "Shopify",
+            "woocommerce": "WooCommerce",
+            "magento": "Magento / Adobe Commerce",
+            "custom": "Собствена разработка",
+            "other": "Друга платформа"
+          }
+        },
+        "ec_extensions": {
+          "text": "Колко са поддържани темата и разширенията?",
+          "options": {
+            "unknown": "Не знаем какво е инсталирано",
+            "outdated": "Има остарели или изоставени разширения",
+            "maintained": "Повечето се обновяват редовно",
+            "curated": "Малко, поддържани и прегледани разширения"
+          }
+        },
+        "ec_customisation": {
+          "text": "Как са направени промените по магазина?",
+          "options": {
+            "core_edits": "Директни промени в ядрото или темата",
+            "mixed": "Смесено, без документация",
+            "child_theme": "Чрез дъщерна тема или приложения",
+            "versioned": "В контрол на версиите, с преглед"
+          }
+        },
+        "ec_speed": {
+          "text": "Колко бързо се зарежда магазинът на телефон?",
+          "options": {
+            "unknown": "Не сме мерили",
+            "slow": "Бавно (над 4 секунди)",
+            "ok": "Приемливо (2–4 секунди)",
+            "fast": "Бързо и се следи редовно"
+          }
+        },
+        "ec_seo": {
+          "text": "Как се управлява техническото SEO?",
+          "options": {
+            "none": "Не се управлява",
+            "basic": "Основни мета данни",
+            "structured": "Карта на сайта, канонични адреси и структурирани данни",
+            "monitored": "Всичко това и редовен преглед на индексирането"
+          }
+        },
+        "ec_sync": {
+          "text": "Как се синхронизират поръчки и наличности?",
+          "options": {
+            "manual": "Ръчно",
+            "files": "С файлове по график",
+            "api_partial": "През API, частично",
+            "api_monitored": "През API, със следене на грешките"
+          }
+        },
+        "ec_failures": {
+          "text": "Какво става, когато интеграция се провали?",
+          "options": {
+            "unnoticed": "Разбираме от клиент",
+            "noticed_late": "Забелязваме по-късно",
+            "alerts": "Получаваме известие",
+            "retries": "Автоматични повторни опити и известие"
+          }
+        },
+        "ec_tracking": {
+          "text": "Доколко са надеждни данните за продажбите и рекламите?",
+          "options": {
+            "none": "Почти нямаме",
+            "partial": "Частични, с разминавания",
+            "consistent": "Съгласувани в основните системи",
+            "server_side": "Съгласувани, със сървърно проследяване"
+          }
+        },
+        "ec_consent": {
+          "text": "Как е решено съгласието за бисквитки и проследяване?",
+          "options": {
+            "none": "Няма банер или е само информативен",
+            "banner": "Банер, но проследяването тръгва преди избора",
+            "respected": "Проследяването следва избора",
+            "reviewed": "Следва избора и се преглежда редовно"
+          }
+        },
+        "ec_updates": {
+          "text": "Как се правят обновявания и резервни копия?",
+          "options": {
+            "rarely": "Рядко, без резервни копия",
+            "ad_hoc": "При нужда, с ръчни копия",
+            "scheduled": "По график, с автоматични копия",
+            "staged": "Първо в тестова среда, с тествано възстановяване"
+          }
+        },
+        "ec_monitoring": {
+          "text": "Как разбирате, че магазинът не работи?",
+          "options": {
+            "customers": "От клиенти",
+            "manual": "Проверяваме понякога",
+            "uptime": "Наблюдение на наличността",
+            "checkout": "Наблюдение и на поръчката (checkout)"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_unknown_extensions": {
+          "title": "Неизвестни или остарели разширения",
+          "description": "Остарелите разширения са най-честата причина за пробиви и сривове при обновяване."
+        },
+        "risk_core_edits": {
+          "title": "Промени в ядрото",
+          "description": "Промените в ядрото или темата се губят при обновяване или блокират обновяванията."
+        },
+        "risk_no_backups": {
+          "title": "Няма надеждни резервни копия",
+          "description": "Една неуспешна промяна може да спре продажбите без път за връщане."
+        },
+        "risk_consent": {
+          "title": "Проследяване без съгласие",
+          "description": "Проследяване преди изричен избор създава правен риск и подкопава доверието в данните."
+        },
+        "qw_measure_speed": {
+          "title": "Измерете и оправете най-бавните страници",
+          "description": "Измерете продукт, категория и количка на телефон и започнете от изображенията и скриптовете на трети страни."
+        },
+        "qw_uptime": {
+          "title": "Наблюдение на наличността и поръчката",
+          "description": "Проверка на всеки няколко минути за началната страница и поръчката, с известие към отговорен човек."
+        },
+        "qw_integration_alerts": {
+          "title": "Известия при грешки в интеграциите",
+          "description": "Всяка неуспешна синхронизация на поръчка или наличност да изпраща известие."
+        },
+        "rec_platform": {
+          "title": "Ред в платформата",
+          "description": "Опис на разширенията, премахване на ненужните и промени само в контрол на версиите."
+        },
+        "rec_performance": {
+          "title": "План за скорост и SEO",
+          "description": "Цели за Core Web Vitals, оптимизирани изображения и структурирани данни за продуктите."
+        },
+        "rec_integrations": {
+          "title": "Надеждни интеграции",
+          "description": "Синхронизация през API с повторни опити, журнал на грешките и известия."
+        },
+        "rec_data": {
+          "title": "Надеждно измерване със съгласие",
+          "description": "Съгласувани данни за продажбите, проследяване само след съгласие и сървърно проследяване, където е уместно."
+        },
+        "rec_operations": {
+          "title": "Тестова среда и тествани копия",
+          "description": "Обновявания първо в тестова среда, автоматични копия и проверено възстановяване."
+        },
+        "ts_composable": {
+          "title": "Модулна архитектура при нужда",
+          "description": "При стабилна основа: отделни услуги за търсене, съдържание или поръчки само там, където това носи стойност."
+        },
+        "ts_performance_budget": {
+          "title": "Бюджет за производителност",
+          "description": "Автоматична проверка на скоростта при всяка промяна, която спира регресиите."
+        },
+        "ctx_hosted_platform": {
+          "title": "Shopify: ограничения",
+          "description": "Хостнатата платформа поема сървърите и обновяванията; рисковете са в приложенията, темата и интеграциите."
+        },
+        "ctx_self_hosted": {
+          "title": "Собствен хостинг: вашата отговорност",
+          "description": "При WooCommerce, Magento или собствена разработка сървърът, обновяванията и сигурността са ваша отговорност."
+        }
+      }
+    },
+    "en": {
+      "title": "E-commerce Architecture Assessment",
+      "intro": "11 questions across 5 areas: platform, speed and SEO, integrations, data and operations. The result shows risks, quick wins and a 30/60/90-day roadmap with the reason why.",
+      "disclaimer": "A self-assessment based on your answers. We do not connect to your systems and scan nothing. The result is not an audit, not legal advice and has not been independently verified.",
+      "dimensions": {
+        "platform": {
+          "title": "Platform and extensions",
+          "description": "How maintained and extensible the platform, theme and extensions are."
+        },
+        "performance": {
+          "title": "Speed and technical SEO",
+          "description": "Load time, Core Web Vitals and indexing."
+        },
+        "integrations": {
+          "title": "Integrations",
+          "description": "How the store exchanges data with ERP, warehouse, couriers, payments and CRM."
+        },
+        "data": {
+          "title": "Data and measurement",
+          "description": "Tracking, consent and reliability of sales data."
+        },
+        "operations": {
+          "title": "Security and operations",
+          "description": "Updates, backups, a staging environment and monitoring."
+        }
+      },
+      "questions": {
+        "platform_context": {
+          "text": "What platform is the store on?",
+          "help": "Used only for notes on the result; it does not change the score.",
+          "options": {
+            "shopify": "Shopify",
+            "woocommerce": "WooCommerce",
+            "magento": "Magento / Adobe Commerce",
+            "custom": "Custom build",
+            "other": "Another platform"
+          }
+        },
+        "ec_extensions": {
+          "text": "How well maintained are the theme and extensions?",
+          "options": {
+            "unknown": "We do not know what is installed",
+            "outdated": "Some are outdated or abandoned",
+            "maintained": "Most are updated regularly",
+            "curated": "A few maintained and reviewed extensions"
+          }
+        },
+        "ec_customisation": {
+          "text": "How were changes to the store made?",
+          "options": {
+            "core_edits": "Direct edits to the core or theme",
+            "mixed": "Mixed, undocumented",
+            "child_theme": "Through a child theme or apps",
+            "versioned": "In version control, reviewed"
+          }
+        },
+        "ec_speed": {
+          "text": "How fast does the store load on a phone?",
+          "options": {
+            "unknown": "We have not measured",
+            "slow": "Slow (over 4 seconds)",
+            "ok": "Acceptable (2–4 seconds)",
+            "fast": "Fast and checked regularly"
+          }
+        },
+        "ec_seo": {
+          "text": "How is technical SEO managed?",
+          "options": {
+            "none": "It is not managed",
+            "basic": "Basic meta data",
+            "structured": "Sitemap, canonical URLs and structured data",
+            "monitored": "All of this and regular indexing reviews"
+          }
+        },
+        "ec_sync": {
+          "text": "How are orders and stock synchronised?",
+          "options": {
+            "manual": "By hand",
+            "files": "With scheduled files",
+            "api_partial": "Through APIs, partly",
+            "api_monitored": "Through APIs, with error monitoring"
+          }
+        },
+        "ec_failures": {
+          "text": "What happens when an integration fails?",
+          "options": {
+            "unnoticed": "A customer tells us",
+            "noticed_late": "We notice later",
+            "alerts": "We get an alert",
+            "retries": "Automatic retries and an alert"
+          }
+        },
+        "ec_tracking": {
+          "text": "How reliable are sales and advertising data?",
+          "options": {
+            "none": "We have almost none",
+            "partial": "Partial, with discrepancies",
+            "consistent": "Consistent across the main systems",
+            "server_side": "Consistent, with server-side tracking"
+          }
+        },
+        "ec_consent": {
+          "text": "How is consent for cookies and tracking handled?",
+          "options": {
+            "none": "No banner, or an information-only one",
+            "banner": "A banner, but tracking starts before the choice",
+            "respected": "Tracking follows the choice",
+            "reviewed": "Follows the choice and is reviewed regularly"
+          }
+        },
+        "ec_updates": {
+          "text": "How are updates and backups done?",
+          "options": {
+            "rarely": "Rarely, without backups",
+            "ad_hoc": "When needed, with manual backups",
+            "scheduled": "On a schedule, with automatic backups",
+            "staged": "First on staging, with tested restores"
+          }
+        },
+        "ec_monitoring": {
+          "text": "How do you find out the store is down?",
+          "options": {
+            "customers": "From customers",
+            "manual": "We check now and then",
+            "uptime": "Uptime monitoring",
+            "checkout": "Monitoring that includes checkout"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_unknown_extensions": {
+          "title": "Unknown or outdated extensions",
+          "description": "Outdated extensions are the most common cause of breaches and of breakage during updates."
+        },
+        "risk_core_edits": {
+          "title": "Core edits",
+          "description": "Edits to the core or theme are lost on update, or block updates altogether."
+        },
+        "risk_no_backups": {
+          "title": "No reliable backups",
+          "description": "One failed change can stop sales with no way back."
+        },
+        "risk_consent": {
+          "title": "Tracking without consent",
+          "description": "Tracking before an explicit choice creates legal risk and undermines trust in the data."
+        },
+        "qw_measure_speed": {
+          "title": "Measure and fix the slowest pages",
+          "description": "Measure product, category and cart on a phone and start with images and third-party scripts."
+        },
+        "qw_uptime": {
+          "title": "Uptime and checkout monitoring",
+          "description": "A check every few minutes of the home page and checkout, with an alert to a named person."
+        },
+        "qw_integration_alerts": {
+          "title": "Alerts on integration failures",
+          "description": "Every failed order or stock sync sends an alert."
+        },
+        "rec_platform": {
+          "title": "Order in the platform",
+          "description": "An inventory of extensions, removing the unneeded ones and changes only in version control."
+        },
+        "rec_performance": {
+          "title": "A speed and SEO plan",
+          "description": "Core Web Vitals targets, optimised images and structured product data."
+        },
+        "rec_integrations": {
+          "title": "Reliable integrations",
+          "description": "API synchronisation with retries, an error log and alerts."
+        },
+        "rec_data": {
+          "title": "Reliable, consented measurement",
+          "description": "Consistent sales data, tracking only after consent and server-side tracking where appropriate."
+        },
+        "rec_operations": {
+          "title": "Staging and tested backups",
+          "description": "Updates first on staging, automatic backups and a verified restore."
+        },
+        "ts_composable": {
+          "title": "Modular architecture where it pays off",
+          "description": "On a stable base: separate services for search, content or orders only where that adds value."
+        },
+        "ts_performance_budget": {
+          "title": "A performance budget",
+          "description": "An automated speed check on every change that stops regressions."
+        },
+        "ctx_hosted_platform": {
+          "title": "Shopify: what applies",
+          "description": "The hosted platform handles servers and updates; the risks sit in apps, the theme and integrations."
+        },
+        "ctx_self_hosted": {
+          "title": "Self-hosted: your responsibility",
+          "description": "With WooCommerce, Magento or a custom build, the server, updates and security are your responsibility."
+        }
+      }
+    }
+  }
+}

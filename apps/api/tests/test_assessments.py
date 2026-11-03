@@ -124,9 +124,23 @@ def legacy_registry(tmp_path_factory, monkeypatch):
 
 def test_shipped_definitions_load_and_validate():
     reg = build_registry()
-    assert reg.keys() == ["cloud_platform", "devops_delivery", "observability_reliability"]
+    assert reg.keys() == [
+        "ai_governance",
+        "ai_ops_readiness",
+        "cloud_platform",
+        "data_integration",
+        "devops_delivery",
+        "ecommerce_architecture",
+        "finops",
+        "observability_reliability",
+    ]
     current = {key: (reg.current(key).version, reg.current(key).status) for key in reg.versions}
     assert current == {
+        "ai_governance": ("1.0.0", "live"),
+        "ai_ops_readiness": ("1.0.0", "live"),
+        "data_integration": ("1.0.0", "live"),
+        "ecommerce_architecture": ("1.0.0", "live"),
+        "finops": ("1.0.0", "live"),
         "cloud_platform": ("1.0.0", "live"),
         "devops_delivery": ("1.1.0", "live"),
         "observability_reliability": ("1.1.0", "live"),

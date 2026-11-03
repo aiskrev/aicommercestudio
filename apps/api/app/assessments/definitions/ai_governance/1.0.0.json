@@ -1,0 +1,949 @@
+{
+  "key": "ai_governance",
+  "version": "1.0.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 6
+  },
+  "dimensions": [
+    {
+      "key": "inventory",
+      "weight": 20
+    },
+    {
+      "key": "risk",
+      "weight": 20
+    },
+    {
+      "key": "data",
+      "weight": 20
+    },
+    {
+      "key": "oversight",
+      "weight": 20
+    },
+    {
+      "key": "transparency",
+      "weight": 20
+    }
+  ],
+  "questions": [
+    {
+      "key": "use_context",
+      "type": "multi_choice",
+      "dimension": "inventory",
+      "evidence": "context",
+      "options": [
+        {
+          "key": "internal",
+          "points": 0
+        },
+        {
+          "key": "customers",
+          "points": 0
+        },
+        {
+          "key": "decisions",
+          "points": 0
+        },
+        {
+          "key": "products",
+          "points": 0
+        }
+      ],
+      "cap": 1,
+      "max_selections": 4
+    },
+    {
+      "key": "ag_inventory",
+      "type": "single_choice",
+      "dimension": "inventory",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "complete",
+          "points": 2
+        },
+        {
+          "key": "maintained",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_owner",
+      "type": "single_choice",
+      "dimension": "inventory",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "it_only",
+          "points": 1
+        },
+        {
+          "key": "named",
+          "points": 2
+        },
+        {
+          "key": "policy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_classification",
+      "type": "single_choice",
+      "dimension": "risk",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "checklist",
+          "points": 2
+        },
+        {
+          "key": "documented",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_regulation",
+      "type": "single_choice",
+      "dimension": "risk",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "aware",
+          "points": 1
+        },
+        {
+          "key": "mapped",
+          "points": 2
+        },
+        {
+          "key": "advised",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_personal_data",
+      "type": "single_choice",
+      "dimension": "data",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "uncontrolled",
+          "points": 1
+        },
+        {
+          "key": "rules",
+          "points": 2
+        },
+        {
+          "key": "minimised",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_contracts",
+      "type": "single_choice",
+      "dimension": "data",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "all",
+          "points": 2
+        },
+        {
+          "key": "reviewed",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_approval",
+      "type": "single_choice",
+      "dimension": "oversight",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "sometimes",
+          "points": 1
+        },
+        {
+          "key": "required",
+          "points": 2
+        },
+        {
+          "key": "tiered",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_logging",
+      "type": "single_choice",
+      "dimension": "oversight",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "logged",
+          "points": 2
+        },
+        {
+          "key": "reviewed",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_disclosure",
+      "type": "single_choice",
+      "dimension": "transparency",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "sometimes",
+          "points": 1
+        },
+        {
+          "key": "always",
+          "points": 2
+        },
+        {
+          "key": "explained",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ag_evaluation",
+      "type": "single_choice",
+      "dimension": "transparency",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "test_set",
+          "points": 2
+        },
+        {
+          "key": "continuous",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_shadow_ai",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "ag_inventory",
+        "options": [
+          "none"
+        ]
+      },
+      "recommendation": "risk_shadow_ai",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "risk_personal_data",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "ag_personal_data",
+        "options": [
+          "unknown",
+          "uncontrolled"
+        ]
+      },
+      "recommendation": "risk_personal_data",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "risk_decisions_without_oversight",
+      "priority": 1,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "use_context",
+            "options": [
+              "decisions"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "ag_approval",
+            "options": [
+              "never",
+              "sometimes"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_decisions_without_oversight",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance",
+        "ai_agents_automation"
+      ]
+    },
+    {
+      "key": "qw_inventory",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "ag_inventory",
+        "options": [
+          "none",
+          "partial"
+        ]
+      },
+      "recommendation": "qw_inventory",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "qw_ai_policy",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "ag_owner",
+        "options": [
+          "none",
+          "it_only"
+        ]
+      },
+      "recommendation": "qw_ai_policy",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance",
+        "advisory_enablement"
+      ]
+    },
+    {
+      "key": "qw_disclosure",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "ag_disclosure",
+        "options": [
+          "no",
+          "sometimes"
+        ]
+      },
+      "recommendation": "qw_disclosure",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "rec_inventory",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "inventory",
+        "value": 50
+      },
+      "recommendation": "rec_inventory",
+      "horizon": 60,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "rec_risk",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "risk",
+        "value": 50
+      },
+      "recommendation": "rec_risk",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "advisory_enablement"
+      ]
+    },
+    {
+      "key": "rec_data",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "data",
+        "value": 50
+      },
+      "recommendation": "rec_data",
+      "horizon": 60,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "rec_oversight",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "oversight",
+        "value": 50
+      },
+      "recommendation": "rec_oversight",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "ai_agents_automation"
+      ]
+    },
+    {
+      "key": "rec_transparency",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "transparency",
+        "value": 50
+      },
+      "recommendation": "rec_transparency",
+      "horizon": 60,
+      "domains": [
+        "ai_governance",
+        "ai_applications"
+      ]
+    },
+    {
+      "key": "ts_governance_board",
+      "priority": 20,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "inventory",
+            "value": 75
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "risk",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "ts_governance_board",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "ctx_ai_act",
+      "priority": 30,
+      "when": {
+        "kind": "answer_in",
+        "question": "use_context",
+        "options": [
+          "decisions",
+          "products"
+        ]
+      },
+      "recommendation": "ctx_ai_act",
+      "kind": "context",
+      "domains": [
+        "ai_governance"
+      ]
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на отговорното управление на AI",
+      "intro": "11 въпроса в 5 области: опис и отговорности, оценка на риска, лични данни, човешки контрол и прозрачност. Не е правен съвет.",
+      "disclaimer": "Самооценка по вашите отговори. Не се свързваме с вашите системи и не сканираме нищо. Резултатът не е одит, не е правен съвет и не е проверен от независима страна.",
+      "dimensions": {
+        "inventory": {
+          "title": "Опис и отговорности",
+          "description": "Знаете ли кои AI системи се ползват и кой отговаря за тях."
+        },
+        "risk": {
+          "title": "Оценка на риска",
+          "description": "Класифицират ли се случаите на употреба по риск."
+        },
+        "data": {
+          "title": "Лични данни и доставчици",
+          "description": "Какви данни стигат до моделите и какви договори има."
+        },
+        "oversight": {
+          "title": "Човешки контрол",
+          "description": "Одобрение, журнал и възможност за корекция."
+        },
+        "transparency": {
+          "title": "Прозрачност и качество",
+          "description": "Информиране на хората и проверка на качеството."
+        }
+      },
+      "questions": {
+        "use_context": {
+          "text": "Къде използвате AI?",
+          "help": "Изберете всичко приложимо. Не променя оценката.",
+          "options": {
+            "internal": "Вътрешни задачи (текстове, обобщения)",
+            "customers": "Комуникация с клиенти",
+            "decisions": "Решения за хора (наемане, кредит, достъп)",
+            "products": "В продукти, които продавате"
+          }
+        },
+        "ag_inventory": {
+          "text": "Има ли опис на AI инструментите и системите, които се ползват?",
+          "options": {
+            "none": "Не",
+            "partial": "Частичен",
+            "complete": "Пълен",
+            "maintained": "Пълен и се поддържа"
+          }
+        },
+        "ag_owner": {
+          "text": "Има ли отговорник за всяка AI система?",
+          "options": {
+            "none": "Не",
+            "it_only": "Само ИТ",
+            "named": "Посочен бизнес отговорник",
+            "policy": "Отговорник и вътрешна политика"
+          }
+        },
+        "ag_classification": {
+          "text": "Оценява ли се рискът на всеки случай на употреба?",
+          "options": {
+            "no": "Не",
+            "informal": "Неформално",
+            "checklist": "С контролен списък",
+            "documented": "Документирано, с преглед при промени"
+          }
+        },
+        "ag_regulation": {
+          "text": "Проследявате ли приложимите изисквания (напр. GDPR, AI Act)?",
+          "options": {
+            "no": "Не",
+            "aware": "Знаем за тях",
+            "mapped": "Съпоставени с нашите случаи",
+            "advised": "Съпоставени и прегледани с юрист"
+          }
+        },
+        "ag_personal_data": {
+          "text": "Стигат ли лични данни до AI доставчици?",
+          "options": {
+            "unknown": "Не знаем",
+            "uncontrolled": "Да, без правила",
+            "rules": "Само по правила",
+            "minimised": "Минимизирани или анонимизирани"
+          }
+        },
+        "ag_contracts": {
+          "text": "Има ли договори за обработка с AI доставчиците?",
+          "options": {
+            "none": "Не",
+            "some": "С част от тях",
+            "all": "С всички",
+            "reviewed": "С всички, с проверено местоположение и срок на данните"
+          }
+        },
+        "ag_approval": {
+          "text": "Одобрява ли човек действията на AI с външен ефект?",
+          "options": {
+            "never": "Не",
+            "sometimes": "Понякога",
+            "required": "Да, задължително",
+            "tiered": "Да, по нива на риск"
+          }
+        },
+        "ag_logging": {
+          "text": "Записват ли се решенията и действията на AI?",
+          "options": {
+            "no": "Не",
+            "partial": "Частично",
+            "logged": "Да",
+            "reviewed": "Да, и се преглеждат"
+          }
+        },
+        "ag_disclosure": {
+          "text": "Знаят ли хората, когато общуват с AI или се оценяват от AI?",
+          "options": {
+            "no": "Не",
+            "sometimes": "Понякога",
+            "always": "Винаги",
+            "explained": "Винаги, с обяснение и контакт за възражение"
+          }
+        },
+        "ag_evaluation": {
+          "text": "Проверява ли се качеството на AI резултатите?",
+          "options": {
+            "no": "Не",
+            "ad_hoc": "Случайно",
+            "test_set": "С тестов набор",
+            "continuous": "С тестов набор и наблюдение в работа"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_shadow_ai": {
+          "title": "Неконтролирано използване на AI",
+          "description": "Без опис не знаете какви данни излизат и къде."
+        },
+        "risk_personal_data": {
+          "title": "Лични данни без правила",
+          "description": "Лични данни, изпратени към AI доставчик без правила и договор, са риск за поверителността и съответствието."
+        },
+        "risk_decisions_without_oversight": {
+          "title": "Решения за хора без човешки контрол",
+          "description": "AI, който влияе на решения за хора без човешко одобрение, е случай с висок риск."
+        },
+        "qw_inventory": {
+          "title": "Опис на AI инструментите",
+          "description": "Таблица: инструмент → за какво → какви данни → отговорник. Попълва се за ден."
+        },
+        "qw_ai_policy": {
+          "title": "Кратка вътрешна политика за AI",
+          "description": "Една страница: какво е позволено, какви данни не се въвеждат и към кого да се обърнат хората."
+        },
+        "qw_disclosure": {
+          "title": "Ясно обозначаване на AI",
+          "description": "Обозначете чатботове и генерирано съдържание и посочете контакт с човек."
+        },
+        "rec_inventory": {
+          "title": "Отговорности и опис",
+          "description": "Отговорник за всяка AI система и поддържан опис."
+        },
+        "rec_risk": {
+          "title": "Оценка на риска по случаи",
+          "description": "Контролен списък за риск при всеки нов случай и преглед с юрист за чувствителните."
+        },
+        "rec_data": {
+          "title": "Правила за данните към AI",
+          "description": "Минимизиране на личните данни и договори за обработка с всички доставчици."
+        },
+        "rec_oversight": {
+          "title": "Човешко одобрение и журнал",
+          "description": "Одобрение по нива на риск и журнал на действията, който се преглежда."
+        },
+        "rec_transparency": {
+          "title": "Прозрачност и проверка на качеството",
+          "description": "Обозначаване на AI, тестови набори и наблюдение на качеството."
+        },
+        "ts_governance_board": {
+          "title": "Редовен преглед на AI портфолиото",
+          "description": "Тримесечен преглед на системите, рисковете и инцидентите с участие на бизнеса и юрист."
+        },
+        "ctx_ai_act": {
+          "title": "Може да попадате в по-строги изисквания",
+          "description": "Решения за хора и AI в продукти могат да попаднат в категории с повече задължения. Тази оценка не определя задълженията ви; за това е нужен юрист."
+        }
+      }
+    },
+    "en": {
+      "title": "Responsible AI Governance Assessment",
+      "intro": "11 questions across 5 areas: inventory and accountability, risk assessment, personal data, human oversight and transparency. Not legal advice.",
+      "disclaimer": "A self-assessment based on your answers. We do not connect to your systems and scan nothing. The result is not an audit, not legal advice and has not been independently verified.",
+      "dimensions": {
+        "inventory": {
+          "title": "Inventory and accountability",
+          "description": "Whether you know which AI systems are used and who is accountable."
+        },
+        "risk": {
+          "title": "Risk assessment",
+          "description": "Whether use cases are classified by risk."
+        },
+        "data": {
+          "title": "Personal data and providers",
+          "description": "What data reaches the models and what agreements exist."
+        },
+        "oversight": {
+          "title": "Human oversight",
+          "description": "Approval, logs and the ability to correct."
+        },
+        "transparency": {
+          "title": "Transparency and quality",
+          "description": "Informing people and checking quality."
+        }
+      },
+      "questions": {
+        "use_context": {
+          "text": "Where do you use AI?",
+          "help": "Select all that apply. It does not change the score.",
+          "options": {
+            "internal": "Internal tasks (texts, summaries)",
+            "customers": "Customer communication",
+            "decisions": "Decisions about people (hiring, credit, access)",
+            "products": "In products you sell"
+          }
+        },
+        "ag_inventory": {
+          "text": "Is there an inventory of the AI tools and systems in use?",
+          "options": {
+            "none": "No",
+            "partial": "Partial",
+            "complete": "Complete",
+            "maintained": "Complete and maintained"
+          }
+        },
+        "ag_owner": {
+          "text": "Is there an accountable owner for each AI system?",
+          "options": {
+            "none": "No",
+            "it_only": "IT only",
+            "named": "A named business owner",
+            "policy": "An owner and an internal policy"
+          }
+        },
+        "ag_classification": {
+          "text": "Is the risk of each use case assessed?",
+          "options": {
+            "no": "No",
+            "informal": "Informally",
+            "checklist": "With a checklist",
+            "documented": "Documented, reviewed on change"
+          }
+        },
+        "ag_regulation": {
+          "text": "Do you track the applicable requirements (e.g. GDPR, the AI Act)?",
+          "options": {
+            "no": "No",
+            "aware": "We are aware of them",
+            "mapped": "Mapped to our use cases",
+            "advised": "Mapped and reviewed with a lawyer"
+          }
+        },
+        "ag_personal_data": {
+          "text": "Does personal data reach AI providers?",
+          "options": {
+            "unknown": "We do not know",
+            "uncontrolled": "Yes, without rules",
+            "rules": "Only under rules",
+            "minimised": "Minimised or anonymised"
+          }
+        },
+        "ag_contracts": {
+          "text": "Are there data processing agreements with AI providers?",
+          "options": {
+            "none": "No",
+            "some": "With some of them",
+            "all": "With all of them",
+            "reviewed": "With all, with data location and retention checked"
+          }
+        },
+        "ag_approval": {
+          "text": "Does a person approve AI actions with an external effect?",
+          "options": {
+            "never": "No",
+            "sometimes": "Sometimes",
+            "required": "Yes, always",
+            "tiered": "Yes, by risk level"
+          }
+        },
+        "ag_logging": {
+          "text": "Are AI decisions and actions logged?",
+          "options": {
+            "no": "No",
+            "partial": "Partly",
+            "logged": "Yes",
+            "reviewed": "Yes, and they are reviewed"
+          }
+        },
+        "ag_disclosure": {
+          "text": "Do people know when they interact with AI or are assessed by AI?",
+          "options": {
+            "no": "No",
+            "sometimes": "Sometimes",
+            "always": "Always",
+            "explained": "Always, with an explanation and a contact to object"
+          }
+        },
+        "ag_evaluation": {
+          "text": "Is the quality of AI outputs checked?",
+          "options": {
+            "no": "No",
+            "ad_hoc": "Ad hoc",
+            "test_set": "With a test set",
+            "continuous": "With a test set and monitoring in production"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_shadow_ai": {
+          "title": "Uncontrolled use of AI",
+          "description": "Without an inventory you do not know what data leaves and where."
+        },
+        "risk_personal_data": {
+          "title": "Personal data without rules",
+          "description": "Personal data sent to an AI provider without rules or an agreement is a privacy and compliance risk."
+        },
+        "risk_decisions_without_oversight": {
+          "title": "Decisions about people without oversight",
+          "description": "AI that influences decisions about people without human approval is a high-risk use case."
+        },
+        "qw_inventory": {
+          "title": "An inventory of AI tools",
+          "description": "A table: tool → purpose → data → owner. It takes a day to fill in."
+        },
+        "qw_ai_policy": {
+          "title": "A short internal AI policy",
+          "description": "One page: what is allowed, which data must not be entered and whom to ask."
+        },
+        "qw_disclosure": {
+          "title": "Clear AI disclosure",
+          "description": "Label chatbots and generated content and give a human contact."
+        },
+        "rec_inventory": {
+          "title": "Accountability and an inventory",
+          "description": "An owner for each AI system and a maintained inventory."
+        },
+        "rec_risk": {
+          "title": "Risk assessment per use case",
+          "description": "A risk checklist for each new use case and a legal review for sensitive ones."
+        },
+        "rec_data": {
+          "title": "Rules for data sent to AI",
+          "description": "Minimise personal data and have processing agreements with all providers."
+        },
+        "rec_oversight": {
+          "title": "Human approval and logs",
+          "description": "Risk-tiered approval and a log of actions that is reviewed."
+        },
+        "rec_transparency": {
+          "title": "Transparency and quality checks",
+          "description": "AI disclosure, test sets and quality monitoring."
+        },
+        "ts_governance_board": {
+          "title": "A regular AI portfolio review",
+          "description": "A quarterly review of systems, risks and incidents with the business and a lawyer."
+        },
+        "ctx_ai_act": {
+          "title": "You may fall under stricter requirements",
+          "description": "Decisions about people and AI in products can fall into categories with more obligations. This assessment does not determine your obligations; a lawyer does."
+        }
+      }
+    }
+  }
+}

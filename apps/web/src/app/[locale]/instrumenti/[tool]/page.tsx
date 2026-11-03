@@ -30,7 +30,8 @@ import { isToolAvailable, isToolPlanned, TOOL_SLUGS, toolByKey, toolHrefs, TOOLS
 
 export const dynamicParams = false;
 
-type HostedTool = "readiness" | "team" | "roi" | "finder" | "solution" | "cloud_maturity" | "devops_maturity" | "observability";
+type EngineTool = keyof typeof ENGINE;
+type HostedTool = "readiness" | "team" | "roi" | "finder" | "solution" | EngineTool;
 
 /** Tools hosted under /instrumenti/<slug>. Only available tools (implemented + flag on) get a page. */
 const HOSTED: Record<string, HostedTool> = {
@@ -42,6 +43,11 @@ const HOSTED: Record<string, HostedTool> = {
   [TOOL_SLUGS.cloud_maturity]: "cloud_maturity",
   [TOOL_SLUGS.devops_maturity]: "devops_maturity",
   [TOOL_SLUGS.observability]: "observability",
+  [TOOL_SLUGS.ecommerce_architecture]: "ecommerce_architecture",
+  [TOOL_SLUGS.data_integration]: "data_integration",
+  [TOOL_SLUGS.ai_governance]: "ai_governance",
+  [TOOL_SLUGS.ai_ops_readiness]: "ai_ops_readiness",
+  [TOOL_SLUGS.finops]: "finops",
 };
 
 /** Engine assessments: the API key behind each tool, and how long a saved result is kept (ASSESSMENT_RETENTION_DAYS). */
@@ -49,7 +55,13 @@ const ENGINE = {
   cloud_maturity: "cloud_platform",
   devops_maturity: "devops_delivery",
   observability: "observability_reliability",
+  ecommerce_architecture: "ecommerce_architecture",
+  data_integration: "data_integration",
+  ai_governance: "ai_governance",
+  ai_ops_readiness: "ai_ops_readiness",
+  finops: "finops",
 } as const;
+const isEngineTool = (key: HostedTool): key is EngineTool => key in ENGINE;
 const ASSESSMENT_RETENTION_DAYS = 90;
 
 /** Services each hosted tool can link to from its result. */
@@ -62,6 +74,11 @@ const TOOL_SERVICES: Record<HostedTool, ServiceKey[]> = {
   cloud_maturity: [],
   devops_maturity: [],
   observability: [],
+  ecommerce_architecture: [],
+  data_integration: [],
+  ai_governance: [],
+  ai_ops_readiness: [],
+  finops: [],
 };
 
 /**
@@ -119,6 +136,11 @@ function toolContent(locale: Locale, key: HostedTool) {
     cloud_maturity: content.engineeringTool.pages.cloud_maturity,
     devops_maturity: content.engineeringTool.pages.devops_maturity,
     observability: content.engineeringTool.pages.observability,
+    ecommerce_architecture: content.engineeringTool.pages.ecommerce_architecture,
+    data_integration: content.engineeringTool.pages.data_integration,
+    ai_governance: content.engineeringTool.pages.ai_governance,
+    ai_ops_readiness: content.engineeringTool.pages.ai_ops_readiness,
+    finops: content.engineeringTool.pages.finops,
   };
   return pages[key];
 }
@@ -256,7 +278,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
           <ReadinessMethodology content={readinessTool} />
         </Section>
       )}
-      {(key === "cloud_maturity" || key === "devops_maturity" || key === "observability") && (
+      {isEngineTool(key) && (
         <Section size="narrow">
           <EngineAssessment
             assessment={ENGINE[key]}
@@ -264,7 +286,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
             content={engineeringTool}
             locale={locale}
             domainLinks={domainHubLinks(locale)}
-            contactHref={href(contactWithService(domainDefinition(ENGINE[key] === "cloud_platform" ? "cloud_platform" : "devops_sre").contactService))}
+            contactHref={href(contactWithService(domainDefinition(toolByKey(key).domain ?? "advisory_enablement").contactService))}
             privacyHref={href(routes.privacy)}
             retentionDays={ASSESSMENT_RETENTION_DAYS}
           />

@@ -7,7 +7,7 @@ and extension points for assessment-specific logic.
 
 **Status:**
 
-* **Live:** `cloud_platform` 1.0.0, `devops_delivery` 1.1.0 and `observability_reliability` 1.1.0, all with web wizards
+* **Live:** `cloud_platform` 1.0.0, `devops_delivery` 1.1.0, `observability_reliability` 1.1.0, `ecommerce_architecture`, `data_integration`, `ai_governance`, `ai_ops_readiness` and `finops` 1.0.0, all with web wizards
   ([ENGINEERING_ASSESSMENTS.md](ENGINEERING_ASSESSMENTS.md)), plus reports and PDF
   ([REPORTS.md](REPORTS.md)) and an optional consultation (migration `0012`).
 * **Preview:** `devops_delivery` 1.0.0 and `observability_reliability` 1.0.0, kept for saved results. The

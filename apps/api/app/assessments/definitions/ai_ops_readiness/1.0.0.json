@@ -1,0 +1,950 @@
+{
+  "key": "ai_ops_readiness",
+  "version": "1.0.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 6
+  },
+  "dimensions": [
+    {
+      "key": "monitoring",
+      "weight": 20
+    },
+    {
+      "key": "quality",
+      "weight": 20
+    },
+    {
+      "key": "change",
+      "weight": 20
+    },
+    {
+      "key": "incidents",
+      "weight": 20
+    },
+    {
+      "key": "cost",
+      "weight": 20
+    }
+  ],
+  "questions": [
+    {
+      "key": "ai_context",
+      "type": "multi_choice",
+      "dimension": "monitoring",
+      "evidence": "context",
+      "options": [
+        {
+          "key": "assistant",
+          "points": 0
+        },
+        {
+          "key": "rag",
+          "points": 0
+        },
+        {
+          "key": "agents",
+          "points": 0
+        },
+        {
+          "key": "extraction",
+          "points": 0
+        }
+      ],
+      "cap": 1,
+      "max_selections": 4
+    },
+    {
+      "key": "ao_uptime",
+      "type": "single_choice",
+      "dimension": "monitoring",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "logs",
+          "points": 1
+        },
+        {
+          "key": "alerts",
+          "points": 2
+        },
+        {
+          "key": "dashboards",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ao_traces",
+      "type": "single_choice",
+      "dimension": "monitoring",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "yes",
+          "points": 2
+        },
+        {
+          "key": "privacy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ao_eval",
+      "type": "single_choice",
+      "dimension": "quality",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "spot",
+          "points": 1
+        },
+        {
+          "key": "test_set",
+          "points": 2
+        },
+        {
+          "key": "automated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ao_feedback",
+      "type": "single_choice",
+      "dimension": "quality",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "in_app",
+          "points": 2
+        },
+        {
+          "key": "loop",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ao_versions",
+      "type": "single_choice",
+      "dimension": "change",
+      "options": [
+        {
+          "key": "live_edits",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "versioned",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ao_provider_changes",
+      "type": "single_choice",
+      "dimension": "change",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "aware",
+          "points": 1
+        },
+        {
+          "key": "plan",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ao_incident",
+      "type": "single_choice",
+      "dimension": "incidents",
+      "options": [
+        {
+          "key": "nothing",
+          "points": 0
+        },
+        {
+          "key": "fix",
+          "points": 1
+        },
+        {
+          "key": "process",
+          "points": 2
+        },
+        {
+          "key": "kill_switch",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ao_fallback",
+      "type": "single_choice",
+      "dimension": "incidents",
+      "options": [
+        {
+          "key": "breaks",
+          "points": 0
+        },
+        {
+          "key": "error",
+          "points": 1
+        },
+        {
+          "key": "fallback",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ao_cost_tracking",
+      "type": "single_choice",
+      "dimension": "cost",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "invoice",
+          "points": 1
+        },
+        {
+          "key": "per_feature",
+          "points": 2
+        },
+        {
+          "key": "per_unit",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ao_limits",
+      "type": "single_choice",
+      "dimension": "cost",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "provider",
+          "points": 1
+        },
+        {
+          "key": "app",
+          "points": 2
+        },
+        {
+          "key": "alerts",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_blind_ai",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "ao_uptime",
+        "options": [
+          "no",
+          "logs"
+        ]
+      },
+      "recommendation": "risk_blind_ai",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "risk_live_edits",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "ao_versions",
+        "options": [
+          "live_edits"
+        ]
+      },
+      "recommendation": "risk_live_edits",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations",
+        "ai_applications"
+      ]
+    },
+    {
+      "key": "risk_unbounded_cost",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "ao_limits",
+        "options": [
+          "no"
+        ]
+      },
+      "recommendation": "risk_unbounded_cost",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "risk_agents_without_kill_switch",
+      "priority": 1,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "ai_context",
+            "options": [
+              "agents"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "ao_incident",
+            "options": [
+              "nothing",
+              "fix"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_agents_without_kill_switch",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations",
+        "ai_agents_automation"
+      ]
+    },
+    {
+      "key": "qw_test_set",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "ao_eval",
+        "options": [
+          "no",
+          "spot"
+        ]
+      },
+      "recommendation": "qw_test_set",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_applications"
+      ]
+    },
+    {
+      "key": "qw_spend_alerts",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "ao_limits",
+        "options": [
+          "no",
+          "provider"
+        ]
+      },
+      "recommendation": "qw_spend_alerts",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "qw_fallback",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "ao_fallback",
+        "options": [
+          "breaks",
+          "error"
+        ]
+      },
+      "recommendation": "qw_fallback",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "rec_monitoring",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "monitoring",
+        "value": 50
+      },
+      "recommendation": "rec_monitoring",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "rec_quality",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "quality",
+        "value": 50
+      },
+      "recommendation": "rec_quality",
+      "horizon": 60,
+      "domains": [
+        "ai_applications",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "rec_change",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "change",
+        "value": 50
+      },
+      "recommendation": "rec_change",
+      "horizon": 60,
+      "domains": [
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "rec_incidents",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "incidents",
+        "value": 50
+      },
+      "recommendation": "rec_incidents",
+      "horizon": 60,
+      "domains": [
+        "managed_operations",
+        "ai_governance"
+      ]
+    },
+    {
+      "key": "rec_cost",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "cost",
+        "value": 50
+      },
+      "recommendation": "rec_cost",
+      "horizon": 60,
+      "domains": [
+        "managed_operations",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "ts_managed_ai_ops",
+      "priority": 20,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "monitoring",
+            "value": 75
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "quality",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "ts_managed_ai_ops",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "managed_operations"
+      ]
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на готовността за AI операции",
+      "intro": "11 въпроса в 5 области: наблюдение, качество, промени, инциденти и разходи. Резултатът показва рискове, бързи подобрения и пътна карта с обяснение защо.",
+      "disclaimer": "Самооценка по вашите отговори. Не се свързваме с вашите системи и не сканираме нищо. Резултатът не е одит, не е правен съвет и не е проверен от независима страна.",
+      "dimensions": {
+        "monitoring": {
+          "title": "Наблюдение",
+          "description": "Наличност, грешки и латентност на AI системите."
+        },
+        "quality": {
+          "title": "Качество на резултатите",
+          "description": "Тестови набори, оценки и обратна връзка."
+        },
+        "change": {
+          "title": "Промени в модели и промптове",
+          "description": "Версии, тестове и връщане назад."
+        },
+        "incidents": {
+          "title": "Инциденти",
+          "description": "Какво става, когато AI сгреши или спре."
+        },
+        "cost": {
+          "title": "Разходи и лимити",
+          "description": "Проследяване на токени, бюджети и лимити."
+        }
+      },
+      "questions": {
+        "ai_context": {
+          "text": "Какви AI системи работят при вас?",
+          "help": "Изберете всичко приложимо. Не променя оценката.",
+          "options": {
+            "assistant": "Асистент или чатбот",
+            "rag": "Търсене в документи (RAG)",
+            "agents": "Агенти, които изпълняват действия",
+            "extraction": "Извличане на данни от документи"
+          }
+        },
+        "ao_uptime": {
+          "text": "Следите ли наличността и грешките на AI системите?",
+          "options": {
+            "no": "Не",
+            "logs": "Има логове, не се следят",
+            "alerts": "Известия при грешки",
+            "dashboards": "Табла и известия за грешки, латентност и отказите на модела"
+          }
+        },
+        "ao_traces": {
+          "text": "Може ли да проследите конкретен отговор до входа и източниците му?",
+          "options": {
+            "no": "Не",
+            "partial": "Частично",
+            "yes": "Да",
+            "privacy": "Да, със защита на личните данни в логовете"
+          }
+        },
+        "ao_eval": {
+          "text": "Как проверявате качеството на отговорите?",
+          "options": {
+            "no": "Не проверяваме",
+            "spot": "Случайни проверки",
+            "test_set": "Тестов набор с реални примери",
+            "automated": "Автоматична оценка при всяка промяна"
+          }
+        },
+        "ao_feedback": {
+          "text": "Събирате ли обратна връзка от потребителите?",
+          "options": {
+            "no": "Не",
+            "informal": "Неформално",
+            "in_app": "В интерфейса",
+            "loop": "В интерфейса и тя води до подобрения"
+          }
+        },
+        "ao_versions": {
+          "text": "Как се променят промптове и модели?",
+          "options": {
+            "live_edits": "Директно в работещата система",
+            "manual": "Ръчно, с бележки",
+            "versioned": "Версионирани, с преглед",
+            "tested": "Версионирани, тествани и с връщане назад"
+          }
+        },
+        "ao_provider_changes": {
+          "text": "Подготвени ли сте за смяна или спиране на модел от доставчика?",
+          "options": {
+            "no": "Не",
+            "aware": "Знаем, че ще се случи",
+            "plan": "Има план",
+            "tested": "Има план и тествана алтернатива"
+          }
+        },
+        "ao_incident": {
+          "text": "Какво правите, когато AI даде грешен или вреден отговор?",
+          "options": {
+            "nothing": "Нищо определено",
+            "fix": "Поправяме при оплакване",
+            "process": "Процес за докладване и поправка",
+            "kill_switch": "Процес и бързо изключване на функцията"
+          }
+        },
+        "ao_fallback": {
+          "text": "Какво става, ако AI доставчикът не отговаря?",
+          "options": {
+            "breaks": "Функцията спира",
+            "error": "Показваме грешка",
+            "fallback": "Резервен вариант (човек или по-прост режим)",
+            "tested": "Тестван резервен вариант"
+          }
+        },
+        "ao_cost_tracking": {
+          "text": "Следите ли разхода за токени и заявки?",
+          "options": {
+            "no": "Не",
+            "invoice": "Само по фактурата",
+            "per_feature": "По функции",
+            "per_unit": "По функции и на единица (заявка, клиент)"
+          }
+        },
+        "ao_limits": {
+          "text": "Има ли лимити за разходите?",
+          "options": {
+            "no": "Не",
+            "provider": "Само лимит при доставчика",
+            "app": "Лимити и в приложението",
+            "alerts": "Лимити и известия при отклонение"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_blind_ai": {
+          "title": "AI работи без наблюдение",
+          "description": "Грешки, откази и бавни отговори остават незабелязани, докато потребител не се оплаче."
+        },
+        "risk_live_edits": {
+          "title": "Промени директно в работеща система",
+          "description": "Промяна в промпт без версия и тест може тихо да влоши всички отговори."
+        },
+        "risk_unbounded_cost": {
+          "title": "Неограничени разходи",
+          "description": "Цикъл или злоупотреба могат да изразходват бюджета за часове."
+        },
+        "risk_agents_without_kill_switch": {
+          "title": "Агенти без бързо изключване",
+          "description": "Агент, който изпълнява действия, трябва да може да бъде спрян веднага."
+        },
+        "qw_test_set": {
+          "title": "Тестов набор от 30–50 реални примера",
+          "description": "Съберете реални въпроси с очаквани отговори и ги пускайте при всяка промяна."
+        },
+        "qw_spend_alerts": {
+          "title": "Лимит и известие за разходите",
+          "description": "Дневен лимит в приложението и известие при необичаен разход."
+        },
+        "qw_fallback": {
+          "title": "Резервен режим",
+          "description": "При недостъпен модел: предаване към човек или по-прост режим с ясно съобщение."
+        },
+        "rec_monitoring": {
+          "title": "Наблюдение на AI системите",
+          "description": "Табла и известия за грешки, латентност и откази, с проследим вход и източници."
+        },
+        "rec_quality": {
+          "title": "Оценка на качеството",
+          "description": "Тестови набори, автоматична оценка и обратна връзка, която води до промени."
+        },
+        "rec_change": {
+          "title": "Управлявани промени",
+          "description": "Версии на промптове и модели, тест преди пускане и връщане назад."
+        },
+        "rec_incidents": {
+          "title": "Готовност за инциденти",
+          "description": "Процес за докладване, бързо изключване и тестван резервен режим."
+        },
+        "rec_cost": {
+          "title": "Контрол на разходите",
+          "description": "Разход по функции и на единица, лимити и известия."
+        },
+        "ts_managed_ai_ops": {
+          "title": "Непрекъснато подобрение",
+          "description": "Редовен цикъл: данни от работа → оценка → промяна → наблюдение."
+        }
+      }
+    },
+    "en": {
+      "title": "AI Operations Readiness Assessment",
+      "intro": "11 questions across 5 areas: monitoring, quality, changes, incidents and cost. The result shows risks, quick wins and a roadmap with the reason why.",
+      "disclaimer": "A self-assessment based on your answers. We do not connect to your systems and scan nothing. The result is not an audit, not legal advice and has not been independently verified.",
+      "dimensions": {
+        "monitoring": {
+          "title": "Monitoring",
+          "description": "Availability, errors and latency of AI systems."
+        },
+        "quality": {
+          "title": "Output quality",
+          "description": "Test sets, evaluations and feedback."
+        },
+        "change": {
+          "title": "Model and prompt changes",
+          "description": "Versions, tests and rollback."
+        },
+        "incidents": {
+          "title": "Incidents",
+          "description": "What happens when AI is wrong or stops."
+        },
+        "cost": {
+          "title": "Cost and limits",
+          "description": "Token tracking, budgets and limits."
+        }
+      },
+      "questions": {
+        "ai_context": {
+          "text": "What AI systems do you run?",
+          "help": "Select all that apply. It does not change the score.",
+          "options": {
+            "assistant": "An assistant or chatbot",
+            "rag": "Document search (RAG)",
+            "agents": "Agents that take actions",
+            "extraction": "Data extraction from documents"
+          }
+        },
+        "ao_uptime": {
+          "text": "Do you monitor availability and errors of AI systems?",
+          "options": {
+            "no": "No",
+            "logs": "There are logs, not watched",
+            "alerts": "Alerts on errors",
+            "dashboards": "Dashboards and alerts for errors, latency and model refusals"
+          }
+        },
+        "ao_traces": {
+          "text": "Can you trace a specific answer back to its input and sources?",
+          "options": {
+            "no": "No",
+            "partial": "Partly",
+            "yes": "Yes",
+            "privacy": "Yes, with personal data protected in the logs"
+          }
+        },
+        "ao_eval": {
+          "text": "How do you check answer quality?",
+          "options": {
+            "no": "We do not",
+            "spot": "Spot checks",
+            "test_set": "A test set of real examples",
+            "automated": "Automated evaluation on every change"
+          }
+        },
+        "ao_feedback": {
+          "text": "Do you collect feedback from users?",
+          "options": {
+            "no": "No",
+            "informal": "Informally",
+            "in_app": "In the interface",
+            "loop": "In the interface, and it leads to improvements"
+          }
+        },
+        "ao_versions": {
+          "text": "How are prompts and models changed?",
+          "options": {
+            "live_edits": "Directly in the live system",
+            "manual": "By hand, with notes",
+            "versioned": "Versioned, reviewed",
+            "tested": "Versioned, tested and with rollback"
+          }
+        },
+        "ao_provider_changes": {
+          "text": "Are you prepared for a provider changing or retiring a model?",
+          "options": {
+            "no": "No",
+            "aware": "We know it will happen",
+            "plan": "There is a plan",
+            "tested": "There is a plan and a tested alternative"
+          }
+        },
+        "ao_incident": {
+          "text": "What do you do when AI gives a wrong or harmful answer?",
+          "options": {
+            "nothing": "Nothing defined",
+            "fix": "We fix it on complaint",
+            "process": "A process to report and fix",
+            "kill_switch": "A process and a quick way to switch the feature off"
+          }
+        },
+        "ao_fallback": {
+          "text": "What happens if the AI provider does not respond?",
+          "options": {
+            "breaks": "The feature breaks",
+            "error": "We show an error",
+            "fallback": "A fallback (a person or a simpler mode)",
+            "tested": "A tested fallback"
+          }
+        },
+        "ao_cost_tracking": {
+          "text": "Do you track spend on tokens and requests?",
+          "options": {
+            "no": "No",
+            "invoice": "Only from the invoice",
+            "per_feature": "Per feature",
+            "per_unit": "Per feature and per unit (request, customer)"
+          }
+        },
+        "ao_limits": {
+          "text": "Are there spending limits?",
+          "options": {
+            "no": "No",
+            "provider": "Only a provider limit",
+            "app": "Limits in the application too",
+            "alerts": "Limits and alerts on anomalies"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_blind_ai": {
+          "title": "AI runs unmonitored",
+          "description": "Errors, refusals and slow answers go unnoticed until a user complains."
+        },
+        "risk_live_edits": {
+          "title": "Edits directly in the live system",
+          "description": "An unversioned, untested prompt change can silently degrade every answer."
+        },
+        "risk_unbounded_cost": {
+          "title": "Unbounded spend",
+          "description": "A loop or abuse can burn the budget within hours."
+        },
+        "risk_agents_without_kill_switch": {
+          "title": "Agents without a kill switch",
+          "description": "An agent that takes actions must be stoppable at once."
+        },
+        "qw_test_set": {
+          "title": "A test set of 30–50 real examples",
+          "description": "Collect real questions with expected answers and run them on every change."
+        },
+        "qw_spend_alerts": {
+          "title": "A spending cap and alert",
+          "description": "A daily cap in the application and an alert on unusual spend."
+        },
+        "qw_fallback": {
+          "title": "A fallback mode",
+          "description": "When the model is unavailable: hand over to a person or a simpler mode with a clear message."
+        },
+        "rec_monitoring": {
+          "title": "Monitoring of AI systems",
+          "description": "Dashboards and alerts for errors, latency and refusals, with traceable inputs and sources."
+        },
+        "rec_quality": {
+          "title": "Quality evaluation",
+          "description": "Test sets, automated evaluation and feedback that leads to changes."
+        },
+        "rec_change": {
+          "title": "Managed changes",
+          "description": "Versions of prompts and models, a test before release and rollback."
+        },
+        "rec_incidents": {
+          "title": "Incident readiness",
+          "description": "A reporting process, a quick switch-off and a tested fallback."
+        },
+        "rec_cost": {
+          "title": "Cost control",
+          "description": "Spend per feature and per unit, limits and alerts."
+        },
+        "ts_managed_ai_ops": {
+          "title": "Continuous improvement",
+          "description": "A regular loop: production data → evaluation → change → monitoring."
+        }
+      }
+    }
+  }
+}

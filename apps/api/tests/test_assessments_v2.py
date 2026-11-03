@@ -292,6 +292,49 @@ def test_observability_keeps_its_cross_question_check(client):
     assert response.status_code == 422 and response.json()["errors"][0]["type"] == "inconsistent"
 
 
+FIVE = ["ecommerce_architecture", "data_integration", "ai_governance", "ai_ops_readiness", "finops"]
+
+
+@pytest.mark.parametrize("key", FIVE)
+def test_new_assessments_score_explain_and_stay_honest(key):
+    definition = registry().current(key)
+    assert (definition.version, definition.status, len(definition.dimensions)) == ("1.0.0", "live", 5)
+    context = [q for q in definition.questions if q.evidence == "context"]
+    assert len(context) == 1 and not context[0].scored
+    first_context_option = context[0].options[0].key
+    for index, (overall, band) in ((0, (0, "initial")), (3, (100, "optimised"))):
+        answers, result = service.assess(
+            definition, answers_at(definition, index, **{context[0].key: [first_context_option]})
+        )
+        assert (result.overall, result.band) == (overall, band)
+        view = present_result(definition, result, "en", answers)
+        assert all(f["because"] for f in view["recommendations"]), key
+        assert all(f["horizon"] in (30, 60, 90, None) for f in view["recommendations"])
+        if index == 0:
+            assert {"risk", "quick_win", "recommendation"} <= {f["kind"] for f in view["recommendations"]}
+        else:
+            assert {f["kind"] for f in view["recommendations"]} <= {"target_state", "context"}
+    # Context never moves the score.
+    base = answers_at(definition, 2)
+    scores = {
+        service.assess(definition, dict(base, **{context[0].key: [o.key]}))[1].overall for o in context[0].options
+    }
+    assert len(scores) == 1
+    for locale in ("bg", "en"):
+        texts = definition.texts[locale].model_dump_json().lower()
+        assert ("not legal advice" in texts) if locale == "en" else ("не е правен съвет" in texts)
+        assert "guarantee" not in texts and "certif" not in texts and "гаранти" not in texts
+
+
+def test_the_ai_act_note_never_states_obligations():
+    definition = registry().current("ai_governance")
+    answers, result = service.assess(definition, answers_at(definition, 2, use_context=["decisions"]))
+    note = next(
+        f for f in present_result(definition, result, "en", answers)["recommendations"] if f["key"] == "ctx_ai_act"
+    )
+    assert "does not determine your obligations" in note["description"]
+
+
 # --------------------------------------------------------------------------- API
 
 
