@@ -32,6 +32,7 @@ export const en: Dictionary = {
     areaServed: ["Bulgaria", "European Union"],
     services: "Services",
     company: "Company",
+    resources: "Resources",
     legal: "Legal",
     privacy: "Privacy",
     cookies: "Cookies",

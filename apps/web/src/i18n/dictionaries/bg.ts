@@ -29,6 +29,7 @@ export const bg = {
     areaServed: ["България", "Европейски съюз"],
     services: "Услуги",
     company: "Компания",
+    resources: "Ресурси",
     legal: "Правна информация",
     privacy: "Поверителност",
     cookies: "Бисквитки",
