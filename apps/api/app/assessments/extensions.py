@@ -72,6 +72,4 @@ class DevopsEvidence(AssessmentExtension):
         return {"metrics_provided": len(provided), "metrics_evidence": evidence}
 
 
-EXTENSIONS: dict[str, AssessmentExtension] = {
-    ext.name: ext for ext in (ObservabilitySignals(), DevopsEvidence())
-}
+EXTENSIONS: dict[str, AssessmentExtension] = {ext.name: ext for ext in (ObservabilitySignals(), DevopsEvidence())}

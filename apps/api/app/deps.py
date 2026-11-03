@@ -74,19 +74,18 @@ def require_session(request: Request, db: DbSession) -> AdminContext:
         raise _unauthorized()
     session = db.scalar(select(AdminSession).where(AdminSession.token_hash == hash_token(token)))
     now = utcnow()
-    if (
-        session is None
-        or session.revoked_at is not None
-        or session.expires_at <= now
-        or not session.user.is_active
-    ):
+    if session is None or session.revoked_at is not None or session.expires_at <= now or not session.user.is_active:
         raise _unauthorized()
 
     if now - session.last_seen_at > timedelta(minutes=settings.session_idle_minutes):
         session.revoked_at = now
         audit.record(
-            db, "auth.session_idle_timeout", actor=session.user, entity_type="admin_user",
-            entity_id=str(session.user_id), ip_hash=client_ip_hash(request),
+            db,
+            "auth.session_idle_timeout",
+            actor=session.user,
+            entity_type="admin_user",
+            entity_id=str(session.user_id),
+            ip_hash=client_ip_hash(request),
         )
         db.commit()
         raise _unauthorized("Сесията изтече поради неактивност. Моля, влезте отново.", "session_expired")

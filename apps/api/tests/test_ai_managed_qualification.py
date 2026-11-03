@@ -89,16 +89,27 @@ def test_level_bands_are_fixed():
     assert qualify(ai_details(agents_count="1", support_interests=["monitoring"]))["suggested_level"] == "essential"
     # 2–5 agents (1) + weekly changes (2) = 3 → managed.
     assert qualify(ai_details(agents_count="2_5", change_frequency="weekly"))["suggested_level"] == "managed"
-    assert qualify(ai_details(agents_count="over_20", response_needs="faster", support_interests=["full_managed"]))[
-        "suggested_level"
-    ] == "advanced"
+    assert (
+        qualify(ai_details(agents_count="over_20", response_needs="faster", support_interests=["full_managed"]))[
+            "suggested_level"
+        ]
+        == "advanced"
+    )
     assert qualify(ai_details(desired_level="unsure"))["matches_desired"] is None
 
 
 @pytest.mark.parametrize(
     "field",
-    ["desired_level", "production_status", "technical_owner", "access_readiness", "test_environment",
-     "data_sensitivity", "change_frequency", "response_needs"],
+    [
+        "desired_level",
+        "production_status",
+        "technical_owner",
+        "access_readiness",
+        "test_environment",
+        "data_sensitivity",
+        "change_frequency",
+        "response_needs",
+    ],
 )
 def test_unknown_qualification_values_are_rejected(client, db, field):
     response = client.post("/api/public/leads", json=lead_with(ai_details(**{field: "24_7"})))

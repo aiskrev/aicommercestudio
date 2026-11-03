@@ -57,9 +57,7 @@ def _block(block, s, width: float) -> list:
         return [_p(block.text, style), Spacer(1, 2 * mm)]
     if isinstance(block, Bullets):
         items = [ListItem(_p(item, s["body"]), leftIndent=10) for item in block.items]
-        bullets = ListFlowable(
-            items, bulletType="bullet", start="•", leftIndent=10, bulletFontName=s["body"].fontName
-        )
+        bullets = ListFlowable(items, bulletType="bullet", start="•", leftIndent=10, bulletFontName=s["body"].fontName)
         return [bullets, Spacer(1, 2 * mm)]
     if isinstance(block, Table):
         columns = len(block.headers)

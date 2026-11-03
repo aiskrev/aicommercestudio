@@ -336,7 +336,15 @@ PATTERNS: dict[str, ProcessPattern] = {
             key="documents",
             label="data entry from documents",
             keywords=(
-                "data entry", "manual entry", "copy", "document", "pdf", "contract", "scan", "paper form", "retyp"
+                "data entry",
+                "manual entry",
+                "copy",
+                "document",
+                "pdf",
+                "contract",
+                "scan",
+                "paper form",
+                "retyp",
             ),
             uses_ai=True,
             opportunities=[

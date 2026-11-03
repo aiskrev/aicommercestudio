@@ -256,9 +256,7 @@ def restore_entity(
 
 
 @router.delete("/entities/{entity_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_entity(
-    entity_id: uuid.UUID, ctx: CataloguePublisher, db: DbSession, if_match: IfMatch = None
-) -> Response:
+def delete_entity(entity_id: uuid.UUID, ctx: CataloguePublisher, db: DbSession, if_match: IfMatch = None) -> Response:
     """Delete a draft that was never published and that nothing links to; otherwise archive it."""
     entity = _entity(db, entity_id)
     _check_revision(entity, if_match)

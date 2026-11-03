@@ -38,13 +38,15 @@ def test_migration_0002_backfills_existing_leads():
     command.upgrade(cfg, "0001")
     engine = create_engine(url)
     with engine.begin() as conn:
-        conn.execute(text(
-            "INSERT INTO leads (id, service, name, company, email, message, status, source, "
-            "privacy_acknowledged_at, privacy_notice_version, marketing_consent, created_at, updated_at) "
-            "VALUES (gen_random_uuid(), 'seo', 'Стар', 'Стара ООД', 'old@example.com', "
-            "'Стар запис отпреди миграцията', "
-            "'NEW', 'website_contact_form', now(), 'v1', false, now(), now())"
-        ))
+        conn.execute(
+            text(
+                "INSERT INTO leads (id, service, name, company, email, message, status, source, "
+                "privacy_acknowledged_at, privacy_notice_version, marketing_consent, created_at, updated_at) "
+                "VALUES (gen_random_uuid(), 'seo', 'Стар', 'Стара ООД', 'old@example.com', "
+                "'Стар запис отпреди миграцията', "
+                "'NEW', 'website_contact_form', now(), 'v1', false, now(), now())"
+            )
+        )
     command.upgrade(cfg, "head")
     with engine.connect() as conn:
         row = conn.execute(text("SELECT service, submitted_service, inquiry_type, platform FROM leads")).one()
@@ -62,16 +64,20 @@ def test_migration_0009_keeps_existing_data_seeds_and_rolls_back():
     command.upgrade(cfg, "0008")
     engine = create_engine(url)
     with engine.begin() as conn:
-        conn.execute(text(
-            "INSERT INTO leads (id, service, submitted_service, name, company, email, message, status, source, "
-            "privacy_acknowledged_at, privacy_notice_version, marketing_consent, created_at, updated_at) "
-            "VALUES (gen_random_uuid(), 'ai_managed', 'ai_managed', 'Стар', 'Стара ООД', 'old@example.com', "
-            "'Запис отпреди каталога', 'QUALIFIED', 'website_contact_form', now(), 'v1', false, now(), now())"
-        ))
-        conn.execute(text(
-            "INSERT INTO ops_organizations (id, slug, name, created_at) "
-            "VALUES (gen_random_uuid(), 'acme', 'Acme', now())"
-        ))
+        conn.execute(
+            text(
+                "INSERT INTO leads (id, service, submitted_service, name, company, email, message, status, source, "
+                "privacy_acknowledged_at, privacy_notice_version, marketing_consent, created_at, updated_at) "
+                "VALUES (gen_random_uuid(), 'ai_managed', 'ai_managed', 'Стар', 'Стара ООД', 'old@example.com', "
+                "'Запис отпреди каталога', 'QUALIFIED', 'website_contact_form', now(), 'v1', false, now(), now())"
+            )
+        )
+        conn.execute(
+            text(
+                "INSERT INTO ops_organizations (id, slug, name, created_at) "
+                "VALUES (gen_random_uuid(), 'acme', 'Acme', now())"
+            )
+        )
     before = _row_snapshot(engine)
 
     command.upgrade(cfg, "head")
@@ -99,14 +105,19 @@ def test_migration_0010_turns_unsnapshotted_rows_into_drafts_and_the_seed_republ
     engine = create_engine(url)
     service_id = entity_id("service", "seo")
     with engine.begin() as conn:
-        conn.execute(text(
-            "INSERT INTO admin_users (id, email, full_name, password_hash, is_active, created_at, failed_login_count) "
-            "VALUES (gen_random_uuid(), 'old.admin@example.com', 'Old', 'x', true, now(), 0)"
-        ))
-        conn.execute(text(
-            "INSERT INTO catalogue_entities (id, entity_type, key, status, revision, created_at, updated_at) "
-            "VALUES (:id, 'service', 'seo', 'published', 1, now(), now())"
-        ), {"id": service_id})
+        conn.execute(
+            text(
+                "INSERT INTO admin_users (id, email, full_name, password_hash, is_active, created_at,"
+                " failed_login_count) VALUES (gen_random_uuid(), 'old.admin@example.com', 'Old', 'x', true, now(), 0)"
+            )
+        )
+        conn.execute(
+            text(
+                "INSERT INTO catalogue_entities (id, entity_type, key, status, revision, created_at, updated_at) "
+                "VALUES (:id, 'service', 'seo', 'published', 1, now(), now())"
+            ),
+            {"id": service_id},
+        )
     command.upgrade(cfg, "0010")
     with engine.connect() as conn:
         assert conn.execute(text("SELECT role FROM admin_users")).scalar() == "admin"
@@ -118,8 +129,15 @@ def test_migration_0010_turns_unsnapshotted_rows_into_drafts_and_the_seed_republ
         assert catalogue_problems(session) == []
     command.downgrade(cfg, "0009")
     with engine.connect() as conn:
-        assert conn.execute(text("SELECT count(*) FROM catalogue_entities WHERE status = 'published' "
-            "AND entity_type IN ('domain', 'service')")).scalar() == 19
+        assert (
+            conn.execute(
+                text(
+                    "SELECT count(*) FROM catalogue_entities WHERE status = 'published' "
+                    "AND entity_type IN ('domain', 'service')"
+                )
+            ).scalar()
+            == 19
+        )
         assert "role" not in {c["name"] for c in inspect(engine).get_columns("admin_users")}
     engine.dispose()
 

@@ -63,9 +63,7 @@ def integration_status(settings: Settings) -> list[IntegrationInfo]:
             "woocommerce",
             "WooCommerce REST API",
             bool(
-                settings.woocommerce_url
-                and settings.woocommerce_consumer_key
-                and settings.woocommerce_consumer_secret
+                settings.woocommerce_url and settings.woocommerce_consumer_key and settings.woocommerce_consumer_secret
             ),
             _PREPARED,
         ),

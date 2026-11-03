@@ -235,7 +235,7 @@ class AdvisorRequest(BaseModel):
     def _contract(self) -> "AdvisorRequest":
         if self.contract_version == "1" and (self.context is not None or self.include_roadmap):
             raise PydanticCustomError(
-                "contract_version", "Полетата context и include_roadmap изискват contract_version \"2\"."
+                "contract_version", 'Полетата context и include_roadmap изискват contract_version "2".'
             )
         if self.contract_version == "2" and self.context is None:
             raise PydanticCustomError("context_required", "Версия 2 изисква контекст на процеса.")

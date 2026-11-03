@@ -458,8 +458,18 @@ def test_1_0_0_results_of_the_twelve_area_assessments_still_rescore(key):
 def test_governance_1_1_0_gap_analysis_documents_and_review_workflow():
     definition = registry().current("ai_governance")
     assert definition.dimension_keys == (
-        "inventory", "classification", "vendors", "privacy", "threat_modeling", "injection",
-        "oversight", "evaluation", "traceability", "incidents", "change", "retention",
+        "inventory",
+        "classification",
+        "vendors",
+        "privacy",
+        "threat_modeling",
+        "injection",
+        "oversight",
+        "evaluation",
+        "traceability",
+        "incidents",
+        "change",
+        "retention",
     )
     answers, weak = service.assess(definition, answers_at(definition, 0, use_context=["decisions"]))
     view = present_result(definition, weak, "en", answers)

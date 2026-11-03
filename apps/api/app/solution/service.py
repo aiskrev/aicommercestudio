@@ -38,7 +38,10 @@ def create_enquiry(
     band = design["complexity"]["band"]  # type: ignore[index]
     agents = design["agents"]
     summary_text = _MESSAGE[locale].format(
-        workflow=config.workflow, agents=len(agents), band=band, approval=config.approval  # type: ignore[arg-type]
+        workflow=config.workflow,
+        agents=len(agents),
+        band=band,
+        approval=config.approval,  # type: ignore[arg-type]
     )
     lead = Lead(
         service=ServiceKey.AI_AGENTS.value,

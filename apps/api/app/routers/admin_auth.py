@@ -77,8 +77,14 @@ def login(payload: LoginIn, request: Request, response: Response, db: DbSession,
 
     if user is not None and user.locked_until is not None and user.locked_until > now:
         # Locked accounts answer exactly like the rate limiter (no account enumeration).
-        audit.record(db, "auth.login_blocked", actor_label="anonymous", entity_type="admin_user",
-                     entity_id=str(user.id), ip_hash=ip_hash)
+        audit.record(
+            db,
+            "auth.login_blocked",
+            actor_label="anonymous",
+            entity_type="admin_user",
+            entity_id=str(user.id),
+            ip_hash=ip_hash,
+        )
         db.commit()
         raise rate_limited(int((user.locked_until - now).total_seconds()) + 1)
 
@@ -90,9 +96,15 @@ def login(payload: LoginIn, request: Request, response: Response, db: DbSession,
             if user.failed_login_count >= settings.login_lockout_threshold:
                 user.locked_until = now + timedelta(seconds=lockout_seconds)
                 user.failed_login_count = 0
-                audit.record(db, "auth.account_locked", actor_label="system", entity_type="admin_user",
-                             entity_id=str(user.id), details={"minutes": settings.login_lockout_minutes},
-                             ip_hash=ip_hash)
+                audit.record(
+                    db,
+                    "auth.account_locked",
+                    actor_label="system",
+                    entity_type="admin_user",
+                    entity_id=str(user.id),
+                    details={"minutes": settings.login_lockout_minutes},
+                    ip_hash=ip_hash,
+                )
         else:
             # Unknown e-mails get the same lockout behaviour, tracked in memory.
             result = limiter.hit(f"login-unknown:{email}", settings.login_lockout_threshold, lockout_seconds)
@@ -131,8 +143,9 @@ def login(payload: LoginIn, request: Request, response: Response, db: DbSession,
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 def logout(ctx: Staff, response: Response, db: DbSession, settings: AppSettings) -> Response:
     ctx.session.revoked_at = utcnow()
-    audit.record(db, "auth.logout", actor=ctx.user, entity_type="admin_user", entity_id=str(ctx.user.id),
-                 ip_hash=ctx.ip_hash)
+    audit.record(
+        db, "auth.logout", actor=ctx.user, entity_type="admin_user", entity_id=str(ctx.user.id), ip_hash=ctx.ip_hash
+    )
     db.commit()
     response.status_code = status.HTTP_204_NO_CONTENT
     _clear_session_cookies(response, settings)
@@ -148,8 +161,15 @@ def logout_all(ctx: Staff, response: Response, db: DbSession, settings: AppSetti
         .where(AdminSession.user_id == ctx.user.id, AdminSession.revoked_at.is_(None))
         .values(revoked_at=now)
     )
-    audit.record(db, "auth.logout_all", actor=ctx.user, entity_type="admin_user", entity_id=str(ctx.user.id),
-                 details={"sessions_revoked": result.rowcount}, ip_hash=ctx.ip_hash)
+    audit.record(
+        db,
+        "auth.logout_all",
+        actor=ctx.user,
+        entity_type="admin_user",
+        entity_id=str(ctx.user.id),
+        details={"sessions_revoked": result.rowcount},
+        ip_hash=ctx.ip_hash,
+    )
     db.commit()
     _clear_session_cookies(response, settings)
     return LogoutAllOut(sessions_revoked=result.rowcount)

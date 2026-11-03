@@ -35,9 +35,7 @@ SUBMITTED_MESSAGES = {
     "en": "Thank you! We have received your results and will get back to you during business hours.",
 }
 # A user-facing message, not a credential.
-_TOKEN_ERROR = (
-    "Формулярът е изпратен твърде бързо или е изтекъл. Моля, опитайте отново след няколко секунди."  # noqa: S105
-)
+_TOKEN_ERROR = "Формулярът е изпратен твърде бързо или е изтекъл. Моля, опитайте отново след няколко секунди."  # noqa: S105
 
 
 def report_rate_limit(request: Request) -> None:
