@@ -16,6 +16,54 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/ops-platform-and-reference-content` (from `main` after PR #38, 2026-11-03): changes on this branch:
+
+* **Ops security foundation** ([AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md) §3, §11a).
+  * Migration `0013` adds the restricted runtime role `acs_app_runtime` (NOLOGIN, NOBYPASSRLS, owns
+    nothing).
+  * Every tenant table has PostgreSQL row-level security, with transaction-local tenant context
+    (`SET LOCAL ROLE` + `set_config`).
+  * New tables use composite foreign keys.
+  * Approved versions and the timelines are immutable.
+  * The permission matrix now has separation of duties, there are module gates (`OPS_MODULES`) and
+    suspended organisations are fully read-only.
+  * RLS is tested with the restricted role.
+* **Configuration and prompt registry** (§12).
+  * Versioned prompt templates, model references, allow-listed parameters and declared tools.
+  * Lifecycle draft → review → approved → retired; four-eyes approval for sensitive versions; an
+    evaluation is required for production.
+  * Integrity hash, diffs, rollback drafts. Nothing is deployed.
+* **Evaluation suite** (§13). Versioned and locked synthetic datasets, deterministic assertions, a
+  deterministic **simulated** runner labelled everywhere, regression comparison and manual labels.
+  Evaluations never approve anything.
+* **Bounded observability** ([AI_OBSERVABILITY.md](AI_OBSERVABILITY.md)).
+  * Execution metadata without content, from manual imports or synthetic records (demo organisations
+    only).
+  * Versioned rate cards with Decimal costs and missing-rate handling; budgets, threshold rules and
+    retention.
+  * Freshness is always `live: false`.
+  * The OpenTelemetry ingestion contract is designed only, not built.
+* **Incidents and controlled changes** ([AI_OPERATIONS_RUNBOOK.md](AI_OPERATIONS_RUNBOOK.md)).
+  * Fixed state machines with permission-aware steps, optimistic locking and immutable timelines.
+  * A change needs an evaluation of its version and a second person, and a release is recorded only.
+* **Read-only client portal, off by default** ([CLIENT_PORTAL.md](CLIENT_PORTAL.md)).
+  * Separate identities, invitation, password + enforced TOTP, sessions with idle expiry, CSRF,
+    lockout and staff-assisted recovery.
+  * The tenant comes only from the session; data views are audited; nothing is written.
+* **Staff UI.** The `/admin/operations` tabs (BG/EN): Registry, Evaluations, Observability, Incidents,
+  Changes, Client access.
+* **Reference content** ([REFERENCE_CONTENT.md](REFERENCE_CONTENT.md)): 20 fictional reference
+  scenarios and 11 integration patterns (BG/EN) with an honest status scale, category navigation,
+  search, the sitemap and content governance.
+* **No deployment and no production migration applied.** Migration `0013` creates a cluster-wide
+  role, so it needs CREATEROLE in production (see the prerequisites).
+
+Results:
+
+* API: **816 passed**, Ruff clean, docs and OpenAPI in sync (117 paths).
+* Web: **759** unit tests passed; typecheck and lint clean.
+* e2e: full run **167 passed, 5 failed**. Causes: identical BG/EN slugs for three reference pages (the routing redirected them to themselves), and two test selectors. After the fix — distinct slugs, plus a unit test that requires them — the affected specs (`reference`, `ops-platform`, `links`, `seo`) were re-run: **16 passed**.
+
 Branch `feature/solution-builder-managed-v2` (from `main` @ `a371f5f`, 2026-11-03): changes on this branch:
 
 * **Agent library.** It now has 12 archetypes: the 10 team roles plus a Proposal Generation Assistant

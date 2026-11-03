@@ -11,6 +11,7 @@
  */
 
 import { AGENT_SLUGS } from "@/lib/agent-slugs";
+import { PATTERN_SLUGS, SCENARIO_SLUGS } from "@/lib/reference-slugs";
 import { TOOL_PAGE_SLUGS } from "@/lib/tool-slugs";
 
 export const locales = ["bg", "en"] as const;
@@ -48,6 +49,8 @@ const EN_SEGMENTS: Record<string, string> = {
   biskvitki: "cookies",
   "obshti-usloviya": "terms",
   "ai-agenti": "ai-agents",
+  "referentni-stsenarii": "reference-scenarios",
+  "integratsionni-modeli": "integration-patterns",
 };
 /** Second-level segments (e.g. `/statii/tema/<topic>`). */
 const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
@@ -57,6 +60,9 @@ const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
   instrumenti: Object.fromEntries(Object.values(TOOL_PAGE_SLUGS).map(({ bg, en }) => [bg, en])),
   // Agent library pages (lib/agent-library.ts → AGENT_SLUGS).
   "ai-agenti": Object.fromEntries(Object.values(AGENT_SLUGS).map(({ bg, en }) => [bg, en])),
+  // Reference scenarios and integration patterns (lib/reference-slugs.ts).
+  "referentni-stsenarii": Object.fromEntries(Object.values(SCENARIO_SLUGS).map(({ bg, en }) => [bg, en])),
+  "integratsionni-modeli": Object.fromEntries(Object.values(PATTERN_SLUGS).map(({ bg, en }) => [bg, en])),
 };
 
 const BG_SEGMENTS = Object.fromEntries(Object.entries(EN_SEGMENTS).map(([bg, en]) => [en, bg]));

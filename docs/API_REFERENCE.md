@@ -450,6 +450,79 @@ Design, isolation and RBAC: [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md).
 | DELETE | `/api/ops/organizations/{organization_id}/members/{membership_id}` | `members.write` + rank rule | remove a member → 204. 409 `ops_last_owner` |
 | GET | `/api/ops/organizations/{organization_id}/audit` | `audit.read` | this organisation's `ops.*` audit entries (`limit` ≤ 200) |
 
+## AI operations platform (staff-only)
+
+See [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md), [AI_OBSERVABILITY.md](AI_OBSERVABILITY.md) and [AI_OPERATIONS_RUNBOOK.md](AI_OPERATIONS_RUNBOOK.md). Every route binds the request to the organisation under row-level security; a switched-off module (`OPS_MODULES`) answers 404; writes in a suspended organisation answer 403 `ops_suspended`.
+
+| Method | Path | Permission | Description |
+| --- | --- | --- | --- |
+| GET | `/api/ops/organizations/{organization_id}/agents/{agent_id}/versions` | `registry.read` | versions of an agent, newest first (summary, no prompt) |
+| POST | `/api/ops/organizations/{organization_id}/agents/{agent_id}/versions` | `registry.write` | create a draft → 201: `{content: {prompt_template, provider?, model?, parameters?, tools?}, change_reason, based_on_id?}` or `{rollback_of_id, change_reason}`. 422 for secret-like text, unknown parameter keys, links or code fields in tools, a write tool without `requires_approval` |
+| GET | `/api/ops/organizations/{organization_id}/versions/{version_id}` | `registry.read` | full version with `content_hash`, `integrity_ok` (hash re-verified), `evidence_simulated` |
+| PATCH | `/api/ops/organizations/{organization_id}/versions/{version_id}` | `registry.write` | edit a draft; 409 `ops_version_locked` otherwise |
+| POST | `/api/ops/organizations/{organization_id}/versions/{version_id}/submit` | `registry.write` | draft → in_review |
+| POST | `/api/ops/organizations/{organization_id}/versions/{version_id}/review` | `registry.approve` | `{decision: approve|request_changes, note?, evaluation_run_id?}`. 403 when the author approves a sensitive version; 409 `ops_evaluation_required` for production without a run of this version; approving retires the previous approved version |
+| POST | `/api/ops/organizations/{organization_id}/versions/{version_id}/retire` | `registry.approve` | approved → retired |
+| GET | `/api/ops/organizations/{organization_id}/versions/{version_id}/diff/{other_id}` | `registry.read` | field changes and a unified prompt diff (same agent only) |
+| GET | `/api/ops/organizations/{organization_id}/agents/{agent_id}/datasets` | `evals.read` | dataset versions of an agent |
+| POST | `/api/ops/organizations/{organization_id}/agents/{agent_id}/datasets` | `evals.write` | new dataset version (draft) with cases → 201 |
+| POST | `/api/ops/organizations/{organization_id}/agents/{agent_id}/datasets/templates/{template}` | `evals.write` | new dataset version from a predefined synthetic template (`support_basics`) |
+| GET | `/api/ops/organizations/{organization_id}/datasets/{dataset_id}` | `evals.read` | dataset with its cases |
+| POST | `/api/ops/organizations/{organization_id}/datasets/{dataset_id}/cases` | `evals.write` | add a case to a draft; 409 `ops_dataset_locked` |
+| POST | `/api/ops/organizations/{organization_id}/datasets/{dataset_id}/lock` | `evals.write` | lock the version (needs ≥ 1 case) |
+| POST | `/api/ops/organizations/{organization_id}/datasets/{dataset_id}/runs` | `evals.write` | `{agent_version_id}` → run with results; runner `deterministic_simulated`, `simulated: true`, no model call. 409 `ops_dataset_not_locked` |
+| GET | `/api/ops/organizations/{organization_id}/eval-runs` | `evals.read` | runs; query `agent_version_id`, `dataset_id` |
+| GET | `/api/ops/organizations/{organization_id}/eval-runs/{run_id}` | `evals.read` | run with per-case results and assertion outcomes |
+| GET | `/api/ops/organizations/{organization_id}/eval-runs/{run_id}/compare/{other_id}` | `evals.read` | regressions, fixes, unchanged; same dataset version only |
+| PUT | `/api/ops/organizations/{organization_id}/eval-results/{result_id}/label` | `evals.label` | `{label: pass|fail|needs_review|null}` |
+| POST | `/api/ops/organizations/{organization_id}/observability/import` | `observability.write` | `{records: [...]}` ≤ 200 execution metadata records (no content fields) → `{batch_id, received, inserted, duplicates}`; idempotent by `external_id` |
+| POST | `/api/ops/organizations/{organization_id}/observability/synthetic` | `observability.write` | deterministic synthetic records, demo organisations only (409 `ops_not_demo`) |
+| GET | `/api/ops/organizations/{organization_id}/observability/summary` | `observability.read` | `days` ≤ 365, `group_by` agent|workspace → runs, error rate, categories, tokens, estimated cost per currency, `missing_rate_runs`, `freshness.live=false` |
+| GET | `/api/ops/organizations/{organization_id}/observability/evaluation` | `observability.read` | budget states (month to date) and threshold rules, evaluated on request; nothing is notified |
+| GET | `/api/ops/organizations/{organization_id}/rate-cards` | `observability.read` | versioned rate cards |
+| POST | `/api/ops/organizations/{organization_id}/rate-cards` | `observability.write` | add a rate card version (with its source note) → 201; 409 duplicate version |
+| GET | `/api/ops/organizations/{organization_id}/budgets` | `observability.read` | budgets |
+| POST | `/api/ops/organizations/{organization_id}/budgets` | `observability.write` | add a budget → 201 |
+| GET | `/api/ops/organizations/{organization_id}/threshold-rules` | `observability.read` | threshold rules |
+| POST | `/api/ops/organizations/{organization_id}/threshold-rules` | `observability.write` | add a rule (`error_rate_percent`, `avg_duration_ms`, `tokens`, `estimated_cost`) → 201 |
+| GET | `/api/ops/organizations/{organization_id}/retention` | `observability.read` | retention of execution records and evaluation results (defaults 90 / 365 days) |
+| PUT | `/api/ops/organizations/{organization_id}/retention` | `observability.write` | `{runs_days 7–730, eval_results_days 30–1095}` |
+| GET | `/api/ops/organizations/{organization_id}/incidents` | `incidents.read` | incidents, newest first; query `status`; each with `allowed_transitions` for the caller |
+| POST | `/api/ops/organizations/{organization_id}/incidents` | `incidents.write` | record an incident → 201 (`title`, `severity`, `impact`, `agent_id?`, `owner_user_id?` (a member), `client_summary?`, `note?`) |
+| GET | `/api/ops/organizations/{organization_id}/incidents/{incident_id}` | `incidents.read` | incident with its append-only timeline |
+| PATCH | `/api/ops/organizations/{organization_id}/incidents/{incident_id}` | `incidents.write` | `expected_version` + severity, owner, client summary, rollback version; 409 `ops_stale` |
+| POST | `/api/ops/organizations/{organization_id}/incidents/{incident_id}/transition` | per step | `{to, expected_version, note?}`: write steps need `incidents.write`, `reviewed` needs `incidents.review`; resolved/reviewed need a note; 409 `ops_transition` / `ops_stale`; suspended → 403 |
+| POST | `/api/ops/organizations/{organization_id}/incidents/{incident_id}/notes` | `incidents.write` | `{body, kind: note|evidence}` plain text (markup and secrets refused) → 204 |
+| GET | `/api/ops/organizations/{organization_id}/changes` | `changes.read` | changes with `allowed_transitions` |
+| POST | `/api/ops/organizations/{organization_id}/changes` | `changes.write` | propose a change for an agent version → 201 |
+| GET | `/api/ops/organizations/{organization_id}/changes/{change_id}` | `changes.read` | change with timeline and `evidence_simulated` |
+| POST | `/api/ops/organizations/{organization_id}/changes/{change_id}/transition` | per step | `{to, expected_version, note?, evaluation_run_id?, release_note?}`: human_approval needs a run of the change's version; approved/rejected need `changes.approve` and a person other than the author; approved needs the registry version approved; released needs a release note (recorded, nothing deployed) |
+| POST | `/api/ops/organizations/{organization_id}/changes/{change_id}/notes` | `changes.write` | plain-text note or evidence → 204 |
+| GET | `/api/ops/organizations/{organization_id}/portal-users` | `portal_users.read` | client accounts (404 while `CLIENT_PORTAL_ENABLED` is off) |
+| POST | `/api/ops/organizations/{organization_id}/portal-users` | `portal_users.write` | invite a client user → 201 with a one-time `/portal/activate#<token>` path; 409 `ops_demo_portal` for demo organisations |
+| POST | `/api/ops/organizations/{organization_id}/portal-users/{user_id}/recovery` | `portal_users.write` | one-time recovery link (resets password and second factor) |
+| POST | `/api/ops/organizations/{organization_id}/portal-users/{user_id}/disable` | `portal_users.write` | disable and revoke sessions |
+
+## Client portal (read-only, off by default)
+
+Only while `CLIENT_PORTAL_ENABLED=true` (404 otherwise). Separate client identities, cookies `acs_portal_session` / `acs_portal_csrf`; the organisation always comes from the session. See [CLIENT_PORTAL.md](CLIENT_PORTAL.md).
+
+| Method | Path | Description |
+| --- | --- | --- |
+| POST | `/api/portal/activate` | `{token, password}` → `{otpauth_uri, secret}` (enrolment); 400 `portal_token_invalid`, 422 weak password |
+| POST | `/api/portal/activate/confirm` | `{token, code}` → 204; activates the account and consumes the token |
+| POST | `/api/portal/recover` | `{token, password}` → new TOTP enrolment; revokes sessions |
+| POST | `/api/portal/recover/confirm` | `{token, code}` → 204 |
+| POST | `/api/portal/login` | `{email, password}` → session cookie (second factor pending); one 401 `portal_invalid_login` for every failure; lockout after 5 failures |
+| POST | `/api/portal/login/mfa` | `{code}` + CSRF → session verified; replayed codes refused |
+| POST | `/api/portal/logout` | CSRF → 204 |
+| GET | `/api/portal/me` | e-mail, name, organisation name |
+| GET | `/api/portal/dashboard` | agents by status, open incidents, evaluation count, `telemetry.connected=false` |
+| GET | `/api/portal/agents` | name, status, environment, approved version number (no prompt or tools) |
+| GET | `/api/portal/evaluations` | run summaries with `simulated` |
+| GET | `/api/portal/incidents` | number, title, severity, impact, status, dates, client summary (no internal notes) |
+| GET | `/api/portal/incidents/{number}` | incident with its status history |
+
 ## Executed example
 
 `scripts/demo-lead-flow.ps1` performs the complete path (invalid submit → valid submit → PostgreSQL row →

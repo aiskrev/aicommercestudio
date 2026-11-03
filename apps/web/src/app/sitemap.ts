@@ -10,6 +10,7 @@ import {
 } from "@/content";
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
 import { AGENT_SLUGS, LIBRARY_KEYS } from "@/lib/agent-library";
+import { PATTERN_KEYS, PATTERN_SLUGS, SCENARIO_KEYS, SCENARIO_SLUGS } from "@/lib/reference";
 import { getCatalogue } from "@/lib/catalogue";
 import { isDomainPublished } from "@/lib/domains";
 import { routes } from "@/lib/routes";
@@ -91,6 +92,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             alternates: alternates(samePathEverywhere(path)),
           }))
         : []),
+      // Reference scenarios and integration patterns: indexes and one static page each.
+      ...[
+        routes.scenarios,
+        ...SCENARIO_KEYS.map((key) => routes.scenario(SCENARIO_SLUGS[key].bg)),
+        routes.patterns,
+        ...PATTERN_KEYS.map((key) => routes.pattern(PATTERN_SLUGS[key].bg)),
+      ].map((path) => ({
+        url: url(path),
+        lastModified: CONTENT_REVISED,
+        changeFrequency: "monthly" as const,
+        priority: path === routes.scenarios || path === routes.patterns ? 0.6 : 0.5,
+        alternates: alternates(samePathEverywhere(path)),
+      })),
       ...services.map((service) => ({
         url: url(routes.service(service.slug)),
         lastModified: CONTENT_REVISED,

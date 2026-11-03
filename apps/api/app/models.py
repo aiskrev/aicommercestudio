@@ -519,6 +519,8 @@ class OpsAgent(Base):
             name="fk_ops_agents_workspace_org",
         ),
         UniqueConstraint("workspace_id", "key", name="uq_ops_agents_workspace_key"),
+        # Target of the composite foreign keys of versions, runs, datasets, incidents and changes.
+        UniqueConstraint("id", "organization_id", name="uq_ops_agents_id_org"),
         CheckConstraint(_in_check("status", OpsAgentStatus), name="status"),
         Index("ix_ops_agents_workspace_id", "workspace_id"),
     )
@@ -924,3 +926,7 @@ class ContentItemTranslation(Base):
     locale: Mapped[str] = mapped_column(String(2), primary_key=True)
     title: Mapped[str | None] = mapped_column(String(200), nullable=True)
     body: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
+# The AI operations platform tables (registry, evaluations, observability, workflows, client portal).
+from app.ops import models as _ops_platform_models  # noqa: E402, F401

@@ -27,7 +27,8 @@ const RAW_PALETTE =
 
 // Files that legitimately carry literal colours: the logo drawing (frozen by the owner), the
 // generated OG image, and theme-colour metadata.
-const HEX_ALLOWED = new Set(["components/layout/Logo.tsx", "app/opengraph-image.tsx", "app/[locale]/layout.tsx"]);
+// Root layouts declare the browser theme colour, which must be a literal.
+const HEX_ALLOWED = new Set(["components/layout/Logo.tsx", "app/opengraph-image.tsx", "app/[locale]/layout.tsx", "app/portal/layout.tsx"]);
 
 describe("design tokens", () => {
   it("public components and pages use semantic colour utilities only", () => {

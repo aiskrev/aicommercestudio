@@ -4,10 +4,18 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { AdminPageHeader } from "@/components/admin/AdminShell";
+import { ClientsTab } from "@/components/admin/ops/ClientsTab";
+import { EvaluationsTab } from "@/components/admin/ops/EvaluationsTab";
+import { ObservabilityTab } from "@/components/admin/ops/ObservabilityTab";
+import { RegistryTab } from "@/components/admin/ops/RegistryTab";
+import { ChangesTab, IncidentsTab } from "@/components/admin/ops/WorkflowTabs";
 import { EmptyState, ErrorState, LoadingState, Panel, Pill, StatCard } from "@/components/admin/ui";
 import { Alert } from "@/components/ui/primitives";
 import type { OpsAgent, OpsAgentStatus, OpsMember, OpsOrganization, OpsOverview, OpsWorkspace } from "@/lib/admin-types";
 import { useAdminData } from "@/lib/use-admin-data";
+
+const TABS = ["overview", "registry", "evaluations", "observability", "incidents", "changes", "clients"] as const;
+type Tab = (typeof TABS)[number];
 
 const STATUS_TONE: Record<OpsAgentStatus, string> = {
   active: "bg-emerald-400/10 text-emerald-200 ring-emerald-400/30",
@@ -17,8 +25,9 @@ const STATUS_TONE: Record<OpsAgentStatus, string> = {
 };
 
 /**
- * Internal AI operations scaffold. Shows only what the API returns for organisations the user is a
- * member of; there is no telemetry, so the page says so instead of showing empty charts.
+ * Internal AI operations portal. Shows only what the API returns for organisations the user is a
+ * member of. Tabs appear for the modules switched on for the deployment and readable by the role;
+ * there is no live telemetry, so the page says so instead of showing empty charts.
  */
 export function Operations() {
   const { t: dict } = useAdminI18n();
@@ -36,6 +45,20 @@ export function Operations() {
   const members = useAdminData<OpsMember[]>(base && canSeeMembers ? `${base}/members` : null);
 
   const header = <AdminPageHeader title={t.title} description={t.description} />;
+  const permissions = overview.data?.permissions ?? [];
+  const modules = new Set<string>(overview.data?.modules ?? []);
+  const visibleTabs = TABS.filter((tab) =>
+    tab === "overview" ? true : tab === "clients" ? permissions.includes("portal_users.read") : modules.has(tab) && permissions.includes(`${tab === "evaluations" ? "evals" : tab}.read`),
+  );
+  const requested = params.get("tab") as Tab | null;
+  const tab: Tab = requested && visibleTabs.includes(requested) ? requested : "overview";
+  const p = dict.opsPlatform;
+  const setTab = (next: Tab) => {
+    const query = new URLSearchParams(params.toString());
+    query.set("tab", next);
+    if (selected) query.set("org", selected.id);
+    router.replace(`${pathname}?${query.toString()}`);
+  };
   if (orgs.error) return <>{header}<ErrorState message={orgs.error} requestId={orgs.errorId} onRetry={orgs.reload} /></>;
   if (!orgs.data) return <>{header}<LoadingState rows={6} /></>;
   if (!selected) {
@@ -89,6 +112,28 @@ export function Operations() {
       </div>
 
       {overview.error && <ErrorState message={overview.error} requestId={overview.errorId} onRetry={overview.reload} />}
+      <div role="tablist" aria-label={t.title} className="mb-6 flex flex-wrap gap-2" data-testid="ops-tabs">
+        {visibleTabs.map((name) => (
+          <button
+            key={name}
+            type="button"
+            role="tab"
+            aria-selected={tab === name}
+            onClick={() => setTab(name)}
+            className={tab === name ? "rounded-lg bg-cyan-400/15 px-3 py-1.5 text-sm font-medium text-cyan-100 ring-1 ring-cyan-400/40" : "rounded-lg px-3 py-1.5 text-sm text-slate-300 ring-1 ring-white/10 hover:text-white"}
+          >
+            {p.tabs[name]}
+          </button>
+        ))}
+      </div>
+      {tab === "registry" && base && <RegistryTab base={base} agents={agents.data ?? []} permissions={permissions} />}
+      {tab === "evaluations" && base && <EvaluationsTab base={base} agents={agents.data ?? []} permissions={permissions} />}
+      {tab === "observability" && base && <ObservabilityTab base={base} permissions={permissions} isDemo={selected.is_demo} />}
+      {tab === "incidents" && base && <IncidentsTab base={base} agents={agents.data ?? []} permissions={permissions} />}
+      {tab === "changes" && base && <ChangesTab base={base} agents={agents.data ?? []} permissions={permissions} />}
+      {tab === "clients" && base && <ClientsTab base={base} permissions={permissions} />}
+      {tab === "overview" && (
+      <>
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
         <StatCard label={t.workspaces} value={overview.data?.workspaces ?? "…"} icon="layers" />
         <StatCard
@@ -165,6 +210,8 @@ export function Operations() {
           </ul>
         </Panel>
       </div>
+      </>
+      )}
     </>
   );
 }

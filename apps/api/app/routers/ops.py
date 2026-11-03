@@ -20,6 +20,7 @@ from app import audit
 from app.deps import Admin, DbSession
 from app.errors import ApiError
 from app.models import AdminUser, AuditLog, OpsAgent, OpsMembership, OpsRole, OpsWorkspace, utcnow
+from app.ops import rls
 from app.ops.rbac import Permission, can_assign
 from app.ops.schemas import (
     AgentCreate,
@@ -35,7 +36,7 @@ from app.ops.schemas import (
     WorkspaceCreate,
     WorkspaceOut,
 )
-from app.ops.tenancy import OpsContext, audit_details, forbidden, get_scoped, require, scoped
+from app.ops.tenancy import MODULES, OpsContext, audit_details, forbidden, get_scoped, module_enabled, require, scoped
 
 router = APIRouter(prefix="/api/ops", tags=["ops"])
 
@@ -65,8 +66,9 @@ AuditRead = Annotated[OpsContext, Depends(require(Permission.AUDIT_READ))]
 
 @router.get("/organizations", response_model=list[MyOrganizationOut])
 def my_organizations(admin: Admin, db: DbSession, response: Response) -> list[MyOrganizationOut]:
-    """Organisations the caller is a member of — never any other."""
+    """Organisations the caller is a member of — never any other (also enforced by RLS)."""
     _no_store(response)
+    rls.bind(db, user_id=admin.user.id)
     memberships = db.scalars(
         select(OpsMembership).where(OpsMembership.user_id == admin.user.id).order_by(OpsMembership.created_at)
     ).all()
@@ -91,6 +93,7 @@ def overview(ctx: OrgRead, db: DbSession, response: Response) -> OverviewOut:
         permissions=ctx.permissions(),
         workspaces=workspaces,
         agents_by_status={status_: count for status_, count in rows},
+        modules=[m for m in MODULES if module_enabled(m)],
     )
 
 
