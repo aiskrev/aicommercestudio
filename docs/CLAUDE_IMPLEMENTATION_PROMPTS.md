@@ -58,9 +58,10 @@ It never merges or deploys.
 | API tests, Ruff, docs sync | `.\scripts\test.ps1 -Suite api` |
 | Web typecheck, ESLint, Vitest | `.\scripts\test.ps1 -Suite web` |
 | End-to-end (Playwright) | `.\scripts\test.ps1 -Suite e2e` |
+| Client portal browser e2e (portal on, test stack) | `.\scripts\test.ps1 -Suite portal` |
 | Dependency audits | `.\scripts\test.ps1 -Suite audit` |
 | Regenerate `docs/openapi.json` | `docker compose --profile test run --rm --build --no-deps -T -v "<repo>:/repo" api-tests python scripts/docs_sync.py --write` |
-| Format only the touched Python files | `ruff format <paths>` inside `api-tests` (formatting the whole tree rewrites unrelated files) |
+| Format Python | `ruff format .` inside `api-tests`; the API suite fails on unformatted code (`ruff format --check`) |
 
 Things that have tripped agents up before:
 
