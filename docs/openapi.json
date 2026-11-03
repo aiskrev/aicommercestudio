@@ -1587,12 +1587,217 @@
         }
       }
     },
+    "/api/admin/auth/mfa/verify": {
+      "post": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Mfa Verify",
+        "description": "Second step of sign-in: an authenticator code or a one-time recovery code.",
+        "operationId": "mfa_verify_api_admin_auth_mfa_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaCodeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/auth/mfa": {
+      "get": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Mfa Status",
+        "operationId": "mfa_status_api_admin_auth_mfa_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaStatusOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/auth/mfa/setup": {
+      "post": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Mfa Setup",
+        "description": "A new key for the authenticator app (from the account page, or a sign-in that must enrol).\nIt becomes active only when a code from it is confirmed; the key itself is never stored.",
+        "operationId": "mfa_setup_api_admin_auth_mfa_setup_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaSetupOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/auth/mfa/confirm": {
+      "post": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Mfa Confirm",
+        "description": "Activate the key with a first code. Every other session of the account is ended; a pending\nsign-in becomes a full session. The recovery codes are returned once.",
+        "operationId": "mfa_confirm_api_admin_auth_mfa_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaCodeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaConfirmOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/auth/mfa/recovery-codes": {
+      "post": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Mfa Recovery Codes",
+        "description": "Replace the recovery codes (the earlier ones stop working). Needs a current authenticator code.",
+        "operationId": "mfa_recovery_codes_api_admin_auth_mfa_recovery_codes_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaCodeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MfaRecoveryCodesOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/auth/mfa/disable": {
+      "post": {
+        "tags": [
+          "admin-auth"
+        ],
+        "summary": "Mfa Disable",
+        "description": "Switch the second factor off (password and a current code); other sessions end.\nRefused while ADMIN_MFA_REQUIRED is on.",
+        "operationId": "mfa_disable_api_admin_auth_mfa_disable_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaDisableIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/auth/logout": {
       "post": {
         "tags": [
           "admin-auth"
         ],
         "summary": "Logout",
+        "description": "End the current session, including a pending one (cancelling the MFA step).",
         "operationId": "logout_api_admin_auth_logout_post",
         "responses": {
           "204": {
@@ -7758,6 +7963,11 @@
               "viewer"
             ],
             "title": "Role"
+          },
+          "mfa_enabled": {
+            "type": "boolean",
+            "title": "Mfa Enabled",
+            "default": false
           }
         },
         "type": "object",
@@ -14621,6 +14831,144 @@
         ],
         "title": "Metric"
       },
+      "MfaCodeIn": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 6,
+            "title": "Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "MfaCodeIn",
+        "description": "A 6-digit authenticator code, or (at sign-in only) a one-time recovery code."
+      },
+      "MfaConfirmOut": {
+        "properties": {
+          "recovery_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Recovery Codes"
+          },
+          "session": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SessionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "recovery_codes"
+        ],
+        "title": "MfaConfirmOut"
+      },
+      "MfaDisableIn": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Password"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 6,
+            "title": "Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "password",
+          "code"
+        ],
+        "title": "MfaDisableIn"
+      },
+      "MfaRecoveryCodesOut": {
+        "properties": {
+          "recovery_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Recovery Codes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recovery_codes"
+        ],
+        "title": "MfaRecoveryCodesOut",
+        "description": "One-time recovery codes, shown once; only their hashes are kept."
+      },
+      "MfaSetupOut": {
+        "properties": {
+          "secret": {
+            "type": "string",
+            "title": "Secret"
+          },
+          "otpauth_uri": {
+            "type": "string",
+            "title": "Otpauth Uri"
+          }
+        },
+        "type": "object",
+        "required": [
+          "secret",
+          "otpauth_uri"
+        ],
+        "title": "MfaSetupOut",
+        "description": "The new key, shown once for the authenticator app; it is not active until a code confirms it."
+      },
+      "MfaStatusOut": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "enabled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled At"
+          },
+          "recovery_codes_remaining": {
+            "type": "integer",
+            "title": "Recovery Codes Remaining"
+          },
+          "required": {
+            "type": "boolean",
+            "title": "Required"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled",
+          "enabled_at",
+          "recovery_codes_remaining",
+          "required"
+        ],
+        "title": "MfaStatusOut"
+      },
       "Milestone": {
         "properties": {
           "title": {
@@ -18729,6 +19077,21 @@
             "type": "string",
             "format": "date-time",
             "title": "Expires At"
+          },
+          "mfa": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "verify",
+                  "enrol"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mfa"
           }
         },
         "type": "object",

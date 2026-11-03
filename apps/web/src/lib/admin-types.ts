@@ -15,11 +15,14 @@ export interface AdminUser {
   full_name: string;
   last_login_at: string | null;
   role: StaffRole;
+  mfa_enabled?: boolean;
 }
 
 export interface AdminSession {
   user: AdminUser;
   expires_at: string;
+  /** Password accepted, session still pending: enter a code (`verify`) or enrol first (`enrol`). */
+  mfa?: "verify" | "enrol" | null;
 }
 
 export interface LeadSummary {
@@ -243,6 +246,26 @@ export interface RetentionPreview {
   advisor_assessments_due?: number;
   team_configuration_retention_days?: number;
   team_configurations_due?: number;
+}
+
+/** Staff TOTP (apps/api/app/routers/admin_auth.py). */
+export interface MfaStatus {
+  enabled: boolean;
+  enabled_at: string | null;
+  recovery_codes_remaining: number;
+  /** ADMIN_MFA_REQUIRED: MFA cannot be switched off. */
+  required: boolean;
+}
+
+export interface MfaSetup {
+  secret: string;
+  otpauth_uri: string;
+}
+
+export interface MfaConfirm {
+  recovery_codes: string[];
+  /** Present when the confirmation completed a pending sign-in. */
+  session: AdminSession | null;
 }
 
 export interface AdminSessionInfo {

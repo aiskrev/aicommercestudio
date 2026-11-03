@@ -155,6 +155,15 @@ docker compose exec api python -m app.cli set-password --email you@your-company.
 Use `docker compose exec` **without** `-T` so the prompt is hidden. Avoid passing passwords on the
 command line (`-e ADMIN_PASSWORD=…`) — they end up in the shell history.
 
+Two-factor authentication: each staff member turns it on under *Account and sessions*
+(`/admin/account`). Once everyone has, set `ADMIN_MFA_REQUIRED=true` in `.env` and restart the API.
+Lost authenticator and no recovery codes left (removes the second factor and logs out all sessions;
+audited):
+
+```powershell
+docker compose exec api python -m app.cli reset-mfa --email you@your-company.bg
+```
+
 ## 8. Tests
 
 ```powershell

@@ -68,7 +68,7 @@ TABLES = [
     "advisor_assessments", "team_configurations", "assessment_results",
     "lead_proposal_versions", "lead_proposals", "lead_opportunities",
     "ai_action_requests", "audit_logs", "lead_notes", "leads",
-    "admin_sessions", "admin_users",
+    "admin_mfa_recovery_codes", "admin_sessions", "admin_users",
 ]
 
 

@@ -327,11 +327,15 @@ class AdminUserOut(BaseModel):
     full_name: str
     last_login_at: datetime | None
     role: Literal["admin", "editor", "viewer"]
+    mfa_enabled: bool = False
 
 
 class SessionOut(BaseModel):
     user: AdminUserOut
     expires_at: datetime
+    # Set when the password was accepted but the session is still pending: `verify` = enter a code,
+    # `enrol` = set up an authenticator first (ADMIN_MFA_REQUIRED). Null for a full session.
+    mfa: Literal["verify", "enrol"] | None = None
 
 
 class AdminSessionInfo(BaseModel):
@@ -345,6 +349,43 @@ class AdminSessionInfo(BaseModel):
 
 class LogoutAllOut(BaseModel):
     sessions_revoked: int
+
+
+class MfaCodeIn(StrictModel):
+    """A 6-digit authenticator code, or (at sign-in only) a one-time recovery code."""
+
+    code: str = Field(min_length=6, max_length=32)
+
+
+class MfaDisableIn(StrictModel):
+    password: str = Field(min_length=1, max_length=256)
+    code: str = Field(min_length=6, max_length=32)
+
+
+class MfaStatusOut(BaseModel):
+    enabled: bool
+    enabled_at: datetime | None
+    recovery_codes_remaining: int
+    # ADMIN_MFA_REQUIRED: MFA cannot be switched off.
+    required: bool
+
+
+class MfaSetupOut(BaseModel):
+    """The new key, shown once for the authenticator app; it is not active until a code confirms it."""
+
+    secret: str
+    otpauth_uri: str
+
+
+class MfaRecoveryCodesOut(BaseModel):
+    """One-time recovery codes, shown once; only their hashes are kept."""
+
+    recovery_codes: list[str]
+
+
+class MfaConfirmOut(MfaRecoveryCodesOut):
+    # Present when the confirmation completed a pending sign-in (forced enrolment).
+    session: SessionOut | None = None
 
 
 # --------------------------------------------------------------------------- leads
