@@ -17,7 +17,12 @@ export type FeatureFlag =
   | "tool_agents"
   | "tool_cloud"
   | "tool_devops"
-  | "tool_observability";
+  | "tool_observability"
+  | "tool_ecommerce"
+  | "tool_data_integration"
+  | "tool_ai_governance"
+  | "tool_ai_ops"
+  | "tool_finops";
 
 export const FLAG_DEFAULTS: Record<FeatureFlag, boolean> = {
   tool_advisor: true,
@@ -30,6 +35,11 @@ export const FLAG_DEFAULTS: Record<FeatureFlag, boolean> = {
   tool_cloud: true,
   tool_devops: true,
   tool_observability: true,
+  tool_ecommerce: true,
+  tool_data_integration: true,
+  tool_ai_governance: true,
+  tool_ai_ops: true,
+  tool_finops: true,
 };
 
 /** Parses `name=on|off` pairs; unknown names and malformed parts are ignored. */

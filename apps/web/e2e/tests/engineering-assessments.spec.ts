@@ -144,6 +144,32 @@ test("observability & reliability in English: explained findings and a target st
   await expect(result.getByTestId("engine-findings-risk")).toHaveCount(0);
 });
 
+test("responsible AI governance in Bulgarian: not legal advice, explained risks", async ({ page }) => {
+  await page.goto("/bg/instrumenti/otgovoren-ai");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Оценка на отговорното управление на AI");
+  const form = page.getByTestId("engine-form");
+  await answerAll(page, form, "first", "Вижте резултата", "Напред", async (step) => {
+    if (step === 0) await form.getByRole("checkbox", { name: /Решения за хора/ }).check();
+  });
+  const result = page.getByTestId("engine-result");
+  await expect(result.getByTestId("tool-score")).toHaveText("0");
+  await expect(result.getByTestId("engine-findings-risk")).toContainText("Решения за хора без човешки контрол");
+  await expect(result.getByTestId("engine-findings-context")).toContainText("не определя задълженията ви");
+  await expect(result).toContainText("не е правен съвет");
+});
+
+test("all five new assessments are served by the API in both languages", async ({ request }) => {
+  for (const key of ["ecommerce_architecture", "data_integration", "ai_governance", "ai_ops_readiness", "finops"]) {
+    for (const locale of ["bg", "en"]) {
+      const response = await request.get(`/api/public/assessments/${key}?locale=${locale}`);
+      expect(response.status(), `${key} ${locale}`).toBe(200);
+      const body = await response.json();
+      expect(body.questions.length, key).toBe(11);
+      expect(JSON.stringify(body)).not.toContain('"points"');
+    }
+  }
+});
+
 test("the assessment API keeps old versions out of scoring and reports behind the token", async ({ request }) => {
   const definition = await (await request.get("/api/public/assessments/devops_delivery?locale=en")).json();
   expect(definition.version).toBe("1.1.0");

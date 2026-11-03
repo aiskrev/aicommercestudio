@@ -108,6 +108,27 @@ It uses the same eight questions as 1.0.0, in four areas weighted 30/25/25/20:
 The `observability_signals` extension still rejects an on-call rota without collected telemetry,
 and still reports the missing core signals.
 
+## 2b. Five further assessments (1.0.0, live)
+
+| Assessment | Areas (5 × 2 questions) | Context (unscored) |
+| --- | --- | --- |
+| E-commerce Architecture (`ecommerce_architecture`) | platform and extensions, speed and technical SEO, integrations, data and measurement, security and operations | platform (Shopify, WooCommerce, Magento, custom, other) |
+| Data Integration (`data_integration`) | sources and ownership, integration patterns, data quality, monitoring and errors, access and security | systems (ERP, CRM, store, accounting, warehouse, BI) |
+| Responsible AI Governance (`ai_governance`) | inventory and accountability, risk assessment, personal data and providers, human oversight, transparency and quality | where AI is used (internal, customers, decisions about people, products) |
+| AI Operations Readiness (`ai_ops_readiness`) | monitoring, output quality, model and prompt changes, incidents, cost and limits | AI systems (assistant, RAG, agents, extraction) |
+| FinOps & AI Cost (`finops`) | visibility and allocation, budgets and forecasting, optimisation, AI model costs, accountability | spend (AWS, Azure, GCP, AI APIs, SaaS, hosting) |
+
+Each has:
+
+* 3–4 risks and 3–4 quick wins (30 days);
+* one recommendation per area below 50 (60 days, capped at 6);
+* 1–2 target states (90 days);
+* context notes where relevant.
+
+Every finding is explained by its trigger. The texts say the result is not an audit and not legal
+advice. The AI governance note on stricter requirements says explicitly that the assessment does not
+determine obligations. FinOps contains no savings forecasts.
+
 ## 3. Shared engine features (backward compatible)
 
 * **Evidence**: `practice` (scored), `metric` and `context` (never scored, no points allowed).

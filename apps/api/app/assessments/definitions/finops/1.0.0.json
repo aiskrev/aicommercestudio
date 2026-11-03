@@ -1,0 +1,972 @@
+{
+  "key": "finops",
+  "version": "1.0.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 6
+  },
+  "dimensions": [
+    {
+      "key": "visibility",
+      "weight": 20
+    },
+    {
+      "key": "budgets",
+      "weight": 20
+    },
+    {
+      "key": "optimisation",
+      "weight": 20
+    },
+    {
+      "key": "ai_cost",
+      "weight": 20
+    },
+    {
+      "key": "governance",
+      "weight": 20
+    }
+  ],
+  "questions": [
+    {
+      "key": "spend_context",
+      "type": "multi_choice",
+      "dimension": "visibility",
+      "evidence": "context",
+      "options": [
+        {
+          "key": "aws",
+          "points": 0
+        },
+        {
+          "key": "azure",
+          "points": 0
+        },
+        {
+          "key": "gcp",
+          "points": 0
+        },
+        {
+          "key": "ai_apis",
+          "points": 0
+        },
+        {
+          "key": "saas",
+          "points": 0
+        },
+        {
+          "key": "hosting",
+          "points": 0
+        }
+      ],
+      "cap": 1,
+      "max_selections": 6
+    },
+    {
+      "key": "fo_tags",
+      "type": "single_choice",
+      "dimension": "visibility",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "partly",
+          "points": 1
+        },
+        {
+          "key": "mostly",
+          "points": 2
+        },
+        {
+          "key": "fully",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_reports",
+      "type": "single_choice",
+      "dimension": "visibility",
+      "options": [
+        {
+          "key": "invoice",
+          "points": 0
+        },
+        {
+          "key": "monthly",
+          "points": 1
+        },
+        {
+          "key": "weekly",
+          "points": 2
+        },
+        {
+          "key": "dashboards",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_budgets",
+      "type": "single_choice",
+      "dimension": "budgets",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "total",
+          "points": 1
+        },
+        {
+          "key": "per_area",
+          "points": 2
+        },
+        {
+          "key": "alerts",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_forecast",
+      "type": "single_choice",
+      "dimension": "budgets",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "rough",
+          "points": 1
+        },
+        {
+          "key": "model",
+          "points": 2
+        },
+        {
+          "key": "unit",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_rightsizing",
+      "type": "single_choice",
+      "dimension": "optimisation",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "once",
+          "points": 1
+        },
+        {
+          "key": "regular",
+          "points": 2
+        },
+        {
+          "key": "automated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_idle",
+      "type": "single_choice",
+      "dimension": "optimisation",
+      "options": [
+        {
+          "key": "unknown",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "scheduled",
+          "points": 2
+        },
+        {
+          "key": "policy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_ai_tracking",
+      "type": "single_choice",
+      "dimension": "ai_cost",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "total",
+          "points": 1
+        },
+        {
+          "key": "per_feature",
+          "points": 2
+        },
+        {
+          "key": "per_request",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_ai_levers",
+      "type": "single_choice",
+      "dimension": "ai_cost",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "model_choice",
+          "points": 1
+        },
+        {
+          "key": "caching",
+          "points": 2
+        },
+        {
+          "key": "measured",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_owner",
+      "type": "single_choice",
+      "dimension": "governance",
+      "options": [
+        {
+          "key": "nobody",
+          "points": 0
+        },
+        {
+          "key": "finance",
+          "points": 1
+        },
+        {
+          "key": "teams",
+          "points": 2
+        },
+        {
+          "key": "shared",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "fo_decisions",
+      "type": "single_choice",
+      "dimension": "governance",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "after",
+          "points": 1
+        },
+        {
+          "key": "before",
+          "points": 2
+        },
+        {
+          "key": "always",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_no_allocation",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_tags",
+        "options": [
+          "no"
+        ]
+      },
+      "recommendation": "risk_no_allocation",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "risk_no_budget_alerts",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_budgets",
+        "options": [
+          "no",
+          "total"
+        ]
+      },
+      "recommendation": "risk_no_budget_alerts",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "risk_ai_blind",
+      "priority": 2,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "spend_context",
+            "options": [
+              "ai_apis"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "fo_ai_tracking",
+            "options": [
+              "no",
+              "total"
+            ]
+          }
+        ]
+      },
+      "recommendation": "risk_ai_blind",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "managed_operations",
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "qw_tags",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_tags",
+        "options": [
+          "no",
+          "partly"
+        ]
+      },
+      "recommendation": "qw_tags",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "qw_budget_alerts",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_budgets",
+        "options": [
+          "no",
+          "total"
+        ]
+      },
+      "recommendation": "qw_budget_alerts",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "qw_idle",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "fo_idle",
+        "options": [
+          "unknown",
+          "manual"
+        ]
+      },
+      "recommendation": "qw_idle",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "qw_ai_caching",
+      "priority": 5,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "answer_in",
+            "question": "spend_context",
+            "options": [
+              "ai_apis"
+            ]
+          },
+          {
+            "kind": "answer_in",
+            "question": "fo_ai_levers",
+            "options": [
+              "no"
+            ]
+          }
+        ]
+      },
+      "recommendation": "qw_ai_caching",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_applications",
+        "managed_operations"
+      ]
+    },
+    {
+      "key": "rec_visibility",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "visibility",
+        "value": 50
+      },
+      "recommendation": "rec_visibility",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "rec_budgets",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "budgets",
+        "value": 50
+      },
+      "recommendation": "rec_budgets",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "rec_optimisation",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "optimisation",
+        "value": 50
+      },
+      "recommendation": "rec_optimisation",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform"
+      ]
+    },
+    {
+      "key": "rec_ai_cost",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "ai_cost",
+        "value": 50
+      },
+      "recommendation": "rec_ai_cost",
+      "horizon": 60,
+      "domains": [
+        "managed_operations",
+        "ai_applications"
+      ]
+    },
+    {
+      "key": "rec_governance",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "governance",
+        "value": 50
+      },
+      "recommendation": "rec_governance",
+      "horizon": 60,
+      "domains": [
+        "cloud_platform",
+        "advisory_enablement"
+      ]
+    },
+    {
+      "key": "ts_unit_economics",
+      "priority": 20,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "visibility",
+            "value": 75
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "budgets",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "ts_unit_economics",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "cloud_platform"
+      ]
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на FinOps и разходите за AI",
+      "intro": "11 въпроса в 5 области: видимост, бюджети, оптимизация, разходи за AI модели и отговорности. Не съдържа прогнози за спестявания.",
+      "disclaimer": "Самооценка по вашите отговори. Не се свързваме с вашите системи и не сканираме нищо. Резултатът не е одит, не е правен съвет и не е проверен от независима страна.",
+      "dimensions": {
+        "visibility": {
+          "title": "Видимост и разпределение",
+          "description": "Знаете ли кой, за какво и колко харчи."
+        },
+        "budgets": {
+          "title": "Бюджети и прогнози",
+          "description": "Бюджети, известия и прогноза."
+        },
+        "optimisation": {
+          "title": "Оптимизация",
+          "description": "Преоразмеряване, графици и ангажименти."
+        },
+        "ai_cost": {
+          "title": "Разходи за AI модели",
+          "description": "Токени, избор на модел, кеширане."
+        },
+        "governance": {
+          "title": "Отговорности",
+          "description": "Кой решава и кой отговаря за разходите."
+        }
+      },
+      "questions": {
+        "spend_context": {
+          "text": "Къде са основните ви разходи?",
+          "help": "Изберете всичко приложимо. Не променя оценката.",
+          "options": {
+            "aws": "AWS",
+            "azure": "Microsoft Azure",
+            "gcp": "Google Cloud",
+            "ai_apis": "AI API (модели)",
+            "saas": "SaaS абонаменти",
+            "hosting": "Хостинг или собствени сървъри"
+          }
+        },
+        "fo_tags": {
+          "text": "Може ли да разпределите разходите по продукт, екип или клиент?",
+          "options": {
+            "no": "Не",
+            "partly": "Частично",
+            "mostly": "За повечето разходи",
+            "fully": "Да, с етикети или отделни акаунти"
+          }
+        },
+        "fo_reports": {
+          "text": "Колко често се преглеждат разходите?",
+          "options": {
+            "invoice": "Когато дойде фактурата",
+            "monthly": "Месечно",
+            "weekly": "Седмично",
+            "dashboards": "Непрекъснато, с табла"
+          }
+        },
+        "fo_budgets": {
+          "text": "Има ли бюджети с известия?",
+          "options": {
+            "no": "Не",
+            "total": "Само общ бюджет",
+            "per_area": "По области",
+            "alerts": "По области, с известия при отклонение"
+          }
+        },
+        "fo_forecast": {
+          "text": "Прогнозирате ли разходите?",
+          "options": {
+            "no": "Не",
+            "rough": "Приблизително",
+            "model": "С модел по растеж",
+            "unit": "С разход на единица (клиент, поръчка)"
+          }
+        },
+        "fo_rightsizing": {
+          "text": "Преоразмерявате ли ресурсите?",
+          "options": {
+            "never": "Никога",
+            "once": "Веднъж",
+            "regular": "Редовно",
+            "automated": "Автоматично"
+          }
+        },
+        "fo_idle": {
+          "text": "Какво става с неизползваните ресурси (тестови среди нощем, стари дискове)?",
+          "options": {
+            "unknown": "Не знаем",
+            "manual": "Чистим понякога",
+            "scheduled": "Графици и редовно почистване",
+            "policy": "Автоматични правила"
+          }
+        },
+        "fo_ai_tracking": {
+          "text": "Знаете ли колко струва всяка AI функция?",
+          "options": {
+            "no": "Не",
+            "total": "Само общо",
+            "per_feature": "По функции",
+            "per_request": "По функции и на заявка"
+          }
+        },
+        "fo_ai_levers": {
+          "text": "Използвате ли начини за намаляване на AI разходите?",
+          "options": {
+            "no": "Не",
+            "model_choice": "Избор на по-евтин модел, където е достатъчен",
+            "caching": "Избор на модел и кеширане",
+            "measured": "Избор на модел, кеширане и пакетна обработка, с измерено качество"
+          }
+        },
+        "fo_owner": {
+          "text": "Кой отговаря за разходите?",
+          "options": {
+            "nobody": "Никой конкретно",
+            "finance": "Само финансите",
+            "teams": "Екипите за своите разходи",
+            "shared": "Екипите, финансите и ръководството заедно"
+          }
+        },
+        "fo_decisions": {
+          "text": "Влизат ли разходите в техническите решения?",
+          "options": {
+            "no": "Не",
+            "after": "След факта",
+            "before": "Преди големи решения",
+            "always": "Винаги, с оценка на разхода"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_no_allocation": {
+          "title": "Разходи без собственик",
+          "description": "Без разпределение никой не вижда своя разход и никой не го намалява."
+        },
+        "risk_no_budget_alerts": {
+          "title": "Изненади във фактурата",
+          "description": "Без бюджети и известия грешка или пик се вижда чак във фактурата."
+        },
+        "risk_ai_blind": {
+          "title": "AI разходи без проследяване",
+          "description": "Разходът за модели расте с употребата; без разбивка по функции не знаете коя се изплаща."
+        },
+        "qw_tags": {
+          "title": "Задължителни етикети",
+          "description": "Три етикета (продукт, екип, среда) и отчет по тях."
+        },
+        "qw_budget_alerts": {
+          "title": "Бюджети и известия",
+          "description": "Бюджет по област с известие при 80% и 100%."
+        },
+        "qw_idle": {
+          "title": "Спиране на неизползваното",
+          "description": "Графици за тестовите среди и премахване на стари дискове и копия."
+        },
+        "qw_ai_caching": {
+          "title": "Модел според задачата и кеширане",
+          "description": "Използвайте по-малък модел, където качеството стига, и кеширайте повтарящите се части на промпта."
+        },
+        "rec_visibility": {
+          "title": "Видимост на разходите",
+          "description": "Разпределение по продукт и екип и редовен преглед."
+        },
+        "rec_budgets": {
+          "title": "Бюджети и прогноза",
+          "description": "Бюджети по области, известия и прогноза по растеж."
+        },
+        "rec_optimisation": {
+          "title": "Редовна оптимизация",
+          "description": "Преоразмеряване, графици и преглед на ангажиментите."
+        },
+        "rec_ai_cost": {
+          "title": "Управление на AI разходите",
+          "description": "Разход по функция и заявка, избор на модел, кеширане и пакетна обработка с измерено качество."
+        },
+        "rec_governance": {
+          "title": "Отговорност за разходите",
+          "description": "Екипите отговарят за своите разходи и ги оценяват преди решенията."
+        },
+        "ts_unit_economics": {
+          "title": "Разход на единица",
+          "description": "Разход на клиент, поръчка или AI заявка, следен заедно с бизнес показателите."
+        }
+      }
+    },
+    "en": {
+      "title": "FinOps & AI Cost Assessment",
+      "intro": "11 questions across 5 areas: visibility, budgets, optimisation, AI model costs and accountability. It contains no savings forecasts.",
+      "disclaimer": "A self-assessment based on your answers. We do not connect to your systems and scan nothing. The result is not an audit, not legal advice and has not been independently verified.",
+      "dimensions": {
+        "visibility": {
+          "title": "Visibility and allocation",
+          "description": "Whether you know who spends how much on what."
+        },
+        "budgets": {
+          "title": "Budgets and forecasting",
+          "description": "Budgets, alerts and forecasts."
+        },
+        "optimisation": {
+          "title": "Optimisation",
+          "description": "Rightsizing, schedules and commitments."
+        },
+        "ai_cost": {
+          "title": "AI model costs",
+          "description": "Tokens, model choice, caching."
+        },
+        "governance": {
+          "title": "Accountability",
+          "description": "Who decides and who is accountable for spend."
+        }
+      },
+      "questions": {
+        "spend_context": {
+          "text": "Where is most of your spend?",
+          "help": "Select all that apply. It does not change the score.",
+          "options": {
+            "aws": "AWS",
+            "azure": "Microsoft Azure",
+            "gcp": "Google Cloud",
+            "ai_apis": "AI APIs (models)",
+            "saas": "SaaS subscriptions",
+            "hosting": "Hosting or own servers"
+          }
+        },
+        "fo_tags": {
+          "text": "Can you allocate spend by product, team or customer?",
+          "options": {
+            "no": "No",
+            "partly": "Partly",
+            "mostly": "For most spend",
+            "fully": "Yes, with tags or separate accounts"
+          }
+        },
+        "fo_reports": {
+          "text": "How often is spend reviewed?",
+          "options": {
+            "invoice": "When the invoice arrives",
+            "monthly": "Monthly",
+            "weekly": "Weekly",
+            "dashboards": "Continuously, with dashboards"
+          }
+        },
+        "fo_budgets": {
+          "text": "Are there budgets with alerts?",
+          "options": {
+            "no": "No",
+            "total": "Only a total budget",
+            "per_area": "Per area",
+            "alerts": "Per area, with alerts on anomalies"
+          }
+        },
+        "fo_forecast": {
+          "text": "Do you forecast spend?",
+          "options": {
+            "no": "No",
+            "rough": "Roughly",
+            "model": "With a growth model",
+            "unit": "With unit costs (customer, order)"
+          }
+        },
+        "fo_rightsizing": {
+          "text": "Do you rightsize resources?",
+          "options": {
+            "never": "Never",
+            "once": "Once",
+            "regular": "Regularly",
+            "automated": "Automatically"
+          }
+        },
+        "fo_idle": {
+          "text": "What happens to idle resources (test environments at night, old disks)?",
+          "options": {
+            "unknown": "We do not know",
+            "manual": "We clean up sometimes",
+            "scheduled": "Schedules and regular clean-up",
+            "policy": "Automated policies"
+          }
+        },
+        "fo_ai_tracking": {
+          "text": "Do you know what each AI feature costs?",
+          "options": {
+            "no": "No",
+            "total": "Only the total",
+            "per_feature": "Per feature",
+            "per_request": "Per feature and per request"
+          }
+        },
+        "fo_ai_levers": {
+          "text": "Do you use ways to reduce AI spend?",
+          "options": {
+            "no": "No",
+            "model_choice": "A cheaper model where it is enough",
+            "caching": "Model choice and caching",
+            "measured": "Model choice, caching and batch processing, with measured quality"
+          }
+        },
+        "fo_owner": {
+          "text": "Who is accountable for spend?",
+          "options": {
+            "nobody": "Nobody in particular",
+            "finance": "Finance only",
+            "teams": "Teams for their own spend",
+            "shared": "Teams, finance and leadership together"
+          }
+        },
+        "fo_decisions": {
+          "text": "Does cost feed into technical decisions?",
+          "options": {
+            "no": "No",
+            "after": "After the fact",
+            "before": "Before major decisions",
+            "always": "Always, with a cost estimate"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_no_allocation": {
+          "title": "Spend without an owner",
+          "description": "Without allocation nobody sees their own spend and nobody reduces it."
+        },
+        "risk_no_budget_alerts": {
+          "title": "Surprises on the invoice",
+          "description": "Without budgets and alerts a mistake or spike shows up only on the invoice."
+        },
+        "risk_ai_blind": {
+          "title": "AI spend without tracking",
+          "description": "Model spend grows with usage; without a per-feature breakdown you do not know which one pays off."
+        },
+        "qw_tags": {
+          "title": "Mandatory tags",
+          "description": "Three tags (product, team, environment) and a report by them."
+        },
+        "qw_budget_alerts": {
+          "title": "Budgets and alerts",
+          "description": "A budget per area with alerts at 80% and 100%."
+        },
+        "qw_idle": {
+          "title": "Stop what is idle",
+          "description": "Schedules for test environments and removal of old disks and snapshots."
+        },
+        "qw_ai_caching": {
+          "title": "Right-size the model and cache",
+          "description": "Use a smaller model where quality is enough and cache the repeated parts of the prompt."
+        },
+        "rec_visibility": {
+          "title": "Spend visibility",
+          "description": "Allocation by product and team and a regular review."
+        },
+        "rec_budgets": {
+          "title": "Budgets and a forecast",
+          "description": "Budgets per area, alerts and a growth-based forecast."
+        },
+        "rec_optimisation": {
+          "title": "Regular optimisation",
+          "description": "Rightsizing, schedules and a review of commitments."
+        },
+        "rec_ai_cost": {
+          "title": "Managing AI spend",
+          "description": "Spend per feature and request, model choice, caching and batch processing with measured quality."
+        },
+        "rec_governance": {
+          "title": "Accountability for spend",
+          "description": "Teams own their spend and estimate it before decisions."
+        },
+        "ts_unit_economics": {
+          "title": "Unit economics",
+          "description": "Cost per customer, order or AI request, tracked alongside business metrics."
+        }
+      }
+    }
+  }
+}

@@ -62,7 +62,8 @@ describe("feature flags and tool registry", () => {
       process.env.TOOL_FLAGS = TOOLS.map((t) => `${t.flag}=on`).join(",");
       expect(TOOLS.filter((t) => t.status === "planned").some(isToolAvailable)).toBe(false);
       process.env.TOOL_FLAGS =
-        "tool_readiness=off,tool_team=off,tool_roi=off,tool_finder=off,tool_solution=off,tool_agents=off,tool_cloud=off,tool_devops=off,tool_observability=off";
+        "tool_readiness=off,tool_team=off,tool_roi=off,tool_finder=off,tool_solution=off,tool_agents=off,tool_cloud=off,tool_devops=off,tool_observability=off," +
+        "tool_ecommerce=off,tool_data_integration=off,tool_ai_governance=off,tool_ai_ops=off,tool_finops=off";
       expect(Object.keys(toolHrefs("en"))).toEqual(["advisor"]);
     } finally {
       process.env.TOOL_FLAGS = previous;
@@ -81,6 +82,11 @@ describe("feature flags and tool registry", () => {
       cloud_maturity: "/en/tools/cloud-platform-maturity",
       devops_maturity: "/en/tools/devops-delivery-maturity",
       observability: "/en/tools/observability-reliability",
+      ecommerce_architecture: "/en/tools/ecommerce-architecture",
+      data_integration: "/en/tools/data-integration",
+      ai_governance: "/en/tools/responsible-ai-governance",
+      ai_ops_readiness: "/en/tools/ai-operations-readiness",
+      finops: "/en/tools/finops-ai-cost",
     });
     expect(toolHrefs("bg").roi).toBe("/bg/instrumenti/roi-kalkulator");
     expect(toolHrefs("bg").finder).toBe("/bg/instrumenti/avtomatizatsii");

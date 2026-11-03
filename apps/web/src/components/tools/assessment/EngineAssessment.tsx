@@ -41,7 +41,7 @@ const fill = (template: string, values: Record<string, string | number>) =>
 
 interface Props {
   assessment: AssessmentKey;
-  tool: Extract<ToolKey, "cloud_maturity" | "devops_maturity" | "observability">;
+  tool: ToolKey;
   content: Content;
   locale: Locale;
   domainLinks: Partial<Record<DomainKey, { href: string; label: string }>>;

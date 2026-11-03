@@ -29,6 +29,51 @@ export const engineeringTool: typeof bgEngineeringTool = {
       lead: "Eight questions on whether you find problems before your customers do. The result shows scores by area, risks, quick wins and a roadmap — every recommendation says which answer triggered it.",
       facts: ["about 4 minutes", "no access to your systems", "no sign-up"],
     },
+    ecommerce_architecture: {
+      metaTitle: "E-commerce Architecture Assessment",
+      metaDescription:
+        "A self-assessment of an online store across 5 areas: platform, speed and SEO, integrations, data and operations. Risks, quick wins and a roadmap with the reason why.",
+      eyebrow: "Tools · E-commerce",
+      title: "E-commerce Architecture Assessment",
+      lead: "11 questions on the store's platform, speed, integrations, data and operations. Every recommendation says which answer triggered it.",
+      facts: ["Shopify, WooCommerce, Magento and custom builds", "no access to your store", "no sign-up"],
+    },
+    data_integration: {
+      metaTitle: "Data Integration Assessment",
+      metaDescription:
+        "A self-assessment across 5 areas: ownership, integration patterns, quality, monitoring and access. Risks, quick wins and a roadmap with the reason why.",
+      eyebrow: "Tools · Data & integration",
+      title: "Data Integration Assessment",
+      lead: "11 questions on how data moves between your systems. Every recommendation says which answer triggered it.",
+      facts: ["ERP, CRM, store, accounting, warehouse and BI", "no access to your systems", "no sign-up"],
+    },
+    ai_governance: {
+      metaTitle: "Responsible AI Governance Assessment",
+      metaDescription:
+        "A self-assessment across 5 areas: inventory and accountability, risk assessment, personal data, human oversight and transparency. Not legal advice.",
+      eyebrow: "Tools · AI governance",
+      title: "Responsible AI Governance Assessment",
+      lead: "11 questions on the rules and controls around your use of AI. The result is not legal advice and does not determine your obligations.",
+      facts: ["not legal advice", "no access to your systems", "no sign-up"],
+    },
+    ai_ops_readiness: {
+      metaTitle: "AI Operations Readiness Assessment",
+      metaDescription:
+        "A self-assessment across 5 areas: monitoring, quality, changes, incidents and cost of AI systems after launch.",
+      eyebrow: "Tools · Managed operations",
+      title: "AI Operations Readiness Assessment",
+      lead: "11 questions on whether your AI systems can be monitored, maintained and improved safely. Every recommendation says why.",
+      facts: ["assistants, RAG, agents and data extraction", "no access to your systems", "no sign-up"],
+    },
+    finops: {
+      metaTitle: "FinOps & AI Cost Assessment",
+      metaDescription:
+        "A self-assessment across 5 areas: visibility, budgets, optimisation, AI model costs and accountability. No savings forecasts.",
+      eyebrow: "Tools · Cloud & cost",
+      title: "FinOps & AI Cost Assessment",
+      lead: "11 questions on how you manage cloud and AI spend. The result contains no savings forecasts.",
+      facts: ["cloud, AI APIs, SaaS and hosting", "no access to your accounts", "no sign-up"],
+    },
   },
   wizard: {
     loading: "Loading the questions…",

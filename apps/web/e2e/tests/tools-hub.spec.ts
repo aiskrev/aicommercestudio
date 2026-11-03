@@ -1,10 +1,15 @@
 import { expect, test } from "@playwright/test";
 
 /**
- * Interactive Tools Hub: featured tools, category and availability filters, honest "Coming soon"
- * cards and intro pages (no form, no start button, noindex, not in the sitemap) and BG/EN routing.
+ * Interactive Tools Hub: featured tools, category and availability filters, every tool live (former
+ * "Coming soon" addresses serve the working tool) and BG/EN routing.
  */
 const CYRILLIC = /[Ѐ-ӿ]/;
+const octet = () => Math.floor(Math.random() * 250) + 1;
+
+// This file opens several assessment pages; its own client address keeps it out of the per-IP
+// rate-limit bucket that the other specs of the same run use (local stacks have no reverse proxy).
+test.use({ extraHTTPHeaders: { "X-Forwarded-For": `10.91.${octet()}.${octet()}` } });
 
 for (const l of [
   {
@@ -46,41 +51,32 @@ for (const l of [
     await page.keyboard.press("Enter");
     await expect(engineering).toHaveAttribute("aria-pressed", "true");
     await expect(directory.locator("article")).toHaveCount(5);
-    // Cloud & platform, DevOps delivery and observability are live; the other two are "Coming soon".
-    await expect(directory.locator("article[data-status='live']")).toHaveCount(3);
-    for (const card of await directory.locator("article[data-status='planned']").all()) {
-      await expect(card).toContainText(l.planned);
-      await expect(card.locator("button")).toHaveCount(0);
-    }
+    // All five engineering assessments are live; no card says "Coming soon".
+    await expect(directory.locator("article[data-status='live']")).toHaveCount(5);
+    for (const card of await directory.locator("article").all()) await expect(card).not.toContainText(l.planned);
     if (l.locale === "en") expect(await page.locator("main").innerText()).not.toMatch(CYRILLIC);
 
     await directory.locator("article").filter({ hasText: l.introTitle }).getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`${l.intro}$`));
+    await expect(page.getByTestId("engine-form")).toBeVisible();
   });
 
-  test(`planned tool intro (${l.locale}) is honest, noindex and routed in both languages`, async ({ page, request }) => {
+  test(`a former "Coming soon" address (${l.locale}) now serves the live, indexable tool`, async ({ page, request }) => {
     const response = await page.goto(l.intro);
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(l.introTitle);
-    await expect(page.getByTestId("tool-coming-soon")).toContainText(l.planned);
-    const main = page.locator("main");
-    await expect(main.locator("form, input, select, textarea")).toHaveCount(0);
-    await expect(main.getByRole("button")).toHaveCount(0);
-    await expect(page.locator("meta[name='robots']")).toHaveAttribute("content", /noindex/);
-    expect(await page.locator("link[rel='canonical']").getAttribute("href")).toMatch(new RegExp(`${l.intro}$`));
+    await expect(page.getByTestId("engine-form")).toBeVisible();
+    await expect(page.getByTestId("tool-coming-soon")).toHaveCount(0);
+    const robots = await page.locator("meta[name='robots']").evaluateAll((els) => els.map((el) => el.getAttribute("content") ?? ""));
+    expect(robots.join(" ")).not.toMatch(/noindex/);
     const alternates = await page.locator("link[rel='alternate'][hreflang]").evaluateAll((links) =>
       links.map((link) => new URL(link.getAttribute("href") ?? "").pathname),
     );
     expect(alternates).toContain(l.introEn);
     expect(alternates).toContain("/bg/instrumenti/arhitektura-na-online-magazin");
-
     const sitemap = await (await request.get("/sitemap.xml")).text();
-    expect(sitemap).not.toContain("arhitektura-na-online-magazin");
-    expect(sitemap).not.toContain("ecommerce-architecture");
-
-    await main.getByRole("link", { name: l.consult }).click();
-    await expect(page).toHaveURL(/\/(kontakti|contact)\?(usluga|service)=[a-z_]+$/);
-    await expect(page.locator("form").first()).toBeVisible();
+    expect(sitemap).toContain("arhitektura-na-online-magazin");
+    expect(sitemap).toContain("ecommerce-architecture");
   });
 }
 
