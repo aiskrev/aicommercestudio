@@ -8,7 +8,7 @@ import { BarList, Matrix } from "@/components/tools/charts/Charts";
 import { ROI_PROCESS_KEY } from "@/components/tools/roi/RoiCalculator";
 import { fill } from "@/components/tools/team/TeamControls";
 import { ToolActions } from "@/components/tools/ToolActions";
-import { ChoiceQuestion, MethodologyNote, StepNav, StepProgress, ToolLeadCapture } from "@/components/tools/ToolUi";
+import { ChoiceQuestion, MethodologyNote, ResultBasis, StepNav, StepProgress, ToolLeadCapture } from "@/components/tools/ToolUi";
 import { Icon } from "@/components/ui/Icon";
 import { Alert, Button, cx } from "@/components/ui/primitives";
 import type { finderTool } from "@/content/bg/tool-finder";
@@ -20,6 +20,7 @@ import { type ExportFormat, type ToolEvent, trackToolEvent } from "@/lib/analyti
 import {
   CRITERIA,
   CRITERION_DIRECTION,
+  FINDER_MODEL_VERSION,
   type Category,
   type Level,
   MAX_PROCESSES,
@@ -543,6 +544,7 @@ function FinderResult({
         </section>
       )}
 
+      <ResultBasis text={ui.basis} version={FINDER_MODEL_VERSION} basis="heuristic" />
       <MethodologyNote title={content.methodologyTitle} paragraphs={[...content.methodology, content.disclaimer]} />
       <ToolActions
         title={ui.actionsTitle}

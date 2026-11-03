@@ -136,11 +136,11 @@ def test_shipped_definitions_load_and_validate():
     ]
     current = {key: (reg.current(key).version, reg.current(key).status) for key in reg.versions}
     assert current == {
-        "ai_governance": ("1.0.0", "live"),
-        "ai_ops_readiness": ("1.0.0", "live"),
+        "ai_governance": ("1.1.0", "live"),
+        "ai_ops_readiness": ("1.1.0", "live"),
         "data_integration": ("1.0.0", "live"),
         "ecommerce_architecture": ("1.0.0", "live"),
-        "finops": ("1.0.0", "live"),
+        "finops": ("1.1.0", "live"),
         "cloud_platform": ("1.0.0", "live"),
         "devops_delivery": ("1.1.0", "live"),
         "observability_reliability": ("1.2.0", "live"),
@@ -149,6 +149,8 @@ def test_shipped_definitions_load_and_validate():
     assert reg.get("devops_delivery", "1.0.0") is not None
     assert reg.get("observability_reliability", "1.0.0") is not None
     assert reg.get("observability_reliability", "1.1.0") is not None
+    for key in ("ai_governance", "ai_ops_readiness", "finops"):
+        assert reg.get(key, "1.0.0") is not None
     for key in reg.versions:
         assert not CYRILLIC.search(reg.current(key).texts["en"].model_dump_json())
     assert reg.current("observability_reliability").extension == "observability_signals"

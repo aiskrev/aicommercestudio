@@ -401,11 +401,14 @@ def test_data_readiness_rag_caveats_and_patterns():
 FIVE = ["ecommerce_architecture", "data_integration", "ai_governance", "ai_ops_readiness", "finops"]
 
 
+TWELVE = ("ai_governance", "ai_ops_readiness", "finops")
+
+
 @pytest.mark.parametrize("key", FIVE)
 def test_new_assessments_score_explain_and_stay_honest(key):
     definition = registry().current(key)
-    assert (definition.version, definition.status) == ("1.0.0", "live")
-    assert len(definition.dimensions) == (11 if key in ("ecommerce_architecture", "data_integration") else 5)
+    assert (definition.version, definition.status) == ("1.1.0" if key in TWELVE else "1.0.0", "live")
+    assert len(definition.dimensions) == (12 if key in TWELVE else 11)
     context = [q for q in definition.questions if q.evidence == "context"]
     assert len(context) == 1 and not context[0].scored
     first_context_option = context[0].options[0].key
@@ -420,7 +423,8 @@ def test_new_assessments_score_explain_and_stay_honest(key):
         if index == 0:
             assert {"risk", "quick_win", "recommendation"} <= {f["kind"] for f in view["recommendations"]}
         else:
-            assert {f["kind"] for f in view["recommendations"]} <= {"target_state", "context"}
+            # Example documents and checklists are reference material, shown for every profile.
+            assert {f["kind"] for f in view["recommendations"]} <= {"target_state", "context", "pattern"}
     # Context never moves the score.
     base = answers_at(definition, 2)
     scores = {
@@ -440,6 +444,138 @@ def test_the_ai_act_note_never_states_obligations():
         f for f in present_result(definition, result, "en", answers)["recommendations"] if f["key"] == "ctx_ai_act"
     )
     assert "does not determine your obligations" in note["description"]
+
+
+@pytest.mark.parametrize("key", TWELVE)
+def test_1_0_0_results_of_the_twelve_area_assessments_still_rescore(key):
+    previous = registry().get(key, "1.0.0")
+    assert previous is not None and len(previous.dimensions) == 5
+    context = {q.key: [q.options[0].key] for q in previous.questions if q.evidence == "context"}
+    _, result = service.assess(previous, answers_at(previous, 1, **context))
+    assert result.overall == 33
+
+
+def test_governance_1_1_0_gap_analysis_documents_and_review_workflow():
+    definition = registry().current("ai_governance")
+    assert definition.dimension_keys == (
+        "inventory", "classification", "vendors", "privacy", "threat_modeling", "injection",
+        "oversight", "evaluation", "traceability", "incidents", "change", "retention",
+    )
+    answers, weak = service.assess(definition, answers_at(definition, 0, use_context=["decisions"]))
+    view = present_result(definition, weak, "en", answers)
+    keys = {f["key"]: f for f in view["recommendations"]}
+    assert {"risk_shadow_ai", "risk_exfiltration", "risk_decisions_without_oversight", "risk_live_changes"} <= set(keys)
+    assert "templates, not legal documents" in keys["pattern_governance_documents"]["title"]
+    assert keys["pattern_review_workflow"]["description"].startswith("A request for a new AI use case")
+    # Risks come first in the remediation checklist, then quick wins, then the per-area recommendations.
+    kinds = [f["kind"] for f in view["recommendations"]]
+    assert kinds.index("risk") < kinds.index("quick_win") < kinds.index("recommendation")
+    assert all(d["level"]["key"] == "initial" for d in view["dimensions"])
+    phrases = {
+        "en": ("not a legal audit", "does not confirm compliance"),
+        "bg": ("не е правен одит", "не удостоверява"),
+    }
+    for locale in ("en", "bg"):
+        assert all(p in definition.texts[locale].disclaimer for p in phrases[locale])
+    assert "ai act" not in " ".join(f["title"].lower() for f in view["recommendations"])
+
+
+def test_ai_ops_1_1_0_risk_register_checklist_and_managed_boundaries():
+    definition = registry().current("ai_ops_readiness")
+    assert len(definition.dimensions) == 12 and all(q.type != "number" for q in definition.questions)
+    answers, weak = service.assess(definition, answers_at(definition, 0, ai_context=["agents"]))
+    view = present_result(definition, weak, "en", answers)
+    keys = {f["key"]: f for f in view["recommendations"]}
+    assert {"risk_live_edits", "risk_broad_tools", "risk_no_kill_switch", "risk_unbounded_cost"} <= set(keys)
+    assert {"pattern_production_checklist", "pattern_managed_boundaries", "ctx_agents"} <= set(keys)
+    assert all(f["because"] for f in view["recommendations"])  # every finding has a traceable rule basis
+    assert [step["horizon"] for step in view["roadmap"]] == [30, 60]
+    assert "show no real health or telemetry" in definition.texts["en"].disclaimer
+    _, strong = service.assess(definition, answers_at(definition, 3, ai_context=["assistant"]))
+    assert "pattern_managed_boundaries" not in strong.recommendations
+    assert "ts_continuous_operations" in strong.recommendations
+
+
+def test_finops_1_1_0_stays_distinct_from_the_roi_calculator():
+    definition = registry().current("finops")
+    assert len(definition.dimensions) == 12
+    # No prices, currencies or amounts to type in: the assessment never computes costs or savings.
+    assert all(q.type in ("single_choice", "multi_choice") for q in definition.questions)
+    for locale in ("bg", "en"):
+        texts = definition.texts[locale].model_dump_json()
+        assert not re.search(r"[€$£]|\bEUR\b|\bUSD\b|\bлв\.?", texts)
+    answers, weak = service.assess(definition, answers_at(definition, 0, spend_context=["ai_apis"]))
+    keys = set(weak.recommendations)
+    assert {"risk_no_allocation", "risk_no_alerts", "risk_ai_unaccounted", "ctx_not_roi"} <= keys
+    note = definition.texts["en"].recommendations["ctx_not_roi"].description
+    assert "uses no price lists, calculates no savings and has no access to your billing" in note
+
+
+def answers_for(definition: AssessmentDefinition) -> dict[str, Any]:
+    """A mid-range profile: required questions only (middle single choice, every multiple choice but "none")."""
+    values: dict[str, Any] = {}
+    for q in definition.questions:
+        if not q.required:
+            continue
+        if q.type == "single_choice":
+            values[q.key] = q.options[len(q.options) // 2].key
+        elif q.type == "multi_choice":
+            values[q.key] = [o.key for o in q.options if o.key != "none"]
+    return values
+
+
+ALL_CURRENT = sorted(build_registry().versions)
+
+
+@pytest.mark.parametrize("key", ALL_CURRENT)
+def test_every_assessment_is_locale_equivalent_repeatable_and_rejects_invalid_input(client, key):
+    definition = registry().current(key)
+    answers = answers_for(definition)
+    bodies = {}
+    for locale in ("bg", "en", "en"):
+        response = score(client, key, answers, locale=locale)
+        assert response.status_code == 200, (key, response.text)
+        bodies.setdefault(locale, []).append(response.json())
+
+    def summary(body):
+        return (
+            body["definition_version"],
+            body["algorithm"],
+            body["overall"],
+            body["band"]["key"],
+            [(d["key"], d["score"], d["level"]["key"]) for d in body["dimensions"]],
+            [(f["key"], f["kind"], f["horizon"], f["track"]) for f in body["recommendations"]],
+            body["roadmap"],
+            body["domains"],
+        )
+
+    assert summary(bodies["bg"][0]) == summary(bodies["en"][0]) == summary(bodies["en"][1])
+    assert bodies["bg"][0]["title"] != bodies["en"][0]["title"]
+    # The same answers always give the same result (the fingerprint covers version, answers and result).
+    first = service.assess(definition, answers)[1]
+    assert first.fingerprint == service.assess(definition, dict(answers))[1].fingerprint
+
+    single = next(q for q in definition.questions if q.type == "single_choice" and q.required)
+    for bad in ("<script>alert(1)</script>", 3, None):
+        payload = dict(answers, **{single.key: bad})
+        if bad is None:
+            payload.pop(single.key)
+        response = score(client, key, payload)
+        assert response.status_code == 422, (key, bad)
+        assert "<script>" not in response.text
+    assert score(client, key, dict(answers, unknown_question="x")).status_code == 422
+
+
+@pytest.mark.parametrize("key", ALL_CURRENT)
+def test_every_assessment_report_renders_in_both_languages(key):
+    definition = registry().current(key)
+    answers, result = service.assess(definition, answers_for(definition))
+    for locale in ("bg", "en"):
+        view = present_result(definition, result, locale, answers)
+        document = build_document(
+            view, locale=locale, created_at=utcnow(), expires_at=utcnow() + timedelta(days=90), reference="R-TEST"
+        )
+        assert render_pdf(document).startswith(b"%PDF")
 
 
 # --------------------------------------------------------------------------- API

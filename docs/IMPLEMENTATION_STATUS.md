@@ -1,6 +1,6 @@
 # Implementation status
 
-Last updated: 2026-10-28. Environment: Windows 11 Pro, Docker Desktop, images `python:3.13-slim`,
+Last updated: 2026-11-03. Environment: Windows 11 Pro, Docker Desktop, images `python:3.13-slim`,
 `node:24-alpine`, `postgres:17-alpine`, `mcr.microsoft.com/playwright:v1.64.1-noble`.
 
 ## Current state: `main` @ `565d0b1` (2026-10-27)
@@ -15,6 +15,26 @@ Executed during the platform baseline audit, against this commit
 | End-to-end (desktop Chromium + mobile) | `.\scripts\test.ps1 -Suite e2e` (production build) | **84 passed** |
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
+
+Branch `feature/assessments-consistency` (from `main` @ `59ff0d6`, 2026-11-03): changes on this branch:
+
+* Responsible AI Governance, AI Operations Readiness and FinOps & AI Cost are now at 1.1.0, with
+  12 areas and 25 questions each. The 1.0.0 versions are kept, so saved results still re-render.
+* The governance assessment gives a gap analysis, example governance documents and a review
+  workflow, and states that it is educational: not a legal audit and not a compliance check.
+* The AI operations assessment gives a risk register, a production-readiness checklist and managed
+  service boundaries.
+* FinOps has no prices and no savings, and is kept separate from the ROI calculator.
+* All ten assessment tools share one results experience: strengths and gaps, a versioned
+  methodology disclosure that says whether the result is a heuristic or measured, and workshops. See
+  [ASSESSMENT_COVERAGE.md](ASSESSMENT_COVERAGE.md).
+* No scoring change to any other assessment. No migration.
+
+Results:
+
+* API: **585 passed**, Ruff clean, docs and OpenAPI in sync.
+* Web: **603** unit tests passed; typecheck and lint clean.
+* e2e: **157 passed** (desktop and mobile).
 
 Branch `feature/assessments-depth` (from `feature/remaining-assessments`, 2026-11-03): the briefs for
 Observability & Reliability, E-commerce Architecture and Data & Integration Readiness in full —

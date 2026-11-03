@@ -7,7 +7,7 @@ import { OpportunityFinder, finderSummaryText } from "@/components/tools/finder/
 import { ROI_PROCESS_KEY, RoiCalculator, roiSummaryText } from "@/components/tools/roi/RoiCalculator";
 import { getContent } from "@/content";
 import { registerAnalyticsSink, type ToolEvent } from "@/lib/analytics";
-import { rankOpportunities } from "@/lib/finder";
+import { FINDER_MODEL_VERSION, rankOpportunities } from "@/lib/finder";
 import { calculateRoi } from "@/lib/roi";
 
 const push = vi.fn();
@@ -214,6 +214,7 @@ describe("opportunity finder", () => {
     expect(within(result).getByTestId("finder-pilot")).toHaveTextContent("“Invoice processing” — AI classification and extraction");
     expect(within(result).getByTestId("finder-pilot")).toHaveTextContent("Indicatively 4–8 weeks");
     expect(within(result).getByTestId("finder-suitability-note")).toHaveTextContent("not a financial return");
+    expect(within(result).getByTestId("tool-version")).toHaveTextContent(`Methodology version ${FINDER_MODEL_VERSION}`);
     expect(within(within(result).getByTestId("finder-workshops")).getByRole("link", { name: "AI agents and business automation" })).toBeInTheDocument();
     expect(cards[1]).toHaveTextContent(finder.blockers.data_not_digital);
     expect(cards[1]).toHaveTextContent(finder.result.agentsLater);

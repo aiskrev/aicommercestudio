@@ -289,6 +289,8 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
             contactHref={href(contactWithService(domainDefinition(toolByKey(key).domain ?? "advisory_enablement").contactService))}
             privacyHref={href(routes.privacy)}
             retentionDays={ASSESSMENT_RETENTION_DAYS}
+            basis={tools.ui.basis}
+            workshops={hubLinks(locale, ["advisory_enablement"])}
           />
         </Section>
       )}

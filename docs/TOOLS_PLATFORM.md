@@ -19,9 +19,9 @@ Foundations for the business assessment and solution-design tools. Hub: `/bg/ins
 | Observability & Reliability Assessment (engine, 11 areas) | `observability` | live | `/bg/instrumenti/nablyudaemost-i-nadezhdnost` ↔ `/en/tools/observability-reliability` | `tool_observability` (on) |
 | E-commerce Architecture Assessment (engine, 11 areas) | `ecommerce_architecture` | live | `/bg/instrumenti/arhitektura-na-online-magazin` ↔ `/en/tools/ecommerce-architecture` | `tool_ecommerce` (on) |
 | Data & Integration Readiness Assessment (engine, 11 areas) | `data_integration` | live | `/bg/instrumenti/integratsiya-na-danni` ↔ `/en/tools/data-integration` | `tool_data_integration` (on) |
-| Responsible AI Governance Assessment (engine, 5 areas) | `ai_governance` | live | `/bg/instrumenti/otgovoren-ai` ↔ `/en/tools/responsible-ai-governance` | `tool_ai_governance` (on) |
-| AI Operations Readiness Assessment (engine, 5 areas) | `ai_ops_readiness` | live | `/bg/instrumenti/gotovnost-za-ai-operatsii` ↔ `/en/tools/ai-operations-readiness` | `tool_ai_ops` (on) |
-| FinOps & AI Cost Assessment (engine, 5 areas) | `finops` | live | `/bg/instrumenti/finops-i-ai-razhodi` ↔ `/en/tools/finops-ai-cost` | `tool_finops` (on) |
+| Responsible AI Governance Assessment (engine 1.1.0, 12 areas) | `ai_governance` | live | `/bg/instrumenti/otgovoren-ai` ↔ `/en/tools/responsible-ai-governance` | `tool_ai_governance` (on) |
+| AI Operations Readiness Assessment (engine 1.1.0, 12 areas) | `ai_ops_readiness` | live | `/bg/instrumenti/gotovnost-za-ai-operatsii` ↔ `/en/tools/ai-operations-readiness` | `tool_ai_ops` (on) |
+| FinOps & AI Cost Assessment (engine 1.1.0, 12 areas) | `finops` | live | `/bg/instrumenti/finops-i-ai-razhodi` ↔ `/en/tools/finops-ai-cost` | `tool_finops` (on) |
 
 Solution builder and agent library: see [SOLUTION_BUILDER.md](SOLUTION_BUILDER.md). The two engineering
 assessments: [ENGINEERING_ASSESSMENTS.md](ENGINEERING_ASSESSMENTS.md); their reports:

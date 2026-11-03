@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EngineAssessment } from "@/components/tools/assessment/EngineAssessment";
 import { engineeringTool } from "@/content/bg/tool-engineering";
 import { engineeringTool as enEngineeringTool } from "@/content/en/tool-engineering";
+import { tools as enTools } from "@/content/en/tools";
 import {
   type AssessmentDefinitionView,
   type AssessmentResultView,
@@ -181,6 +182,8 @@ function renderTool(content = enEngineeringTool) {
       contactHref="/en/contact?service=audit"
       privacyHref="/en/privacy"
       retentionDays={90}
+      basis={enTools.ui.basis}
+      workshops={[{ href: "/en/services/advisory-assessments-and-enablement", label: "Advisory, assessments & enablement" }]}
     />,
   );
 }
@@ -264,6 +267,14 @@ describe("engine assessment wizard", () => {
       "/en/services/devops-sre",
     );
     expect(view).toHaveTextContent(enEngineeringTool.result.selfReported);
+    // The shared results layout: strengths/gaps from the area scores, workshops, versioned methodology.
+    expect(screen.getByRole("region", { name: enEngineeringTool.result.gaps })).toHaveTextContent("Version control");
+    expect(screen.getByRole("region", { name: enEngineeringTool.result.strengths })).toHaveTextContent(enEngineeringTool.result.noStrengths);
+    expect(within(screen.getByTestId("engine-workshops")).getByRole("link")).toHaveAttribute("href", "/en/services/advisory-assessments-and-enablement");
+    const basis = screen.getByTestId("tool-basis");
+    expect(basis).toHaveAttribute("data-basis", "heuristic");
+    expect(within(basis).getByTestId("tool-version")).toHaveTextContent("Methodology version 1.1.0");
+    expect(view).toHaveTextContent("version 1.1.0, algorithm weighted-mean/1");
   });
 
   it("shows the result without asking for contact details; saving and consultation are optional", async () => {

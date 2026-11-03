@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode, Ref } from "react";
 
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { Alert, Button, ButtonLink, cx, Skeleton } from "@/components/ui/primitives";
+import { Alert, Badge, Button, ButtonLink, cx, Skeleton } from "@/components/ui/primitives";
 
 /* Shared building blocks for interactive tools: progress, questions, navigation, results,
    recommendations and states. Presentational only — tool logic lives in lib/. */
@@ -417,6 +417,33 @@ export function PhasedRoadmap({
           </li>
         ))}
       </ol>
+    </section>
+  );
+}
+
+/**
+ * The same disclosure on every assessment result: which methodology version produced it and whether it
+ * is a heuristic from the visitor's answers or includes values they stated as measured.
+ */
+export function ResultBasis({
+  text,
+  version,
+  basis,
+}: {
+  text: { label: string; version: string; heuristic: string; measured: string; note: string };
+  version: string;
+  basis: "heuristic" | "measured";
+}) {
+  return (
+    <section aria-label={text.label} className="grid gap-2" data-testid="tool-basis" data-basis={basis}>
+      <p className="flex flex-wrap items-center gap-2 text-sm">
+        <span className="text-fg-muted">{text.label}:</span>
+        <span data-testid="tool-version">
+          <Badge tone="outline">{text.version.replace("{version}", version)}</Badge>
+        </span>
+        <Badge tone={basis === "measured" ? "success" : "warning"}>{basis === "measured" ? text.measured : text.heuristic}</Badge>
+      </p>
+      <p className="text-sm text-fg-muted">{text.note}</p>
     </section>
   );
 }
