@@ -17,7 +17,12 @@ import {
 import { isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
+import { LinkList } from "@/components/reference/ReferenceBlocks";
+import { WorkshopCards } from "@/components/workshops/WorkshopCards";
+import { topicScenarios, topicWorkshops } from "@/lib/insight-topics";
+import { scenarioLinks } from "@/lib/reference-links";
 import { contactWithService, routes } from "@/lib/routes";
+import { workshopLinks } from "@/lib/workshop-links";
 import { buildMetadata, collectionPageJsonLd, itemListJsonLd } from "@/lib/seo";
 
 export const dynamicParams = false;
@@ -54,6 +59,9 @@ export default async function CategoryPage({ params }: PageProps<"/[locale]/stat
   const path = href(routes.insightsCategory(category.slug));
   const articles = articlesInCategory(locale, category.key);
   const service = serviceByKey(locale, category.relatedService);
+  const { workshops, reference } = getContent(locale);
+  const relatedWorkshops = workshopLinks(locale, topicWorkshops(category.key));
+  const relatedScenarios = scenarioLinks(locale, topicScenarios(category.key));
 
   return (
     <>
@@ -99,6 +107,26 @@ export default async function CategoryPage({ params }: PageProps<"/[locale]/stat
             <span className="t-h3">{service.shortTitle}</span>
           </span>
         </Link>
+        {relatedWorkshops.length > 0 && (
+          <section aria-labelledby="topic-workshops-title" className="mt-12">
+            <h2 id="topic-workshops-title" className="t-h3-lg">
+              {workshops.section.title}
+            </h2>
+            <p className="mt-2 text-fg-muted">{workshops.section.lead}</p>
+            <WorkshopCards items={relatedWorkshops} customLabel={workshops.page.custom} className="mt-6" testId="topic-workshops" />
+          </section>
+        )}
+        {relatedScenarios.length > 0 && (
+          <section aria-labelledby="topic-scenarios-title" className="mt-10">
+            <h2 id="topic-scenarios-title" className="t-h3-lg">
+              {reference.scenarios.title}
+            </h2>
+            <div className="mt-4">
+              <LinkList items={relatedScenarios} testId="topic-scenarios" />
+            </div>
+          </section>
+        )}
+
         <Link href={href(routes.insights)} className="mt-6 inline-flex text-sm text-brand">
           ← {dict.common.allArticles}
         </Link>

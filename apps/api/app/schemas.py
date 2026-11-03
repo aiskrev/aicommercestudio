@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, mo
 from pydantic_core import PydanticCustomError
 
 from app.advisor.schemas import AdvisorAssessmentSummary
-from app.models import BudgetRange, InquiryType, LeadLocale, LeadStatus, Platform, ServiceKey, Timeline
+from app.models import BudgetRange, InquiryType, LeadLocale, LeadStatus, Platform, ServiceKey, Timeline, WorkshopKey
 
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 _PHONE_RE = re.compile(r"^\+?[0-9 ()\-./]{6,40}$")
@@ -230,6 +230,8 @@ class LeadCreate(StrictModel):
     locale: LeadLocale = LeadLocale.BG
     # Only for service == ai_managed.
     ai_managed: AiManagedDetails | None = None
+    # Catalogue workshop or assessment the enquiry is about (sent from a workshop page).
+    workshop: WorkshopKey | None = None
 
     @field_validator("name", "company")
     @classmethod
@@ -375,6 +377,8 @@ class LeadSummaryOut(BaseModel):
     # AI Managed Services triage (None for other leads).
     ams_level: str | None = None
     ams_readiness: str | None = None
+    # Catalogue workshop or assessment the enquiry was sent about (None otherwise).
+    workshop_key: str | None = None
 
 
 class ReadinessDetailsOut(BaseModel):

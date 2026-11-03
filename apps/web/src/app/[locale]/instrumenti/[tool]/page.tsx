@@ -23,8 +23,10 @@ import { ACTION_SERVICE } from "@/lib/readiness";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
 import { domainHubLinks } from "@/lib/domain-links";
-import { type DomainKey, domainDefinition } from "@/lib/domains";
+import { domainDefinition } from "@/lib/domains";
 import { TOOL_PAGE_SLUGS } from "@/lib/tool-slugs";
+import { workshopLinks } from "@/lib/workshop-links";
+import { workshopsForAssessment } from "@/lib/workshops";
 import { isToolAvailable, isToolPlanned, TOOL_SLUGS, toolByKey, toolHrefs, TOOLS, type ToolKey, toolMinutes } from "@/lib/tools";
 
 export const dynamicParams = false;
@@ -114,14 +116,12 @@ function resolveTool(slug: string): HostedTool | null {
   return key;
 }
 
-/** Published domain hubs (they list the workshops and consultant-led assessments). */
-function hubLinks(locale: Locale, domains: DomainKey[]): { href: string; label: string }[] {
-  return domains
-    .filter((domain) => domainDefinition(domain).published)
-    .map((domain) => {
-      const hub = domainByKey(locale, domain);
-      return { href: localizePath(locale, routes.service(hub.slug)), label: hub.name };
-    });
+/** Workshops and consultant-led assessments that continue from this tool's result (lib/workshops.ts). */
+function resultWorkshops(locale: Locale, tool: ToolKey): { href: string; label: string }[] {
+  return [
+    ...workshopLinks(locale, workshopsForAssessment(tool)).map(({ href, label }) => ({ href, label })),
+    { href: localizePath(locale, routes.workshops), label: getContent(locale).workshops.section.all },
+  ];
 }
 
 function toolContent(locale: Locale, key: HostedTool) {
@@ -235,7 +235,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
             teamHref={hrefs.team}
             advisorHref={hrefs.advisor}
             services={services}
-            workshops={hubLinks(locale, ["ai_agents_automation", "advisory_enablement"])}
+            workshops={resultWorkshops(locale, "finder")}
           />
         </Section>
       )}
@@ -268,7 +268,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
               advisorHref={hrefs.advisor}
               privacyHref={href(routes.privacy)}
               locale={locale}
-              workshops={hubLinks(locale, ["ai_strategy", "advisory_enablement"])}
+              workshops={resultWorkshops(locale, "readiness")}
             />
           </Suspense>
         </Section>
@@ -290,7 +290,7 @@ export default async function ToolPage({ params }: PageProps<"/[locale]/instrume
             privacyHref={href(routes.privacy)}
             retentionDays={ASSESSMENT_RETENTION_DAYS}
             basis={tools.ui.basis}
-            workshops={hubLinks(locale, ["advisory_enablement"])}
+            workshops={resultWorkshops(locale, key)}
           />
         </Section>
       )}

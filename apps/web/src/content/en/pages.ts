@@ -55,6 +55,7 @@ export const industries: typeof bgIndustries = {
       description: "Growing stores that need stable technology, better visibility and less manual work.",
       needs: ["Reliable maintenance", "Category and product SEO", "Clear sales reporting"],
       services: ["maintenance", "seo", "analytics"],
+      workshops: ["ecommerce_integration_discovery", "ai_strategy_discovery"],
     },
     {
       icon: "cart",
@@ -62,6 +63,7 @@ export const industries: typeof bgIndustries = {
       description: "Merchants who rely on apps and themes and want control over performance and integrations.",
       needs: ["Theme and app optimization", "Warehouse and ERP integrations", "Order automation"],
       services: ["maintenance", "integrations", "automation"],
+      workshops: ["ecommerce_integration_discovery"],
     },
     {
       icon: "layers",
@@ -69,6 +71,7 @@ export const industries: typeof bgIndustries = {
       description: "WordPress-based stores where updates, plugins and security need constant attention.",
       needs: ["Safe updates", "Security hardening", "Speed and Core Web Vitals"],
       services: ["maintenance", "integrations", "seo"],
+      workshops: ["ecommerce_integration_discovery"],
     },
     {
       icon: "building",
@@ -76,6 +79,7 @@ export const industries: typeof bgIndustries = {
       description: "Brick-and-mortar shops and distributors building or expanding their online sales.",
       needs: ["Technical audit and plan", "Connecting in-store inventory", "SEO and measurement basics"],
       services: ["audit", "integrations", "seo"],
+      workshops: ["ecommerce_integration_discovery", "ai_strategy_discovery"],
     },
     {
       icon: "workflow",
@@ -83,6 +87,7 @@ export const industries: typeof bgIndustries = {
       description: "Teams that lose hours on repetitive tasks between email, spreadsheets, CRM and accounting.",
       needs: ["Process mapping", "Automation with human approval", "System integrations"],
       services: ["automation", "integrations", "ai_tools"],
+      workshops: ["ai_readiness_mapping", "agent_architecture"],
     },
     {
       icon: "sparkles",
@@ -90,6 +95,7 @@ export const industries: typeof bgIndustries = {
       description: "Businesses with a concrete idea for an AI assistant, document analysis or an internal knowledge base.",
       needs: ["Prototype and quality evaluation", "Data protection", "Integration with existing systems"],
       services: ["ai_tools", "automation", "audit"],
+      workshops: ["ai_strategy_discovery", "rag_data_readiness"],
     },
     {
       icon: "shield",
@@ -97,6 +103,7 @@ export const industries: typeof bgIndustries = {
       description: "Companies with an existing website or store that want predictable technical care and organic growth.",
       needs: ["Monthly maintenance", "Monitoring and security", "SEO retainer"],
       services: ["maintenance", "seo", "analytics"],
+      workshops: ["ecommerce_integration_discovery"],
     },
     {
       icon: "activity",
@@ -104,6 +111,7 @@ export const industries: typeof bgIndustries = {
       description: "Businesses that use an AI assistant or automation but lack the expertise to monitor and maintain it.",
       needs: ["Monitoring and early problem detection", "Quality evaluation", "Cost control"],
       services: ["ai_managed", "ai_tools", "integrations"],
+      workshops: ["responsible_ai_review", "observability_sre"],
     },
   ],
   sectorsTitle: "Typical sectors",

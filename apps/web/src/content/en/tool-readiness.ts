@@ -246,7 +246,7 @@ export const readinessTool: typeof bgReadinessTool = {
   },
   workshops: {
     title: "Workshops and consultant-led assessments",
-    text: "If you would rather start together, see the fixed-scope formats in these domains:",
+    text: "If you would rather start together, these formats continue from your result. Scope and price are agreed in writing:",
   },
   report: {
     title: "Personalised PDF report",

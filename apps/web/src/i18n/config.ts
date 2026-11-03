@@ -13,6 +13,7 @@
 import { AGENT_SLUGS } from "@/lib/agent-slugs";
 import { PATTERN_SLUGS, SCENARIO_SLUGS } from "@/lib/reference-slugs";
 import { TOOL_PAGE_SLUGS } from "@/lib/tool-slugs";
+import { WORKSHOP_SLUGS } from "@/lib/workshop-slugs";
 
 export const locales = ["bg", "en"] as const;
 export type Locale = (typeof locales)[number];
@@ -51,6 +52,7 @@ const EN_SEGMENTS: Record<string, string> = {
   "ai-agenti": "ai-agents",
   "referentni-stsenarii": "reference-scenarios",
   "integratsionni-modeli": "integration-patterns",
+  "rabotni-sreshti": "workshops",
 };
 /** Second-level segments (e.g. `/statii/tema/<topic>`). */
 const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
@@ -63,6 +65,8 @@ const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
   // Reference scenarios and integration patterns (lib/reference-slugs.ts).
   "referentni-stsenarii": Object.fromEntries(Object.values(SCENARIO_SLUGS).map(({ bg, en }) => [bg, en])),
   "integratsionni-modeli": Object.fromEntries(Object.values(PATTERN_SLUGS).map(({ bg, en }) => [bg, en])),
+  // Workshops & Advisory catalogue (lib/workshop-slugs.ts).
+  "rabotni-sreshti": Object.fromEntries(Object.values(WORKSHOP_SLUGS).map(({ bg, en }) => [bg, en])),
 };
 
 const BG_SEGMENTS = Object.fromEntries(Object.entries(EN_SEGMENTS).map(([bg, en]) => [en, bg]));
@@ -74,7 +78,7 @@ const BG_SUBSEGMENTS: Record<string, Record<string, string>> = Object.fromEntrie
 );
 
 /** Query parameter names used by internal links; English URLs use English names. */
-const EN_QUERY: Record<string, string> = { usluga: "service", tip: "type" };
+const EN_QUERY: Record<string, string> = { usluga: "service", tip: "type", sreshta: "workshop" };
 const EN_QUERY_VALUES: Record<string, Record<string, string>> = { tip: { oferta: "quote" } };
 const BG_QUERY = Object.fromEntries(Object.entries(EN_QUERY).map(([bg, en]) => [en, bg]));
 const BG_QUERY_VALUES: Record<string, Record<string, string>> = Object.fromEntries(

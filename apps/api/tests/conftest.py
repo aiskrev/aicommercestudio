@@ -66,6 +66,7 @@ TABLES = [
     "ops_eval_results", "ops_eval_runs", "ops_eval_cases", "ops_eval_datasets", "ops_agent_versions",
     "ops_agents", "ops_memberships", "ops_workspaces", "ops_organizations",
     "advisor_assessments", "team_configurations", "assessment_results",
+    "lead_proposal_versions", "lead_proposals", "lead_opportunities",
     "ai_action_requests", "audit_logs", "lead_notes", "leads",
     "admin_sessions", "admin_users",
 ]

@@ -8,6 +8,7 @@ import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
+import { workshopLinks } from "@/lib/workshop-links";
 import { buildMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/za-kogo">) {
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/za-kogo"
 
 export default async function IndustriesPage({ params }: PageProps<"/[locale]/za-kogo">) {
   const locale = await resolveLocale(params);
-  const { industries: page, home } = getContent(locale);
+  const { industries: page, home, workshops } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
 
@@ -63,6 +64,20 @@ export default async function IndustriesPage({ params }: PageProps<"/[locale]/za
                   );
                 })}
               </div>
+              {segment.workshops.length > 0 && (
+                <div className="mt-4" data-testid="industry-workshops">
+                  <p className="t-label">{workshops.section.title}</p>
+                  <ul className="mt-2 grid gap-1.5">
+                    {workshopLinks(locale, segment.workshops).map((item) => (
+                      <li key={item.key}>
+                        <Link href={item.href} className="link text-sm">
+                          {item.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </li>
           ))}
         </ul>

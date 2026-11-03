@@ -16,6 +16,7 @@ import {
   Section,
   SectionHeading,
 } from "@/components/ui/primitives";
+import { WorkshopCards } from "@/components/workshops/WorkshopCards";
 import { domainByKey, getContent, serviceByKey } from "@/content";
 import type { DomainContent } from "@/content/types";
 import type { Dictionary } from "@/i18n";
@@ -23,6 +24,8 @@ import { type Locale, localizePath } from "@/i18n/config";
 import { type DomainDefinition, type DomainKey, domainStatus, isDomainPublished } from "@/lib/domains";
 import { contactWithService, routes } from "@/lib/routes";
 import { isToolAvailable, toolByKey, toolHrefs, toolMinutes } from "@/lib/tools";
+import { workshopLinks } from "@/lib/workshop-links";
+import { workshopsForDomains } from "@/lib/workshops";
 
 /**
  * Domain hub (docs/CONTENT_STRATEGY_BG_EN.md §5.1): what the domain covers, which families are
@@ -44,7 +47,8 @@ export function DomainHub({
   offerings?: ReactNode;
 }) {
   const labels = dict.domain;
-  const { tools } = getContent(locale);
+  const { tools, workshops } = getContent(locale);
+  const domainWorkshops = workshopLinks(locale, workshopsForDomains([definition.key]));
   const href = (path: string) => localizePath(locale, path);
   const serviceHref = (key: Parameters<typeof serviceByKey>[1]) => href(routes.service(serviceByKey(locale, key).slug));
   const domainLink = (key: DomainKey) => {
@@ -163,6 +167,24 @@ export function DomainHub({
       </Section>
 
       {offerings && <Section labelledBy="domain-offerings-title">{offerings}</Section>}
+
+      {/* ------------------------------------------------------------ workshops & advisory (lib/workshops.ts) */}
+      {domainWorkshops.length > 0 && (
+        <Section labelledBy="domain-workshops-title" tone="raised">
+          <SectionHeading
+            id="domain-workshops-title"
+            eyebrow={domain.name}
+            title={workshops.section.title}
+            lead={workshops.section.lead}
+            action={
+              <Link href={href(routes.workshops)} className="link text-sm">
+                {workshops.section.all} →
+              </Link>
+            }
+          />
+          <WorkshopCards items={domainWorkshops} customLabel={workshops.page.custom} className="mt-8" testId="domain-workshops" />
+        </Section>
+      )}
 
       {/* ------------------------------------------------------------ deliverables + engagement */}
       <Section labelledBy="domain-deliverables-title">

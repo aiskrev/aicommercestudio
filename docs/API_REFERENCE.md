@@ -106,6 +106,7 @@ Signed timing token: `{"token": "1761200000.ab12cd34ef56.<sig>"}`, valid between
 | service | `maintenance, seo, ai_tools, automation, analytics, integrations, audit, ai_managed, other` |
 | locale | optional `bg` (default) or `en` — website language, stored on the lead; other values → 422. The success `message` is returned in this language. |
 | ai_managed | only with `service = "ai_managed"` (otherwise 422 `ai_details_service`), optional — see below |
+| workshop | optional key of the Workshops & Advisory catalogue the enquiry is about (`ai_strategy_discovery`, `ai_readiness_mapping`, `agent_architecture`, `landing_zone_assessment`, `kubernetes_review`, `devops_gitops_assessment`, `observability_sre`, `ecommerce_integration_discovery`, `rag_data_readiness`, `responsible_ai_review`); other values → 422. Stored as `workshop_key` |
 | name / company | 2–120 / 2–160 chars, no links or HTML |
 | email | valid address ≤ 254, stored lower-case |
 | phone | optional, `+?[0-9 ()-./]{6,40}` |
@@ -366,6 +367,24 @@ Admin responses are `Cache-Control: no-store`.
 | POST | `/api/admin/leads/{id}/ai/triage` | Read-only AI suggestion (mock provider by default); audited |
 | GET | `/api/admin/leads/{id}/readiness-report` | PDF of a readiness submission (404 for other leads) |
 | GET | `/api/admin/leads/{id}/team-report` | PDF plan of an AI team consultation (404 for other leads) |
+
+## Admin: engineering opportunity, proposals and SOW drafts
+
+Admins only (editors and viewers get 403); CSRF on every write; every change is audited on the lead
+(`opportunity.saved`, `proposal.created`, `proposal.version_added`, `proposal.<action>`) with field
+names and statuses only. Nothing here sends e-mail, syncs a CRM or changes the lead's consents. See
+[OPPORTUNITY_WORKFLOW.md](OPPORTUNITY_WORKFLOW.md).
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/admin/leads/{id}/opportunity` | The record, or defaults (`exists: false`, `revision: 0`), with `source` (lead source, inquiry type, submitted service, `workshop_key`, `linked` assessments) |
+| PUT | `/api/admin/leads/{id}/opportunity` | Create/replace with `expected_revision` (0 to create; stale → 409 `opportunity_stale`). A qualification decision and a recommendation each need a rationale; stakeholders need `stakeholders_confirmed: true` and `provided_in` |
+| GET | `/api/admin/leads/{id}/proposals` | Proposal and SOW drafts with version metadata and the latest version's content and review findings |
+| POST | `/api/admin/leads/{id}/proposals` | `{"kind": "proposal"\|"sow", "title", "generate"?: true, "content"?}` → 201. `generate` assembles a first draft from the record (`origin: generated_draft`, commercial terms are placeholders) |
+| GET | `/api/admin/leads/{id}/proposals/{proposal_id}` | One proposal |
+| GET | `/api/admin/leads/{id}/proposals/{proposal_id}/versions/{number}` | One immutable version with its findings |
+| POST | `/api/admin/leads/{id}/proposals/{proposal_id}/versions` | `{"expected_revision", "content", "change_note"}`; only in `draft` or `rejected` (a rejected proposal returns to `draft`), otherwise 409 `proposal_closed` |
+| POST | `/api/admin/leads/{id}/proposals/{proposal_id}/transition` | `{"action": "submit"\|"approve"\|"reject"\|"reopen"\|"withdraw", "expected_revision", "note"?, "acknowledge_warnings"?}`. Approval refuses blocking findings (422 `proposal_incomplete`) and unacknowledged warnings (422 `warnings_unacknowledged`); reject and withdraw need a note. Approval is not a signature |
 
 ## Admin: service catalogue
 

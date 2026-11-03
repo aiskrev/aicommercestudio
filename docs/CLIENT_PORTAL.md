@@ -67,5 +67,29 @@ No blocker was found.
 * the audit.
 
 The web tests are `components/portal/portal.test.tsx` (unavailable state, two-step sign-in, CSRF
-header, no organisation id in any request, BG/EN parity). The e2e test is `ops-platform.spec.ts`: the
-portal is off and its API answers 404.
+header, no organisation id in any request, BG/EN parity).
+
+### End-to-end test
+
+* `ops-platform.spec.ts` (every run, portal off): the page says the portal is not open and the API
+  answers 404.
+* `portal.spec.ts` (only with the portal on) walks the whole flow in a browser:
+  1. a staff invitation (refused for a demo organisation);
+  2. activation from the link (the token leaves the address bar);
+  3. password and TOTP enrolment;
+  4. sign-in with a fresh code (the enrolment step cannot be replayed);
+  5. the dashboard with the "not connected" note;
+  6. isolation: a query parameter never selects another tenant, writes answer 405, and the admin and
+     Ops APIs answer 401 to the client session;
+  7. sign-out revokes the session.
+
+  It skips itself while the portal is off, so CI (portal off) reports it as skipped. To run it, start
+  a **local test stack** with `CLIENT_PORTAL_ENABLED=true` for the API (a Compose override), create a
+  non-demo organisation `e2e-portal`, then run the spec:
+
+  ```powershell
+  docker compose exec -T api sh -c 'python -m app.cli ops-create-org --slug e2e-portal --name "E2E Portal Organisation" --owner-email "$ADMIN_BOOTSTRAP_EMAIL"'
+  docker compose --profile test run --rm --no-deps e2e npx playwright test tests/portal.spec.ts
+  ```
+
+  Switching the portal on in a test stack is not a release: the repository default stays off.

@@ -2,7 +2,9 @@
 
 ## Threat model
 
-Updated 2026-10-27 to cover the interactive tools and the AI operations scaffold.
+Updated 2026-10-27 to cover the interactive tools and the AI operations scaffold, and on 2026-11-03 for
+the V2 surfaces (row-level security, the client portal, the opportunity workflow). The audit of the
+whole platform with findings by severity is [INTEGRATION_AUDIT_V2.md](INTEGRATION_AUDIT_V2.md).
 
 | Asset | Threats | Main controls |
 | --- | --- | --- |
@@ -14,7 +16,9 @@ Updated 2026-10-27 to cover the interactive tools and the AI operations scaffold
 | Secrets | leakage via Git or frontend | `.env` git-ignored; no secrets in `NEXT_PUBLIC_*`; random generation by `setup.ps1`; production refuses placeholder secrets |
 | AI agents (future) | unintended side effects, prompt injection, data exfiltration | approval policy (fail closed), audited decisions, PII redaction before any external call, read-only V1 feature |
 | Interactive tools and their data | personal data or secrets in tool payloads, enumeration of saved links, abuse of PDF generation | ROI, Finder, Solution Builder and Agent Library run in the browser and send nothing. Readiness and team payloads are enumerated values (strict schemas). Saved team links store only a SHA-256 token hash, sent in a POST body, never in a URL. Every public POST is rate-limited. Share codes are versioned and strictly decoded. |
-| Tenant data (AI operations scaffold) | cross-tenant read/write, tenant enumeration, privilege escalation | membership resolved per request; foreign organisation → 404 (same as missing); queries only through `scoped()`; composite FK workspace ↔ organisation; RBAC matrix with rank rules and last-owner protection; audited writes. **RLS not yet enabled** (the runtime DB role is the schema owner). |
+| Tenant data (AI operations scaffold) | cross-tenant read/write, tenant enumeration, privilege escalation | membership resolved per request; foreign organisation → 404 (same as missing); queries only through `scoped()`; composite FK workspace ↔ organisation; RBAC matrix with rank rules and last-owner protection; audited writes. **Row-level security** on every tenant table under the NOLOGIN, NOBYPASSRLS role `acs_app_runtime`, switched to per transaction (`SET LOCAL ROLE`); composite tenant foreign keys on every child row; immutable registry versions and append-only timelines (triggers). Residual risk: the application still *connects* as the schema owner, so code outside `require()` is not under RLS — a separate login role is a release prerequisite (AI_OPERATIONS_PORTAL.md §11a). |
+| Client portal (off by default) | account takeover, cross-tenant reads, enumeration, CSRF, replayed codes, exposure of prompts or internal notes | separate identities and cookies; invitation tokens hashed, single-use, in the URL fragment; password + TOTP (derived secret, ±1 step, used steps refused); lockout and identical errors; 8 h / 30 min sessions; CSRF on every write; tenant only from the session under RLS; GET-only data routes (others 405); no prompt, tool, provider or internal-note fields in responses; every view audited. Switched off until explicit approval (CLIENT_PORTAL.md). |
+| Opportunity and proposal records (personal data, commercial drafts) | stakeholder data beyond what the client gave, fabricated commercial terms, unreviewed AI output sent to a client, silent edits of history, over-retention | admin-only routes with CSRF; stakeholders only with `provided_in` and an explicit confirmation; plain-text, size-bounded sections; generated drafts deterministic with placeholder commercial terms; approval blocked until a person completes them, warnings acknowledged explicitly; append-only versions (trigger); audit without free text or names; cascade with the lead for retention and erasure; no e-mail or CRM integration; the Ops runtime role has no access to lead tables (migration 0014). |
 
 ## Implemented controls
 
@@ -148,6 +152,9 @@ production when the items marked (enforced) are wrong.
 - [ ] Secrets supplied by the host/secret manager, `.env` not copied into images (already in `.dockerignore`)
 - [ ] `SEED_SAMPLE_DATA=false` (enforced); create admins with `create-admin` and keep `ADMIN_BOOTSTRAP_PASSWORD` empty
 - [ ] Schedule `python -m app.cli maintenance` daily
+- [ ] Schedule `python -m app.cli ops-retention` daily (execution records and evaluation results per organisation policy)
+- [ ] Migration `0013` creates the NOLOGIN role `acs_app_runtime`: the migrating user needs `CREATEROLE` once (or a DBA creates the role first); the application role must not be a superuser or have `BYPASSRLS`
+- [ ] Keep `CLIENT_PORTAL_ENABLED=false` until the portal release prerequisites are met and approved (CLIENT_PORTAL.md)
 - [ ] Encrypted, tested PostgreSQL backups (`infra/backup-db.sh`, restore drill monthly)
 - [ ] Run `.\scripts\test.ps1` and `-Suite audit`; review results
 - [ ] Legal texts completed and reviewed; contact details verified

@@ -58,6 +58,22 @@ class ServiceKey(enum.StrEnum):
     OTHER = "other"
 
 
+class WorkshopKey(enum.StrEnum):
+    """Workshops & Advisory catalogue (apps/web/src/lib/workshop-slugs.ts; the key list is mirrored in
+    app/workshop_keys.json = apps/web/src/lib/workshop-keys.json, checked by scripts/test.ps1)."""
+
+    AI_STRATEGY_DISCOVERY = "ai_strategy_discovery"
+    AI_READINESS_MAPPING = "ai_readiness_mapping"
+    AGENT_ARCHITECTURE = "agent_architecture"
+    LANDING_ZONE_ASSESSMENT = "landing_zone_assessment"
+    KUBERNETES_REVIEW = "kubernetes_review"
+    DEVOPS_GITOPS_ASSESSMENT = "devops_gitops_assessment"
+    OBSERVABILITY_SRE = "observability_sre"
+    ECOMMERCE_INTEGRATION_DISCOVERY = "ecommerce_integration_discovery"
+    RAG_DATA_READINESS = "rag_data_readiness"
+    RESPONSIBLE_AI_REVIEW = "responsible_ai_review"
+
+
 class LeadLocale(enum.StrEnum):
     """Language of the website the inquiry was sent from (and preferred communication language)."""
 
@@ -168,6 +184,7 @@ class Lead(Base):
         CheckConstraint(_in_check("budget_range", BudgetRange, nullable=True), name="budget_range"),
         CheckConstraint(_in_check("timeline", Timeline, nullable=True), name="timeline"),
         CheckConstraint(_in_check("locale", LeadLocale), name="locale"),
+        CheckConstraint(_in_check("workshop_key", WorkshopKey, nullable=True), name="workshop_key"),
         Index("ix_leads_locale", "locale"),
         Index("ix_leads_created_at", "created_at"),
         Index("ix_leads_status", "status"),
@@ -191,6 +208,8 @@ class Lead(Base):
     locale: Mapped[str] = mapped_column(
         String(2), nullable=False, default=LeadLocale.BG.value, server_default=text("'bg'")
     )
+    # Workshop or assessment from the catalogue the enquiry was sent about (lib/workshops.ts), if any.
+    workshop_key: Mapped[str | None] = mapped_column(String(48), nullable=True)
     # Validated service-specific details, e.g. {"kind": "ai_managed", ...} (see schemas.AiManagedDetails).
     service_details: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     name: Mapped[str] = mapped_column(String(120), nullable=False)
@@ -928,5 +947,7 @@ class ContentItemTranslation(Base):
     body: Mapped[str | None] = mapped_column(Text, nullable=True)
 
 
-# The AI operations platform tables (registry, evaluations, observability, workflows, client portal).
+# Tables defined in their own modules: the engineering opportunity workflow on top of leads, and the
+# AI operations platform (registry, evaluations, observability, workflows, client portal).
+from app.opportunities import models as _opportunity_models  # noqa: E402, F401
 from app.ops import models as _ops_platform_models  # noqa: E402, F401

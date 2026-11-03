@@ -1,4 +1,5 @@
 import type { ProcessStep, ServiceKey, TitledText } from "@/content/types";
+import type { WorkshopKey } from "@/lib/workshop-slugs";
 
 export const toolsPage = {
   metaTitle: "Интерактивни AI инструменти за оценка на процесите",
@@ -48,6 +49,7 @@ export const industries = {
       description: "Магазини, които растат и имат нужда от стабилна техника, по-добра видимост и по-малко ръчна работа.",
       needs: ["Надеждна поддръжка", "SEO на категории и продукти", "Ясни отчети за продажбите"],
       services: ["maintenance", "seo", "analytics"],
+      workshops: ["ecommerce_integration_discovery", "ai_strategy_discovery"],
     },
     {
       icon: "cart",
@@ -55,6 +57,7 @@ export const industries = {
       description: "Търговци, които разчитат на приложения и теми и искат контрол върху производителността и интеграциите.",
       needs: ["Оптимизация на темата и приложенията", "Интеграции със склад и ERP", "Автоматизации на поръчки"],
       services: ["maintenance", "integrations", "automation"],
+      workshops: ["ecommerce_integration_discovery"],
     },
     {
       icon: "layers",
@@ -62,6 +65,7 @@ export const industries = {
       description: "Магазини върху WordPress, при които обновленията, плъгините и сигурността изискват постоянна грижа.",
       needs: ["Безопасни обновления", "Подсилване на сигурността", "Скорост и Core Web Vitals"],
       services: ["maintenance", "integrations", "seo"],
+      workshops: ["ecommerce_integration_discovery"],
     },
     {
       icon: "building",
@@ -69,6 +73,7 @@ export const industries = {
       description: "Физически магазини и дистрибутори, които изграждат или разширяват онлайн продажбите си.",
       needs: ["Технически одит и план", "Свързване с наличностите в обекта", "Основи на SEO и измерването"],
       services: ["audit", "integrations", "seo"],
+      workshops: ["ecommerce_integration_discovery", "ai_strategy_discovery"],
     },
     {
       icon: "workflow",
@@ -76,6 +81,7 @@ export const industries = {
       description: "Екипи, които губят часове в повтарящи се задачи между имейл, таблици, CRM и счетоводство.",
       needs: ["Карта на процесите", "Автоматизации с човешко одобрение", "Интеграции между системите"],
       services: ["automation", "integrations", "ai_tools"],
+      workshops: ["ai_readiness_mapping", "agent_architecture"],
     },
     {
       icon: "sparkles",
@@ -83,6 +89,7 @@ export const industries = {
       description: "Бизнеси с конкретна идея за AI асистент, анализ на документи или вътрешна база знания.",
       needs: ["Прототип и оценка на качеството", "Защита на данните", "Интеграция със съществуващи системи"],
       services: ["ai_tools", "automation", "audit"],
+      workshops: ["ai_strategy_discovery", "rag_data_readiness"],
     },
     {
       icon: "shield",
@@ -90,6 +97,7 @@ export const industries = {
       description: "Компании със съществуващ сайт или магазин, които искат предвидима техническа грижа и органичен растеж.",
       needs: ["Месечна поддръжка", "Мониторинг и сигурност", "SEO абонамент"],
       services: ["maintenance", "seo", "analytics"],
+      workshops: ["ecommerce_integration_discovery"],
     },
     {
       icon: "activity",
@@ -97,8 +105,9 @@ export const industries = {
       description: "Бизнеси, които вече използват AI асистент или автоматизация, но нямат експертиза да я наблюдават и поддържат.",
       needs: ["Наблюдение и ранно откриване на проблеми", "Оценка на качеството", "Контрол на разходите"],
       services: ["ai_managed", "ai_tools", "integrations"],
+      workshops: ["responsible_ai_review", "observability_sre"],
     },
-  ] satisfies (TitledText & { needs: string[]; services: ServiceKey[] })[],
+  ] satisfies (TitledText & { needs: string[]; services: ServiceKey[]; workshops: WorkshopKey[] })[],
   sectorsTitle: "Типични сектори",
   sectorsLead: "Подходът е приложим в различни сектори на онлайн търговията, например:",
   sectors: [

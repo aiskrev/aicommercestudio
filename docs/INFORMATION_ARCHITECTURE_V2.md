@@ -66,7 +66,7 @@ Home  /bg ↔ /en                                                            [li
 │  ├─ About  /za-nas ↔ /about                                              [live]
 │  ├─ Engineering methodology  /proces ↔ /process                          [live → extend]
 │  ├─ Security & trust  /sigurnost ↔ /security                             [new]
-│  └─ Workshops  /rabotni-sreshti ↔ /workshops                             [conditional; until then a section of domain J]
+│  └─ Workshops  /rabotni-sreshti ↔ /workshops                             [live since 2026-11-03: 10 formats, CONTENT_STRATEGY §5.5]
 ├─ Contact  /kontakti ↔ /contact (?usluga= / ?service=, &tip=oferta / &type=quote)   [live]
 └─ Legal  /poveritelnost, /biskvitki, /obshti-usloviya ↔ /privacy, /cookies, /terms  [live, noindex while draft]
 
@@ -281,7 +281,7 @@ the code.
 | `/bg/kontakti` | `/en/contact` | inquiry and quote form (`?usluga=`/`?service=`, `&tip=oferta`/`&type=quote`) | `ContactForm`, API `/api/public/leads`, `/quote-requests` | public | live | Submit |
 | `/bg/poveritelnost`, `/bg/biskvitki`, `/bg/obshti-usloviya` | `/en/privacy`, `/en/cookies`, `/en/terms` | legal | `legal.ts` | public-noindex while draft | live (T2) | — |
 | `/bg/sigurnost` (proposed) | `/en/security` | security and trust: data handling, approval policy, secrets, tenancy, retention, disclosure contact | new `content/*/security.ts` from `SECURITY.md` | public | new | Book a consultation |
-| `/bg/rabotni-sreshti` (proposed) | `/en/workshops` | workshop formats (discovery, approval design, architecture) | new content; until then a section on hub J | public | conditional (≥ 3 formats with their own agenda and outputs) | Book a workshop |
+| `/bg/rabotni-sreshti`, `/bg/rabotni-sreshti/<slug>` | `/en/workshops`, `/en/workshops/<slug>` | ten workshop and advisory formats with audience, prerequisites, agenda, deliverables and limits | `content/*/workshops.ts`, `lib/workshops.ts` | public | live (2026-11-03) | Send an enquiry (`&sreshta=` / `&workshop=`) |
 | `/admin/*` | same (no locale; admin language cookie) | staff: leads, AI approvals, activity, AI operations scaffold, account | `components/admin/*`, `/api/admin`, `/api/ops` | staff | live | — |
 | `/portal/*` | same (no locale; language preference) | clients: organisations, registry, incidents, reports | AI_OPERATIONS_PORTAL.md | client | planned (P3–P4) | — |
 
@@ -371,6 +371,6 @@ overflow scan.
 | --- | --- | --- |
 | IA-D1 | Header label "Tools" vs "Tools & assessments" | "Tools" (shorter; assessments reachable from J) |
 | IA-D2 | Show unpublished domains in the mega-menu as "planned" or hide them | hide (consistent with tools) |
-| IA-D3 | Publish workshops as a page or keep them on hub J | keep on J until ≥ 3 formats |
+| IA-D3 | Publish workshops as a page or keep them on hub J | **decided 2026-11-03:** own page (ten formats); each hub also lists its own |
 | IA-D4 | Industry and problem pages: which ones first | online stores; manual data entry between systems |
 | (D1, D4, D7) | from PLATFORM_VISION §10 | — |

@@ -194,4 +194,37 @@ describe("ContactForm — quote requests", () => {
     expect(body).not.toHaveProperty("platform");
     expect(body).not.toHaveProperty("website_url");
   });
+
+  it("sends the workshop the enquiry is about, and drops it when the visitor removes it", async () => {
+    const workshopLabels = { about: "Запитване за: {title}", remove: "Премахни" };
+    const props = {
+      labels: bg.form,
+      messages: bg.validation,
+      inquiry: bg.inquiry,
+      services,
+      privacyHref: "/poveritelnost",
+      aiLabels: bg.aiManagedForm,
+      locale: "bg" as const,
+      workshopLabels,
+    };
+    const user = userEvent.setup();
+    const { unmount } = render(<ContactForm {...props} initialWorkshop={{ key: "kubernetes_review", title: "Преглед на Kubernetes платформата" }} />);
+    expect(screen.getByTestId("contact-workshop")).toHaveTextContent("Запитване за: Преглед на Kubernetes платформата");
+    await fillValid(user);
+    await user.click(screen.getByRole("button", { name: bg.form.submit }));
+    await screen.findByTestId("contact-success");
+    let [, init] = fetchMock.mock.calls.find(([url]) => url === "/api/public/leads")!;
+    expect(JSON.parse(init.body).workshop).toBe("kubernetes_review");
+    unmount();
+
+    fetchMock.mockClear();
+    render(<ContactForm {...props} initialWorkshop={{ key: "kubernetes_review", title: "Преглед на Kubernetes платформата" }} />);
+    await user.click(screen.getByRole("button", { name: "Премахни" }));
+    expect(screen.queryByTestId("contact-workshop")).toBeNull();
+    await fillValid(user);
+    await user.click(screen.getByRole("button", { name: bg.form.submit }));
+    await screen.findByTestId("contact-success");
+    [, init] = fetchMock.mock.calls.find(([url]) => url === "/api/public/leads")!;
+    expect(JSON.parse(init.body)).not.toHaveProperty("workshop");
+  });
 });

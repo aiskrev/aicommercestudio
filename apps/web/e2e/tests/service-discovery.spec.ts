@@ -37,15 +37,17 @@ for (const l of [
   });
 }
 
-test("a domain hub states plainly when no assessment or workshop is published", async ({ page }) => {
+test("a domain hub lists its workshops and never also claims that none is published", async ({ page }) => {
   await page.goto("/bg/uslugi/devops-sre-i-nablyudaemost");
-  const block = page.getByTestId("catalogue-offerings");
-  await expect(block.getByRole("heading", { level: 2, name: "Оценки и работни срещи" })).toBeVisible();
-  await expect(block.getByTestId("offerings-empty")).toContainText("все още няма публикувани оценки или работни срещи");
-  const contact = block.getByRole("link", { name: "Заявете разговор" });
-  await expect(contact).toHaveAttribute("href", /^\/bg\/kontakti\?usluga=[a-z_]+$/);
-  await contact.click();
-  await expect(page).toHaveURL(/\/bg\/kontakti\?usluga=/);
+  // The Workshops & Advisory catalogue covers every domain; the empty state of the published
+  // catalogue (catalogue.test.tsx) is therefore not shown next to it.
+  await expect(page.getByTestId("domain-workshops").locator("[data-workshop]")).toHaveCount(3);
+  await expect(page.getByTestId("offerings-empty")).toHaveCount(0);
+  const card = page.getByTestId("domain-workshops").locator("[data-workshop=devops_gitops_assessment]");
+  await card.getByRole("link").click();
+  await expect(page).toHaveURL(/\/bg\/rabotni-sreshti\/otsenka-devops-i-gitops$/);
+  await page.getByTestId("workshop-enquiry").click();
+  await expect(page).toHaveURL(/\/bg\/kontakti\?usluga=integrations&sreshta=devops_gitops_assessment$/);
   await expect(page.locator("form").first()).toBeVisible();
 });
 

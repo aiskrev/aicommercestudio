@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ArticleCard } from "@/components/editorial/ArticleCard";
@@ -23,6 +24,7 @@ import {
   Section,
   SectionHeading,
 } from "@/components/ui/primitives";
+import { WorkshopCards } from "@/components/workshops/WorkshopCards";
 import {
   articleByKey,
   domainByKey,
@@ -42,6 +44,8 @@ import { resolveLocale } from "@/lib/params";
 import { contactWithService, quoteWithService, routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
 import { SERVICE_TOOLS, toolHrefs, toolMinutes } from "@/lib/tools";
+import { workshopLinks } from "@/lib/workshop-links";
+import { workshopsForDomains } from "@/lib/workshops";
 
 /**
  * Rendering (docs/SERVICE_CATALOGUE_ARCHITECTURE.md §9): the domain hubs and the existing service
@@ -134,6 +138,8 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   const parent = parentDomain?.published ? domainByKey(locale, parentDomain.key) : undefined;
   const offerings = parentDomain ? domainOfferings((await getCatalogue(locale)).entries, parentDomain.key) : [];
   const managedFollowUp = parentDomain ? hasManagedFollowUp(parentDomain.key) && service.key !== "ai_managed" : false;
+  const { workshops } = getContent(locale);
+  const serviceWorkshops = parentDomain ? workshopLinks(locale, workshopsForDomains([parentDomain.key])) : [];
 
   return (
     <>
@@ -344,6 +350,24 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         </Section>
       )}
 
+      {/* ------------------------------------------------------------ workshops & advisory of the parent domain */}
+      {serviceWorkshops.length > 0 && (
+        <Section labelledBy="service-workshops-title" tone="raised">
+          <SectionHeading
+            id="service-workshops-title"
+            size="sm"
+            title={workshops.section.title}
+            lead={workshops.section.lead}
+            action={
+              <Link href={href(routes.workshops)} className="link text-sm">
+                {workshops.section.all} →
+              </Link>
+            }
+          />
+          <WorkshopCards items={serviceWorkshops} customLabel={workshops.page.custom} className="mt-6" testId="service-workshops" />
+        </Section>
+      )}
+
       {/* ------------------------------------------------------------ process */}
       <Section labelledBy="service-process-title">
         <EditorialSplit
@@ -446,16 +470,20 @@ async function DomainPage({ locale, domain, dict }: { locale: Locale; domain: Do
         domain={domain}
         definition={domainDefinition(domain.key)}
         dict={dict}
+        // The catalogue's "nothing published yet" state would contradict the hub's workshop section:
+        // show the block only with published entries, or when the domain has no workshop at all.
         offerings={
-          <CatalogueOfferings
-            id="domain-offerings-title"
-            entries={offerings}
-            hrefFor={(entry: CatalogueEntry) => href(routes.service(entry.slug))}
-            locale={locale}
-            labels={dict.catalogue}
-            statusLabels={dict.domain.status}
-            contactHref={href(contactWithService(domainDefinition(domain.key).contactService))}
-          />
+          offerings.length === 0 && workshopsForDomains([domain.key]).length > 0 ? undefined : (
+            <CatalogueOfferings
+              id="domain-offerings-title"
+              entries={offerings}
+              hrefFor={(entry: CatalogueEntry) => href(routes.service(entry.slug))}
+              locale={locale}
+              labels={dict.catalogue}
+              statusLabels={dict.domain.status}
+              contactHref={href(contactWithService(domainDefinition(domain.key).contactService))}
+            />
+          )
         }
       />
     </>

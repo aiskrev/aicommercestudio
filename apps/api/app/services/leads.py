@@ -56,6 +56,7 @@ def create_lead(
         timeline=data.timeline.value if is_quote else None,
         website_url=data.website_url if is_quote else None,
         locale=data.locale.value,
+        workshop_key=data.workshop.value if data.workshop is not None else None,
         service_details=(
             _ai_managed_details(data.ai_managed) if data.ai_managed is not None else None
         ),
