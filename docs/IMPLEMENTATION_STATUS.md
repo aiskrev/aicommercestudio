@@ -45,7 +45,7 @@ Results:
 
 * API: **744 passed**, Ruff clean, docs and OpenAPI in sync, golden-vector copies identical.
 * Web: **740** unit tests passed; typecheck and lint clean.
-* e2e: full run **162 passed, 2 failed**. Both failures were in the new tests themselves: a shared per-IP rate limit and a form token used too quickly. After fixing them, the two specs were re-run: **12 passed**.
+* e2e: **164 passed** across desktop and mobile. The new enquiry and inquiry tests each use their own client address, because the contact rate limit is per IP.
 
 Branch `feature/assessments-consistency` (from `main` @ `59ff0d6`, 2026-11-03): changes on this branch:
 
