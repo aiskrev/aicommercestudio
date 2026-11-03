@@ -361,6 +361,17 @@
   }
   /* Quiet card: hairline only, for dense lists inside a raised section. */
   .card-quiet { background: transparent; border-color: var(--border-default); }
+  /* Feature panel: the one large offering of a section. A faint brand tint at the top edge and a
+     brand hairline; never repeated as a grid of equal panels. */
+  .feature-panel {
+    position: relative;
+    border-radius: var(--radius-xl);
+    border: 1px solid color-mix(in oklab, var(--color-brand) 28%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--color-brand) 8%, transparent), transparent 42%),
+      var(--color-surface-1);
+    box-shadow: var(--shadow-panel);
+  }
   .panel {
     border-radius: var(--radius-xl);
     border: 1px solid var(--border-default);
