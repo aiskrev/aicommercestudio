@@ -21,6 +21,7 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0009` | Service catalogue V1: `catalogue_entities` (supertype: `entity_type`, stable `key`, `status` draft/published/archived, `revision`), `service_domains`, `service_families`, `services` (subtypes sharing the entity id through the composite FK `(id, entity_type)`), `family_services`, `entity_translations` (per locale; slug unique per `(locale, route_namespace)`), `entity_relations` (typed edges with an allowed-combination CHECK). New tables only, no data; `leads` unchanged and not referenced. Downgrade drops the seven tables. See [Service catalogue](#service-catalogue-migration-0009). |
 | `0013` | AI operations platform: registry versions, evaluation datasets/cases/runs/results, rate cards, execution records, budgets, threshold rules, retention policies, incidents and changes with append-only timelines, client portal users/tokens/sessions; `uq_ops_agents_id_org`; the NOLOGIN, NOBYPASSRLS runtime role `acs_app_runtime` with grants, row-level security policies on every tenant table and immutability triggers. Needs `CREATEROLE` for the migrating user the first time. See [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md). |
 | `0014` | Opportunity workflow: `leads.workshop_key` (nullable, CHECK against the ten catalogue keys); `lead_opportunities` (1:1 with the lead), `lead_proposals` and `lead_proposal_versions` (append-only trigger `lead_proposal_versions_append_only`), all `ON DELETE CASCADE` from `leads`. Revokes every privilege of `acs_app_runtime` on the lead tables (leads, notes, opportunity, proposals, versions, advisor assessments, team configurations, assessment results). Additive; downgrade drops the tables and the column and restores the earlier grants. See [OPPORTUNITY_WORKFLOW.md](OPPORTUNITY_WORKFLOW.md). |
+| `0015` | Staff TOTP MFA (audit H-2): `admin_users.mfa_nonce` varchar(64) null, `mfa_enabled` boolean NOT NULL default false, `mfa_enabled_at` timestamptz null, `mfa_last_step` bigint null; `admin_sessions.mfa_pending` varchar(8) null (CHECK `verify`/`enrol`; NULL for every existing session); `admin_mfa_recovery_codes` (hashed one-time codes, FK `ON DELETE CASCADE`, `code_hash` unique, index on `user_id`), with every privilege of `acs_app_runtime` revoked. Additive and backward compatible; downgrade drops the table and the columns. See [SECURITY.md → Staff MFA](SECURITY.md). |
 | `0008` | AI operations scaffold: `ops_organizations` (slug unique, status/region, `is_demo`), `ops_workspaces` (unique `(organization_id, slug)` and `(id, organization_id)`), `ops_memberships` (user × organisation × role CHECK, unique pair), `ops_agents` (registry metadata; composite FK `(workspace_id, organization_id)` → workspaces so an agent cannot sit in another tenant's workspace). New tables only; downgrade drops them. See AI_OPERATIONS_PORTAL.md. |
 
 Apply: automatic on container start (`RUN_MIGRATIONS_ON_START=true`), or manually
@@ -41,8 +42,13 @@ All timestamps are `timestamptz` in UTC.
 | password_hash | varchar(255) | Argon2id |
 | is_active | boolean | inactive users cannot log in or use sessions |
 | created_at, last_login_at | timestamptz | |
-| failed_login_count | integer, default 0 | consecutive failed logins; reset on success or when a lock is applied |
+| failed_login_count | integer, default 0 | consecutive failed passwords and MFA codes; reset on a completed sign-in or when a lock is applied |
 | locked_until | timestamptz null | set after `LOGIN_LOCKOUT_THRESHOLD` failures for `LOGIN_LOCKOUT_MINUTES` |
+| role | varchar(12), default `admin` | `admin` / `editor` / `viewer` (CHECK, 0010) |
+| mfa_nonce | varchar(64) null | random nonce; the TOTP secret is derived from `SECRET_KEY` and it, never stored (0015) |
+| mfa_enabled | boolean, default false | true once a first code confirmed the key |
+| mfa_enabled_at | timestamptz null | |
+| mfa_last_step | bigint null | last accepted TOTP time step; that step and earlier ones are refused (no replay) |
 
 ## admin_sessions
 
@@ -55,6 +61,17 @@ All timestamps are `timestamptz` in UTC.
 | created_at, last_seen_at, expires_at, revoked_at | timestamptz | `expires_at` indexed |
 | ip_hash | varchar(64) | keyed HMAC of the IP, never the raw IP |
 | user_agent | varchar(255) | |
+| mfa_pending | varchar(8) null | `verify` / `enrol` (CHECK) while the second factor is outstanding: such a session (15 min) reaches only the MFA step; NULL = full session (0015) |
+
+## admin_mfa_recovery_codes
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| id | uuid PK | |
+| user_id | uuid FK → admin_users (CASCADE) | indexed |
+| code_hash | varchar(64) unique | HMAC-SHA256 keyed with `SECRET_KEY`; the code itself is shown once and not stored |
+| created_at | timestamptz | |
+| used_at | timestamptz null | set on the single use; a new set deletes the old rows |
 
 ## leads
 

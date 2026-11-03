@@ -76,6 +76,35 @@ ERROR_MESSAGES: dict[str, dict[Locale, str]] = {
         "bg": "Невалиден CSRF токен. Презаредете страницата.",
         "en": "Invalid CSRF token. Please reload the page.",
     },
+    "mfa_required": {
+        "bg": "Въведете кода от приложението за удостоверяване, за да завършите входа.",
+        "en": "Enter the code from your authenticator app to finish logging in.",
+    },
+    "mfa_enrolment_required": {
+        "bg": "Настройте двуфакторно удостоверяване, за да продължите.",
+        "en": "Set up two-factor authentication to continue.",
+    },
+    "mfa_code_invalid": {"bg": "Кодът не е валиден.", "en": "The code is not valid."},
+    "mfa_not_pending": {
+        "bg": "Няма незавършен вход с втори фактор.",
+        "en": "There is no sign-in waiting for a second factor.",
+    },
+    "mfa_already_enabled": {
+        "bg": "Двуфакторното удостоверяване вече е включено.",
+        "en": "Two-factor authentication is already on.",
+    },
+    "mfa_not_enabled": {
+        "bg": "Двуфакторното удостоверяване не е включено.",
+        "en": "Two-factor authentication is not on.",
+    },
+    "mfa_setup_missing": {
+        "bg": "Първо започнете настройката, за да получите ключ.",
+        "en": "Start the set-up first to get a key.",
+    },
+    "mfa_policy_required": {
+        "bg": "Двуфакторното удостоверяване е задължително и не може да бъде изключено.",
+        "en": "Two-factor authentication is required and cannot be switched off.",
+    },
     "lead_not_found": {"bg": "Запитването не е намерено.", "en": "Inquiry not found."},
     "domain_not_found": {"bg": "Направлението не е намерено.", "en": "Service domain not found."},
     "service_not_found": {"bg": "Услугата не е намерена.", "en": "Service not found."},

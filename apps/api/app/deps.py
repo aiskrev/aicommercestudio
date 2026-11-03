@@ -14,7 +14,7 @@ from app import audit
 from app.config import Settings, get_settings
 from app.db import get_db
 from app.errors import ApiError
-from app.models import AdminRole, AdminSession, AdminUser, utcnow
+from app.models import AdminMfaPending, AdminRole, AdminSession, AdminUser, utcnow
 from app.rate_limit import limiter
 from app.security import hash_ip, hash_token, tokens_match
 
@@ -66,8 +66,14 @@ def _unauthorized(detail: str = "Необходим е вход в систем�
     return ApiError(status.HTTP_401_UNAUTHORIZED, detail, code)
 
 
-def require_session(request: Request, db: DbSession) -> AdminContext:
-    """A valid staff session (any role) with CSRF on state-changing requests."""
+FULL = None  # a session that has passed every factor
+VERIFY = AdminMfaPending.VERIFY.value
+ENROL = AdminMfaPending.ENROL.value
+
+
+def _load_session(request: Request, db: Session, stages: frozenset[str | None]) -> AdminContext:
+    """A valid staff session at one of `stages` (full, or pending `verify` / `enrol`), with CSRF on
+    state-changing requests. A pending session is refused everywhere except the MFA step."""
     settings = get_settings()
     token = request.cookies.get(settings.session_cookie_name)
     if not token or len(token) > 200:
@@ -90,6 +96,17 @@ def require_session(request: Request, db: DbSession) -> AdminContext:
         db.commit()
         raise _unauthorized("Сесията изтече поради неактивност. Моля, влезте отново.", "session_expired")
 
+    stage = session.mfa_pending
+    if stage is FULL and settings.admin_mfa_required and not session.user.mfa_enabled and ENROL not in stages:
+        # A session from before ADMIN_MFA_REQUIRED was switched on reaches only enrolment and logout.
+        raise _unauthorized("Настройте двуфакторно удостоверяване, за да продължите.", "mfa_enrolment_required")
+    if stage not in stages:
+        if stage == VERIFY:
+            raise _unauthorized("Въведете кода от приложението за удостоверяване.", "mfa_required")
+        if stage == ENROL:
+            raise _unauthorized("Настройте двуфакторно удостоверяване, за да продължите.", "mfa_enrolment_required")
+        raise ApiError(status.HTTP_409_CONFLICT, "Няма незавършен вход с втори фактор.", "mfa_not_pending")
+
     if request.method not in SAFE_METHODS:
         header = request.headers.get(CSRF_HEADER)
         if not header or not tokens_match(header, session.csrf_hash):
@@ -101,7 +118,30 @@ def require_session(request: Request, db: DbSession) -> AdminContext:
     return AdminContext(user=session.user, session=session, ip_hash=client_ip_hash(request))
 
 
+def require_session(request: Request, db: DbSession) -> AdminContext:
+    """A full staff session (any role): password and, where enrolled or required, the second factor."""
+    return _load_session(request, db, frozenset({FULL}))
+
+
+def require_mfa_verify_session(request: Request, db: DbSession) -> AdminContext:
+    """Only a session waiting for a code (the sign-in MFA step)."""
+    return _load_session(request, db, frozenset({VERIFY}))
+
+
+def require_mfa_setup_session(request: Request, db: DbSession) -> AdminContext:
+    """A full session (enrolment from the account page) or one that must enrol before it is usable."""
+    return _load_session(request, db, frozenset({FULL, ENROL}))
+
+
+def require_any_session(request: Request, db: DbSession) -> AdminContext:
+    """Any stage; used only by logout, which ends the session it is called with."""
+    return _load_session(request, db, frozenset({FULL, VERIFY, ENROL}))
+
+
 Staff = Annotated[AdminContext, Depends(require_session)]
+MfaVerifySession = Annotated[AdminContext, Depends(require_mfa_verify_session)]
+MfaSetupSession = Annotated[AdminContext, Depends(require_mfa_setup_session)]
+AnySession = Annotated[AdminContext, Depends(require_any_session)]
 
 
 def _forbidden_role() -> ApiError:

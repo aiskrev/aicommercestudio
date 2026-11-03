@@ -3,6 +3,7 @@
 python -m app.cli seed                      # bootstrap admin (+ synthetic data in development) + catalogue
 python -m app.cli create-admin --email x@y  # password read from ADMIN_PASSWORD env or prompted
 python -m app.cli set-password --email x@y  # reset a password, clear lockout, revoke sessions
+python -m app.cli reset-mfa --email x@y     # remove a lost second factor (TOTP + recovery codes), revoke sessions
 python -m app.cli maintenance [--dry-run]   # GDPR retention + expired session cleanup
 python -m app.cli purge-synthetic           # remove synthetic development data
 python -m app.cli ops-create-org --slug s --name n --owner-email x@y  # AI operations tenant + owner
@@ -37,7 +38,7 @@ from app.db import get_sessionmaker
 from app.models import AdminRole, AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
 from app.ops import service as ops
 from app.security import hash_password, validate_password_strength
-from app.services import ai_actions, leads, staff
+from app.services import admin_mfa, ai_actions, leads, staff
 from app.team import service as team
 
 SYNTHETIC_SOURCE = "synthetic_seed"
@@ -278,6 +279,39 @@ def cmd_set_password(args: argparse.Namespace) -> int:
     return 0
 
 
+def reset_admin_mfa(db: Session, email: str) -> int:
+    """Remove a staff account's second factor (lost device): the TOTP key and every recovery code are
+    deleted and all open sessions revoked (audited). The next sign-in enrols again when ADMIN_MFA_REQUIRED
+    is on. Returns the number of revoked sessions."""
+    user = db.scalar(select(AdminUser).where(func.lower(AdminUser.email) == email.strip().lower()))
+    if user is None:
+        raise LookupError(f"no administrator with e-mail {email}")
+    was_enabled = user.mfa_enabled
+    admin_mfa.clear(db, user)
+    revoked = admin_mfa.revoke_sessions(db, user)
+    audit.record(
+        db,
+        "admin.mfa_reset",
+        actor_label="cli",
+        entity_type="admin_user",
+        entity_id=str(user.id),
+        details={"was_enabled": was_enabled, "sessions_revoked": revoked},
+    )
+    db.commit()
+    return revoked
+
+
+def cmd_reset_mfa(args: argparse.Namespace) -> int:
+    with get_sessionmaker()() as db:
+        try:
+            revoked = reset_admin_mfa(db, args.email)
+        except LookupError as exc:
+            _print(f"Error: {exc}")
+            return 1
+    _print(f"Second factor removed for {args.email.strip().lower()}; sessions revoked: {revoked}")
+    return 0
+
+
 def cmd_purge_synthetic(_: argparse.Namespace) -> int:
     settings = get_settings()
     with get_sessionmaker()() as db:
@@ -426,6 +460,9 @@ def main(argv: list[str] | None = None) -> int:
     reset = sub.add_parser("set-password", help="Reset an administrator's password (clears lockout, revokes sessions)")
     reset.add_argument("--email", required=True)
     reset.set_defaults(func=cmd_set_password)
+    mfa = sub.add_parser("reset-mfa", help="Remove a staff account's second factor (lost device); revokes sessions")
+    mfa.add_argument("--email", required=True)
+    mfa.set_defaults(func=cmd_reset_mfa)
     role = sub.add_parser("set-role", help="Set a staff role: admin (all), editor or viewer (service catalogue only)")
     role.add_argument("--email", required=True)
     role.add_argument("--role", required=True, choices=[r.value for r in AdminRole])

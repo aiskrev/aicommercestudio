@@ -9,7 +9,7 @@ whole platform with findings by severity is [INTEGRATION_AUDIT_V2.md](INTEGRATIO
 | Asset | Threats | Main controls |
 | --- | --- | --- |
 | Lead data (personal data) | unauthorised access, leaks via public API, excessive retention | no public read endpoint; admin-only API with server-side sessions; retention job; minimal fields; IP stored only as keyed hash |
-| Admin accounts | credential stuffing, brute force, session theft, CSRF | Argon2id; per-IP + per-e-mail rate limits; **persistent account lockout** (survives restarts; unknown e-mails behave identically); generic errors; HttpOnly SameSite cookies; hashed session tokens; CSRF double submit; Origin check; 8 h absolute + 60 min idle expiry; logout and **logout-all**; session list |
+| Admin accounts | credential stuffing, brute force, phished or reused passwords, session theft, CSRF, replayed codes | Argon2id; **TOTP second factor** (derived secret, ±1 step, used steps refused, one-time recovery codes; required for everyone with `ADMIN_MFA_REQUIRED`); per-IP + per-e-mail rate limits shared by the password and code steps; **persistent account lockout** counting wrong passwords and codes together (survives restarts; unknown e-mails behave identically); generic errors; HttpOnly SameSite cookies; hashed session tokens, a new token after the second factor; CSRF double submit; Origin check; 8 h absolute + 60 min idle expiry; logout and **logout-all**; session list |
 | Contact form | spam, bots, floods, oversized payloads | signed timing token, honeypot, link heuristic, per-client and global rate limits, 64 KB body limit, strict schema (`extra=forbid`) |
 | Database | SQL injection | SQLAlchemy parameter binding everywhere; LIKE wildcards escaped; tested with injection payloads |
 | Browser | XSS, clickjacking, mixed content | React escaping; JSON-LD `<` escaped; CSP (`default-src 'self'`, `frame-ancestors 'none'`, `object-src 'none'`); `X-Frame-Options: DENY`; `nosniff`; HSTS at the proxy/API in production |
@@ -27,6 +27,44 @@ for names, enum/CHECK constraints in the database, mirrored client-side validati
 
 **Authentication** — see [ARCHITECTURE.md](ARCHITECTURE.md#authentication). Admins are created only via
 CLI/bootstrap; there is no public registration. Password policy: ≥12 chars, mixed case and digits.
+
+**Staff MFA (TOTP)** — closes audit finding H-2 once switched on. Code: `app/services/admin_mfa.py`,
+`app/routers/admin_auth.py`, `app/deps.py`; the TOTP itself is the client portal's (`app/portal/totp.py`).
+
+* **Algorithm:** RFC 6238 (SHA-1, 30 s, 6 digits), one step of clock drift either side. The matched
+  step is stored (`mfa_last_step`) and that step or any earlier one is refused, so a code works once.
+* **Secret:** derived, never stored: HMAC-SHA256(`SECRET_KEY`, `admin-totp:<user id>:<nonce>`). Only the
+  random nonce is in the database, so a database copy alone cannot produce codes. The context differs
+  from the portal's (`portal-totp`). Rotating `SECRET_KEY` invalidates every enrolment (and every
+  recovery code): run `reset-mfa` for each account and let them enrol again.
+* **Enrolment:** on `/admin/account` (*Account and sessions*): the key is shown once (plus an
+  `otpauth://` link), and it becomes active only when a code from it is confirmed. Enabling ends every
+  other session of the account.
+* **Sign-in:** password → a **pending session** (`admin_sessions.mfa_pending`, 15 minutes) → code →
+  the pending session is revoked and a new full session with a new token and CSRF token is issued. A
+  pending session gets 401 `mfa_required` (or `mfa_enrolment_required`) from every route except the MFA
+  step and logout. The step needs the CSRF token like any other write.
+* **Brute force:** the code step uses the same per-IP and per-e-mail buckets as the password step,
+  and every wrong code counts towards the same persistent lockout. A correct password does not reset
+  the counter (only a completed sign-in does), so codes cannot be guessed by re-entering the password.
+  Locking during the code step also revokes the pending session.
+* **Recovery codes:** ten random 12-character codes, shown once at enrolment or on replacement, stored
+  as HMAC-SHA256 keyed with `SECRET_KEY`; each works once at sign-in, never for account changes.
+  Replacing them (with a current authenticator code) invalidates the old set.
+* **Switching off:** needs the password and a current code; refused while `ADMIN_MFA_REQUIRED=true`.
+* **Lost device without recovery codes:** an operator runs
+  `docker compose exec api python -m app.cli reset-mfa --email <e-mail>` — removes the key and the
+  recovery codes, revokes every session, audited as `admin.mfa_reset`.
+* **Policy:** `ADMIN_MFA_REQUIRED` (default **false**, so a deploy never locks the owner out). When true,
+  an account without MFA must enrol right after the password before its session is usable, and full
+  sessions created before the switch reach only enrolment and logout until the person signs in again.
+  **Launch:** enrol every staff account, then set `ADMIN_MFA_REQUIRED=true`.
+* **Audit:** `auth.mfa_challenge`, `auth.mfa_failed`, `auth.mfa_recovery_code_used` (remaining count),
+  `auth.mfa_setup_started` / `_failed`, `auth.mfa_enabled`, `auth.mfa_disabled` / `_disable_failed`,
+  `auth.mfa_recovery_codes_replaced`, `admin.mfa_reset`, and `auth.login` with `{"mfa": "totp" |
+  "recovery_code" | "enrolled"}`. No secret, code or recovery code is ever logged (tested).
+* **Residual risk:** forced enrolment trusts whoever knows the password at that moment, so enrol the
+  accounts before switching the policy on. Rate limits are in memory per API process (M-2).
 
 **Authorisation** — staff have a role (`admin_users.role`): `admin`, `editor` or `viewer`. Every
 `/api/admin/*` route outside the catalogue depends on `require_admin`, which requires the `admin` role

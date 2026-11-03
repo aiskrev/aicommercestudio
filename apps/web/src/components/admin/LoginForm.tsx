@@ -3,16 +3,38 @@
 import { type FormEvent, useState } from "react";
 
 import { useAdminI18n } from "@/components/admin/AdminI18n";
+import { MfaCodeStep, MfaEnrolment, RecoveryCodes } from "@/components/admin/Mfa";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClass, cx } from "@/components/ui/primitives";
 import { adminFetch, ApiError, safeAdminRedirect } from "@/lib/admin-api";
+import type { AdminSession } from "@/lib/admin-types";
+
+/** Password → (when the account has TOTP, or ADMIN_MFA_REQUIRED is on) a code or enrolment step. */
+type Step = "password" | "verify" | "enrol" | "codes";
 
 export function LoginForm({ next }: { next?: string }) {
-  const t = useAdminI18n().t.login;
+  const { t: dict } = useAdminI18n();
+  const t = dict.login;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [step, setStep] = useState<Step>("password");
+  const [codes, setCodes] = useState<string[]>([]);
+
+  const finish = () => window.location.assign(safeAdminRedirect(next));
+
+  function backToPassword(message: string | null) {
+    setStep("password");
+    setSubmitting(false);
+    setError(message);
+  }
+
+  async function cancel() {
+    // Ends the pending session; failure is harmless (it expires on its own).
+    await adminFetch("/api/admin/auth/logout", { method: "POST" }).catch(() => undefined);
+    backToPassword(null);
+  }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -23,11 +45,16 @@ export function LoginForm({ next }: { next?: string }) {
     setSubmitting(true);
     setError(null);
     try {
-      await adminFetch("/api/admin/auth/login", {
+      const session = await adminFetch<AdminSession>("/api/admin/auth/login", {
         method: "POST",
         body: JSON.stringify({ email: email.trim(), password }),
       });
-      window.location.assign(safeAdminRedirect(next));
+      setPassword("");
+      if (session.mfa) {
+        setStep(session.mfa);
+        return;
+      }
+      finish();
     } catch (err) {
       setSubmitting(false);
       setPassword("");
@@ -36,6 +63,25 @@ export function LoginForm({ next }: { next?: string }) {
       else setError(t.unavailable);
     }
   }
+
+  if (step === "verify") {
+    return <MfaCodeStep onVerified={finish} onCancel={cancel} onLocked={() => backToPassword(t.tooMany)} />;
+  }
+  if (step === "enrol") {
+    return (
+      <div className="grid gap-4">
+        <h2 className="text-lg font-semibold text-white">{dict.mfa.enrolTitle}</h2>
+        <MfaEnrolment
+          onCancel={cancel}
+          onConfirmed={(result) => {
+            setCodes(result.recovery_codes);
+            setStep("codes");
+          }}
+        />
+      </div>
+    );
+  }
+  if (step === "codes") return <RecoveryCodes codes={codes} onDone={finish} />;
 
   return (
     <form onSubmit={onSubmit} noValidate className="grid gap-5" aria-label={t.formLabel}>

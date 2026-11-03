@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     # Persistent account lockout after consecutive failed logins.
     login_lockout_threshold: int = Field(default=5, ge=3, le=50)
     login_lockout_minutes: int = Field(default=15, ge=1, le=24 * 60)
+    # Staff TOTP. Off by default so a deploy never locks anyone out; when on, every staff account
+    # without a second factor must enrol right after the password, and MFA cannot be switched off.
+    admin_mfa_required: bool = False
     trust_proxy_headers: bool = True
     enable_api_docs: bool | None = None
     max_request_body_bytes: int = 64 * 1024

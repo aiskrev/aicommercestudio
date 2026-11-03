@@ -97,6 +97,9 @@ not enabled, because the API connects as the schema owner.
 * Argon2id password hashes; constant-time behaviour for unknown e-mails.
 * Opaque session token (32 random bytes) in an **HttpOnly, SameSite=Lax** cookie; only its SHA-256
   is stored (`admin_sessions`). Sessions expire after `SESSION_TTL_HOURS` and are revocable.
+* **TOTP second factor** for staff: password → a short pending session that reaches only the MFA step →
+  code (or a one-time recovery code) → a new full session. Required for every account when
+  `ADMIN_MFA_REQUIRED=true` (default off). Details: [SECURITY.md → Staff MFA](SECURITY.md).
 * Double-submit **CSRF** token (readable cookie + `X-CSRF-Token` header, hash stored server-side)
   required for every state-changing admin request; plus an Origin check on unsafe methods.
 * Next.js protects `/admin/*` twice: the proxy redirects requests without a cookie, and the

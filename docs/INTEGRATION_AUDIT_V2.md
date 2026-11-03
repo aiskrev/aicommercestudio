@@ -76,7 +76,7 @@ No **critical** finding was found.
 | ID | Severity | Finding | State |
 | --- | --- | --- | --- |
 | H-1 | High (blocks a client release) | The API connects to PostgreSQL as the schema owner and switches to `acs_app_runtime` per tenant-bound transaction. Code that reads tenant tables outside `require()` would not be under RLS. Composite tenant foreign keys and the route-level tests are the second barrier. | open; portal off; prerequisite in CLIENT_PORTAL.md |
-| H-2 | High (blocks a production launch) | No MFA for staff accounts (admin sessions reach all personal data). | open (P2) |
+| H-2 | High (blocks a production launch) | No MFA for staff accounts (admin sessions reach all personal data). | **fixed in code** (migration `0015`): TOTP for staff with a derived secret, replay refusal, one-time recovery codes, a pending session that reaches only the MFA step, the password step's rate limits and lockout, CLI `reset-mfa`; covered by `test_admin_mfa.py`, `mfa.test.tsx` and `admin-mfa.spec.ts`. **Before launch:** every staff account enrols, then `ADMIN_MFA_REQUIRED=true` (off by default so a deploy cannot lock the owner out). SECURITY.md → Staff MFA |
 | M-1 | Medium | Migration `0013` granted `acs_app_runtime` full DML on **every** table, including `leads` and other personal-data tables (blanket GRANT and default privileges). The role is only used inside tenant-bound Ops transactions, but a bug there could have read enquiries. | **fixed** in `0014`: REVOKE ALL on the eight lead tables, covered by a test |
 | M-2 | Medium | The rate limiter is in memory per process: limits multiply with more API instances. The account lockout itself is persistent. | open; single-instance deployment documented |
 | M-3 | Medium | Proposal approval by the same person who wrote the latest version is allowed (one administrator). | accepted for now; documented, easy to tighten |
@@ -223,7 +223,8 @@ conflicting copy was created.
 * the production deployment, backups and uptime monitoring;
 * legal texts (drafts today);
 * the company details;
-* staff MFA (H-2).
+* staff MFA switched on: every staff account enrolled, then `ADMIN_MFA_REQUIRED=true` (H-2; implemented,
+  off by default).
 
 **For the client portal (in addition):**
 

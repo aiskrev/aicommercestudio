@@ -117,6 +117,13 @@ class AdminRole(enum.StrEnum):
     VIEWER = "viewer"
 
 
+class AdminMfaPending(enum.StrEnum):
+    """What a pending staff session still needs: a code (`verify`) or enrolment (`enrol`)."""
+
+    VERIFY = "verify"
+    ENROL = "enrol"
+
+
 class AIActionStatus(enum.StrEnum):
     PENDING = "PENDING"
     APPROVED = "APPROVED"
@@ -150,11 +157,20 @@ class AdminUser(Base):
     role: Mapped[str] = mapped_column(
         String(12), nullable=False, default=AdminRole.ADMIN.value, server_default=AdminRole.ADMIN.value
     )
+    # TOTP second factor. The secret is derived from SECRET_KEY and this random nonce, never stored
+    # (app/services/admin_mfa.py); `mfa_last_step` refuses a code that was already used.
+    mfa_nonce: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    mfa_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=text("false"))
+    mfa_enabled_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    mfa_last_step: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
 
 
 class AdminSession(Base):
     __tablename__ = "admin_sessions"
-    __table_args__ = (Index("ix_admin_sessions_expires_at", "expires_at"),)
+    __table_args__ = (
+        Index("ix_admin_sessions_expires_at", "expires_at"),
+        CheckConstraint(_in_check("mfa_pending", AdminMfaPending, nullable=True), name="mfa_pending"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(
@@ -169,8 +185,25 @@ class AdminSession(Base):
     revoked_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
     ip_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     user_agent: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Set while the password is verified but the second factor is not: such a session reaches only the
+    # MFA step (and logout). A completed step replaces it with a new, full session.
+    mfa_pending: Mapped[str | None] = mapped_column(String(8), nullable=True)
 
     user: Mapped[AdminUser] = relationship(lazy="joined")
+
+
+class AdminMfaRecoveryCode(Base):
+    """One-time staff recovery codes: only a keyed hash is stored; `used_at` marks the single use."""
+
+    __tablename__ = "admin_mfa_recovery_codes"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("admin_users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    code_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
+    used_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
 
 
 class Lead(Base):

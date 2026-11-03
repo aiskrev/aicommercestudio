@@ -97,6 +97,7 @@ TABLES = [
     "audit_logs",
     "lead_notes",
     "leads",
+    "admin_mfa_recovery_codes",
     "admin_sessions",
     "admin_users",
 ]

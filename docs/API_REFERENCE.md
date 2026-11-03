@@ -333,13 +333,21 @@ data never appear. References to entries that are not published are left out.
 
 | Method | Path | Notes |
 | --- | --- | --- |
-| POST | `/api/admin/auth/login` | `{"email","password"}` → `acs_session` (HttpOnly, SameSite=Lax, Secure in production) + `acs_csrf` (SameSite=Strict) cookies. 401 `invalid_credentials`; 429 `rate_limited` from the per-IP/per-e-mail limiter **or** the persistent lockout (`LOGIN_LOCKOUT_THRESHOLD` consecutive failures → locked `LOGIN_LOCKOUT_MINUTES`). Unknown e-mails behave identically. |
-| POST | `/api/admin/auth/logout` | Revokes the current session, clears cookies → 204 |
+| POST | `/api/admin/auth/login` | `{"email","password"}` → `acs_session` (HttpOnly, SameSite=Lax, Secure in production) + `acs_csrf` (SameSite=Strict) cookies and `{"user", "expires_at", "mfa"}`. `mfa` is `null` for a full session, `"verify"` when the account has TOTP (the cookie holds a 15-minute **pending** session: next call `mfa/verify`), or `"enrol"` when `ADMIN_MFA_REQUIRED=true` and the account has no TOTP (next: `mfa/setup` + `mfa/confirm`). 401 `invalid_credentials`; 429 `rate_limited` from the per-IP/per-e-mail limiter **or** the persistent lockout (`LOGIN_LOCKOUT_THRESHOLD` consecutive failures of passwords and codes together → locked `LOGIN_LOCKOUT_MINUTES`). Unknown e-mails behave identically. |
+| POST | `/api/admin/auth/mfa/verify` | **Pending `verify` session only**, CSRF. `{"code"}`: a 6-digit TOTP code or a one-time recovery code → a new full session (new cookies) and `SessionOut`. 400 `mfa_code_invalid` (also for a replayed code or a used recovery code); 429 when the lockout is reached (the pending session is revoked); 409 `mfa_not_pending` with a full session. Same rate limits as `login`. |
+| GET | `/api/admin/auth/mfa` | `{enabled, enabled_at, recovery_codes_remaining, required}` |
+| POST | `/api/admin/auth/mfa/setup` | Full session or pending `enrol` session. → `{secret, otpauth_uri}`: a new key (not active until confirmed; replaces an unconfirmed one). 409 `mfa_already_enabled` |
+| POST | `/api/admin/auth/mfa/confirm` | Full or pending `enrol` session. `{"code"}` from the new key → `{recovery_codes: [10], session}`; ends every other session of the account. From a pending session it also issues the full session (`session` set, new cookies). 400 `mfa_code_invalid`, 409 `mfa_setup_missing` / `mfa_already_enabled` |
+| POST | `/api/admin/auth/mfa/recovery-codes` | `{"code"}` (current TOTP code; recovery codes are not accepted) → `{recovery_codes}`; the old set stops working. 400 `mfa_code_invalid`, 409 `mfa_not_enabled` |
+| POST | `/api/admin/auth/mfa/disable` | `{"password","code"}` → 204; ends the account's other sessions. 400 `invalid_credentials` / `mfa_code_invalid`; 409 `mfa_policy_required` while `ADMIN_MFA_REQUIRED=true` |
+| POST | `/api/admin/auth/logout` | Revokes the current session (also a pending one), clears cookies → 204 |
 | POST | `/api/admin/auth/logout-all` | Revokes **all** sessions of the current admin → `{"sessions_revoked": n}` |
 | GET | `/api/admin/auth/sessions` | Active sessions: `id, created_at, last_seen_at, expires_at, user_agent, current` |
-| GET | `/api/admin/auth/me` | `{"user": {..., "role"}, "expires_at": ...}`; open to every staff role (also `logout`, `logout-all`, `sessions`) |
+| GET | `/api/admin/auth/me` | `{"user": {..., "role", "mfa_enabled"}, "expires_at": ...}`; open to every staff role (also `logout`, `logout-all`, `sessions` and the `mfa` routes) |
 
-Every other `/api/admin/*` route requires the session cookie (401). `POST`/`PATCH`/`DELETE` additionally
+Every other `/api/admin/*` route requires a **full** session cookie (401; a pending session gets 401
+`mfa_required` or `mfa_enrolment_required`, and with `ADMIN_MFA_REQUIRED=true` so does a full session of
+an account without TOTP). `POST`/`PATCH`/`DELETE` additionally
 require `X-CSRF-Token: <acs_csrf cookie value>` (403 `csrf_failed`) and a same-site `Origin` when one is sent.
 Sessions expire after `SESSION_TTL_HOURS` (absolute) or `SESSION_IDLE_MINUTES` without activity.
 Admin responses are `Cache-Control: no-store`.

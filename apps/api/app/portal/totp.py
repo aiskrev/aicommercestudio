@@ -1,8 +1,10 @@
-"""RFC 6238 time-based one-time passwords (SHA-1, 30 s, 6 digits) — the portal's enforced second factor.
+"""RFC 6238 time-based one-time passwords (SHA-1, 30 s, 6 digits) — the second factor of the client
+portal and of staff sign-in (app/services/admin_mfa.py).
 
-The shared secret is derived, not stored: HMAC-SHA256(SECRET_KEY, "portal-totp:" + user id + nonce).
-Only the random nonce is in the database, so a copy of the database is not enough to generate codes;
-re-enrolment (recovery) replaces the nonce and invalidates the old secret.
+The shared secret is derived, not stored: HMAC-SHA256(SECRET_KEY, "<context>:" + user id + nonce), with
+the context `portal-totp` for client users and `admin-totp` for staff. Only the random nonce is in the
+database, so a copy of the database is not enough to generate codes; re-enrolment (recovery) replaces
+the nonce and invalidates the old secret.
 """
 
 from __future__ import annotations
@@ -25,8 +27,8 @@ def new_nonce() -> str:
     return secrets.token_hex(32)
 
 
-def secret_for(secret_key: str, user_id: uuid.UUID, nonce: str) -> bytes:
-    return hmac.new(secret_key.encode(), f"portal-totp:{user_id}:{nonce}".encode(), hashlib.sha256).digest()[:20]
+def secret_for(secret_key: str, user_id: uuid.UUID, nonce: str, context: str = "portal-totp") -> bytes:
+    return hmac.new(secret_key.encode(), f"{context}:{user_id}:{nonce}".encode(), hashlib.sha256).digest()[:20]
 
 
 def secret_b32(secret: bytes) -> str:

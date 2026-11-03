@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { AdminPageHeader } from "@/components/admin/AdminShell";
+import { MfaPanel } from "@/components/admin/Mfa";
 import { EmptyState, ErrorState, LoadingState, Panel } from "@/components/admin/ui";
 import { Alert, Badge, Button } from "@/components/ui/primitives";
 import { type AdminDictionary, fmt } from "@/i18n/admin";
@@ -69,6 +70,8 @@ export default function AdminAccountPage() {
             </ul>
           )}
         </Panel>
+
+        <MfaPanel />
 
         <Panel title={t.security}>
           <div className="grid gap-4 text-sm text-slate-300">
