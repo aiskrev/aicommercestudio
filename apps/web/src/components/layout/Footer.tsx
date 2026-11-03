@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/layout/Logo";
 import { ContactDetails } from "@/components/sections/ContactDetails";
 import { ButtonLink, Container } from "@/components/ui/primitives";
-import { serviceByKey } from "@/content";
+import { getContent, serviceByKey } from "@/content";
 import type { ServiceKey } from "@/content/types";
 import { type Locale, localizePath } from "@/i18n/config";
 import type { Dictionary } from "@/i18n";
@@ -25,6 +25,8 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     { href: href(routes.process), label: dict.nav.approach },
     { href: href(routes.about), label: dict.nav.about },
     { href: href(routes.insights), label: dict.nav.insights },
+    { href: href(routes.scenarios), label: getContent(locale).reference.scenarios.title },
+    { href: href(routes.patterns), label: getContent(locale).reference.patterns.title },
     { href: href(routes.contact), label: dict.nav.contact },
   ];
   const legal = [

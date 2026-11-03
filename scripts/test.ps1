@@ -67,6 +67,8 @@ if ($Suite -in @("e2e", "all")) {
             docker compose exec -T -e ADMIN_PASSWORD=$staffPassword api python -m app.cli set-password --email $account[0] | Out-Null
             docker compose exec -T api python -m app.cli set-role --email $account[0] --role $account[1] | Out-Null
         }
+        # Labelled demo organisation (sample registry data) owned by the bootstrap admin, for the Ops platform flows.
+        docker compose exec -T api sh -c 'python -m app.cli ops-seed-demo --owner-email "$ADMIN_BOOTSTRAP_EMAIL"' | Out-Null
         docker compose --profile test run --rm --build -e E2E_STAFF_PASSWORD=$staffPassword e2e
     }
 }

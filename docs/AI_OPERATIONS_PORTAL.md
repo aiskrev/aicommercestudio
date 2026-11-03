@@ -5,14 +5,24 @@ Services clients, and the scaffold that exists today. It builds on
 [AI_OPERATIONS_ARCHITECTURE.md](AI_OPERATIONS_ARCHITECTURE.md), which covers the console concept.
 That document is now superseded by this one for data model, API and phasing.
 
-> **Status, 2026-10-27.**
+> **Status, 2026-11-03.**
 >
-> * **What exists:** a staff-only **scaffold**: organisations, workspaces, memberships with roles, an
->   agent registry (metadata only), and organisation-scoped APIs with authorization and
->   tenant-isolation tests. A read-only admin page shows it.
-> * **What is not collected:** no telemetry is collected or displayed. The overview API reports
->   `telemetry.connected = false`, and the public page presents the portal as *planned*.
-> * **What does not exist yet:** client logins and real customer integrations.
+> * **What exists (staff-only):**
+>   * organisations, workspaces, memberships with roles;
+>   * the agent registry;
+>   * a versioned configuration and prompt registry with review (§12);
+>   * an evaluation suite with a deterministic simulated runner (§13);
+>   * a bounded observability data model ([AI_OBSERVABILITY.md](AI_OBSERVABILITY.md));
+>   * incidents and controlled changes ([AI_OPERATIONS_RUNBOOK.md](AI_OPERATIONS_RUNBOOK.md)).
+>
+>   All of it is organisation-scoped, under PostgreSQL row-level security with a restricted runtime
+>   role (§3, §11a).
+> * **What exists but is off:** a read-only client portal with separate identities and enforced MFA
+>   ([CLIENT_PORTAL.md](CLIENT_PORTAL.md)), behind `CLIENT_PORTAL_ENABLED=false`.
+> * **What is not collected:** no telemetry. Execution records are labelled synthetic samples or
+>   manual imports, and the overview reports `telemetry.connected = false`.
+> * **What does not exist:** a telemetry gateway, customer integrations, notifications, automatic
+>   deployment.
 
 ## 1. Findings from the existing system
 
@@ -72,10 +82,10 @@ Defence in depth. Each layer is independently tested:
 | 1 | **Context resolution.** Every route names `organization_id`. `require(permission)` loads the caller's membership. With no membership the answer is **404** (`ops_not_found`), the same as a missing organisation, so tenants cannot be enumerated. With no permission the answer is **403**. Writes to a suspended organisation return 403 `ops_suspended`. | Implemented (`app/ops/tenancy.py`) |
 | 2 | **Scoped queries only.** Routes read through `scoped(ctx, Model)` / `get_scoped(...)`, which always add `organization_id = ctx.organization_id`. A foreign id passed through the caller's own organisation path is "not found". | Implemented |
 | 3 | **Referential integrity across tenants.** Composite foreign key `(workspace_id, organization_id) → ops_workspaces(id, organization_id)`, so the database rejects an agent placed in another tenant's workspace. The same pattern applies to every future child table. | Implemented (migration `0008`) |
-| 4 | **PostgreSQL row-level security.** Policies `USING (organization_id = current_setting('app.org_id')::uuid)` on tenant tables, set per transaction with `SET LOCAL`. It requires the API to connect as a **non-owner, non-superuser role**: today the Compose database user owns the schema and would bypass RLS. | MVP, before any client login |
+| 4 | **PostgreSQL row-level security.** Every tenant table has RLS enabled with a policy `organization_id = ops_current_org()` (USING and WITH CHECK). The organisation comes from the transaction-local setting `app.ops_org`. Memberships and organisations are also visible to their own user (`app.ops_user`), which the organisation list needs. Tenant-scoped requests run as **`acs_app_runtime`** (NOLOGIN, NOBYPASSRLS, owns nothing) via `SET LOCAL ROLE` at the start of every transaction (`app/ops/rls.py`). The schema owner, used by migrations, the CLI and retention, still bypasses RLS (not FORCEd). | Implemented (migration `0013`), tested with the restricted role |
 | 5 | **Ingestion keys bound to one workspace.** The gateway derives tenant and workspace from the key. Payload fields `organization_id` and `workspace_id` are ignored or rejected. | V2 |
 | 6 | **Per-tenant limits and quotas** (requests, payload size, storage) so one tenant cannot degrade others. | V2 |
-| 7 | **Tests** for every route and every new table: cross-tenant read, write, list and audit, the database-level constraint, and RLS with the restricted role. | Implemented for the scaffold (`tests/test_ops_portal.py`) |
+| 7 | **Tests** for every route and every new table: cross-tenant read, write, list and audit, the database-level constraint, and RLS with the restricted role. | Implemented (`tests/test_ops_portal.py`, `test_ops_security.py`, `test_ops_registry_evals.py`, `test_ops_observability_workflows.py`, `test_portal.py`) |
 
 Staff access to client data: today a staff user sees only organisations they are a member of. The
 target design is **just-in-time support access**: a time-boxed membership granted by an owner (or a
@@ -352,3 +362,118 @@ Then open `/admin/operations`: the demo organisation is labelled "sample data". 
 ```bash
 docker compose exec api python -m app.cli ops-purge-demo
 ```
+
+## 11a. Verified security properties (2026-11-03)
+
+Every property below is tested.
+
+* **Restricted role.** `acs_app_runtime` is not a superuser, has no BYPASSRLS, cannot log in and owns
+  no ops or portal table (`test_runtime_role_is_restricted`).
+* **RLS on every tenant table.** RLS is enabled and has a policy on every tenant table, including
+  memberships and organisations (`test_every_tenant_table_has_rls_and_a_policy`).
+* **Reads.** As the runtime role bound to A, only A's rows are visible, even with an explicit filter
+  for B. With no binding, nothing is visible.
+* **Writes.** Inserting into B, or moving A's row into B, fails WITH CHECK. Updates and deletes of B's
+  rows match nothing.
+* **Bound sessions.** Every transaction of a bound request runs as the runtime role. A query that
+  forgot its tenant filter still sees one organisation, also after a commit. The role and the setting
+  do not leak to the next pooled session (`test_bound_sessions_run_every_transaction_as_the_runtime_role`).
+* **The owner bypasses RLS.** This is demonstrated on purpose (`test_owner_bypasses_rls_…`): owner-only
+  tests are not evidence of isolation.
+* **Composite foreign keys** refuse cross-tenant links in every new table: versions, datasets, cases,
+  runs, results, execution records, budgets, rules, incidents, changes, timelines, portal tokens and
+  sessions.
+* **Immutability.** Approved and retired registry versions are immutable (trigger). Incident and change
+  timelines are append-only (trigger), and the runtime role has no UPDATE or DELETE on them or on
+  `audit_logs`.
+* **Permission matrix.**
+  * Owners and admins hold every permission.
+  * Operators prepare: write permissions only.
+  * Reviewers decide: approve, label, review only.
+  * Viewers read.
+
+  Every route under an organisation path declares `require()` (`test_every_tenant_route_declares_a_permission`).
+* **Enumeration.** A foreign organisation and a missing one answer the same 404. A foreign object
+  through one's own path is not found.
+* **Suspended organisations** are read-only, including the transitions whose permission depends on
+  the step.
+* **Cross-tenant audit.** An organisation's audit view returns only entries carrying its id. Unscoped
+  entries never appear.
+* **Demo organisations.** They are created only outside production, labelled in the UI, the only
+  place synthetic execution records may be generated, and excluded from client access.
+* **Feature gates.** `OPS_MODULES` switches modules off (their routes answer 404 and the tabs
+  disappear). `CLIENT_PORTAL_ENABLED` is off by default.
+* **Retention and deletion.** Deleting an organisation cascades to all of its rows. Execution records
+  and evaluation results follow the per-organisation retention (`ops-retention`).
+
+### Remaining prerequisites for client access
+
+1. **A separate login role.** Deploy with a separate **login role** for the application that is a
+   member of, or identical to, `acs_app_runtime` and owns nothing. Keep the schema owner for
+   migrations only. Today the application connects as the owner and switches role per transaction,
+   so a compromised connection could `RESET ROLE`.
+2. **A penetration test** of authentication and tenant isolation.
+3. **E-mail.** Transactional e-mail for invitations and recovery.
+4. **Privacy.** A DPA and the privacy notice for client users.
+5. **Support access.** Just-in-time support access for staff (time-boxed memberships) instead of
+   standing memberships.
+6. **Approval.** Explicit release approval, then `CLIENT_PORTAL_ENABLED=true`.
+
+## 12. Configuration and prompt registry
+
+The registry lives in `ops_agent_versions` and `app/ops/registry.py`, with the staff tab "Registry".
+It extends `ops_agents` and is not a second registry.
+
+* **Content.** A version holds:
+  * a prompt template (≤ 20 000 characters, checked for secrets);
+  * a provider and model reference;
+  * allow-listed parameters (`temperature`, `top_p`, `top_k`, `max_tokens`, `stop_sequences`; any
+    other key, e.g. `api_key`, is refused);
+  * declared tools (name, kind, integration label, read or write access, `requires_approval` —
+    mandatory for write tools; no URLs, endpoints or code fields).
+* **Metadata.** The environment comes from the workspace; the owner, change reason, base version and
+  rollback reference are recorded.
+* **Lifecycle.** draft → in_review → approved → retired. A reviewer can send a version back to draft.
+  Approving retires the previously approved version.
+* **Sensitive versions.** A version is sensitive when it targets production, declares a write tool or
+  changes the provider or model of its base. It must be approved by someone other than its author,
+  whatever their role. A production version also needs an evaluation run of that exact version as
+  evidence; a simulated run is flagged as such.
+* **Integrity.** `content_hash` is the SHA-256 of the canonical content, re-verified on every read
+  (`integrity_ok`). A database trigger refuses content changes after draft.
+* **Diffs and rollback.** Diffs show field changes and a unified prompt diff. A rollback draft copies
+  an approved or retired version's content.
+* **No deployment.** Nothing is deployed. Audit entries carry identifiers, numbers, flags and the
+  hash — never the prompt.
+
+## 13. Evaluation suite
+
+The suite lives in `ops_eval_*` and `app/ops/evaluation.py`, with the staff tab "Evaluations".
+
+* **Datasets.** Datasets are versioned per agent: edited as drafts, then locked. A locked version
+  never changes.
+* **Cases.** Each case has a synthetic input, the expected behaviour and deterministic assertions:
+  `contains`, `not_contains`, `starts_with`, `max_chars`, and a bounded `regex` (no backreferences or
+  nested quantifiers). A predefined synthetic template is available (`support_basics`).
+* **Runs and the simulated runner.** A run links an agent version to a locked dataset version. The
+  only runner is `deterministic_simulated`. It calls no model; its output is the input followed by
+  the version's declared rules (prompt lines starting with `Rule:`, `Always:` or `Never:`), labelled
+  `[SIMULATED OUTPUT — no model was called]`. Assertions therefore detect when a version drops or
+  changes a rule. Runs and results carry `simulated: true` everywhere, including the client portal.
+* **Comparison and labels.** Comparison of two runs lists regressions, fixes and unchanged cases.
+  Manual labels (pass, fail, needs review) need `evals.label`.
+* **No self-approval.** Running or labelling never changes a version's status. Only a person's
+  review decision does, so no model output can approve its own deployment.
+
+### Real evaluation runner (future, separately approved phase)
+
+* **Isolated worker.** A real runner would run in an isolated worker, called through the existing
+  provider adapter (`app/ai`) with the organisation's own provider account or a studio account
+  approved for it. It would use its own budget and rate limits.
+* **Data allowed.** Only datasets marked as approved for external processing, after the redaction
+  check (`looks_like_secret` plus PII rules), would be sent. Confidential datasets would stay local.
+* **Labelling.** Results would be stored with `simulated: false`, the runner name, model and
+  parameters, and labelled "model evaluation".
+* **Model-graded rubrics.** These would be advisory only and never an approval.
+* **Approval.** Enabling it needs its own review: the DPA, provider terms, cost limits and a security
+  review.

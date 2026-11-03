@@ -60,6 +60,10 @@ TABLES = [
     "content_item_translations", "content_items",
     "entity_relations", "entity_translations", "family_services", "services", "service_families",
     "service_domains", "catalogue_entities",
+    "portal_sessions", "portal_tokens", "portal_users",
+    "ops_change_events", "ops_changes", "ops_incident_events", "ops_incidents",
+    "ops_retention_policies", "ops_threshold_rules", "ops_budgets", "ops_runs", "ops_rate_cards",
+    "ops_eval_results", "ops_eval_runs", "ops_eval_cases", "ops_eval_datasets", "ops_agent_versions",
     "ops_agents", "ops_memberships", "ops_workspaces", "ops_organizations",
     "advisor_assessments", "team_configurations", "assessment_results",
     "ai_action_requests", "audit_logs", "lead_notes", "leads",
@@ -165,3 +169,26 @@ def make_lead(client: TestClient):
         return response.json()
 
     return _make
+
+
+@pytest.fixture
+def tenants(db):
+    """Ops tenants: org A (owner a@…) and org B (owner b@…), each with a production workspace and an agent."""
+    from app.models import OpsAgent, OpsWorkspace
+    from app.ops import service as ops
+    from tests.test_ops_portal import user
+
+    user(db, "owner.a@example.com")
+    user(db, "owner.b@example.com")
+    org_a = ops.create_organization(db, slug="tenant-a", name="Tenant A", owner_email="owner.a@example.com")
+    org_b = ops.create_organization(db, slug="tenant-b", name="Tenant B", owner_email="owner.b@example.com")
+    data = {}
+    for org in (org_a, org_b):
+        ws = OpsWorkspace(organization_id=org.id, slug="production", name="Production", environment="production")
+        db.add(ws)
+        db.flush()
+        agent = OpsAgent(organization_id=org.id, workspace_id=ws.id, key="support", name="Support", status="active")
+        db.add(agent)
+        db.commit()
+        data[org.slug] = {"org": org.id, "workspace": ws.id, "agent": agent.id}
+    return data

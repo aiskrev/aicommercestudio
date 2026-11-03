@@ -288,6 +288,8 @@ export interface OpsOverview {
   workspaces: number;
   agents_by_status: Partial<Record<OpsAgentStatus, number>>;
   telemetry: { connected: boolean; note: string };
+  /** Platform modules switched on for this deployment. */
+  modules?: ("registry" | "evaluations" | "observability" | "incidents" | "changes")[];
 }
 
 export interface OpsWorkspace {

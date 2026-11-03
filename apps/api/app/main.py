@@ -27,6 +27,8 @@ from app.routers import (
     catalogue,
     health,
     ops,
+    ops_platform,
+    portal,
     public,
     readiness,
     solution,
@@ -136,6 +138,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_catalogue.router)
     app.include_router(admin_staff.router)
     app.include_router(ops.router)
+    app.include_router(ops_platform.router)
+    app.include_router(portal.staff)
+    app.include_router(portal.client)
     return app
 
 

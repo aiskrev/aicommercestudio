@@ -8,6 +8,7 @@
     python -m app.cli ops-create-org --slug s --name n --owner-email x@y  # AI operations tenant + owner
     python -m app.cli ops-seed-demo --owner-email x@y   # labelled sample registry (not in production)
     python -m app.cli ops-purge-demo            # remove demo organisations
+    python -m app.cli ops-retention             # apply ops retention (runs, evaluation results)
     python -m app.cli set-role --email x@y --role editor  # staff role: admin | editor | viewer
     python -m app.cli catalogue-seed [--dry-run] [--reconcile]  # create (or mirror) the catalogue entries
     python -m app.cli catalogue-check           # BG/EN content, slugs and lead categories of the catalogue
@@ -289,6 +290,16 @@ def cmd_ops_purge_demo(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_ops_retention(args: argparse.Namespace) -> int:
+    from app.ops.observability import purge_expired
+
+    with get_sessionmaker()() as db:
+        removed = purge_expired(db)
+    _print(f"[ops-retention] Removed execution records: {removed['runs']}, "
+           f"evaluation results: {removed['eval_results']}")
+    return 0
+
+
 def cmd_catalogue_seed(args: argparse.Namespace) -> int:
     try:
         doc = catalogue.load_document(Path(args.file)) if args.file else catalogue.load_document()
@@ -375,6 +386,9 @@ def main(argv: list[str] | None = None) -> int:
     demo.add_argument("--owner-email", required=True)
     demo.set_defaults(func=cmd_ops_seed_demo)
     sub.add_parser("ops-purge-demo", help="Delete demo organisations").set_defaults(func=cmd_ops_purge_demo)
+    sub.add_parser(
+        "ops-retention", help="Delete execution records and evaluation results past each organisation's retention"
+    ).set_defaults(func=cmd_ops_retention)
     cat = sub.add_parser("catalogue-seed", help="Reconcile the service catalogue with the seed document (idempotent)")
     cat.add_argument("--dry-run", action="store_true", help="Report what would change and roll back")
     cat.add_argument("--file", help="Seed document (default: app/catalogue/seed_v1.json)")

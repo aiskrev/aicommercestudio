@@ -60,7 +60,10 @@ class TelemetryStatus(BaseModel):
     """Always reported, so a client never mistakes an empty dashboard for a healthy system."""
 
     connected: bool = False
-    note: str = "No telemetry source is connected. Run, cost, latency and incident data are not collected yet."
+    note: str = (
+        "No telemetry source is connected. Execution records exist only as labelled synthetic samples or "
+        "manual imports; nothing is collected from client systems."
+    )
 
 
 class OverviewOut(BaseModel):
@@ -70,6 +73,8 @@ class OverviewOut(BaseModel):
     workspaces: int
     agents_by_status: dict[str, int]
     telemetry: TelemetryStatus = Field(default_factory=TelemetryStatus)
+    # Platform modules switched on for this deployment (OPS_MODULES).
+    modules: list[str] = []
 
 
 # --------------------------------------------------------------------------- workspaces

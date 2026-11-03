@@ -17,6 +17,7 @@ import { keywordMap } from "@/content/bg/seo";
 import { coreServices, services } from "@/content/bg/services";
 import { readinessTool } from "@/content/bg/tool-readiness";
 import { agentLibrary } from "@/content/bg/agent-library";
+import { reference } from "@/content/bg/reference";
 import { finderTool } from "@/content/bg/tool-finder";
 import { roiTool } from "@/content/bg/tool-roi";
 import { engineeringTool } from "@/content/bg/tool-engineering";
@@ -48,6 +49,7 @@ import { keywordMap as enKeywordMap } from "@/content/en/seo";
 import { coreServices as enCoreServices, services as enServices } from "@/content/en/services";
 import { readinessTool as enReadinessTool } from "@/content/en/tool-readiness";
 import { agentLibrary as enAgentLibrary } from "@/content/en/agent-library";
+import { reference as enReference } from "@/content/en/reference";
 import { finderTool as enFinderTool } from "@/content/en/tool-finder";
 import { roiTool as enRoiTool } from "@/content/en/tool-roi";
 import { engineeringTool as enEngineeringTool } from "@/content/en/tool-engineering";
@@ -82,6 +84,7 @@ const bg = {
   finderTool,
   solutionTool,
   agentLibrary,
+  reference,
   articles,
   insightsPage,
   editorialCategories,
@@ -115,6 +118,7 @@ const en: SiteContent = {
   finderTool: enFinderTool,
   solutionTool: enSolutionTool,
   agentLibrary: enAgentLibrary,
+  reference: enReference,
   articles: enArticles,
   insightsPage: enInsightsPage,
   editorialCategories: enEditorialCategories,

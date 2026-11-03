@@ -114,6 +114,19 @@ class Settings(BaseSettings):
     # assessments stay "Coming soon" on the website and are not reachable through the API.
     assessments_preview_enabled: bool = False
 
+    # AI operations platform modules that are switched on (comma-separated). A module that is off has no
+    # routes (404) and is not shown in the staff UI. Telemetry ingestion and report uploads do not exist.
+    ops_modules: str = "registry,evaluations,observability,incidents,changes"
+    # Read-only client portal (separate client identities with MFA). Off unless explicitly approved for
+    # release; its routes answer 404 while off.
+    client_portal_enabled: bool = False
+    # Client portal sessions: absolute lifetime and idle timeout.
+    portal_session_hours: int = Field(default=8, ge=1, le=24)
+    portal_session_idle_minutes: int = Field(default=30, ge=5, le=240)
+    portal_session_cookie_name: str = "acs_portal_session"
+    portal_csrf_cookie_name: str = "acs_portal_csrf"
+    portal_invitation_hours: int = Field(default=72, ge=1, le=336)
+
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None

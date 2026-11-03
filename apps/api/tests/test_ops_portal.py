@@ -16,7 +16,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.cli import ensure_admin
 from app.config import get_settings
-from app.models import AuditLog, OpsAgent, OpsMembership, OpsOrganization, OpsRole, OpsWorkspace
+from app.models import AuditLog, OpsAgent, OpsMembership, OpsOrganization, OpsRole
 from app.ops import service as ops
 from app.ops.rbac import ROLE_PERMISSIONS, Permission, can, can_assign
 
@@ -41,25 +41,6 @@ def user(db, email: str):
 def add_member(db, org: OpsOrganization, email: str, role: OpsRole) -> None:
     db.add(OpsMembership(organization_id=org.id, user_id=user(db, email).id, role=role))
     db.commit()
-
-
-@pytest.fixture
-def tenants(db):
-    """Org A (owner a@…) and org B (owner b@…), each with a workspace and an agent."""
-    user(db, "owner.a@example.com")
-    user(db, "owner.b@example.com")
-    org_a = ops.create_organization(db, slug="tenant-a", name="Tenant A", owner_email="owner.a@example.com")
-    org_b = ops.create_organization(db, slug="tenant-b", name="Tenant B", owner_email="owner.b@example.com")
-    data = {}
-    for org in (org_a, org_b):
-        ws = OpsWorkspace(organization_id=org.id, slug="production", name="Production", environment="production")
-        db.add(ws)
-        db.flush()
-        agent = OpsAgent(organization_id=org.id, workspace_id=ws.id, key="support", name="Support", status="active")
-        db.add(agent)
-        db.commit()
-        data[org.slug] = {"org": org.id, "workspace": ws.id, "agent": agent.id}
-    return data
 
 
 def base(org_id) -> str:

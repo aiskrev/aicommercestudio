@@ -40,6 +40,9 @@ export function decideRoute(
     return { type: "next" };
   }
 
+  // Client portal: its own root layout and language handling; the API checks the portal session.
+  if (pathname === "/portal" || pathname.startsWith("/portal/")) return { type: "next" };
+
   if (pathname === "/") {
     const locale: Locale = isLocale(preferredLocale) ? preferredLocale : defaultLocale;
     return { type: "redirect", location: `/${locale}${search}`, permanent: false };
