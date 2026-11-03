@@ -178,7 +178,7 @@ export function Header({
       onClick={() => toggle(id)}
       data-active={active || undefined}
       className={cx(
-        "nav-link inline-flex min-h-11 items-center gap-1 px-3 text-[14.5px] font-medium transition-colors",
+        "nav-link inline-flex min-h-11 items-center gap-1 whitespace-nowrap px-2.5 text-nav font-medium transition-colors xl:px-3",
         active || openMenu === id ? "text-fg" : "text-fg-muted hover:text-fg",
       )}
     >
@@ -244,7 +244,7 @@ export function Header({
                                           href={service.href}
                                           aria-current={isCurrent(service.href) ? "page" : undefined}
                                           className={cx(
-                                            "flex min-h-11 items-center px-3 text-[13.5px] text-fg-secondary hover:text-fg aria-[current=page]:text-fg",
+                                            "flex min-h-11 items-center px-3 text-caption text-fg-secondary hover:text-fg aria-[current=page]:text-fg",
                                             menuLinkClass,
                                           )}
                                         >
@@ -305,7 +305,7 @@ export function Header({
                       href={entry.href}
                       aria-current={isCurrent(entry.href) ? "page" : undefined}
                       className={cx(
-                        "nav-link inline-flex min-h-11 items-center px-3 text-[14.5px] font-medium transition-colors",
+                        "nav-link inline-flex min-h-11 items-center whitespace-nowrap px-2.5 text-nav font-medium transition-colors xl:px-3",
                         isCurrent(entry.href) ? "text-fg" : "text-fg-muted hover:text-fg",
                       )}
                     >
@@ -417,7 +417,7 @@ export function Header({
                   <Link
                     href={services.href}
                     aria-current={pathname === services.href ? "page" : undefined}
-                    className="mt-1 flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-[15px] font-semibold text-brand hover:bg-surface-2"
+                    className="mt-1 flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-body-sm font-semibold text-brand hover:bg-surface-2"
                   >
                     {services.allLabel}
                     <Icon name="arrowRight" className="h-4 w-4" />
@@ -524,7 +524,7 @@ function MobileLink({
       aria-current={current ? "page" : undefined}
       className={cx(
         "flex min-h-11 items-center gap-3 rounded-xl px-4 py-2.5 transition-colors hover:bg-surface-2 aria-[current=page]:bg-surface-3 aria-[current=page]:text-fg",
-        small ? "text-[14px] text-fg-muted" : "text-[15px] text-fg-secondary",
+        small ? "text-sm text-fg-muted" : "text-body-sm text-fg-secondary",
         strong && "font-semibold text-fg",
         chevron && "justify-between text-base font-medium",
       )}

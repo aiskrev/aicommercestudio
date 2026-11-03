@@ -18,16 +18,19 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
       const service = serviceByKey(locale, key);
       return { href: href(routes.service(service.slug)), label: service.shortTitle };
     });
-  const company = [
+  const { workshops, reference } = getContent(locale);
+  const resources = [
     { href: href(routes.aiSolutions), label: dict.nav.aiSolutions },
     { href: href(routes.tools), label: dict.nav.tools },
-    { href: href(routes.industries), label: dict.nav.industries },
-    { href: href(routes.process), label: dict.nav.approach },
-    { href: href(routes.about), label: dict.nav.about },
+    { href: href(routes.workshops), label: workshops.page.title },
+    { href: href(routes.scenarios), label: reference.scenarios.title },
+    { href: href(routes.patterns), label: reference.patterns.title },
     { href: href(routes.insights), label: dict.nav.insights },
-    { href: href(routes.workshops), label: getContent(locale).workshops.page.title },
-    { href: href(routes.scenarios), label: getContent(locale).reference.scenarios.title },
-    { href: href(routes.patterns), label: getContent(locale).reference.patterns.title },
+  ];
+  const company = [
+    { href: href(routes.about), label: dict.nav.about },
+    { href: href(routes.process), label: dict.nav.approach },
+    { href: href(routes.industries), label: dict.nav.industries },
     { href: href(routes.contact), label: dict.nav.contact },
   ];
   const legal = [
@@ -42,7 +45,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
       <Container className="grid gap-8 border-b border-line-subtle py-12 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end lg:py-16">
         <div>
           <Logo href={href(routes.home)} gradientId="logo-gradient-footer" />
-          <p className="mt-6 max-w-2xl font-display text-[clamp(1.35rem,1.1rem+0.8vw,1.75rem)] font-bold leading-snug tracking-[-0.02em] text-fg">
+          <p className="t-h3-lg mt-6 max-w-2xl text-fg">
             {dict.footer.tagline}
           </p>
         </div>
@@ -55,9 +58,10 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
       </Container>
 
       {/* link groups */}
-      <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+      <Container className="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-5 lg:gap-10">
         <FooterColumn title={dict.nav.servicesAi} links={serviceLinks(AI_SERVICE_NAV)} />
         <FooterColumn title={dict.nav.servicesFoundation} links={[...serviceLinks(FOUNDATION_SERVICE_NAV), { href: href(routes.services), label: dict.common.allServices }]} />
+        <FooterColumn title={dict.footer.resources} links={resources} />
         <FooterColumn title={dict.footer.company} links={company} />
         <div>
           <FooterColumn title={dict.footer.legal} links={legal} />
