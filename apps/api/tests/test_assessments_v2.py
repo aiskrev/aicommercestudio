@@ -234,7 +234,8 @@ def test_definitions_reject_points_on_unscored_questions_and_unknown_domains():
 
 
 def observability() -> AssessmentDefinition:
-    return registry().current("observability_reliability")
+    """Version 1.1.0, kept so results saved with it still re-render (1.2.0 is current)."""
+    return registry().get("observability_reliability", "1.1.0")
 
 
 OBS_WEAK = {
@@ -258,7 +259,7 @@ OBS_STRONG = {
 }
 
 
-def test_observability_1_1_0_is_live_with_the_same_questions_as_1_0_0():
+def test_observability_1_1_0_has_the_same_questions_as_1_0_0():
     current, previous = observability(), registry().get("observability_reliability", "1.0.0")
     assert (current.version, current.status, previous.status) == ("1.1.0", "live", "preview")
     assert [q.key for q in current.questions] == [q.key for q in previous.questions]
@@ -285,11 +286,116 @@ def test_observability_boundaries_and_explained_findings():
     assert [step["horizon"] for step in view["roadmap"]] == [90]
 
 
+ALL_SIGNALS = ["logs", "metrics", "traces", "error_tracking"]
+
+
+def obs12() -> AssessmentDefinition:
+    return registry().current("observability_reliability")
+
+
 def test_observability_keeps_its_cross_question_check(client):
-    response = score(
-        client, "observability_reliability", dict(OBS_STRONG, telemetry=[], alert_routing="on_call_rotation")
-    )
+    answers = answers_at(obs12(), 3, telemetry=[])
+    response = score(client, "observability_reliability", dict(answers, alert_routing="on_call_rotation"))
     assert response.status_code == 422 and response.json()["errors"][0]["type"] == "inconsistent"
+
+
+def test_observability_1_2_0_nothing_collected_counts_as_no_telemetry(client):
+    answers = answers_at(obs12(), 3, telemetry=["none"])
+    response = score(client, "observability_reliability", dict(answers, alert_routing="on_call_rotation"))
+    assert response.status_code == 422 and response.json()["errors"][0]["type"] == "inconsistent"
+    _, result = service.assess(obs12(), answers_at(obs12(), 0, telemetry=["none"]))
+    assert result.dimensions["telemetry"] == 0
+    assert result.extras == {"missing_signals": ["logs", "metrics", "traces"]}
+
+
+def test_observability_1_2_0_covers_the_requested_areas():
+    definition = obs12()
+    assert (definition.version, definition.status) == ("1.2.0", "live")
+    assert definition.dimension_keys == (
+        "golden_signals",
+        "telemetry",
+        "otel",
+        "slo",
+        "alerting",
+        "incidents",
+        "runbooks",
+        "capacity",
+        "dependencies",
+        "change_failure",
+        "resilience",
+    )
+    assert definition.extension == "observability_signals"
+
+
+def test_observability_1_2_0_findings_architecture_and_illustrative_slos():
+    definition = obs12()
+    answers, weak = service.assess(definition, answers_at(definition, 0, telemetry=[]))
+    assert (weak.overall, weak.band) == (0, "initial")
+    assert weak.extras == {"missing_signals": ["logs", "metrics", "traces"]}
+    view = present_result(definition, weak, "en", answers)
+    keys = {f["key"]: f for f in view["recommendations"]}
+    assert {"risk_no_alerts", "risk_blind_spots", "risk_untested_recovery", "risk_external_blind"} <= set(keys)
+    assert keys["pattern_telemetry_architecture"]["description"].startswith("OpenTelemetry SDKs")
+    slos = keys["pattern_example_slos"]
+    assert "illustrative only" in slos["title"] and "not recommended values" in slos["description"]
+    assert all(f["because"] for f in view["recommendations"])
+
+    answers, strong = service.assess(definition, answers_at(definition, 3, telemetry=ALL_SIGNALS))
+    assert (strong.overall, strong.band) == (100, "optimised")
+    view = present_result(definition, strong, "en", answers)
+    assert {f["kind"] for f in view["recommendations"]} == {"target_state"}
+    for locale in ("bg", "en"):
+        disclaimer = definition.texts[locale].disclaimer.lower()
+        assert (
+            "do not" in disclaimer and "measure availability" in disclaimer
+        ) or "не измерваме наличност" in disclaimer
+
+
+@pytest.mark.parametrize(("gs_coverage", "gs_health", "expected"), [(1, 1, True), (1, 2, False), (2, 2, False)])
+def test_recommendation_boundary_is_exclusive_at_50(gs_coverage, gs_health, expected):
+    """Golden signals at 33 → recommended; exactly 50 or more → not (`dimension_below` is strict)."""
+    definition = obs12()
+    answers = answers_at(definition, 3, telemetry=ALL_SIGNALS)
+    answers["gs_coverage"] = definition.question("gs_coverage").options[gs_coverage].key
+    answers["gs_health"] = definition.question("gs_health").options[gs_health].key
+    _, result = service.assess(definition, answers)
+    assert result.dimensions["golden_signals"] == round((gs_coverage + gs_health) / 6 * 100)
+    assert ("rec_golden_signals" in result.recommendations) is expected
+
+
+def test_ecommerce_tracks_and_ai_only_after_the_foundations():
+    definition = registry().current("ecommerce_architecture")
+    assert len(definition.dimensions) == 11
+    answers, weak = service.assess(definition, answers_at(definition, 0, platform_context=["woocommerce"]))
+    view = present_result(definition, weak, "en", answers)
+    tracks = {f["key"]: f["track"] for f in view["recommendations"]}
+    assert set(tracks.values()) <= {"configuration", "engineering", "ai"}
+    assert {"configuration", "engineering"} <= set(tracks.values())
+    assert "ctx_ai_prerequisites" in tracks and not any(k.startswith("ai_") for k in tracks)
+    assert tracks["risk_card_data"] == "engineering"
+    answers, strong = service.assess(definition, answers_at(definition, 3, platform_context=["shopify"]))
+    ai = [f for f in present_result(definition, strong, "en", answers)["recommendations"] if f["track"] == "ai"]
+    assert {f["key"] for f in ai} == {"ai_support_drafts", "ai_product_content", "ai_semantic_search"}
+    payment = definition.texts["en"].questions["pay_scope"]
+    assert "Do not enter any payment details" in payment.help
+    assert all(q.type != "number" for q in definition.questions)  # nothing free-form to type in
+    assert "promise no increase in sales or conversion" in definition.texts["en"].disclaimer
+
+
+def test_data_readiness_rag_caveats_and_patterns():
+    definition = registry().current("data_integration")
+    assert len(definition.dimensions) == 11
+    answers, weak = service.assess(definition, answers_at(definition, 0, systems_context=["erp"]))
+    keys = set(weak.recommendations)
+    assert {"rag_not_yet", "ctx_rag_caveats", "pattern_api_gateway", "pattern_outbox_events", "pattern_elt"} <= keys
+    assert "rag_pilot" not in keys
+    answers, strong = service.assess(definition, answers_at(definition, 3, systems_context=["bi"]))
+    keys = set(strong.recommendations)
+    assert {"rag_pilot", "ctx_rag_caveats"} <= keys and "rag_not_yet" not in keys
+    caveat = definition.texts["en"].recommendations["ctx_rag_caveats"].description
+    assert "numbers, reports and system data" in caveat
+    assert "do not measure" in definition.texts["en"].questions["dq_duplicates"].help
+    assert "Do not upload" in definition.texts["en"].disclaimer
 
 
 FIVE = ["ecommerce_architecture", "data_integration", "ai_governance", "ai_ops_readiness", "finops"]
@@ -298,7 +404,8 @@ FIVE = ["ecommerce_architecture", "data_integration", "ai_governance", "ai_ops_r
 @pytest.mark.parametrize("key", FIVE)
 def test_new_assessments_score_explain_and_stay_honest(key):
     definition = registry().current(key)
-    assert (definition.version, definition.status, len(definition.dimensions)) == ("1.0.0", "live", 5)
+    assert (definition.version, definition.status) == ("1.0.0", "live")
+    assert len(definition.dimensions) == (11 if key in ("ecommerce_architecture", "data_integration") else 5)
     context = [q for q in definition.questions if q.evidence == "context"]
     assert len(context) == 1 and not context[0].scored
     first_context_option = context[0].options[0].key

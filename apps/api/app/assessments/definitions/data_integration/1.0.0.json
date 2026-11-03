@@ -4,35 +4,59 @@
   "status": "live",
   "scoring": {
     "algorithm": "weighted-mean/1",
-    "max_recommendations": 6
+    "max_recommendations": 10
   },
   "dimensions": [
     {
-      "key": "ownership",
-      "weight": 20
+      "key": "governance",
+      "weight": 9
     },
     {
-      "key": "patterns",
-      "weight": 20
+      "key": "inventory",
+      "weight": 9
     },
     {
       "key": "quality",
-      "weight": 20
+      "weight": 9
     },
     {
-      "key": "monitoring",
-      "weight": 20
+      "key": "api",
+      "weight": 9
+    },
+    {
+      "key": "events",
+      "weight": 9
+    },
+    {
+      "key": "pipelines",
+      "weight": 9
+    },
+    {
+      "key": "contracts",
+      "weight": 9
     },
     {
       "key": "access",
-      "weight": 20
+      "weight": 9
+    },
+    {
+      "key": "privacy",
+      "weight": 9
+    },
+    {
+      "key": "rag",
+      "weight": 9
+    },
+    {
+      "key": "lineage",
+      "weight": 10
     }
   ],
   "questions": [
     {
       "key": "systems_context",
       "type": "multi_choice",
-      "dimension": "ownership",
+      "dimension": "inventory",
       "evidence": "context",
       "options": [
         {
@@ -64,32 +88,9 @@
       "max_selections": 6
     },
     {
-      "key": "di_source_of_truth",
+      "key": "dg_owners",
       "type": "single_choice",
-      "dimension": "ownership",
-      "options": [
-        {
-          "key": "no",
-          "points": 0
-        },
-        {
-          "key": "partly",
-          "points": 1
-        },
-        {
-          "key": "mostly",
-          "points": 2
-        },
-        {
-          "key": "documented",
-          "points": 3
-        }
-      ]
-    },
-    {
-      "key": "di_owners",
-      "type": "single_choice",
-      "dimension": "ownership",
+      "dimension": "governance",
       "options": [
         {
           "key": "none",
@@ -110,35 +111,35 @@
       ]
     },
     {
-      "key": "di_method",
+      "key": "dg_policies",
       "type": "single_choice",
-      "dimension": "patterns",
+      "dimension": "governance",
       "options": [
         {
-          "key": "manual",
+          "key": "none",
           "points": 0
         },
         {
-          "key": "files",
+          "key": "informal",
           "points": 1
         },
         {
-          "key": "api_batch",
+          "key": "documented",
           "points": 2
         },
         {
-          "key": "events",
+          "key": "enforced",
           "points": 3
         }
       ]
     },
     {
-      "key": "di_documentation",
+      "key": "inv_systems",
       "type": "single_choice",
-      "dimension": "patterns",
+      "dimension": "inventory",
       "options": [
         {
-          "key": "no",
+          "key": "none",
           "points": 0
         },
         {
@@ -146,17 +147,40 @@
           "points": 1
         },
         {
-          "key": "diagram",
+          "key": "complete",
           "points": 2
         },
         {
-          "key": "contracts",
+          "key": "classified",
           "points": 3
         }
       ]
     },
     {
-      "key": "di_duplicates",
+      "key": "inv_source",
+      "type": "single_choice",
+      "dimension": "inventory",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "partly",
+          "points": 1
+        },
+        {
+          "key": "mostly",
+          "points": 2
+        },
+        {
+          "key": "documented",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "dq_duplicates",
       "type": "single_choice",
       "dimension": "quality",
       "options": [
@@ -179,16 +203,16 @@
       ]
     },
     {
-      "key": "di_validation",
+      "key": "dq_completeness",
       "type": "single_choice",
       "dimension": "quality",
       "options": [
         {
-          "key": "no",
+          "key": "unknown",
           "points": 0
         },
         {
-          "key": "manual",
+          "key": "gaps",
           "points": 1
         },
         {
@@ -196,15 +220,130 @@
           "points": 2
         },
         {
-          "key": "pipeline",
+          "key": "reported",
           "points": 3
         }
       ]
     },
     {
-      "key": "di_failures",
+      "key": "api_coverage",
       "type": "single_choice",
-      "dimension": "monitoring",
+      "dimension": "api",
+      "options": [
+        {
+          "key": "few",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "most",
+          "points": 2
+        },
+        {
+          "key": "documented",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "api_management",
+      "type": "single_choice",
+      "dimension": "api",
+      "options": [
+        {
+          "key": "shared_keys",
+          "points": 0
+        },
+        {
+          "key": "basic",
+          "points": 1
+        },
+        {
+          "key": "versioned",
+          "points": 2
+        },
+        {
+          "key": "gateway",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ev_usage",
+      "type": "single_choice",
+      "dimension": "events",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "webhooks",
+          "points": 1
+        },
+        {
+          "key": "some_streams",
+          "points": 2
+        },
+        {
+          "key": "core",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ev_delivery",
+      "type": "single_choice",
+      "dimension": "events",
+      "options": [
+        {
+          "key": "lost",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "retries",
+          "points": 2
+        },
+        {
+          "key": "idempotent",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "pl_method",
+      "type": "single_choice",
+      "dimension": "pipelines",
+      "options": [
+        {
+          "key": "manual",
+          "points": 0
+        },
+        {
+          "key": "scripts",
+          "points": 1
+        },
+        {
+          "key": "orchestrated",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "pl_failures",
+      "type": "single_choice",
+      "dimension": "pipelines",
       "options": [
         {
           "key": "complaints",
@@ -219,36 +358,59 @@
           "points": 2
         },
         {
-          "key": "alerts_retry",
+          "key": "slas",
           "points": 3
         }
       ]
     },
     {
-      "key": "di_recovery",
+      "key": "dc_changes",
       "type": "single_choice",
-      "dimension": "monitoring",
+      "dimension": "contracts",
       "options": [
         {
-          "key": "no",
+          "key": "breaks",
           "points": 0
         },
         {
-          "key": "manual",
+          "key": "announced",
           "points": 1
         },
         {
-          "key": "partly",
+          "key": "versioned",
           "points": 2
         },
         {
-          "key": "idempotent",
+          "key": "contracts",
           "points": 3
         }
       ]
     },
     {
-      "key": "di_credentials",
+      "key": "dc_definitions",
+      "type": "single_choice",
+      "dimension": "contracts",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "catalogue",
+          "points": 2
+        },
+        {
+          "key": "owned",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ac_credentials",
       "type": "single_choice",
       "dimension": "access",
       "options": [
@@ -271,9 +433,32 @@
       ]
     },
     {
-      "key": "di_personal_data",
+      "key": "ac_reviews",
       "type": "single_choice",
       "dimension": "access",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "periodic",
+          "points": 2
+        },
+        {
+          "key": "automated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "pr_personal",
+      "type": "single_choice",
+      "dimension": "privacy",
       "options": [
         {
           "key": "unknown",
@@ -289,6 +474,121 @@
         },
         {
           "key": "minimised",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "pr_retention",
+      "type": "single_choice",
+      "dimension": "privacy",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "defined",
+          "points": 1
+        },
+        {
+          "key": "some",
+          "points": 2
+        },
+        {
+          "key": "enforced",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "rag_documents",
+      "type": "single_choice",
+      "dimension": "rag",
+      "options": [
+        {
+          "key": "scattered",
+          "points": 0
+        },
+        {
+          "key": "central_outdated",
+          "points": 1
+        },
+        {
+          "key": "maintained",
+          "points": 2
+        },
+        {
+          "key": "curated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "rag_permissions",
+      "type": "single_choice",
+      "dimension": "rag",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "partly",
+          "points": 1
+        },
+        {
+          "key": "yes",
+          "points": 2
+        },
+        {
+          "key": "enforceable",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ln_lineage",
+      "type": "single_choice",
+      "dimension": "lineage",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "partial",
+          "points": 2
+        },
+        {
+          "key": "automated",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ln_freshness",
+      "type": "single_choice",
+      "dimension": "lineage",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "alerts",
+          "points": 2
+        },
+        {
+          "key": "slas",
           "points": 3
         }
       ]
@@ -314,101 +614,142 @@
   ],
   "rules": [
     {
-      "key": "risk_manual_transfer",
+      "key": "risk_no_source_of_truth",
       "priority": 1,
       "when": {
         "kind": "answer_in",
-        "question": "di_method",
+        "question": "inv_source",
         "options": [
-          "manual"
+          "no"
         ]
       },
-      "recommendation": "risk_manual_transfer",
-      "kind": "risk",
-      "horizon": 30,
-      "domains": [
-        "data_integration",
-        "ai_agents_automation"
-      ]
-    },
-    {
-      "key": "risk_silent_failures",
-      "priority": 1,
-      "when": {
-        "kind": "answer_in",
-        "question": "di_failures",
-        "options": [
-          "complaints"
-        ]
-      },
-      "recommendation": "risk_silent_failures",
+      "recommendation": "risk_no_source_of_truth",
       "kind": "risk",
       "horizon": 30,
       "domains": [
         "data_integration"
-      ]
+      ],
+      "track": "engineering"
     },
     {
-      "key": "risk_shared_keys",
+      "key": "risk_silent_pipelines",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "pl_failures",
+        "options": [
+          "complaints"
+        ]
+      },
+      "recommendation": "risk_silent_pipelines",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_shared_credentials",
       "priority": 2,
       "when": {
         "kind": "answer_in",
-        "question": "di_credentials",
+        "question": "ac_credentials",
         "options": [
           "shared",
           "personal"
         ]
       },
-      "recommendation": "risk_shared_keys",
+      "recommendation": "risk_shared_credentials",
       "kind": "risk",
       "horizon": 30,
       "domains": [
         "ai_governance",
         "data_integration"
-      ]
+      ],
+      "track": "engineering"
     },
     {
-      "key": "qw_source_of_truth",
+      "key": "risk_breaking_changes",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "dc_changes",
+        "options": [
+          "breaks"
+        ]
+      },
+      "recommendation": "risk_breaking_changes",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_unknown_personal_data",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "pr_personal",
+        "options": [
+          "unknown",
+          "everywhere"
+        ]
+      },
+      "recommendation": "risk_unknown_personal_data",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "qw_source_table",
       "priority": 4,
       "when": {
         "kind": "answer_in",
-        "question": "di_source_of_truth",
+        "question": "inv_source",
         "options": [
           "no",
           "partly"
         ]
       },
-      "recommendation": "qw_source_of_truth",
+      "recommendation": "qw_source_table",
       "kind": "quick_win",
       "horizon": 30,
       "domains": [
         "data_integration"
-      ]
+      ],
+      "track": "configuration"
     },
     {
-      "key": "qw_failure_alerts",
+      "key": "qw_pipeline_alerts",
       "priority": 4,
       "when": {
         "kind": "answer_in",
-        "question": "di_failures",
+        "question": "pl_failures",
         "options": [
           "complaints",
           "manual"
         ]
       },
-      "recommendation": "qw_failure_alerts",
+      "recommendation": "qw_pipeline_alerts",
       "kind": "quick_win",
       "horizon": 30,
       "domains": [
         "data_integration"
-      ]
+      ],
+      "track": "configuration"
     },
     {
       "key": "qw_service_accounts",
       "priority": 5,
       "when": {
         "kind": "answer_in",
-        "question": "di_credentials",
+        "question": "ac_credentials",
         "options": [
           "shared",
           "personal"
@@ -419,36 +760,77 @@
       "horizon": 30,
       "domains": [
         "ai_governance"
-      ]
+      ],
+      "track": "configuration"
     },
     {
-      "key": "rec_ownership",
+      "key": "qw_retention",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "pr_retention",
+        "options": [
+          "none",
+          "defined"
+        ]
+      },
+      "recommendation": "qw_retention",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_glossary",
+      "priority": 6,
+      "when": {
+        "kind": "answer_in",
+        "question": "dc_definitions",
+        "options": [
+          "none",
+          "partial"
+        ]
+      },
+      "recommendation": "qw_glossary",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_governance",
       "priority": 10,
       "when": {
         "kind": "dimension_below",
-        "dimension": "ownership",
+        "dimension": "governance",
         "value": 50
       },
-      "recommendation": "rec_ownership",
+      "recommendation": "rec_governance",
       "horizon": 60,
       "domains": [
         "data_integration",
         "advisory_enablement"
-      ]
+      ],
+      "track": "configuration"
     },
     {
-      "key": "rec_patterns",
+      "key": "rec_inventory",
       "priority": 10,
       "when": {
         "kind": "dimension_below",
-        "dimension": "patterns",
+        "dimension": "inventory",
         "value": 50
       },
-      "recommendation": "rec_patterns",
+      "recommendation": "rec_inventory",
       "horizon": 60,
       "domains": [
         "data_integration"
-      ]
+      ],
+      "track": "configuration"
     },
     {
       "key": "rec_quality",
@@ -462,26 +844,72 @@
       "horizon": 60,
       "domains": [
         "data_integration"
-      ]
+      ],
+      "track": "engineering"
     },
     {
-      "key": "rec_monitoring",
+      "key": "rec_api",
       "priority": 11,
       "when": {
         "kind": "dimension_below",
-        "dimension": "monitoring",
+        "dimension": "api",
         "value": 50
       },
-      "recommendation": "rec_monitoring",
+      "recommendation": "rec_api",
       "horizon": 60,
       "domains": [
-        "data_integration",
-        "managed_operations"
-      ]
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_events",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "events",
+        "value": 50
+      },
+      "recommendation": "rec_events",
+      "horizon": 60,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_pipelines",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "pipelines",
+        "value": 50
+      },
+      "recommendation": "rec_pipelines",
+      "horizon": 60,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_contracts",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "contracts",
+        "value": 50
+      },
+      "recommendation": "rec_contracts",
+      "horizon": 60,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
     },
     {
       "key": "rec_access",
-      "priority": 12,
+      "priority": 13,
       "when": {
         "kind": "dimension_below",
         "dimension": "access",
@@ -492,23 +920,171 @@
       "domains": [
         "ai_governance",
         "data_integration"
-      ]
+      ],
+      "track": "engineering"
     },
     {
-      "key": "ts_event_driven",
+      "key": "rec_privacy",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "privacy",
+        "value": 50
+      },
+      "recommendation": "rec_privacy",
+      "horizon": 60,
+      "domains": [
+        "ai_governance"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_lineage",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "lineage",
+        "value": 50
+      },
+      "recommendation": "rec_lineage",
+      "horizon": 60,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "pattern_api_gateway",
       "priority": 20,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "api",
+        "value": 75
+      },
+      "recommendation": "pattern_api_gateway",
+      "kind": "pattern",
+      "horizon": 60,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "pattern_outbox_events",
+      "priority": 21,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "events",
+        "value": 75
+      },
+      "recommendation": "pattern_outbox_events",
+      "kind": "pattern",
+      "horizon": 60,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "pattern_elt",
+      "priority": 22,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "pipelines",
+        "value": 75
+      },
+      "recommendation": "pattern_elt",
+      "kind": "pattern",
+      "horizon": 60,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rag_pilot",
+      "priority": 25,
       "when": {
         "kind": "all",
         "conditions": [
           {
             "kind": "dimension_at_least",
-            "dimension": "patterns",
+            "dimension": "rag",
+            "value": 67
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "access",
+            "value": 50
+          }
+        ]
+      },
+      "recommendation": "rag_pilot",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "ai_applications",
+        "data_integration"
+      ],
+      "track": "ai"
+    },
+    {
+      "key": "rag_not_yet",
+      "priority": 26,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "rag",
+        "value": 67
+      },
+      "recommendation": "rag_not_yet",
+      "kind": "context",
+      "domains": [
+        "advisory_enablement"
+      ],
+      "track": "ai"
+    },
+    {
+      "key": "ctx_rag_caveats",
+      "priority": 27,
+      "when": {
+        "kind": "overall_at_least",
+        "value": 0
+      },
+      "recommendation": "ctx_rag_caveats",
+      "kind": "context",
+      "track": "ai"
+    },
+    {
+      "key": "ts_data_contracts",
+      "priority": 30,
+      "when": {
+        "kind": "dimension_at_least",
+        "dimension": "contracts",
+        "value": 75
+      },
+      "recommendation": "ts_data_contracts",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "data_integration"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "ts_event_driven",
+      "priority": 31,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "events",
             "value": 75
           },
           {
             "kind": "dimension_at_least",
-            "dimension": "monitoring",
-            "value": 75
+            "dimension": "pipelines",
+            "value": 50
           }
         ]
       },
@@ -517,65 +1093,59 @@
       "horizon": 90,
       "domains": [
         "data_integration"
-      ]
-    },
-    {
-      "key": "ts_data_contracts",
-      "priority": 21,
-      "when": {
-        "kind": "dimension_at_least",
-        "dimension": "ownership",
-        "value": 75
-      },
-      "recommendation": "ts_data_contracts",
-      "kind": "target_state",
-      "horizon": 90,
-      "domains": [
-        "data_integration"
-      ]
-    },
-    {
-      "key": "ctx_bi",
-      "priority": 30,
-      "when": {
-        "kind": "answer_in",
-        "question": "systems_context",
-        "options": [
-          "bi"
-        ]
-      },
-      "recommendation": "ctx_bi",
-      "kind": "context",
-      "domains": [
-        "data_integration"
-      ]
+      ],
+      "track": "engineering"
     }
   ],
   "texts": {
     "bg": {
-      "title": "Оценка на интеграцията на данни",
-      "intro": "11 въпроса в 5 области: собственост, начин на интеграция, качество, наблюдение и достъп. Резултатът показва рискове, бързи подобрения и пътна карта с обяснение защо.",
-      "disclaimer": "Самооценка по вашите отговори. Не се свързваме с вашите системи и не сканираме нищо. Резултатът не е одит, не е правен съвет и не е проверен от независима страна.",
+      "title": "Оценка на готовността на данни и интеграции",
+      "intro": "23 въпроса в 11 области: от собственост и опис до API, събития, потоци, договори за данни, поверителност, RAG и произход на данните. Резултатът показва блокери, модели за интеграция, приоритети и пътна карта.",
+      "disclaimer": "Самооценка по вашите отговори. Не качвайте и не изпращайте данни — не измерваме качеството им и не се свързваме с вашите системи. Не е одит и не е правен съвет.",
       "dimensions": {
-        "ownership": {
-          "title": "Източници и собственост",
-          "description": "Знаете ли кои системи са източник на истината и кой отговаря за данните."
+        "governance": {
+          "title": "Собственост и управление на данните",
+          "description": "Отговорници и правила за основните данни."
         },
-        "patterns": {
-          "title": "Начин на интеграция",
-          "description": "Ръчно, с файлове или през API и събития."
+        "inventory": {
+          "title": "Опис на системите източници",
+          "description": "Кои системи държат какви данни и коя е източник на истината."
         },
         "quality": {
-          "title": "Качество на данните",
-          "description": "Дубликати, грешки и проверки."
+          "title": "Качество и пълнота",
+          "description": "Дубликати, пропуски и проверки (по ваша оценка)."
         },
-        "monitoring": {
-          "title": "Наблюдение и грешки",
-          "description": "Как се откриват и поправят неуспешни синхронизации."
+        "api": {
+          "title": "Готовност на API",
+          "description": "Наличност, достъп и версии на API."
+        },
+        "events": {
+          "title": "Събитийна архитектура",
+          "description": "Събития и надеждната им доставка."
+        },
+        "pipelines": {
+          "title": "ETL/ELT и надеждност на потоците",
+          "description": "Как се движат данните към отчети и анализи."
+        },
+        "contracts": {
+          "title": "Схеми и договори за данните",
+          "description": "Промени в схемите и описание на полетата."
         },
         "access": {
-          "title": "Достъп и сигурност",
-          "description": "Ключове, права и лични данни в интеграциите."
+          "title": "Идентичност и достъп до данните",
+          "description": "Ключове, права и прегледи на достъпа."
+        },
+        "privacy": {
+          "title": "Поверителност и срокове за съхранение",
+          "description": "Лични данни и тяхното изтриване."
+        },
+        "rag": {
+          "title": "Знания и пригодност за RAG",
+          "description": "Подредени документи и права за търсене в тях."
+        },
+        "lineage": {
+          "title": "Произход на данните и наблюдение",
+          "description": "Откъде идват данните и дали са актуални."
         }
       },
       "questions": {
@@ -591,44 +1161,45 @@
             "bi": "Отчети и анализи (BI)"
           }
         },
-        "di_source_of_truth": {
-          "text": "Ясно ли е коя система е източник на истината за клиенти, продукти и поръчки?",
-          "options": {
-            "no": "Не, данните се редактират навсякъде",
-            "partly": "За част от данните",
-            "mostly": "За повечето данни",
-            "documented": "Да, описано и спазвано"
-          }
-        },
-        "di_owners": {
+        "dg_owners": {
           "text": "Има ли отговорник за всеки основен набор от данни?",
           "options": {
             "none": "Не",
             "informal": "Неформално",
-            "named": "Да, посочени хора",
-            "governed": "Да, с правила за промени"
+            "named": "Посочени хора",
+            "governed": "Посочени, с правила за промени"
           }
         },
-        "di_method": {
-          "text": "Как се пренасят данните между системите?",
+        "dg_policies": {
+          "text": "Има ли правила за данните (класификация, качество, достъп)?",
           "options": {
-            "manual": "Ръчно (копиране, преписване)",
-            "files": "С файлове (CSV, Excel)",
-            "api_batch": "През API по график",
-            "events": "През API и събития почти в реално време"
+            "none": "Не",
+            "informal": "Неписани",
+            "documented": "Описани",
+            "enforced": "Описани и прилагани"
           }
         },
-        "di_documentation": {
-          "text": "Описани ли са потоците от данни?",
+        "inv_systems": {
+          "text": "Има ли опис на системите и данните в тях?",
+          "options": {
+            "none": "Не",
+            "partial": "Частичен",
+            "complete": "Пълен",
+            "classified": "Пълен, с отговорници и класове данни"
+          }
+        },
+        "inv_source": {
+          "text": "Ясно ли е коя система е източник на истината за клиенти, продукти и поръчки?",
           "options": {
             "no": "Не",
-            "partial": "Частично",
-            "diagram": "Има актуална схема",
-            "contracts": "Схема и договори за данните (полета, формати)"
+            "partly": "За част от данните",
+            "mostly": "За повечето",
+            "documented": "Да, описано и спазвано"
           }
         },
-        "di_duplicates": {
-          "text": "Колко често има дубликати или разминавания между системите?",
+        "dq_duplicates": {
+          "text": "Колко често има дубликати или разминавания?",
+          "help": "Ваша оценка; не измерваме данните ви.",
           "options": {
             "often": "Често",
             "sometimes": "Понякога",
@@ -636,49 +1207,158 @@
             "checked": "Рядко, и се проверява автоматично"
           }
         },
-        "di_validation": {
-          "text": "Проверяват ли се данните при въвеждане или пренос?",
+        "dq_completeness": {
+          "text": "Знаете ли колко пълни са ключовите полета?",
+          "help": "Ваша оценка; не измерваме данните ви.",
           "options": {
-            "no": "Не",
-            "manual": "Ръчно, понякога",
-            "rules": "С правила при въвеждане",
-            "pipeline": "С правила при въвеждане и при пренос"
+            "unknown": "Не",
+            "gaps": "Знаем за пропуски",
+            "rules": "Правила при въвеждане",
+            "reported": "Правила и редовни отчети за пълнотата"
           }
         },
-        "di_failures": {
-          "text": "Как разбирате, че синхронизация не е минала?",
+        "api_coverage": {
+          "text": "Имат ли системите ви API?",
+          "options": {
+            "few": "Малко от тях",
+            "some": "Част от тях",
+            "most": "Повечето",
+            "documented": "Всички, с документация"
+          }
+        },
+        "api_management": {
+          "text": "Как се управляват достъпът и версиите на API?",
+          "options": {
+            "shared_keys": "Споделени ключове, без версии",
+            "basic": "Отделни ключове",
+            "versioned": "Отделни ключове и версии",
+            "gateway": "Шлюз с версии, лимити и наблюдение"
+          }
+        },
+        "ev_usage": {
+          "text": "Използвате ли събития между системите?",
+          "options": {
+            "none": "Не",
+            "webhooks": "Отделни webhooks",
+            "some_streams": "Някои потоци от събития",
+            "core": "Събития в основата, със схеми"
+          }
+        },
+        "ev_delivery": {
+          "text": "Какво става със събитие, което не е обработено?",
+          "options": {
+            "lost": "Губи се незабелязано",
+            "manual": "Пускаме го отново ръчно",
+            "retries": "Автоматични повторни опити",
+            "idempotent": "Повторни опити и безопасна повторна обработка"
+          }
+        },
+        "pl_method": {
+          "text": "Как данните стигат до отчетите?",
+          "options": {
+            "manual": "Ръчни експорти",
+            "scripts": "Скриптове по график",
+            "orchestrated": "Оркестрирани потоци",
+            "tested": "Оркестрирани, с тестове на данните"
+          }
+        },
+        "pl_failures": {
+          "text": "Как разбирате, че поток с данни се е провалил?",
           "options": {
             "complaints": "От оплаквания",
             "manual": "При ръчна проверка",
             "alerts": "От известие",
-            "alerts_retry": "От известие, с автоматични повторни опити"
+            "slas": "От известие, с повторни опити и договорени срокове"
           }
         },
-        "di_recovery": {
-          "text": "Може ли неуспешен пренос да се повтори безопасно?",
+        "dc_changes": {
+          "text": "Какво става при промяна на схемата на данните?",
           "options": {
-            "no": "Не, рискуваме дубликати",
-            "manual": "Ръчно, внимателно",
-            "partly": "Частично",
-            "idempotent": "Да, повторението е безопасно"
+            "breaks": "Нещо се чупи",
+            "announced": "Обявяваме промяната",
+            "versioned": "Схемите са версионирани",
+            "contracts": "Договори за данните, проверявани автоматично"
           }
         },
-        "di_credentials": {
-          "text": "Как се пазят ключовете и паролите за интеграциите?",
+        "dc_definitions": {
+          "text": "Описани ли са полетата и значението им?",
+          "options": {
+            "none": "Не",
+            "partial": "Частично",
+            "catalogue": "В каталог на данните",
+            "owned": "В каталог, с отговорници"
+          }
+        },
+        "ac_credentials": {
+          "text": "Как се пазят ключовете за достъп до данни?",
           "options": {
             "shared": "Споделени или в кода",
             "personal": "Лични акаунти на служители",
             "service": "Сервизни акаунти",
-            "vault": "Сервизни акаунти с минимални права и хранилище за тайни"
+            "vault": "Минимални права и хранилище за тайни"
           }
         },
-        "di_personal_data": {
+        "ac_reviews": {
+          "text": "Преглеждат ли се правата за достъп?",
+          "options": {
+            "never": "Никога",
+            "ad_hoc": "При нужда",
+            "periodic": "Периодично",
+            "automated": "Автоматично"
+          }
+        },
+        "pr_personal": {
           "text": "Пренасят ли се лични данни само там, където са нужни?",
           "options": {
             "unknown": "Не знаем",
             "everywhere": "Пренасяме всичко",
             "limited": "Ограничено",
             "minimised": "Минимизирано и описано"
+          }
+        },
+        "pr_retention": {
+          "text": "Има ли срокове за съхранение и изтриване?",
+          "options": {
+            "none": "Не",
+            "defined": "Определени, не се прилагат",
+            "some": "Прилагат се за част от данните",
+            "enforced": "Прилагат се, с автоматично изтриване"
+          }
+        },
+        "rag_documents": {
+          "text": "В какво състояние са вътрешните документи и знания?",
+          "options": {
+            "scattered": "Разпилени",
+            "central_outdated": "На едно място, но остарели",
+            "maintained": "На едно място и поддържани",
+            "curated": "Подредени, с отговорници и версии"
+          }
+        },
+        "rag_permissions": {
+          "text": "Известно ли е кой какви документи може да вижда?",
+          "options": {
+            "no": "Не",
+            "partly": "Частично",
+            "yes": "Да",
+            "enforceable": "Да, и може да се приложи при търсене"
+          }
+        },
+        "ln_lineage": {
+          "text": "Знаете ли откъде идва всяка цифра в отчетите?",
+          "options": {
+            "no": "Не",
+            "manual": "От ръчна документация",
+            "partial": "Частично автоматично",
+            "automated": "Автоматично проследяване"
+          }
+        },
+        "ln_freshness": {
+          "text": "Следите ли дали данните са актуални?",
+          "options": {
+            "no": "Не",
+            "manual": "Ръчно",
+            "alerts": "Известия при остарели данни",
+            "slas": "Известия и договорени срокове"
           }
         }
       },
@@ -701,88 +1381,168 @@
         }
       },
       "recommendations": {
-        "risk_manual_transfer": {
-          "title": "Ръчно пренасяне на данни",
-          "description": "Преписването създава грешки и закъснения и не може да се мащабира."
+        "risk_no_source_of_truth": {
+          "title": "Няма източник на истината",
+          "description": "Когато данните се редактират навсякъде, всяка интеграция пренася грешки и спорове."
         },
-        "risk_silent_failures": {
-          "title": "Тихи грешки в синхронизацията",
-          "description": "Неуспешен пренос се забелязва чак от клиент или колега."
+        "risk_silent_pipelines": {
+          "title": "Тихи грешки в потоците",
+          "description": "Отчети и решения се основават на непълни данни, без някой да знае."
         },
-        "risk_shared_keys": {
+        "risk_shared_credentials": {
           "title": "Споделени или лични ключове",
-          "description": "Когато служител напусне или ключ изтече, интеграцията спира или остава отворена."
+          "description": "Когато служител напусне или ключ изтече, достъпът спира или остава отворен."
         },
-        "qw_source_of_truth": {
-          "title": "Една страница „източник на истината“",
-          "description": "Таблица: данни → система източник → кой отговаря. Отнема ден и спира много спорове."
+        "risk_breaking_changes": {
+          "title": "Промените в схемите чупят системи",
+          "description": "Без версии и договори всяка промяна е риск за всички потребители на данните."
         },
-        "qw_failure_alerts": {
-          "title": "Известия при неуспешен пренос",
-          "description": "Всеки неуспешен пренос да изпраща известие с причината."
+        "risk_unknown_personal_data": {
+          "title": "Лични данни без контрол",
+          "description": "Не знаете къде са личните данни, затова не можете да ги защитите или изтриете навреме."
+        },
+        "qw_source_table": {
+          "title": "Таблица „източник на истината“",
+          "description": "Данни → система източник → отговорник. Ден работа, която спира много спорове."
+        },
+        "qw_pipeline_alerts": {
+          "title": "Известия при неуспешни потоци",
+          "description": "Всеки неуспешен поток да изпраща известие с причината."
         },
         "qw_service_accounts": {
-          "title": "Сервизни акаунти за интеграциите",
+          "title": "Сервизни акаунти",
           "description": "Сменете личните и споделените ключове със сервизни акаунти с минимални права."
         },
-        "rec_ownership": {
-          "title": "Собственост върху данните",
-          "description": "Отговорник и система източник за всеки основен набор от данни."
+        "qw_retention": {
+          "title": "Срокове за съхранение на практика",
+          "description": "Започнете с автоматично изтриване на най-старите лични данни в една система."
         },
-        "rec_patterns": {
-          "title": "Интеграции през API",
-          "description": "Замяна на ръчните и файловите преноси с API и описани договори за данните."
+        "qw_glossary": {
+          "title": "Речник на ключовите полета",
+          "description": "Определение и отговорник за двадесетте най-използвани полета."
+        },
+        "rec_governance": {
+          "title": "Собственост и правила",
+          "description": "Отговорник и правила за всеки основен набор от данни."
+        },
+        "rec_inventory": {
+          "title": "Опис и източници на истината",
+          "description": "Пълен опис на системите и описан източник на истината."
         },
         "rec_quality": {
-          "title": "Правила за качество",
-          "description": "Проверки при въвеждане и пренос, и редовно откриване на дубликати."
+          "title": "Приоритети за поправка на данните",
+          "description": "Правила при въвеждане и пренос, отчети за пълнотата и откриване на дубликати."
         },
-        "rec_monitoring": {
-          "title": "Наблюдение и безопасни повторения",
-          "description": "Журнал, известия и повторяеми преноси без дубликати."
+        "rec_api": {
+          "title": "API готовност",
+          "description": "Документирани API, отделни ключове, версии и лимити."
+        },
+        "rec_events": {
+          "title": "Надеждни събития",
+          "description": "Повторни опити и безопасна повторна обработка вместо изгубени събития."
+        },
+        "rec_pipelines": {
+          "title": "Надеждни потоци",
+          "description": "Оркестрирани потоци с тестове на данните и известия."
+        },
+        "rec_contracts": {
+          "title": "Договори за данните",
+          "description": "Версионирани схеми и описани полета с отговорници."
         },
         "rec_access": {
-          "title": "Сигурен достъп",
-          "description": "Хранилище за тайни, минимални права и пренос само на нужните лични данни."
+          "title": "Сигурен достъп до данните",
+          "description": "Минимални права, хранилище за тайни и редовни прегледи."
+        },
+        "rec_privacy": {
+          "title": "Поверителност по дизайн",
+          "description": "Минимизиране на личните данни и автоматично изтриване по срок."
+        },
+        "rec_lineage": {
+          "title": "Произход и актуалност",
+          "description": "Проследяване откъде идват данните и известия при остарели данни."
+        },
+        "pattern_api_gateway": {
+          "title": "Модел: API слой пред системите",
+          "description": "Шлюз с удостоверяване, версии и лимити пред вътрешните системи; интеграциите говорят само с него."
+        },
+        "pattern_outbox_events": {
+          "title": "Модел: outbox и шина за събития",
+          "description": "Промяната и събитието се записват заедно (outbox) → шина за събития → потребители, които обработват безопасно повторно."
+        },
+        "pattern_elt": {
+          "title": "Модел: ELT към хранилище за данни",
+          "description": "Суровите данни се зареждат в хранилище; трансформациите са версионирани, тествани и оркестрирани."
+        },
+        "rag_pilot": {
+          "title": "Пилот с търсене в знанията (RAG)",
+          "description": "Документите и правата са подредени, затова пилот с асистент върху тях е разумен. Започнете с един екип, проверявайте източниците на отговорите и измервайте качеството."
+        },
+        "rag_not_yet": {
+          "title": "RAG още не е следващата стъпка",
+          "description": "Първо подредете документите, отговорниците и правата за достъп. RAG не поправя качеството на данните или интеграциите и не замества отчет от структурирани данни."
+        },
+        "ctx_rag_caveats": {
+          "title": "Кога RAG помага и кога не",
+          "description": "RAG помага за въпроси върху текстови документи. За числа, отчети и данни в системи по-подходящи са запитвания към данните или интеграция. Отговорите трябва да сочат източници и да се проверяват."
+        },
+        "ts_data_contracts": {
+          "title": "Договорите като част от CI",
+          "description": "Промяна в схема се проверява автоматично спрямо договорите, преди да стигне до потребителите."
         },
         "ts_event_driven": {
           "title": "Събития вместо периодични преноси",
-          "description": "Промените се разпространяват като събития към системите, които ги ползват."
-        },
-        "ts_data_contracts": {
-          "title": "Договори за данните",
-          "description": "Версионирани договори между системите, проверявани автоматично."
-        },
-        "ctx_bi": {
-          "title": "Отчетите зависят от интеграциите",
-          "description": "Грешките в преноса стигат до отчетите и решенията; качеството на интеграциите е и качество на анализите."
+          "description": "Промените се разпространяват като събития към системите, които ги използват."
         }
       }
     },
     "en": {
-      "title": "Data Integration Assessment",
-      "intro": "11 questions across 5 areas: ownership, integration patterns, quality, monitoring and access. The result shows risks, quick wins and a roadmap with the reason why.",
-      "disclaimer": "A self-assessment based on your answers. We do not connect to your systems and scan nothing. The result is not an audit, not legal advice and has not been independently verified.",
+      "title": "Data & Integration Readiness Assessment",
+      "intro": "23 questions across 11 areas: from ownership and inventory to APIs, events, pipelines, data contracts, privacy, RAG and lineage. The result shows blockers, integration patterns, priorities and a roadmap.",
+      "disclaimer": "A self-assessment based on your answers. Do not upload or send any data — we do not measure its quality and do not connect to your systems. Not an audit and not legal advice.",
       "dimensions": {
-        "ownership": {
-          "title": "Sources and ownership",
-          "description": "Whether you know which systems are the source of truth and who owns the data."
+        "governance": {
+          "title": "Data ownership and governance",
+          "description": "Owners and rules for the main data."
         },
-        "patterns": {
-          "title": "Integration patterns",
-          "description": "By hand, with files, or through APIs and events."
+        "inventory": {
+          "title": "Source-system inventory",
+          "description": "Which systems hold what data and which is the source of truth."
         },
         "quality": {
-          "title": "Data quality",
-          "description": "Duplicates, errors and checks."
+          "title": "Data quality and completeness",
+          "description": "Duplicates, gaps and checks (by your own assessment)."
         },
-        "monitoring": {
-          "title": "Monitoring and errors",
-          "description": "How failed synchronisations are found and fixed."
+        "api": {
+          "title": "API readiness",
+          "description": "Availability, access and versioning of APIs."
+        },
+        "events": {
+          "title": "Event-driven architecture",
+          "description": "Events and their reliable delivery."
+        },
+        "pipelines": {
+          "title": "ETL/ELT and pipeline reliability",
+          "description": "How data moves to reports and analytics."
+        },
+        "contracts": {
+          "title": "Schema evolution and data contracts",
+          "description": "Schema changes and field definitions."
         },
         "access": {
-          "title": "Access and security",
-          "description": "Keys, permissions and personal data in integrations."
+          "title": "Identity and access to data",
+          "description": "Keys, permissions and access reviews."
+        },
+        "privacy": {
+          "title": "Privacy and retention",
+          "description": "Personal data and its deletion."
+        },
+        "rag": {
+          "title": "Knowledge retrieval and RAG suitability",
+          "description": "Curated documents and permissions for searching them."
+        },
+        "lineage": {
+          "title": "Data lineage and operational monitoring",
+          "description": "Where data comes from and whether it is fresh."
         }
       },
       "questions": {
@@ -798,44 +1558,45 @@
             "bi": "Reporting and analytics (BI)"
           }
         },
-        "di_source_of_truth": {
-          "text": "Is it clear which system is the source of truth for customers, products and orders?",
-          "options": {
-            "no": "No, data is edited everywhere",
-            "partly": "For some of the data",
-            "mostly": "For most data",
-            "documented": "Yes, documented and followed"
-          }
-        },
-        "di_owners": {
+        "dg_owners": {
           "text": "Is there an owner for each main data set?",
           "options": {
             "none": "No",
             "informal": "Informally",
-            "named": "Yes, named people",
-            "governed": "Yes, with rules for changes"
+            "named": "Named people",
+            "governed": "Named, with rules for changes"
           }
         },
-        "di_method": {
-          "text": "How does data move between systems?",
+        "dg_policies": {
+          "text": "Are there data rules (classification, quality, access)?",
           "options": {
-            "manual": "By hand (copying, re-typing)",
-            "files": "With files (CSV, Excel)",
-            "api_batch": "Through APIs on a schedule",
-            "events": "Through APIs and events in near real time"
+            "none": "No",
+            "informal": "Unwritten",
+            "documented": "Documented",
+            "enforced": "Documented and enforced"
           }
         },
-        "di_documentation": {
-          "text": "Are the data flows documented?",
+        "inv_systems": {
+          "text": "Is there an inventory of systems and the data they hold?",
+          "options": {
+            "none": "No",
+            "partial": "Partial",
+            "complete": "Complete",
+            "classified": "Complete, with owners and data classes"
+          }
+        },
+        "inv_source": {
+          "text": "Is it clear which system is the source of truth for customers, products and orders?",
           "options": {
             "no": "No",
-            "partial": "Partly",
-            "diagram": "There is a current diagram",
-            "contracts": "A diagram and data contracts (fields, formats)"
+            "partly": "For some data",
+            "mostly": "For most",
+            "documented": "Yes, documented and followed"
           }
         },
-        "di_duplicates": {
-          "text": "How often are there duplicates or mismatches between systems?",
+        "dq_duplicates": {
+          "text": "How often are there duplicates or mismatches?",
+          "help": "Your own assessment; we do not measure your data.",
           "options": {
             "often": "Often",
             "sometimes": "Sometimes",
@@ -843,49 +1604,158 @@
             "checked": "Rarely, and it is checked automatically"
           }
         },
-        "di_validation": {
-          "text": "Is data validated on entry or transfer?",
+        "dq_completeness": {
+          "text": "Do you know how complete key fields are?",
+          "help": "Your own assessment; we do not measure your data.",
           "options": {
-            "no": "No",
-            "manual": "By hand, sometimes",
-            "rules": "With rules on entry",
-            "pipeline": "With rules on entry and on transfer"
+            "unknown": "No",
+            "gaps": "We know of gaps",
+            "rules": "Rules on entry",
+            "reported": "Rules and regular completeness reports"
           }
         },
-        "di_failures": {
-          "text": "How do you find out a synchronisation failed?",
+        "api_coverage": {
+          "text": "Do your systems have APIs?",
+          "options": {
+            "few": "Few of them",
+            "some": "Some of them",
+            "most": "Most",
+            "documented": "All, documented"
+          }
+        },
+        "api_management": {
+          "text": "How are API access and versions managed?",
+          "options": {
+            "shared_keys": "Shared keys, no versions",
+            "basic": "Separate keys",
+            "versioned": "Separate keys and versions",
+            "gateway": "A gateway with versions, limits and monitoring"
+          }
+        },
+        "ev_usage": {
+          "text": "Do you use events between systems?",
+          "options": {
+            "none": "No",
+            "webhooks": "Individual webhooks",
+            "some_streams": "Some event streams",
+            "core": "Events at the core, with schemas"
+          }
+        },
+        "ev_delivery": {
+          "text": "What happens to an event that is not processed?",
+          "options": {
+            "lost": "It is lost unnoticed",
+            "manual": "We replay it by hand",
+            "retries": "Automatic retries",
+            "idempotent": "Retries and safe reprocessing"
+          }
+        },
+        "pl_method": {
+          "text": "How does data reach reports?",
+          "options": {
+            "manual": "Manual exports",
+            "scripts": "Scheduled scripts",
+            "orchestrated": "Orchestrated pipelines",
+            "tested": "Orchestrated, with data tests"
+          }
+        },
+        "pl_failures": {
+          "text": "How do you find out a data pipeline failed?",
           "options": {
             "complaints": "From complaints",
             "manual": "During a manual check",
             "alerts": "From an alert",
-            "alerts_retry": "From an alert, with automatic retries"
+            "slas": "From an alert, with retries and agreed deadlines"
           }
         },
-        "di_recovery": {
-          "text": "Can a failed transfer be repeated safely?",
+        "dc_changes": {
+          "text": "What happens when a data schema changes?",
           "options": {
-            "no": "No, we risk duplicates",
-            "manual": "By hand, carefully",
-            "partly": "Partly",
-            "idempotent": "Yes, repeating is safe"
+            "breaks": "Something breaks",
+            "announced": "We announce the change",
+            "versioned": "Schemas are versioned",
+            "contracts": "Data contracts, checked automatically"
           }
         },
-        "di_credentials": {
-          "text": "How are integration keys and passwords kept?",
+        "dc_definitions": {
+          "text": "Are fields and their meaning documented?",
+          "options": {
+            "none": "No",
+            "partial": "Partly",
+            "catalogue": "In a data catalogue",
+            "owned": "In a catalogue, with owners"
+          }
+        },
+        "ac_credentials": {
+          "text": "How are data access keys kept?",
           "options": {
             "shared": "Shared or in code",
             "personal": "Employees' personal accounts",
             "service": "Service accounts",
-            "vault": "Least-privilege service accounts and a secrets store"
+            "vault": "Least privilege and a secrets store"
           }
         },
-        "di_personal_data": {
-          "text": "Is personal data transferred only where it is needed?",
+        "ac_reviews": {
+          "text": "Are access rights reviewed?",
+          "options": {
+            "never": "Never",
+            "ad_hoc": "When needed",
+            "periodic": "Periodically",
+            "automated": "Automatically"
+          }
+        },
+        "pr_personal": {
+          "text": "Is personal data transferred only where needed?",
           "options": {
             "unknown": "We do not know",
             "everywhere": "We transfer everything",
             "limited": "Limited",
             "minimised": "Minimised and documented"
+          }
+        },
+        "pr_retention": {
+          "text": "Are there retention and deletion periods?",
+          "options": {
+            "none": "No",
+            "defined": "Defined, not enforced",
+            "some": "Enforced for some data",
+            "enforced": "Enforced, with automatic deletion"
+          }
+        },
+        "rag_documents": {
+          "text": "What state are internal documents and knowledge in?",
+          "options": {
+            "scattered": "Scattered",
+            "central_outdated": "In one place, but outdated",
+            "maintained": "In one place and maintained",
+            "curated": "Curated, with owners and versions"
+          }
+        },
+        "rag_permissions": {
+          "text": "Is it known who may see which documents?",
+          "options": {
+            "no": "No",
+            "partly": "Partly",
+            "yes": "Yes",
+            "enforceable": "Yes, and it can be enforced in search"
+          }
+        },
+        "ln_lineage": {
+          "text": "Do you know where every number in reports comes from?",
+          "options": {
+            "no": "No",
+            "manual": "From manual documentation",
+            "partial": "Partly automatically",
+            "automated": "Automated lineage"
+          }
+        },
+        "ln_freshness": {
+          "text": "Do you monitor whether data is fresh?",
+          "options": {
+            "no": "No",
+            "manual": "By hand",
+            "alerts": "Alerts on stale data",
+            "slas": "Alerts and agreed deadlines"
           }
         }
       },
@@ -908,61 +1778,117 @@
         }
       },
       "recommendations": {
-        "risk_manual_transfer": {
-          "title": "Manual data transfer",
-          "description": "Re-typing creates errors and delays and does not scale."
+        "risk_no_source_of_truth": {
+          "title": "No source of truth",
+          "description": "When data is edited everywhere, every integration carries errors and disputes."
         },
-        "risk_silent_failures": {
-          "title": "Silent synchronisation failures",
-          "description": "A failed transfer is noticed only by a customer or a colleague."
+        "risk_silent_pipelines": {
+          "title": "Silent pipeline failures",
+          "description": "Reports and decisions rely on incomplete data without anyone knowing."
         },
-        "risk_shared_keys": {
+        "risk_shared_credentials": {
           "title": "Shared or personal keys",
-          "description": "When an employee leaves or a key leaks, the integration stops or stays open."
+          "description": "When an employee leaves or a key leaks, access stops or stays open."
         },
-        "qw_source_of_truth": {
-          "title": "A one-page source-of-truth table",
-          "description": "A table: data → source system → owner. It takes a day and stops many disputes."
+        "risk_breaking_changes": {
+          "title": "Schema changes break systems",
+          "description": "Without versions and contracts every change is a risk for all data consumers."
         },
-        "qw_failure_alerts": {
-          "title": "Alerts on failed transfers",
-          "description": "Every failed transfer sends an alert with the reason."
+        "risk_unknown_personal_data": {
+          "title": "Personal data without control",
+          "description": "You do not know where personal data is, so you cannot protect or delete it in time."
+        },
+        "qw_source_table": {
+          "title": "A source-of-truth table",
+          "description": "Data → source system → owner. A day's work that stops many disputes."
+        },
+        "qw_pipeline_alerts": {
+          "title": "Alerts on failed pipelines",
+          "description": "Every failed pipeline sends an alert with the reason."
         },
         "qw_service_accounts": {
-          "title": "Service accounts for integrations",
+          "title": "Service accounts",
           "description": "Replace personal and shared keys with least-privilege service accounts."
         },
-        "rec_ownership": {
-          "title": "Data ownership",
-          "description": "An owner and a source system for each main data set."
+        "qw_retention": {
+          "title": "Retention in practice",
+          "description": "Start with automatic deletion of the oldest personal data in one system."
         },
-        "rec_patterns": {
-          "title": "Integrations through APIs",
-          "description": "Replace manual and file transfers with APIs and documented data contracts."
+        "qw_glossary": {
+          "title": "A glossary of key fields",
+          "description": "A definition and an owner for the twenty most used fields."
+        },
+        "rec_governance": {
+          "title": "Ownership and rules",
+          "description": "An owner and rules for each main data set."
+        },
+        "rec_inventory": {
+          "title": "Inventory and sources of truth",
+          "description": "A complete inventory of systems and a documented source of truth."
         },
         "rec_quality": {
-          "title": "Quality rules",
-          "description": "Checks on entry and transfer, and regular duplicate detection."
+          "title": "Data remediation priorities",
+          "description": "Rules on entry and transfer, completeness reports and duplicate detection."
         },
-        "rec_monitoring": {
-          "title": "Monitoring and safe retries",
-          "description": "A log, alerts and repeatable transfers without duplicates."
+        "rec_api": {
+          "title": "API readiness",
+          "description": "Documented APIs, separate keys, versions and limits."
+        },
+        "rec_events": {
+          "title": "Reliable events",
+          "description": "Retries and safe reprocessing instead of lost events."
+        },
+        "rec_pipelines": {
+          "title": "Reliable pipelines",
+          "description": "Orchestrated pipelines with data tests and alerts."
+        },
+        "rec_contracts": {
+          "title": "Data contracts",
+          "description": "Versioned schemas and documented fields with owners."
         },
         "rec_access": {
-          "title": "Secure access",
-          "description": "A secrets store, least privilege and transferring only the personal data needed."
+          "title": "Secure access to data",
+          "description": "Least privilege, a secrets store and regular reviews."
+        },
+        "rec_privacy": {
+          "title": "Privacy by design",
+          "description": "Personal data minimisation and automatic deletion by retention period."
+        },
+        "rec_lineage": {
+          "title": "Lineage and freshness",
+          "description": "Tracking where data comes from and alerts on stale data."
+        },
+        "pattern_api_gateway": {
+          "title": "Pattern: an API layer in front of systems",
+          "description": "A gateway with authentication, versions and limits in front of internal systems; integrations talk only to it."
+        },
+        "pattern_outbox_events": {
+          "title": "Pattern: outbox and an event bus",
+          "description": "The change and the event are written together (outbox) → an event bus → consumers that reprocess safely."
+        },
+        "pattern_elt": {
+          "title": "Pattern: ELT into a warehouse",
+          "description": "Raw data is loaded into a warehouse; transformations are versioned, tested and orchestrated."
+        },
+        "rag_pilot": {
+          "title": "A knowledge-retrieval (RAG) pilot",
+          "description": "Documents and permissions are in order, so a pilot assistant on them is reasonable. Start with one team, check the cited sources and measure quality."
+        },
+        "rag_not_yet": {
+          "title": "RAG is not the next step yet",
+          "description": "First curate documents, owners and access rights. RAG does not fix data quality or integrations and does not replace a report built from structured data."
+        },
+        "ctx_rag_caveats": {
+          "title": "When RAG helps and when it does not",
+          "description": "RAG helps with questions over text documents. For numbers, reports and system data, queries or integration fit better. Answers must cite sources and be checked."
+        },
+        "ts_data_contracts": {
+          "title": "Contracts as part of CI",
+          "description": "A schema change is checked automatically against contracts before it reaches consumers."
         },
         "ts_event_driven": {
           "title": "Events instead of scheduled transfers",
           "description": "Changes are published as events to the systems that use them."
-        },
-        "ts_data_contracts": {
-          "title": "Data contracts",
-          "description": "Versioned contracts between systems, checked automatically."
-        },
-        "ctx_bi": {
-          "title": "Reports depend on the integrations",
-          "description": "Transfer errors reach reports and decisions; integration quality is reporting quality."
         }
       }
     }

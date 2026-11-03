@@ -54,6 +54,8 @@ export interface Finding {
   kind: FindingKind;
   horizon: 30 | 60 | 90 | null;
   domains: DomainKey[];
+  /** How it would be addressed: platform configuration, traditional engineering or an AI use case. */
+  track?: "configuration" | "engineering" | "ai" | null;
   because: string[];
 }
 

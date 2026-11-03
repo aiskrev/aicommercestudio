@@ -20,7 +20,7 @@ results are unchanged):
 * question `evidence`: `practice` (scored), `metric` and `context` (never scored);
 * rule `kind`: `recommendation`, `risk`, `quick_win`, `target_state`, `pattern`, `context` (only
   `recommendation` counts toward the cap);
-* rule `horizon` (30/60/90) and `domains`;
+* rule `horizon` (30/60/90), `domains` and `track` (`configuration` | `engineering` | `ai`);
 * in the result view: `because` (the inputs or thresholds behind each finding), a level per
   dimension, `roadmap`, `domains` and `inputs`.
 

@@ -23,29 +23,29 @@ export const engineeringTool: typeof bgEngineeringTool = {
     observability: {
       metaTitle: "Observability & Reliability Assessment",
       metaDescription:
-        "A self-assessment across 4 areas: telemetry, alerting, incidents and reliability targets (SLOs). Risks, quick wins and a 30/60/90-day roadmap with the reason why.",
+        "A self-assessment across 11 areas: golden signals, telemetry, OpenTelemetry, SLOs, alerting, incidents, runbooks, capacity, dependencies, change failures and resilience. No availability measurement.",
       eyebrow: "Tools · DevOps & SRE",
       title: "Observability & Reliability Assessment",
-      lead: "Eight questions on whether you find problems before your customers do. The result shows scores by area, risks, quick wins and a roadmap — every recommendation says which answer triggered it.",
-      facts: ["about 4 minutes", "no access to your systems", "no sign-up"],
+      lead: "22 questions across 11 areas. The result shows maturity per area, critical gaps, a reference telemetry architecture, illustrative SLIs/SLOs and a next-step backlog — every recommendation says why.",
+      facts: ["does not measure availability or SLOs", "no access to your systems", "no sign-up"],
     },
     ecommerce_architecture: {
       metaTitle: "E-commerce Architecture Assessment",
       metaDescription:
-        "A self-assessment of an online store across 5 areas: platform, speed and SEO, integrations, data and operations. Risks, quick wins and a roadmap with the reason why.",
+        "A self-assessment across 11 areas: storefront, maintainability, catalogue, orders, payments, search, analytics, SEO, customer support, integrations and operations. Configuration, engineering and AI cases.",
       eyebrow: "Tools · E-commerce",
       title: "E-commerce Architecture Assessment",
-      lead: "11 questions on the store's platform, speed, integrations, data and operations. Every recommendation says which answer triggered it.",
-      facts: ["Shopify, WooCommerce, Magento and custom builds", "no access to your store", "no sign-up"],
+      lead: "23 questions across 11 areas. Recommendations are split into platform configuration, traditional engineering and suitable AI cases, with priorities for performance, security, integration and automation.",
+      facts: ["no payment details and no store access", "no promised sales uplift", "no sign-up"],
     },
     data_integration: {
-      metaTitle: "Data Integration Assessment",
+      metaTitle: "Data & Integration Readiness Assessment",
       metaDescription:
-        "A self-assessment across 5 areas: ownership, integration patterns, quality, monitoring and access. Risks, quick wins and a roadmap with the reason why.",
+        "A self-assessment across 11 areas: ownership, source systems, quality, APIs, events, pipelines, data contracts, access, privacy, RAG and lineage.",
       eyebrow: "Tools · Data & integration",
-      title: "Data Integration Assessment",
-      lead: "11 questions on how data moves between your systems. Every recommendation says which answer triggered it.",
-      facts: ["ERP, CRM, store, accounting, warehouse and BI", "no access to your systems", "no sign-up"],
+      title: "Data & Integration Readiness Assessment",
+      lead: "23 questions across 11 areas. The result shows blockers, integration patterns, data remediation priorities, RAG readiness with caveats and a roadmap.",
+      facts: ["no data upload", "quality is self-reported, not measured", "no sign-up"],
     },
     ai_governance: {
       metaTitle: "Responsible AI Governance Assessment",
@@ -112,6 +112,7 @@ export const engineeringTool: typeof bgEngineeringTool = {
       pattern: "Example CI/CD and GitOps patterns",
       context: "Notes for your context",
     },
+    tracks: { configuration: "Platform configuration", engineering: "Engineering", ai: "Suitable for AI" },
     because: "Why",
     horizon: "{days} days",
     roadmap: "30/60/90-day roadmap",

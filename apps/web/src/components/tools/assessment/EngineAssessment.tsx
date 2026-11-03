@@ -500,6 +500,11 @@ function EngineResult({
                   <p className="flex flex-wrap items-center gap-2 font-semibold text-fg">
                     {f.title}
                     {f.horizon && <Badge tone="outline">{fill(r.horizon, { days: f.horizon })}</Badge>}
+                    {f.track && (
+                      <span data-track={f.track}>
+                        <Badge tone={f.track === "ai" ? "accent" : "neutral"}>{r.tracks[f.track]}</Badge>
+                      </span>
+                    )}
                   </p>
                   <p className="mt-1 leading-relaxed text-fg-secondary">{f.description}</p>
                   {f.because.length > 0 && (

@@ -126,22 +126,70 @@ test("DevOps delivery in English: metrics stay optional, unverified and unscored
   await expect(result.getByTestId("engine-findings-context")).toContainText("Your metrics are estimates");
 });
 
-test("observability & reliability in English: explained findings and a target state", async ({ page }) => {
+test("observability & reliability in English: eleven areas, target states for a strong profile", async ({ page }) => {
   await page.goto("/en/tools/observability-reliability");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Observability & Reliability Assessment");
   const form = page.getByTestId("engine-form");
-  await expect(form.getByText("Area 1 of 4")).toBeVisible();
+  await expect(form.getByText("Area 1 of 11")).toBeVisible();
   await answerAll(page, form, "last", "See the result", "Next", async (step) => {
-    if (step !== 0) return;
-    for (const signal of ["Logs", "Metrics", "Request tracing"]) await form.getByRole("checkbox", { name: signal }).check();
-    await form.getByLabel(/How many days do you keep logs/).fill("90");
+    if (step !== 1) return;
+    for (const signal of ["Logs", "Metrics", "Distributed traces", "Error tracking"]) await form.getByRole("checkbox", { name: signal }).check();
   });
   const result = page.getByTestId("engine-result");
   await expect(result.getByRole("heading", { level: 2, name: "Your result" })).toBeFocused();
-  await expect(result.getByTestId("engine-findings-target_state")).toContainText("Error budgets and a release policy");
-  await expect(result.getByTestId("engine-findings-target_state")).toContainText("Reliability targets: 100/100, at least 75");
-  await expect(result.getByTestId("engine-roadmap")).toContainText("90 days");
+  await expect(result.getByTestId("tool-score")).toHaveText("100");
+  await expect(result.getByTestId("engine-findings-target_state")).toContainText("An error budget policy");
+  await expect(result.getByTestId("engine-findings-target_state")).toContainText("SLIs, SLOs and error budgets: 100/100, at least 75");
   await expect(result.getByTestId("engine-findings-risk")).toHaveCount(0);
+  await expect(result).toContainText("We do not connect to your monitoring systems, measure availability or reliability");
+});
+
+test("observability in Bulgarian for a weak profile: critical gaps, reference architecture, illustrative SLOs", async ({ page }) => {
+  await page.goto("/bg/instrumenti/nablyudaemost-i-nadezhdnost");
+  const form = page.getByTestId("engine-form");
+  await answerAll(page, form, "first", "Вижте резултата", "Напред", async (step) => {
+    if (step === 1) await form.getByRole("checkbox", { name: "Нищо централно" }).check();
+  });
+  const result = page.getByTestId("engine-result");
+  await expect(result.getByTestId("tool-score")).toHaveText("0");
+  await expect(result.getByTestId("engine-findings-risk")).toContainText("Проблемите се откриват от клиентите");
+  const patterns = result.getByTestId("engine-findings-pattern");
+  await expect(patterns).toContainText("Примерна еталонна телеметрична архитектура");
+  await expect(patterns).toContainText("Примерни SLI и SLO (само илюстративни)");
+  await expect(patterns).toContainText("не препоръчани стойности");
+});
+
+test("e-commerce architecture in English: configuration, engineering and AI tracks", async ({ page }) => {
+  await page.goto("/en/tools/ecommerce-architecture");
+  const form = page.getByTestId("engine-form");
+  await expect(form.getByText("Area 1 of 11")).toBeVisible();
+  await expect(form.getByText(/Do not enter any payment details/)).toHaveCount(0); // asked on a later step
+  await answerAll(page, form, "last", "See the result", "Next", async (step) => {
+    if (step === 0) await form.getByRole("checkbox", { name: "Shopify" }).check();
+    if (step === 4) await expect(form.getByText(/Do not enter any payment details/)).toBeVisible();
+  });
+  const result = page.getByTestId("engine-result");
+  await expect(result.getByTestId("tool-score")).toHaveText("100");
+  const targets = result.getByTestId("engine-findings-target_state");
+  await expect(targets).toContainText("AI drafts for support");
+  await expect(targets.locator("[data-track='ai']")).toHaveCount(3);
+  await expect(result.getByTestId("engine-findings-context")).toContainText("Shopify: what is yours");
+  await expect(result).toContainText("promise no increase in sales or conversion");
+});
+
+test("data & integration readiness in Bulgarian: blockers, patterns and RAG caveats", async ({ page }) => {
+  await page.goto("/bg/instrumenti/integratsiya-na-danni");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Оценка на готовността на данни и интеграции");
+  const form = page.getByTestId("engine-form");
+  await answerAll(page, form, "first", "Вижте резултата", "Напред", async (step) => {
+    if (step === 1) await form.getByRole("checkbox", { name: "ERP" }).check();
+  });
+  const result = page.getByTestId("engine-result");
+  await expect(result.getByTestId("engine-findings-risk")).toContainText("Няма източник на истината");
+  await expect(result.getByTestId("engine-findings-pattern")).toContainText("Модел: outbox и шина за събития");
+  const context = result.getByTestId("engine-findings-context");
+  await expect(context).toContainText("RAG още не е следващата стъпка");
+  await expect(context).toContainText("Кога RAG помага и кога не");
 });
 
 test("responsible AI governance in Bulgarian: not legal advice, explained risks", async ({ page }) => {
@@ -164,7 +212,7 @@ test("all five new assessments are served by the API in both languages", async (
       const response = await request.get(`/api/public/assessments/${key}?locale=${locale}`);
       expect(response.status(), `${key} ${locale}`).toBe(200);
       const body = await response.json();
-      expect(body.questions.length, key).toBe(11);
+      expect(body.questions.length, key).toBe(key === "ecommerce_architecture" || key === "data_integration" ? 23 : 11);
       expect(JSON.stringify(body)).not.toContain('"points"');
     }
   }

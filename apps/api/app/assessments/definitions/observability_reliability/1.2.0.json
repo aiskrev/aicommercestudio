@@ -1,0 +1,1780 @@
+{
+  "key": "observability_reliability",
+  "version": "1.2.0",
+  "status": "live",
+  "scoring": {
+    "algorithm": "weighted-mean/1",
+    "max_recommendations": 10
+  },
+  "dimensions": [
+    {
+      "key": "golden_signals",
+      "weight": 10
+    },
+    {
+      "key": "telemetry",
+      "weight": 10
+    },
+    {
+      "key": "otel",
+      "weight": 8
+    },
+    {
+      "key": "slo",
+      "weight": 10
+    },
+    {
+      "key": "alerting",
+      "weight": 10
+    },
+    {
+      "key": "incidents",
+      "weight": 10
+    },
+    {
+      "key": "runbooks",
+      "weight": 8
+    },
+    {
+      "key": "capacity",
+      "weight": 8
+    },
+    {
+      "key": "dependencies",
+      "weight": 8
+    },
+    {
+      "key": "change_failure",
+      "weight": 8
+    },
+    {
+      "key": "resilience",
+      "weight": 10
+    }
+  ],
+  "questions": [
+    {
+      "key": "gs_coverage",
+      "type": "single_choice",
+      "dimension": "golden_signals",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "key",
+          "points": 2
+        },
+        {
+          "key": "journeys",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "gs_health",
+      "type": "single_choice",
+      "dimension": "golden_signals",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "infra",
+          "points": 1
+        },
+        {
+          "key": "services",
+          "points": 2
+        },
+        {
+          "key": "owned",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "telemetry",
+      "type": "multi_choice",
+      "dimension": "telemetry",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "logs",
+          "points": 2
+        },
+        {
+          "key": "metrics",
+          "points": 2
+        },
+        {
+          "key": "traces",
+          "points": 2
+        },
+        {
+          "key": "error_tracking",
+          "points": 1
+        }
+      ],
+      "cap": 6,
+      "max_selections": 5
+    },
+    {
+      "key": "tm_correlation",
+      "type": "single_choice",
+      "dimension": "telemetry",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "ids",
+          "points": 2
+        },
+        {
+          "key": "trace_ids",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ot_instrumentation",
+      "type": "single_choice",
+      "dimension": "otel",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "vendor",
+          "points": 1
+        },
+        {
+          "key": "partial_otel",
+          "points": 2
+        },
+        {
+          "key": "otel",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "ot_collector",
+      "type": "single_choice",
+      "dimension": "otel",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "basic",
+          "points": 1
+        },
+        {
+          "key": "sampling",
+          "points": 2
+        },
+        {
+          "key": "full",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "slo_defined",
+      "type": "single_choice",
+      "dimension": "slo",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "some",
+          "points": 2
+        },
+        {
+          "key": "all_critical",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "slo_budget",
+      "type": "single_choice",
+      "dimension": "slo",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "tracked",
+          "points": 1
+        },
+        {
+          "key": "reviewed",
+          "points": 2
+        },
+        {
+          "key": "policy",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "alert_routing",
+      "type": "single_choice",
+      "dimension": "alerting",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "email_only",
+          "points": 1
+        },
+        {
+          "key": "chat",
+          "points": 2
+        },
+        {
+          "key": "on_call_rotation",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "alert_actionable",
+      "type": "single_choice",
+      "dimension": "alerting",
+      "options": [
+        {
+          "key": "almost_none",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "most",
+          "points": 2
+        },
+        {
+          "key": "almost_all",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "inc_process",
+      "type": "single_choice",
+      "dimension": "incidents",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "ad_hoc",
+          "points": 1
+        },
+        {
+          "key": "documented",
+          "points": 2
+        },
+        {
+          "key": "practiced",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "inc_oncall",
+      "type": "single_choice",
+      "dimension": "incidents",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "best_effort",
+          "points": 1
+        },
+        {
+          "key": "rota",
+          "points": 2
+        },
+        {
+          "key": "sustainable",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "rb_runbooks",
+      "type": "single_choice",
+      "dimension": "runbooks",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "some",
+          "points": 1
+        },
+        {
+          "key": "most",
+          "points": 2
+        },
+        {
+          "key": "tested",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "rb_escalation",
+      "type": "single_choice",
+      "dimension": "runbooks",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "informal",
+          "points": 1
+        },
+        {
+          "key": "documented",
+          "points": 2
+        },
+        {
+          "key": "practised",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cap_monitoring",
+      "type": "single_choice",
+      "dimension": "capacity",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "infra",
+          "points": 1
+        },
+        {
+          "key": "trends",
+          "points": 2
+        },
+        {
+          "key": "forecast",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cap_load_tests",
+      "type": "single_choice",
+      "dimension": "capacity",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "events",
+          "points": 1
+        },
+        {
+          "key": "regular",
+          "points": 2
+        },
+        {
+          "key": "pipeline",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "dep_map",
+      "type": "single_choice",
+      "dimension": "dependencies",
+      "options": [
+        {
+          "key": "none",
+          "points": 0
+        },
+        {
+          "key": "partial",
+          "points": 1
+        },
+        {
+          "key": "complete",
+          "points": 2
+        },
+        {
+          "key": "traces",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "dep_external",
+      "type": "single_choice",
+      "dimension": "dependencies",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "status_pages",
+          "points": 1
+        },
+        {
+          "key": "synthetic",
+          "points": 2
+        },
+        {
+          "key": "slas",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cf_link",
+      "type": "single_choice",
+      "dimension": "change_failure",
+      "options": [
+        {
+          "key": "no",
+          "points": 0
+        },
+        {
+          "key": "sometimes",
+          "points": 1
+        },
+        {
+          "key": "always",
+          "points": 2
+        },
+        {
+          "key": "automatic",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "cf_rollback",
+      "type": "single_choice",
+      "dimension": "change_failure",
+      "options": [
+        {
+          "key": "fix_forward",
+          "points": 0
+        },
+        {
+          "key": "manual",
+          "points": 1
+        },
+        {
+          "key": "markers",
+          "points": 2
+        },
+        {
+          "key": "automatic",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "dr_tests",
+      "type": "single_choice",
+      "dimension": "resilience",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "once",
+          "points": 1
+        },
+        {
+          "key": "yearly",
+          "points": 2
+        },
+        {
+          "key": "regular",
+          "points": 3
+        }
+      ]
+    },
+    {
+      "key": "res_testing",
+      "type": "single_choice",
+      "dimension": "resilience",
+      "options": [
+        {
+          "key": "never",
+          "points": 0
+        },
+        {
+          "key": "staging",
+          "points": 1
+        },
+        {
+          "key": "game_days",
+          "points": 2
+        },
+        {
+          "key": "regular",
+          "points": 3
+        }
+      ]
+    }
+  ],
+  "bands": [
+    {
+      "key": "initial",
+      "min": 0
+    },
+    {
+      "key": "developing",
+      "min": 25
+    },
+    {
+      "key": "defined",
+      "min": 50
+    },
+    {
+      "key": "optimised",
+      "min": 75
+    }
+  ],
+  "rules": [
+    {
+      "key": "risk_no_alerts",
+      "priority": 1,
+      "when": {
+        "kind": "answer_in",
+        "question": "alert_routing",
+        "options": [
+          "none"
+        ]
+      },
+      "recommendation": "risk_no_alerts",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_blind_spots",
+      "priority": 1,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "telemetry",
+        "value": 34
+      },
+      "recommendation": "risk_blind_spots",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_no_incident_process",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "inc_process",
+        "options": [
+          "none"
+        ]
+      },
+      "recommendation": "risk_no_incident_process",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre",
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_untested_recovery",
+      "priority": 2,
+      "when": {
+        "kind": "answer_in",
+        "question": "dr_tests",
+        "options": [
+          "never"
+        ]
+      },
+      "recommendation": "risk_untested_recovery",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre",
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "risk_external_blind",
+      "priority": 3,
+      "when": {
+        "kind": "answer_in",
+        "question": "dep_external",
+        "options": [
+          "no"
+        ]
+      },
+      "recommendation": "risk_external_blind",
+      "kind": "risk",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "qw_on_call_routing",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "alert_routing",
+        "options": [
+          "none",
+          "email_only"
+        ]
+      },
+      "recommendation": "qw_on_call_routing",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_golden_signals",
+      "priority": 4,
+      "when": {
+        "kind": "answer_in",
+        "question": "gs_coverage",
+        "options": [
+          "none",
+          "some"
+        ]
+      },
+      "recommendation": "qw_golden_signals",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_alert_noise",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "alert_actionable",
+        "options": [
+          "almost_none",
+          "some"
+        ]
+      },
+      "recommendation": "qw_alert_noise",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_top_runbooks",
+      "priority": 5,
+      "when": {
+        "kind": "answer_in",
+        "question": "rb_runbooks",
+        "options": [
+          "none",
+          "some"
+        ]
+      },
+      "recommendation": "qw_top_runbooks",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre",
+        "managed_operations"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "qw_deploy_markers",
+      "priority": 6,
+      "when": {
+        "kind": "answer_in",
+        "question": "cf_rollback",
+        "options": [
+          "fix_forward",
+          "manual"
+        ]
+      },
+      "recommendation": "qw_deploy_markers",
+      "kind": "quick_win",
+      "horizon": 30,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_golden_signals",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "golden_signals",
+        "value": 50
+      },
+      "recommendation": "rec_golden_signals",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_telemetry",
+      "priority": 10,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "telemetry",
+        "value": 50
+      },
+      "recommendation": "rec_telemetry",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_otel",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "otel",
+        "value": 50
+      },
+      "recommendation": "rec_otel",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_slo",
+      "priority": 11,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "slo",
+        "value": 50
+      },
+      "recommendation": "rec_slo",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_alerting",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "alerting",
+        "value": 50
+      },
+      "recommendation": "rec_alerting",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_incidents",
+      "priority": 12,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "incidents",
+        "value": 50
+      },
+      "recommendation": "rec_incidents",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_runbooks",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "runbooks",
+        "value": 50
+      },
+      "recommendation": "rec_runbooks",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "managed_operations"
+      ],
+      "track": "configuration"
+    },
+    {
+      "key": "rec_capacity",
+      "priority": 13,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "capacity",
+        "value": 50
+      },
+      "recommendation": "rec_capacity",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "cloud_platform"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_dependencies",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "dependencies",
+        "value": 50
+      },
+      "recommendation": "rec_dependencies",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_change_failure",
+      "priority": 14,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "change_failure",
+        "value": 50
+      },
+      "recommendation": "rec_change_failure",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "rec_resilience",
+      "priority": 15,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "resilience",
+        "value": 50
+      },
+      "recommendation": "rec_resilience",
+      "horizon": 60,
+      "domains": [
+        "devops_sre",
+        "managed_operations"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "pattern_telemetry_architecture",
+      "priority": 20,
+      "when": {
+        "kind": "any",
+        "conditions": [
+          {
+            "kind": "dimension_below",
+            "dimension": "telemetry",
+            "value": 75
+          },
+          {
+            "kind": "dimension_below",
+            "dimension": "otel",
+            "value": 75
+          }
+        ]
+      },
+      "recommendation": "pattern_telemetry_architecture",
+      "kind": "pattern",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "pattern_example_slos",
+      "priority": 21,
+      "when": {
+        "kind": "dimension_below",
+        "dimension": "slo",
+        "value": 75
+      },
+      "recommendation": "pattern_example_slos",
+      "kind": "pattern",
+      "horizon": 60,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "ts_error_budget_policy",
+      "priority": 30,
+      "when": {
+        "kind": "dimension_at_least",
+        "dimension": "slo",
+        "value": 75
+      },
+      "recommendation": "ts_error_budget_policy",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "devops_sre"
+      ],
+      "track": "engineering"
+    },
+    {
+      "key": "ts_game_days",
+      "priority": 31,
+      "when": {
+        "kind": "all",
+        "conditions": [
+          {
+            "kind": "dimension_at_least",
+            "dimension": "incidents",
+            "value": 50
+          },
+          {
+            "kind": "dimension_at_least",
+            "dimension": "resilience",
+            "value": 50
+          }
+        ]
+      },
+      "recommendation": "ts_game_days",
+      "kind": "target_state",
+      "horizon": 90,
+      "domains": [
+        "devops_sre",
+        "managed_operations"
+      ],
+      "track": "engineering"
+    }
+  ],
+  "texts": {
+    "bg": {
+      "title": "Оценка на наблюдаемостта и надеждността",
+      "intro": "22 въпроса в 11 области: от златните сигнали и OpenTelemetry до SLO, дежурства, зависимости и тестове за устойчивост. Резултатът показва зрелост по области, критични пропуски, примерна телеметрична архитектура и списък със следващи стъпки.",
+      "disclaimer": "Самооценка по вашите отговори. Не се свързваме с вашите системи за наблюдение, не измерваме наличност или надеждност и не потвърждаваме постигнати SLO. Примерните SLI и SLO са само илюстрация.",
+      "dimensions": {
+        "golden_signals": {
+          "title": "Златни сигнали и здраве на услугите",
+          "description": "Латентност, трафик, грешки и натоварване за ключовите услуги и пътища на потребителя."
+        },
+        "telemetry": {
+          "title": "Метрики, логове и трасиране",
+          "description": "Какво се събира централно и може ли да се свърже по заявка."
+        },
+        "otel": {
+          "title": "Инструментиране с OpenTelemetry",
+          "description": "Стандартно инструментиране и колектор със семплиране и филтриране."
+        },
+        "slo": {
+          "title": "SLI, SLO и бюджети за грешки",
+          "description": "Измерими цели за надеждност и как се използват."
+        },
+        "alerting": {
+          "title": "Качество на известията",
+          "description": "Кой получава известията и колко от тях изискват действие."
+        },
+        "incidents": {
+          "title": "Инциденти и дежурства",
+          "description": "Процес при инцидент и устойчиви дежурства."
+        },
+        "runbooks": {
+          "title": "Инструкции и ескалация",
+          "description": "Runbooks към известията и ясен път за ескалация."
+        },
+        "capacity": {
+          "title": "Капацитет и производителност",
+          "description": "Наблюдение на капацитета, прогноза и тестове за натоварване."
+        },
+        "dependencies": {
+          "title": "Видимост на зависимостите",
+          "description": "Карта на зависимостите и наблюдение на външни услуги."
+        },
+        "change_failure": {
+          "title": "Анализ на неуспешни промени",
+          "description": "Връзка между промени и инциденти и бързо връщане назад."
+        },
+        "resilience": {
+          "title": "Възстановяване и тестове за устойчивост",
+          "description": "Тествано възстановяване и планирани тестове на отказ."
+        }
+      },
+      "questions": {
+        "gs_coverage": {
+          "text": "Измервате ли латентност, трафик, грешки и натоварване за ключовите услуги?",
+          "options": {
+            "none": "Не",
+            "some": "За част от услугите",
+            "key": "За всички ключови услуги",
+            "journeys": "За ключовите услуги и пътищата на потребителя"
+          }
+        },
+        "gs_health": {
+          "text": "Има ли табло за здравето на всяка ключова услуга?",
+          "options": {
+            "none": "Не",
+            "infra": "Само за инфраструктурата",
+            "services": "За повечето услуги",
+            "owned": "За всички, с отговорник за всяко табло"
+          }
+        },
+        "telemetry": {
+          "text": "Какво събирате централно?",
+          "help": "Изберете всичко приложимо.",
+          "options": {
+            "none": "Нищо централно",
+            "logs": "Логове",
+            "metrics": "Метрики",
+            "traces": "Разпределено трасиране",
+            "error_tracking": "Проследяване на грешки"
+          }
+        },
+        "tm_correlation": {
+          "text": "Може ли да свържете логове, метрики и трасиране за една заявка?",
+          "options": {
+            "no": "Не",
+            "manual": "Ръчно, по време",
+            "ids": "С идентификатор на заявката",
+            "trace_ids": "С идентификатор на трасирането навсякъде"
+          }
+        },
+        "ot_instrumentation": {
+          "text": "Как са инструментирани услугите?",
+          "options": {
+            "none": "Почти не са",
+            "vendor": "С агенти на конкретен доставчик",
+            "partial_otel": "Частично с OpenTelemetry",
+            "otel": "OpenTelemetry като стандарт"
+          }
+        },
+        "ot_collector": {
+          "text": "Минава ли телеметрията през колектор със семплиране и филтриране на лични данни?",
+          "options": {
+            "no": "Не",
+            "basic": "Колектор без правила",
+            "sampling": "Със семплиране",
+            "full": "Със семплиране и филтриране на лични данни"
+          }
+        },
+        "slo_defined": {
+          "text": "Имате ли измерими цели за надеждност (SLO)?",
+          "help": "Отговорът е самооценка; не измерваме вашата наличност.",
+          "options": {
+            "none": "Не",
+            "informal": "Неформални очаквания",
+            "some": "За част от услугите",
+            "all_critical": "За всички критични услуги"
+          }
+        },
+        "slo_budget": {
+          "text": "Използвате ли бюджети за грешки при решения?",
+          "options": {
+            "no": "Не",
+            "tracked": "Следим ги",
+            "reviewed": "Преглеждаме ги редовно",
+            "policy": "Правило: при изчерпване спираме новите функции"
+          }
+        },
+        "alert_routing": {
+          "text": "Как известията стигат до екипа?",
+          "options": {
+            "none": "Нямаме известия",
+            "email_only": "Само по имейл",
+            "chat": "В чат канал",
+            "on_call_rotation": "До дежурен по график"
+          }
+        },
+        "alert_actionable": {
+          "text": "Колко от известията наистина изискват действие?",
+          "options": {
+            "almost_none": "Почти никое",
+            "some": "Част от тях",
+            "most": "Повечето",
+            "almost_all": "Почти всички, по SLO"
+          }
+        },
+        "inc_process": {
+          "text": "Имате ли процес при инцидент?",
+          "options": {
+            "none": "Не",
+            "ad_hoc": "Действаме според ситуацията",
+            "documented": "Описан процес с роли",
+            "practiced": "Описан и упражняван"
+          }
+        },
+        "inc_oncall": {
+          "text": "Как са организирани дежурствата?",
+          "options": {
+            "none": "Няма дежурства",
+            "best_effort": "Който е наличен",
+            "rota": "График",
+            "sustainable": "График с предаване и ограничение на натоварването"
+          }
+        },
+        "rb_runbooks": {
+          "text": "Имат ли известията инструкции (runbooks)?",
+          "options": {
+            "none": "Не",
+            "some": "Някои",
+            "most": "Повечето, с връзка от известието",
+            "tested": "Всички, проверявани редовно"
+          }
+        },
+        "rb_escalation": {
+          "text": "Има ли ясен път за ескалация, включително към доставчици?",
+          "options": {
+            "none": "Не",
+            "informal": "Неформален",
+            "documented": "Описан",
+            "practised": "Описан и упражняван"
+          }
+        },
+        "cap_monitoring": {
+          "text": "Как следите капацитета?",
+          "options": {
+            "none": "Не следим",
+            "infra": "Само инфраструктурни метрики",
+            "trends": "По услуги, с тенденции",
+            "forecast": "С прогноза и известия преди изчерпване"
+          }
+        },
+        "cap_load_tests": {
+          "text": "Правите ли тестове за натоварване?",
+          "options": {
+            "never": "Никога",
+            "events": "Преди големи събития",
+            "regular": "Редовно",
+            "pipeline": "Автоматично при промени"
+          }
+        },
+        "dep_map": {
+          "text": "Имате ли карта на зависимостите между услугите?",
+          "options": {
+            "none": "Не",
+            "partial": "Частична",
+            "complete": "Пълна, поддържана ръчно",
+            "traces": "Автоматична, от трасирането"
+          }
+        },
+        "dep_external": {
+          "text": "Наблюдавате ли външните услуги и API, от които зависите?",
+          "options": {
+            "no": "Не",
+            "status_pages": "Следим техните статус страници",
+            "synthetic": "Със собствени проверки",
+            "slas": "Със собствени проверки и проследяване на договорените нива"
+          }
+        },
+        "cf_link": {
+          "text": "Свързвате ли инцидентите с промените, които са ги причинили?",
+          "options": {
+            "no": "Не",
+            "sometimes": "Понякога",
+            "always": "Винаги, при разбора",
+            "automatic": "Автоматично, по маркери за внедряване"
+          }
+        },
+        "cf_rollback": {
+          "text": "Как реагирате на неуспешна промяна?",
+          "options": {
+            "fix_forward": "Поправяме на място",
+            "manual": "Ръчно връщане назад",
+            "markers": "Маркери на таблата и бързо връщане",
+            "automatic": "Автоматично връщане при влошаване на SLO"
+          }
+        },
+        "dr_tests": {
+          "text": "Тествате ли възстановяването след бедствие?",
+          "options": {
+            "never": "Никога",
+            "once": "Веднъж",
+            "yearly": "Веднъж годишно",
+            "regular": "Редовно, с измерени RTO и RPO"
+          }
+        },
+        "res_testing": {
+          "text": "Правите ли планирани тестове на отказ (game days)?",
+          "options": {
+            "never": "Никога",
+            "staging": "Понякога в тестова среда",
+            "game_days": "Планирани упражнения",
+            "regular": "Редовни упражнения с предпазни мерки"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Начално",
+          "description": "Повечето практики са ръчни или липсват; рискът зависи от отделни хора."
+        },
+        "developing": {
+          "title": "В развитие",
+          "description": "Има основни практики, но не навсякъде и не по еднакъв начин."
+        },
+        "defined": {
+          "title": "Дефинирано",
+          "description": "Практиките са стандартизирани и повечето се прилагат автоматично."
+        },
+        "optimised": {
+          "title": "Оптимизирано",
+          "description": "Практиките са автоматизирани, измервани и непрекъснато подобрявани."
+        }
+      },
+      "recommendations": {
+        "risk_no_alerts": {
+          "title": "Проблемите се откриват от клиентите",
+          "description": "Без известия никой не научава за срив, докато клиент не се оплаче."
+        },
+        "risk_blind_spots": {
+          "title": "Слепи петна в телеметрията",
+          "description": "Събират се твърде малко сигнали, за да се разбере защо нещо се е счупило."
+        },
+        "risk_no_incident_process": {
+          "title": "Няма процес при инциденти",
+          "description": "Без роли и стъпки всеки инцидент трае по-дълго и зависи от това кой е наличен."
+        },
+        "risk_untested_recovery": {
+          "title": "Непроверено възстановяване",
+          "description": "Възстановяване, което не е тествано, обикновено не работи, когато е нужно."
+        },
+        "risk_external_blind": {
+          "title": "Външните зависимости са невидими",
+          "description": "Срив при доставчик изглежда като ваш срив и отнема време да се открие."
+        },
+        "qw_on_call_routing": {
+          "title": "Известия до дежурен",
+          "description": "Насочете критичните известия към дежурен човек вместо към имейл."
+        },
+        "qw_golden_signals": {
+          "title": "Четирите златни сигнала за една ключова услуга",
+          "description": "Започнете с латентност, трафик, грешки и натоварване на услугата, която носи най-много приходи."
+        },
+        "qw_alert_noise": {
+          "title": "Чистка на известията",
+          "description": "Изключете или обединете известията без действие; всяко останало да има собственик."
+        },
+        "qw_top_runbooks": {
+          "title": "Инструкции за петте най-чести известия",
+          "description": "Кратки стъпки за проверка и възстановяване, свързани от самото известие."
+        },
+        "qw_deploy_markers": {
+          "title": "Маркери за внедряване на таблата",
+          "description": "Всяко внедряване да се вижда на графиките, за да свързвате промени и инциденти."
+        },
+        "rec_golden_signals": {
+          "title": "Здраве на услугите по златните сигнали",
+          "description": "Табла по услуги и пътища на потребителя, всяко със собственик."
+        },
+        "rec_telemetry": {
+          "title": "Свързана телеметрия",
+          "description": "Централни логове, метрики и трасиране, свързани с идентификатор на трасирането."
+        },
+        "rec_otel": {
+          "title": "OpenTelemetry като стандарт",
+          "description": "Инструментиране без зависимост от доставчик и колектор със семплиране и филтриране."
+        },
+        "rec_slo": {
+          "title": "SLO за критичните услуги",
+          "description": "Измерими цели, договорени с бизнеса, и бюджети за грешки."
+        },
+        "rec_alerting": {
+          "title": "Известия, които изискват действие",
+          "description": "Известия по SLO и симптоми вместо по всяка метрика."
+        },
+        "rec_incidents": {
+          "title": "Процес при инцидент и устойчиви дежурства",
+          "description": "Роли, комуникация, разбор без търсене на виновни и разумно натоварване."
+        },
+        "rec_runbooks": {
+          "title": "Инструкции и ескалация",
+          "description": "Runbook за всяко известие и описан път за ескалация."
+        },
+        "rec_capacity": {
+          "title": "Капацитет с прогноза",
+          "description": "Прогноза по услуги и тестове за натоварване преди пикове."
+        },
+        "rec_dependencies": {
+          "title": "Видими зависимости",
+          "description": "Карта от трасирането и собствени проверки на външните услуги."
+        },
+        "rec_change_failure": {
+          "title": "Анализ на неуспешните промени",
+          "description": "Маркери за внедряване и автоматично връщане при влошаване."
+        },
+        "rec_resilience": {
+          "title": "Тествана устойчивост",
+          "description": "Редовни тестове за възстановяване и планирани упражнения за отказ."
+        },
+        "pattern_telemetry_architecture": {
+          "title": "Примерна еталонна телеметрична архитектура",
+          "description": "SDK и автоматично инструментиране с OpenTelemetry → колектор (семплиране, филтриране на лични данни, обогатяване) → отделни хранилища за метрики, логове и трасиране → табла и известия по SLO, свързани с идентификатор на трасирането."
+        },
+        "pattern_example_slos": {
+          "title": "Примерни SLI и SLO (само илюстративни)",
+          "description": "Примери, не препоръчани стойности: наличност = дял на успешните заявки за 28 дни, напр. 99,5%; латентност = дял на заявките под праг, напр. 95% под 500 ms. Определете своите стойности по реални данни и нуждите на потребителите."
+        },
+        "ts_error_budget_policy": {
+          "title": "Правило за бюджета за грешки",
+          "description": "Когато бюджетът се изчерпва, новите функции изчакват, а екипът работи по надеждността."
+        },
+        "ts_game_days": {
+          "title": "Редовни упражнения за отказ",
+          "description": "Планирани упражнения в продукция с предпазни мерки, с проследени действия."
+        }
+      }
+    },
+    "en": {
+      "title": "Observability & Reliability Assessment",
+      "intro": "22 questions across 11 areas: from golden signals and OpenTelemetry to SLOs, on-call, dependencies and resilience testing. The result shows maturity per area, critical gaps, a reference telemetry architecture and a next-step backlog.",
+      "disclaimer": "A self-assessment based on your answers. We do not connect to your monitoring systems, measure availability or reliability, or confirm any SLO achievement. Example SLIs and SLOs are illustrative only.",
+      "dimensions": {
+        "golden_signals": {
+          "title": "Golden signals and service health",
+          "description": "Latency, traffic, errors and saturation for key services and user journeys."
+        },
+        "telemetry": {
+          "title": "Metrics, logs and traces",
+          "description": "What is collected centrally and whether it can be correlated per request."
+        },
+        "otel": {
+          "title": "OpenTelemetry instrumentation",
+          "description": "Standard instrumentation and a collector with sampling and filtering."
+        },
+        "slo": {
+          "title": "SLIs, SLOs and error budgets",
+          "description": "Measurable reliability targets and how they are used."
+        },
+        "alerting": {
+          "title": "Alert quality",
+          "description": "Who receives alerts and how many of them require action."
+        },
+        "incidents": {
+          "title": "Incident response and on-call",
+          "description": "An incident process and sustainable on-call."
+        },
+        "runbooks": {
+          "title": "Runbooks and escalation",
+          "description": "Runbooks linked to alerts and a clear escalation path."
+        },
+        "capacity": {
+          "title": "Capacity and performance",
+          "description": "Capacity monitoring, forecasting and load testing."
+        },
+        "dependencies": {
+          "title": "Dependency visibility",
+          "description": "A dependency map and monitoring of external services."
+        },
+        "change_failure": {
+          "title": "Change failure analysis",
+          "description": "Linking changes to incidents and rolling back quickly."
+        },
+        "resilience": {
+          "title": "Disaster recovery and resilience testing",
+          "description": "Tested recovery and planned failure testing."
+        }
+      },
+      "questions": {
+        "gs_coverage": {
+          "text": "Do you measure latency, traffic, errors and saturation for key services?",
+          "options": {
+            "none": "No",
+            "some": "For some services",
+            "key": "For all key services",
+            "journeys": "For key services and user journeys"
+          }
+        },
+        "gs_health": {
+          "text": "Is there a health dashboard for each key service?",
+          "options": {
+            "none": "No",
+            "infra": "For infrastructure only",
+            "services": "For most services",
+            "owned": "For all, each with an owner"
+          }
+        },
+        "telemetry": {
+          "text": "What do you collect centrally?",
+          "help": "Select all that apply.",
+          "options": {
+            "none": "Nothing centrally",
+            "logs": "Logs",
+            "metrics": "Metrics",
+            "traces": "Distributed traces",
+            "error_tracking": "Error tracking"
+          }
+        },
+        "tm_correlation": {
+          "text": "Can you correlate logs, metrics and traces for one request?",
+          "options": {
+            "no": "No",
+            "manual": "By hand, by timestamp",
+            "ids": "With a request identifier",
+            "trace_ids": "With a trace identifier everywhere"
+          }
+        },
+        "ot_instrumentation": {
+          "text": "How are services instrumented?",
+          "options": {
+            "none": "Barely at all",
+            "vendor": "With a specific vendor's agents",
+            "partial_otel": "Partly with OpenTelemetry",
+            "otel": "OpenTelemetry as the standard"
+          }
+        },
+        "ot_collector": {
+          "text": "Does telemetry pass through a collector with sampling and personal-data filtering?",
+          "options": {
+            "no": "No",
+            "basic": "A collector without rules",
+            "sampling": "With sampling",
+            "full": "With sampling and personal-data filtering"
+          }
+        },
+        "slo_defined": {
+          "text": "Do you have measurable reliability targets (SLOs)?",
+          "help": "Your own assessment; we do not measure your availability.",
+          "options": {
+            "none": "No",
+            "informal": "Informal expectations",
+            "some": "For some services",
+            "all_critical": "For all critical services"
+          }
+        },
+        "slo_budget": {
+          "text": "Do you use error budgets in decisions?",
+          "options": {
+            "no": "No",
+            "tracked": "We track them",
+            "reviewed": "We review them regularly",
+            "policy": "A policy: when exhausted, new features wait"
+          }
+        },
+        "alert_routing": {
+          "text": "How do alerts reach the team?",
+          "options": {
+            "none": "We have no alerts",
+            "email_only": "By e-mail only",
+            "chat": "In a chat channel",
+            "on_call_rotation": "To an on-call person by rota"
+          }
+        },
+        "alert_actionable": {
+          "text": "How many alerts actually require action?",
+          "options": {
+            "almost_none": "Almost none",
+            "some": "Some",
+            "most": "Most",
+            "almost_all": "Almost all, based on SLOs"
+          }
+        },
+        "inc_process": {
+          "text": "Do you have an incident response process?",
+          "options": {
+            "none": "No",
+            "ad_hoc": "We act as the situation requires",
+            "documented": "A documented process with roles",
+            "practiced": "Documented and practised"
+          }
+        },
+        "inc_oncall": {
+          "text": "How is on-call organised?",
+          "options": {
+            "none": "No on-call",
+            "best_effort": "Whoever is available",
+            "rota": "A rota",
+            "sustainable": "A rota with handover and load limits"
+          }
+        },
+        "rb_runbooks": {
+          "text": "Do alerts have runbooks?",
+          "options": {
+            "none": "No",
+            "some": "Some",
+            "most": "Most, linked from the alert",
+            "tested": "All, checked regularly"
+          }
+        },
+        "rb_escalation": {
+          "text": "Is there a clear escalation path, including to vendors?",
+          "options": {
+            "none": "No",
+            "informal": "Informal",
+            "documented": "Documented",
+            "practised": "Documented and practised"
+          }
+        },
+        "cap_monitoring": {
+          "text": "How do you monitor capacity?",
+          "options": {
+            "none": "We do not",
+            "infra": "Infrastructure metrics only",
+            "trends": "Per service, with trends",
+            "forecast": "With a forecast and alerts before exhaustion"
+          }
+        },
+        "cap_load_tests": {
+          "text": "Do you run load tests?",
+          "options": {
+            "never": "Never",
+            "events": "Before big events",
+            "regular": "Regularly",
+            "pipeline": "Automatically on changes"
+          }
+        },
+        "dep_map": {
+          "text": "Do you have a map of dependencies between services?",
+          "options": {
+            "none": "No",
+            "partial": "Partial",
+            "complete": "Complete, maintained by hand",
+            "traces": "Automatic, from traces"
+          }
+        },
+        "dep_external": {
+          "text": "Do you monitor external services and APIs you depend on?",
+          "options": {
+            "no": "No",
+            "status_pages": "We follow their status pages",
+            "synthetic": "With our own checks",
+            "slas": "With our own checks and tracking of agreed levels"
+          }
+        },
+        "cf_link": {
+          "text": "Do you link incidents to the changes that caused them?",
+          "options": {
+            "no": "No",
+            "sometimes": "Sometimes",
+            "always": "Always, in the review",
+            "automatic": "Automatically, through deployment markers"
+          }
+        },
+        "cf_rollback": {
+          "text": "How do you react to a failed change?",
+          "options": {
+            "fix_forward": "We fix it in place",
+            "manual": "A manual rollback",
+            "markers": "Dashboard markers and a quick rollback",
+            "automatic": "Automatic rollback when SLOs degrade"
+          }
+        },
+        "dr_tests": {
+          "text": "Do you test disaster recovery?",
+          "options": {
+            "never": "Never",
+            "once": "Once",
+            "yearly": "Yearly",
+            "regular": "Regularly, with measured RTO and RPO"
+          }
+        },
+        "res_testing": {
+          "text": "Do you run planned failure tests (game days)?",
+          "options": {
+            "never": "Never",
+            "staging": "Sometimes in staging",
+            "game_days": "Planned exercises",
+            "regular": "Regular exercises with guardrails"
+          }
+        }
+      },
+      "bands": {
+        "initial": {
+          "title": "Initial",
+          "description": "Most practices are manual or missing; risk depends on individual people."
+        },
+        "developing": {
+          "title": "Developing",
+          "description": "Basic practices exist, but not everywhere and not consistently."
+        },
+        "defined": {
+          "title": "Defined",
+          "description": "Practices are standardised and most are applied automatically."
+        },
+        "optimised": {
+          "title": "Optimised",
+          "description": "Practices are automated, measured and continuously improved."
+        }
+      },
+      "recommendations": {
+        "risk_no_alerts": {
+          "title": "Customers find the problems first",
+          "description": "Without alerts nobody learns about an outage until a customer complains."
+        },
+        "risk_blind_spots": {
+          "title": "Blind spots in telemetry",
+          "description": "Too few signals are collected to understand why something broke."
+        },
+        "risk_no_incident_process": {
+          "title": "No incident process",
+          "description": "Without roles and steps every incident lasts longer and depends on who is available."
+        },
+        "risk_untested_recovery": {
+          "title": "Untested recovery",
+          "description": "Recovery that has never been tested usually fails when it is needed."
+        },
+        "risk_external_blind": {
+          "title": "External dependencies are invisible",
+          "description": "A provider outage looks like your own outage and takes time to identify."
+        },
+        "qw_on_call_routing": {
+          "title": "Alerts to an on-call person",
+          "description": "Route critical alerts to an on-call person instead of e-mail."
+        },
+        "qw_golden_signals": {
+          "title": "The four golden signals for one key service",
+          "description": "Start with latency, traffic, errors and saturation of the service that matters most."
+        },
+        "qw_alert_noise": {
+          "title": "Clean up alerts",
+          "description": "Silence or merge alerts that need no action; every remaining one gets an owner."
+        },
+        "qw_top_runbooks": {
+          "title": "Runbooks for the five most frequent alerts",
+          "description": "Short check and recovery steps, linked from the alert itself."
+        },
+        "qw_deploy_markers": {
+          "title": "Deployment markers on dashboards",
+          "description": "Show every deployment on the graphs so changes and incidents can be linked."
+        },
+        "rec_golden_signals": {
+          "title": "Service health from golden signals",
+          "description": "Dashboards per service and user journey, each with an owner."
+        },
+        "rec_telemetry": {
+          "title": "Correlated telemetry",
+          "description": "Central logs, metrics and traces, correlated by trace identifier."
+        },
+        "rec_otel": {
+          "title": "OpenTelemetry as the standard",
+          "description": "Vendor-neutral instrumentation and a collector with sampling and filtering."
+        },
+        "rec_slo": {
+          "title": "SLOs for critical services",
+          "description": "Measurable targets agreed with the business, and error budgets."
+        },
+        "rec_alerting": {
+          "title": "Alerts that require action",
+          "description": "Alerts on SLOs and symptoms instead of every metric."
+        },
+        "rec_incidents": {
+          "title": "Incident process and sustainable on-call",
+          "description": "Roles, communication, blameless reviews and a reasonable load."
+        },
+        "rec_runbooks": {
+          "title": "Runbooks and escalation",
+          "description": "A runbook for every alert and a documented escalation path."
+        },
+        "rec_capacity": {
+          "title": "Capacity with a forecast",
+          "description": "A forecast per service and load tests before peaks."
+        },
+        "rec_dependencies": {
+          "title": "Visible dependencies",
+          "description": "A map from traces and your own checks of external services."
+        },
+        "rec_change_failure": {
+          "title": "Change failure analysis",
+          "description": "Deployment markers and automatic rollback on degradation."
+        },
+        "rec_resilience": {
+          "title": "Tested resilience",
+          "description": "Regular recovery tests and planned failure exercises."
+        },
+        "pattern_telemetry_architecture": {
+          "title": "Suggested reference telemetry architecture",
+          "description": "OpenTelemetry SDKs and auto-instrumentation → a collector (sampling, personal-data filtering, enrichment) → stores for metrics, logs and traces → dashboards and SLO alerts, correlated by trace identifier."
+        },
+        "pattern_example_slos": {
+          "title": "Example SLIs and SLOs (illustrative only)",
+          "description": "Examples, not recommended values: availability = share of successful requests over 28 days, e.g. 99.5%; latency = share of requests under a threshold, e.g. 95% under 500 ms. Set your own values from real data and user needs."
+        },
+        "ts_error_budget_policy": {
+          "title": "An error budget policy",
+          "description": "When the budget runs low, new features wait and the team works on reliability."
+        },
+        "ts_game_days": {
+          "title": "Regular failure exercises",
+          "description": "Planned exercises in production with guardrails, with tracked follow-ups."
+        }
+      }
+    }
+  },
+  "extension": "observability_signals"
+}

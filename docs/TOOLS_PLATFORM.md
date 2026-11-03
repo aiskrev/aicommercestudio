@@ -16,9 +16,9 @@ Foundations for the business assessment and solution-design tools. Hub: `/bg/ins
 | AI agent library (10 static agent pages) | `agents` | live | `/bg/ai-agenti` ↔ `/en/ai-agents` | `tool_agents` (on) |
 | Cloud & Platform Maturity Assessment (engine, 10 areas) | `cloud_maturity` | live | `/bg/instrumenti/zrelost-na-oblak-i-platforma` ↔ `/en/tools/cloud-platform-maturity` | `tool_cloud` (on) |
 | DevOps Delivery Maturity (engine, 11 areas, unscored metrics) | `devops_maturity` | live | `/bg/instrumenti/zrelost-na-devops-dostavkata` ↔ `/en/tools/devops-delivery-maturity` | `tool_devops` (on) |
-| Observability & Reliability Assessment (engine, 4 areas) | `observability` | live | `/bg/instrumenti/nablyudaemost-i-nadezhdnost` ↔ `/en/tools/observability-reliability` | `tool_observability` (on) |
-| E-commerce Architecture Assessment (engine, 5 areas) | `ecommerce_architecture` | live | `/bg/instrumenti/arhitektura-na-online-magazin` ↔ `/en/tools/ecommerce-architecture` | `tool_ecommerce` (on) |
-| Data Integration Assessment (engine, 5 areas) | `data_integration` | live | `/bg/instrumenti/integratsiya-na-danni` ↔ `/en/tools/data-integration` | `tool_data_integration` (on) |
+| Observability & Reliability Assessment (engine, 11 areas) | `observability` | live | `/bg/instrumenti/nablyudaemost-i-nadezhdnost` ↔ `/en/tools/observability-reliability` | `tool_observability` (on) |
+| E-commerce Architecture Assessment (engine, 11 areas) | `ecommerce_architecture` | live | `/bg/instrumenti/arhitektura-na-online-magazin` ↔ `/en/tools/ecommerce-architecture` | `tool_ecommerce` (on) |
+| Data & Integration Readiness Assessment (engine, 11 areas) | `data_integration` | live | `/bg/instrumenti/integratsiya-na-danni` ↔ `/en/tools/data-integration` | `tool_data_integration` (on) |
 | Responsible AI Governance Assessment (engine, 5 areas) | `ai_governance` | live | `/bg/instrumenti/otgovoren-ai` ↔ `/en/tools/responsible-ai-governance` | `tool_ai_governance` (on) |
 | AI Operations Readiness Assessment (engine, 5 areas) | `ai_ops_readiness` | live | `/bg/instrumenti/gotovnost-za-ai-operatsii` ↔ `/en/tools/ai-operations-readiness` | `tool_ai_ops` (on) |
 | FinOps & AI Cost Assessment (engine, 5 areas) | `finops` | live | `/bg/instrumenti/finops-i-ai-razhodi` ↔ `/en/tools/finops-ai-cost` | `tool_finops` (on) |

@@ -199,6 +199,7 @@ def present_result(
                 "kind": rule.kind,
                 "horizon": rule.horizon,
                 "domains": list(rule.domains),
+                "track": rule.track,
                 "because": _because(definition, key, answers, result, locale),
             }
         )
