@@ -34,7 +34,17 @@ down_revision: str | None = "0008"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
-LEAD_CATEGORIES = ("maintenance", "seo", "ai_tools", "automation", "analytics", "integrations", "audit", "ai_managed", "ai_agents")
+LEAD_CATEGORIES = (
+    "maintenance",
+    "seo",
+    "ai_tools",
+    "automation",
+    "analytics",
+    "integrations",
+    "audit",
+    "ai_managed",
+    "ai_agents",
+)
 KEY_PATTERN = r"^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)?$"
 SLUG_PATTERN = r"^[a-z0-9]+(-[a-z0-9]+)*$"
 RELATION_TYPES_CHECK = (
@@ -67,9 +77,7 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("created_by_id", sa.Uuid(), nullable=True),
         sa.Column("updated_by_id", sa.Uuid(), nullable=True),
-        sa.CheckConstraint(
-            "entity_type IN ('domain', 'family', 'service')", name="ck_catalogue_entities_entity_type"
-        ),
+        sa.CheckConstraint("entity_type IN ('domain', 'family', 'service')", name="ck_catalogue_entities_entity_type"),
         sa.CheckConstraint("status IN ('draft', 'published', 'archived')", name="ck_catalogue_entities_status"),
         sa.CheckConstraint(f"key ~ '{KEY_PATTERN}'", name="ck_catalogue_entities_key_format"),
         sa.CheckConstraint("revision >= 1", name="ck_catalogue_entities_revision_positive"),
@@ -161,9 +169,7 @@ def upgrade() -> None:
         sa.Column("position", sa.SmallInteger(), nullable=False),
         sa.CheckConstraint("entity_type = 'service'", name="ck_services_entity_type"),
         sa.CheckConstraint("offering_type IN ('service')", name="ck_services_offering_type"),
-        sa.CheckConstraint(
-            "delivery_status IN ('available', 'custom', 'planned')", name="ck_services_delivery_status"
-        ),
+        sa.CheckConstraint("delivery_status IN ('available', 'custom', 'planned')", name="ck_services_delivery_status"),
         sa.CheckConstraint(
             f"lead_category IS NULL OR lead_category IN ({lead_categories})", name="ck_services_lead_category"
         ),
@@ -272,9 +278,7 @@ def upgrade() -> None:
         sa.Column("to_entity_id", sa.Uuid(), nullable=False),
         sa.Column("to_type", sa.String(16), nullable=False),
         sa.Column("position", sa.SmallInteger(), nullable=False),
-        sa.CheckConstraint(
-            "kind IN ('related', 'cross_sell', 'delivered_through')", name="ck_entity_relations_kind"
-        ),
+        sa.CheckConstraint("kind IN ('related', 'cross_sell', 'delivered_through')", name="ck_entity_relations_kind"),
         sa.CheckConstraint(RELATION_TYPES_CHECK, name="ck_entity_relations_kind_types"),
         sa.CheckConstraint("from_entity_id <> to_entity_id", name="ck_entity_relations_not_self"),
         sa.CheckConstraint("position >= 0", name="ck_entity_relations_position"),

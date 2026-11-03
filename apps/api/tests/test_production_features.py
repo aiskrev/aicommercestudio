@@ -16,8 +16,14 @@ from tests.conftest import ADMIN_EMAIL, ADMIN_PASSWORD, lead_payload
 
 def quote_payload(**overrides) -> dict:
     payload = lead_payload(service="ai_tools", message="Искаме оферта за AI асистент за клиентски въпроси.")
-    payload.update({"platform": "shopify", "budget_range": "2500_10000", "timeline": "within_3_months",
-                    "website_url": "example-shop.bg"})
+    payload.update(
+        {
+            "platform": "shopify",
+            "budget_range": "2500_10000",
+            "timeline": "within_3_months",
+            "website_url": "example-shop.bg",
+        }
+    )
     payload.update(overrides)
     return payload
 
@@ -116,10 +122,20 @@ def test_error_envelope_has_code_and_request_id(client, admin_user):
     [
         ("post", "/api/public/leads", {"json": {}}, 422, "validation_error"),
         ("post", "/api/public/leads", {"json": lead_payload(form_token="x")}, 400, "form_token_invalid"),
-        ("post", "/api/public/leads", {"json": lead_payload(), "headers": {"Origin": "https://evil.example"}},
-         403, "origin_rejected"),
-        ("post", "/api/public/leads", {"content": b"{" + b" " * 70000 + b"}",
-                                       "headers": {"Content-Type": "application/json"}}, 413, "payload_too_large"),
+        (
+            "post",
+            "/api/public/leads",
+            {"json": lead_payload(), "headers": {"Origin": "https://evil.example"}},
+            403,
+            "origin_rejected",
+        ),
+        (
+            "post",
+            "/api/public/leads",
+            {"content": b"{" + b" " * 70000 + b"}", "headers": {"Content-Type": "application/json"}},
+            413,
+            "payload_too_large",
+        ),
         ("get", "/api/public/nope", {}, 404, "not_found"),
     ],
 )
@@ -235,9 +251,7 @@ def test_optimistic_concurrency_rejects_stale_updates(admin_client, make_lead, d
     lead_id = _first_lead_id(admin_client)
     assert admin_client.patch(f"/api/admin/leads/{lead_id}", json={"status": "CONTACTED"}).status_code == 200
 
-    stale = admin_client.patch(
-        f"/api/admin/leads/{lead_id}", json={"status": "LOST", "expected_status": "NEW"}
-    )
+    stale = admin_client.patch(f"/api/admin/leads/{lead_id}", json={"status": "LOST", "expected_status": "NEW"})
     assert stale.status_code == 409
     assert stale.json()["code"] == "status_conflict"
     assert db.scalar(select(Lead.status)) == "CONTACTED"

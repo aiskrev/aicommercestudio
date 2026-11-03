@@ -1,0 +1,7 @@
+# Test-only override: switches the read-only client portal on for the portal browser e2e
+# (`.\scripts\test.ps1 -Suite portal`, CI job "Client portal e2e"). Never use it for a deployment:
+# the portal must not be released without explicit approval (docs/CLIENT_PORTAL.md).
+services:
+  api:
+    environment:
+      CLIENT_PORTAL_ENABLED: "true"

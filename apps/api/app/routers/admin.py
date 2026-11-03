@@ -148,8 +148,10 @@ def _solution_details(lead: Lead) -> SolutionDetailsOut | None:
         return None
     try:
         return SolutionDetailsOut.model_validate(
-            {**{k: v for k, v in details.items() if k in SolutionDetailsOut.model_fields and k != "complexity"},
-             "complexity": (details.get("complexity") or {}).get("band")}
+            {
+                **{k: v for k, v in details.items() if k in SolutionDetailsOut.model_fields and k != "complexity"},
+                "complexity": (details.get("complexity") or {}).get("band"),
+            }
         )
     except ValidationError:
         logger.warning("lead_service_details_invalid", extra={"lead": lead.reference})
@@ -231,9 +233,7 @@ def audit_log(
         created_to=created_to,
     )
     items, total = leads.search_audit(db, filters, page, page_size)
-    return AuditPage(
-        items=[AuditLogOut.model_validate(e) for e in items], total=total, page=page, page_size=page_size
-    )
+    return AuditPage(items=[AuditLogOut.model_validate(e) for e in items], total=total, page=page, page_size=page_size)
 
 
 @router.get("/system/status", response_model=SystemStatus)
@@ -288,7 +288,10 @@ def retention_run(payload: RetentionRunIn, ctx: Admin, db: DbSession, settings: 
     configurations = team_service.purge_expired(db)
     saved_assessments = assessment_service.purge_expired(db)
     audit.record(
-        db, "retention.run", actor=ctx.user, entity_type="system",
+        db,
+        "retention.run",
+        actor=ctx.user,
+        entity_type="system",
         details={
             "leads_deleted": result.leads_deleted,
             "audit_entries_deleted": result.audit_entries_deleted,
@@ -411,7 +414,11 @@ def lead_readiness_report(lead_id: uuid.UUID, ctx: Admin, db: DbSession) -> Resp
             status.HTTP_503_SERVICE_UNAVAILABLE, "Отчетът не може да бъде създаден.", "report_unavailable"
         ) from exc
     audit.record(
-        db, "lead.readiness_report_downloaded", actor=ctx.user, entity_type="lead", entity_id=str(lead.id),
+        db,
+        "lead.readiness_report_downloaded",
+        actor=ctx.user,
+        entity_type="lead",
+        entity_id=str(lead.id),
         ip_hash=ctx.ip_hash,
     )
     db.commit()
@@ -449,7 +456,11 @@ def lead_team_report(lead_id: uuid.UUID, ctx: Admin, db: DbSession, settings: Ap
             status.HTTP_503_SERVICE_UNAVAILABLE, "Отчетът не може да бъде създаден.", "report_unavailable"
         ) from exc
     audit.record(
-        db, "lead.team_report_downloaded", actor=ctx.user, entity_type="lead", entity_id=str(lead.id),
+        db,
+        "lead.team_report_downloaded",
+        actor=ctx.user,
+        entity_type="lead",
+        entity_id=str(lead.id),
         ip_hash=ctx.ip_hash,
     )
     db.commit()
@@ -483,9 +494,16 @@ def triage_lead(lead_id: uuid.UUID, ctx: Admin, db: DbSession) -> LeadTriageOut:
         logger.warning("ai_triage_failed", extra={"error": str(exc)})
         raise ApiError(status.HTTP_502_BAD_GATEWAY, "AI услугата не е достъпна в момента.", "ai_unavailable") from exc
     audit.record(
-        db, "ai.lead_triage", actor=ctx.user, entity_type="lead", entity_id=str(lead.id),
-        details={"provider": result.provider, "suggested_service": result.suggested_service,
-                 "priority": result.priority},
+        db,
+        "ai.lead_triage",
+        actor=ctx.user,
+        entity_type="lead",
+        entity_id=str(lead.id),
+        details={
+            "provider": result.provider,
+            "suggested_service": result.suggested_service,
+            "priority": result.priority,
+        },
         ip_hash=ctx.ip_hash,
     )
     db.commit()

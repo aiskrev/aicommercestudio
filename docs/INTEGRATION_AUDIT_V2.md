@@ -67,7 +67,7 @@ Anything not run is marked as such.
 | Real evaluation runner | not built | evaluations are simulated and labelled |
 | Redis rate limiter, job queue | not built | single API instance only |
 | Production deployment, backups, uptime monitoring | not done | DEPLOYMENT.md, owner decisions |
-| Portal browser e2e in CI | not in CI | CI keeps the portal off, so `portal.spec.ts` is skipped there. It was run locally on a portal-on stack |
+| Portal browser e2e in CI | **added** (follow-up) | CI job `e2e-portal` runs `test.ps1 -Suite portal` on a throwaway stack with the portal on; the default stays off |
 
 ## 3. Security findings by severity
 
@@ -82,8 +82,8 @@ No **critical** finding was found.
 | M-3 | Medium | Proposal approval by the same person who wrote the latest version is allowed (one administrator). | accepted for now; documented, easy to tighten |
 | M-4 | Medium (operational) | Migration `0013` needs `CREATEROLE` for the migrating user the first time. A misconfigured production role could also have BYPASSRLS. | documented in SECURITY.md → Production checklist |
 | L-1 | Low | Documentation drift: DATABASE_SCHEMA.md lacked migration `0013`; API_ARCHITECTURE_V2 said no route exists; PRODUCT_MODULES and SECURITY.md (the threat model said RLS was not enabled) were behind the code. | **fixed** |
-| L-2 | Low | `ruff format` is not enforced repo-wide. Formatting the whole tree rewrites 38 files (Ruff *lint* is clean). | open (backlog) |
-| L-3 | Low | No automated test for `prefers-reduced-motion`. | open (backlog) |
+| L-2 | Low | `ruff format` is not enforced repo-wide. Formatting the whole tree rewrites 38 files (Ruff *lint* is clean). | **fixed** in the follow-up branch `chore/audit-backlog-quality`: one formatting commit, `ruff format --check` in the API suite |
+| L-3 | Low | No automated test for `prefers-reduced-motion`. | **fixed** in the same branch: `motion.spec.ts` |
 | I-1 | Info | Opportunity audit entries carry field names and statuses only (no names, no free text), verified by a test. | — |
 
 **Areas reviewed with no finding:**
@@ -238,9 +238,10 @@ conflicting copy was created.
 
 ## 11. Optional post-launch backlog
 
-* Enforce `ruff format` in CI after a one-time formatting commit (L-2).
-* Add a reduced-motion e2e check (L-3).
-* Run the portal browser e2e in CI as a separate job with the portal on in an isolated stack.
+* Done in the follow-up branch:
+  * `ruff format` enforced after a one-time formatting commit (L-2);
+  * a reduced-motion e2e check (L-3);
+  * the portal browser e2e in CI as a separate job with the portal on in an isolated stack.
 * Four-eyes approval for proposals once there are two administrators.
 * An LLM drafter for proposals behind the same rules, with an evaluation set.
 * The first engineering articles (C-5).

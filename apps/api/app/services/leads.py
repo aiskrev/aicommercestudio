@@ -57,9 +57,7 @@ def create_lead(
         website_url=data.website_url if is_quote else None,
         locale=data.locale.value,
         workshop_key=data.workshop.value if data.workshop is not None else None,
-        service_details=(
-            _ai_managed_details(data.ai_managed) if data.ai_managed is not None else None
-        ),
+        service_details=(_ai_managed_details(data.ai_managed) if data.ai_managed is not None else None),
         name=data.name,
         company=data.company,
         email=data.email,
@@ -179,15 +177,25 @@ def apply_update(db: Session, lead: Lead, changes: LeadUpdate, actor: AdminUser,
     now = utcnow()
     if changes.status is not None and lead.status != changes.status.value:
         audit.record(
-            db, "lead.status_changed", actor=actor, entity_type="lead", entity_id=str(lead.id),
-            details={"from": lead.status, "to": changes.status.value}, ip_hash=ip_hash,
+            db,
+            "lead.status_changed",
+            actor=actor,
+            entity_type="lead",
+            entity_id=str(lead.id),
+            details={"from": lead.status, "to": changes.status.value},
+            ip_hash=ip_hash,
         )
         lead.status = changes.status.value
         lead.status_changed_at = now
     if changes.service is not None and lead.service != changes.service.value:
         audit.record(
-            db, "lead.service_changed", actor=actor, entity_type="lead", entity_id=str(lead.id),
-            details={"from": lead.service, "to": changes.service.value}, ip_hash=ip_hash,
+            db,
+            "lead.service_changed",
+            actor=actor,
+            entity_type="lead",
+            entity_id=str(lead.id),
+            details={"from": lead.service, "to": changes.service.value},
+            ip_hash=ip_hash,
         )
         lead.service = changes.service.value
     db.commit()
@@ -198,12 +206,14 @@ def record_view(db: Session, lead: Lead, actor: AdminUser, ip_hash: str | None, 
     """Audit access to personal data, at most once per administrator and lead per throttle window."""
     since = utcnow() - timedelta(minutes=throttle_minutes)
     recent = db.scalar(
-        select(AuditLog.id).where(
+        select(AuditLog.id)
+        .where(
             AuditLog.action == "lead.viewed",
             AuditLog.entity_id == str(lead.id),
             AuditLog.actor_id == actor.id,
             AuditLog.created_at >= since,
-        ).limit(1)
+        )
+        .limit(1)
     )
     if recent is None:
         audit.record(db, "lead.viewed", actor=actor, entity_type="lead", entity_id=str(lead.id), ip_hash=ip_hash)
@@ -315,9 +325,7 @@ def dashboard_stats(db: Session, now: datetime | None = None) -> dict:
         return db.scalar(stmt) or 0
 
     pending_ai = db.scalar(
-        select(func.count())
-        .select_from(AIActionRequest)
-        .where(AIActionRequest.status == AIActionStatus.PENDING.value)
+        select(func.count()).select_from(AIActionRequest).where(AIActionRequest.status == AIActionStatus.PENDING.value)
     )
     return {
         "total_leads": sum(by_status.values()),
@@ -363,8 +371,14 @@ def _expired_leads(
 
 
 def purge_expired(
-    db: Session, lead_retention_days: int, audit_retention_days: int, *, dry_run: bool = False,
-    now: datetime | None = None, readiness_retention_days: int | None = None, team_retention_days: int | None = None,
+    db: Session,
+    lead_retention_days: int,
+    audit_retention_days: int,
+    *,
+    dry_run: bool = False,
+    now: datetime | None = None,
+    readiness_retention_days: int | None = None,
+    team_retention_days: int | None = None,
 ) -> RetentionResult:
     """Delete leads not updated within the retention period and audit entries older than theirs."""
     now = now or utcnow()
@@ -390,8 +404,12 @@ class RetentionPreview:
 
 
 def retention_preview(
-    db: Session, lead_retention_days: int, audit_retention_days: int, now: datetime | None = None,
-    readiness_retention_days: int | None = None, team_retention_days: int | None = None,
+    db: Session,
+    lead_retention_days: int,
+    audit_retention_days: int,
+    now: datetime | None = None,
+    readiness_retention_days: int | None = None,
+    team_retention_days: int | None = None,
 ) -> RetentionPreview:
     now = now or utcnow()
     lead_cutoff = now - timedelta(days=lead_retention_days)

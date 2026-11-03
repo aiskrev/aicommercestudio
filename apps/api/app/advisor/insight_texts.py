@@ -78,9 +78,18 @@ T: dict[str, dict] = {
             "low": "Преди внедряване е нужна подготовка: достъп до данните, отговорни хора или по-прост обхват.",
         },
         "risks": {
-            "data": ("Обработка на {value}", "Нужни са минимизиране на данните, права по роли, срок за съхранение и договор с всеки доставчик, който ги обработва."),
-            "customer": ("Грешки, видими за клиенти", "Грешен отговор или действие стига до клиент. В пилота всяко изходящо съобщение минава през човек."),
-            "write": ("Запис във външни системи", "Автоматичен запис може да промени поръчки, наличности или счетоводство. Записът минава през одобрение и тестова среда."),
+            "data": (
+                "Обработка на {value}",
+                "Нужни са минимизиране на данните, права по роли, срок за съхранение и договор с всеки доставчик, който ги обработва.",
+            ),
+            "customer": (
+                "Грешки, видими за клиенти",
+                "Грешен отговор или действие стига до клиент. В пилота всяко изходящо съобщение минава през човек.",
+            ),
+            "write": (
+                "Запис във външни системи",
+                "Автоматичен запис може да промени поръчки, наличности или счетоводство. Записът минава през одобрение и тестова среда.",
+            ),
         },
         "domains": {
             "ai_agents_automation": "Автоматизация на работния процес и агенти с човешко одобрение.",
@@ -93,8 +102,14 @@ T: dict[str, dict] = {
         },
         "checkpoints": {
             "workflow": "Стъпката е маркирана в оценката като изискваща човешко одобрение.",
-            "customer": ("Одобрение на всяко изходящо съобщение към клиент", "По време на пилота, докато качеството не бъде доказано."),
-            "money": ("Одобрение на плащания и счетоводни записи", "Финансовите действия не се изпълняват автоматично."),
+            "customer": (
+                "Одобрение на всяко изходящо съобщение към клиент",
+                "По време на пилота, докато качеството не бъде доказано.",
+            ),
+            "money": (
+                "Одобрение на плащания и счетоводни записи",
+                "Финансовите действия не се изпълняват автоматично.",
+            ),
         },
         "prereq": {
             "integration": "Достъп до {system} за {access}: API ключ на сервизен акаунт или редовен експорт.",
@@ -115,9 +130,22 @@ T: dict[str, dict] = {
             "human": "Човек одобрява стъпките с външен ефект; решението само подготвя и предлага.",
         },
         "roadmap": {
-            30: ("Първите 30 дни: подготовка", ["Изясняване на достъпа до системите и данните", "Сервизни акаунти и тестова среда", "Набор от реални примери за измерване"]),
-            60: ("До 60 дни: пилот", ["Пилот в един екип или канал с човешко одобрение", "Седмичен преглед на грешките и изключенията"]),
-            90: ("До 90 дни: решение", ["Оценка на пилота спрямо критериите", "Решение: разширяване, промяна или спиране"]),
+            30: (
+                "Първите 30 дни: подготовка",
+                [
+                    "Изясняване на достъпа до системите и данните",
+                    "Сервизни акаунти и тестова среда",
+                    "Набор от реални примери за измерване",
+                ],
+            ),
+            60: (
+                "До 60 дни: пилот",
+                ["Пилот в един екип или канал с човешко одобрение", "Седмичен преглед на грешките и изключенията"],
+            ),
+            90: (
+                "До 90 дни: решение",
+                ["Оценка на пилота спрямо критериите", "Решение: разширяване, промяна или спиране"],
+            ),
         },
         "provenance": "Тези изводи са изчислени от фиксирани правила върху вашите избори и валидираната оценка; не са генерирани от модела и не съдържат прогнози за пари.",
     },
@@ -196,9 +224,18 @@ T: dict[str, dict] = {
             "low": "Preparation is needed before building: data access, named owners or a simpler scope.",
         },
         "risks": {
-            "data": ("Processing {value}", "Data minimisation, role-based access, a retention period and an agreement with every provider that processes it are needed."),
-            "customer": ("Errors visible to customers", "A wrong answer or action reaches a customer. During the pilot every outgoing message goes through a person."),
-            "write": ("Writing to external systems", "Automatic writes can change orders, stock or accounting. Writes go through approval and a test environment."),
+            "data": (
+                "Processing {value}",
+                "Data minimisation, role-based access, a retention period and an agreement with every provider that processes it are needed.",
+            ),
+            "customer": (
+                "Errors visible to customers",
+                "A wrong answer or action reaches a customer. During the pilot every outgoing message goes through a person.",
+            ),
+            "write": (
+                "Writing to external systems",
+                "Automatic writes can change orders, stock or accounting. Writes go through approval and a test environment.",
+            ),
         },
         "domains": {
             "ai_agents_automation": "Workflow automation and agents with human approval.",
@@ -211,8 +248,14 @@ T: dict[str, dict] = {
         },
         "checkpoints": {
             "workflow": "The step is marked in the assessment as requiring human approval.",
-            "customer": ("Approval of every outgoing customer message", "During the pilot, until the quality is proven."),
-            "money": ("Approval of payments and accounting entries", "Financial actions are never executed automatically."),
+            "customer": (
+                "Approval of every outgoing customer message",
+                "During the pilot, until the quality is proven.",
+            ),
+            "money": (
+                "Approval of payments and accounting entries",
+                "Financial actions are never executed automatically.",
+            ),
         },
         "prereq": {
             "integration": "Access to {system} for {access}: a service-account API key or a regular export.",
@@ -233,8 +276,18 @@ T: dict[str, dict] = {
             "human": "A person approves steps with an external effect; the solution only prepares and suggests.",
         },
         "roadmap": {
-            30: ("First 30 days: preparation", ["Clarify access to the systems and data", "Service accounts and a test environment", "A set of real examples to measure against"]),
-            60: ("By 60 days: pilot", ["A pilot in one team or channel with human approval", "A weekly review of errors and exceptions"]),
+            30: (
+                "First 30 days: preparation",
+                [
+                    "Clarify access to the systems and data",
+                    "Service accounts and a test environment",
+                    "A set of real examples to measure against",
+                ],
+            ),
+            60: (
+                "By 60 days: pilot",
+                ["A pilot in one team or channel with human approval", "A weekly review of errors and exceptions"],
+            ),
             90: ("By 90 days: decision", ["Evaluate the pilot against the criteria", "Decide: expand, change or stop"]),
         },
         "provenance": "These insights are computed by fixed rules from your choices and the validated assessment; they are not generated by the model and contain no money forecasts.",

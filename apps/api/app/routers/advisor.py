@@ -75,8 +75,8 @@ def advisor_status(request: Request, settings: AppSettings) -> AdvisorStatus:
     dependencies=[Depends(advisor_rate_limit)],
     summary="Generate an automation assessment (no personal data required)",
     description=(
-        "contract_version \"1\" (default) returns the original response unchanged. "
-        "contract_version \"2\" requires `context` and also returns `insights`."
+        'contract_version "1" (default) returns the original response unchanged. '
+        'contract_version "2" requires `context` and also returns `insights`.'
     ),
 )
 def create_assessment(

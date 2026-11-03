@@ -109,8 +109,17 @@ def test_demo_assessment_has_every_section_and_is_labelled(client, db):
     assert "Демонстрационен режим" in body["disclaimer"]
     assessment = body["assessment"]
     for key in (
-        "problem_summary", "opportunities", "proposed_workflow", "integrations", "human_approvals",
-        "data_protection", "risks", "complexity", "phases", "clarification_questions", "next_steps",
+        "problem_summary",
+        "opportunities",
+        "proposed_workflow",
+        "integrations",
+        "human_approvals",
+        "data_protection",
+        "risks",
+        "complexity",
+        "phases",
+        "clarification_questions",
+        "next_steps",
     ):
         assert assessment[key], key
     assert assessment["complexity"]["level"] in ("low", "medium", "high")

@@ -98,8 +98,15 @@ def _register_failure(db: DbSession, settings: Settings, user: AdminUser, ip_has
         return False
     user.locked_until = utcnow() + timedelta(minutes=settings.login_lockout_minutes)
     user.failed_login_count = 0
-    audit.record(db, "auth.account_locked", actor_label="system", entity_type="admin_user",
-                 entity_id=str(user.id), details={"minutes": settings.login_lockout_minutes}, ip_hash=ip_hash)
+    audit.record(
+        db,
+        "auth.account_locked",
+        actor_label="system",
+        entity_type="admin_user",
+        entity_id=str(user.id),
+        details={"minutes": settings.login_lockout_minutes},
+        ip_hash=ip_hash,
+    )
     return True
 
 
@@ -135,8 +142,15 @@ def _complete_login(
     user.last_login_at = utcnow()
     user.failed_login_count = 0
     user.locked_until = None
-    audit.record(db, "auth.login", actor=user, entity_type="admin_user", entity_id=str(user.id),
-                 details=details or None, ip_hash=session.ip_hash)
+    audit.record(
+        db,
+        "auth.login",
+        actor=user,
+        entity_type="admin_user",
+        entity_id=str(user.id),
+        details=details or None,
+        ip_hash=session.ip_hash,
+    )
     db.commit()
     return SessionOut(user=AdminUserOut.model_validate(user), expires_at=session.expires_at)
 
@@ -155,8 +169,14 @@ def login(payload: LoginIn, request: Request, response: Response, db: DbSession,
 
     if user is not None and user.locked_until is not None and user.locked_until > now:
         # Locked accounts answer exactly like the rate limiter (no account enumeration).
-        audit.record(db, "auth.login_blocked", actor_label="anonymous", entity_type="admin_user",
-                     entity_id=str(user.id), ip_hash=ip_hash)
+        audit.record(
+            db,
+            "auth.login_blocked",
+            actor_label="anonymous",
+            entity_type="admin_user",
+            entity_id=str(user.id),
+            ip_hash=ip_hash,
+        )
         db.commit()
         raise rate_limited(int((user.locked_until - now).total_seconds()) + 1)
 
@@ -182,8 +202,15 @@ def login(payload: LoginIn, request: Request, response: Response, db: DbSession,
         # cannot be retried indefinitely by re-entering the correct password in between.
         pending = AdminMfaPending.VERIFY.value if user.mfa_enabled else AdminMfaPending.ENROL.value
         session = _new_session(db, settings, request, response, user, pending)
-        audit.record(db, "auth.mfa_challenge", actor=user, entity_type="admin_user", entity_id=str(user.id),
-                     details={"step": pending}, ip_hash=ip_hash)
+        audit.record(
+            db,
+            "auth.mfa_challenge",
+            actor=user,
+            entity_type="admin_user",
+            entity_id=str(user.id),
+            details={"step": pending},
+            ip_hash=ip_hash,
+        )
         db.commit()
         return SessionOut(user=AdminUserOut.model_validate(user), expires_at=session.expires_at, mfa=pending)
 
@@ -200,7 +227,11 @@ def _already_enabled() -> ApiError:
 
 @router.post("/mfa/verify", response_model=SessionOut)
 def mfa_verify(
-    payload: MfaCodeIn, ctx: MfaVerifySession, request: Request, response: Response, db: DbSession,
+    payload: MfaCodeIn,
+    ctx: MfaVerifySession,
+    request: Request,
+    response: Response,
+    db: DbSession,
     settings: AppSettings,
 ) -> SessionOut:
     """Second step of sign-in: an authenticator code or a one-time recovery code."""
@@ -209,8 +240,14 @@ def mfa_verify(
     user = admin_mfa.lock_user(db, ctx.user.id)
     if user.locked_until is not None and user.locked_until > now:
         ctx.session.revoked_at = now
-        audit.record(db, "auth.login_blocked", actor_label="anonymous", entity_type="admin_user",
-                     entity_id=str(user.id), ip_hash=ctx.ip_hash)
+        audit.record(
+            db,
+            "auth.login_blocked",
+            actor_label="anonymous",
+            entity_type="admin_user",
+            entity_id=str(user.id),
+            ip_hash=ctx.ip_hash,
+        )
         db.commit()
         raise rate_limited(int((user.locked_until - now).total_seconds()) + 1)
 
@@ -222,8 +259,14 @@ def mfa_verify(
     ):
         method = "recovery_code"
     if method is None:
-        audit.record(db, "auth.mfa_failed", actor_label="anonymous", entity_type="admin_user",
-                     entity_id=str(user.id), ip_hash=ctx.ip_hash)
+        audit.record(
+            db,
+            "auth.mfa_failed",
+            actor_label="anonymous",
+            entity_type="admin_user",
+            entity_id=str(user.id),
+            ip_hash=ctx.ip_hash,
+        )
         if _register_failure(db, settings, user, ctx.ip_hash):
             ctx.session.revoked_at = now
             db.commit()
@@ -232,9 +275,15 @@ def mfa_verify(
         raise _code_invalid()
 
     if method == "recovery_code":
-        audit.record(db, "auth.mfa_recovery_code_used", actor=user, entity_type="admin_user",
-                     entity_id=str(user.id), details={"remaining": admin_mfa.recovery_codes_remaining(db, user)},
-                     ip_hash=ctx.ip_hash)
+        audit.record(
+            db,
+            "auth.mfa_recovery_code_used",
+            actor=user,
+            entity_type="admin_user",
+            entity_id=str(user.id),
+            details={"remaining": admin_mfa.recovery_codes_remaining(db, user)},
+            ip_hash=ctx.ip_hash,
+        )
     ctx.session.revoked_at = now
     return _complete_login(db, settings, request, response, user, mfa=method)
 
@@ -258,8 +307,9 @@ def mfa_setup(ctx: MfaSetupSession, response: Response, db: DbSession, settings:
     if user.mfa_enabled:
         raise _already_enabled()
     setup = admin_mfa.start_setup(settings, user)
-    audit.record(db, "auth.mfa_setup_started", actor=user, entity_type="admin_user", entity_id=str(user.id),
-                 ip_hash=ctx.ip_hash)
+    audit.record(
+        db, "auth.mfa_setup_started", actor=user, entity_type="admin_user", entity_id=str(user.id), ip_hash=ctx.ip_hash
+    )
     db.commit()
     response.headers["Cache-Control"] = "no-store"
     return MfaSetupOut(**setup)
@@ -267,7 +317,11 @@ def mfa_setup(ctx: MfaSetupSession, response: Response, db: DbSession, settings:
 
 @router.post("/mfa/confirm", response_model=MfaConfirmOut)
 def mfa_confirm(
-    payload: MfaCodeIn, ctx: MfaSetupSession, request: Request, response: Response, db: DbSession,
+    payload: MfaCodeIn,
+    ctx: MfaSetupSession,
+    request: Request,
+    response: Response,
+    db: DbSession,
     settings: AppSettings,
 ) -> MfaConfirmOut:
     """Activate the key with a first code. Every other session of the account is ended; a pending
@@ -280,14 +334,27 @@ def mfa_confirm(
         raise ApiError(status.HTTP_409_CONFLICT, "Първо започнете настройката.", "mfa_setup_missing")
     codes = admin_mfa.confirm_setup(db, settings, user, payload.code)
     if codes is None:
-        audit.record(db, "auth.mfa_setup_failed", actor=user, entity_type="admin_user", entity_id=str(user.id),
-                     ip_hash=ctx.ip_hash)
+        audit.record(
+            db,
+            "auth.mfa_setup_failed",
+            actor=user,
+            entity_type="admin_user",
+            entity_id=str(user.id),
+            ip_hash=ctx.ip_hash,
+        )
         db.commit()
         raise _code_invalid()
     at_sign_in = ctx.session.mfa_pending is not None
     revoked = admin_mfa.revoke_sessions(db, user, keep=None if at_sign_in else ctx.session.id)
-    audit.record(db, "auth.mfa_enabled", actor=user, entity_type="admin_user", entity_id=str(user.id),
-                 details={"sessions_revoked": revoked, "at_sign_in": at_sign_in}, ip_hash=ctx.ip_hash)
+    audit.record(
+        db,
+        "auth.mfa_enabled",
+        actor=user,
+        entity_type="admin_user",
+        entity_id=str(user.id),
+        details={"sessions_revoked": revoked, "at_sign_in": at_sign_in},
+        ip_hash=ctx.ip_hash,
+    )
     response.headers["Cache-Control"] = "no-store"
     if at_sign_in:
         session = _complete_login(db, settings, request, response, user, mfa="enrolled")
@@ -302,8 +369,9 @@ def _require_current_code(db: DbSession, settings: Settings, ctx: AdminContext, 
     if not user.mfa_enabled:
         raise ApiError(status.HTTP_409_CONFLICT, "Двуфакторното удостоверяване не е включено.", "mfa_not_enabled")
     if not admin_mfa.check_totp(settings, user, code):
-        audit.record(db, "auth.mfa_failed", actor=user, entity_type="admin_user", entity_id=str(user.id),
-                     ip_hash=ctx.ip_hash)
+        audit.record(
+            db, "auth.mfa_failed", actor=user, entity_type="admin_user", entity_id=str(user.id), ip_hash=ctx.ip_hash
+        )
         if _register_failure(db, settings, user, ctx.ip_hash):
             admin_mfa.revoke_sessions(db, user)
         db.commit()
@@ -319,8 +387,14 @@ def mfa_recovery_codes(
     _enforce_login_limits(request, settings, ctx.user.email)
     user = _require_current_code(db, settings, ctx, payload.code)
     codes = admin_mfa.replace_recovery_codes(db, settings, user)
-    audit.record(db, "auth.mfa_recovery_codes_replaced", actor=user, entity_type="admin_user",
-                 entity_id=str(user.id), ip_hash=ctx.ip_hash)
+    audit.record(
+        db,
+        "auth.mfa_recovery_codes_replaced",
+        actor=user,
+        entity_type="admin_user",
+        entity_id=str(user.id),
+        ip_hash=ctx.ip_hash,
+    )
     db.commit()
     response.headers["Cache-Control"] = "no-store"
     return MfaRecoveryCodesOut(recovery_codes=codes)
@@ -334,8 +408,14 @@ def mfa_disable(payload: MfaDisableIn, ctx: Staff, request: Request, db: DbSessi
         raise ApiError(status.HTTP_409_CONFLICT, "Двуфакторното удостоверяване е задължително.", "mfa_policy_required")
     _enforce_login_limits(request, settings, ctx.user.email)
     if not verify_password(ctx.user.password_hash, payload.password):
-        audit.record(db, "auth.mfa_disable_failed", actor=ctx.user, entity_type="admin_user",
-                     entity_id=str(ctx.user.id), ip_hash=ctx.ip_hash)
+        audit.record(
+            db,
+            "auth.mfa_disable_failed",
+            actor=ctx.user,
+            entity_type="admin_user",
+            entity_id=str(ctx.user.id),
+            ip_hash=ctx.ip_hash,
+        )
         if _register_failure(db, settings, ctx.user, ctx.ip_hash):
             admin_mfa.revoke_sessions(db, ctx.user)
         db.commit()
@@ -343,8 +423,15 @@ def mfa_disable(payload: MfaDisableIn, ctx: Staff, request: Request, db: DbSessi
     user = _require_current_code(db, settings, ctx, payload.code)
     admin_mfa.clear(db, user)
     revoked = admin_mfa.revoke_sessions(db, user, keep=ctx.session.id)
-    audit.record(db, "auth.mfa_disabled", actor=user, entity_type="admin_user", entity_id=str(user.id),
-                 details={"sessions_revoked": revoked}, ip_hash=ctx.ip_hash)
+    audit.record(
+        db,
+        "auth.mfa_disabled",
+        actor=user,
+        entity_type="admin_user",
+        entity_id=str(user.id),
+        details={"sessions_revoked": revoked},
+        ip_hash=ctx.ip_hash,
+    )
     db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -353,8 +440,9 @@ def mfa_disable(payload: MfaDisableIn, ctx: Staff, request: Request, db: DbSessi
 def logout(ctx: AnySession, response: Response, db: DbSession, settings: AppSettings) -> Response:
     """End the current session, including a pending one (cancelling the MFA step)."""
     ctx.session.revoked_at = utcnow()
-    audit.record(db, "auth.logout", actor=ctx.user, entity_type="admin_user", entity_id=str(ctx.user.id),
-                 ip_hash=ctx.ip_hash)
+    audit.record(
+        db, "auth.logout", actor=ctx.user, entity_type="admin_user", entity_id=str(ctx.user.id), ip_hash=ctx.ip_hash
+    )
     db.commit()
     response.status_code = status.HTTP_204_NO_CONTENT
     _clear_session_cookies(response, settings)
@@ -370,8 +458,15 @@ def logout_all(ctx: Staff, response: Response, db: DbSession, settings: AppSetti
         .where(AdminSession.user_id == ctx.user.id, AdminSession.revoked_at.is_(None))
         .values(revoked_at=now)
     )
-    audit.record(db, "auth.logout_all", actor=ctx.user, entity_type="admin_user", entity_id=str(ctx.user.id),
-                 details={"sessions_revoked": result.rowcount}, ip_hash=ctx.ip_hash)
+    audit.record(
+        db,
+        "auth.logout_all",
+        actor=ctx.user,
+        entity_type="admin_user",
+        entity_id=str(ctx.user.id),
+        details={"sessions_revoked": result.rowcount},
+        ip_hash=ctx.ip_hash,
+    )
     db.commit()
     _clear_session_cookies(response, settings)
     return LogoutAllOut(sessions_revoked=result.rowcount)

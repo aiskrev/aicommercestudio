@@ -1,19 +1,19 @@
 """Operational commands.
 
-    python -m app.cli seed                      # bootstrap admin (+ synthetic data in development) + catalogue
-    python -m app.cli create-admin --email x@y  # password read from ADMIN_PASSWORD env or prompted
-    python -m app.cli set-password --email x@y  # reset a password, clear lockout, revoke sessions
-    python -m app.cli reset-mfa --email x@y     # remove a lost second factor (TOTP + recovery codes), revoke sessions
-    python -m app.cli maintenance [--dry-run]   # GDPR retention + expired session cleanup
-    python -m app.cli purge-synthetic           # remove synthetic development data
-    python -m app.cli ops-create-org --slug s --name n --owner-email x@y  # AI operations tenant + owner
-    python -m app.cli ops-seed-demo --owner-email x@y   # labelled sample registry (not in production)
-    python -m app.cli ops-purge-demo            # remove demo organisations
-    python -m app.cli ops-retention             # apply ops retention (runs, evaluation results)
-    python -m app.cli set-role --email x@y --role editor  # staff role: admin | editor | viewer
-    python -m app.cli catalogue-seed [--dry-run] [--reconcile]  # create (or mirror) the catalogue entries
-    python -m app.cli catalogue-check           # BG/EN content, slugs and lead categories of the catalogue
-    python -m app.cli catalogue-purge --yes     # delete catalogue rows (rollback helper; leads unaffected)
+python -m app.cli seed                      # bootstrap admin (+ synthetic data in development) + catalogue
+python -m app.cli create-admin --email x@y  # password read from ADMIN_PASSWORD env or prompted
+python -m app.cli set-password --email x@y  # reset a password, clear lockout, revoke sessions
+python -m app.cli reset-mfa --email x@y     # remove a lost second factor (TOTP + recovery codes), revoke sessions
+python -m app.cli maintenance [--dry-run]   # GDPR retention + expired session cleanup
+python -m app.cli purge-synthetic           # remove synthetic development data
+python -m app.cli ops-create-org --slug s --name n --owner-email x@y  # AI operations tenant + owner
+python -m app.cli ops-seed-demo --owner-email x@y   # labelled sample registry (not in production)
+python -m app.cli ops-purge-demo            # remove demo organisations
+python -m app.cli ops-retention             # apply ops retention (runs, evaluation results)
+python -m app.cli set-role --email x@y --role editor  # staff role: admin | editor | viewer
+python -m app.cli catalogue-seed [--dry-run] [--reconcile]  # create (or mirror) the catalogue entries
+python -m app.cli catalogue-check           # BG/EN content, slugs and lead categories of the catalogue
+python -m app.cli catalogue-purge --yes     # delete catalogue rows (rollback helper; leads unaffected)
 """
 
 from __future__ import annotations
@@ -45,20 +45,62 @@ SYNTHETIC_SOURCE = "synthetic_seed"
 
 # Clearly fake development records. Reserved example.com domain; no real people or companies.
 _SYNTHETIC_LEADS = [
-    ("maintenance", "Иван Тестов", "Демо Мода ЕООД (синтетични данни)", LeadStatus.NEW, 1,
-     "Магазинът ни на WooCommerce стана бавен след последното обновяване и количката понякога дава грешка."),
-    ("seo", "Мария Примерова", "Примерен Дом ООД (синтетични данни)", LeadStatus.CONTACTED, 4,
-     "Искаме технически SEO одит на категориите — органичният трафик спада от няколко месеца."),
-    ("ai_tools", "Георги Демов", "Тест Електроникс АД (синтетични данни)", LeadStatus.QUALIFIED, 9,
-     "Търсим AI асистент, който да отговаря на въпроси за наличности и доставка въз основа на нашите данни."),
-    ("automation", "Елена Образцова", "Образец Дистрибуция ЕООД (синтетични данни)", LeadStatus.PROPOSAL, 15,
-     "Ръчно обработваме входящите поръчки по имейл и ги въвеждаме в ERP. Искаме автоматизация с одобрение."),
-    ("analytics", "Петър Пробов", "Проба Козметика ООД (синтетични данни)", LeadStatus.WON, 24,
-     "Нуждаем се от табло с продажби по продукти и анализ на изоставените колички в GA4."),
-    ("integrations", "Никола Шаблонов", "Шаблон Б2Б ЕООД (синтетични данни)", LeadStatus.LOST, 33,
-     "Трябва ни синхронизация на наличности между Shopify и склада чрез API и webhooks."),
-    ("audit", "Десислава Макетова", "Макет Спорт ООД (синтетични данни)", LeadStatus.NEW, 0,
-     "Бихме искали цялостен технически одит на магазина и план за подобрения за следващите месеци."),
+    (
+        "maintenance",
+        "Иван Тестов",
+        "Демо Мода ЕООД (синтетични данни)",
+        LeadStatus.NEW,
+        1,
+        "Магазинът ни на WooCommerce стана бавен след последното обновяване и количката понякога дава грешка.",
+    ),
+    (
+        "seo",
+        "Мария Примерова",
+        "Примерен Дом ООД (синтетични данни)",
+        LeadStatus.CONTACTED,
+        4,
+        "Искаме технически SEO одит на категориите — органичният трафик спада от няколко месеца.",
+    ),
+    (
+        "ai_tools",
+        "Георги Демов",
+        "Тест Електроникс АД (синтетични данни)",
+        LeadStatus.QUALIFIED,
+        9,
+        "Търсим AI асистент, който да отговаря на въпроси за наличности и доставка въз основа на нашите данни.",
+    ),
+    (
+        "automation",
+        "Елена Образцова",
+        "Образец Дистрибуция ЕООД (синтетични данни)",
+        LeadStatus.PROPOSAL,
+        15,
+        "Ръчно обработваме входящите поръчки по имейл и ги въвеждаме в ERP. Искаме автоматизация с одобрение.",
+    ),
+    (
+        "analytics",
+        "Петър Пробов",
+        "Проба Козметика ООД (синтетични данни)",
+        LeadStatus.WON,
+        24,
+        "Нуждаем се от табло с продажби по продукти и анализ на изоставените колички в GA4.",
+    ),
+    (
+        "integrations",
+        "Никола Шаблонов",
+        "Шаблон Б2Б ЕООД (синтетични данни)",
+        LeadStatus.LOST,
+        33,
+        "Трябва ни синхронизация на наличности между Shopify и склада чрез API и webhooks.",
+    ),
+    (
+        "audit",
+        "Десислава Макетова",
+        "Макет Спорт ООД (синтетични данни)",
+        LeadStatus.NEW,
+        0,
+        "Бихме искали цялостен технически одит на магазина и план за подобрения за следващите месеци.",
+    ),
 ]
 
 
@@ -87,7 +129,10 @@ def seed_synthetic_data(db: Session, admin: AdminUser | None) -> int:
     for index, (service, name, company, status, days_ago, message) in enumerate(_SYNTHETIC_LEADS, start=1):
         moment = now - timedelta(days=days_ago, hours=index)
         lead = Lead(
-            service=service, submitted_service=service, name=name, company=company,
+            service=service,
+            submitted_service=service,
+            name=name,
+            company=company,
             **(
                 {
                     "inquiry_type": "quote",
@@ -98,19 +143,30 @@ def seed_synthetic_data(db: Session, admin: AdminUser | None) -> int:
                 if index % 2 == 0
                 else {}
             ),
-            email=f"demo.lead{index}@example.com", phone=None,
+            email=f"demo.lead{index}@example.com",
+            phone=None,
             message=f"[СИНТЕТИЧНИ ДАННИ] {message}",
-            status=status.value, source=SYNTHETIC_SOURCE,
-            privacy_acknowledged_at=moment, privacy_notice_version="synthetic",
-            marketing_consent=index % 3 == 0, marketing_consent_at=moment if index % 3 == 0 else None,
-            created_at=moment, updated_at=moment,
+            status=status.value,
+            source=SYNTHETIC_SOURCE,
+            privacy_acknowledged_at=moment,
+            privacy_notice_version="synthetic",
+            marketing_consent=index % 3 == 0,
+            marketing_consent_at=moment if index % 3 == 0 else None,
+            created_at=moment,
+            updated_at=moment,
             status_changed_at=moment if status != LeadStatus.NEW else None,
         )
         db.add(lead)
         db.flush()
         if admin and status != LeadStatus.NEW:
-            db.add(LeadNote(lead_id=lead.id, author_id=admin.id, created_at=moment,
-                            body="[Синтетична бележка] Първоначален разговор за уточняване на обхвата."))
+            db.add(
+                LeadNote(
+                    lead_id=lead.id,
+                    author_id=admin.id,
+                    created_at=moment,
+                    body="[Синтетична бележка] Първоначален разговор за уточняване на обхвата.",
+                )
+            )
         created += 1
     audit.record(db, "seed.synthetic_data", actor_label="cli", details={"leads": created})
     db.commit()
@@ -198,7 +254,11 @@ def set_admin_password(db: Session, email: str, password: str) -> int:
         .values(revoked_at=now)
     ).rowcount
     audit.record(
-        db, "admin.password_reset", actor_label="cli", entity_type="admin_user", entity_id=str(user.id),
+        db,
+        "admin.password_reset",
+        actor_label="cli",
+        entity_type="admin_user",
+        entity_id=str(user.id),
         details={"sessions_revoked": revoked},
     )
     db.commit()
@@ -230,7 +290,11 @@ def reset_admin_mfa(db: Session, email: str) -> int:
     admin_mfa.clear(db, user)
     revoked = admin_mfa.revoke_sessions(db, user)
     audit.record(
-        db, "admin.mfa_reset", actor_label="cli", entity_type="admin_user", entity_id=str(user.id),
+        db,
+        "admin.mfa_reset",
+        actor_label="cli",
+        entity_type="admin_user",
+        entity_id=str(user.id),
         details={"was_enabled": was_enabled, "sessions_revoked": revoked},
     )
     db.commit()
@@ -274,9 +338,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         if not args.dry_run:
             cutoff = utcnow() - timedelta(days=1)
             sessions_removed = db.execute(
-                delete(AdminSession).where(
-                    or_(AdminSession.expires_at < utcnow(), AdminSession.revoked_at < cutoff)
-                )
+                delete(AdminSession).where(or_(AdminSession.expires_at < utcnow(), AdminSession.revoked_at < cutoff))
             ).rowcount
             db.commit()
     prefix = "[dry-run] would delete" if args.dry_run else "deleted"
@@ -325,8 +387,9 @@ def cmd_ops_retention(args: argparse.Namespace) -> int:
 
     with get_sessionmaker()() as db:
         removed = purge_expired(db)
-    _print(f"[ops-retention] Removed execution records: {removed['runs']}, "
-           f"evaluation results: {removed['eval_results']}")
+    _print(
+        f"[ops-retention] Removed execution records: {removed['runs']}, evaluation results: {removed['eval_results']}"
+    )
     return 0
 
 

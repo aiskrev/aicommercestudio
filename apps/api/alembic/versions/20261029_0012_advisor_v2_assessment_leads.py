@@ -32,9 +32,7 @@ def upgrade() -> None:
     op.add_column(
         "advisor_assessments", sa.Column("contract_version", sa.String(4), server_default="1", nullable=False)
     )
-    op.add_column(
-        "advisor_assessments", sa.Column("insights", postgresql.JSONB(astext_type=sa.Text()), nullable=True)
-    )
+    op.add_column("advisor_assessments", sa.Column("insights", postgresql.JSONB(astext_type=sa.Text()), nullable=True))
     op.add_column("assessment_results", sa.Column("lead_id", sa.Uuid(), nullable=True))
     op.add_column("assessment_results", sa.Column("linked_at", sa.DateTime(timezone=True), nullable=True))
     op.create_foreign_key(

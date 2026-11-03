@@ -99,9 +99,7 @@ def test_state_changing_request_requires_csrf_token(admin_client, make_lead):
     wrong = admin_client.patch(
         f"/api/admin/leads/{lead_id}", json={"status": "CONTACTED"}, headers={"X-CSRF-Token": "forged"}
     )
-    ok = admin_client.patch(
-        f"/api/admin/leads/{lead_id}", json={"status": "CONTACTED"}, headers={"X-CSRF-Token": csrf}
-    )
+    ok = admin_client.patch(f"/api/admin/leads/{lead_id}", json={"status": "CONTACTED"}, headers={"X-CSRF-Token": csrf})
     assert missing.status_code == 403
     assert wrong.status_code == 403
     assert ok.status_code == 200

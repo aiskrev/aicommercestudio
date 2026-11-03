@@ -659,5 +659,3 @@ class AIActionOut(BaseModel):
 class AIActionDecision(StrictModel):
     decision: Literal["approve", "reject"]
     comment: str | None = Field(default=None, max_length=1000)
-
-

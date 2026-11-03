@@ -44,9 +44,7 @@ def upgrade() -> None:
     op.create_check_constraint("ck_leads_submitted_service", "leads", f"submitted_service IN ({SERVICES})")
     op.create_check_constraint("ck_leads_inquiry_type", "leads", f"inquiry_type IN ({INQUIRY_TYPES})")
     op.create_check_constraint("ck_leads_platform", "leads", f"platform IS NULL OR platform IN ({PLATFORMS})")
-    op.create_check_constraint(
-        "ck_leads_budget_range", "leads", f"budget_range IS NULL OR budget_range IN ({BUDGETS})"
-    )
+    op.create_check_constraint("ck_leads_budget_range", "leads", f"budget_range IS NULL OR budget_range IN ({BUDGETS})")
     op.create_check_constraint("ck_leads_timeline", "leads", f"timeline IS NULL OR timeline IN ({TIMELINES})")
     op.create_index("ix_leads_service", "leads", ["service"])
     op.create_index("ix_leads_inquiry_type", "leads", ["inquiry_type"])

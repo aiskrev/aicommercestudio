@@ -147,12 +147,7 @@ def _expired(cutoff: datetime):
 
 def count_expired(db: Session, now: datetime | None = None) -> int:
     cutoff = now or utcnow()
-    return (
-        db.scalar(
-            select(func.count()).select_from(AssessmentResultRecord).where(_expired(cutoff))
-        )
-        or 0
-    )
+    return db.scalar(select(func.count()).select_from(AssessmentResultRecord).where(_expired(cutoff))) or 0
 
 
 def purge_expired(db: Session, *, dry_run: bool = False, now: datetime | None = None) -> AssessmentRetention:

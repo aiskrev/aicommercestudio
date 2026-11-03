@@ -4,9 +4,10 @@ All suites run in Docker; no local Node or Python is needed.
 
 ```powershell
 .\scripts\test.ps1                 # api + web + e2e
-.\scripts\test.ps1 -Suite api      # docker compose --profile test run --rm --build api-tests  (+ ruff, docs sync)
+.\scripts\test.ps1 -Suite api      # docker compose --profile test run --rm --build api-tests  (+ ruff check, ruff format --check, docs sync)
 .\scripts\test.ps1 -Suite web      # docker compose --profile test run --rm --build web-tests
 .\scripts\test.ps1 -Suite e2e      # docker compose up -d --build; docker compose --profile test run --rm --build e2e
+.\scripts\test.ps1 -Suite portal   # portal browser e2e on a stack with the portal ON (docker-compose.portal-e2e.yml), then back to the default
 .\scripts\test.ps1 -Suite audit    # pip-audit + npm audit --omit=dev
 .\scripts\lighthouse.ps1           # Lighthouse lab baseline (not a test; see PERFORMANCE_BASELINE.md)
 ```
@@ -36,6 +37,7 @@ values never printed) and calls **the same `scripts/test.ps1` suites** in the sa
 | `api` | `./scripts/test.ps1 -Suite api` | pytest against PostgreSQL + ruff |
 | `web` | `./scripts/test.ps1 -Suite web` | then `docker compose build web` (production build) |
 | `e2e` | `./scripts/test.ps1 -Suite e2e` | on failure: API/web logs and the Playwright HTML report as an artifact (7 days) |
+| `e2e-portal` | `./scripts/test.ps1 -Suite portal` | the client portal switched on in a throwaway test stack; `E2E_REQUIRE_PORTAL=1` turns a skip into a failure; same failure artifacts |
 
 `.github/workflows/audit.yml` runs `./scripts/test.ps1 -Suite audit` weekly (Monday 05:17 UTC) and
 on demand — not on pull requests, because new advisories appear without code changes.
@@ -154,7 +156,8 @@ and Pixel 7 emulation. Admin credentials come from `.env`.
 | `operations.spec.ts` | AI Managed Services operating areas and planned portal (BG/EN); `/admin/operations` behind login; `/api/ops` 401 anonymously |
 | `ops-platform.spec.ts` | client portal off (page says so, API 404, noindex); with admin credentials on the seeded demo organisation: registry draft → submit → approve (integrity shown), synthetic evaluation run marked simulated, synthetic usage records shown as not live, incident recorded and triaged with only the allowed next steps |
 | `workshops.spec.ts` | Workshops & Advisory: BG catalogue (10 offers, 3 groups, no-prices notice, no currency or guarantee), self-canonical and reciprocal hreflang, JSON-LD without offers or ratings; an EN offer page with every section and related links, "no articles yet" instead of invented ones; the enquiry CTA opens the contact form with the workshop; a BG enquiry sends `workshop`; footer, "Start here" menu, industries and a domain hub link the catalogue; the engineering topic is `noindex`, out of the sitemap and points to workshops; language switch and no overflow at 360 px |
-| `portal.spec.ts` | **only on a stack started with `CLIENT_PORTAL_ENABLED=true`** (skips itself otherwise; see CLIENT_PORTAL.md): staff invitation (refused for the demo organisation) → activation in the browser (token removed from the URL) → password + TOTP → sign-in with a fresh code → dashboard with the not-connected note → a query parameter never selects another tenant, writes 405, admin and Ops APIs 401 → sign-out revokes the session; anonymous 401 |
+| `motion.spec.ts` | `prefers-reduced-motion: reduce` on five pages: no animation or transition longer than an instant on any element or pseudo-element, scroll reveals off and content fully visible, decorative motion hidden, the services menu opens without an entry animation; a no-preference control run proves the check detects motion |
+| `portal.spec.ts` | **only on a stack started with `CLIENT_PORTAL_ENABLED=true`** (`-Suite portal`, CI job `e2e-portal`; skips itself in the default suite; see CLIENT_PORTAL.md): staff invitation (refused for the demo organisation) → activation in the browser (token removed from the URL) → password + TOTP → sign-in with a fresh code → dashboard with the not-connected note → a query parameter never selects another tenant, writes 405, admin and Ops APIs 401 → sign-out revokes the session; anonymous 401 |
 | `reference.spec.ts` | scenario library BG (20 fictional cards, 7 category anchors), scenario sections, diagram and interfaces, links to patterns, language switch with localized slugs; pattern search, status legend, no configured integrations; pattern detail; sitemap and `robots.txt`; one H1 and no overflow on desktop and phone |
 | `advisor.spec.ts` | demo-mode journey: fill the advisor form → structured result with demo disclaimer and approval flags, no money/percentage figures → consultation linked to the assessment → admin sees `AI оценка #<ref>` on the lead; API rejects invalid input and personal-data fields; promo link from `/ai-resheniya` |
 
