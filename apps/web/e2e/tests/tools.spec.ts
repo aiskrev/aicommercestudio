@@ -30,10 +30,10 @@ test("AI readiness assessment runs end to end in Bulgarian", async ({ page }) =>
   await expect(result.getByRole("heading", { name: "Три приоритетни действия" })).toBeVisible();
   await expect(result.getByRole("heading", { name: "План за първите 90 дни" })).toBeVisible();
   await expect(result.getByText("Как се изчислява оценката")).toBeVisible();
-  // Relevant workshops: the domain hubs that list the fixed-scope formats.
-  await expect(result.getByTestId("readiness-workshops").getByRole("link", { name: "AI стратегия и трансформация" })).toHaveAttribute(
+  // Relevant workshops: the consultant-led formats that continue from this assessment.
+  await expect(result.getByTestId("readiness-workshops").getByRole("link", { name: "Работна среща за AI стратегия" })).toHaveAttribute(
     "href",
-    "/bg/uslugi/ai-strategiya-i-transformatsiya",
+    "/bg/rabotni-sreshti/ai-strategiya-rabotna-sreshta",
   );
   await expect(result.getByRole("link", { name: "Заяви консултация" })).toHaveAttribute("href", "/bg/kontakti?usluga=audit");
   await expect(result.getByRole("button", { name: "Изтегли PDF отчета" })).toBeVisible();

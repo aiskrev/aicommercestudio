@@ -156,6 +156,103 @@ D7 is decided.
 * **No item is linked to an unpublished hub.** The tool registry's "available-only" principle
   applies to domain pages too (a `domainAvailable` flag).
 
+### 5.5 Workshops & Advisory catalogue (`/bg/rabotni-sreshti` ↔ `/en/workshops`)
+
+**Status:** implemented on 2026-11-03. This resolves IA-D3 of INFORMATION_ARCHITECTURE_V2: with ten
+formats, the catalogue is a page of its own, not a section of hub J.
+
+* **Code.**
+  * Structure: `lib/workshop-slugs.ts` and `lib/workshops.ts` (kind, domains, assessments, scenarios,
+    patterns).
+  * Texts: `content/{bg,en}/workshops.ts`.
+  * Keys and titles shared with the API: `lib/workshop-keys.json` (an identical copy is
+    `apps/api/app/workshop_keys.json`, and `scripts/test.ps1` compares the two).
+* **The ten offers:**
+
+  | # | Offer | Kind |
+  | --- | --- | --- |
+  | 1 | AI Strategy Discovery Workshop (Работна среща за AI стратегия) | workshop |
+  | 2 | AI Readiness and Opportunity Mapping | assessment |
+  | 3 | Agent Architecture Workshop | workshop |
+  | 4 | Cloud Landing Zone Assessment | assessment |
+  | 5 | Kubernetes Platform Review | review |
+  | 6 | DevOps and GitOps Assessment | assessment |
+  | 7 | Observability and SRE Workshop | workshop |
+  | 8 | E-commerce Integration Discovery | workshop |
+  | 9 | RAG and Data Readiness Workshop | workshop |
+  | 10 | Responsible AI Governance Review | review |
+
+* **Page per offer.** Each page has these sections:
+  * audience;
+  * problems addressed;
+  * prerequisites;
+  * format (participants, delivery, length);
+  * agenda;
+  * deliverables;
+  * limitations ("what is not included");
+  * related services, free assessments, reference scenarios, integration patterns and articles;
+  * the enquiry CTA.
+* **Lengths.**
+  * A workshop's length is the indicative band of SERVICE_TAXONOMY §2: half a day to two days, agreed
+    in writing.
+  * An assessment or review has a fixed scope agreed beforehand. Its timing "depends on the scope and
+    on access".
+  * No number of days is promised.
+* **Claims.** There are no prices, currencies, percentages or guarantees. A test scans both
+  languages. Every offer is labelled "Scoped individually" / „Индивидуален обхват“ (the family status
+  in SERVICE_TAXONOMY J is *custom engagement*). The limitations say plainly what an offer is not (no
+  implementation, no certification, no legal advice, no round-the-clock support).
+* **Integration.**
+
+  | Where | What |
+  | --- | --- |
+  | Header | Services ▾ → "Start here" lists the catalogue |
+  | Footer | Link to the catalogue |
+  | Domain hubs | "Workshops and assessments" section with the offers of that domain. The published-catalogue block appears only when it has entries, so a hub never says "nothing published" next to its workshops |
+  | Service pages | The offers of the service's primary domain |
+  | Assessment results (readiness, Finder, the eight engine assessments) | The offers that continue from that tool, then the whole catalogue |
+  | Industries | Two offers per segment at most |
+  | Reference scenarios | The offers that use the scenario |
+  | Topic pages | The offers of the topic's domains |
+  | Workshop pages | The published articles of the matching topics; "none yet" when there are none |
+
+* **Enquiry.**
+  * The CTA opens `/bg/kontakti?usluga=<service>&sreshta=<key>` (EN `?service=…&workshop=…`).
+  * The form shows "Enquiry about: …" with a way to remove it.
+  * The lead stores `workshop_key`, and the admin opportunity record shows it and pre-fills the
+    recommendation.
+* **SEO.**
+  * Titles are at most 60 characters; descriptions are 120–160 characters (tested).
+  * `Service` JSON-LD with no price.
+  * The index carries `CollectionPage` and `ItemList` JSON-LD.
+  * Every page is in the sitemap with reciprocal hreflang.
+  * BG and EN slugs differ.
+
+### 5.6 Insights taxonomy (engineering topics)
+
+* **Domains.** `lib/insight-topics.ts` maps every topic to service domains.
+* **New topics.** Four engineering topics were added in both languages:
+
+  | BG (key) | EN slug |
+  | --- | --- |
+  | Облак и платформи (`oblak-i-platformi`) | `cloud-and-platform` |
+  | DevOps и SRE (`devops-i-sre`) | `devops-and-sre` |
+  | Данни и интеграции (`danni-i-integratsii`) | `data-and-integration` |
+  | Управление на AI (`upravlenie-na-ai`) | `ai-governance` |
+
+* **No articles were written to fill them.** There are no invented articles, publication dates or
+  author credentials. A topic page with fewer than two articles:
+  * says that no articles are published yet;
+  * links to the matching workshops and reference scenarios;
+  * is `noindex`;
+  * is left out of the sitemap (MIN_ARTICLES_FOR_INDEXED_CATEGORY).
+
+  A test checks that the new topics stay empty until real articles exist.
+* **Existing content is unchanged.** Existing articles, topics, slugs and canonical URLs are not
+  modified.
+* **Adding an article** to an engineering topic follows the existing article rules (§3 claims, a
+  real author, a real date). Once a topic has two articles, it becomes indexable automatically.
+
 ## 6. URLs and routing
 
 | Item | BG | EN | Mechanism |
@@ -267,3 +364,5 @@ Business decisions D1–D7 are listed in PLATFORM_VISION §10. Content-specific:
 | C-2 | Which hubs launch first | E, F, H first (no page today), then A, B, C, D, G, I, J as group pages over existing services |
 | C-3 | Whether domain hubs get their own articles (informational content per domain) | none until the hubs exist |
 | C-4 | Verification of the proposed keywords (Keyword Planner BG/EN) | all `unverified` |
+| C-5 | Who writes the first engineering articles (cloud, DevOps/SRE, data, AI governance) and when | the topics stay empty and `noindex` |
+| C-6 | Whether workshops get published prices or fixed lengths | no: scoped individually, quoted in writing |

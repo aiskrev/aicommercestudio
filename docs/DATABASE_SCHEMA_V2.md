@@ -6,7 +6,10 @@
 [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md#service-catalogue-migration-0009). Migration `0010` adds
 §3.15 (`admin_users.role`), §3.8/§3.9 (content items for capabilities and deliverables),
 assessments and workshops with a duration band (§3.4), and per-entry publication snapshots instead
-of the releases of §3.14. The rest of this document is still a design. The rationale, conflicts and roll-out are in
+of the releases of §3.14. The rest of this document is still a design. Later migrations
+(`0011`–`0014`: saved assessment results, advisor V2, the AI operations platform, the opportunity
+workflow) are outside the catalogue and are described in [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md),
+the authoritative schema reference (audited 2026-11-03). The rationale, conflicts and roll-out are in
 [SERVICE_CATALOGUE_ARCHITECTURE.md](SERVICE_CATALOGUE_ARCHITECTURE.md). The API is in
 [API_ARCHITECTURE_V2.md](API_ARCHITECTURE_V2.md).
 

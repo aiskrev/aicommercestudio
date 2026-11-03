@@ -12,6 +12,8 @@ import { resolveLocale } from "@/lib/params";
 import { SCENARIO_KEYS, SCENARIO_SLUGS, scenario, scenarioBySlug } from "@/lib/reference";
 import { assessmentLinks, patternLinks, serviceLinks } from "@/lib/reference-links";
 import { contactWithService, routes } from "@/lib/routes";
+import { workshopLinks } from "@/lib/workshop-links";
+import { workshopsForScenario } from "@/lib/workshops";
 import { buildMetadata } from "@/lib/seo";
 
 export const dynamicParams = false;
@@ -177,6 +179,11 @@ export default async function ScenarioPage({ params }: PageProps<"/[locale]/refe
           <TextBlock title={d.relatedPatterns}>
             <LinkList items={patternLinks(locale, def.patterns)} testId="scenario-patterns" />
           </TextBlock>
+          {workshopLinks(locale, workshopsForScenario(key)).length > 0 && (
+            <TextBlock title={getContent(locale).workshops.section.title}>
+              <LinkList items={workshopLinks(locale, workshopsForScenario(key))} testId="scenario-workshops" />
+            </TextBlock>
+          )}
         </div>
         <p className="mt-10">
           <Link href={href(routes.scenarios)} className="link">

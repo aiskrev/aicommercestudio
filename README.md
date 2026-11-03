@@ -133,6 +133,10 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [AI_OBSERVABILITY.md](docs/AI_OBSERVABILITY.md) | Bounded observability data model, costs with versioned rate cards, budgets, retention, future OpenTelemetry ingestion contract |
 | [AI_OPERATIONS_RUNBOOK.md](docs/AI_OPERATIONS_RUNBOOK.md) | Incident and controlled change workflows (record management, no automation) |
 | [CLIENT_PORTAL.md](docs/CLIENT_PORTAL.md) | Read-only client portal (off by default): identities, MFA, sessions, recovery, release prerequisites |
+| [OPPORTUNITY_WORKFLOW.md](docs/OPPORTUNITY_WORKFLOW.md) | Engineering opportunity record, proposal and SOW drafts, review checks, human approval, retention |
+| [INTEGRATION_AUDIT_V2.md](docs/INTEGRATION_AUDIT_V2.md) | Integration and quality audit of the V2 platform: capability matrix, findings by severity, executed tests, launch blockers, V2 document map |
+| [ADR_INDEX.md](docs/ADR_INDEX.md) | Index of the architecture decisions recorded across the design documents |
+| [CLAUDE_IMPLEMENTATION_PROMPTS.md](docs/CLAUDE_IMPLEMENTATION_PROMPTS.md) | How implementation work is briefed to an AI coding agent; shipped prompt packages |
 | [AI_OPERATIONS_ARCHITECTURE.md](docs/AI_OPERATIONS_ARCHITECTURE.md) | Earlier console concept (superseded by AI_OPERATIONS_PORTAL.md) |
 | [BUSINESS_PLAN.md](docs/BUSINESS_PLAN.md) | Positioning, offer, commercial model (no invented figures) |
 

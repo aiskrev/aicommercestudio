@@ -21,6 +21,8 @@ async function signIn(page: Page) {
 }
 
 test("the client portal is off and says so; its API does not exist while off", async ({ page, request }) => {
+  // A test stack started with the portal on (portal.spec.ts) checks the enabled flow instead.
+  test.skip((await request.get("/api/portal/me")).status() !== 404, "the client portal is switched on in this stack");
   await page.goto("/portal");
   await expect(page.getByTestId("portal-unavailable")).toBeVisible();
   expect((await request.post("/api/portal/login", { data: { email: "a@example.com", password: "x" } })).status()).toBe(404);

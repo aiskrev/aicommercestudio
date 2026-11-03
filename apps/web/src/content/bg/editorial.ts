@@ -38,6 +38,35 @@ const categorySources: Omit<EditorialCategory, "key">[] = [
     description: "Сравнения и съвети за Shopify, WooCommerce и решения по поръчка — разходи, гъвкавост и поддръжка.",
     relatedService: "integrations",
   },
+  // Engineering topics (lib/insight-topics.ts). No articles yet: the pages say so and stay noindex.
+  {
+    slug: "oblak-i-platformi",
+    name: "Облак и платформи",
+    title: "Статии за облачни основни зони, Kubernetes и платформено инженерство",
+    description: "Структура на облачните акаунти, мрежа, идентичност, инфраструктура като код и Kubernetes платформи.",
+    relatedService: "integrations",
+  },
+  {
+    slug: "devops-i-sre",
+    name: "DevOps и SRE",
+    title: "Статии за CI/CD, GitOps, наблюдаемост и надеждност",
+    description: "Доставка на софтуер, контрол на промените, наблюдаемост с OpenTelemetry, SLO и управление на инциденти.",
+    relatedService: "integrations",
+  },
+  {
+    slug: "danni-i-integratsii",
+    name: "Данни и интеграции",
+    title: "Статии за интеграции, потоци от данни и подготовка на данни за AI",
+    description: "API, събития, синхронизация между системи, потоци от данни и подготовка на документи за RAG.",
+    relatedService: "integrations",
+  },
+  {
+    slug: "upravlenie-na-ai",
+    name: "Управление на AI",
+    title: "Статии за отговорен AI, рискове, одобрение от човек и сигурност",
+    description: "Правила, роли и контроли за AI системи: оценка, документация, наблюдение и защита на данните.",
+    relatedService: "audit",
+  },
 ];
 
 export const editorialCategories: EditorialCategory[] = categorySources.map((category) => ({ ...category, key: category.slug }));

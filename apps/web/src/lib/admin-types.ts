@@ -39,6 +39,8 @@ export interface LeadSummary {
   /** AI Managed Services triage (null for other leads). */
   ams_level?: AmsLevel | null;
   ams_readiness?: AmsReadiness | null;
+  /** Catalogue workshop or assessment the enquiry was sent about (lib/workshops.ts), if any. */
+  workshop_key?: string | null;
 }
 
 /** Descriptive AI-system information from an AI Managed Services inquiry (never credentials). */

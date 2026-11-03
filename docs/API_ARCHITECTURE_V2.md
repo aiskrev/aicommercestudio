@@ -1,9 +1,11 @@
 # API architecture v2: service catalogue
 
-**Status:** design only. No route exists yet, and [API_REFERENCE.md](API_REFERENCE.md) and
-`docs/openapi.json` describe the current API unchanged. When these routes are built, they are added
-to API_REFERENCE.md and the spec is regenerated. `scripts/docs_sync.py` fails the API suite
-otherwise.
+**Status (audited 2026-11-03):** partly implemented. The read-only public catalogue
+(`/api/public/catalogue/*`) and the admin editor routes (`/api/admin/catalogue/*`, draft → preview →
+publish → archive, per-entry snapshots instead of catalogue-wide releases) are live since migration
+`0010` and are listed in [API_REFERENCE.md](API_REFERENCE.md) and `docs/openapi.json`, which are the
+authoritative description of the API. The rest of this document is design. `scripts/docs_sync.py`
+fails the API suite when a built route is missing from API_REFERENCE.md.
 
 **Companion documents:**
 

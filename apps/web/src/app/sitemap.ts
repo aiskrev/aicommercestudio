@@ -11,6 +11,7 @@ import {
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
 import { AGENT_SLUGS, LIBRARY_KEYS } from "@/lib/agent-library";
 import { PATTERN_KEYS, PATTERN_SLUGS, SCENARIO_KEYS, SCENARIO_SLUGS } from "@/lib/reference";
+import { WORKSHOP_KEYS, WORKSHOP_SLUGS } from "@/lib/workshops";
 import { getCatalogue } from "@/lib/catalogue";
 import { isDomainPublished } from "@/lib/domains";
 import { routes } from "@/lib/routes";
@@ -92,8 +93,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             alternates: alternates(samePathEverywhere(path)),
           }))
         : []),
-      // Reference scenarios and integration patterns: indexes and one static page each.
+      // Workshops, reference scenarios and integration patterns: indexes and one static page each.
       ...[
+        routes.workshops,
+        ...WORKSHOP_KEYS.map((key) => routes.workshop(WORKSHOP_SLUGS[key].bg)),
         routes.scenarios,
         ...SCENARIO_KEYS.map((key) => routes.scenario(SCENARIO_SLUGS[key].bg)),
         routes.patterns,
@@ -102,7 +105,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         url: url(path),
         lastModified: CONTENT_REVISED,
         changeFrequency: "monthly" as const,
-        priority: path === routes.scenarios || path === routes.patterns ? 0.6 : 0.5,
+        priority: path === routes.workshops ? 0.7 : path === routes.scenarios || path === routes.patterns ? 0.6 : 0.5,
         alternates: alternates(samePathEverywhere(path)),
       })),
       ...services.map((service) => ({

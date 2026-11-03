@@ -47,17 +47,50 @@ in [PLATFORM_BASELINE_AUDIT.md](PLATFORM_BASELINE_AUDIT.md).
   - tenant-scoped API with isolation tests.
 - Release review: OG image, layout and accessibility fixes.
 
+### V2 increments (2026-10-27 → 2026-11-03, PRs #17–#39 and the audit branch)
+
+- **Positioning and IA:** platform vision, ten-domain taxonomy, BG/EN content strategy, IA v2, the
+  mega-menu, the domain hubs.
+- **Service catalogue:**
+  - migrations 0009–0010;
+  - the public read-only API;
+  - the admin editor with per-entry publishing;
+  - staff roles (`admin`, `editor`, `viewer`).
+- **Founder profile and contacts:** the founder profile and a single source for contacts, protected
+  by tests.
+- **Tools and assessments:**
+  - the assessment engine with versioned definitions;
+  - readiness model 2026-11.1;
+  - ten specialised assessments with one results experience;
+  - reports and PDF;
+  - opt-in saved results (migrations 0011–0012);
+  - Advisor V2;
+  - Solution Builder and agent library v2;
+  - AI Managed Services v2.
+- **Ops platform** (migration 0013):
+  - RLS under a restricted runtime role;
+  - registry, evaluations (simulated), bounded observability, incidents and changes;
+  - the read-only client portal, **off**.
+- **Reference content:** 20 fictional reference scenarios and 11 integration patterns.
+- **Workshops & Advisory and opportunities** (migration 0014):
+  - the Workshops & Advisory catalogue (ten formats) and the engineering insight topics (no articles
+    yet);
+  - the opportunity, proposal and SOW workflow with human approval;
+  - the integration and quality audit ([INTEGRATION_AUDIT_V2.md](INTEGRATION_AUDIT_V2.md)).
+
 ## Next: V2 platform (see IMPLEMENTATION_DEPENDENCIES_V2.md)
 
 1. **P0:** documentation in sync with the code (done 2026-10-27, enforced by `scripts/test.ps1`).
    Delete the superseded branches (owner).
 2. **P1, data-platform hardening:**
-   - restricted runtime database role and PostgreSQL RLS;
+   - restricted runtime database role and PostgreSQL RLS — **done** (0013), except a separate
+     runtime *login* role;
    - a manual migration step in production;
    - a Redis-backed rate limiter and a job queue.
-3. **P2:** staff roles and TOTP MFA.
+3. **P2:** staff roles — **done**; TOTP MFA for staff — open.
 4. **P3 / P4:** client identity (invitations, MFA), then a read-only client portal with manual data
-   (registry, versions, incidents, reports).
+   (registry, versions, incidents, reports) — **implemented and switched off**; release needs the
+   prerequisites in CLIENT_PORTAL.md and explicit approval.
 5. **P5–P7, telemetry:**
    - telemetry ingestion (keys, gateway, runs and spans, cost computation);
    - evaluations and human review queues;

@@ -46,6 +46,9 @@ interface Props {
   locale?: "bg" | "en";
   /** Labels for the AI Managed Services section (shown when that service is selected). */
   aiLabels: Dictionary["aiManagedForm"];
+  /** Workshop or assessment the enquiry is about (lib/workshops.ts); sent as `workshop`, removable. */
+  initialWorkshop?: { key: string; title: string };
+  workshopLabels?: { about: string; remove: string };
 }
 
 type Status = "idle" | "submitting" | "success";
@@ -86,7 +89,10 @@ export function ContactForm({
   advisorNote,
   locale = "bg",
   aiLabels,
+  initialWorkshop,
+  workshopLabels,
 }: Props) {
+  const [workshop, setWorkshop] = useState(initialWorkshop);
   const allowed = services.map((s) => s.value);
   const [values, setValues] = useState<ContactValues>(() => ({
     ...emptyContactValues(allowed.includes(initialService) ? initialService : "", initialInquiry),
@@ -151,7 +157,7 @@ export function ContactForm({
     }
 
     setStatus("submitting");
-    const payload = toPayload(values, token, locale);
+    const payload = { ...toPayload(values, token, locale), ...(workshop ? { workshop: workshop.key } : {}) };
     const result = await submitLead(
       advisorAssessmentId ? { ...payload, advisor_assessment_id: advisorAssessmentId } : payload,
       submissionEndpoint(values),
@@ -248,6 +254,16 @@ export function ContactForm({
       {advisorAssessmentId && advisorNote && (
         <Alert tone="info" role="note">
           {advisorNote}
+        </Alert>
+      )}
+      {workshop && workshopLabels && (
+        <Alert tone="info" role="note">
+          <span className="flex flex-wrap items-center gap-x-4 gap-y-1" data-testid="contact-workshop">
+            <span>{workshopLabels.about.replace("{title}", workshop.title)}</span>
+            <button type="button" className="link text-sm" onClick={() => setWorkshop(undefined)}>
+              {workshopLabels.remove}
+            </button>
+          </span>
         </Alert>
       )}
 

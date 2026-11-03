@@ -43,6 +43,13 @@ if ($Suite -in @("api", "web", "all")) {
         if ($api -ne $web) { Write-Host "catalogue seed differs between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
         $global:LASTEXITCODE = [int]($api -ne $web)
     }
+    # Workshop keys and titles: the API accepts them on enquiries and uses the titles in proposal drafts.
+    Invoke-Suite "Workshop keys (API = web copy)" {
+        $api = (Get-FileHash "apps/api/app/workshop_keys.json").Hash
+        $web = (Get-FileHash "apps/web/src/lib/workshop-keys.json").Hash
+        if ($api -ne $web) { Write-Host "workshop keys differ between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
+        $global:LASTEXITCODE = [int]($api -ne $web)
+    }
 }
 if ($Suite -in @("api", "all")) {
     Invoke-Suite "API tests (pytest)" { docker compose --profile test run --rm --build api-tests }

@@ -18,6 +18,7 @@ import { coreServices, services } from "@/content/bg/services";
 import { readinessTool } from "@/content/bg/tool-readiness";
 import { agentLibrary } from "@/content/bg/agent-library";
 import { reference } from "@/content/bg/reference";
+import { workshops } from "@/content/bg/workshops";
 import { finderTool } from "@/content/bg/tool-finder";
 import { roiTool } from "@/content/bg/tool-roi";
 import { engineeringTool } from "@/content/bg/tool-engineering";
@@ -50,6 +51,7 @@ import { coreServices as enCoreServices, services as enServices } from "@/conten
 import { readinessTool as enReadinessTool } from "@/content/en/tool-readiness";
 import { agentLibrary as enAgentLibrary } from "@/content/en/agent-library";
 import { reference as enReference } from "@/content/en/reference";
+import { workshops as enWorkshops } from "@/content/en/workshops";
 import { finderTool as enFinderTool } from "@/content/en/tool-finder";
 import { roiTool as enRoiTool } from "@/content/en/tool-roi";
 import { engineeringTool as enEngineeringTool } from "@/content/en/tool-engineering";
@@ -85,6 +87,7 @@ const bg = {
   solutionTool,
   agentLibrary,
   reference,
+  workshops,
   articles,
   insightsPage,
   editorialCategories,
@@ -119,6 +122,7 @@ const en: SiteContent = {
   solutionTool: enSolutionTool,
   agentLibrary: enAgentLibrary,
   reference: enReference,
+  workshops: enWorkshops,
   articles: enArticles,
   insightsPage: enInsightsPage,
   editorialCategories: enEditorialCategories,

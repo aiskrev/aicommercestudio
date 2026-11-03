@@ -135,7 +135,7 @@ export const engineeringTool: typeof bgEngineeringTool = {
     noGaps: "No area below 50/100.",
     workshops: {
       title: "Workshops and consultant-led assessments",
-      text: "If you would like to discuss the result with your team or review it together, see the workshop and consultant-led assessment formats.",
+      text: "If you would like to discuss the result with your team or review it together, these formats continue from it. Scope and price are agreed in writing.",
     },
     methodologyTitle: "How the result is calculated",
     methodology: [

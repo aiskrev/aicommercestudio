@@ -1,6 +1,8 @@
 # Product modules
 
-**Status:** reference document. It describes the modules that exist (verified on `main` @ `52bf6e1`)
+**Status:** reference document, re-audited on 2026-11-03: since `52bf6e1` the reference library
+(§3.6), the Workshops & Advisory catalogue (§3.9), the staff opportunity workflow (§4) and the
+read-only client portal (§5, switched off) were added. It describes the modules that exist
 and the ones that [INFORMATION_ARCHITECTURE_V2.md](INFORMATION_ARCHITECTURE_V2.md) and
 [IMPLEMENTATION_DEPENDENCIES_V2.md](IMPLEMENTATION_DEPENDENCIES_V2.md) plan. One module = one
 coherent capability with its own routes, code, data and tests. New work should extend a module
@@ -159,6 +161,12 @@ not client projects. They show how domains combine (e.g. agent + approval gates 
 
 **Status:** new, conditional (§7 thresholds in IA v2).
 
+**Implemented (2026-11-03)** under different routes: `/referentni-stsenarii[/<slug>]` ↔
+`/reference-scenarios[/<slug>]` (20 fictional scenarios) and `/integratsionni-modeli[/<slug>]` ↔
+`/integration-patterns[/<slug>]` (11 patterns with an honest integration status). The
+`/arhitekturi` routes were not built: the reference architecture is part of each scenario.
+Authoritative description: [REFERENCE_CONTENT.md](REFERENCE_CONTENT.md).
+
 ### 3.7 Segments (new)
 
 **Routes:**
@@ -181,7 +189,21 @@ not client projects. They show how domains combine (e.g. agent + approval gates 
 **Code:** `components/contact/*`, API `/api/public/leads`, `/api/public/quote-requests`.
 
 **Status:** live. Planned: domain-level pre-selection only after decision D4 (an API enum and a
-migration).
+migration). Since 2026-11-03 an enquiry can name the workshop it is about (`&sreshta=` /
+`&workshop=` → `leads.workshop_key`).
+
+### 3.9 Workshops & Advisory (live, 2026-11-03)
+
+**Routes:** `/rabotni-sreshti[/<slug>]` ↔ `/workshops[/<slug>]`.
+
+**Purpose.** Ten consultant-led formats (workshops, assessments, reviews), each with audience,
+problems, prerequisites, format, agenda, deliverables, limitations and an enquiry CTA. No prices or
+fixed durations.
+
+**Code:** `lib/workshop-slugs.ts`, `lib/workshops.ts`, `lib/workshop-links.ts`,
+`content/*/workshops.ts`, `components/workshops/WorkshopCards.tsx`. Linked from navigation, the
+footer, domain hubs, service pages, assessment results, industries, scenarios and topic pages.
+Authoritative description: [CONTENT_STRATEGY_BG_EN.md](CONTENT_STRATEGY_BG_EN.md) §5.5.
 
 ## 4. Staff (admin)
 
@@ -196,9 +218,18 @@ robots-disallowed. The admin language comes from a cookie; there is no locale in
 | Retention | dashboard panel | `/api/admin/retention*` | live |
 | Account and sessions | `/admin/account` | `/api/admin/auth/*` | live |
 | AI operations scaffold | `/admin/operations` | `/api/ops/*` (organisation-scoped, RBAC) | live, staff only. Docs: AI_OPERATIONS_PORTAL.md. |
-| Staff roles and MFA | — | — | planned (P2) |
+| Opportunity, proposals and SOW drafts | panels on `/admin/leads/<id>` | `/api/admin/leads/{id}/opportunity`, `/proposals*` | live (2026-11-03), admins only. Docs: OPPORTUNITY_WORKFLOW.md. |
+| AI operations platform | `/admin/operations?tab=…` | `/api/ops/*` (registry, evaluations, observability, incidents, changes, client accounts) | live, staff only, RLS under the runtime role |
+| Staff roles | `/admin/staff` | `/api/admin/staff*` | live (`admin`, `editor`, `viewer`) |
+| Staff MFA | — | — | planned (P2) |
 
-## 5. Client portal (planned)
+## 5. Client portal (implemented, switched off)
+
+**Status (2026-11-03):** the read-only P4 slice is implemented and **off** by default
+(`CLIENT_PORTAL_ENABLED=false`): invitations, password + TOTP, sessions, staff-assisted recovery,
+dashboard, agents, evaluation summaries, incidents and the "not connected" state. Release needs
+explicit approval and the prerequisites in [CLIENT_PORTAL.md](CLIENT_PORTAL.md). The phase table
+below remains the plan for P5–P7.
 
 **Routes:** `/portal/*`. There is no locale segment; the language comes from a preference, as in
 the admin.

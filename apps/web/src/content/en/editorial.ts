@@ -45,4 +45,37 @@ export const editorialCategories: EditorialCategory[] = [
     description: "Comparisons and advice on Shopify, WooCommerce and custom solutions — costs, flexibility and maintenance.",
     relatedService: "integrations",
   },
+  // Engineering topics (lib/insight-topics.ts). No articles yet: the pages say so and stay noindex.
+  {
+    key: "oblak-i-platformi",
+    slug: "cloud-and-platform",
+    name: "Cloud and platform",
+    title: "Articles on cloud landing zones, Kubernetes and platform engineering",
+    description: "Cloud account structure, network, identity, infrastructure as code and Kubernetes platforms.",
+    relatedService: "integrations",
+  },
+  {
+    key: "devops-i-sre",
+    slug: "devops-and-sre",
+    name: "DevOps and SRE",
+    title: "Articles on CI/CD, GitOps, observability and reliability",
+    description: "Software delivery, change control, observability with OpenTelemetry, SLOs and incident management.",
+    relatedService: "integrations",
+  },
+  {
+    key: "danni-i-integratsii",
+    slug: "data-and-integration",
+    name: "Data and integration",
+    title: "Articles on integration, data pipelines and preparing data for AI",
+    description: "APIs, events, synchronisation between systems, data pipelines and preparing documents for RAG.",
+    relatedService: "integrations",
+  },
+  {
+    key: "upravlenie-na-ai",
+    slug: "ai-governance",
+    name: "AI governance",
+    title: "Articles on responsible AI, risk, human approval and security",
+    description: "Rules, roles and controls for AI systems: evaluation, documentation, monitoring and data protection.",
+    relatedService: "audit",
+  },
 ];

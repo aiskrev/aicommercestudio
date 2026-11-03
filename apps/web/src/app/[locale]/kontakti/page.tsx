@@ -10,7 +10,7 @@ import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
-import { contactFormProps } from "@/lib/contact-form-props";
+import { contactFormProps, workshopTitles } from "@/lib/contact-form-props";
 import { buildMetadata } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/kontakti">) {
@@ -83,7 +83,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
 
           <div>
             <Suspense fallback={<ContactForm {...formProps} />}>
-              <ContactFormWithParams {...formProps} />
+              <ContactFormWithParams {...formProps} workshopTitles={workshopTitles(locale)} />
             </Suspense>
           </div>
         </Container>

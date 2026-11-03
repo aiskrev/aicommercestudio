@@ -25,6 +25,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     { href: href(routes.process), label: dict.nav.approach },
     { href: href(routes.about), label: dict.nav.about },
     { href: href(routes.insights), label: dict.nav.insights },
+    { href: href(routes.workshops), label: getContent(locale).workshops.page.title },
     { href: href(routes.scenarios), label: getContent(locale).reference.scenarios.title },
     { href: href(routes.patterns), label: getContent(locale).reference.patterns.title },
     { href: href(routes.contact), label: dict.nav.contact },

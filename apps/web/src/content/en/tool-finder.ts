@@ -117,7 +117,7 @@ export const finderTool: typeof bgFinderTool = {
   },
   workshops: {
     title: "Workshops and consultant-led assessments",
-    text: "If you would rather choose the first process together, see the fixed-scope formats in these domains:",
+    text: "If you would rather choose the first process together, these formats continue from your result. Scope and price are agreed in writing:",
   },
   methodologyTitle: "How the score is calculated",
   methodology: [

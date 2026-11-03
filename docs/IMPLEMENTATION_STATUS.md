@@ -16,6 +16,29 @@ Executed during the platform baseline audit, against this commit
 | pip-audit / npm audit (production deps) | `.\scripts\test.ps1 -Suite audit` | **no known vulnerabilities / 0** |
 | Alembic | `alembic heads` / `alembic current` (local dev database) | single head **`0008`** / `0008` |
 
+Branch `feature/workshops-opportunities-audit` (from `main` @ `0b33ea9`, after PR #39, 2026-11-03):
+
+* **Workshops & Advisory catalogue** (CONTENT_STRATEGY_BG_EN §5.5).
+  * Ten BG/EN offers at `/bg/rabotni-sreshti` ↔ `/en/workshops`.
+  * Each offer has an audience, problems, prerequisites, format, agenda, deliverables, limitations,
+    related links and an enquiry CTA.
+  * Linked from the navigation, the footer, the domain hubs, the service pages, the assessment
+    results, the industries, the scenarios and the topics.
+  * The enquiry stores `leads.workshop_key`.
+  * No prices, durations promised or guarantees.
+* **Insights taxonomy.** Four engineering topics, deliberately without invented articles: they are
+  `noindex` and out of the sitemap until there are two real articles.
+* **Opportunity workflow** ([OPPORTUNITY_WORKFLOW.md](OPPORTUNITY_WORKFLOW.md), migration `0014`).
+  * The opportunity record per lead; proposal and SOW drafts with append-only versions.
+  * Deterministic first drafts with placeholder commercial terms.
+  * Review checks and a human approval that is blocked until a person completes the terms.
+  * Admins only, audited, cascades with the lead.
+  * The Ops runtime role loses every privilege on lead tables.
+* **Client portal browser e2e** (`portal.spec.ts`), run on a portal-on test stack; the default stays
+  off.
+* **Integration and quality audit** with the V2 document map: [INTEGRATION_AUDIT_V2.md](INTEGRATION_AUDIT_V2.md).
+  The executed checks and their results are in its §4.
+
 Branch `feature/ops-platform-and-reference-content` (from `main` after PR #38, 2026-11-03): changes on this branch:
 
 * **Ops security foundation** ([AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md) §3, §11a).

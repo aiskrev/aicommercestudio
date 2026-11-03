@@ -13,6 +13,8 @@ export const routes = {
   scenario: (slug: string) => `/referentni-stsenarii/${slug}`,
   patterns: "/integratsionni-modeli",
   pattern: (slug: string) => `/integratsionni-modeli/${slug}`,
+  workshops: "/rabotni-sreshti",
+  workshop: (slug: string) => `/rabotni-sreshti/${slug}`,
   industries: "/za-kogo",
   about: "/za-nas",
   founder: "/za-nas/osnovatel",
@@ -42,6 +44,11 @@ export const routes = {
 
 export function contactWithService(serviceKey: string): string {
   return `${routes.contact}?usluga=${encodeURIComponent(serviceKey)}`;
+}
+
+/** Contact page opened as an enquiry about one workshop or assessment (lib/workshops.ts). */
+export function contactAboutWorkshop(serviceKey: string, workshopKey: string): string {
+  return `${contactWithService(serviceKey)}&sreshta=${encodeURIComponent(workshopKey)}`;
 }
 
 /** Contact page opened as a quote request for the given service. */

@@ -19,6 +19,8 @@ upgrade/downgrade round trip on a fresh database, and a data-migration test (row
 | `0012` | `advisor_assessments.contract_version` (default `'1'`) and `insights` (JSONB, nullable); `assessment_results.lead_id` (FK `ON DELETE CASCADE`, index) and `linked_at`. Additive only; downgrade drops the columns. |
 | `0010` | Catalogue publishing and staff roles. `admin_users.role` (`admin`/`editor`/`viewer`, NOT NULL, server default `admin`, CHECK): existing accounts keep full rights. `catalogue_entities.published_revision`, `published_at`, `published_by_id`, `published_snapshot` (JSONB read model), with a CHECK that a published domain or service has a snapshot. Data step: 0009 rows that were `published` without a snapshot become `draft`, and the bootstrap seed publishes them again. `services`: offering types `assessment` and `workshop`, `duration_min_days` / `duration_max_days` (numeric(4,1), assessments and workshops only). `content_items` + `content_item_translations` (capabilities and deliverables, aligned between BG and EN). Downgrade drops all of it; assessment and workshop rows are deleted with their entities. |
 | `0009` | Service catalogue V1: `catalogue_entities` (supertype: `entity_type`, stable `key`, `status` draft/published/archived, `revision`), `service_domains`, `service_families`, `services` (subtypes sharing the entity id through the composite FK `(id, entity_type)`), `family_services`, `entity_translations` (per locale; slug unique per `(locale, route_namespace)`), `entity_relations` (typed edges with an allowed-combination CHECK). New tables only, no data; `leads` unchanged and not referenced. Downgrade drops the seven tables. See [Service catalogue](#service-catalogue-migration-0009). |
+| `0013` | AI operations platform: registry versions, evaluation datasets/cases/runs/results, rate cards, execution records, budgets, threshold rules, retention policies, incidents and changes with append-only timelines, client portal users/tokens/sessions; `uq_ops_agents_id_org`; the NOLOGIN, NOBYPASSRLS runtime role `acs_app_runtime` with grants, row-level security policies on every tenant table and immutability triggers. Needs `CREATEROLE` for the migrating user the first time. See [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md). |
+| `0014` | Opportunity workflow: `leads.workshop_key` (nullable, CHECK against the ten catalogue keys); `lead_opportunities` (1:1 with the lead), `lead_proposals` and `lead_proposal_versions` (append-only trigger `lead_proposal_versions_append_only`), all `ON DELETE CASCADE` from `leads`. Revokes every privilege of `acs_app_runtime` on the lead tables (leads, notes, opportunity, proposals, versions, advisor assessments, team configurations, assessment results). Additive; downgrade drops the tables and the column and restores the earlier grants. See [OPPORTUNITY_WORKFLOW.md](OPPORTUNITY_WORKFLOW.md). |
 | `0008` | AI operations scaffold: `ops_organizations` (slug unique, status/region, `is_demo`), `ops_workspaces` (unique `(organization_id, slug)` and `(id, organization_id)`), `ops_memberships` (user × organisation × role CHECK, unique pair), `ops_agents` (registry metadata; composite FK `(workspace_id, organization_id)` → workspaces so an agent cannot sit in another tenant's workspace). New tables only; downgrade drops them. See AI_OPERATIONS_PORTAL.md. |
 
 Apply: automatic on container start (`RUN_MIGRATIONS_ON_START=true`), or manually
@@ -80,7 +82,16 @@ All timestamps are `timestamptz` in UTC.
 | ip_hash | varchar(64) null | abuse correlation without storing the IP |
 | locale | varchar(2), default `bg` | website language of the inquiry; CHECK in (`bg`, `en`); indexed (admin filter) |
 | service_details | jsonb null | service-specific, validated data. AI Managed Services: `{"kind": "ai_managed", "sector", "system_types"[], "agents_count", "ai_provider", "hosting", "support_interests"[], "communication_language", "additional_notes"}` — descriptive only, never credentials (free text is screened for secrets) |
+| workshop_key | varchar(48) null | the Workshops & Advisory offer the enquiry was sent from (migration `0014`); CHECK in the ten keys of `app/workshop_keys.json` |
 | created_at, updated_at, status_changed_at | timestamptz | `created_at`, `updated_at` indexed |
+
+### lead_opportunities, lead_proposals, lead_proposal_versions (migration 0014)
+
+| Table | Columns | Notes |
+| --- | --- | --- |
+| `lead_opportunities` | `lead_id` PK/FK → leads (CASCADE), `service_domain`, `problem_summary`, `scope_summary`, `discovery_status`, `qualification_status`, `qualification_rationale`, `technical_constraints`, `stakeholders` JSONB (`[{name, role, provided_in}]`), `next_action`, `next_action_due` date, `notes`, `recommended_workshop`, `recommended_assessment`, `recommendation_rationale`, `revision`, `created_at`, `updated_at`, `updated_by_id` → admin_users (SET NULL) | CHECKs on every enumerated column; index on `qualification_status` |
+| `lead_proposals` | `id`, `lead_id` → leads (CASCADE), `kind` (`proposal`/`sow`), `title`, `status` (`draft`, `in_review`, `approved`, `rejected`, `withdrawn`), `current_version`, `revision`, `created_by_id`, `decided_by_id`, `decision_note`, `approved_version`, `approved_at`, timestamps | CHECK `ck_lead_proposals_approval`: approved ⇔ approved version and time set |
+| `lead_proposal_versions` | `id`, `proposal_id` → lead_proposals (CASCADE), `number` (unique per proposal), `origin` (`human`/`generated_draft`), `content` JSONB (validated `ProposalContent`), `change_note`, `author_id` (SET NULL), `created_at` | append-only: the trigger refuses UPDATE except the author's SET NULL |
 
 ## lead_notes
 
@@ -130,6 +141,8 @@ Append-only activity log. `details` must never contain raw personal data.
 | `admin.role_changed` | role change from the admin staff page (actor = the administrator) or CLI `set-role` (actor `cli`); `from`, `to` |
 | `catalogue.entity_deleted` | a never-published draft was deleted (`key`, `revision`) |
 | `ops.member_added`, `ops.member_role_changed`, `ops.member_removed` | organisation membership changes (`user_id`, roles) |
+| `opportunity.saved` | the opportunity record was created or changed (`fields` = changed field names, statuses, number of stakeholders; never texts or names) |
+| `proposal.created`, `proposal.version_added`, `proposal.submit`, `proposal.approve`, `proposal.reject`, `proposal.reopen`, `proposal.withdraw` | proposal and SOW drafts (`proposal`, `kind`, `origin`, `version`, `status`, `warnings_acknowledged`) |
 
 ## ai_action_requests
 
@@ -387,6 +400,7 @@ seed in `app.cli seed`. Otherwise the next container start upgrades again.
 | Advisor assessments | unlinked rows deleted after `expires_at` (`ADVISOR_RETENTION_DAYS`, default 30); linked rows are deleted with their lead | same command and admin retention panel |
 | AI team configurations | unlinked rows deleted after `expires_at` (`TEAM_CONFIGURATION_RETENTION_DAYS`, default 90); linked rows are deleted with their lead; configurator leads also expire after `TEAM_LEAD_RETENTION_DAYS` (default 365) | same command and admin retention panel |
 | Individual erasure request | admin deletes the lead in the UI (`DELETE /api/admin/leads/{id}`); a linked advisor assessment is deleted with it | audit keeps only id + reason |
+| Opportunity, proposals, versions | deleted with their lead (retention and erasure, `ON DELETE CASCADE`) | no separate job |
 
 ## Seed data
 

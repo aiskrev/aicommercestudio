@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 test("there are no broken internal links", async ({ page, request, baseURL }) => {
+  // The crawl visits every sitemap URL and every internal link (≈ 300 pages since the workshops).
+  test.setTimeout(180_000);
   const origin = new URL(baseURL!).origin;
   const toVisit = new Set<string>(["/"]);
 

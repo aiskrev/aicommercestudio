@@ -67,7 +67,10 @@ ENGINE_TOOLS.forEach((tool, index) => {
       await expect(result.getByRole("region", { name: "Gaps" }).getByRole("listitem").first()).toBeVisible();
       await expect(result.getByText("Why:").first()).toBeVisible();
       await expect(result.getByTestId("engine-services").getByRole("link").first()).toBeVisible();
-      await expect(result.getByTestId("engine-workshops").getByRole("link")).toHaveCount(1);
+      // The workshops that continue from this assessment, then the whole catalogue.
+      const workshops = result.getByTestId("engine-workshops").getByRole("link");
+      await expect(workshops.first()).toHaveAttribute("href", /^\/en\/workshops\/[a-z-]+$/);
+      await expect(workshops.last()).toHaveAttribute("href", "/en/workshops");
       const basis = result.getByTestId("tool-basis");
       await expect(basis).toHaveAttribute("data-basis", "heuristic");
       await expect(basis.getByTestId("tool-version")).toHaveText(/^Methodology version [0-9]+\.[0-9]+\.[0-9]+$/);

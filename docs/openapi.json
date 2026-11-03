@@ -3372,6 +3372,451 @@
         }
       }
     },
+    "/api/admin/leads/{lead_id}/opportunity": {
+      "get": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "Get Opportunity",
+        "description": "The opportunity record with the lead's source and linked assessments (defaults when none yet).",
+        "operationId": "get_opportunity_api_admin_leads__lead_id__opportunity_get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "Save Opportunity",
+        "operationId": "save_opportunity_api_admin_leads__lead_id__opportunity_put",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpportunityUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpportunityOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`expected_revision` is stale, or the transition is not allowed"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/leads/{lead_id}/proposals": {
+      "get": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "List Proposals",
+        "operationId": "list_proposals_api_admin_leads__lead_id__proposals_get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProposalOut"
+                  },
+                  "title": "Response List Proposals Api Admin Leads  Lead Id  Proposals Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "Create Proposal",
+        "description": "Create a proposal or SOW draft: blank, with content, or a generated first draft (`generate`).",
+        "operationId": "create_proposal_api_admin_leads__lead_id__proposals_post",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/leads/{lead_id}/proposals/{proposal_id}": {
+      "get": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "Get Proposal",
+        "operationId": "get_proposal_api_admin_leads__lead_id__proposals__proposal_id__get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/leads/{lead_id}/proposals/{proposal_id}/versions/{number}": {
+      "get": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "Get Version",
+        "operationId": "get_version_api_admin_leads__lead_id__proposals__proposal_id__versions__number__get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Proposal Id"
+            }
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__opportunities__schemas__VersionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/leads/{lead_id}/proposals/{proposal_id}/versions": {
+      "post": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "Add Version",
+        "operationId": "add_version_api_admin_leads__lead_id__proposals__proposal_id__versions_post",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__opportunities__schemas__VersionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`expected_revision` is stale, or the transition is not allowed"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/leads/{lead_id}/proposals/{proposal_id}/transition": {
+      "post": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "Transition",
+        "description": "submit · approve · reject · reopen · withdraw. Approval is a recorded human decision; nothing is sent.",
+        "operationId": "transition_api_admin_leads__lead_id__proposals__proposal_id__transition_post",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalTransition"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProposalOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`expected_revision` is stale, or the transition is not allowed"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/staff": {
       "get": {
         "tags": [
@@ -4167,7 +4612,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/VersionCreate"
+                "$ref": "#/components/schemas/app__ops__registry__VersionCreate"
               }
             }
           }
@@ -4178,7 +4623,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VersionOut"
+                  "$ref": "#/components/schemas/app__ops__registry__VersionOut"
                 }
               }
             }
@@ -4231,7 +4676,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VersionOut"
+                  "$ref": "#/components/schemas/app__ops__registry__VersionOut"
                 }
               }
             }
@@ -4292,7 +4737,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VersionOut"
+                  "$ref": "#/components/schemas/app__ops__registry__VersionOut"
                 }
               }
             }
@@ -4345,7 +4790,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VersionOut"
+                  "$ref": "#/components/schemas/app__ops__registry__VersionOut"
                 }
               }
             }
@@ -4408,7 +4853,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VersionOut"
+                  "$ref": "#/components/schemas/app__ops__registry__VersionOut"
                 }
               }
             }
@@ -4461,7 +4906,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/VersionOut"
+                  "$ref": "#/components/schemas/app__ops__registry__VersionOut"
                 }
               }
             }
@@ -8890,6 +9335,28 @@
         ],
         "title": "AssessmentSummaryOut"
       },
+      "AssessmentToolKey": {
+        "type": "string",
+        "enum": [
+          "advisor",
+          "readiness",
+          "team",
+          "roi",
+          "finder",
+          "solution",
+          "agents",
+          "cloud_maturity",
+          "devops_maturity",
+          "observability",
+          "ecommerce_architecture",
+          "data_integration",
+          "ai_governance",
+          "ai_ops_readiness",
+          "finops"
+        ],
+        "title": "AssessmentToolKey",
+        "description": "Self-service assessments that can be recommended (apps/web/src/lib/tools.ts)."
+      },
       "AssumptionOverrides": {
         "properties": {
           "day_rate": {
@@ -9090,7 +9557,7 @@
           },
           "risks": {
             "items": {
-              "$ref": "#/components/schemas/Risk"
+              "$ref": "#/components/schemas/app__advisor__schemas__Risk"
             },
             "type": "array",
             "minItems": 1,
@@ -10059,6 +10526,38 @@
         ],
         "title": "CodeIn"
       },
+      "Commercial": {
+        "properties": {
+          "pricing_basis": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Pricing Basis",
+            "default": ""
+          },
+          "payment_terms": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Payment Terms",
+            "default": ""
+          },
+          "validity": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Validity",
+            "default": ""
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Notes",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "Commercial",
+        "description": "Commercial terms are written by a person. Generated drafts fill every field with the placeholder."
+      },
       "Comparison": {
         "properties": {
           "base_run_id": {
@@ -10572,6 +11071,17 @@
           "level"
         ],
         "title": "DimensionScoreOut"
+      },
+      "DiscoveryStatus": {
+        "type": "string",
+        "enum": [
+          "not_started",
+          "scheduled",
+          "in_progress",
+          "completed",
+          "not_needed"
+        ],
+        "title": "DiscoveryStatus"
       },
       "DomainDetail": {
         "properties": {
@@ -11973,6 +12483,40 @@
         ],
         "title": "FieldProblem"
       },
+      "Finding": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "commercial_placeholder",
+              "commercial_missing",
+              "unfilled_placeholder",
+              "guarantee_wording",
+              "signature_wording",
+              "price_outside_commercial",
+              "staffing_claim",
+              "empty_section"
+            ],
+            "title": "Code"
+          },
+          "section": {
+            "type": "string",
+            "title": "Section"
+          },
+          "blocking": {
+            "type": "boolean",
+            "title": "Blocking"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "section",
+          "blocking"
+        ],
+        "title": "Finding",
+        "description": "A review warning on a version. `blocking` findings prevent approval."
+      },
       "FindingOut": {
         "properties": {
           "key": {
@@ -13177,6 +13721,16 @@
                 "type": "null"
               }
             ]
+          },
+          "workshop": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkshopKey"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -13293,6 +13847,17 @@
               }
             ],
             "title": "Ams Readiness"
+          },
+          "workshop_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workshop Key"
           },
           "phone": {
             "anyOf": [
@@ -13681,6 +14246,17 @@
               }
             ],
             "title": "Ams Readiness"
+          },
+          "workshop_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workshop Key"
           }
         },
         "type": "object",
@@ -13834,6 +14410,55 @@
           "expires_in_hours"
         ],
         "title": "LinkOut"
+      },
+      "LinkedRecord": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "advisor_assessment",
+              "assessment_result",
+              "team_configuration",
+              "readiness",
+              "solution",
+              "ai_managed"
+            ],
+            "title": "Kind"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "reference"
+        ],
+        "title": "LinkedRecord"
       },
       "LoginIn": {
         "properties": {
@@ -13996,6 +14621,35 @@
         ],
         "title": "Metric"
       },
+      "Milestone": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Description",
+            "default": ""
+          },
+          "indicative_timing": {
+            "type": "string",
+            "maxLength": 120,
+            "title": "Indicative Timing",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "Milestone",
+        "description": "Indicative only: a timing is a written estimate, never a commitment."
+      },
       "MonthlyVolume": {
         "type": "string",
         "enum": [
@@ -14111,6 +14765,402 @@
           "priority"
         ],
         "title": "Opportunity"
+      },
+      "OpportunityOut": {
+        "properties": {
+          "exists": {
+            "type": "boolean",
+            "title": "Exists"
+          },
+          "lead_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Lead Id"
+          },
+          "source": {
+            "$ref": "#/components/schemas/OpportunitySource"
+          },
+          "service_domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Service Domain"
+          },
+          "problem_summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem Summary"
+          },
+          "scope_summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Summary"
+          },
+          "discovery_status": {
+            "type": "string",
+            "title": "Discovery Status",
+            "default": "not_started"
+          },
+          "qualification_status": {
+            "type": "string",
+            "title": "Qualification Status",
+            "default": "unassessed"
+          },
+          "qualification_rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualification Rationale"
+          },
+          "technical_constraints": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Technical Constraints"
+          },
+          "stakeholders": {
+            "items": {
+              "$ref": "#/components/schemas/Stakeholder"
+            },
+            "type": "array",
+            "title": "Stakeholders"
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "next_action_due": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action Due"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "recommended_workshop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended Workshop"
+          },
+          "recommended_assessment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended Assessment"
+          },
+          "recommendation_rationale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation Rationale"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision",
+            "default": 0
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "updated_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By"
+          }
+        },
+        "type": "object",
+        "required": [
+          "exists",
+          "lead_id",
+          "source"
+        ],
+        "title": "OpportunityOut"
+      },
+      "OpportunitySource": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "inquiry_type": {
+            "type": "string",
+            "title": "Inquiry Type"
+          },
+          "submitted_service": {
+            "type": "string",
+            "title": "Submitted Service"
+          },
+          "workshop_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workshop Key"
+          },
+          "linked": {
+            "items": {
+              "$ref": "#/components/schemas/LinkedRecord"
+            },
+            "type": "array",
+            "title": "Linked"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "inquiry_type",
+          "submitted_service",
+          "workshop_key",
+          "linked"
+        ],
+        "title": "OpportunitySource",
+        "description": "Where the lead came from and which records are linked to it (read-only)."
+      },
+      "OpportunityUpdate": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Expected Revision"
+          },
+          "service_domain": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ServiceDomain"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "problem_summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Problem Summary"
+          },
+          "scope_summary": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope Summary"
+          },
+          "discovery_status": {
+            "$ref": "#/components/schemas/DiscoveryStatus",
+            "default": "not_started"
+          },
+          "qualification_status": {
+            "$ref": "#/components/schemas/QualificationStatus",
+            "default": "unassessed"
+          },
+          "qualification_rationale": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qualification Rationale"
+          },
+          "technical_constraints": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Technical Constraints"
+          },
+          "stakeholders": {
+            "items": {
+              "$ref": "#/components/schemas/Stakeholder"
+            },
+            "type": "array",
+            "maxItems": 12,
+            "title": "Stakeholders"
+          },
+          "stakeholders_confirmed": {
+            "type": "boolean",
+            "title": "Stakeholders Confirmed",
+            "default": false
+          },
+          "next_action": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action"
+          },
+          "next_action_due": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Action Due"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "recommended_workshop": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkshopKey"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recommended_assessment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AssessmentToolKey"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "recommendation_rationale": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommendation Rationale"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision"
+        ],
+        "title": "OpportunityUpdate"
       },
       "OpsAgentStatus": {
         "type": "string",
@@ -14951,6 +16001,413 @@
         ],
         "title": "Prerequisite"
       },
+      "ProposalContent-Input": {
+        "properties": {
+          "scope": {
+            "type": "string",
+            "maxLength": 4000,
+            "title": "Scope",
+            "default": ""
+          },
+          "deliverables": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Deliverables"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Assumptions"
+          },
+          "exclusions": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Exclusions"
+          },
+          "dependencies": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Dependencies"
+          },
+          "responsibilities": {
+            "items": {
+              "$ref": "#/components/schemas/Responsibility"
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Responsibilities"
+          },
+          "acceptance_criteria": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Acceptance Criteria"
+          },
+          "milestones": {
+            "items": {
+              "$ref": "#/components/schemas/Milestone"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Milestones"
+          },
+          "risks": {
+            "items": {
+              "$ref": "#/components/schemas/Risk-Input"
+            },
+            "type": "array",
+            "maxItems": 30,
+            "title": "Risks"
+          },
+          "commercial": {
+            "$ref": "#/components/schemas/Commercial"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ProposalContent"
+      },
+      "ProposalContent-Output": {
+        "properties": {
+          "scope": {
+            "type": "string",
+            "maxLength": 4000,
+            "title": "Scope",
+            "default": ""
+          },
+          "deliverables": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Deliverables"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Assumptions"
+          },
+          "exclusions": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Exclusions"
+          },
+          "dependencies": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Dependencies"
+          },
+          "responsibilities": {
+            "items": {
+              "$ref": "#/components/schemas/Responsibility"
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Responsibilities"
+          },
+          "acceptance_criteria": {
+            "items": {
+              "type": "string",
+              "maxLength": 500,
+              "minLength": 1
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Acceptance Criteria"
+          },
+          "milestones": {
+            "items": {
+              "$ref": "#/components/schemas/Milestone"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "title": "Milestones"
+          },
+          "risks": {
+            "items": {
+              "$ref": "#/components/schemas/app__opportunities__schemas__Risk"
+            },
+            "type": "array",
+            "maxItems": 30,
+            "title": "Risks"
+          },
+          "commercial": {
+            "$ref": "#/components/schemas/Commercial"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ProposalContent"
+      },
+      "ProposalCreate": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ProposalKind"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Title"
+          },
+          "generate": {
+            "type": "boolean",
+            "title": "Generate",
+            "default": false
+          },
+          "content": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposalContent-Input"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "title"
+        ],
+        "title": "ProposalCreate"
+      },
+      "ProposalKind": {
+        "type": "string",
+        "enum": [
+          "proposal",
+          "sow"
+        ],
+        "title": "ProposalKind"
+      },
+      "ProposalOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "lead_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Lead Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "current_version": {
+            "type": "integer",
+            "title": "Current Version"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "decided_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided By"
+          },
+          "decision_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Note"
+          },
+          "approved_version": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved Version"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "versions": {
+            "items": {
+              "$ref": "#/components/schemas/VersionMeta"
+            },
+            "type": "array",
+            "title": "Versions"
+          },
+          "latest": {
+            "$ref": "#/components/schemas/app__opportunities__schemas__VersionOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "lead_id",
+          "kind",
+          "title",
+          "status",
+          "current_version",
+          "revision",
+          "created_by",
+          "decided_by",
+          "decision_note",
+          "approved_version",
+          "approved_at",
+          "created_at",
+          "updated_at",
+          "versions",
+          "latest"
+        ],
+        "title": "ProposalOut"
+      },
+      "ProposalTransition": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "submit",
+              "approve",
+              "reject",
+              "withdraw",
+              "reopen"
+            ],
+            "title": "Action"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "acknowledge_warnings": {
+            "type": "boolean",
+            "title": "Acknowledge Warnings",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "action",
+          "expected_revision"
+        ],
+        "title": "ProposalTransition"
+      },
+      "QualificationStatus": {
+        "type": "string",
+        "enum": [
+          "unassessed",
+          "qualified",
+          "not_qualified",
+          "on_hold"
+        ],
+        "title": "QualificationStatus"
+      },
       "QuestionOut": {
         "properties": {
           "key": {
@@ -15166,6 +16623,16 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/AiManagedDetails"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "workshop": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkshopKey"
               },
               {
                 "type": "null"
@@ -15712,6 +17179,32 @@
         ],
         "title": "RelatedResponse"
       },
+      "Responsibility": {
+        "properties": {
+          "party": {
+            "type": "string",
+            "enum": [
+              "client",
+              "provider",
+              "shared"
+            ],
+            "title": "Party"
+          },
+          "item": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Item"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "party",
+          "item"
+        ],
+        "title": "Responsibility"
+      },
       "ResultConsultationRequest": {
         "properties": {
           "token": {
@@ -16099,24 +17592,25 @@
         ],
         "title": "ReviewDecision"
       },
-      "Risk": {
+      "Risk-Input": {
         "properties": {
           "risk": {
             "type": "string",
+            "maxLength": 500,
             "minLength": 1,
             "title": "Risk"
           },
           "mitigation": {
             "type": "string",
-            "minLength": 1,
-            "title": "Mitigation"
+            "maxLength": 500,
+            "title": "Mitigation",
+            "default": ""
           }
         },
         "additionalProperties": false,
         "type": "object",
         "required": [
-          "risk",
-          "mitigation"
+          "risk"
         ],
         "title": "Risk"
       },
@@ -16841,6 +18335,23 @@
         ],
         "title": "ServiceDetail"
       },
+      "ServiceDomain": {
+        "type": "string",
+        "enum": [
+          "ai_strategy",
+          "ai_agents_automation",
+          "ai_applications",
+          "commerce_engineering",
+          "cloud_platform",
+          "devops_sre",
+          "data_integration",
+          "ai_governance",
+          "managed_operations",
+          "advisory_enablement"
+        ],
+        "title": "ServiceDomain",
+        "description": "The ten service domains (apps/web/src/lib/domains.ts, docs/SERVICE_TAXONOMY.md)."
+      },
       "ServiceFieldsEdit": {
         "properties": {
           "primary_domain": {
@@ -17522,6 +19033,41 @@
           "is_self"
         ],
         "title": "StaffOut"
+      },
+      "Stakeholder": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "role": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Role"
+          },
+          "provided_in": {
+            "type": "string",
+            "enum": [
+              "enquiry",
+              "call",
+              "email",
+              "meeting"
+            ],
+            "title": "Provided In"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "role",
+          "provided_in"
+        ],
+        "title": "Stakeholder",
+        "description": "A person the client named explicitly. `provided_in` records where they did so; nothing is inferred."
       },
       "StatusStep": {
         "properties": {
@@ -19015,56 +20561,6 @@
         ],
         "title": "VersionContent"
       },
-      "VersionCreate": {
-        "properties": {
-          "content": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/VersionContent"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "change_reason": {
-            "type": "string",
-            "maxLength": 500,
-            "minLength": 3,
-            "title": "Change Reason"
-          },
-          "based_on_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Based On Id"
-          },
-          "rollback_of_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Rollback Of Id"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "change_reason"
-        ],
-        "title": "VersionCreate"
-      },
       "VersionDiff": {
         "properties": {
           "from_version": {
@@ -19099,31 +20595,17 @@
         ],
         "title": "VersionDiff"
       },
-      "VersionOut": {
+      "VersionMeta": {
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "agent_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Agent Id"
-          },
           "number": {
             "type": "integer",
             "title": "Number"
           },
-          "status": {
+          "origin": {
             "type": "string",
-            "title": "Status"
+            "title": "Origin"
           },
-          "environment": {
-            "type": "string",
-            "title": "Environment"
-          },
-          "provider": {
+          "change_note": {
             "anyOf": [
               {
                 "type": "string"
@@ -19132,9 +20614,9 @@
                 "type": "null"
               }
             ],
-            "title": "Provider"
+            "title": "Change Note"
           },
-          "model": {
+          "author": {
             "anyOf": [
               {
                 "type": "string"
@@ -19143,193 +20625,31 @@
                 "type": "null"
               }
             ],
-            "title": "Model"
-          },
-          "sensitive": {
-            "type": "boolean",
-            "title": "Sensitive"
-          },
-          "change_reason": {
-            "type": "string",
-            "title": "Change Reason"
-          },
-          "based_on_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Based On Id"
-          },
-          "rollback_of_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Rollback Of Id"
-          },
-          "created_by": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Created By"
+            "title": "Author"
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "title": "Created At"
           },
-          "submitted_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Submitted At"
-          },
-          "reviewed_by": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reviewed By"
-          },
-          "reviewed_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Reviewed At"
-          },
-          "review_note": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Review Note"
-          },
-          "evaluation_run_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Evaluation Run Id"
-          },
-          "retired_at": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Retired At"
-          },
-          "prompt_template": {
-            "type": "string",
-            "title": "Prompt Template"
-          },
-          "parameters": {
-            "additionalProperties": true,
-            "type": "object",
-            "title": "Parameters"
-          },
-          "tools": {
+          "changed_sections": {
             "items": {
-              "additionalProperties": true,
-              "type": "object"
+              "type": "string"
             },
             "type": "array",
-            "title": "Tools"
-          },
-          "content_hash": {
-            "type": "string",
-            "title": "Content Hash"
-          },
-          "integrity_ok": {
-            "type": "boolean",
-            "title": "Integrity Ok"
-          },
-          "evidence_simulated": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Evidence Simulated"
+            "title": "Changed Sections"
           }
         },
         "type": "object",
         "required": [
-          "id",
-          "agent_id",
           "number",
-          "status",
-          "environment",
-          "provider",
-          "model",
-          "sensitive",
-          "change_reason",
-          "based_on_id",
-          "rollback_of_id",
-          "created_by",
+          "origin",
+          "change_note",
+          "author",
           "created_at",
-          "submitted_at",
-          "reviewed_by",
-          "reviewed_at",
-          "review_note",
-          "evaluation_run_id",
-          "retired_at",
-          "prompt_template",
-          "parameters",
-          "tools",
-          "content_hash",
-          "integrity_ok"
+          "changed_sections"
         ],
-        "title": "VersionOut"
+        "title": "VersionMeta"
       },
       "VersionSummary": {
         "properties": {
@@ -19588,6 +20908,23 @@
         ],
         "title": "WorkflowStep"
       },
+      "WorkshopKey": {
+        "type": "string",
+        "enum": [
+          "ai_strategy_discovery",
+          "ai_readiness_mapping",
+          "agent_architecture",
+          "landing_zone_assessment",
+          "kubernetes_review",
+          "devops_gitops_assessment",
+          "observability_sre",
+          "ecommerce_integration_discovery",
+          "rag_data_readiness",
+          "responsible_ai_review"
+        ],
+        "title": "WorkshopKey",
+        "description": "Workshops & Advisory catalogue (apps/web/src/lib/workshop-slugs.ts; the key list is mirrored in\napp/workshop_keys.json = apps/web/src/lib/workshop-keys.json, checked by scripts/test.ps1)."
+      },
       "WorkspaceCreate": {
         "properties": {
           "slug": {
@@ -19649,6 +20986,425 @@
           "created_at"
         ],
         "title": "WorkspaceOut"
+      },
+      "app__advisor__schemas__Risk": {
+        "properties": {
+          "risk": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Risk"
+          },
+          "mitigation": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Mitigation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "risk",
+          "mitigation"
+        ],
+        "title": "Risk"
+      },
+      "app__opportunities__schemas__Risk": {
+        "properties": {
+          "risk": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Risk"
+          },
+          "mitigation": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Mitigation",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "risk"
+        ],
+        "title": "Risk"
+      },
+      "app__opportunities__schemas__VersionCreate": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "content": {
+            "$ref": "#/components/schemas/ProposalContent-Input"
+          },
+          "change_note": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Change Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "content",
+          "change_note"
+        ],
+        "title": "VersionCreate"
+      },
+      "app__opportunities__schemas__VersionOut": {
+        "properties": {
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "origin": {
+            "type": "string",
+            "title": "Origin"
+          },
+          "change_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Change Note"
+          },
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Author"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "changed_sections": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Changed Sections"
+          },
+          "content": {
+            "$ref": "#/components/schemas/ProposalContent-Output"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "type": "array",
+            "title": "Findings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "number",
+          "origin",
+          "change_note",
+          "author",
+          "created_at",
+          "changed_sections",
+          "content",
+          "findings"
+        ],
+        "title": "VersionOut"
+      },
+      "app__ops__registry__VersionCreate": {
+        "properties": {
+          "content": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VersionContent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "change_reason": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Change Reason"
+          },
+          "based_on_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Based On Id"
+          },
+          "rollback_of_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rollback Of Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "change_reason"
+        ],
+        "title": "VersionCreate"
+      },
+      "app__ops__registry__VersionOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "number": {
+            "type": "integer",
+            "title": "Number"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "sensitive": {
+            "type": "boolean",
+            "title": "Sensitive"
+          },
+          "change_reason": {
+            "type": "string",
+            "title": "Change Reason"
+          },
+          "based_on_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Based On Id"
+          },
+          "rollback_of_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rollback Of Id"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "review_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Note"
+          },
+          "evaluation_run_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluation Run Id"
+          },
+          "retired_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retired At"
+          },
+          "prompt_template": {
+            "type": "string",
+            "title": "Prompt Template"
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Parameters"
+          },
+          "tools": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "content_hash": {
+            "type": "string",
+            "title": "Content Hash"
+          },
+          "integrity_ok": {
+            "type": "boolean",
+            "title": "Integrity Ok"
+          },
+          "evidence_simulated": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Simulated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "agent_id",
+          "number",
+          "status",
+          "environment",
+          "provider",
+          "model",
+          "sensitive",
+          "change_reason",
+          "based_on_id",
+          "rollback_of_id",
+          "created_by",
+          "created_at",
+          "submitted_at",
+          "reviewed_by",
+          "reviewed_at",
+          "review_note",
+          "evaluation_run_id",
+          "retired_at",
+          "prompt_template",
+          "parameters",
+          "tools",
+          "content_hash",
+          "integrity_ok"
+        ],
+        "title": "VersionOut"
       }
     }
   }
