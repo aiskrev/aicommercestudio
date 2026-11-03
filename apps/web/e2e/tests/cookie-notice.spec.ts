@@ -42,7 +42,8 @@ test("the cookie information is published: no draft notice, indexable, in the si
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
     await expect(page.getByTestId("legal-draft-notice")).toHaveCount(0);
-    expect((await page.locator("meta[name='robots']").getAttribute("content")) ?? "").not.toContain("noindex");
+    const robots = await page.locator("meta[name='robots']").evaluateAll((els) => els.map((el) => el.getAttribute("content") ?? ""));
+    expect(robots.join(" ")).not.toContain("noindex");
     for (const name of ["acs_locale", "acs_cookie_notice", "acs_session", "acs_csrf"]) await expect(page.locator("main")).toContainText(name);
     await expect(page.locator("main")).not.toContainText("[");
   }
