@@ -1,0 +1,82 @@
+# Builds a release from main: every quality gate first, then immutable images in GHCR.
+# Started by hand only, so a push to main never releases anything. Images are tagged sha-<commit>
+# and never overwritten; the VPS pulls them and builds nothing.
+#
+# Repository variables (Settings → Secrets and variables → Actions → Variables):
+#   SITE_URL, PUBLIC_CONTACT_DOMAIN, PUBLIC_CONTACT_EMAIL. The web image bakes them in at build time.
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    name: Quality gates
+    uses: ./.github/workflows/ci.yml
+
+  audit:
+    name: Dependency audit
+    uses: ./.github/workflows/audit.yml
+
+  images:
+    name: Image (${{ matrix.image }})
+    needs: [ci, audit]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - image: api
+            context: apps/api
+            target: runtime
+          - image: web
+            context: apps/web
+            target: runner
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Require the production build variables
+        if: matrix.image == 'web'
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}
+          PUBLIC_CONTACT_DOMAIN: ${{ vars.PUBLIC_CONTACT_DOMAIN }}
+          PUBLIC_CONTACT_EMAIL: ${{ vars.PUBLIC_CONTACT_EMAIL }}
+        run: |
+          for name in SITE_URL PUBLIC_CONTACT_DOMAIN PUBLIC_CONTACT_EMAIL; do
+            [ -n "${!name}" ] || { echo "::error::Repository variable $name is not set"; exit 1; }
+          done
+          case "$SITE_URL" in https://*) ;; *) echo "::error::SITE_URL must use https://"; exit 1 ;; esac
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          target: ${{ matrix.target }}
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/aiskrev/aicommercestudio-${{ matrix.image }}:sha-${{ github.sha }}
+          build-args: |
+            SITE_URL=${{ vars.SITE_URL }}
+            PUBLIC_CONTACT_DOMAIN=${{ vars.PUBLIC_CONTACT_DOMAIN }}
+            PUBLIC_CONTACT_EMAIL=${{ vars.PUBLIC_CONTACT_EMAIL }}
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}

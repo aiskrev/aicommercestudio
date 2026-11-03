@@ -1,0 +1,46 @@
+# Production Caddy configuration behind Cloudflare (proxied DNS, SSL mode Full (strict)).
+# The certificate is a Cloudflare Origin CA certificate: it does not depend on ACME reaching the
+# origin through the proxy. The private key is generated on the server and never leaves it.
+#
+# Client address: the API trusts the right-most X-Forwarded-For entry, so Caddy must send exactly one
+# value, the real visitor. CF-Connecting-IP is honoured only when the connection comes from a
+# Cloudflare range below; any other peer, or a spoofed header from the Internet, is ignored and the
+# socket address is used. Source of the ranges: https://www.cloudflare.com/ips/ (review regularly).
+
+{
+	servers {
+		trusted_proxies static 173.245.48.0/20 103.21.244.0/22 103.22.200.0/22 103.31.4.0/22 141.101.64.0/18 108.162.192.0/18 190.93.240.0/20 188.114.96.0/20 197.234.240.0/22 198.41.128.0/17 162.158.0.0/15 104.16.0.0/13 104.24.0.0/14 172.64.0.0/13 131.0.72.0/22 2400:cb00::/32 2606:4700::/32 2803:f800::/32 2405:b500::/32 2405:8100::/32 2a06:98c0::/29 2c0f:f248::/32
+		client_ip_headers CF-Connecting-IP
+	}
+}
+
+ai-commercestudio.com {
+	tls /etc/caddy/origin/origin.crt /etc/caddy/origin/origin.key
+
+	encode zstd gzip
+
+	reverse_proxy 127.0.0.1:3000 {
+		header_up X-Forwarded-For {client_ip}
+		header_up -CF-Connecting-IP
+	}
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	# Access log with rotation: 10 files x 50 MB, at most 30 days.
+	log {
+		output file /var/log/caddy/ai-commerce-studio.log {
+			roll_size 50mb
+			roll_keep 10
+			roll_keep_for 720h
+		}
+		format json
+	}
+}
+
+www.ai-commercestudio.com {
+	tls /etc/caddy/origin/origin.crt /etc/caddy/origin/origin.key
+	redir https://ai-commercestudio.com{uri} permanent
+}

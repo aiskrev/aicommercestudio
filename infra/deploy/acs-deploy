@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# Controlled release tool on the VPS, installed as /usr/local/sbin/acs-deploy (root:root, 0750).
+#   acs-deploy deploy sha-<40 hex>    pull the release and start it; refuses if migrations are pending
+#   acs-deploy migrate sha-<40 hex>   approved job: backup, then alembic upgrade + seed with that image
+#   acs-deploy rollback               return to the previous release (never touches the database)
+#   acs-deploy status                 running release and container health
+# A failed deploy returns to the previous release by itself. Nothing here deletes volumes or images.
+set -euo pipefail
+
+ROOT=${ACS_ROOT:-/opt/ai-commerce-studio}
+BACKUP=${ACS_BACKUP:-$ROOT/backup-db.sh}
+HEALTH_TIMEOUT=${ACS_HEALTH_TIMEOUT:-180}
+RELEASE_RE='^sha-[0-9a-f]{40}$'
+PREVIOUS=
+
+cd "$ROOT"
+exec 9>"$ROOT/.deploy.lock"
+flock -n 9 || { echo "another acs-deploy is running" >&2; exit 75; }
+
+log() { printf '%s %s\n' "$(date -u +%FT%TZ)" "$*"; }
+
+compose() {
+  docker compose --project-directory "$ROOT" --env-file "$ROOT/.env" --env-file "$ROOT/release.env" -f "$ROOT/compose.yml" "$@"
+}
+
+valid_release() { [[ ${1:-} =~ $RELEASE_RE ]] || { echo "invalid release id" >&2; exit 64; }; }
+current_release() { sed -n 's/^ACS_RELEASE=//p' "$ROOT/release.env" 2>/dev/null || true; }
+write_release() { umask 027; printf 'ACS_RELEASE=%s\n' "$1" > "$ROOT/release.env.new"; mv "$ROOT/release.env.new" "$ROOT/release.env"; }
+
+# Put back the release that was running before this command; none means a first deployment.
+restore_release() { if [ -n "$PREVIOUS" ]; then write_release "$PREVIOUS"; else rm -f "$ROOT/release.env"; fi; }
+
+# Same check Caddy's upstream sees: the web container, its API proxy, the API and the database.
+ready() {
+  local port host
+  port=$(sed -n 's/^ACS_WEB_PORT=//p' "$ROOT/.env"); port=${port:-3000}
+  host=$(sed -n 's#^SITE_URL=https\?://##p' "$ROOT/.env")
+  curl -fsS --max-time 5 -H "Host: ${host:-localhost}" -H 'X-Forwarded-Proto: https' \
+    "http://127.0.0.1:${port}/api/health/ready" > /dev/null
+}
+
+# Revision in the database against the head inside the image. Exit 0 only when they are the same.
+schema_current() {
+  local db head
+  db=$(compose --profile migrate run --rm --no-deps -T migrate alembic current 2>/dev/null | awk '/^[0-9a-zA-Z_]+( |$)/{print $1}' | tail -1)
+  head=$(compose --profile migrate run --rm --no-deps -T migrate alembic heads 2>/dev/null | awk '/^[0-9a-zA-Z_]+( |$)/{print $1}' | tail -1)
+  log "schema: database=${db:-none} image=${head:-unknown}"
+  [ -n "$head" ] && [ "$db" = "$head" ]
+}
+
+start_release() {
+  compose up -d --remove-orphans --wait --wait-timeout "$HEALTH_TIMEOUT" db api web && ready
+}
+
+cmd_deploy() {
+  local release=$1
+  valid_release "$release"
+  PREVIOUS=$(current_release)
+  write_release "$release"
+  log "pulling $release"
+  if ! compose pull --quiet api web; then
+    restore_release
+    echo "pull failed, nothing was changed" >&2
+    exit 1
+  fi
+  compose up -d --wait --wait-timeout 60 db
+  if ! schema_current; then
+    restore_release
+    echo "migrations are pending for $release: run the approved migrate job first; nothing was changed" >&2
+    exit 3
+  fi
+  if start_release; then
+    if [ -n "$PREVIOUS" ] && [ "$PREVIOUS" != "$release" ]; then printf '%s\n' "$PREVIOUS" > "$ROOT/release.previous"; fi
+    log "running $release"
+    return 0
+  fi
+  log "health check failed for $release"
+  compose ps --format 'table {{.Service}}\t{{.Status}}' || true
+  if [ -n "$PREVIOUS" ] && [ "$PREVIOUS" != "$release" ]; then
+    write_release "$PREVIOUS"
+    log "automatic rollback to $PREVIOUS"
+    start_release && log "rollback healthy"
+  fi
+  exit 1
+}
+
+cmd_migrate() {
+  local release=$1 tables
+  valid_release "$release"
+  PREVIOUS=$(current_release)
+  write_release "$release"
+  trap restore_release EXIT
+  compose --profile migrate pull --quiet migrate
+  compose up -d --wait --wait-timeout 60 db
+  # shellcheck disable=SC2016 # expanded by the shell inside the db container
+  tables=$(compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Atc "select count(*) from information_schema.tables where table_schema = '"'"'public'"'"'"')
+  if [ "${tables:-0}" -gt 0 ]; then
+    log "backup before migration"
+    COMPOSE="docker compose --project-directory $ROOT --env-file $ROOT/.env --env-file $ROOT/release.env -f $ROOT/compose.yml" "$BACKUP"
+  else
+    log "empty database: no backup needed"
+  fi
+  compose --profile migrate run --rm -T migrate
+  schema_current
+  log "migrations applied with $release"
+}
+
+cmd_rollback() {
+  local target
+  target=$(cat "$ROOT/release.previous" 2>/dev/null || true)
+  valid_release "$target"
+  cmd_deploy "$target"
+}
+
+cmd_status() {
+  echo "release: $(current_release)"
+  compose ps --format 'table {{.Service}}\t{{.Status}}'
+}
+
+case "${1:-}" in
+  deploy) cmd_deploy "${2:-}" ;;
+  migrate) cmd_migrate "${2:-}" ;;
+  rollback) cmd_rollback ;;
+  status) cmd_status ;;
+  *) echo "usage: acs-deploy deploy|migrate <release> | rollback | status" >&2; exit 64 ;;
+esac
