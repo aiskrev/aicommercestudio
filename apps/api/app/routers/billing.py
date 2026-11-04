@@ -10,6 +10,7 @@ import logging
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, Request, Response, status
+from fastapi.concurrency import run_in_threadpool
 from pydantic import Field
 
 from app.billing import service
@@ -104,6 +105,6 @@ async def webhook(
         logger.error("billing_live_event_refused")
         raise ApiError(status.HTTP_400_BAD_REQUEST, "Live events aren't accepted.", "live_mode_refused")
     if event["type"] in service.HANDLED:
-        service.record_event(db, event)
+        await run_in_threadpool(service.record_event, db, event)  # keep the event loop free
         tasks.add_task(service.process_pending)
     return {"received": True}

@@ -93,7 +93,7 @@ export function ZoneDashboard({ locale }: { locale: Locale }) {
     <dl className="grid max-w-2xl gap-4 sm:grid-cols-2">
       <div className="text-sm">
         <dt className="font-semibold">{t.plan}</dt>
-        <dd>{data.plan}</dd>
+        <dd className="capitalize">{data.plan}</dd>
       </div>
       <div className="text-sm">
         <dt className="font-semibold">{t.projects}</dt>
@@ -122,7 +122,7 @@ export function ZonePlan({ locale }: { locale: Locale }) {
   return (
     <div className="max-w-2xl space-y-4 text-sm">
       <p>
-        {t.plan}: <strong>{data.plan}</strong>
+        {t.plan}: <strong className="capitalize">{data.plan}</strong>
       </p>
       <ul className="space-y-1">
         {rows.map(([label, key]) => (

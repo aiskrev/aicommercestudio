@@ -13,7 +13,7 @@ flags, and production refuses to start with the workspace, Stripe or demo docume
 
 | Check | Evidence |
 | --- | --- |
-| Regressions on public pages, tools and lead forms | Playwright e2e suite, `public`, `contact`, `tools`, `seo`, `links` specs: 204 of 205; the one failure was `admin.spec.ts`, see below |
+| Regressions on public pages, tools and lead forms | Playwright e2e suite, including `public`, `contact`, `tools`, `seo` and `links` specs: 205 of 205 |
 | BG/EN parity of account and client area routes | `/bg/konto/...` and `/en/account/...` opened in a browser; language switch works |
 | Language of e-mails | Unit tests for both; a BG verification e-mail read from a local `.eml` file |
 | Verification and recovery, expired and reused tokens | `test_accounts.py`; reuse also tried by hand: first 204, second 400 `token_invalid` |
@@ -31,9 +31,8 @@ flags, and production refuses to start with the workspace, Stripe or demo docume
 | Schema compatibility with the old version | Local: code at `6e0a4e1` started against schema `0021`, read leads and refused a bad sign-in |
 | Flags on, in a real browser | Local: sign-up, confirmation, sign-in, project, assessment, support request and client area pages |
 
-Suites on this branch: API 1061 of 1061, portal 1 of 1, e2e 204 of 205. The web suite failed on a lint
-error and `admin.spec.ts` on a selector that found a reference twice. Both are fixed; see the pull request
-checks for the final result.
+Final local run on this branch: web passed, API 1061 of 1061, e2e 205 of 205, portal 1 of 1. An earlier run
+failed on a lint error and on a selector in `admin.spec.ts` that found a reference twice; both are fixed.
 
 ### Not verified
 
