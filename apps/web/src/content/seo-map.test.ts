@@ -195,12 +195,11 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
   });
 
   describe("sitemap and robots policy", () => {
-    it("omits draft legal pages and thin topic pages", () => {
-      expect(content.legal.isDraft).toBe(true);
-      for (const path of [routes.privacy, routes.terms]) expect(sitemapPaths).not.toContain(url(path));
-      // The cookie information is final (reviewed): indexed and listed.
+    it("lists the published legal pages and omits thin topic pages", () => {
+      // The legal texts are final (reviewed): indexed and listed.
+      expect(content.legal.isDraft).toBe(false);
       expect(content.legal.cookiesDraft).toBe(false);
-      expect(sitemapPaths).toContain(url(routes.cookies));
+      for (const path of [routes.privacy, routes.terms, routes.cookies]) expect(sitemapPaths).toContain(url(path));
       for (const category of content.editorialCategories) {
         const path = url(routes.insightsCategory(category.slug));
         if (isIndexableCategory(locale, category.key)) expect(sitemapPaths).toContain(path);

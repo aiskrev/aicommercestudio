@@ -1,10 +1,7 @@
 import type { LegalDocument } from "@/content/types";
+import { company } from "@/lib/company";
 
-/**
- * DRAFT legal texts (English). Placeholders in [square brackets] must be completed and the texts
- * reviewed by a qualified lawyer before the site is published. The Bulgarian version prevails
- * unless the reviewed texts state otherwise.
- */
+/** Legal texts (English). The Bulgarian version prevails. */
 export { COOKIE_POLICY_IS_DRAFT, LEGAL_TEXTS_ARE_DRAFTS } from "@/content/bg/legal";
 
 export const legalDraftNotice =
@@ -14,15 +11,15 @@ export const privacyPolicy: LegalDocument = {
   title: "Privacy policy",
   metaDescription:
     "How A.I. Commerce Studio processes personal data from the contact forms and the AI advisor: purposes, legal bases, retention, processors and your GDPR rights.",
-  updated: "2026-10-25",
+  updated: "2026-11-04",
   intro:
     "This policy describes how we process the personal data you provide through this website, in accordance with Regulation (EU) 2016/679 (GDPR) and Bulgarian law.",
   sections: [
     {
       heading: "1. Data controller",
       paragraphs: [
-        "Controller: [Company name], UIC [company ID], registered office and address of management: [Address].",
-        "Email for data protection questions: [contact email]. Data protection officer: [if applicable].",
+        "Controller: “ISKREV CONSULTING” Ltd., UIC 207509557, registered office and address of management: bl. 457, entr. 1, fl. 13, apt. 75, Mladost 4 housing estate, Mladost district, 1715 Sofia, Bulgaria.",
+        `Email for data protection questions: ${company.contactEmail}. The company has not appointed a data protection officer.`,
       ],
     },
     {
@@ -49,7 +46,7 @@ export const privacyPolicy: LegalDocument = {
     {
       heading: "4. AI Automation Advisor",
       paragraphs: [
-        "The AI advisor does not require personal data. Email addresses, phone numbers and links are removed from the description before it is processed. Unless you untick the save option, the assessment is kept for [30 days] and then deleted automatically; if you request a consultation, it is attached to your inquiry and follows that inquiry's retention period.",
+        "The AI advisor does not require personal data. Email addresses, phone numbers and links are removed from the description before it is processed. Unless you untick the save option, the assessment is kept for 30 days and then deleted automatically; if you request a consultation, it is attached to your inquiry and follows that inquiry's retention period.",
         "When an AI model is enabled, the description (without the removed data) is sent to the model provider solely to generate the assessment. Without a configured provider the advisor runs in demonstration mode and sends no data outside our infrastructure.",
       ],
     },
@@ -64,15 +61,15 @@ export const privacyPolicy: LegalDocument = {
     {
       heading: "6. Retention",
       paragraphs: [
-        "Inquiry data is kept for up to [24 months] after the last communication, unless a contractual relationship arises, in which case the periods under that contract and the law apply. After that, the data is deleted automatically.",
-        "The administrative action log does not contain the content of inquiries and is kept for up to [36 months] for security purposes. Database backups are kept for up to [14 days] and then overwritten.",
+        "Inquiry data is kept for up to 24 months after the last communication, unless a contractual relationship arises, in which case the periods under that contract and the law apply. After that, the data is deleted automatically.",
+        "The administrative action log does not contain the content of inquiries and is kept for up to 36 months for security purposes. Database backups are kept for up to 14 days and then overwritten.",
       ],
     },
     {
       heading: "7. Recipients, processors and transfers outside the EU",
       paragraphs: [
-        "The data is accessible only to authorized staff of the controller. We use hosting and infrastructure providers as processors: [list of processors and the countries where they are located].",
-        "If we use an AI model provider or an email service, it is named in this list, processes data only on our instructions and under a data processing agreement. If data is transferred outside the European Economic Area, this happens only with appropriate safeguards under Chapter V GDPR, such as standard contractual clauses. [To be completed once providers are selected.]",
+        "The data is accessible only to authorized staff of the controller. We use hosting and infrastructure providers as processors: Hetzner Online GmbH (hosting, Germany) and Cloudflare, Inc. (content delivery, protection and email forwarding, USA).",
+        "If we use an AI model provider or an email service, it is named in this list, processes data only on our instructions and under a data processing agreement. If data is transferred outside the European Economic Area, this happens only with appropriate safeguards under Chapter V GDPR, such as standard contractual clauses.",
       ],
     },
     {
@@ -99,7 +96,7 @@ export const privacyPolicy: LegalDocument = {
     {
       heading: "10. How to request access or deletion",
       paragraphs: [
-        "Send a request to [contact email] from the email address you used for the inquiry, or quote the inquiry's reference number. We may ask for additional information to confirm your identity.",
+        `Send a request to ${company.contactEmail} from the email address you used for the inquiry, or quote the inquiry's reference number. We may ask for additional information to confirm your identity.`,
         "We respond within one month. On deletion, the inquiry, its notes and any attached AI assessment are removed; the action log keeps only a record that a deletion took place, without the personal data.",
       ],
     },
@@ -161,15 +158,15 @@ export const cookiePolicy: LegalDocument = {
 export const termsOfUse: LegalDocument = {
   title: "Terms of use and legal information",
   metaDescription: "Terms of use for the A.I. Commerce Studio website and legal information about the service provider.",
-  updated: "2026-10-25",
+  updated: "2026-11-04",
   intro:
     "These terms govern the use of the website. Terms for specific services are agreed separately in an individual quote and contract.",
   sections: [
     {
       heading: "1. Provider information",
       paragraphs: [
-        "[Company name], UIC [company ID], registered office and address of management: [Address], email: [email], phone: [phone]. \"A.I. Commerce Studio\" is a working trade name.",
-        "[VAT registration details, if applicable.]",
+        `“ISKREV CONSULTING” Ltd., UIC 207509557, registered office and address of management: bl. 457, entr. 1, fl. 13, apt. 75, Mladost 4 housing estate, Mladost district, 1715 Sofia, Bulgaria, email: ${company.contactEmail}, phone: ${company.phoneDisplay}. "A.I. Commerce Studio" is a working trade name.`,
+        "The company is not registered for VAT.",
       ],
     },
     {

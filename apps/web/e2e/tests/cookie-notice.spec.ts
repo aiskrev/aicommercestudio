@@ -50,9 +50,14 @@ test("the cookie information is published: no draft notice, indexable, in the si
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).toContain("/bg/biskvitki");
   expect(sitemap).toContain("/en/cookies");
-  // The privacy policy and the terms are still drafts.
-  await page.goto("/bg/poveritelnost");
-  await expect(page.getByTestId("legal-draft-notice")).toBeVisible();
+  // The privacy policy and the terms are published too.
+  for (const path of ["/bg/poveritelnost", "/bg/obshti-usloviya", "/en/privacy", "/en/terms"]) {
+    await page.goto(path);
+    await expect(page.getByTestId("legal-draft-notice")).toHaveCount(0);
+    await expect(page.locator("main")).not.toContainText("[");
+    await expect(page.locator("main")).toContainText("207509557");
+    expect(sitemap).toContain(path);
+  }
 });
 
 test("the footer and the About page no longer announce unpublished company details", async ({ page }) => {

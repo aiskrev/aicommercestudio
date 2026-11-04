@@ -27,7 +27,7 @@ export default async function TermsPage({ params }: PageProps<"/[locale]/obshti-
   return (
     <LegalPage
       document={document}
-      draftNotice={legal.draftNotice}
+      draftNotice={legal.isDraft ? legal.draftNotice : undefined}
       updatedLabel={dict.common.updated}
       breadcrumbs={[
         { name: dict.common.home, path: localizePath(locale, routes.home) },

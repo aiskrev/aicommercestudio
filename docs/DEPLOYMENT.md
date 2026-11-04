@@ -130,8 +130,8 @@ Verify after go-live: `curl -I https://example.bg` (HSTS, CSP, `X-Frame-Options:
 Before the first deployment:
 
 - [x] Cookie information reviewed and published (`COOKIE_POLICY_IS_DRAFT = false`, cookie notice live)
-- [ ] Privacy policy and terms reviewed; `LEGAL_TEXTS_ARE_DRAFTS = false`; company details and contact data filled in **(owner)**
-- [ ] Privacy policy lists processors (hosting, e-mail, AI provider if enabled) and backup retention **(owner)**
+- [x] Privacy policy and terms reviewed; `LEGAL_TEXTS_ARE_DRAFTS = false`; company details and contact data filled in
+- [x] Privacy policy lists processors (hosting, e-mail forwarding) and backup retention; add the AI provider before enabling it
 - [ ] DPA signed with the hosting provider (and Anthropic / SMTP provider if enabled) **(owner)**
 - [ ] Server hardened (SSH keys, firewall 22/80/443, automatic security updates)
 - [ ] Domain DNS points to the server; Caddyfile has the real domain
