@@ -37,6 +37,8 @@ No blocker was found.
 
 ## Before a public release (not done)
 
+Product accounts in SAAS_EXPANSION_PLAN.md do not replace these steps and never switch the portal on (ADR-52).
+
 * An external penetration test of authentication and isolation.
 * The **restricted API login** switched on (`acs_app_api`, migration 0018; see `infra/deploy/README.md`).
   Production refuses to start with the portal on and the owner connection.

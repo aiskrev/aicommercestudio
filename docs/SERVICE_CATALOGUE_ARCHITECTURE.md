@@ -46,6 +46,7 @@ and the lead pipeline keep working unchanged during every step of the transition
   module of the modular monolith (`app/catalogue/`), like `app/ops/` and `app/team/`.
 * **No prices.** Neither the public catalogue nor its tables hold prices, ranges or outcome figures.
   The internal pricing guidance (AI_MANAGED_SERVICES_PRICING.md) stays a document.
+  Planned SaaS prices do not change this: they belong to a separate module (SAAS_EXPANSION_PLAN.md, ADR-54).
 * No migration of articles, legal texts, tool logic, the readiness and team scoring vectors or the
   agent library. They stay in code. The catalogue references tools by their stable `ToolKey`.
 * No generic JSON for business rules. JSONB appears only in the immutable release snapshots
