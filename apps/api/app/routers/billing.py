@@ -10,6 +10,7 @@ import logging
 from typing import Annotated, Any, Literal
 
 from fastapi import APIRouter, BackgroundTasks, Depends, Header, Request, Response, status
+from fastapi.concurrency import run_in_threadpool
 from pydantic import Field
 
 from app.billing import service
@@ -19,7 +20,7 @@ from app.config import get_settings
 from app.deps import AppSettings, DbSession
 from app.errors import ApiError
 from app.routers.accounts import Account
-from app.routers.workspace import WorkspaceCtx
+from app.routers.workspace import Context, WorkspaceCtx
 from app.schemas import StrictModel
 
 logger = logging.getLogger(__name__)
@@ -34,6 +35,14 @@ def _enabled() -> None:
 def _no_store(response: Response) -> None:
     response.headers["Cache-Control"] = "no-store"
 
+
+def billing_role(ctx: WorkspaceCtx) -> Context:
+    if ctx.role not in ("owner", "billing"):
+        raise ApiError(status.HTTP_403_FORBIDDEN, "Your role doesn't allow this.", "role_not_allowed")
+    return ctx
+
+
+Billing = Annotated[Context, Depends(billing_role)]
 
 router = APIRouter(prefix="/api/billing", tags=["billing"], dependencies=[Depends(_enabled), Depends(_no_store)])
 
@@ -57,12 +66,12 @@ def offers(ctx: WorkspaceCtx, db: DbSession) -> list[dict[str, Any]]:
 
 
 @router.get("/status")
-def billing_status(ctx: WorkspaceCtx, db: DbSession) -> dict[str, Any]:
+def billing_status(ctx: Billing, db: DbSession) -> dict[str, Any]:
     return service.status_for(db, ctx.workspace.id)
 
 
 @router.post("/checkout")
-def checkout(payload: CheckoutIn, ctx: WorkspaceCtx, db: DbSession, settings: AppSettings) -> dict[str, Any]:
+def checkout(payload: CheckoutIn, ctx: Billing, db: DbSession, settings: AppSettings) -> dict[str, Any]:
     try:
         result = service.start_checkout(db, settings, ctx.workspace, payload.offer, payload.locale)
     except BillingError as exc:
@@ -71,9 +80,7 @@ def checkout(payload: CheckoutIn, ctx: WorkspaceCtx, db: DbSession, settings: Ap
 
 
 @router.post("/portal")
-def portal(
-    payload: PortalIn, account: Account, ctx: WorkspaceCtx, db: DbSession, settings: AppSettings
-) -> dict[str, str]:
+def portal(payload: PortalIn, account: Account, ctx: Billing, db: DbSession, settings: AppSettings) -> dict[str, str]:
     try:
         return {"url": service.open_portal(db, settings, ctx.workspace, account.account.id, payload.locale)}
     except BillingError as exc:
@@ -98,6 +105,6 @@ async def webhook(
         logger.error("billing_live_event_refused")
         raise ApiError(status.HTTP_400_BAD_REQUEST, "Live events aren't accepted.", "live_mode_refused")
     if event["type"] in service.HANDLED:
-        service.record_event(db, event)
+        await run_in_threadpool(service.record_event, db, event)  # keep the event loop free
         tasks.add_task(service.process_pending)
     return {"received": True}

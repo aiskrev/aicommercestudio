@@ -207,6 +207,55 @@ class WorkspaceProject(Base):
     updated_at: Mapped[datetime] = mapped_column(TS, nullable=False, default=utcnow, onupdate=utcnow)
 
 
+class WorkspaceMember(Base):
+    """Anyone besides the owner. Only an accepted invitation creates a row; e-mail domain never does."""
+
+    __tablename__ = "workspace_members"
+    __table_args__ = (CheckConstraint("role IN ('billing', 'member')", name="role"),)
+
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("customer_workspaces.id", ondelete="CASCADE"), primary_key=True
+    )
+    account_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("customer_accounts.id", ondelete="CASCADE"), primary_key=True
+    )
+    role: Mapped[str] = mapped_column(String(10), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(TS, nullable=False, default=utcnow)
+
+
+class WorkspaceInvitation(Base):
+    __tablename__ = "workspace_invitations"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("customer_workspaces.id", ondelete="CASCADE"), nullable=False
+    )
+    email: Mapped[str] = mapped_column(String(254), nullable=False)
+    role: Mapped[str] = mapped_column(String(10), nullable=False)
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    expires_at: Mapped[datetime] = mapped_column(TS, nullable=False)
+    used_at: Mapped[datetime | None] = mapped_column(TS)
+    created_at: Mapped[datetime] = mapped_column(TS, nullable=False, default=utcnow)
+
+
+class SupportRequest(Base):
+    """`software` is about the subscription; `service` is about a human support contract."""
+
+    __tablename__ = "support_requests"
+    __table_args__ = (Index("ix_support_requests_workspace", "workspace_id"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    workspace_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("customer_workspaces.id", ondelete="CASCADE"), nullable=False
+    )
+    created_by: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("customer_accounts.id", ondelete="SET NULL"))
+    kind: Mapped[str] = mapped_column(String(10), nullable=False)
+    subject: Mapped[str] = mapped_column(String(160), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    status: Mapped[str] = mapped_column(String(10), nullable=False, default="open")
+    created_at: Mapped[datetime] = mapped_column(TS, nullable=False, default=utcnow)
+
+
 class AssessmentVersion(Base):
     """One saved assessment. Never edited: a follow-up or a variant is a new version."""
 

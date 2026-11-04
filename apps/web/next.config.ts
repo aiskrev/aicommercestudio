@@ -1,12 +1,15 @@
 import type { NextConfig } from "next";
 
 const isProd = process.env.NODE_ENV === "production";
+// Cloudflare Turnstile is the only outside script, and only when it is switched on for a build.
+const turnstile = process.env.TURNSTILE_ENABLED === "true" ? " https://challenges.cloudflare.com" : "";
 
 // No third-party scripts, trackers or fonts are loaded: everything is served from 'self'.
 // 'unsafe-inline' for scripts is required by Next.js inline bootstrapping without nonces.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}${turnstile}`,
+  `frame-src 'self'${turnstile}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",

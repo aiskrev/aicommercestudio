@@ -68,6 +68,11 @@ const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
     "nov-link": "new-link",
     "zabravena-parola": "forgot-password",
     "nova-parola": "reset-password",
+    abonamenti: "subscriptions",
+    fakturi: "invoices",
+    zapitvaniya: "support",
+    organizatsiya: "organisation",
+    sigurnost: "security",
   },
   // Tool pages (lib/tool-slugs.ts): live tools and the intro pages of planned ones.
   instrumenti: Object.fromEntries(Object.values(TOOL_PAGE_SLUGS).map(({ bg, en }) => [bg, en])),

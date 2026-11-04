@@ -37,6 +37,7 @@ from app.routers import (
     solution,
     team,
     workspace,
+    zone,
 )
 
 logger = logging.getLogger(__name__)
@@ -149,6 +150,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(accounts.router)
     app.include_router(workspace.router)
     app.include_router(billing.router)
+    app.include_router(zone.router)
     return app
 
 

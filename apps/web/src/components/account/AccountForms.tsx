@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
 import { type FormEvent, type ReactNode, useEffect, useState } from "react";
 
 import { Alert, Button } from "@/components/ui/primitives";
@@ -13,6 +14,11 @@ import { routes } from "@/lib/routes";
 export type AccountView = "signIn" | "register" | "resend" | "verify" | "forgot" | "reset";
 
 type Status = { tone: "error" | "success"; text: string } | null;
+
+function human(data: FormData): { turnstile_token?: string } {
+  const token = data.get("cf-turnstile-response");
+  return typeof token === "string" && token ? { turnstile_token: token } : {};
+}
 
 function TextField({
   id,
@@ -65,7 +71,15 @@ function CheckField({ id, required, children }: { id: string; required?: boolean
 }
 
 /** The sign-in, sign-up, confirmation and recovery forms. Answers never say whether an e-mail is known. */
-export function AccountForm({ view, locale }: { view: AccountView; locale: Locale }) {
+export function AccountForm({
+  view,
+  locale,
+  turnstileSiteKey,
+}: {
+  view: AccountView;
+  locale: Locale;
+  turnstileSiteKey?: string;
+}) {
   const t = accountTexts[locale];
   const router = useRouter();
   const href = (path: string) => localizePath(locale, path);
@@ -109,13 +123,14 @@ export function AccountForm({ view, locale }: { view: AccountView; locale: Local
           locale,
           privacy_acknowledged: data.get("privacy") === "on",
           marketing_consent: data.get("marketing") === "on",
+          ...human(data),
         });
         setStatus({ tone: "success", text: t.register.done });
       } else if (view === "resend") {
         await call("/verification/resend", { email: text("email"), locale });
         setStatus({ tone: "success", text: t.resend.done });
       } else if (view === "forgot") {
-        await call("/password/forgot", { email: text("email"), locale });
+        await call("/password/forgot", { email: text("email"), locale, ...human(data) });
         setStatus({ tone: "success", text: t.forgot.done });
       } else if (view === "verify") {
         await call("/verification/confirm", { token });
@@ -183,6 +198,12 @@ export function AccountForm({ view, locale }: { view: AccountView; locale: Local
                 {t.register.privacyAfter}
               </CheckField>
               <CheckField id="marketing">{t.register.marketing}</CheckField>
+            </>
+          )}
+          {turnstileSiteKey && (view === "register" || view === "forgot") && (
+            <>
+              <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" />
+              <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-language={locale} />
             </>
           )}
           <Button type="submit" loading={busy} loadingLabel={t.working}>

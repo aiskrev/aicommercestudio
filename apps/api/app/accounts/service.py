@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.accounts.models import CustomerSession, CustomerToken, OutboxMessage, OutboxStatus, RateLimitBucket
 from app.models import utcnow
+from app.workspace.models import WorkspaceInvitation
 from app.workspace.usage import sweep_expired
 
 KEEP_DAYS = 30
@@ -30,6 +31,7 @@ def purge_expired(db: Session) -> int:
             OutboxMessage.status != OutboxStatus.PENDING.value, OutboxMessage.created_at < cutoff
         ),
         delete(RateLimitBucket).where(RateLimitBucket.window_start < now - timedelta(days=1)),
+        delete(WorkspaceInvitation).where(WorkspaceInvitation.expires_at < cutoff),
     ):
         removed += db.execute(statement).rowcount
     removed += sweep_expired(db)

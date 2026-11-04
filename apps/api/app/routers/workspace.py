@@ -27,7 +27,7 @@ from app.schemas import StrictModel
 from app.workspace import entitlements, service, usage
 from app.workspace.demo import DEMO
 from app.workspace.entitlements import Entitlements
-from app.workspace.models import AssessmentVersion, CustomerWorkspace, WorkspaceProject
+from app.workspace.models import AssessmentVersion, CustomerWorkspace, WorkspaceMember, WorkspaceProject
 from app.workspace.service import RunIn, WorkspaceError
 
 
@@ -48,18 +48,30 @@ router = APIRouter(prefix="/api/workspace", tags=["workspace"], dependencies=[De
 class Context:
     workspace: CustomerWorkspace
     rights: Entitlements
+    role: str = "owner"
 
 
 def _error(exc: WorkspaceError) -> ApiError:
     return ApiError(exc.status, exc.detail, exc.code, errors=exc.extra or None)
 
 
-def workspace_context(account: Account, db: DbSession) -> Context:
+def workspace_context(
+    account: Account,
+    db: DbSession,
+    x_workspace: Annotated[uuid.UUID | None, Header()] = None,
+) -> Context:
+    """The caller's own workspace, or one named in X-Workspace if they are a member of it."""
     workspace = entitlements.workspace_for(db, account.account.id)
     db.commit()
+    role = "owner"
+    if x_workspace is not None and x_workspace != workspace.id:
+        member = db.get(WorkspaceMember, (x_workspace, account.account.id))
+        if member is None:  # the same answer as a workspace that doesn't exist
+            raise ApiError(status.HTTP_404_NOT_FOUND, "Not found.", "not_found")
+        workspace, role = db.get(CustomerWorkspace, x_workspace), member.role
     rights = entitlements.resolve(db, workspace.id)
     limits.hit("workspace", str(workspace.id), rights.limit("limit_requests_per_minute"), 60)
-    return Context(workspace=workspace, rights=rights)
+    return Context(workspace=workspace, rights=rights, role=role)
 
 
 WorkspaceCtx = Annotated[Context, Depends(workspace_context)]
@@ -236,6 +248,8 @@ def sandbox_plan(
     """Test adapter: changes the plan with no payment. Production refuses to start with it on."""
     if settings.billing_provider != "sandbox":
         raise ApiError(status.HTTP_404_NOT_FOUND, "Not found.", "not_found")
+    if ctx.role != "owner":
+        raise ApiError(status.HTTP_403_FORBIDDEN, "Your role doesn't allow this.", "role_not_allowed")
     entitlements.grant(db, ctx.workspace.id, payload.plan, "sandbox")
     audit.record(
         db,

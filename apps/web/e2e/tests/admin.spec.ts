@@ -174,7 +174,7 @@ test.describe("admin lead management", () => {
     // An AI readiness submission shows its server-computed result and a PDF only admins can download.
     await page.goto(`/admin/leads?q=${encodeURIComponent(readinessCompany)}`);
     await page.getByRole("link", { name: "E2E Готовност" }).first().click();
-    await expect(page.getByText(`#${readinessReference}`)).toBeVisible();
+    await expect(page.getByText(`#${readinessReference}`).first()).toBeVisible();
     const readiness = page.getByTestId("readiness-details");
     await expect(readiness).toContainText("25 / 100");
     await expect(readiness).toContainText("Изграждане на основи");
@@ -191,7 +191,7 @@ test.describe("admin lead management", () => {
     // An AI team consultation shows the configuration, its estimate and an admin-only PDF plan.
     await page.goto(`/admin/leads?q=${encodeURIComponent(teamCompany)}`);
     await page.getByRole("link", { name: "E2E Екип" }).first().click();
-    await expect(page.getByText(`#${teamReference}`)).toBeVisible();
+    await expect(page.getByText(`#${teamReference}`).first()).toBeVisible();
     const team = page.getByTestId("team-details");
     await expect(team).toContainText("Средна");
     await expect(team).toContainText("customer_support, knowledge_assistant");

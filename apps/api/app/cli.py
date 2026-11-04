@@ -43,6 +43,8 @@ from app.billing.models import BillingOffer, ScopeConfirmation
 from app.catalogue import seed as catalogue
 from app.config import get_settings
 from app.db import get_sessionmaker
+from app.invoicing import service as invoicing
+from app.invoicing.models import AccountingDocument
 from app.models import AdminRole, AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
 from app.ops import service as ops
 from app.security import hash_password, validate_password_strength
@@ -426,6 +428,19 @@ def cmd_billing_confirm_scope(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_invoicing_run(_args: argparse.Namespace) -> int:
+    result = invoicing.issue_pending()
+    _print("[invoicing-run] " + " ".join(f"{key}={value}" for key, value in result.items()))
+    return 1 if result["failed"] or result["blocked"] else 0
+
+
+def cmd_invoicing_export(_args: argparse.Namespace) -> int:
+    """All documents as CSV, for the accountant. Run as the owner, output goes to stdout."""
+    with get_sessionmaker()() as db:
+        sys.stdout.write(invoicing.export_csv(list(db.scalars(select(AccountingDocument)).all())))
+    return 0
+
+
 def cmd_outbox_run(_args: argparse.Namespace) -> int:
     result = dispatch_pending(limit=100)
     _print("[outbox-run] " + " ".join(f"{key}={value}" for key, value in result.items()))
@@ -552,6 +567,8 @@ def main(argv: list[str] | None = None) -> int:
     maint.set_defaults(func=cmd_maintenance)
     sub.add_parser("outbox-run", help="Send due transactional e-mail").set_defaults(func=cmd_outbox_run)
     sub.add_parser("billing-run", help="Process stored Stripe events").set_defaults(func=cmd_billing_run)
+    sub.add_parser("invoicing-run", help="Issue queued documents").set_defaults(func=cmd_invoicing_run)
+    sub.add_parser("invoicing-export", help="Documents as CSV").set_defaults(func=cmd_invoicing_export)
     sub.add_parser("billing-reconcile", help="Compare with Stripe and fix drift").set_defaults(
         func=cmd_billing_reconcile
     )

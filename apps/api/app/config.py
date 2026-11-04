@@ -145,6 +145,12 @@ class Settings(BaseSettings):
     workspace_ai_call_cost_micros: int = Field(default=500_000, ge=1)
     # Spending cap across all workspaces per month. 0 means no AI at all, never "no cap".
     workspace_ai_global_monthly_micros: int = Field(default=0, ge=0)
+    # Accounting documents (docs/INVOICING.md). "none" issues nothing; "demo" is never a real document.
+    invoicing_source: Literal["none", "demo"] = "none"
+    invoicing_enforce_tax: bool = True
+    # Set only from the accountant's answer. Empty means no retention date is written.
+    accounting_retention_years: int | None = Field(default=None, ge=1, le=30)
+    turnstile_secret_key: str | None = None
     # Customer accounts (docs/CUSTOMER_ACCOUNTS.md). Off until a release review.
     customer_accounts_enabled: bool = False
     account_session_hours: int = Field(default=12, ge=1, le=72)
@@ -229,6 +235,8 @@ class Settings(BaseSettings):
             problems.append("CORS_ORIGINS must only contain https:// origins in production")
         if self.advisor_workspace_enabled:
             problems.append("ADVISOR_WORKSPACE_ENABLED is not released for production")
+        if self.invoicing_source == "demo":
+            problems.append("INVOICING_SOURCE=demo is not allowed in production")
         if self.billing_provider == "stripe":
             problems.append("BILLING_PROVIDER=stripe is not released for production")
         if self.billing_provider == "sandbox":
