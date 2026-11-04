@@ -408,10 +408,11 @@ Every property below is tested.
 
 ### Remaining prerequisites for client access
 
-1. **A separate login role.** Deploy with a separate **login role** for the application that is a
-   member of, or identical to, `acs_app_runtime` and owns nothing. Keep the schema owner for
-   migrations only. Today the application connects as the owner and switches role per transaction,
-   so a compromised connection could `RESET ROLE`.
+1. **The restricted login, switched on.** `acs_app_api` (migration 0018) owns nothing, cannot bypass
+   RLS and has no privilege on tenant tables, so an unbound query fails. `RESET ROLE` returns to that
+   role, not to the owner. Residual risk: the role can still enter `acs_app_runtime` with a tenant id
+   it chooses, so SQL injection in the API could reach another tenant's rows. Queries stay
+   parameterised and composite foreign keys remain the second barrier.
 2. **A penetration test** of authentication and tenant isolation.
 3. **E-mail.** Transactional e-mail for invitations and recovery.
 4. **Privacy.** A DPA and the privacy notice for client users.

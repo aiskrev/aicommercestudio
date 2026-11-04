@@ -79,7 +79,7 @@ sessions and tokens, delivery records older than 30 days and stale rate-limit wi
 
 1. A sending provider with SPF, DKIM and DMARC for the sending domain, tested end to end. The current
    `contact@ai-commercestudio.com` address only receives mail.
-2. Finding H-1 closed (separate runtime login role) and a security review of this stage. The runtime role has no privilege on these tables today, so closing H-1 must grant the new login role exactly what they need.
+2. The restricted login switched on (`API_DB_USER=acs_app_api`, see `infra/deploy/README.md`) and a security review of this stage. Production refuses to start with accounts on and the owner connection.
    The same gate asks for a tested off-site restore and working alerts.
 3. Privacy notice updated for account data; a new `PRIVACY_NOTICE_VERSION`.
 4. `migrate-and-deploy` with a backup, then install `acs-outbox.timer`.

@@ -38,8 +38,8 @@ No blocker was found.
 ## Before a public release (not done)
 
 * An external penetration test of authentication and isolation.
-* A deployment with a **separate runtime login role**: today the application connects as the schema
-  owner and switches to `acs_app_runtime` per transaction (see [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md)).
+* The **restricted API login** switched on (`acs_app_api`, migration 0018; see `infra/deploy/README.md`).
+  Production refuses to start with the portal on and the owner connection.
 * Transactional e-mail for invitations and self-service recovery, with approval of the wording.
 * A data processing agreement and the privacy notice for client users.
 * Explicit approval, then `CLIENT_PORTAL_ENABLED=true`.

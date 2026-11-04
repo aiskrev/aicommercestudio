@@ -7,6 +7,7 @@ from typing import Literal
 
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from sqlalchemy import make_url
 
 _WEAK_SECRET_MARKERS = ("change-me", "changeme", "secret", "password", "example")
 
@@ -209,6 +210,10 @@ class Settings(BaseSettings):
             problems.append("EMAIL_PROVIDER=dev_file is not allowed in production")
         if self.customer_accounts_enabled and not (self.email_provider == "smtp" and self.smtp_host and self.smtp_from):
             problems.append("CUSTOMER_ACCOUNTS_ENABLED needs a configured e-mail provider")
+        if (self.customer_accounts_enabled or self.client_portal_enabled) and (
+            make_url(self.database_url).username != "acs_app_api"
+        ):
+            problems.append("customer accounts and the client portal need the restricted database role")
         if problems:
             raise ValueError("Unsafe production configuration: " + "; ".join(problems))
         return self

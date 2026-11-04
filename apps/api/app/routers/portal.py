@@ -237,12 +237,14 @@ def _limit(request: Request, kind: str) -> None:
 
 @client.post("/activate", response_model=EnrolOut)
 def activate(body: EnrolIn, request: Request, db: DbSession, settings: AppSettings) -> EnrolOut:
+    rls.bootstrap(db)
     _limit(request, "token")
     return EnrolOut(**service.start_enrolment(db, settings, body.token, PortalTokenPurpose.INVITATION, body.password))
 
 
 @client.post("/activate/confirm", status_code=status.HTTP_204_NO_CONTENT)
 def activate_confirm(body: ConfirmIn, request: Request, db: DbSession, settings: AppSettings) -> Response:
+    rls.bootstrap(db)
     _limit(request, "token")
     service.confirm_enrolment(db, settings, body.token, PortalTokenPurpose.INVITATION, body.code)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -250,12 +252,14 @@ def activate_confirm(body: ConfirmIn, request: Request, db: DbSession, settings:
 
 @client.post("/recover", response_model=EnrolOut)
 def recover(body: EnrolIn, request: Request, db: DbSession, settings: AppSettings) -> EnrolOut:
+    rls.bootstrap(db)
     _limit(request, "token")
     return EnrolOut(**service.start_enrolment(db, settings, body.token, PortalTokenPurpose.RECOVERY, body.password))
 
 
 @client.post("/recover/confirm", status_code=status.HTTP_204_NO_CONTENT)
 def recover_confirm(body: ConfirmIn, request: Request, db: DbSession, settings: AppSettings) -> Response:
+    rls.bootstrap(db)
     _limit(request, "token")
     service.confirm_enrolment(db, settings, body.token, PortalTokenPurpose.RECOVERY, body.code)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -292,6 +296,7 @@ def _clear_cookies(response: Response, settings) -> None:
 def login(body: LoginIn, request: Request, response: Response, db: DbSession, settings: AppSettings) -> LoginOut:
     _limit(request, "login")
     now = utcnow()
+    rls.bootstrap(db)
     user = db.scalar(select(PortalUser).where(func.lower(PortalUser.email) == body.email.lower()))
     org = db.get(OpsOrganization, user.organization_id) if user else None
     ok = verify_password(user.password_hash if user else None, body.password)
@@ -332,6 +337,7 @@ def _session(request: Request, db: DbSession, *, mfa: bool) -> PortalPrincipal:
     raw = request.cookies.get(settings.portal_session_cookie_name)
     if not raw or len(raw) > 200:
         raise service.unauthorized()
+    rls.bootstrap(db)
     session = db.scalar(select(PortalSession).where(PortalSession.token_hash == hash_token(raw)))
     now = utcnow()
     if session is None or session.revoked_at is not None or session.expires_at <= now:

@@ -6,7 +6,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-from sqlalchemy import Select, delete, func, or_, select
+from sqlalchemy import Select, delete, func, or_, select, text
 from sqlalchemy.orm import Session, selectinload
 
 from app import audit
@@ -390,7 +390,8 @@ def purge_expired(
         return RetentionResult(len(expired), old_audit)
     for lead in expired:
         delete_lead(db, lead, actor=None, ip_hash=None, reason=f"retention>{lead_retention_days}d")
-    db.execute(delete(AuditLog).where(AuditLog.created_at < audit_cutoff))
+    # The API may not delete audit entries directly; this function only removes expired ones (migration 0018).
+    db.execute(text("SELECT acs_purge_audit_logs(:cutoff)"), {"cutoff": audit_cutoff})
     db.commit()
     return RetentionResult(len(expired), old_audit)
 
