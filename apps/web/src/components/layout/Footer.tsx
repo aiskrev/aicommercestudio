@@ -44,7 +44,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
       {/* statement + primary action */}
       <Container className="grid gap-8 border-b border-line-subtle py-12 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end lg:py-16">
         <div>
-          <Logo href={href(routes.home)} gradientId="logo-gradient-footer" />
+          <Logo href={href(routes.home)} />
           <p className="t-h3-lg mt-6 max-w-2xl text-fg">
             {dict.footer.tagline}
           </p>
