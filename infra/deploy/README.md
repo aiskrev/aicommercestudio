@@ -64,10 +64,36 @@ certificate as `/etc/caddy/origin/origin.crt`. The key stays in `/etc/caddy/orig
 
 An Origin CA certificate is trusted only by Cloudflare, so the DNS records must stay proxied.
 
+## Network access
+
+| Layer | Rule |
+| --- | --- |
+| Hetzner Cloud Firewall | 22 from the owner's address only; 80, 443 and ICMP open |
+| UFW on the host | 22; 443 only from the Cloudflare ranges; 80 closed |
+| Cloudflare | SSL Full (strict), Always Use HTTPS, root and `www` proxied |
+
+Port 80 is closed, so Always Use HTTPS must stay on: without it `http://` requests fail with 522.
+When Cloudflare publishes new ranges, update UFW as well as the Caddyfile.
+
+The Access application for `deploy-ssh` must use a policy with the action **Service Auth**. With
+**Allow**, a service token is refused (`websocket: bad handshake`). With the tunnel stopped, the
+hostname answers 530 before Access is evaluated, so test Access while the tunnel is running.
+
+Mail: `contact@ai-commercestudio.com` is Cloudflare Email Routing, receive only. A test sent from the
+destination provider itself can bounce, so test from a different provider.
+
+## Backups
+
+`systemd/` holds the timers, installed in `/etc/systemd/system`: database backup at 02:15 UTC and the
+retention job at 02:30 UTC. Dumps stay in `/var/backups/ai-commerce-studio` (14 kept). A restore into
+an isolated container was verified on 2026-11-04. There is no off-site copy yet **(owner: storage)**.
+
 ## Rehearsal record
 
 `compose.yml`, `acs-deploy` and the gate were exercised locally on 2026-11-04 against production-built
 images through a local registry, in an isolated Compose project: refusal with pending migrations, all
 15 migrations on an empty database, deploy, upgrade, automatic rollback from a broken release, manual
 rollback, migration with backup, gate refusals. The header chain was tested through Caddy and the real
-Next.js proxy with a stand-in for the API. None of this ran on the VPS.
+Next.js proxy with a stand-in for the API.
+
+The first production release ran on 2026-11-04: `sha-4d846c5`, migrated to revision 0015.
