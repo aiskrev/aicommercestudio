@@ -156,6 +156,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | Document | Contents |
 | --- | --- |
 | [PLATFORM_EXPANSION_PLAN.md](docs/PLATFORM_EXPANSION_PLAN.md) | Tools and portal expansion plan with phase checklist |
+| [SAAS_EXPANSION_PLAN.md](docs/SAAS_EXPANSION_PLAN.md) | Plan for customer accounts, plans, usage and billing: status matrix, architecture, ADR-52, backlog and open decisions (design only) |
 | [IMPLEMENTATION_REPORT.md](docs/IMPLEMENTATION_REPORT.md) | AI Managed Services + bilingual platform iteration (historical) |
 
 ## Important notes
