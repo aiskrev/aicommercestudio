@@ -1,10 +1,11 @@
 import { createHmac } from "node:crypto";
 
-import { expect, type Page, test } from "@playwright/test";
+import { expect, type Locator, type Page, test } from "@playwright/test";
+import jsQR from "jsqr";
 
 /**
- * Staff TOTP sign-in in a browser (launch blocker H-2): enrolment on the account page → password and a
- * code → a used code is refused → a recovery code works once.
+ * Staff TOTP sign-in in a browser (launch blocker H-2): enrolment on the account page (QR code, key copy)
+ * → password and a code → a used code is refused → a recovery code works once.
  *
  * scripts/test.ps1 creates e2e.mfa@example.com (viewer) with the per-run E2E_STAFF_PASSWORD and runs
  * `python -m app.cli reset-mfa` for it before the suite, so every run starts without a second factor.
@@ -35,6 +36,20 @@ async function nextCode(secret: string): Promise<string> {
   return totp(secret);
 }
 
+/** Reads a QR code the way a phone does: from the pixels on screen, so contrast and the quiet zone count. */
+async function scanQr(page: Page, qr: Locator): Promise<string | undefined> {
+  const png = (await qr.screenshot()).toString("base64");
+  const image = await page.evaluate(async (base64) => {
+    const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
+    const bitmap = await createImageBitmap(new Blob([bytes], { type: "image/png" }));
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+    const context = canvas.getContext("2d")!;
+    context.drawImage(bitmap, 0, 0);
+    return { width: bitmap.width, height: bitmap.height, pixels: Array.from(context.getImageData(0, 0, bitmap.width, bitmap.height).data) };
+  }, png);
+  return jsQR(Uint8ClampedArray.from(image.pixels), image.width, image.height)?.data;
+}
+
 async function enterPassword(page: Page) {
   await page.goto("/admin/login");
   await page.getByLabel("Имейл").fill(MFA_USER);
@@ -55,6 +70,17 @@ test("staff TOTP: enrol on the account page, sign in with password and code, rep
   const octet = () => Math.floor(Math.random() * 250) + 1;
   const context = await browser.newContext({ extraHTTPHeaders: { "X-Forwarded-For": `10.97.${octet()}.${octet()}` } });
   const page = await context.newPage();
+  // The stack is served over plain http://web:3000, where browsers offer no navigator.clipboard.
+  await page.addInitScript(() => {
+    const clipboard = { writeText: async (text: string) => void ((window as unknown as { copiedText: string }).copiedText = text) };
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: clipboard });
+  });
+  const requests: string[] = [];
+  const cspViolations: string[] = [];
+  page.on("request", (request) => requests.push(request.url()));
+  page.on("console", (message) => {
+    if (/content security policy/i.test(message.text())) cspViolations.push(message.text());
+  });
 
   // Without a second factor the password is enough.
   await enterPassword(page);
@@ -68,7 +94,24 @@ test("staff TOTP: enrol on the account page, sign in with password and code, rep
   await panel.getByRole("button", { name: "Покажи ключа" }).click();
   const secret = (await panel.getByTestId("mfa-secret").getAttribute("data-secret")) ?? "";
   expect(secret).toMatch(/^[A-Z2-7]{32}$/);
-  await panel.getByLabel("Код").fill(totp(secret));
+  await expect(panel.getByTestId("mfa-secret")).toHaveText(secret.match(/.{4}/g)!.join(" "));
+
+  // The QR code scans to the same URI as the link, and neither it nor the key went anywhere.
+  const uri = await panel.getByRole("link", { name: "Отвори в приложението за удостоверяване" }).getAttribute("href");
+  expect(uri).toContain(`secret=${secret}`);
+  const qr = panel.getByRole("img", { name: "QR код, който добавя ключа в приложението за удостоверяване" });
+  await expect(qr).toBeVisible();
+  expect(await scanQr(page, qr)).toBe(uri);
+  const origin = new URL(page.url()).origin;
+  expect(requests.filter((url) => url.includes(secret) || !url.startsWith(origin))).toEqual([]);
+  expect(cspViolations).toEqual([]);
+
+  // The copy button gives the key without the spaces of the display.
+  await panel.getByRole("button", { name: "Копирай ключа без интервали" }).click();
+  await expect(panel.getByRole("button", { name: "Копирано" })).toBeVisible();
+  expect(await page.evaluate(() => (window as unknown as { copiedText: string }).copiedText)).toBe(secret);
+
+  await panel.getByLabel("Код", { exact: true }).fill(totp(secret)); // "QR код…" is a label too
   await panel.getByRole("button", { name: "Включи" }).click();
   const list = panel.getByTestId("mfa-recovery-codes");
   await expect(list.getByRole("listitem")).toHaveCount(10);

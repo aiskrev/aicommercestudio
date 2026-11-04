@@ -2,7 +2,7 @@ import { fireEvent, render, screen, waitFor, within } from "@testing-library/rea
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LoginForm } from "@/components/admin/LoginForm";
-import { groupKey, MfaPanel } from "@/components/admin/Mfa";
+import { groupKey, MfaEnrolment, MfaPanel } from "@/components/admin/Mfa";
 import { adminDictionaries } from "@/i18n/admin";
 import { ApiError } from "@/lib/admin-api";
 
@@ -111,6 +111,7 @@ describe("admin login with a second factor", () => {
     const key = await screen.findByTestId("mfa-secret");
     expect(key).toHaveTextContent("JBSW Y3DP EHPK 3PXP JBSW Y3DP EHPK 3PXP");
     expect(screen.getByRole("link", { name: t.mfa.openApp })).toHaveAttribute("href", expect.stringMatching(/^otpauth:\/\/totp\//));
+    expect(screen.getByRole("img", { name: t.mfa.qrLabel })).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText(t.mfa.code), { target: { value: "654321" } });
     fireEvent.click(screen.getByRole("button", { name: t.mfa.confirm }));
@@ -120,6 +121,78 @@ describe("admin login with a second factor", () => {
     fireEvent.click(within(list).getByRole("button", { name: t.mfa.codesDone }));
     expect(assign).toHaveBeenCalledWith("/admin/catalogue");
   });
+});
+
+describe("adding the key to an authenticator app", () => {
+  const secret = "JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP";
+  const uri = `otpauth://totp/A.I.%20Commerce%20Studio%20Admin%3Aadmin%40example.com?secret=${secret}&issuer=A.I.%20Commerce%20Studio%20Admin&digits=6&period=30`;
+  const writeText = vi.fn();
+
+  beforeEach(() => {
+    Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+  });
+
+  afterEach(() => {
+    Reflect.deleteProperty(navigator, "clipboard");
+    writeText.mockReset();
+  });
+
+  async function showKey(setup: { secret: string; otpauth_uri: string } = { secret, otpauth_uri: uri }) {
+    fetchMock.mockResolvedValue(setup);
+    const view = render(<MfaEnrolment onConfirmed={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: t.mfa.start }));
+    await screen.findByTestId("mfa-secret");
+    return view;
+  }
+
+  const modules = (view: { container: HTMLElement }) => view.container.querySelector("svg[data-testid='mfa-qr'] path")?.getAttribute("d");
+
+  it("draws the QR code inline, with no image request and with a white background of its own", async () => {
+    const view = await showKey();
+    const qr = screen.getByRole("img", { name: t.mfa.qrLabel });
+    expect(qr.tagName.toLowerCase()).toBe("svg");
+    expect(view.container.querySelector("img, iframe, object, embed, image, use")).toBeNull();
+    expect(qr.querySelector("rect")).toHaveAttribute("fill", "#fff");
+    expect(qr.querySelector("path")).toHaveAttribute("fill", "#000");
+    expect(modules(view)).toMatch(/^(M\d+ \d+h1v1h-1z)+$/);
+    expect(qr.outerHTML).not.toContain(secret);
+    expect(fetchMock).toHaveBeenCalledTimes(1); // the set-up call; drawing the code asks nothing of anyone
+  });
+
+  it("leaves the quiet zone empty and encodes the URI it was given", async () => {
+    const view = await showKey();
+    const qr = screen.getByRole("img", { name: t.mfa.qrLabel });
+    const size = Number(qr.getAttribute("viewBox")?.split(" ")[2]);
+    const first = modules(view) ?? "";
+    const dark = [...first.matchAll(/M(\d+) (\d+)/g)].flatMap(([, x, y]) => [Number(x), Number(y)]);
+    expect(Math.min(...dark)).toBe(4);
+    expect(Math.max(...dark)).toBe(size - 5);
+    view.unmount();
+
+    const other = await showKey({ secret, otpauth_uri: uri.replace(secret, "ABCDEFGHIJKLMNOPABCDEFGHIJKLMNOP") });
+    expect(modules(other)).not.toBe(first);
+  });
+
+  it("copies the key without spaces and does not submit the form", async () => {
+    writeText.mockResolvedValue(undefined);
+    await showKey();
+    expect(screen.getByTestId("mfa-secret")).toHaveTextContent("JBSW Y3DP EHPK 3PXP JBSW Y3DP EHPK 3PXP");
+    fireEvent.click(screen.getByRole("button", { name: t.mfa.copyKey }));
+    expect(await screen.findByRole("button", { name: t.mfa.copied })).toBeInTheDocument();
+    expect(writeText).toHaveBeenCalledExactlyOnceWith(secret);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("says so when the browser refuses the copy, and the key stays usable", async () => {
+    writeText.mockRejectedValue(new DOMException("denied", "NotAllowedError"));
+    await showKey();
+    fireEvent.click(screen.getByRole("button", { name: t.mfa.copyKey }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(t.mfa.copyKeyFailed);
+    expect(screen.getByRole("button", { name: t.mfa.copyKey })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: t.mfa.openApp })).toHaveAttribute("href", uri);
+  });
+
 });
 
 describe("account page two-factor panel", () => {
