@@ -1,6 +1,7 @@
 "use client";
 
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
+import { encode } from "uqr";
 
 import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { Panel } from "@/components/admin/ui";
@@ -14,6 +15,36 @@ import { useAdminData } from "@/lib/use-admin-data";
 /** Base32 key in groups of four, easier to type into an authenticator app. */
 export function groupKey(secret: string): string {
   return secret.match(/.{1,4}/g)?.join(" ") ?? secret;
+}
+
+/**
+ * The otpauth URI as a QR code. The URI contains the TOTP secret, so the code is built here and drawn as
+ * inline SVG: nothing leaves the page and the CSP needs no change. Black on its own white background with
+ * the standard four-module quiet zone, because scanners fail on the dark admin theme. Four pixels per
+ * module keeps every module the same size on screen.
+ */
+function KeyQrCode({ uri, label }: { uri: string; label: string }) {
+  const { size, path } = useMemo(() => {
+    const qr = encode(uri, { ecc: "M", border: 4 });
+    const modules = qr.data.flatMap((row, y) => row.map((dark, x) => (dark ? `M${x} ${y}h1v1h-1z` : "")));
+    return { size: qr.size, path: modules.join("") };
+  }, [uri]);
+
+  return (
+    <svg
+      role="img"
+      aria-label={label}
+      data-testid="mfa-qr"
+      viewBox={`0 0 ${size} ${size}`}
+      width={size * 4}
+      height={size * 4}
+      shapeRendering="crispEdges"
+      className="h-auto max-w-full shrink-0 rounded-lg"
+    >
+      <rect width={size} height={size} fill="#fff" />
+      <path d={path} fill="#000" />
+    </svg>
+  );
 }
 
 function codeError(err: unknown, invalid: string, fallback: string): string {
@@ -100,6 +131,19 @@ export function MfaEnrolment({ onConfirmed, onCancel }: { onConfirmed: (result: 
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [keyCopied, setKeyCopied] = useState(false);
+
+  /** Copies the key without the display spaces: some authenticator apps refuse them. */
+  async function copyKey(secret: string) {
+    setError(null);
+    try {
+      await navigator.clipboard.writeText(secret);
+      setKeyCopied(true);
+    } catch {
+      setKeyCopied(false);
+      setError(t.copyKeyFailed);
+    }
+  }
 
   async function start() {
     setBusy(true);
@@ -149,14 +193,20 @@ export function MfaEnrolment({ onConfirmed, onCancel }: { onConfirmed: (result: 
   return (
     <form onSubmit={confirm} noValidate className="grid gap-4 text-sm text-slate-300" data-testid="mfa-enrolment">
       <p>{t.keyIntro}</p>
-      <div className="rounded-xl border border-white/[0.07] p-4">
-        <p className="text-xs uppercase tracking-wide text-slate-400">{t.key}</p>
-        <code className="mt-1 block break-all font-mono text-base text-white" data-testid="mfa-secret" data-secret={setup.secret}>
-          {groupKey(setup.secret)}
-        </code>
-        <a href={setup.otpauth_uri} className="mt-2 inline-block text-sm text-brand hover:underline">
-          {t.openApp}
-        </a>
+      <div className="flex flex-wrap items-start gap-4 rounded-xl border border-white/[0.07] p-4">
+        <KeyQrCode uri={setup.otpauth_uri} label={t.qrLabel} />
+        <div className="min-w-56 flex-1">
+          <p className="text-xs uppercase tracking-wide text-slate-400">{t.key}</p>
+          <code className="mt-1 block break-all font-mono text-base text-white" data-testid="mfa-secret" data-secret={setup.secret}>
+            {groupKey(setup.secret)}
+          </code>
+          <Button variant="secondary" size="sm" icon="clipboard" className="mt-3" onClick={() => copyKey(setup.secret)}>
+            {keyCopied ? t.copied : t.copyKey}
+          </Button>
+          <a href={setup.otpauth_uri} className="mt-3 block text-sm text-brand hover:underline">
+            {t.openApp}
+          </a>
+        </div>
       </div>
       {error && <Alert tone="error" role="alert">{error}</Alert>}
       <CodeField id="mfa-enrol-code" value={code} onChange={setCode} />
