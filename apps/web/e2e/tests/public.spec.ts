@@ -12,7 +12,7 @@ test.describe("public website", () => {
     await expect(page.getByTestId("system-map")).toBeVisible();
     const offer = page.locator("section[aria-labelledby='offer-title']");
     await expect(offer.locator("article")).toHaveCount(3);
-    await expect(offer.getByRole("heading", { level: 3 })).toHaveText(["AI бизнес автоматизация", "Инженеринг на търговия и платформи", "AI Managed Services"]);
+    await expect(offer.getByRole("heading", { level: 3 })).toHaveText(["AI бизнес автоматизация", "Онлайн търговия, данни и облачни платформи", "AI Managed Services"]);
     await expect(offer.locator("article a")).toHaveCount(10); // the ten domain hubs, not every service
     // AI Managed Services lifecycle and the fictional, labelled solution patterns.
     await expect(page.getByTestId("managed-lifecycle").getByRole("link")).toHaveCount(6);
