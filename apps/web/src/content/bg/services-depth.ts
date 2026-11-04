@@ -222,7 +222,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
       },
       {
         title: "Прототип",
-        description: "Работещ прототип върху реални примери в рамките на кратка итерация.",
+        description: "Работещ прототип върху реални примери за кратко време.",
       },
       {
         title: "Оценка",

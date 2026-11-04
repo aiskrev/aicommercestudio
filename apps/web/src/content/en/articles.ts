@@ -193,7 +193,7 @@ const foundationArticles: Article[] = [
       {
         heading: "Expanding autonomy gradually",
         paragraphs: [
-          "Start by requiring approval for anything with an effect outside the system. Once you have built up history and confidence in the quality, you can deliberately expand the automatic actions — with clear boundaries and the ability to roll back.",
+          "Start by requiring approval for anything with an effect outside the system. Once you have built up history and confidence in the quality, you can deliberately expand the automatic actions — with clear limits and the ability to roll back.",
         ],
       },
       {

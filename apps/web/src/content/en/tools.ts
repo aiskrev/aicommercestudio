@@ -37,7 +37,7 @@ export const tools: typeof bgTools = {
     meanwhileTitle: "Until then",
     meanwhileText: "A consultant can run this assessment with you, under a written scope and with written findings.",
     meanwhileCta: "Request the assessment from a consultant",
-    domainCta: "Go to the domain",
+    domainCta: "Go to the service area",
     tryTitle: "Or start with an available tool",
   },
   labels: {
@@ -148,7 +148,7 @@ export const tools: typeof bgTools = {
       title: "AI agent library",
       description: "Browse typical agent roles by business function: tasks, tools and limits. The catalogue is for planning, and the agents are not connected to your systems.",
       audience: "Teams looking for ideas for their first agent",
-      output: "Profiles of typical agents: tasks, tools, boundaries and approvals.",
+      output: "Profiles of typical agents: tasks, tools, limits and approvals.",
       cta: "Browse the agents",
     },
     {

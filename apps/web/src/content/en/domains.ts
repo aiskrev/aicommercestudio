@@ -11,7 +11,7 @@ export const domains: DomainContent[] = [
       "Our strategy work draws on our founder Aleksandar Iskrev's experience in enterprise architecture and AI platform engineering.",
     slug: "ai-strategy-and-transformation",
     name: "AI Strategy & Transformation",
-    summary: "Where AI is worth building, in what order and under which controls — before you invest in implementation.",
+    summary: "Where AI is worth building, in what order and with which safeguards, before you invest in a project.",
     positioning:
       "We work out where AI is worth building at all, in what order and with which safeguards, before any money goes into implementation. You get a plan engineers can act on, not a slide deck.",
     idealCustomers: [
@@ -493,7 +493,7 @@ export const domains: DomainContent[] = [
     key: "ai_governance",
     slug: "ai-governance-security-and-assurance",
     name: "AI Governance, Security & Assurance",
-    summary: "Controls around AI systems that can be checked: permissions, data, quality evaluation and incident handling.",
+    summary: "Safeguards around AI systems that can be checked: permissions, data, quality evaluation and incident handling.",
     positioning:
       "We put safeguards around AI systems that a business, its customers and its auditors can check: who may do what, which data reaches which model, how quality is measured and what happens when something goes wrong. This is technical governance, not legal advice.",
     idealCustomers: [
@@ -557,7 +557,7 @@ export const domains: DomainContent[] = [
     cta: "Request an AI system risk review",
     metaTitle: "AI governance and security: risk, data protection, controls",
     metaDescription:
-      "Risk review, approval and permission design, data protection, prompt-injection defences and evaluation for AI systems — engineering controls, not legal advice.",
+      "Risk review, approval and permission design, data protection, prompt-injection defences and evaluation for AI systems — technical safeguards, not legal advice.",
   },
   {
     key: "managed_operations",
