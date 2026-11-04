@@ -23,7 +23,7 @@ from app.accounts import limits
 from app.accounts.mail import dispatch_pending, email_available, enqueue
 from app.accounts.models import CustomerAccount, CustomerSession, CustomerToken, OutboxKind, TokenPurpose
 from app.config import Settings, get_settings
-from app.deps import CSRF_HEADER, SAFE_METHODS, AppSettings, DbSession, client_ip_hash
+from app.deps import CSRF_HEADER, SAFE_METHODS, AppSettings, DbSession, client_ip, client_ip_hash
 from app.errors import ApiError
 from app.models import utcnow
 from app.schemas import StrictModel
@@ -36,6 +36,7 @@ from app.security import (
     validate_password_strength,
     verify_password,
 )
+from app.turnstile import require_human
 
 ACCEPTED = {"status": "accepted"}
 Locale = Literal["bg", "en"]
@@ -46,7 +47,11 @@ def _enabled() -> None:
         raise ApiError(status.HTTP_404_NOT_FOUND, "Not found.", "not_found")
 
 
-router = APIRouter(prefix="/api/accounts", tags=["accounts"], dependencies=[Depends(_enabled)])
+def _no_store(response: Response) -> None:
+    response.headers["Cache-Control"] = "no-store"
+
+
+router = APIRouter(prefix="/api/accounts", tags=["accounts"], dependencies=[Depends(_enabled), Depends(_no_store)])
 
 
 def _strong(value: str) -> str:
@@ -61,6 +66,7 @@ class RegisterIn(StrictModel):
     locale: Locale = "bg"
     privacy_acknowledged: Literal[True]
     marketing_consent: bool = False
+    turnstile_token: str | None = Field(default=None, max_length=2048)
 
     _password = field_validator("password")(_strong)
 
@@ -68,6 +74,7 @@ class RegisterIn(StrictModel):
 class EmailIn(StrictModel):
     email: EmailStr = Field(max_length=254)
     locale: Locale = "bg"
+    turnstile_token: str | None = Field(default=None, max_length=2048)
 
 
 class TokenIn(StrictModel):
@@ -213,6 +220,7 @@ def register(
 ) -> dict[str, str]:
     _require_email_delivery(settings)
     _limit_email(settings, "register", request, payload.email)
+    require_human(settings, payload.turnstile_token, client_ip(request))
     password_hash = hash_password(payload.password)  # on every path, so timing does not reveal an account
     existing = _find(db, payload.email)
     if existing is not None:
@@ -331,6 +339,7 @@ def forgot(
 ) -> dict[str, str]:
     _require_email_delivery(settings)
     _limit_email(settings, "forgot", request, payload.email)
+    require_human(settings, payload.turnstile_token, client_ip(request))
     account = _find(db, payload.email)
     if account is not None:
         enqueue(db, account, OutboxKind.RESET_PASSWORD, payload.locale)

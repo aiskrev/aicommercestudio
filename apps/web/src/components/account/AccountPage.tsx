@@ -30,7 +30,7 @@ export function AccountPage({ locale, view }: { locale: Locale; view: View }) {
     <>
       <PageHero eyebrow={t.eyebrow} title={title} lead={lead} />
       <Section>
-        {view === "home" ? <AccountHome locale={locale} /> : <AccountForm view={view} locale={locale} />}
+        {view === "home" ? <AccountHome locale={locale} /> : <AccountForm view={view} locale={locale} turnstileSiteKey={process.env.TURNSTILE_SITE_KEY} />}
       </Section>
     </>
   );

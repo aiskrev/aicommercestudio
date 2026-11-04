@@ -1,0 +1,19 @@
+{
+  "note": "For review. Not applied. Check the period and rule count your plan allows. The webhook is left out on purpose.",
+  "rules": [
+    {
+      "description": "Sign-in and recovery",
+      "expression": "http.request.method eq \"POST\" and (http.request.uri.path eq \"/api/accounts/login\" or http.request.uri.path eq \"/api/accounts/register\" or http.request.uri.path eq \"/api/accounts/password/forgot\")",
+      "action": "block",
+      "ratelimit": {
+        "characteristics": [
+          "ip.src",
+          "cf.colo.id"
+        ],
+        "period": 10,
+        "requests_per_period": 10,
+        "mitigation_timeout": 10
+      }
+    }
+  ]
+}

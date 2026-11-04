@@ -582,6 +582,27 @@ Only with `BILLING_PROVIDER=stripe` and the workspace on (404 otherwise). See [S
 | POST | `/api/billing/portal` | `{locale}` → `{url}`; billing owner only, otherwise 404 |
 | POST | `/api/billing/stripe/webhook` | Stripe only; needs a valid `Stripe-Signature` |
 
+## Client zone (off by default)
+
+Only with the workspace on (404 otherwise). Customer session; `X-Workspace` chooses a workspace the account belongs to. Roles: `owner`, `billing`, `member`. See [INVOICING.md](INVOICING.md).
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/api/zone/overview` | plan, usage and real counts only |
+| GET | `/api/zone/billing-profile` | owner, billing |
+| PUT | `/api/zone/billing-profile` | owner, billing; affects future documents only |
+| GET | `/api/zone/documents` | owner, billing |
+| GET | `/api/zone/documents/export` | CSV; owner, billing |
+| GET | `/api/zone/documents/{document_id}/download` | issued documents; owner, billing |
+| GET | `/api/zone/members` | everyone in the workspace |
+| PATCH | `/api/zone/members/{account_id}` | owner |
+| DELETE | `/api/zone/members/{account_id}` | owner |
+| POST | `/api/zone/invitations` | owner; `{email, role}` → one-time token |
+| POST | `/api/zone/invitations/accept` | `{token}`; only for the invited e-mail |
+| GET | `/api/zone/memberships` | workspaces of this account |
+| GET | `/api/zone/support` | requests of this workspace |
+| POST | `/api/zone/support` | `{kind, subject, message}` |
+
 ## Client portal (read-only, off by default)
 
 Only while `CLIENT_PORTAL_ENABLED=true` (404 otherwise). Separate client identities, cookies `acs_portal_session` / `acs_portal_csrf`; the organisation always comes from the session. See [CLIENT_PORTAL.md](CLIENT_PORTAL.md).

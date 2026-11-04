@@ -42,6 +42,8 @@ class Gateway(Protocol):
 
     def list_events(self, types: list[str], since: int) -> list[dict[str, Any]]: ...
 
+    def invoice_for_payment(self, payment_intent: str) -> str | None: ...
+
 
 class StripeGateway:
     def __init__(self, settings: Settings) -> None:
@@ -87,6 +89,12 @@ class StripeGateway:
     def list_events(self, types: list[str], since: int) -> list[dict[str, Any]]:
         page = self.client.v1.events.list({"types": types, "created": {"gte": since}, "limit": 100})
         return [item.to_dict() for item in page.data]
+
+    def invoice_for_payment(self, payment_intent: str) -> str | None:
+        page = self.client.v1.invoice_payments.list(
+            {"payment": {"type": "payment_intent", "payment_intent": payment_intent}, "status": "paid"}
+        )
+        return page.data[0].invoice if page.data else None
 
 
 def get_gateway() -> Gateway:

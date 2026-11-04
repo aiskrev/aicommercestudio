@@ -47,6 +47,7 @@ class FakeStripe:
         self.portals: list[str] = []
         self.events: list[dict] = []
         self.fail_next = 0
+        self.payment_invoices: dict[str, str] = {}
 
     def create_customer(self, workspace_id):
         self.customers.append(workspace_id)
@@ -99,6 +100,9 @@ class FakeStripe:
     def list_events(self, types, since):
         return self.events
 
+    def invoice_for_payment(self, payment_intent):
+        return self.payment_invoices.get(payment_intent)
+
 
 @pytest.fixture
 def fake(monkeypatch) -> FakeStripe:
@@ -114,6 +118,7 @@ def fake(monkeypatch) -> FakeStripe:
         "email_provider": "smtp",
         "smtp_host": "mail.test",
         "smtp_from": "no-reply@example.com",
+        "invoicing_enforce_tax": False,
     }.items():
         monkeypatch.setattr(settings, name, value)
     monkeypatch.setattr("app.accounts.mail.get_sender", lambda *_: box)

@@ -1,0 +1,24 @@
+{
+  "note": "For review. Not applied. Order matters: the bypass is first.",
+  "rules": [
+    {
+      "description": "Bypass private and API paths",
+      "expression": "starts_with(http.request.uri.path, \"/api/\") or starts_with(http.request.uri.path, \"/admin\") or starts_with(http.request.uri.path, \"/portal\") or starts_with(http.request.uri.path, \"/bg/konto\") or starts_with(http.request.uri.path, \"/en/account\")",
+      "action": "set_cache_settings",
+      "action_parameters": {
+        "cache": false
+      }
+    },
+    {
+      "description": "Static build files",
+      "expression": "starts_with(http.request.uri.path, \"/_next/static/\")",
+      "action": "set_cache_settings",
+      "action_parameters": {
+        "cache": true,
+        "edge_ttl": {
+          "mode": "respect_origin"
+        }
+      }
+    }
+  ]
+}

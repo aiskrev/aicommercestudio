@@ -1,0 +1,20 @@
+{
+  "note": "For review. Not applied. Stripe cannot solve a challenge; the signature is the protection.",
+  "rules": [
+    {
+      "description": "Stripe webhook: skip managed challenges",
+      "expression": "http.request.method eq \"POST\" and http.request.uri.path eq \"/api/billing/stripe/webhook\"",
+      "action": "skip",
+      "action_parameters": {
+        "phases": [
+          "http_ratelimit",
+          "http_request_firewall_managed"
+        ],
+        "products": [
+          "bic",
+          "securityLevel"
+        ]
+      }
+    }
+  ]
+}

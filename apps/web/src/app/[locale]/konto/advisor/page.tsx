@@ -1,5 +1,5 @@
-import { AdvisorBilling } from "@/components/account/AdvisorBilling";
 import { AdvisorWorkspace } from "@/components/account/AdvisorWorkspace";
+import { ZoneNav } from "@/components/account/ZonePanels";
 import { PageHero, Section } from "@/components/ui/primitives";
 import { workspaceTexts } from "@/i18n/workspace";
 import { resolveLocale } from "@/lib/params";
@@ -19,10 +19,8 @@ export default async function Page({ params }: PageProps<"/[locale]/konto/adviso
     <>
       <PageHero eyebrow={t.eyebrow} title={t.title} lead={t.lead} />
       <Section>
-        <div className="space-y-10">
-          <AdvisorBilling locale={locale} />
-          <AdvisorWorkspace locale={locale} />
-        </div>
+        <ZoneNav locale={locale} />
+        <AdvisorWorkspace locale={locale} />
       </Section>
     </>
   );

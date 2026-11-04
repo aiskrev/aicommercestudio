@@ -33,6 +33,8 @@ from app.billing.models import (
 )
 from app.config import Settings, get_settings
 from app.db import get_sessionmaker
+from app.invoicing import service as invoicing
+from app.invoicing.models import DocumentKind
 from app.models import utcnow
 from app.workspace import entitlements
 from app.workspace.models import CustomerWorkspace, EntitlementGrant
@@ -124,6 +126,12 @@ def start_checkout(
     offer = db.get(BillingOffer, offer_key)
     if offer is None or offer.approved_at is None:
         raise BillingError(404, "offer_unavailable", "This offer isn't available.")
+    try:
+        invoicing.require_sale_allowed(db, settings, workspace.id)
+    except invoicing.ProfileMissing as exc:
+        raise BillingError(409, "billing_profile_required", "Add your invoice details first.") from exc
+    except invoicing.TaxNotConfirmed as exc:
+        raise BillingError(409, "tax_not_confirmed", "This sale isn't available yet. We've been notified.") from exc
     if offer.requires_scope and db.get(ScopeConfirmation, (workspace.id, offer.key)) is None:
         raise BillingError(409, "scope_not_confirmed", "We confirm the scope with you before any payment.")
     _check_offer(gateway, offer)
@@ -293,6 +301,17 @@ def sync_checkout(db: Session, settings: Settings, gateway: Gateway, session_id:
     if row.payment_status not in ("refunded", "partially_refunded", "disputed", "dispute_lost"):
         row.payment_status = data.get("payment_status") or row.payment_status
         row.access_active = paid
+    if paid:
+        invoicing.enqueue(
+            db,
+            workspace_id=checkout.workspace_id,
+            source_key=f"purchase:{session_id}",
+            kind=DocumentKind.INVOICE,
+            amount_minor=data.get("amount_total") or offer.amount_minor,
+            currency=data.get("currency") or offer.currency,
+            description=offer.key,
+            payment_ref=data.get("payment_intent"),
+        )
 
 
 def _purchase_for(db: Session, payment_intent: str | None) -> BillingPurchase | None:
@@ -333,6 +352,25 @@ def sync_charge(db: Session, gateway: Gateway, charge_id: str) -> None:
         purchase.payment_status = "refunded" if full else "partially_refunded"
         if full:
             purchase.access_active = False
+    if workspace_id is not None:
+        # Linked to the invoice it corrects. Several partial refunds make one note each, for the new part.
+        refunded = data.get("amount_refunded") or 0
+        fresh = refunded - invoicing.credited_so_far(db, charge_id)
+        if fresh > 0:
+            invoice_id = gateway.invoice_for_payment(intent) if intent and purchase is None else None
+            parent = invoicing.parent_for(db, intent, invoice_id)
+            invoicing.enqueue(
+                db,
+                workspace_id=workspace_id,
+                source_key=f"refund:{charge_id}:{refunded}",
+                kind=DocumentKind.CREDIT_NOTE,
+                amount_minor=fresh,
+                currency=data.get("currency") or "eur",
+                description="refund",
+                payment_ref=intent,
+                refund_ref=charge_id,
+                parent_id=parent.id if parent else None,
+            )
 
 
 def sync_dispute(db: Session, gateway: Gateway, dispute_id: str) -> None:
@@ -363,6 +401,18 @@ def _apply(db: Session, settings: Settings, gateway: Gateway, event: BillingEven
         parent = (invoice.get("parent") or {}).get("subscription_details") or {}
         if parent.get("subscription"):
             sync_subscription(db, settings, gateway, parent["subscription"])
+        workspace_id = _workspace_of(db, invoice.get("customer"))
+        if invoice.get("status") == "paid" and workspace_id is not None and invoice.get("amount_paid"):
+            invoicing.enqueue(
+                db,
+                workspace_id=workspace_id,
+                source_key=f"stripe_invoice:{event.object_id}",
+                kind=DocumentKind.INVOICE,
+                amount_minor=invoice["amount_paid"],
+                currency=invoice.get("currency") or "eur",
+                description="subscription",
+                stripe_invoice_id=event.object_id,
+            )
     elif event.type in CHECKOUT_EVENTS:
         sync_checkout(db, settings, gateway, event.object_id)
     elif event.type in CHARGE_EVENTS:
