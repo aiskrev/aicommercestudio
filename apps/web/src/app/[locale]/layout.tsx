@@ -1,8 +1,8 @@
 import "../globals.css";
 
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono, Manrope } from "next/font/google";
 
+import { fontVariables } from "@/lib/fonts";
 import { CookieNotice } from "@/components/layout/CookieNotice";
 import { Footer } from "@/components/layout/Footer";
 import { StickyQuoteBar } from "@/components/editorial/StickyQuoteBar";
@@ -17,9 +17,6 @@ import { organizationJsonLd, websiteJsonLd } from "@/lib/seo";
 import { site } from "@/lib/site";
 import { buildNavigation } from "@/lib/site-nav";
 
-const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter", display: "swap" });
-const manrope = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-manrope", display: "swap" });
-const mono = JetBrains_Mono({ subsets: ["latin", "cyrillic"], variable: "--font-mono-face", display: "swap", weight: ["400", "500"] });
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -45,7 +42,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   const navigation = buildNavigation(locale, dict);
 
   return (
-    <html lang={localeMeta[locale].htmlLang} className={`${inter.variable} ${manrope.variable} ${mono.variable}`}>
+    <html lang={localeMeta[locale].htmlLang} className={fontVariables}>
       <body className="flex min-h-dvh flex-col">
         <a
           href="#main"
