@@ -3,7 +3,7 @@ import type { readinessTool as bgReadinessTool } from "@/content/bg/tool-readine
 export const readinessTool: typeof bgReadinessTool = {
   metaTitle: "AI readiness assessment for your company — free check",
   metaDescription:
-    "A free AI readiness assessment: 12 questions across strategy, infrastructure, data, governance, talent and organization. A score, recommendations and a 90-day plan.",
+    "A free AI readiness assessment: 12 questions across strategy, infrastructure, data, governance, talent and organisation. A score, recommendations and a 90-day plan.",
   eyebrow: "Tools · Strategy",
   title: "AI readiness assessment",
   lead: "Twelve questions across six dimensions show how ready your company is for AI — and what the next steps should be over the first 90 days.",
@@ -15,7 +15,7 @@ export const readinessTool: typeof bgReadinessTool = {
     data: { title: "Data", description: "Access to data and its quality." },
     governance: { title: "Governance", description: "Personal data, security and human approval." },
     talent: { title: "Talent and skills", description: "The team's experience and access to technical expertise." },
-    organization: { title: "Organizational readiness", description: "Ownership and readiness for change." },
+    organization: { title: "Organisational readiness", description: "Ownership and readiness for change." },
   },
   questions: {
     strategy_goals: {
@@ -223,7 +223,7 @@ export const readinessTool: typeof bgReadinessTool = {
     methodologyTitle: "How the score is calculated",
     methodology: {
       scale: "Twelve questions, two in each of the six dimensions. Every answer has five levels — from 0 (absent) to 4 (established practice). A dimension's score is the sum of its two answers divided by 8, expressed from 0 to 100.",
-      weights: "The overall score is a weighted sum of the dimensions: strategy 15%, infrastructure 15%, data 20%, governance 20%, talent and skills 15%, organizational readiness 15%. Data and governance weigh more because they most often stop AI projects — this is our expert judgement, not an external standard.",
+      weights: "The overall score is a weighted sum of the dimensions: strategy 15%, infrastructure 15%, data 20%, governance 20%, talent and skills 15%, organisational readiness 15%. Data and governance weigh more because they most often stop AI projects — this is our expert judgement, not an external standard.",
       bands: "Stages: 0–24 exploration, 25–49 building foundations, 50–74 ready for a pilot, 75–100 ready to scale.",
       blockers: "Some answers are flagged as blockers regardless of the overall score — for example unclear rules for personal data, very poor data quality or no access to technical expertise.",
       disclaimer: "This is an indicative self-assessment, not a certified or scientifically validated maturity model. The result on this page is calculated in your browser and contains no forecasts of savings or results.",

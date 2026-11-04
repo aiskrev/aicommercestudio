@@ -88,8 +88,8 @@ test("the AI team configurator runs end to end in Bulgarian", async ({ page }) =
   await expect(result.getByTestId("team-result-not-deployed")).toContainText("не работят");
   await expect(result.getByTestId("team-effort-note")).toContainText("не са оферта");
   await expect(result.getByTestId("team-risks")).toContainText("Грешки пред клиенти");
-  await expect(page.getByRole("button", { name: "Копирай връзка към резултата" })).toBeVisible();
-  await expect(page.locator("section[aria-labelledby='tool-lead-title']").getByRole("link", { name: "Заяви консултация" })).toHaveAttribute(
+  await expect(page.getByRole("button", { name: "Копирайте връзка към резултата" })).toBeVisible();
+  await expect(page.locator("section[aria-labelledby='tool-lead-title']").getByRole("link", { name: "Заявете консултация" })).toHaveAttribute(
     "href",
     "/bg/kontakti?usluga=ai_agents",
   );

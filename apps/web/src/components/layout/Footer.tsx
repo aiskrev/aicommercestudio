@@ -65,7 +65,6 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <FooterColumn title={dict.footer.company} links={company} />
         <div>
           <FooterColumn title={dict.footer.legal} links={legal} />
-          <p className="mt-5 max-w-xs text-xs leading-relaxed text-fg-subtle">{dict.footer.draftNote}</p>
         </div>
       </Container>
 

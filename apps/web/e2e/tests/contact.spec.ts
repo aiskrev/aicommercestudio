@@ -7,12 +7,12 @@ test.describe("contact form", () => {
       if (req.url().endsWith("/api/public/leads") && req.method() === "POST") leadRequests += 1;
     });
     await page.goto("/bg/kontakti");
-    await page.getByRole("button", { name: "Изпрати запитването" }).click();
+    await page.getByRole("button", { name: "Изпратете запитването" }).click();
     await expect(page.getByText("Моля, коригирайте маркираните полета.")).toBeVisible();
     await expect(page.getByLabel(/^Имейл/)).toHaveAttribute("aria-invalid", "true");
 
     await page.getByLabel(/^Имейл/).fill("not-an-email");
-    await page.getByRole("button", { name: "Изпрати запитването" }).click();
+    await page.getByRole("button", { name: "Изпратете запитването" }).click();
     await expect(page.getByText("Въведете валиден имейл адрес.")).toBeVisible();
     expect(leadRequests).toBe(0);
   });
@@ -44,7 +44,7 @@ test.describe("contact form", () => {
     await page.waitForTimeout(3500);
 
     const response = page.waitForResponse((r) => r.url().endsWith("/api/public/quote-requests"));
-    await page.getByRole("button", { name: "Изпрати запитването" }).click();
+    await page.getByRole("button", { name: "Изпратете запитването" }).click();
     expect((await response).status()).toBe(201);
     await expect(page.getByTestId("contact-success")).toContainText(/Референтен номер: [0-9A-F]{8}/);
   });
@@ -60,7 +60,7 @@ test.describe("contact form", () => {
     await page.getByRole("checkbox", { name: /информацията за поверителност/ }).check();
     // The API rejects forms submitted faster than FORM_TOKEN_MIN_SECONDS (anti-bot timing check).
     await page.waitForTimeout(3500);
-    await page.getByRole("button", { name: "Изпрати запитването" }).click();
+    await page.getByRole("button", { name: "Изпратете запитването" }).click();
 
     const success = page.getByTestId("contact-success");
     await expect(success).toBeVisible();

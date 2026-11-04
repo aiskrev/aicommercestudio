@@ -340,7 +340,7 @@ export const workshops: typeof bgWorkshops = {
       audience: [
         "Online stores that move orders, stock or prices by hand.",
         "Companies changing their ERP, platform or logistics provider.",
-        "Teams planning catalog or customer-service automation.",
+        "Teams planning catalogue or customer-service automation.",
       ],
       problems: [
         "Stock and prices differ between systems.",

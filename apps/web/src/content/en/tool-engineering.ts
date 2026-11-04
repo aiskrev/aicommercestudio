@@ -18,7 +18,7 @@ export const engineeringTool: typeof bgEngineeringTool = {
       eyebrow: "Tools · DevOps & SRE",
       title: "DevOps Delivery Maturity Assessment",
       lead: "22 questions on practices across 11 areas, and optional delivery metrics. The score comes from the practices only; metrics are shown separately as your own, unverified data.",
-      facts: ["deterministic scoring", "metrics are not scored", "no sign-up"],
+      facts: ["scored by a fixed formula", "metrics are not scored", "no sign-up"],
     },
     observability: {
       metaTitle: "Observability & Reliability Assessment",

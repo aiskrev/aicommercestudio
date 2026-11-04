@@ -2,11 +2,11 @@
   "ai_strategy_discovery": { "bg": "Работна среща за AI стратегия", "en": "AI Strategy Discovery Workshop" },
   "ai_readiness_mapping": { "bg": "Оценка на AI готовността и картата на възможностите", "en": "AI Readiness and Opportunity Mapping" },
   "agent_architecture": { "bg": "Работна среща за архитектура на AI агенти", "en": "Agent Architecture Workshop" },
-  "landing_zone_assessment": { "bg": "Оценка на облачната основна зона", "en": "Cloud Landing Zone Assessment" },
+  "landing_zone_assessment": { "bg": "Оценка на базовата облачна среда (landing zone)", "en": "Cloud Landing Zone Assessment" },
   "kubernetes_review": { "bg": "Преглед на Kubernetes платформата", "en": "Kubernetes Platform Review" },
   "devops_gitops_assessment": { "bg": "Оценка на DevOps и GitOps практиките", "en": "DevOps and GitOps Assessment" },
   "observability_sre": { "bg": "Работна среща за наблюдаемост и SRE", "en": "Observability and SRE Workshop" },
-  "ecommerce_integration_discovery": { "bg": "Откриване на интеграциите за електронна търговия", "en": "E-commerce Integration Discovery" },
+  "ecommerce_integration_discovery": { "bg": "Анализ на интеграциите на онлайн магазина", "en": "E-commerce Integration Discovery" },
   "rag_data_readiness": { "bg": "Работна среща за RAG и готовност на данните", "en": "RAG and Data Readiness Workshop" },
   "responsible_ai_review": { "bg": "Преглед на управлението на отговорен AI", "en": "Responsible AI Governance Review" }
 }

@@ -37,7 +37,7 @@ export const keywordMap: KeywordTarget[] = [
   {
     path: "/uslugi/seo-optimization",
     primaryKeyword: "e-commerce SEO",
-    secondaryKeywords: ["SEO for online stores", "category page SEO", "Core Web Vitals optimization"],
+    secondaryKeywords: ["SEO for online stores", "category page SEO", "Core Web Vitals optimisation"],
     intent: "transactional",
     rationale: "Commercial intent for an SEO service; the do-it-yourself audit query is served by an article.",
     volumeStatus: "unverified",
@@ -68,7 +68,7 @@ export const keywordMap: KeywordTarget[] = [
   },
   {
     path: "/uslugi/analytics-and-conversion",
-    primaryKeyword: "conversion rate optimization",
+    primaryKeyword: "conversion rate optimisation",
     secondaryKeywords: ["GA4 for e-commerce", "abandoned cart analysis", "sales dashboard"],
     intent: "transactional",
     rationale: "Measurement and CRO service; GA4 is secondary because it is a tool, not the goal.",

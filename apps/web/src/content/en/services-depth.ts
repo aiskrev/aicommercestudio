@@ -35,7 +35,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
       },
       {
         title: "Speed and heavy scripts",
-        description: "Unoptimized images, scripts left behind by unused apps and slow hosting.",
+        description: "Unoptimised images, scripts left behind by unused apps and slow hosting.",
       },
       {
         title: "Access and roles",
@@ -113,7 +113,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
       },
       {
         title: "Categories and content",
-        description: "Optimizing priority categories and a content plan that follows search intent.",
+        description: "Optimising priority categories and a content plan that follows search intent.",
       },
       {
         title: "Measurement and reporting",
@@ -195,7 +195,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
     checks: [
       {
         title: "Data quality and freshness",
-        description: "AI answers only as well as the documents, catalog and policies it works from.",
+        description: "AI answers only as well as the documents, catalogue and policies it works from.",
       },
       {
         title: "Volume and repetition of the task",
@@ -244,7 +244,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
     headings: {
       problems: "Signs that a process is ready for automation",
       capabilities: "What we automate in business processes",
-      checks: "What we analyze before automating",
+      checks: "What we analyse before automating",
       workflow: "How we introduce automation step by step",
       deliverables: "What you receive from an automation project",
     },
@@ -267,7 +267,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
       },
       {
         title: "Error handling",
-        description: "What happens with missing data, an unavailable system or an unrecognized document.",
+        description: "What happens with missing data, an unavailable system or an unrecognised document.",
       },
     ],
     workflow: [
@@ -299,7 +299,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
   analytics: {
     headings: {
       problems: "Signs that your data is not helping decisions",
-      capabilities: "What conversion optimization includes",
+      capabilities: "What conversion optimisation includes",
       checks: "What we check in your measurement setup",
       workflow: "How the analysis runs",
       deliverables: "What you receive from the analysis",
@@ -341,7 +341,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
       },
       {
         title: "Hypotheses and tests",
-        description: "A prioritized list of changes and how the effect of each one will be measured.",
+        description: "A prioritised list of changes and how the effect of each one will be measured.",
       },
     ],
     inputs: [
@@ -371,7 +371,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
       },
       {
         title: "API limits",
-        description: "Rate limits, pagination and error behavior of each system.",
+        description: "Rate limits, pagination and error behaviour of each system.",
       },
       {
         title: "Retries without duplicates",
@@ -453,7 +453,7 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
       },
       {
         title: "Baseline",
-        description: "We record current behavior — errors, latency, costs and test-set results.",
+        description: "We record current behaviour — errors, latency, costs and test-set results.",
       },
       {
         title: "Monitoring and procedures",
@@ -476,14 +476,14 @@ export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
     headings: {
       problems: "When to commission a technical audit of your store",
       capabilities: "What the technical audit covers",
-      checks: "How we prioritize the findings",
+      checks: "How we prioritise the findings",
       workflow: "How the audit runs",
       deliverables: "What you receive after the audit",
     },
     checks: [
       {
         title: "Impact on sales",
-        description: "Cart and checkout problems are prioritized over cosmetic ones.",
+        description: "Cart and checkout problems are prioritised over cosmetic ones.",
       },
       {
         title: "Risk",

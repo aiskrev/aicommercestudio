@@ -14,7 +14,7 @@ export const toolsPage: typeof bgToolsPage = {
   eyebrow: "Tools",
   title: "Interactive tools for a first assessment",
   lead:
-    "Assess for yourself where AI and automation can help — no sign-up and no personal data. We only show tools that already work and clearly mark what is coming.",
+    "See for yourself where AI and automation could help, with no sign-up and no personal data. You'll only find tools here that already work, and we mark what is still to come.",
 };
 
 export const servicesPage: typeof bgServicesPage = {
@@ -22,20 +22,20 @@ export const servicesPage: typeof bgServicesPage = {
   metaDescription:
     "A.I. Commerce Studio services: AI strategy, AI agent development, workflow automation, custom AI engineering, integrations, managed AI, maintenance, SEO, analytics.",
   eyebrow: "Services",
-  title: "Engineering services for online commerce and AI",
+  title: "Services for AI, online commerce and cloud systems",
   lead:
-    "AI services from strategy and agent development to operation after launch — and the engineering foundation of an online business: maintenance, SEO and analytics.",
+    "We help from AI strategy and agent development through to support after launch. We also look after the technical side of an online business: maintenance, SEO and analytics.",
   offeringTitle: "Not sure where to start?",
   offeringLead:
-    "The technical audit is a structured, paid assessment of your store, data and processes. It ends with a prioritized plan that you can carry out with us or on your own.",
+    "Start with a technical audit: a paid assessment of your store, data and processes. It ends with a prioritised plan that you can carry out with us or on your own.",
   groups: {
     ai: {
       title: "AI services",
-      lead: "Agents, automation, custom engineering, integrations and the operation of AI systems in production.",
+      lead: "We build agents, automations and custom applications, connect them to your systems and support them after launch.",
     },
     core: {
-      title: "E-commerce foundation",
-      lead: "The technical base AI runs on: a stable store, visibility in search and correct data.",
+      title: "The foundations of your online store",
+      lead: "AI needs these to work: a stable store, visibility in search and accurate data.",
     },
   },
 };
@@ -45,9 +45,9 @@ export const industries: typeof bgIndustries = {
   metaDescription:
     "We help online stores, Shopify and WooCommerce merchants, local retailers moving online and small businesses looking for automation, AI solutions and AI operations.",
   eyebrow: "Who we work with",
-  title: "A partner for businesses that want technology to work for them",
+  title: "For companies that want technology to save them work",
   lead:
-    "We work with small and mid-sized businesses for which the online channel matters but which have no in-house technical team — or need extra expertise in SEO, data and AI.",
+    "We work with small and mid-sized companies that have no in-house technical team, or need help with online commerce, data, cloud systems and AI.",
   segments: [
     {
       icon: "store",
@@ -61,7 +61,7 @@ export const industries: typeof bgIndustries = {
       icon: "cart",
       title: "Shopify merchants",
       description: "Merchants who rely on apps and themes and want control over performance and integrations.",
-      needs: ["Theme and app optimization", "Warehouse and ERP integrations", "Order automation"],
+      needs: ["Theme and app optimisation", "Warehouse and ERP integrations", "Order automation"],
       services: ["maintenance", "integrations", "automation"],
       workshops: ["ecommerce_integration_discovery"],
     },
@@ -129,17 +129,17 @@ export const industries: typeof bgIndustries = {
 };
 
 export const about: typeof bgAbout = {
-  metaTitle: "About us — an e-commerce engineering and AI studio",
+  metaTitle: "About us — a technical partner for AI and online commerce",
   metaDescription:
-    "A.I. Commerce Studio is an e-commerce engineering and AI studio for small and mid-sized businesses in Bulgaria and the EU. These are the principles we work by.",
+    "A.I. Commerce Studio helps small and mid-sized companies in Bulgaria and the EU with AI solutions, online commerce, integrations and cloud platforms. See how we work.",
   eyebrow: "About",
-  title: "An engineering approach to online commerce",
+  title: "A technical partner for AI and online commerce",
   lead:
-    "A.I. Commerce Studio is an e-commerce engineering and growth studio that combines online store maintenance, SEO, data, integrations and artificial intelligence.",
+    "A.I. Commerce Studio helps small and mid-sized companies with AI and business automation, online commerce, data and integrations, cloud platforms and support after launch.",
   mission: {
     title: "Our mission",
     paragraphs: [
-      "Small and mid-sized businesses can rarely afford separate specialists for the platform, SEO, data, integrations and AI. As a result, decisions are made piecemeal and responsibility gets spread across several vendors.",
+      "Small and mid-sized companies can rarely hire separate specialists for the platform, SEO, data, integrations and AI. So decisions get made piecemeal, and responsibility gets lost between several suppliers.",
       "We want to be a technical partner that sees the whole picture: how the store works, where customers come from, how data flows, and where automation and AI can save time without creating new risks.",
     ],
   },
@@ -172,7 +172,7 @@ export const about: typeof bgAbout = {
     {
       icon: "refresh",
       title: "Incremental improvement",
-      description: "Short iterations with visible results instead of long projects without feedback.",
+      description: "We work in short stages with visible results, not long projects without feedback.",
     },
   ],
   companyTitle: "Company information",
@@ -183,17 +183,17 @@ export const about: typeof bgAbout = {
 export const processPage: typeof bgProcessPage = {
   metaTitle: "Our process: from consultation to results",
   metaDescription:
-    "How we work: from the first conversation and technical analysis to the plan, iterative delivery, measuring results and ongoing support.",
+    "How we work: from the first conversation and technical analysis to the plan, building in stages, measuring results and support afterwards.",
   eyebrow: "Process",
-  title: "How working with us runs",
+  title: "How we work with you",
   lead:
-    "The process is predictable and transparent: at every stage you know what is happening, what you receive and what we need from you.",
+    "At every stage you know what is happening, what you will receive and what we need from you.",
   steps: [
     {
       title: "Initial conversation",
       summary: "We understand the business, the goal and the constraints.",
       details: [
-        "We discuss the problem or opportunity you want to address.",
+        "We talk through the problem you want to solve.",
         "We clarify the platforms, systems and people involved.",
         "We decide whether and how we can help.",
       ],
@@ -203,7 +203,7 @@ export const processPage: typeof bgProcessPage = {
       title: "Technical analysis",
       summary: "We review the current state.",
       details: [
-        "We analyze the store, integrations, data or process — depending on the task.",
+        "We analyse the store, integrations, data or process — depending on the task.",
         "For larger scopes we propose a paid technical audit.",
         "We identify risks and dependencies.",
       ],
@@ -220,10 +220,10 @@ export const processPage: typeof bgProcessPage = {
       outcome: "A written quote you can compare and discuss.",
     },
     {
-      title: "Iterative delivery",
-      summary: "We work in short cycles with visible progress.",
+      title: "Building in stages",
+      summary: "We work in short stages with visible progress.",
       details: [
-        "Every iteration ends with a working result to review.",
+        "Each stage ends with a working result you can review.",
         "Changes are tested before they reach production.",
         "We communicate status and risks regularly.",
       ],
@@ -266,7 +266,7 @@ export const aiSolutions: typeof bgAiSolutions = {
   eyebrow: "AI solutions",
   title: "AI that works with your data and your rules",
   lead:
-    "We design AI solutions as part of your business processes — with a clear task, verifiable quality, data protection and human oversight wherever decisions have consequences.",
+    "We build AI into the way you actually work. We start from a clear task, check the quality and protect your data, and a person approves the actions that matter.",
   typesTitle: "What we build",
   types: [
     {
@@ -277,7 +277,7 @@ export const aiSolutions: typeof bgAiSolutions = {
     {
       icon: "database",
       title: "RAG over your documents",
-      description: "Search and answers over internal documents, catalogs and policies, with sources cited.",
+      description: "Search and answers across internal documents, catalogues and policies, with sources cited.",
     },
     {
       icon: "fileText",
@@ -325,7 +325,7 @@ export const aiSolutions: typeof bgAiSolutions = {
     {
       icon: "layers",
       title: "Provider independence",
-      description: "The AI layer is abstracted so the model and provider (e.g. Anthropic Claude) can be replaced.",
+      description: "We build the solution so that the model and provider (such as Anthropic Claude) can be replaced.",
     },
     {
       icon: "gauge",
@@ -347,7 +347,7 @@ export const aiSolutions: typeof bgAiSolutions = {
   ],
   managed: {
     title: "After launch: AI Managed Services",
-    lead: "An AI agent can stop working correctly even while the website and server are up. Monitoring, quality evaluation, security and cost control after deployment.",
+    lead: "An AI agent can start making mistakes even while the website and server look fine. After launch we keep an eye on quality, security and cost.",
     cta: "Explore AI Managed Services",
   },
   lifecycleTitle: "AI project lifecycle",

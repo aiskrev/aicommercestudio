@@ -7,7 +7,7 @@ export const teamTool: typeof bgTeamTool = {
   eyebrow: "Tools · Agents",
   title: "Build your AI team",
   lead: "Choose the agents, the systems they work in and where a person approves. You get an architecture, workflows, risks and a phased plan — calculated by clear rules.",
-  facts: ["6 steps", "about 6 minutes", "no sign-up, no personal data"],
+  facts: ["6 steps and a summary", "about 6 minutes", "no sign-up, no personal data"],
   steps: {
     context: { title: "Context", description: "A few questions about the business, so we can suggest suitable roles." },
     departments: { title: "Departments", description: "Which departments will work with the AI agents?" },

@@ -5,14 +5,14 @@ test.describe("public website", () => {
     const response = await page.goto("/bg");
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(/A\.I\. Commerce Studio/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Инженеринг");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Превръщаме AI");
     const hero = page.locator("main").getByRole("link", { name: "Заявете консултация" }).first();
     await expect(hero).toHaveAttribute("href", "/bg/kontakti");
     await expect(page.getByRole("link", { name: "Оценете AI готовността си" })).toHaveAttribute("href", "/bg/ai-automation-advisor");
     await expect(page.getByTestId("system-map")).toBeVisible();
     const offer = page.locator("section[aria-labelledby='offer-title']");
     await expect(offer.locator("article")).toHaveCount(3);
-    await expect(offer.getByRole("heading", { level: 3 })).toHaveText(["AI бизнес автоматизация", "Инженеринг на търговия и платформи", "AI Managed Services"]);
+    await expect(offer.getByRole("heading", { level: 3 })).toHaveText(["AI бизнес автоматизация", "Онлайн търговия, данни и облачни платформи", "AI Managed Services"]);
     await expect(offer.locator("article a")).toHaveCount(10); // the ten domain hubs, not every service
     // AI Managed Services lifecycle and the fictional, labelled solution patterns.
     await expect(page.getByTestId("managed-lifecycle").getByRole("link")).toHaveCount(6);
@@ -23,7 +23,7 @@ test.describe("public website", () => {
 
   test("English homepage mirrors the structure with English destinations", async ({ page }) => {
     await page.goto("/en");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Engineering");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("We turn AI");
     await expect(page.locator("main").getByRole("link", { name: "Book a consultation" }).first()).toHaveAttribute("href", "/en/contact");
     await expect(page.getByRole("link", { name: "Assess your AI readiness" })).toHaveAttribute("href", "/en/ai-automation-advisor");
     for (const id of ["offer-title", "tools-title", "managed-title", "orchestration-title", "credibility-title", "process-title", "proof-title", "founder-title", "faq-title"]) {

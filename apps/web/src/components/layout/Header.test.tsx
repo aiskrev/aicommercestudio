@@ -24,8 +24,8 @@ const props = {
   homeHref: "/bg",
   services: navigation.services,
   entries: navigation.entries,
-  cta: { href: "/bg/kontakti", label: "Заяви консултация" },
-  labels: { nav: "Основна навигация", openMenu: "Отвори менюто", closeMenu: "Затвори менюто" },
+  cta: { href: "/bg/kontakti", label: "Заявете консултация" },
+  labels: { nav: "Основна навигация", openMenu: "Отворете менюто", closeMenu: "Затвори менюто" },
   locale: "bg" as const,
   slugs: buildSlugMap(),
   languageLabels: bg.language,
@@ -79,7 +79,7 @@ describe("Header", () => {
   it("mobile menu toggles, locks scrolling, focuses the first control and closes with Escape", async () => {
     const user = userEvent.setup();
     render(<Header {...props} />);
-    const toggle = screen.getByRole("button", { name: "Отвори менюто" });
+    const toggle = screen.getByRole("button", { name: "Отворете менюто" });
     await user.click(toggle);
 
     expect(screen.getByRole("button", { name: "Затвори менюто" })).toHaveAttribute("aria-expanded", "true");
@@ -91,7 +91,7 @@ describe("Header", () => {
     expect(within(group).getByRole("link", { name: "AI Managed Services и оптимизация" })).toHaveAttribute("aria-current", "page");
 
     await user.keyboard("{Escape}");
-    expect(screen.getByRole("button", { name: "Отвори менюто" })).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByRole("button", { name: "Отворете менюто" })).toHaveAttribute("aria-expanded", "false");
     expect(document.body.style.overflow).toBe("");
   });
 
@@ -151,7 +151,7 @@ describe("Header", () => {
     render(<Header {...props} />);
     const desktop = screen.getAllByRole("navigation", { name: "Основна навигация" })[0];
     const desktopHrefs = new Set(Array.from(desktop.querySelectorAll("a")).map((a) => a.getAttribute("href")));
-    await user.click(screen.getByRole("button", { name: "Отвори менюто" }));
+    await user.click(screen.getByRole("button", { name: "Отворете менюто" }));
     const sheet = document.getElementById(screen.getByRole("button", { name: "Затвори менюто" }).getAttribute("aria-controls")!)!;
     const mobileHrefs = new Set(Array.from(sheet.querySelectorAll("a")).map((a) => a.getAttribute("href")));
     for (const href of PREVIOUS_DESTINATIONS) {
@@ -172,7 +172,7 @@ describe("Header", () => {
     const main = document.createElement("main");
     document.body.appendChild(main);
     render(<Header {...props} />);
-    await user.click(screen.getByRole("button", { name: "Отвори менюто" }));
+    await user.click(screen.getByRole("button", { name: "Отворете менюто" }));
     expect(main.inert).toBe(true);
     await user.keyboard("{Escape}");
     expect(main.inert).toBe(false);

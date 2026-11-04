@@ -43,7 +43,7 @@ test("advisor works in demo mode end to end: assessment → consultation → adm
   const reference = (await result.locator("strong.font-mono").first().textContent())?.trim() ?? "";
   expect(reference).toMatch(/^[0-9A-F]{8}$/);
 
-  await page.getByRole("button", { name: "Заяви консултация по тази оценка" }).click();
+  await page.getByRole("button", { name: "Заявете консултация по тази оценка" }).click();
   const consultation = page.getByTestId("advisor-consultation");
   await expect(consultation).toContainText(reference);
   await expect(consultation.getByLabel(/Услуга/)).toHaveValue("automation");
@@ -53,7 +53,7 @@ test("advisor works in demo mode end to end: assessment → consultation → adm
   await consultation.getByLabel(/Описание на проекта/).pressSequentially("поръчки и товарителници.");
   await consultation.getByRole("checkbox", { name: /информацията за поверителност/ }).check();
   await humanPause();
-  await consultation.getByRole("button", { name: "Изпрати запитването" }).click();
+  await consultation.getByRole("button", { name: "Изпратете запитването" }).click();
   await expect(page.getByTestId("contact-success")).toBeVisible();
 
   // Administrator sees the assessment attached to the lead.

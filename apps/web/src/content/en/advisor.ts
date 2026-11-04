@@ -38,7 +38,7 @@ export const advisor: AdvisorContent = {
     {
       question: "What kind of process should I describe?",
       answer:
-        "Repetitive tasks with clear steps: entering orders or invoices, answering similar inquiries, reports built from several spreadsheets, document processing, stock synchronization.",
+        "Repetitive tasks with clear steps: entering orders or invoices, answering similar inquiries, reports built from several spreadsheets, document processing, stock synchronisation.",
     },
     {
       question: "Why doesn't the assessment say how much I will save?",

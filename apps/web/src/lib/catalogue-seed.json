@@ -41,7 +41,7 @@
      "slug": "ai-strategy-and-transformation",
      "name": "AI Strategy & Transformation",
      "summary": "Where AI is worth building, in what order and under which controls — before you invest in implementation.",
-     "body": "This domain decides where AI is worth building at all, in what order, and under which controls, before any money goes into implementation. The output is a plan that engineering can execute, not a slide deck.",
+     "body": "We work out where AI is worth building at all, in what order and with which safeguards, before any money goes into implementation. You get a plan engineers can act on, not a slide deck.",
      "cta_label": "Request an AI readiness assessment",
      "seo_title": "AI strategy and an implementation roadmap for your business",
      "seo_description": "Readiness assessment, use-case prioritisation and a phased AI roadmap with acceptance criteria and human approval points — before you invest in implementation.",
@@ -75,7 +75,7 @@
      "slug": "ai-agenti-i-biznes-avtomatizatsiya",
      "name": "AI агенти и бизнес автоматизация",
      "summary": "Агенти и автоматизирани процеси във вашите системи — с проверка на правата и човешко одобрение.",
-     "body": "Изграждаме агенти и автоматизирани работни процеси, които действат във вашите системи. Всяко действие с външен ефект минава през детерминистична проверка на правата и — където правилата го изискват — през човешко одобрение. Не изграждаме автономни системи с неограничени правомощия.",
+     "body": "Изграждаме агенти и автоматизирани работни процеси, които действат във вашите системи. Всяко действие с външен ефект минава през фиксирана проверка на правата и — където правилата го изискват — през човешко одобрение. Не изграждаме автономни системи с неограничени правомощия.",
      "cta_label": "Опишете процеса за автоматизация",
      "seo_title": "AI агенти и бизнес автоматизация с човешки контрол",
      "seo_description": "Проектиране и внедряване на AI агенти и автоматизирани работни процеси в CRM, имейл, helpdesk и ERP — с одобрение на действията и журнал.",
@@ -92,7 +92,7 @@
      "slug": "ai-agents-and-business-automation",
      "name": "AI Agents & Business Automation",
      "summary": "Agents and automated workflows inside your systems — with permission checks and human approval.",
-     "body": "This domain builds agents and automated workflows that act inside your systems. Every action with an external effect goes through a deterministic permission check and, where the rules require it, a human approval. It does not build autonomous systems with unbounded authority.",
+     "body": "We build agents and automated workflows that act inside your systems. Every action with an external effect goes through a fixed permission check and, where the rules require it, approval by a person. We don't build autonomous systems with unlimited authority.",
      "cta_label": "Describe the process you want to automate",
      "seo_title": "AI agents and business automation with human approval",
      "seo_description": "Design and delivery of AI agents and automated workflows across CRM, e-mail, helpdesk and ERP — with permission checks, approval points and an audit trail.",
@@ -144,7 +144,7 @@
      "slug": "ai-applications-and-knowledge-systems",
      "name": "AI Applications & Knowledge Systems",
      "summary": "AI assistants and features on your own documents and data — with sources, permissions and measured quality.",
-     "body": "This domain builds AI applications that answer from your own documents and data, with sources, permissions and measured quality. It covers internal assistants, document analysis, and AI features inside existing products.",
+     "body": "We build AI applications that answer from your own documents and data, with sources, permissions and measured quality. That includes internal assistants, document analysis and AI features inside existing products.",
      "cta_label": "Discuss an AI application for your data",
      "seo_title": "AI applications and knowledge assistants on your documents",
      "seo_description": "Internal AI assistants, document analysis and AI product features built on your own data — with cited sources, access control and measured quality.",
@@ -198,7 +198,7 @@
      "slug": "ai-governance-security-and-assurance",
      "name": "AI Governance, Security & Assurance",
      "summary": "Controls around AI systems that can be checked: permissions, data, quality evaluation and incident handling.",
-     "body": "This domain puts controls around AI systems that a business, its customers and its auditors can check: who may do what, which data reaches which model, how quality is evaluated, and what happens when something goes wrong. It is engineering governance, not legal advice.",
+     "body": "We put safeguards around AI systems that a business, its customers and its auditors can check: who may do what, which data reaches which model, how quality is measured and what happens when something goes wrong. This is technical governance, not legal advice.",
      "cta_label": "Request an AI system risk review",
      "seo_title": "AI governance and security: risk, data protection, controls",
      "seo_description": "Risk review, approval and permission design, data protection, prompt-injection defences and evaluation for AI systems — engineering controls, not legal advice.",
@@ -252,7 +252,7 @@
      "slug": "commerce-engineering",
      "name": "Commerce Engineering",
      "summary": "Stability, speed, search visibility, measurement and integrations for Shopify and WooCommerce stores.",
-     "body": "This domain is the technical foundation of online stores: stability, speed, search visibility, measurement and integrations for Shopify and WooCommerce. It is the original core of the studio, and it is where AI features for commerce are applied.",
+     "body": "We look after the technical side of online stores on Shopify and WooCommerce: stability, speed, search visibility, measurement and integrations. This is where the studio started, and it is where AI features for online stores are put to use.",
      "cta_label": "Request a technical store audit",
      "seo_title": "Commerce engineering for Shopify and WooCommerce stores",
      "seo_description": "Maintenance, performance, technical SEO, analytics and integrations for online stores — one technical partner for the store, its data and its AI features.",
@@ -287,7 +287,7 @@
      "slug": "oblachen-i-platformen-inzhenering",
      "name": "Облачен и платформен инженеринг",
      "summary": "Облачна инфраструктура като код: среди, контейнери, бази данни, тайни, архиви и разходи.",
-     "body": "Проектираме и изграждаме инфраструктурата, върху която работят приложенията и AI натоварванията: контейнери, управлявани бази данни, мрежи, идентичност, тайни и контрол на разходите — в избрания от вас облак или при хостинг доставчик в ЕС, описано като код и предадено с документация. Това е самостоятелна инженерна услуга, а не добавка към AI.",
+     "body": "Проектираме и изграждаме инфраструктурата, върху която работят приложенията и AI системите ви: контейнери, управлявани бази данни, мрежи, идентичност, тайни и контрол на разходите — в избрания от вас облак или при хостинг доставчик в ЕС, описано като код и предадено с документация. Това е самостоятелна инженерна услуга, а не добавка към AI.",
      "cta_label": "Обсъдете облачна среда за вашето приложение",
      "seo_title": "Облачна инфраструктура и платформен инженеринг (IaC)",
      "seo_description": "Проектиране и изграждане на облачни среди: инфраструктура като код, контейнери, управлявани бази данни, тайни, архиви и контрол на разходите в ЕС.",
@@ -306,7 +306,7 @@
      "slug": "cloud-and-platform-engineering",
      "name": "Cloud & Platform Engineering",
      "summary": "Cloud infrastructure as code: environments, containers, databases, secrets, backups and cost control.",
-     "body": "This domain designs and builds the infrastructure that applications and AI workloads run on: containers, managed databases, networking, identity, secrets and cost control on your chosen cloud or an EU hosting provider, all described as code and handed over with documentation. It is a substantial engineering offering in its own right, not an accessory to AI.",
+     "body": "We design and build the infrastructure your applications and AI workloads run on: containers, managed databases, networking, identity, secrets and cost control on your chosen cloud or an EU hosting provider, all described as code and handed over with documentation. It is a substantial engineering offering in its own right, not an accessory to AI.",
      "cta_label": "Discuss a cloud platform for your application",
      "seo_title": "Cloud and platform engineering with infrastructure as code",
      "seo_description": "Design and build of cloud environments: infrastructure as code, containers, managed databases, secrets, tested backups and cost control, EU-hosted by default.",
@@ -360,7 +360,7 @@
      "slug": "devops-sre-and-observability",
      "name": "DevOps, SRE & Observability",
      "summary": "Repeatable software delivery and visible production behaviour: pipelines, monitoring, incident practice.",
-     "body": "This domain makes software delivery repeatable and production behaviour visible: pipelines, release safety, monitoring, alerting and incident practice. SRE here means service-level objectives, error budgets and blameless reviews, applied at the scale of your team. It is not a 24/7 operations centre.",
+     "body": "We make software releases repeatable and show you how your systems behave in real use: pipelines, safe releases, monitoring, alerts and incident practice. By SRE we mean service-level objectives, error budgets and blameless reviews, scaled to your team. This is not a 24/7 operations centre.",
      "cta_label": "Request a delivery and observability review",
      "seo_title": "DevOps, SRE and observability: CI/CD and monitoring",
      "seo_description": "CI/CD pipelines, safe releases, logs, metrics, OpenTelemetry tracing, SLOs and an incident practice — sized for your team and documented in your repository.",
@@ -413,7 +413,7 @@
      "slug": "data-and-integration-engineering",
      "name": "Data & Integration Engineering",
      "summary": "Connected systems and usable data: API integrations, synchronisation, event flows and data models.",
-     "body": "This domain connects systems and makes their data usable: API integrations, sync jobs, event flows and analytical data models with clear ownership and error handling. Agents, assistants and reporting depend on it.",
+     "body": "We connect your systems and make their data usable: API integrations, sync jobs, event flows and data models for analysis, with clear ownership and error handling. Agents, assistants and reporting all depend on this work.",
      "cta_label": "Describe the systems you need connected",
      "seo_title": "Data and integration engineering for business systems",
      "seo_description": "Connecting store, CRM, ERP and accounting, data synchronisation, pipelines and data models for reporting and AI — with retries, error queues and monitoring.",
@@ -467,7 +467,7 @@
      "slug": "managed-ai-and-platform-operations",
      "name": "Managed AI & Platform Operations",
      "summary": "Ongoing operation of what has been built: monitoring, maintenance, evaluation, cost and incidents.",
-     "body": "This domain is the ongoing operation of what has been built, by us or by others: monitoring, maintenance, evaluation, cost control, incident response and continuous improvement, under a written scope. Data comes from your systems once access is agreed. Nothing is reported before it is actually connected.",
+     "body": "We keep running what has been built, by us or by others: monitoring, maintenance, quality checks, cost control, incident response and ongoing improvements, under a written scope. Data comes from your systems once access is agreed. We report nothing until it is actually connected.",
      "cta_label": "Request an AI assessment",
      "seo_title": "Managed AI systems and platform operations",
      "seo_description": "Ongoing operation of AI agents, applications, stores and cloud environments: monitoring, evaluation, cost, incidents and improvements — under an agreed scope.",
@@ -518,11 +518,11 @@
     "en": {
      "slug": "advisory-assessments-and-enablement",
      "name": "Advisory, Assessments & Enablement",
-     "summary": "Short, fixed-scope work that produces decisions: audits, architecture reviews and hands-on enablement.",
-     "body": "This domain covers short, fixed-scope work that produces decisions and capability in your own team: audits, architecture reviews, second opinions and hands-on enablement. It is the recommended first step before most implementations.",
+     "summary": "Short, fixed-scope work that helps you decide: audits, architecture reviews and hands-on training.",
+     "body": "Short, fixed-scope work that helps you decide and builds skills in your own team: audits, architecture reviews, second opinions and hands-on training. We recommend it as the first step before most projects.",
      "cta_label": "Request a technical audit",
-     "seo_title": "Technical advisory, audits and enablement for AI and DevOps",
-     "seo_description": "Technical audits, architecture and code reviews, workshops and hands-on team enablement for AI, integrations and DevOps — the first step before implementation.",
+     "seo_title": "Technical advisory, audits and training for AI and DevOps",
+     "seo_description": "Technical audits, architecture and code reviews, workshops and hands-on team training for AI, integrations and DevOps: the first step before a project.",
      "primary_keyword": "technical advisory",
      "deliverables": [
       "Audit reports with a prioritised backlog.",
@@ -1127,7 +1127,7 @@
    "via": [],
    "translations": {
     "bg": {
-     "name": "Хостинг на AI натоварвания",
+     "name": "Хостинг на AI системи",
      "summary": "Шлюзове към API на модели, частна мрежова връзка към доставчиците, GPU капацитет само където е нужен, съхранение на данните в ЕС.",
      "prerequisite": null
     },
@@ -1892,7 +1892,7 @@
       },
       {
        "title": "Правила и човешко одобрение",
-       "body": "Действията с ефект върху клиенти, пари или данни минават през детерминистични проверки и одобрение."
+       "body": "Действията с ефект върху клиенти, пари или данни минават през фиксирани проверки и одобрение."
       },
       {
        "title": "Оценка и наблюдение",
@@ -1934,7 +1934,7 @@
       },
       {
        "title": "Rules and human approval",
-       "body": "Actions that affect customers, money or data pass deterministic checks and an approval step."
+       "body": "Actions that affect customers, money or data pass fixed checks and an approval step."
       },
       {
        "title": "Evaluation and monitoring",
@@ -2256,7 +2256,7 @@
      "name": "Technical maintenance for Shopify and WooCommerce stores",
      "short_name": "E-commerce maintenance",
      "summary": "Shopify and WooCommerce maintenance, monitoring, performance and security — so your store runs reliably every day.",
-     "body": "An online store is a living system: platform updates, new apps and plugins, integrations and catalog changes constantly create the risk of errors. We take care of the technical side so your team can focus on selling.",
+     "body": "An online store is a living system: platform updates, new apps and plugins, integrations and catalogue changes constantly create the risk of errors. We take care of the technical side so your team can focus on selling.",
      "seo_title": "Online store maintenance for Shopify and WooCommerce",
      "seo_description": "Online store maintenance for Shopify and WooCommerce: safe updates, monitoring, speed, security and backups. A monthly plan or one-off help.",
      "primary_keyword": "online store maintenance",
@@ -2274,11 +2274,11 @@
        "body": "Monitoring availability, response times and critical pages, with alerts when something deviates."
       },
       {
-       "title": "Performance optimization",
-       "body": "Page-speed analysis and optimization of images, scripts and caching."
+       "title": "Performance optimisation",
+       "body": "Page-speed analysis and optimisation of images, scripts and caching."
       },
       {
-       "title": "Product catalog upkeep",
+       "title": "Product catalogue upkeep",
        "body": "Bulk corrections to products, attributes and categories; data import and export."
       },
       {
@@ -2382,7 +2382,7 @@
      "slug": "seo-optimization",
      "name": "SEO for online stores: technical SEO, categories and products",
      "short_name": "SEO and organic growth",
-     "summary": "Technical SEO audits, category and product optimization, structured data and Core Web Vitals with measurable progress.",
+     "summary": "Technical SEO audits, category and product optimisation, structured data and Core Web Vitals with measurable progress.",
      "body": "Organic traffic is one of the most durable sales channels, but online stores lose it easily — through duplicate content, slow pages, weak categories or technical errors. We treat SEO as an engineering task with clear priorities and measurement.",
      "seo_title": "E-commerce SEO and technical SEO for online stores",
      "seo_description": "E-commerce SEO for online stores: indexing, canonical URLs, category and product SEO, Core Web Vitals and monthly reporting — without ranking promises.",
@@ -2393,12 +2393,12 @@
        "body": "Indexing, crawling, canonical URLs, redirects, duplicate content and internal links."
       },
       {
-       "title": "On-page optimization",
+       "title": "On-page optimisation",
        "body": "Titles, meta descriptions, heading structure and content that matches search intent."
       },
       {
        "title": "Category and product SEO",
-       "body": "Catalog structure, filters, descriptions and internal linking aimed at commercial-intent searches."
+       "body": "Catalogue structure, filters, descriptions and internal linking aimed at commercial-intent searches."
       },
       {
        "title": "Content strategy",
@@ -2406,10 +2406,10 @@
       },
       {
        "title": "Structured data",
-       "body": "Product, BreadcrumbList, Organization and other schema.org markup that reflects the real content."
+       "body": "Product, BreadcrumbList, Organisation and other schema.org markup that reflects the real content."
       },
       {
-       "title": "Core Web Vitals optimization",
+       "title": "Core Web Vitals optimisation",
        "body": "Improving LCP, INP and CLS through specific technical changes."
       },
       {
@@ -2422,11 +2422,11 @@
       },
       {
        "title": "Monthly SEO programs",
-       "body": "A prioritized monthly plan of technical tasks, content and impact measurement."
+       "body": "A prioritised monthly plan of technical tasks, content and impact measurement."
       }
      ],
      "deliverables": [
-      "A technical SEO audit with a prioritized plan",
+      "A technical SEO audit with a prioritised plan",
       "Recommendations for the category structure",
       "A monthly report with key metrics",
       "A list of completed and upcoming tasks"
@@ -2503,13 +2503,13 @@
     },
     "en": {
      "slug": "analytics-and-conversion",
-     "name": "E-commerce analytics and conversion rate optimization",
+     "name": "E-commerce analytics and conversion rate optimisation",
      "short_name": "Analytics and conversion",
      "summary": "Sales dashboards, funnel and abandoned-cart analysis, GA4 and recommendations for improving the customer journey.",
      "body": "Most online stores collect plenty of data, but little of it turns into decisions. We build clear reports and analyses that show where you lose customers and which changes have the greatest potential.",
-     "seo_title": "Conversion rate optimization and e-commerce analytics with GA4",
-     "seo_description": "Conversion rate optimization for online stores: accurate GA4 measurement, funnel and abandoned-cart analysis, sales dashboards and prioritized tests.",
-     "primary_keyword": "conversion rate optimization",
+     "seo_title": "Conversion rate optimisation and e-commerce analytics with GA4",
+     "seo_description": "Conversion rate optimisation for online stores: accurate GA4 measurement, funnel and abandoned-cart analysis, sales dashboards and prioritised tests.",
+     "primary_keyword": "conversion rate optimisation",
      "capabilities": [
       {
        "title": "Sales dashboards",
@@ -2537,7 +2537,7 @@
       },
       {
        "title": "A/B test recommendations",
-       "body": "Prioritized hypotheses with the expected effect and how it will be measured."
+       "body": "Prioritised hypotheses with the expected effect and how it will be measured."
       },
       {
        "title": "Customer journey improvements",
@@ -2547,7 +2547,7 @@
      "deliverables": [
       "An audit of measurement and data quality",
       "A dashboard with the key metrics",
-      "A funnel analysis with prioritized recommendations",
+      "A funnel analysis with prioritised recommendations",
       "A testing and measurement plan"
      ]
     }
@@ -2733,9 +2733,9 @@
     },
     "en": {
      "slug": "ai-managed-services",
-     "name": "AI Managed Services — AI Agent Operations & Optimization",
+     "name": "AI Managed Services — AI Agent Operations & Optimisation",
      "short_name": "AI Managed Services & optimisation",
-     "summary": "Monitoring, maintenance, quality evaluation, security and cost optimization for AI agents and automations that are already in production.",
+     "summary": "Monitoring, maintenance, quality evaluation, security and cost optimisation for AI agents and automations that are already in production.",
      "body": "Building an AI agent is only the beginning. We help keep your AI systems reliable, secure, observable and effective — with monitoring, controlled changes, quality evaluation and clear reporting.",
      "seo_title": "AI Agent Monitoring & Managed Services",
      "seo_description": "AI Managed Services: monitoring, maintenance, quality evaluation, security and cost control for AI agents, RAG assistants and AI-driven automations — custom quotes.",
@@ -2754,7 +2754,7 @@
        "body": "Test sets, golden cases, groundedness checks for RAG and quality trends across releases."
       },
       {
-       "title": "Cost optimization",
+       "title": "Cost optimisation",
        "body": "Model selection, prompt length, caching, budget alerts and a monthly cost report."
       },
       {
@@ -2838,10 +2838,10 @@
      "slug": "technical-audit",
      "name": "AI strategy & readiness: a technical audit of your processes, data and store",
      "short_name": "AI strategy & readiness",
-     "summary": "A structured assessment of your store, data and processes that ends with a prioritized improvement plan.",
-     "body": "An audit is a good first step when it is unclear where to start. Within an agreed scope we review your store, integrations, data and processes, and you receive a concrete, prioritized action plan.",
+     "summary": "A structured assessment of your store, data and processes that ends with a prioritised improvement plan.",
+     "body": "An audit is a good first step when it is unclear where to start. Within an agreed scope we review your store, integrations, data and processes, and you receive a concrete, prioritised action plan.",
      "seo_title": "Technical audit of an online store and AI readiness",
-     "seo_description": "A technical audit of your online store: performance, SEO basics, security, integrations, data and AI opportunities — with a prioritized plan and effort estimates.",
+     "seo_description": "A technical audit of your online store: performance, SEO basics, security, integrations, data and AI opportunities — with a prioritised plan and effort estimates.",
      "primary_keyword": "technical audit of an online store",
      "capabilities": [
       {
@@ -2871,7 +2871,7 @@
      ],
      "deliverables": [
       "A written report of findings",
-      "A prioritized action plan — quick wins and longer-term measures",
+      "A prioritised action plan — quick wins and longer-term measures",
       "An effort estimate for each recommendation",
       "A meeting to present and discuss the results"
      ]

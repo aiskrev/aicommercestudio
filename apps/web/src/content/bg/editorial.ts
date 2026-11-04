@@ -42,7 +42,7 @@ const categorySources: Omit<EditorialCategory, "key">[] = [
   {
     slug: "oblak-i-platformi",
     name: "Облак и платформи",
-    title: "Статии за облачни основни зони, Kubernetes и платформено инженерство",
+    title: "Статии за базови облачни среди, Kubernetes и платформено инженерство",
     description: "Структура на облачните акаунти, мрежа, идентичност, инфраструктура като код и Kubernetes платформи.",
     relatedService: "integrations",
   },

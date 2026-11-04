@@ -96,7 +96,7 @@ test("a shared design opens straight on the plan; an invalid code is ignored", a
 
 test("library-only archetypes have every profile field and open their own workflow in the builder", async ({ page }) => {
   await page.goto("/en/ai-agents/ecommerce-catalog-assistant");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("E-commerce catalog assistant");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("E-commerce catalogue assistant");
   for (const id of ["agent-prerequisites", "agent-risks", "agent-approvals"]) {
     await expect(page.getByTestId(id).getByRole("listitem").first()).toBeVisible();
   }
