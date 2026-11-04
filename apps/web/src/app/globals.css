@@ -108,9 +108,9 @@
   --color-violet-500: #83a9f9;
 
   /* Typography */
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: var(--font-manrope), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono-face), ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+  --font-sans: var(--font-inter-cyrillic), var(--font-inter-latin), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-manrope-cyrillic), var(--font-manrope-latin), var(--font-inter-cyrillic), var(--font-inter-latin), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-cyrillic), var(--font-mono-latin), ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
 
   /* Text sizes outside the heading scale (utilities text-body-sm, text-nav, text-caption, text-micro,
      text-lead-sm) replace the former arbitrary text-[NNpx] values. */
