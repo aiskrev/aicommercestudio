@@ -7,6 +7,7 @@ from sqlalchemy import engine_from_config, pool
 
 import app.accounts.models  # noqa: F401
 import app.models  # noqa: F401  (registers tables on Base.metadata)
+import app.workspace.models  # noqa: F401
 from app.config import get_settings
 from app.db import Base
 

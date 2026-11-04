@@ -8126,6 +8126,566 @@
           }
         }
       }
+    },
+    "/api/workspace/demo": {
+      "get": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Demo",
+        "operationId": "demo_api_workspace_demo_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Demo Api Workspace Demo Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/plans": {
+      "get": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Plans",
+        "operationId": "plans_api_workspace_plans_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response Plans Api Workspace Plans Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/me": {
+      "get": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Me",
+        "operationId": "me_api_workspace_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Me Api Workspace Me Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/projects": {
+      "get": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "List Projects",
+        "operationId": "list_projects_api_workspace_projects_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response List Projects Api Workspace Projects Get"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Create Project",
+        "operationId": "create_project_api_workspace_projects_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Create Project Api Workspace Projects Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/projects/{project_id}": {
+      "patch": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Rename Project",
+        "operationId": "rename_project_api_workspace_projects__project_id__patch",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProjectIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Rename Project Api Workspace Projects  Project Id  Patch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Delete Project",
+        "operationId": "delete_project_api_workspace_projects__project_id__delete",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/projects/{project_id}/versions": {
+      "get": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "List Versions",
+        "operationId": "list_versions_api_workspace_projects__project_id__versions_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": true
+                  },
+                  "title": "Response List Versions Api Workspace Projects  Project Id  Versions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Run Assessment",
+        "operationId": "run_assessment_api_workspace_projects__project_id__versions_post",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 100,
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/app__workspace__service__RunIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Run Assessment Api Workspace Projects  Project Id  Versions Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/projects/{project_id}/versions/{number}": {
+      "get": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Read Version",
+        "operationId": "read_version_api_workspace_projects__project_id__versions__number__get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Read Version Api Workspace Projects  Project Id  Versions  Number  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/projects/{project_id}/compare": {
+      "get": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Compare",
+        "operationId": "compare_api_workspace_projects__project_id__compare_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "left",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Left"
+            }
+          },
+          {
+            "name": "right",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Right"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Compare Api Workspace Projects  Project Id  Compare Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/projects/{project_id}/versions/{number}/export": {
+      "get": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Export",
+        "operationId": "export_api_workspace_projects__project_id__versions__number__export_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "number",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Number"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "markdown",
+                "json"
+              ],
+              "type": "string",
+              "default": "markdown",
+              "title": "Format"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/workspace/billing/sandbox/plan": {
+      "post": {
+        "tags": [
+          "workspace"
+        ],
+        "summary": "Sandbox Plan",
+        "description": "Test adapter: changes the plan with no payment. Production refuses to start with it on.",
+        "operationId": "sandbox_plan_api_workspace_billing_sandbox_plan_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SandboxPlanIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -13473,7 +14033,7 @@
         "properties": {
           "records": {
             "items": {
-              "$ref": "#/components/schemas/RunIn"
+              "$ref": "#/components/schemas/app__ops__observability__RunIn"
             },
             "type": "array",
             "maxItems": 200,
@@ -16880,6 +17440,22 @@
         ],
         "title": "ProfileOut"
       },
+      "ProjectIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "title": "ProjectIn"
+      },
       "ProposalContent-Input": {
         "properties": {
           "scope": {
@@ -18840,105 +19416,6 @@
         ],
         "title": "RunDetail"
       },
-      "RunIn": {
-        "properties": {
-          "external_id": {
-            "type": "string",
-            "maxLength": 80,
-            "minLength": 1,
-            "pattern": "^[A-Za-z0-9._:-]+$",
-            "title": "External Id"
-          },
-          "agent_id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Agent Id"
-          },
-          "agent_version_id": {
-            "anyOf": [
-              {
-                "type": "string",
-                "format": "uuid"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Agent Version Id"
-          },
-          "started_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Started At"
-          },
-          "duration_ms": {
-            "type": "integer",
-            "maximum": 86400000.0,
-            "minimum": 0.0,
-            "title": "Duration Ms"
-          },
-          "status": {
-            "$ref": "#/components/schemas/RunStatus"
-          },
-          "error_category": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ErrorCategory"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "provider": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Provider"
-          },
-          "model": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Model"
-          },
-          "input_tokens": {
-            "type": "integer",
-            "maximum": 50000000.0,
-            "minimum": 0.0,
-            "title": "Input Tokens",
-            "default": 0
-          },
-          "output_tokens": {
-            "type": "integer",
-            "maximum": 50000000.0,
-            "minimum": 0.0,
-            "title": "Output Tokens",
-            "default": 0
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "external_id",
-          "agent_id",
-          "started_at",
-          "duration_ms",
-          "status"
-        ],
-        "title": "RunIn",
-        "description": "One execution record. Metadata and counters only — there is no field for prompt or output content."
-      },
       "RunOut": {
         "properties": {
           "id": {
@@ -19016,6 +19493,26 @@
           "cancelled"
         ],
         "title": "RunStatus"
+      },
+      "SandboxPlanIn": {
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "free",
+              "pro",
+              "business",
+              "custom"
+            ],
+            "title": "Plan"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "plan"
+        ],
+        "title": "SandboxPlanIn"
       },
       "SavedOut": {
         "properties": {
@@ -22083,6 +22580,105 @@
         ],
         "title": "VersionOut"
       },
+      "app__ops__observability__RunIn": {
+        "properties": {
+          "external_id": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9._:-]+$",
+            "title": "External Id"
+          },
+          "agent_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Agent Id"
+          },
+          "agent_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Version Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "maximum": 86400000.0,
+            "minimum": 0.0,
+            "title": "Duration Ms"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RunStatus"
+          },
+          "error_category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorCategory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "input_tokens": {
+            "type": "integer",
+            "maximum": 50000000.0,
+            "minimum": 0.0,
+            "title": "Input Tokens",
+            "default": 0
+          },
+          "output_tokens": {
+            "type": "integer",
+            "maximum": 50000000.0,
+            "minimum": 0.0,
+            "title": "Output Tokens",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "external_id",
+          "agent_id",
+          "started_at",
+          "duration_ms",
+          "status"
+        ],
+        "title": "RunIn",
+        "description": "One execution record. Metadata and counters only — there is no field for prompt or output content."
+      },
       "app__ops__registry__VersionCreate": {
         "properties": {
           "content": {
@@ -22507,6 +23103,129 @@
           "expires_at"
         ],
         "title": "SessionOut"
+      },
+      "app__workspace__service__RunIn": {
+        "properties": {
+          "engine": {
+            "type": "string",
+            "pattern": "^(template|ai)$",
+            "title": "Engine",
+            "default": "template"
+          },
+          "business_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BusinessType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "process_description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000,
+                "minLength": 40
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Process Description"
+          },
+          "monthly_volume": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MonthlyVolume"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "team_size": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TeamSize"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/ToolKey"
+            },
+            "type": "array",
+            "maxItems": 16,
+            "title": "Tools"
+          },
+          "other_tools": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Other Tools",
+            "default": ""
+          },
+          "context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AdvisorContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "pattern": "^(bg|en)$",
+            "title": "Locale",
+            "default": "bg"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "parent_number": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Number"
+          },
+          "clarification": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "minLength": 3
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clarification"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "RunIn"
       }
     }
   }

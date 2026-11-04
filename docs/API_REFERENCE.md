@@ -550,6 +550,26 @@ Only while `CUSTOMER_ACCOUNTS_ENABLED=true` (404 otherwise). See [CUSTOMER_ACCOU
 | POST | `/api/accounts/sessions/revoke-others` | → 204 |
 | DELETE | `/api/accounts/sessions/{session_id}` | → 204; 404 for another account's session |
 
+## Advisor Workspace (off by default)
+
+Only while `ADVISOR_WORKSPACE_ENABLED=true` and accounts are on (404 otherwise). See [ADVISOR_WORKSPACE.md](ADVISOR_WORKSPACE.md). Needs the customer session; answers are `no-store`. 403 `feature_not_in_plan` or `quota_exceeded` when the plan doesn't allow it.
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/api/workspace/demo` | fixed synthetic data |
+| GET | `/api/workspace/plans` | plans, features and limits; only approved prices |
+| GET | `/api/workspace/me` | plan, rights, limits and this month's usage |
+| GET | `/api/workspace/projects` | own projects |
+| POST | `/api/workspace/projects` | `{name}` → 201 |
+| PATCH | `/api/workspace/projects/{project_id}` | `{name}` |
+| DELETE | `/api/workspace/projects/{project_id}` | → 204 |
+| GET | `/api/workspace/projects/{project_id}/versions` | history, without full results |
+| POST | `/api/workspace/projects/{project_id}/versions` | needs `Idempotency-Key`; `{engine, inputs…}` or `{parent_number, clarification}` → 201 |
+| GET | `/api/workspace/projects/{project_id}/versions/{number}` | one version; a locked result has only a preview |
+| GET | `/api/workspace/projects/{project_id}/compare` | `?left=&right=`; needs `compare` |
+| GET | `/api/workspace/projects/{project_id}/versions/{number}/export` | `?format=markdown\|json` |
+| POST | `/api/workspace/billing/sandbox/plan` | `{plan}` → 204; only with `BILLING_PROVIDER=sandbox`, never in production |
+
 ## Client portal (read-only, off by default)
 
 Only while `CLIENT_PORTAL_ENABLED=true` (404 otherwise). Separate client identities, cookies `acs_portal_session` / `acs_portal_csrf`; the organisation always comes from the session. See [CLIENT_PORTAL.md](CLIENT_PORTAL.md).

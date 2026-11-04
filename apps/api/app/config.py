@@ -131,6 +131,13 @@ class Settings(BaseSettings):
     portal_csrf_cookie_name: str = "acs_portal_csrf"
     portal_invitation_hours: int = Field(default=72, ge=1, le=336)
 
+    # Advisor Workspace (docs/ADVISOR_WORKSPACE.md). Not released: production refuses to start with it on.
+    advisor_workspace_enabled: bool = False
+    billing_provider: Literal["disabled", "sandbox"] = "disabled"
+    # Reserved per AI call. Providers don't report tokens here, so this is an upper estimate, not a price.
+    workspace_ai_call_cost_micros: int = Field(default=500_000, ge=1)
+    # Spending cap across all workspaces per month. 0 means no AI at all, never "no cap".
+    workspace_ai_global_monthly_micros: int = Field(default=0, ge=0)
     # Customer accounts (docs/CUSTOMER_ACCOUNTS.md). Off until a release review.
     customer_accounts_enabled: bool = False
     account_session_hours: int = Field(default=12, ge=1, le=72)
@@ -206,6 +213,10 @@ class Settings(BaseSettings):
             problems.append("SITE_URL must use https:// in production")
         if any(not origin.startswith("https://") for origin in self.cors_origin_list):
             problems.append("CORS_ORIGINS must only contain https:// origins in production")
+        if self.advisor_workspace_enabled:
+            problems.append("ADVISOR_WORKSPACE_ENABLED is not released for production")
+        if self.billing_provider == "sandbox":
+            problems.append("BILLING_PROVIDER=sandbox is not allowed in production")
         if self.email_provider == "dev_file":
             problems.append("EMAIL_PROVIDER=dev_file is not allowed in production")
         if self.customer_accounts_enabled and not (self.email_provider == "smtp" and self.smtp_host and self.smtp_from):

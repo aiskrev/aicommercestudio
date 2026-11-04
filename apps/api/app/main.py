@@ -35,6 +35,7 @@ from app.routers import (
     readiness,
     solution,
     team,
+    workspace,
 )
 
 logger = logging.getLogger(__name__)
@@ -145,6 +146,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(portal.staff)
     app.include_router(portal.client)
     app.include_router(accounts.router)
+    app.include_router(workspace.router)
     return app
 
 
