@@ -25,7 +25,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Skip API routes, Next internals and files with an extension (robots.txt, sitemap.xml, icon.svg …)
+  // Skip API routes, Next internals and files with an extension (robots.txt, sitemap.xml, icon.png …)
   // as well as generated metadata images.
   matcher: ["/((?!api|_next|opengraph-image|.*\\..*).*)"],
 };
