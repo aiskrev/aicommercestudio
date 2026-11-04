@@ -1,18 +1,28 @@
 import type { ReactNode } from "react";
 
-import type { ServiceKey } from "@/content/types";
+import type { CoreServiceKey, OfferServiceKey, ServiceKey } from "@/content/types";
 
 /**
  * Small abstract line drawing per discipline (decorative, aria-hidden). Each motif hints at the
  * shape of the work — a maintenance cycle, a crawl tree, a flow — without pretending to be data.
  */
+/** The services of the public offer reuse the motif of their nearest discipline. */
+const OFFER_MOTIF: Record<OfferServiceKey, CoreServiceKey> = {
+  business_websites: "ai_tools",
+  store_development: "maintenance",
+  portals_web_apps: "ai_tools",
+  payments_subscriptions: "integrations",
+  security_performance: "audit",
+  integration_care: "integrations",
+};
+
 export function ServiceMotif({ service, className }: { service: ServiceKey; className?: string }) {
   const stroke = "var(--color-brand)";
   const muted = "var(--color-line-strong)";
   const accent = "var(--color-brand-2)";
   const common = { fill: "none", strokeWidth: 1.5, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
 
-  const motifs: Record<ServiceKey, ReactNode> = {
+  const motifs: Record<CoreServiceKey, ReactNode> = {
     // update → test → release cycle
     maintenance: (
       <>
@@ -119,7 +129,7 @@ export function ServiceMotif({ service, className }: { service: ServiceKey; clas
 
   return (
     <svg viewBox="0 0 120 80" className={className} aria-hidden="true" focusable="false">
-      {motifs[service]}
+      {motifs[service in OFFER_MOTIF ? OFFER_MOTIF[service as OfferServiceKey] : (service as CoreServiceKey)]}
     </svg>
   );
 }

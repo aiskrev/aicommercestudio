@@ -1,8 +1,9 @@
 import { type ServiceDepth, serviceDepth } from "@/content/bg/services-depth";
 import { type ServiceTemplate, serviceTemplate } from "@/content/bg/services-template";
-import type { Service } from "@/content/types";
+import { offerServices } from "@/content/bg/services-offer";
+import type { CoreServiceKey, Service } from "@/content/types";
 
-const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] = [
+const baseServices: (Omit<Service, keyof ServiceDepth | keyof ServiceTemplate> & { key: CoreServiceKey })[] = [
   {
     key: "ai_agents",
     slug: "razrabotka-na-ai-agenti",
@@ -709,10 +710,13 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
   },
 ];
 
-export const services: Service[] = baseServices.map((service) => ({
-  ...service,
-  ...serviceDepth[service.key],
-  ...serviceTemplate[service.key],
-}));
+export const services: Service[] = [
+  ...baseServices.map((service) => ({
+    ...service,
+    ...serviceDepth[service.key],
+    ...serviceTemplate[service.key],
+  })),
+  ...offerServices,
+];
 
 export const coreServices = services.filter((s) => !s.isOffering);

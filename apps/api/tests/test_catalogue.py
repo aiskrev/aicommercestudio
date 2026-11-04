@@ -107,12 +107,12 @@ def test_entity_ids_are_deterministic():
 
 def test_seed_on_an_empty_database_creates_the_full_catalogue(db):
     result = seed_catalogue(db)
-    assert dict(result.created) == {"domain": 10, "family": 60, "service": 9}
-    assert dict(result.published) == {"domain": 10, "service": 9}
+    assert dict(result.created) == {"domain": 10, "family": 60, "service": 15}
+    assert dict(result.published) == {"domain": 10, "service": 15}
     assert not result.updated and not result.extra
-    assert count(db, CatalogueEntity) == 79
+    assert count(db, CatalogueEntity) == 85
     assert count(db, ContentItem) > 0
-    assert count(db, EntityTranslation) == 79 * 2
+    assert count(db, EntityTranslation) == 85 * 2
     assert count(db, FamilyService) > 0
     assert count(db, EntityRelation) > 0
     assert catalogue_problems(db) == []
@@ -126,11 +126,11 @@ def test_repeated_seeding_changes_nothing(db):
     snapshot = sorted((r.id, r.revision, r.updated_at) for r in db.scalars(select(CatalogueEntity)))
     result = seed_catalogue(db)
     assert not result.created and not result.updated and not result.published
-    assert sum(result.unchanged.values()) == 79
+    assert sum(result.unchanged.values()) == 85
     assert not seed_catalogue(db, reconcile=True).changed
     db.expire_all()
     assert sorted((r.id, r.revision, r.updated_at) for r in db.scalars(select(CatalogueEntity))) == snapshot
-    assert count(db, EntityTranslation) == 79 * 2
+    assert count(db, EntityTranslation) == 85 * 2
     assert db.scalar(select(func.count()).select_from(AuditLog).where(AuditLog.action == "catalogue.seeded")) == 1
 
 
@@ -149,7 +149,7 @@ def test_reconcile_updates_in_place_and_republishes(db):
     assert (row.revision, row.published_revision) == (2, 2)
     assert db.get(EntityTranslation, (row.id, "en")).summary == "Changed summary for the test."
     assert row.published_snapshot["texts"]["en"]["summary"] == "Changed summary for the test."
-    assert count(db, CatalogueEntity) == 79
+    assert count(db, CatalogueEntity) == 85
 
     result = seed_catalogue(db, reconcile=True)  # back to the committed document
     assert dict(result.updated) == {"domain": 1, "service": 1}
@@ -183,7 +183,7 @@ def test_bootstrap_backfills_never_published_entries_but_not_edited_ones(db):
     db.commit()
 
     result = seed_catalogue(db)
-    assert dict(result.published) == {"domain": 10, "service": 8}
+    assert dict(result.published) == {"domain": 10, "service": 14}
     seo = db.get(CatalogueEntity, entity_id("service", "seo"))
     assert seo.status == "published" and seo.published_snapshot["capabilities"]
     analytics = db.get(CatalogueEntity, entity_id("service", "analytics"))
@@ -193,8 +193,8 @@ def test_bootstrap_backfills_never_published_entries_but_not_edited_ones(db):
 
 def test_dry_run_writes_nothing(db):
     result = seed_catalogue(db, dry_run=True)
-    assert dict(result.created) == {"domain": 10, "family": 60, "service": 9}
-    assert dict(result.published) == {"domain": 10, "service": 9}
+    assert dict(result.created) == {"domain": 10, "family": 60, "service": 15}
+    assert dict(result.published) == {"domain": 10, "service": 15}
     assert count(db, CatalogueEntity) == 0
     assert count(db, AuditLog) == 0
 
@@ -250,10 +250,10 @@ def test_every_lead_service_key_except_other_maps_to_one_service():
 def test_purge_removes_the_catalogue_and_keeps_leads(make_lead, db):
     make_lead(service="automation")
     seed_catalogue(db)
-    assert purge_catalogue(db) == 79
+    assert purge_catalogue(db) == 85
     assert count(db, CatalogueEntity) == 0
     assert count(db, Lead) == 1
-    assert dict(seed_catalogue(db).created) == {"domain": 10, "family": 60, "service": 9}
+    assert dict(seed_catalogue(db).created) == {"domain": 10, "family": 60, "service": 15}
 
 
 def test_cli_commands(db):
@@ -263,7 +263,7 @@ def test_cli_commands(db):
     assert cli_main(["catalogue-seed"]) == 0
     assert cli_main(["catalogue-check"]) == 0
     assert cli_main(["catalogue-purge"]) == 1  # refused without --yes
-    assert count(db, CatalogueEntity) == 79
+    assert count(db, CatalogueEntity) == 85
 
 
 # --------------------------------------------------------------------------- schema constraints

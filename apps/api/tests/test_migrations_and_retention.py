@@ -82,7 +82,7 @@ def test_migration_0009_keeps_existing_data_seeds_and_rolls_back():
 
     command.upgrade(cfg, "head")
     with Session(engine) as session:
-        assert dict(seed_catalogue(session).published) == {"domain": 10, "service": 9}
+        assert dict(seed_catalogue(session).published) == {"domain": 10, "service": 15}
         assert catalogue_problems(session) == []
         assert seed_catalogue(session).changed is False
     assert _row_snapshot(engine) == before
@@ -124,8 +124,9 @@ def test_migration_0010_turns_unsnapshotted_rows_into_drafts_and_the_seed_republ
         assert conn.execute(text("SELECT status FROM catalogue_entities")).scalar() == "draft"
     with engine.begin() as conn:  # the half-seeded 0009 row is replaced by a clean seed
         conn.execute(text("DELETE FROM catalogue_entities"))
+    command.upgrade(cfg, "0016")  # the current seed has the categories added in 0016
     with Session(engine) as session:
-        assert dict(seed_catalogue(session).published) == {"domain": 10, "service": 9}
+        assert dict(seed_catalogue(session).published) == {"domain": 10, "service": 15}
         assert catalogue_problems(session) == []
     command.downgrade(cfg, "0009")
     with engine.connect() as conn:

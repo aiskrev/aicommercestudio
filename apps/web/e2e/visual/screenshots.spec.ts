@@ -33,6 +33,16 @@ const PAGES: [string, string][] = [
   ["industries-en", "/en/industries"],
   ["privacy-bg", "/bg/poveritelnost"],
   ["admin-login", "/admin/login"],
+  ["offer-websites-bg", "/bg/uslugi/interaktivni-biznes-saytove"],
+  ["offer-store-en", "/en/services/online-store-development"],
+  ["offer-portals-bg", "/bg/uslugi/klientski-portali-i-uebprilozheniya"],
+  ["offer-payments-en", "/en/services/subscription-and-payment-integration"],
+  ["offer-security-bg", "/bg/uslugi/zashtita-i-uskoryavane-na-saytove"],
+  ["offer-care-en", "/en/services/integration-and-automation-care"],
+  ["care-plans-bg", "/bg/paketi"],
+  ["care-plans-en", "/en/care-plans"],
+  ["demo-centre-bg", "/bg/demo-tsentar"],
+  ["demo-centre-en", "/en/demo-centre"],
 ];
 
 // Optional filters for quick iterations: SHOT_ONLY=home-bg,home-en  SHOT_WIDTHS=1440,390

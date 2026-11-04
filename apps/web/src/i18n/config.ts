@@ -53,6 +53,8 @@ const EN_SEGMENTS: Record<string, string> = {
   "referentni-stsenarii": "reference-scenarios",
   "integratsionni-modeli": "integration-patterns",
   "rabotni-sreshti": "workshops",
+  paketi: "care-plans",
+  "demo-tsentar": "demo-centre",
 };
 /** Second-level segments (e.g. `/statii/tema/<topic>`). */
 const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {

@@ -1,4 +1,4 @@
-import type { Service, ServiceKey } from "@/content/types";
+import type { CoreServiceKey, Service } from "@/content/types";
 
 export type ServiceDepth = Pick<Service, "headings" | "checks" | "workflow" | "inputs" | "relatedArticles">;
 
@@ -6,7 +6,7 @@ export type ServiceDepth = Pick<Service, "headings" | "checks" | "workflow" | "i
  * Service-specific depth content: what is actually checked, how the first weeks run and what the
  * client provides. Written as practical technical knowledge — it makes no claims about past results.
  */
-export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
+export const serviceDepth: Record<CoreServiceKey, ServiceDepth> = {
   maintenance: {
     headings: {
       problems: "Кога онлайн магазинът има нужда от техническа поддръжка",

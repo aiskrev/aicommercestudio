@@ -1,11 +1,11 @@
 import type { ServiceDepth } from "@/content/bg/services-depth";
-import type { ServiceKey } from "@/content/types";
+import type { CoreServiceKey } from "@/content/types";
 
 /**
  * English service depth content. `relatedArticles` holds article keys (shared across locales).
  * Written as practical technical knowledge — it makes no claims about past results.
  */
-export const serviceDepth: Record<ServiceKey, ServiceDepth> = {
+export const serviceDepth: Record<CoreServiceKey, ServiceDepth> = {
   maintenance: {
     headings: {
       problems: "When an online store needs technical maintenance",

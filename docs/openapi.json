@@ -18868,6 +18868,12 @@
           "audit",
           "ai_managed",
           "ai_agents",
+          "business_websites",
+          "store_development",
+          "portals_web_apps",
+          "payments_subscriptions",
+          "security_performance",
+          "integration_care",
           "other"
         ],
         "title": "ServiceKey"
