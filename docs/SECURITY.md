@@ -38,7 +38,9 @@ CLI/bootstrap; there is no public registration. Password policy: ≥12 chars, mi
   from the portal's (`portal-totp`). Rotating `SECRET_KEY` invalidates every enrolment (and every
   recovery code): run `reset-mfa` for each account and let them enrol again.
 * **Enrolment:** on `/admin/account` (*Account and sessions*): the key is shown once (plus an
-  `otpauth://` link), and it becomes active only when a code from it is confirmed. Enabling ends every
+  `otpauth://` link, a QR code of that link and a button that copies the key without spaces), and it
+  becomes active only when a code from it is confirmed. The QR code is built in the browser and drawn as
+  inline SVG, never by a third-party service, because the link contains the secret. Enabling ends every
   other session of the account.
 * **Sign-in:** password → a **pending session** (`admin_sessions.mfa_pending`, 15 minutes) → code →
   the pending session is revoked and a new full session with a new token and CSRF token is issued. A
