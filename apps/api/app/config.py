@@ -133,7 +133,14 @@ class Settings(BaseSettings):
 
     # Advisor Workspace (docs/ADVISOR_WORKSPACE.md). Not released: production refuses to start with it on.
     advisor_workspace_enabled: bool = False
-    billing_provider: Literal["disabled", "sandbox"] = "disabled"
+    billing_provider: Literal["disabled", "sandbox", "stripe"] = "disabled"
+    # Test mode only for now: a live key is refused in every environment (docs/STRIPE_BILLING.md).
+    stripe_secret_key: str | None = None
+    stripe_webhook_secret: str | None = None
+    stripe_live_allowed: bool = False
+    stripe_automatic_tax: bool = False
+    # Days a past_due subscription keeps its plan while Stripe retries the payment.
+    billing_grace_days: int = Field(default=7, ge=0, le=30)
     # Reserved per AI call. Providers don't report tokens here, so this is an upper estimate, not a price.
     workspace_ai_call_cost_micros: int = Field(default=500_000, ge=1)
     # Spending cap across all workspaces per month. 0 means no AI at all, never "no cap".
@@ -196,6 +203,13 @@ class Settings(BaseSettings):
         return bool(self.smtp_host and self.smtp_from and self.lead_notification_email)
 
     @model_validator(mode="after")
+    def _stripe_test_mode_only(self) -> Settings:
+        key = self.stripe_secret_key or ""
+        if key.startswith(("sk_live", "rk_live")) and not self.stripe_live_allowed:
+            raise ValueError("STRIPE_SECRET_KEY must be a test key until live activation is approved")
+        return self
+
+    @model_validator(mode="after")
     def _validate_production(self) -> Settings:
         if not self.is_production:
             return self
@@ -215,6 +229,8 @@ class Settings(BaseSettings):
             problems.append("CORS_ORIGINS must only contain https:// origins in production")
         if self.advisor_workspace_enabled:
             problems.append("ADVISOR_WORKSPACE_ENABLED is not released for production")
+        if self.billing_provider == "stripe":
+            problems.append("BILLING_PROVIDER=stripe is not released for production")
         if self.billing_provider == "sandbox":
             problems.append("BILLING_PROVIDER=sandbox is not allowed in production")
         if self.email_provider == "dev_file":

@@ -570,6 +570,18 @@ Only while `ADVISOR_WORKSPACE_ENABLED=true` and accounts are on (404 otherwise).
 | GET | `/api/workspace/projects/{project_id}/versions/{number}/export` | `?format=markdown\|json` |
 | POST | `/api/workspace/billing/sandbox/plan` | `{plan}` → 204; only with `BILLING_PROVIDER=sandbox`, never in production |
 
+## Billing (Stripe test mode, off by default)
+
+Only with `BILLING_PROVIDER=stripe` and the workspace on (404 otherwise). See [STRIPE_BILLING.md](STRIPE_BILLING.md).
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/api/billing/offers` | approved offers |
+| GET | `/api/billing/status` | subscriptions and purchases of this workspace |
+| POST | `/api/billing/checkout` | `{offer, locale}` → `{url, reused}`; 409 `subscription_exists`, `scope_not_confirmed`, `offer_unavailable` |
+| POST | `/api/billing/portal` | `{locale}` → `{url}`; billing owner only, otherwise 404 |
+| POST | `/api/billing/stripe/webhook` | Stripe only; needs a valid `Stripe-Signature` |
+
 ## Client portal (read-only, off by default)
 
 Only while `CLIENT_PORTAL_ENABLED=true` (404 otherwise). Separate client identities, cookies `acs_portal_session` / `acs_portal_csrf`; the organisation always comes from the session. See [CLIENT_PORTAL.md](CLIENT_PORTAL.md).

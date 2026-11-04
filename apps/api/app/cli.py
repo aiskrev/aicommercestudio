@@ -23,6 +23,7 @@ import argparse
 import getpass
 import os
 import sys
+import uuid
 from datetime import timedelta
 from pathlib import Path
 
@@ -36,6 +37,9 @@ from app.accounts import service as account_service
 from app.accounts.mail import dispatch_pending
 from app.advisor import service as advisor
 from app.assessments import service as assessment_service
+from app.billing import service as billing
+from app.billing.gateway import get_gateway
+from app.billing.models import BillingOffer, ScopeConfirmation
 from app.catalogue import seed as catalogue
 from app.config import get_settings
 from app.db import get_sessionmaker
@@ -379,6 +383,49 @@ def cmd_db_api_role(_args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_billing_run(_args: argparse.Namespace) -> int:
+    result = billing.process_pending()
+    _print("[billing-run] " + " ".join(f"{key}={value}" for key, value in result.items()))
+    return 1 if result["failed"] else 0
+
+
+def cmd_billing_reconcile(_args: argparse.Namespace) -> int:
+    result = billing.reconcile()
+    _print("[billing-reconcile] " + " ".join(f"{key}={value}" for key, value in result.items()))
+    return 1 if result["errors"] or result["duplicates"] else 0
+
+
+def cmd_billing_offer(args: argparse.Namespace) -> int:
+    """Add or replace an offer after checking it against the price in Stripe. It stays unsold unless approved."""
+    price = get_gateway().retrieve_price(args.price)
+    interval = (price.get("recurring") or {}).get("interval")
+    offer = BillingOffer(
+        key=args.key,
+        kind="subscription" if interval else "one_time",
+        plan_key=args.plan,
+        billing_interval=interval,
+        stripe_price_id=args.price,
+        currency=price["currency"],
+        amount_minor=price["unit_amount"],
+        requires_scope=args.requires_scope,
+        approved_at=utcnow() if args.approve else None,
+    )
+    with get_sessionmaker()() as db:
+        db.merge(offer)
+        db.commit()
+    _print(f"[billing-offer] {args.key}: {price['unit_amount']} {price['currency']} approved={args.approve}")
+    return 0
+
+
+def cmd_billing_confirm_scope(args: argparse.Namespace) -> int:
+    """Record that intake is done and the scope agreed, which opens payment for that workspace."""
+    with get_sessionmaker()() as db:
+        db.merge(ScopeConfirmation(workspace_id=args.workspace, offer_key=args.offer, confirmed_by=args.by))
+        db.commit()
+    _print(f"[billing-confirm-scope] {args.offer} confirmed")
+    return 0
+
+
 def cmd_outbox_run(_args: argparse.Namespace) -> int:
     result = dispatch_pending(limit=100)
     _print("[outbox-run] " + " ".join(f"{key}={value}" for key, value in result.items()))
@@ -504,6 +551,22 @@ def main(argv: list[str] | None = None) -> int:
     maint.add_argument("--dry-run", action="store_true")
     maint.set_defaults(func=cmd_maintenance)
     sub.add_parser("outbox-run", help="Send due transactional e-mail").set_defaults(func=cmd_outbox_run)
+    sub.add_parser("billing-run", help="Process stored Stripe events").set_defaults(func=cmd_billing_run)
+    sub.add_parser("billing-reconcile", help="Compare with Stripe and fix drift").set_defaults(
+        func=cmd_billing_reconcile
+    )
+    offer = sub.add_parser("billing-offer", help="Add an offer from a Stripe price")
+    offer.add_argument("--key", required=True)
+    offer.add_argument("--price", required=True)
+    offer.add_argument("--plan")
+    offer.add_argument("--requires-scope", action="store_true")
+    offer.add_argument("--approve", action="store_true")
+    offer.set_defaults(func=cmd_billing_offer)
+    scope = sub.add_parser("billing-confirm-scope", help="Open payment after intake and agreed scope")
+    scope.add_argument("--workspace", required=True, type=uuid.UUID)
+    scope.add_argument("--offer", required=True)
+    scope.add_argument("--by", required=True)
+    scope.set_defaults(func=cmd_billing_confirm_scope)
     sub.add_parser("db-api-role", help="Enable the API login role from API_DB_PASSWORD").set_defaults(
         func=cmd_db_api_role
     )

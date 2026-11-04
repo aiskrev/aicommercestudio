@@ -39,6 +39,7 @@ export const routes = {
   accountReset: "/konto/nova-parola",
   accountAdvisor: "/konto/advisor",
   accountAdvisorDemo: "/konto/advisor/demo",
+  accountAdvisorPayment: "/konto/advisor/payment",
   adminLogin: "/admin/login",
   admin: "/admin",
   adminLeads: "/admin/leads",

@@ -38,6 +38,10 @@ export function workspaceFetch<T>(path: string, locale: Locale, networkMessage: 
   return request<T>(`/api/workspace${path}`, locale, networkMessage, options);
 }
 
+export function billingFetch<T>(path: string, locale: Locale, networkMessage: string, options?: RequestOptions) {
+  return request<T>(`/api/billing${path}`, locale, networkMessage, options);
+}
+
 async function request<T>(
   url: string,
   locale: Locale,
