@@ -37,6 +37,8 @@ No blocker was found.
 
 ## Before a public release (not done)
 
+Product accounts in SAAS_EXPANSION_PLAN.md do not replace these steps and never switch the portal on (ADR-52).
+
 * An external penetration test of authentication and isolation.
 * A deployment with a **separate runtime login role**: today the application connects as the schema
   owner and switches to `acs_app_runtime` per transaction (see [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md)).

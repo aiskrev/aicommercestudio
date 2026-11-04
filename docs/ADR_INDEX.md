@@ -74,6 +74,11 @@ Statuses: **accepted** (in force, implemented), **accepted · design** (agreed, 
 | --- | --- | --- | --- |
 | ADR-50 | The logo, wordmark and favicon are frozen by owner decision | accepted | DESIGN_SYSTEM.md, CLAUDE.md |
 | ADR-51 | The founder portrait and public contact details have one source and are protected by tests | accepted | CLAUDE.md, `lib/protected-content.test.ts`, `lib/company.test.ts` |
+| ADR-52 | Product accounts stay separate from the operations portal; a link needs staff approval and registration never grants operational data | proposed | SAAS_EXPANSION_PLAN.md §5 |
+| ADR-53 | Modular monolith with shared `auth_core` and separate principals; no microservices or second auth stack | accepted · design | SAAS_EXPANSION_PLAN.md §4 |
+| ADR-54 | The catalogue stays free of prices; commercial data lives in the `products` module | accepted · design | SAAS_EXPANSION_PLAN.md §6 |
+| ADR-55 | Hosted checkout behind a provider port; card data never touches our systems | accepted · design | SAAS_EXPANSION_PLAN.md §6 |
+| ADR-56 | Transactional e-mail through an approved provider and an outbox; replaces ADR-46 for account and billing mail once approved | open | SAAS_EXPANSION_PLAN.md §6 |
 
 ## Open owner decisions
 
