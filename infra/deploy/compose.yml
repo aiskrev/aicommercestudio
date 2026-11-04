@@ -14,7 +14,7 @@ x-logging: &logging
     max-file: "5"
 
 x-api-env: &api-env
-  DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-acs}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-acs}
+  DATABASE_URL: postgresql+psycopg://${API_DB_USER:-${POSTGRES_USER:-acs}}:${API_DB_PASSWORD:-${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}}@db:5432/${POSTGRES_DB:-acs}
   APP_ENV: production
   ENABLE_API_DOCS: "false"
   SEED_SAMPLE_DATA: "false"
@@ -70,7 +70,9 @@ services:
     env_file: .env
     environment:
       <<: *api-env
-    command: ["sh", "-c", "alembic upgrade head && python -m app.cli seed"]
+      # The schema owner: only this job and the maintenance timer use it, never the running API.
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-acs}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-acs}
+    command: ["sh", "-c", "alembic upgrade head && python -m app.cli db-api-role && python -m app.cli seed"]
     depends_on:
       db:
         condition: service_healthy

@@ -73,6 +73,7 @@ services:
     environment:
       API_INTERNAL_URL: http://api:8000
       CUSTOMER_ACCOUNTS_ENABLED: ${CUSTOMER_ACCOUNTS_ENABLED:-false}
+      ADVISOR_WORKSPACE_ENABLED: ${ADVISOR_WORKSPACE_ENABLED:-false}
       # Enables POST /api/catalogue-revalidate (on-demand regeneration of the catalogue pages); empty = disabled.
       CATALOGUE_REVALIDATE_SECRET: ${CATALOGUE_REVALIDATE_SECRET:-}
     depends_on:

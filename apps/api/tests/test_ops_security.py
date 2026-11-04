@@ -145,7 +145,7 @@ def test_bound_sessions_run_every_transaction_as_the_runtime_role(db, tenants):
         # …also in the next transaction of the same session.
         assert set(session.scalars(select(OpsAgent.id))) == {a["agent"]}
         assert session.get(OpsAgent, b["agent"]) is None
-    # The setting and the role are transaction-local: a fresh session on the pool is the owner, unscoped.
+    # The setting and the role are transaction-local: a fresh session on the pool is unscoped.
     with get_sessionmaker()() as session:
         assert session.scalar(text("SELECT current_user")) != RUNTIME
         assert session.scalar(text("SELECT current_setting('app.ops_org', true)")) in (None, "")

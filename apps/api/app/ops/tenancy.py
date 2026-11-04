@@ -88,6 +88,7 @@ def require(permission: Permission, module: str | None = None) -> Callable[..., 
     def dependency(organization_id: uuid.UUID, admin: Admin, db: DbSession) -> OpsContext:
         if module is not None and not module_enabled(module):
             raise not_found()
+        rls.bind(db, user_id=admin.user.id)  # the caller's own memberships, and nothing else yet
         ctx = load_context(db, admin, organization_id)
         if not ctx.can(permission):
             raise forbidden()

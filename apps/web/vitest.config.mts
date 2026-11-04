@@ -10,6 +10,8 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    // Long user-event flows pass in seconds alone but miss a 5 s limit on a busy machine.
+    testTimeout: 20_000,
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     css: false,

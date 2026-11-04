@@ -79,6 +79,9 @@ Statuses: **accepted** (in force, implemented), **accepted · design** (agreed, 
 | ADR-54 | The catalogue stays free of prices; commercial data lives in the `products` module | accepted · design | SAAS_EXPANSION_PLAN.md §6 |
 | ADR-55 | Hosted checkout behind a provider port; card data never touches our systems | accepted · design | SAAS_EXPANSION_PLAN.md §6 |
 | ADR-56 | Transactional e-mail through an approved provider and an outbox; replaces ADR-46 for account and billing mail once approved | open | SAAS_EXPANSION_PLAN.md §6 |
+| ADR-57 | The API connects as `acs_app_api`, which owns nothing and has no direct right on tenant tables; closes H-1 once switched on | accepted | infra/deploy/README.md |
+| ADR-58 | Account limits use shared counters in PostgreSQL, not the in-memory limiter of ADR-04 | accepted | CUSTOMER_ACCOUNTS.md |
+| ADR-59 | Costly work reserves quota before the provider call and settles with the result; no overage, and no plan has an unlimited value | accepted | ADVISOR_WORKSPACE.md |
 
 ## Open owner decisions
 

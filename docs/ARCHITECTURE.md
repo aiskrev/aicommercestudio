@@ -89,8 +89,8 @@ SEO and API languages: [INTERNATIONALIZATION.md](INTERNATIONALIZATION.md).
 Staff-only. Every `/api/ops/organizations/{id}/…` route resolves the caller's membership
 (`app/ops/tenancy.py::require`). A foreign organisation answers 404, the same as a missing one.
 Data is read only through `scoped()`, and child rows use a composite foreign key to
-`(id, organization_id)`. Roles and permissions: `app/ops/rbac.py`. PostgreSQL RLS is designed but
-not enabled, because the API connects as the schema owner.
+`(id, organization_id)`. Roles and permissions: `app/ops/rbac.py`. PostgreSQL RLS is enabled (migration 0013);
+the API connects as the restricted `acs_app_api` once that is switched on (`infra/deploy/README.md`).
 
 ### Authentication
 

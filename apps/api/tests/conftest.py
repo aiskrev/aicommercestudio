@@ -10,16 +10,22 @@ from pathlib import Path
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import make_url
+from sqlalchemy.orm import sessionmaker
 
 _base_url = make_url(os.environ.get("DATABASE_URL", "postgresql+psycopg://acs:acs@localhost:5433/acs"))
 TEST_DB = f"{_base_url.database}_test"
 TEST_DATABASE_URL = _base_url.set(database=TEST_DB).render_as_string(hide_password=False)
 SERVER_URL = _base_url.set(database="postgres").render_as_string(hide_password=False)
+# Requests run as the API's restricted role, as in production. Fixtures, migrations and the CLI use the owner.
+API_ROLE_PASSWORD = "test-only-api-role"  # noqa: S105
+API_DATABASE_URL = (
+    _base_url.set(username="acs_app_api", password=API_ROLE_PASSWORD, database=TEST_DB)
+).render_as_string(hide_password=False)
 
 os.environ.update(
     {
         "APP_ENV": "test",
-        "DATABASE_URL": TEST_DATABASE_URL,
+        "DATABASE_URL": API_DATABASE_URL,
         "SECRET_KEY": os.environ.get("TEST_SECRET_KEY", "test-only-key-0123456789-abcdefghijklmnopqrstuvwxyz"),
         "CORS_ORIGINS": "http://localhost:3000",
         "COOKIE_SECURE": "false",
@@ -48,7 +54,6 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from app.cli import ensure_admin  # noqa: E402
 from app.config import get_settings  # noqa: E402
-from app.db import get_sessionmaker  # noqa: E402
 from app.models import AdminUser  # noqa: E402
 from app.rate_limit import limiter  # noqa: E402
 from app.spam import issue_form_token  # noqa: E402
@@ -57,6 +62,13 @@ API_ROOT = Path(__file__).resolve().parents[1]
 ADMIN_EMAIL = "admin.test@example.com"
 ADMIN_PASSWORD = "Test-Password-2026"
 TABLES = [
+    "usage_events",
+    "usage_reservations",
+    "usage_counters",
+    "assessment_versions",
+    "workspace_projects",
+    "entitlement_grants",
+    "customer_workspaces",
     "outbox_messages",
     "customer_tokens",
     "customer_sessions",
@@ -108,6 +120,9 @@ TABLES = [
 ]
 
 
+owner_sessionmaker = sessionmaker(bind=create_engine(TEST_DATABASE_URL), autoflush=False, expire_on_commit=False)
+
+
 def recreate_database(name: str) -> None:
     engine = create_engine(SERVER_URL, isolation_level="AUTOCOMMIT")
     with engine.connect() as conn:
@@ -128,7 +143,15 @@ def alembic_config(url: str) -> Config:
 def database() -> Iterator[None]:
     recreate_database(TEST_DB)
     command.upgrade(alembic_config(TEST_DATABASE_URL), "head")
+    with owner_sessionmaker() as session:
+        session.execute(text(f"ALTER ROLE acs_app_api LOGIN PASSWORD '{API_ROLE_PASSWORD}'"))
+        session.commit()
     yield
+
+
+@pytest.fixture(autouse=True)
+def cli_runs_as_owner(monkeypatch) -> None:
+    monkeypatch.setattr("app.cli.get_sessionmaker", lambda: owner_sessionmaker)
 
 
 @pytest.fixture(autouse=True)
@@ -138,7 +161,7 @@ def clean_state(database: None) -> Iterator[None]:
     limiter.reset()
     reset_ai_budget()
     yield
-    with get_sessionmaker()() as db:
+    with owner_sessionmaker() as db:
         db.execute(text(f"TRUNCATE {', '.join(TABLES)} RESTART IDENTITY CASCADE"))
         db.commit()
     limiter.reset()
@@ -146,7 +169,7 @@ def clean_state(database: None) -> Iterator[None]:
 
 @pytest.fixture
 def db():
-    with get_sessionmaker()() as session:
+    with owner_sessionmaker() as session:
         yield session
 
 

@@ -27,7 +27,8 @@ from datetime import timedelta
 from pathlib import Path
 
 from pydantic import ValidationError
-from sqlalchemy import delete, func, or_, select, update
+from sqlalchemy import delete, func, or_, select, text, update
+from sqlalchemy.exc import DBAPIError
 from sqlalchemy.orm import Session
 
 from app import audit
@@ -357,6 +358,27 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_db_api_role(_args: argparse.Namespace) -> int:
+    """Let the restricted API role log in. Runs as the owner; the password never appears in output."""
+    password = os.environ.get("API_DB_PASSWORD", "")
+    if not password:
+        _print("[db-api-role] API_DB_PASSWORD is not set: the role stays NOLOGIN")
+        return 0
+    try:
+        with get_sessionmaker()() as db:
+            statement = db.execute(
+                text("SELECT format('ALTER ROLE acs_app_api LOGIN PASSWORD %L', CAST(:password AS text))"),
+                {"password": password},
+            ).scalar_one()
+            db.connection().exec_driver_sql(statement)
+            db.commit()
+    except DBAPIError:
+        _print("[db-api-role] Failed to set the role password")  # the error would quote the statement
+        return 1
+    _print("[db-api-role] acs_app_api can log in")
+    return 0
+
+
 def cmd_outbox_run(_args: argparse.Namespace) -> int:
     result = dispatch_pending(limit=100)
     _print("[outbox-run] " + " ".join(f"{key}={value}" for key, value in result.items()))
@@ -482,6 +504,9 @@ def main(argv: list[str] | None = None) -> int:
     maint.add_argument("--dry-run", action="store_true")
     maint.set_defaults(func=cmd_maintenance)
     sub.add_parser("outbox-run", help="Send due transactional e-mail").set_defaults(func=cmd_outbox_run)
+    sub.add_parser("db-api-role", help="Enable the API login role from API_DB_PASSWORD").set_defaults(
+        func=cmd_db_api_role
+    )
     sub.add_parser(
         "purge-synthetic", help="Delete all synthetic development leads (source=synthetic_seed)"
     ).set_defaults(func=cmd_purge_synthetic)

@@ -97,3 +97,25 @@ rollback, migration with backup, gate refusals. The header chain was tested thro
 Next.js proxy with a stand-in for the API.
 
 The first production release ran on 2026-11-04: `sha-4d846c5`, migrated to revision 0015.
+
+## Restricted API database login (H-1)
+
+The API can connect as `acs_app_api`, a role that owns nothing, cannot bypass row-level security and has
+no privilege on tenant tables. Migrations and the maintenance timer keep using the schema owner. Until
+this is switched on the API connects as the owner, as before. Production refuses to start with customer
+accounts or the client portal on and the owner connection.
+
+Switching on is a production change: it needs the owner's approval and a backup first.
+
+1. Release with `migrate-and-deploy`, so that migration 0018 exists on the server.
+2. Install the updated `systemd/acs-maintenance.service`, then `systemctl daemon-reload`. The retention
+   job needs the owner connection, so it runs in the `migrate` image, not inside the API container.
+3. In `/opt/ai-commerce-studio/.env`, add `API_DB_USER=acs_app_api` and `API_DB_PASSWORD=<openssl rand -hex 24>`.
+4. Run `acs-deploy migrate` (it runs `db-api-role`, which lets the role log in), then restart the API.
+5. Check: `/health/ready` answers, staff sign-in works, and
+   `select usename from pg_stat_activity where application_name = '' and usename = 'acs_app_api'` shows the API.
+
+To go back: remove the two lines from `.env` and restart the API. Nothing else changes.
+
+`python -m app.cli` commands that manage data run as the owner: use
+`docker compose --profile migrate run --rm -T migrate python -m app.cli <command>`, not `exec api`.

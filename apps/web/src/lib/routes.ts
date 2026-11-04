@@ -37,6 +37,8 @@ export const routes = {
   accountResend: "/konto/nov-link",
   accountForgot: "/konto/zabravena-parola",
   accountReset: "/konto/nova-parola",
+  accountAdvisor: "/konto/advisor",
+  accountAdvisorDemo: "/konto/advisor/demo",
   adminLogin: "/admin/login",
   admin: "/admin",
   adminLeads: "/admin/leads",

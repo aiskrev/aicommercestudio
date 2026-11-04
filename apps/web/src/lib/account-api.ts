@@ -28,13 +28,23 @@ function csrfToken(): string | null {
   return part ? decodeURIComponent(part.slice(CSRF_COOKIE.length + 1)) : null;
 }
 
-export async function accountFetch<T>(
-  path: string,
+type RequestOptions = { method?: string; body?: unknown; headers?: Record<string, string> };
+
+export function accountFetch<T>(path: string, locale: Locale, networkMessage: string, options?: RequestOptions) {
+  return request<T>(`/api/accounts${path}`, locale, networkMessage, options);
+}
+
+export function workspaceFetch<T>(path: string, locale: Locale, networkMessage: string, options?: RequestOptions) {
+  return request<T>(`/api/workspace${path}`, locale, networkMessage, options);
+}
+
+async function request<T>(
+  url: string,
   locale: Locale,
   networkMessage: string,
-  { method = "GET", body }: { method?: string; body?: unknown } = {},
+  { method = "GET", body, headers: extra }: RequestOptions = {},
 ): Promise<T> {
-  const headers = new Headers({ "Accept-Language": locale });
+  const headers = new Headers({ "Accept-Language": locale, ...extra });
   if (body !== undefined) headers.set("Content-Type", "application/json");
   if (method !== "GET") {
     const csrf = csrfToken();
@@ -42,7 +52,7 @@ export async function accountFetch<T>(
   }
   let response: Response;
   try {
-    response = await fetch(`/api/accounts${path}`, {
+    response = await fetch(url, {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
