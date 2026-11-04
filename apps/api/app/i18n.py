@@ -30,6 +30,15 @@ def request_locale(request: Request) -> Locale:
 
 
 ERROR_MESSAGES: dict[str, dict[Locale, str]] = {
+    "email_unavailable": {
+        "bg": "В момента не можем да изпращаме имейли. Опитайте по-късно.",
+        "en": "We can't send e-mail right now. Please try again later.",
+    },
+    "email_not_verified": {"bg": "Първо потвърдете имейла си.", "en": "Confirm your e-mail first."},
+    "token_invalid": {
+        "bg": "Този линк е невалиден или е изтекъл.",
+        "en": "This link is invalid or has expired.",
+    },
     "validation_error": {"bg": "Моля, коригирайте маркираните полета.", "en": "Please correct the highlighted fields."},
     "rate_limited": {
         "bg": "Твърде много заявки. Моля, опитайте отново по-късно.",

@@ -130,6 +130,20 @@ class Settings(BaseSettings):
     portal_csrf_cookie_name: str = "acs_portal_csrf"
     portal_invitation_hours: int = Field(default=72, ge=1, le=336)
 
+    # Customer accounts (docs/CUSTOMER_ACCOUNTS.md). Off until a release review.
+    customer_accounts_enabled: bool = False
+    account_session_hours: int = Field(default=12, ge=1, le=72)
+    account_session_idle_minutes: int = Field(default=120, ge=5, le=24 * 60)
+    account_session_cookie_name: str = "acs_account_session"
+    account_csrf_cookie_name: str = "acs_account_csrf"
+    account_verify_token_hours: int = Field(default=24, ge=1, le=72)
+    account_reset_token_hours: int = Field(default=1, ge=1, le=24)
+    account_ip_rate_limit: int = Field(default=20, ge=1)
+    account_email_rate_limit: int = Field(default=5, ge=1)
+    account_rate_window_seconds: int = Field(default=900, ge=60)
+    # "disabled": nothing is sent and sign-up is refused. "dev_file": .eml files, never in production.
+    email_provider: Literal["disabled", "smtp", "dev_file"] = "disabled"
+    email_dev_dir: str = "/tmp/acs-mail"  # noqa: S108 - development only
     smtp_host: str | None = None
     smtp_port: int = 587
     smtp_username: str | None = None
@@ -191,6 +205,10 @@ class Settings(BaseSettings):
             problems.append("SITE_URL must use https:// in production")
         if any(not origin.startswith("https://") for origin in self.cors_origin_list):
             problems.append("CORS_ORIGINS must only contain https:// origins in production")
+        if self.email_provider == "dev_file":
+            problems.append("EMAIL_PROVIDER=dev_file is not allowed in production")
+        if self.customer_accounts_enabled and not (self.email_provider == "smtp" and self.smtp_host and self.smtp_from):
+            problems.append("CUSTOMER_ACCOUNTS_ENABLED needs a configured e-mail provider")
         if problems:
             raise ValueError("Unsafe production configuration: " + "; ".join(problems))
         return self

@@ -1,0 +1,9 @@
+[Unit]
+Description=Send due transactional e-mail every minute (enable together with customer accounts)
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+
+[Install]
+WantedBy=timers.target
