@@ -107,7 +107,14 @@ def test_domain_detail_by_key_and_by_slug(client, seeded):
     by_key = client.get(f"{API}/domains/commerce_engineering", params={"locale": "en"}).json()
     by_slug = client.get(f"{API}/domains/by-slug/commerce-engineering", params={"locale": "en"}).json()
     assert by_key == by_slug
-    assert [s["key"] for s in by_key["services"]] == ["maintenance", "seo", "analytics"]
+    assert [s["key"] for s in by_key["services"]] == [
+        "maintenance",
+        "seo",
+        "analytics",
+        "business_websites",
+        "store_development",
+        "payments_subscriptions",
+    ]
     assert by_key["contact_service"] == "audit"
     assert by_key["deliverables"] and by_key["families"]
     assert all(r["key"] in DOMAIN_ORDER for r in by_key["related_domains"])
@@ -149,21 +156,27 @@ def test_slug_of_the_other_locale_and_unknown_entries_are_404(client, seeded):
 
 def test_service_listing_pagination_and_deterministic_order(client, seeded):
     full = client.get(f"{API}/services", params={"limit": 100}).json()
-    assert full["total"] == 9 and len(full["items"]) == 9
+    assert full["total"] == 15 and len(full["items"]) == 15
     assert keys(full) == [
         "ai_agents",
         "automation",
         "ai_tools",
+        "portals_web_apps",
         "maintenance",
         "seo",
         "analytics",
+        "business_websites",
+        "store_development",
+        "payments_subscriptions",
+        "security_performance",
         "integrations",
         "ai_managed",
+        "integration_care",
         "audit",
     ]
-    pages = [client.get(f"{API}/services", params={"limit": 4, "offset": o}).json() for o in (0, 4, 8)]
+    pages = [client.get(f"{API}/services", params={"limit": 4, "offset": o}).json() for o in (0, 4, 8, 12)]
     assert sum((keys(p) for p in pages), []) == keys(full)
-    assert [p["offset"] for p in pages] == [0, 4, 8] and pages[2]["limit"] == 4
+    assert [p["offset"] for p in pages] == [0, 4, 8, 12] and pages[3]["limit"] == 4
     assert client.get(f"{API}/services", params={"offset": 50}).json()["items"] == []
     by_name = client.get(f"{API}/services", params={"sort": "name", "locale": "en", "limit": 100}).json()
     names = [i["name"].casefold() for i in by_name["items"]]
@@ -175,9 +188,25 @@ def test_service_listing_pagination_and_deterministic_order(client, seeded):
 
 def test_service_filters(client, seeded):
     commerce = client.get(f"{API}/services", params={"domain": "commerce_engineering"}).json()
-    assert keys(commerce) == ["maintenance", "seo", "analytics"]
+    assert keys(commerce) == [
+        "maintenance",
+        "seo",
+        "analytics",
+        "business_websites",
+        "store_development",
+        "payments_subscriptions",
+    ]
     two = client.get(f"{API}/services", params=[("domain", "commerce_engineering"), ("domain", "managed_operations")])
-    assert keys(two.json()) == ["maintenance", "seo", "analytics", "ai_managed"]
+    assert keys(two.json()) == [
+        "maintenance",
+        "seo",
+        "analytics",
+        "business_websites",
+        "store_development",
+        "payments_subscriptions",
+        "ai_managed",
+        "integration_care",
+    ]
     assert client.get(f"{API}/services", params={"offering_type": "workshop"}).json()["total"] == 0
     assert keys(client.get(f"{API}/services", params={"q": "SEO", "locale": "en"}).json()) == ["seo"]
 
@@ -461,7 +490,14 @@ def test_domains_cannot_be_archived_and_list_filters(admin_client, seeded):
     services = admin_client.get(
         f"{ADMIN}/entities", params={"type": "service", "domain": "commerce_engineering"}
     ).json()
-    assert [i["key"] for i in services["items"]] == ["maintenance", "seo", "analytics"]
+    assert [i["key"] for i in services["items"]] == [
+        "maintenance",
+        "seo",
+        "analytics",
+        "business_websites",
+        "store_development",
+        "payments_subscriptions",
+    ]
     found = admin_client.get(f"{ADMIN}/entities", params={"q": "seo-optim"}).json()
     assert [i["key"] for i in found["items"]] == ["seo"]
     assert admin_client.get(f"{ADMIN}/entities", params={"page_size": 101}).status_code == 422

@@ -264,4 +264,10 @@ export const SERVICE_TOOLS: Record<ServiceKey, ToolKey[]> = {
   maintenance: [],
   seo: [],
   analytics: ["roi"],
+  business_websites: [],
+  store_development: [],
+  portals_web_apps: ["solution"],
+  payments_subscriptions: [],
+  security_performance: [],
+  integration_care: ["advisor"],
 };

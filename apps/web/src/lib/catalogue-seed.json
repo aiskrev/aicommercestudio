@@ -2181,6 +2181,109 @@
    }
   },
   {
+   "key": "portals_web_apps",
+   "primary_domain": "ai_applications",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "portals_web_apps",
+   "icon": "layers",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 1,
+   "status": "published",
+   "related": [
+    "business_websites",
+    "integrations",
+    "payments_subscriptions"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "klientski-portali-i-uebprilozheniya",
+     "name": "Клиентски портали и уеб приложения по поръчка",
+     "short_name": "Клиентски портали и уеб приложения",
+     "summary": "Защитени зони за клиенти и вътрешни приложения, които заменят таблици и ръчни процеси.",
+     "body": "Изграждаме защитени приложения за вашите клиенти и екипи: достъп до документи и поръчки, заявки, статуси. Това е проект за вашия бизнес, а не готов продукт, който вече работи на този сайт.",
+     "seo_title": "Клиентски портали и уеб приложения по поръчка",
+     "seo_description": "Изграждаме клиентски портали и уеб приложения на Next.js и FastAPI: вход, роли, защита на данните, журнал и интеграции. Цена след оценка.",
+     "primary_keyword": "Клиентски портали",
+     "capabilities": [
+      {
+       "title": "Вход и роли",
+       "body": "Потребители, роли и двуфакторен вход според нивото на риск."
+      },
+      {
+       "title": "Разделяне на данните",
+       "body": "Всеки клиент вижда само своите данни, а това се покрива с тестове."
+      },
+      {
+       "title": "Работни процеси",
+       "body": "Заявки, статуси, одобрения и известия."
+      },
+      {
+       "title": "Журнал на действията",
+       "body": "Записваме кой какво е направил в чувствителните операции."
+      },
+      {
+       "title": "Интеграции",
+       "body": "Връзка със CRM, ERP и други системи през техните API."
+      },
+      {
+       "title": "Администрация",
+       "body": "Панел за вашия екип за управление на потребители и данни."
+      }
+     ],
+     "deliverables": [
+      "Работещо приложение в договорената среда",
+      "Изходен код и документация",
+      "Тестове за достъпа и разделянето на данните",
+      "План за резервни копия и възстановяване"
+     ]
+    },
+    "en": {
+     "slug": "customer-portals-and-web-applications",
+     "name": "Customer portals and custom web applications",
+     "short_name": "Customer Portals & Web Applications",
+     "summary": "Secure areas for your customers and internal applications that replace spreadsheets and manual steps.",
+     "body": "We build secure applications for your customers and teams: access to documents and orders, requests and statuses. This is a project for your business, not a ready-made product that already runs on this site.",
+     "seo_title": "Customer portals and custom web applications",
+     "seo_description": "We build customer portals and web applications on Next.js and FastAPI: sign-in, roles, data separation, audit logs and integrations. Pricing after an assessment.",
+     "primary_keyword": "Customer portals",
+     "capabilities": [
+      {
+       "title": "Sign-in and roles",
+       "body": "Users, roles and two-factor sign-in, depending on the risk."
+      },
+      {
+       "title": "Keeping data separate",
+       "body": "Each customer sees only their own data, and tests prove it."
+      },
+      {
+       "title": "Workflows",
+       "body": "Requests, statuses, approvals and notifications."
+      },
+      {
+       "title": "Audit log",
+       "body": "We record who did what in sensitive operations."
+      },
+      {
+       "title": "Integrations",
+       "body": "Links to CRM, ERP and other systems through their APIs."
+      },
+      {
+       "title": "Administration",
+       "body": "A panel for your team to manage users and data."
+      }
+     ],
+     "deliverables": [
+      "A working application in the agreed environment",
+      "Source code and documentation",
+      "Tests for access and data separation",
+      "A backup and recovery plan"
+     ]
+    }
+   }
+  },
+  {
    "key": "maintenance",
    "primary_domain": "commerce_engineering",
    "offering_type": "service",
@@ -2554,6 +2657,418 @@
    }
   },
   {
+   "key": "business_websites",
+   "primary_domain": "commerce_engineering",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "business_websites",
+   "icon": "globe",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 3,
+   "status": "published",
+   "related": [
+    "store_development",
+    "portals_web_apps",
+    "security_performance"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "interaktivni-biznes-saytove",
+     "name": "Интерактивни бизнес сайтове, които работят като инструмент",
+     "short_name": "Интерактивни бизнес сайтове",
+     "summary": "Сайтове с калкулатори, конфигуратори, формуляри и връзка към вашите системи, а не само страници с текст.",
+     "body": "Изграждаме сайтове, с които посетителят може да свърши нещо: да изчисли, да избере, да заяви. Започваме от това какво трябва да постигне сайтът за бизнеса ви, а после избираме технологията.",
+     "seo_title": "Интерактивни бизнес сайтове: изработка на Next.js",
+     "seo_description": "Изработваме бързи двуезични бизнес сайтове с калкулатори, формуляри и връзка към CRM. Писмен обхват, тестове и предаване на кода. Цена след оценка.",
+     "primary_keyword": "Интерактивни бизнес сайтове",
+     "capabilities": [
+      {
+       "title": "Структура и съдържание",
+       "body": "Подреждаме страниците около въпросите на клиентите ви и какво трябва да направят."
+      },
+      {
+       "title": "Интерактивни елементи",
+       "body": "Калкулатори, конфигуратори и многостъпкови формуляри по вашите правила."
+      },
+      {
+       "title": "Форми и запитвания",
+       "body": "Проверка на данните, защита от спам и запис на запитванията в админ панел или CRM."
+      },
+      {
+       "title": "Двуезичност и SEO основа",
+       "body": "Отделни адреси по език, коректни заглавия и карта на сайта."
+      },
+      {
+       "title": "Достъпност и скорост",
+       "body": "Тестваме на телефон и с клавиатура и следим скоростта на зареждане."
+      },
+      {
+       "title": "Измерване",
+       "body": "Настройваме измерване на заявките, без бисквитки за реклама, освен ако не решите друго."
+      }
+     ],
+     "deliverables": [
+      "Работещ сайт в реалната среда",
+      "Изходен код в хранилище на ваше име",
+      "Документация и инструкции за редакция",
+      "Тестове на ключовите потоци"
+     ]
+    },
+    "en": {
+     "slug": "interactive-business-websites",
+     "name": "Interactive business websites that do a job",
+     "short_name": "Interactive Business Websites",
+     "summary": "Websites with calculators, configurators, forms and links to your systems, not just pages of text.",
+     "body": "We build websites where a visitor can get something done: work out a cost, compare options, send a request. We start from what the site needs to achieve for your business, then choose the technology.",
+     "seo_title": "Interactive business websites built on Next.js",
+     "seo_description": "We build fast, bilingual business websites with calculators, forms and CRM links. Written scope, tests and code handover. Pricing after an assessment.",
+     "primary_keyword": "Interactive business websites",
+     "capabilities": [
+      {
+       "title": "Structure and content",
+       "body": "We organise pages around your customers' questions and what they need to do next."
+      },
+      {
+       "title": "Interactive features",
+       "body": "Calculators, configurators and multi-step forms that follow your rules."
+      },
+      {
+       "title": "Forms and enquiries",
+       "body": "Validation, spam protection and enquiries saved to an admin area or CRM."
+      },
+      {
+       "title": "Two languages and SEO basics",
+       "body": "Separate addresses per language, correct titles and a sitemap."
+      },
+      {
+       "title": "Accessibility and speed",
+       "body": "We test on phones and with a keyboard, and we watch loading speed."
+      },
+      {
+       "title": "Measurement",
+       "body": "We set up measurement of enquiries, without advertising cookies unless you decide otherwise."
+      }
+     ],
+     "deliverables": [
+      "A working site in the live environment",
+      "Source code in a repository in your name",
+      "Documentation and editing instructions",
+      "Tests for the key flows"
+     ]
+    }
+   }
+  },
+  {
+   "key": "store_development",
+   "primary_domain": "commerce_engineering",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "store_development",
+   "icon": "cart",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 4,
+   "status": "published",
+   "related": [
+    "maintenance",
+    "integrations",
+    "payments_subscriptions"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "izrabotka-na-online-magazini",
+     "name": "Изработка на онлайн магазини на Shopify и WooCommerce",
+     "short_name": "Изработка на онлайн магазини",
+     "summary": "Нов магазин или преход от стара платформа, с плащания, доставки и връзка към вашите системи.",
+     "body": "Изграждаме нови онлайн магазини и местим съществуващи на по-подходяща платформа. Помагаме да изберете между Shopify и WooCommerce според каталога, процесите и бюджета ви за поддръжка.",
+     "seo_title": "Изработка на онлайн магазини: Shopify и WooCommerce",
+     "seo_description": "Изработка на онлайн магазин на Shopify или WooCommerce: каталог, плащания, доставки, интеграции и миграция. Писмен обхват и приемане. Цена след оценка.",
+     "primary_keyword": "Изработка на онлайн магазини",
+     "capabilities": [
+      {
+       "title": "Избор на платформа",
+       "body": "Сравняваме варианта според вашите нужди, а не според навик."
+      },
+      {
+       "title": "Каталог и продуктови данни",
+       "body": "Структура на категории и атрибути, вариации и импорт на продукти."
+      },
+      {
+       "title": "Плащания и доставки",
+       "body": "Настройка на избраните доставчици и куриери, с тестови поръчки."
+      },
+      {
+       "title": "Интеграции",
+       "body": "Връзка със склад, ERP, счетоводство и CRM през наличните им API."
+      },
+      {
+       "title": "Миграция",
+       "body": "Пренос на продукти, клиенти и поръчки и план за пренасочване на адресите."
+      },
+      {
+       "title": "Обучение на екипа",
+       "body": "Показваме как се добавят продукти и как се обработва поръчка."
+      }
+     ],
+     "deliverables": [
+      "Работещ магазин с тествана поръчка от край до край",
+      "Документирани настройки и достъпи",
+      "План за пренасочване при миграция",
+      "Инструкции за екипа ви"
+     ]
+    },
+    "en": {
+     "slug": "online-store-development",
+     "name": "Online store development on Shopify and WooCommerce",
+     "short_name": "Online Store Development",
+     "summary": "A new store or a move from an old platform, with payments, delivery and links to your systems.",
+     "body": "We build new online stores and move existing ones to a better-suited platform. We help you choose between Shopify and WooCommerce based on your catalogue, your processes and how you plan to maintain the store.",
+     "seo_title": "Online store development: Shopify and WooCommerce",
+     "seo_description": "Online store development on Shopify or WooCommerce: catalogue, payments, delivery, integrations and migration. Written scope. Pricing after an assessment.",
+     "primary_keyword": "Online store development",
+     "capabilities": [
+      {
+       "title": "Choosing a platform",
+       "body": "We compare the options against your needs, not out of habit."
+      },
+      {
+       "title": "Catalogue and product data",
+       "body": "Categories, attributes, variants and product import."
+      },
+      {
+       "title": "Payments and delivery",
+       "body": "Setting up your chosen providers and couriers, with test orders."
+      },
+      {
+       "title": "Integrations",
+       "body": "Links to stock, ERP, accounting and CRM through their available APIs."
+      },
+      {
+       "title": "Migration",
+       "body": "Moving products, customers and orders, with a redirect plan."
+      },
+      {
+       "title": "Team training",
+       "body": "We show your team how to add products and handle an order."
+      }
+     ],
+     "deliverables": [
+      "A working store with an order tested end to end",
+      "Documented settings and access",
+      "A redirect plan for migrations",
+      "Instructions for your team"
+     ]
+    }
+   }
+  },
+  {
+   "key": "payments_subscriptions",
+   "primary_domain": "commerce_engineering",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "payments_subscriptions",
+   "icon": "refresh",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 5,
+   "status": "published",
+   "related": [
+    "store_development",
+    "portals_web_apps",
+    "integrations"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "abonamenti-i-online-plashtaniya",
+     "name": "Интеграция на абонаменти и онлайн плащания",
+     "short_name": "Абонаменти и онлайн плащания",
+     "summary": "Свързваме сайта или приложението ви с избран платежен доставчик: еднократни плащания, абонаменти и известия.",
+     "body": "Свързваме сайта или приложението ви с платежен доставчик, който избирате заедно с вашия счетоводител. Данните на картите остават при доставчика и не минават през вашия сървър.",
+     "seo_title": "Интеграция на онлайн плащания и абонаменти",
+     "seo_description": "Свързваме сайтове и приложения с платежни доставчици: защитена страница за плащане, абонаменти, известия и съгласуване. Цена след оценка.",
+     "primary_keyword": "Интеграция на онлайн плащания",
+     "capabilities": [
+      {
+       "title": "Защитена страница за плащане",
+       "body": "Плащането минава през страница на доставчика."
+      },
+      {
+       "title": "Абонаменти",
+       "body": "Планове, подновяване, неуспешни плащания и прекратяване."
+      },
+      {
+       "title": "Известия от доставчика",
+       "body": "Проверка на подписа и обработка без двойно записване."
+      },
+      {
+       "title": "Съгласуване",
+       "body": "Сверка между плащанията при доставчика и данните във вашата система."
+      },
+      {
+       "title": "Връзка със счетоводството",
+       "body": "Експорт на данни във формата, договорен със счетоводителя ви."
+      },
+      {
+       "title": "Тестови сценарии",
+       "body": "Описваме и проверяваме успешни и неуспешни плащания."
+      }
+     ],
+     "deliverables": [
+      "Работещи плащания в тестов режим и после в реален",
+      "Описание на състоянията на абонамента",
+      "Процедура при неуспешно плащане",
+      "Документация за екипа ви"
+     ]
+    },
+    "en": {
+     "slug": "subscription-and-payment-integration",
+     "name": "Subscription and payment integration",
+     "short_name": "Subscription & Payment Integration",
+     "summary": "We connect your site or application to your chosen payment provider: one-off payments, subscriptions and notifications.",
+     "body": "We connect your site or application to a payment provider you choose together with your accountant. Card details stay with the provider and never pass through your server.",
+     "seo_title": "Online payment and subscription integration",
+     "seo_description": "We connect websites and applications to payment providers: hosted payment pages, subscriptions, webhooks and reconciliation. Pricing after an assessment.",
+     "primary_keyword": "Online payment and subscription integration",
+     "capabilities": [
+      {
+       "title": "Hosted payment page",
+       "body": "Payment happens on the provider's own page."
+      },
+      {
+       "title": "Subscriptions",
+       "body": "Plans, renewals, failed payments and cancellation."
+      },
+      {
+       "title": "Provider notifications",
+       "body": "Signature checks and processing that can't record anything twice."
+      },
+      {
+       "title": "Reconciliation",
+       "body": "Comparing the provider's payments with the data in your system."
+      },
+      {
+       "title": "Link to accounting",
+       "body": "Data exports in the format agreed with your accountant."
+      },
+      {
+       "title": "Test scenarios",
+       "body": "We describe and check successful and failed payments."
+      }
+     ],
+     "deliverables": [
+      "Working payments in test mode, then live",
+      "A description of subscription states",
+      "A procedure for failed payments",
+      "Documentation for your team"
+     ]
+    }
+   }
+  },
+  {
+   "key": "security_performance",
+   "primary_domain": "devops_sre",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "security_performance",
+   "icon": "shield",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 0,
+   "status": "published",
+   "related": [
+    "maintenance",
+    "business_websites",
+    "audit"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "zashtita-i-uskoryavane-na-saytove",
+     "name": "Защита и ускоряване на сайтове",
+     "short_name": "Защита и ускоряване на сайтове",
+     "summary": "Преглед и подобрения на сигурността и скоростта на работещ сайт или магазин.",
+     "body": "Преглеждаме работещ сайт или магазин и отстраняваме най-важните рискове за сигурността и причините за бавно зареждане. Започваме от измерване и ви показваме какво е намерено и какво е променено.",
+     "seo_title": "Защита и ускоряване на сайтове и онлайн магазини",
+     "seo_description": "Преглед на сигурността и скоростта на сайт: заглавки, достъпи, обновления, кеширане и Core Web Vitals. Без обещания за пълна защита. Цена след оценка.",
+     "primary_keyword": "Защита и ускоряване на сайтове",
+     "capabilities": [
+      {
+       "title": "Преглед на сигурността",
+       "body": "Версии, достъпи, настройки на сървъра и заглавки за сигурност."
+      },
+      {
+       "title": "Контрол на достъпа",
+       "body": "Премахване на излишни акаунти и двуфакторен вход."
+      },
+      {
+       "title": "Защита на периметъра",
+       "body": "Настройка на CDN и защитна стена според нуждите ви."
+      },
+      {
+       "title": "Скорост",
+       "body": "Изображения, скриптове, кеширане и Core Web Vitals."
+      },
+      {
+       "title": "Резервни копия",
+       "body": "Проверка на копията и тест за възстановяване."
+      },
+      {
+       "title": "Наблюдение на промени",
+       "body": "Настройваме известия при неочаквани промени, когато средата го позволява."
+      }
+     ],
+     "deliverables": [
+      "Доклад с открити проблеми по приоритет",
+      "Приложени договорени подобрения",
+      "Измервания преди и след",
+      "Списък с оставащи рискове"
+     ]
+    },
+    "en": {
+     "slug": "website-security-and-performance",
+     "name": "Website security and performance",
+     "short_name": "Website Security & Performance",
+     "summary": "A review and improvements to the security and speed of a live website or store.",
+     "body": "We review a live website or store and fix the most important security risks and causes of slow loading. We start by measuring, and we show you what we found and what we changed.",
+     "seo_title": "Website security and performance for online stores",
+     "seo_description": "A security and speed review for your website: headers, access, updates, caching and Core Web Vitals. No promises of total protection. Pricing after an assessment.",
+     "primary_keyword": "Website security and performance",
+     "capabilities": [
+      {
+       "title": "Security review",
+       "body": "Versions, access, server settings and security headers."
+      },
+      {
+       "title": "Access control",
+       "body": "Removing unused accounts and adding two-factor sign-in."
+      },
+      {
+       "title": "Edge protection",
+       "body": "Setting up a CDN and firewall to suit your needs."
+      },
+      {
+       "title": "Speed",
+       "body": "Images, scripts, caching and Core Web Vitals."
+      },
+      {
+       "title": "Backups",
+       "body": "Checking backups and testing a restore."
+      },
+      {
+       "title": "Watching for changes",
+       "body": "We set up alerts for unexpected changes where the environment allows it."
+      }
+     ],
+     "deliverables": [
+      "A prioritised report of findings",
+      "Agreed improvements applied",
+      "Measurements before and after",
+      "A list of remaining risks"
+     ]
+    }
+   }
+  },
+  {
    "key": "integrations",
    "primary_domain": "data_integration",
    "offering_type": "service",
@@ -2771,6 +3286,109 @@
       "Agreed monitoring based on the integrations available",
       "A monthly summary: health, incidents, quality and costs",
       "A list of recommendations and controlled changes"
+     ]
+    }
+   }
+  },
+  {
+   "key": "integration_care",
+   "primary_domain": "managed_operations",
+   "offering_type": "service",
+   "delivery_status": "available",
+   "lead_category": "integration_care",
+   "icon": "plug",
+   "custom_page": false,
+   "is_entry_offer": false,
+   "position": 1,
+   "status": "published",
+   "related": [
+    "integrations",
+    "automation",
+    "ai_managed"
+   ],
+   "translations": {
+    "bg": {
+     "slug": "poddrazhka-na-integratsii-i-avtomatizatsii",
+     "name": "Поддръжка на интеграции и автоматизации",
+     "short_name": "Поддръжка на интеграции и автоматизации",
+     "summary": "Следим и поддържаме връзките между системите ви, независимо кой ги е изградил.",
+     "body": "Интеграциите спират тихо: променя се API, изтича ключ, опашка се пълни. Поемаме работещите връзки и автоматизации, следим ги и ги поддържаме в договорен обхват.",
+     "seo_title": "Поддръжка на интеграции и автоматизации",
+     "seo_description": "Поддръжка на работещи интеграции и автоматизации: наблюдение, известия при грешки, обновления и документация. Обхватът се договаря. Цена след оценка.",
+     "primary_keyword": "Поддръжка на интеграции",
+     "capabilities": [
+      {
+       "title": "Опис на връзките",
+       "body": "Какво с какво е свързано, с какви ключове и кой отговаря."
+      },
+      {
+       "title": "Наблюдение и известия",
+       "body": "Известия при спиране, грешки и забавяне."
+      },
+      {
+       "title": "Обновления",
+       "body": "Следим промени в API и подновяваме ключове."
+      },
+      {
+       "title": "Отстраняване на проблеми",
+       "body": "Диагностика и корекции в договорения обхват."
+      },
+      {
+       "title": "Документация",
+       "body": "Описание, което друг екип също може да използва."
+      },
+      {
+       "title": "Планирани промени",
+       "body": "Подготвяме промените по интеграциите заедно с вашия екип."
+      }
+     ],
+     "deliverables": [
+      "Опис на интеграциите и автоматизациите",
+      "Настроени известия",
+      "Месечен преглед на проблемите и промените",
+      "Обновена документация"
+     ]
+    },
+    "en": {
+     "slug": "integration-and-automation-care",
+     "name": "Integration and automation care",
+     "short_name": "Integration & Automation Care",
+     "summary": "We monitor and maintain the links between your systems, whoever built them.",
+     "body": "Integrations fail quietly: an API changes, a key expires, a queue fills up. We take over your live connections and automations, keep an eye on them and maintain them within an agreed scope.",
+     "seo_title": "Integration and automation care and maintenance",
+     "seo_description": "Care for live integrations and automations: monitoring, error alerts, updates and documentation. Scope agreed in writing. Pricing after an assessment.",
+     "primary_keyword": "Integration and automation",
+     "capabilities": [
+      {
+       "title": "An inventory of connections",
+       "body": "What is connected to what, with which keys, and who is responsible."
+      },
+      {
+       "title": "Monitoring and alerts",
+       "body": "Alerts when something stops, fails or slows down."
+      },
+      {
+       "title": "Updates",
+       "body": "We follow API changes and renew keys."
+      },
+      {
+       "title": "Fixing problems",
+       "body": "Diagnosis and corrections within the agreed scope."
+      },
+      {
+       "title": "Documentation",
+       "body": "A description another team can use too."
+      },
+      {
+       "title": "Planned changes",
+       "body": "We prepare changes to integrations together with your team."
+      }
+     ],
+     "deliverables": [
+      "An inventory of integrations and automations",
+      "Alerts set up",
+      "A monthly review of problems and changes",
+      "Up-to-date documentation"
      ]
     }
    }

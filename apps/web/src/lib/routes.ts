@@ -14,6 +14,8 @@ export const routes = {
   patterns: "/integratsionni-modeli",
   pattern: (slug: string) => `/integratsionni-modeli/${slug}`,
   workshops: "/rabotni-sreshti",
+  carePlans: "/paketi",
+  demoCentre: "/demo-tsentar",
   workshop: (slug: string) => `/rabotni-sreshti/${slug}`,
   industries: "/za-kogo",
   about: "/za-nas",

@@ -1,11 +1,11 @@
 import type { ServiceTemplate } from "@/content/bg/services-template";
-import type { ServiceKey } from "@/content/types";
+import type { CoreServiceKey } from "@/content/types";
 
 /**
  * English service-page template content: approach and realistic use cases.
  * Scenarios only — no client names, results or promised percentages.
  */
-export const serviceTemplate: Record<ServiceKey, ServiceTemplate> = {
+export const serviceTemplate: Record<CoreServiceKey, ServiceTemplate> = {
   ai_agents: {
     approach: [
       { title: "A narrow job, clear limits", description: "The agent gets one described task, a list of permitted tools and rules for when to stop and ask a person." },

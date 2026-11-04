@@ -90,6 +90,9 @@ export const en: Dictionary = {
     ],
   },
   service: {
+    limitationsTitle: "What it doesn't include or promise",
+    acceptanceTitle: "How the work is accepted",
+    aftercareTitle: "After acceptance",
     conceptLabel: "Conceptual outline of the work",
     problemsEyebrow: "When you need it",
     problemsTitle: "Problems we solve",

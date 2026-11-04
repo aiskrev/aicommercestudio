@@ -16,13 +16,19 @@ const API_SERVICE_KEYS = [
   "integrations",
   "audit",
   "ai_managed",
+  "business_websites",
+  "store_development",
+  "portals_web_apps",
+  "payments_subscriptions",
+  "security_performance",
+  "integration_care",
 ];
 
 describe.each(locales)("content integrity (%s)", (locale) => {
   const content = getContent(locale);
 
-  it("has eight core services plus the audit offering", () => {
-    expect(content.coreServices).toHaveLength(8);
+  it("has the core services plus the audit offering", () => {
+    expect(content.coreServices).toHaveLength(14);
     expect(content.services.map((s) => s.key).sort()).toEqual([...API_SERVICE_KEYS].sort());
     expect(content.services.find((s) => s.key === "audit")?.isOffering).toBe(true);
   });
