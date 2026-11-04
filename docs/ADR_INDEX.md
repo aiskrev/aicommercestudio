@@ -82,6 +82,7 @@ Statuses: **accepted** (in force, implemented), **accepted · design** (agreed, 
 | ADR-57 | The API connects as `acs_app_api`, which owns nothing and has no direct right on tenant tables; closes H-1 once switched on | accepted | infra/deploy/README.md |
 | ADR-58 | Account limits use shared counters in PostgreSQL, not the in-memory limiter of ADR-04 | accepted | CUSTOMER_ACCOUNTS.md |
 | ADR-59 | Costly work reserves quota before the provider call and settles with the result; no overage, and no plan has an unlimited value | accepted | ADVISOR_WORKSPACE.md |
+| ADR-60 | Stripe events only say what to read again; access follows the state fetched from Stripe, never a redirect or a single event | accepted | STRIPE_BILLING.md |
 
 ## Open owner decisions
 

@@ -8686,6 +8686,196 @@
           }
         }
       }
+    },
+    "/api/billing/offers": {
+      "get": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Offers",
+        "operationId": "offers_api_billing_offers_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response Offers Api Billing Offers Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/status": {
+      "get": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Billing Status",
+        "operationId": "billing_status_api_billing_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Billing Status Api Billing Status Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/checkout": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Checkout",
+        "operationId": "checkout_api_billing_checkout_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Checkout Api Billing Checkout Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/portal": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Portal",
+        "operationId": "portal_api_billing_portal_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortalIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Portal Api Billing Portal Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/billing/stripe/webhook": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Webhook",
+        "operationId": "webhook_api_billing_stripe_webhook_post",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Stripe-Signature"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "boolean"
+                  },
+                  "title": "Response Webhook Api Billing Stripe Webhook Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -11605,6 +11795,31 @@
           "updated_at"
         ],
         "title": "ChangeOut"
+      },
+      "CheckoutIn": {
+        "properties": {
+          "offer": {
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 2,
+            "title": "Offer"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "bg",
+              "en"
+            ],
+            "title": "Locale",
+            "default": "bg"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "offer"
+        ],
+        "title": "CheckoutIn"
       },
       "Checkpoint": {
         "properties": {
@@ -17089,6 +17304,22 @@
           "finished_at"
         ],
         "title": "PortalEvaluation"
+      },
+      "PortalIn": {
+        "properties": {
+          "locale": {
+            "type": "string",
+            "enum": [
+              "bg",
+              "en"
+            ],
+            "title": "Locale",
+            "default": "bg"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "PortalIn"
       },
       "PortalIncident": {
         "properties": {

@@ -8,6 +8,8 @@ import type { NextRequest } from "next/server";
 export const dynamic = "force-dynamic";
 
 const MAX_BODY_BYTES = 64 * 1024;
+/** A Stripe event can be larger than a form; its signature covers these exact bytes. */
+const MAX_WEBHOOK_BYTES = 1024 * 1024;
 const HOP_BY_HOP = new Set([
   "connection",
   "keep-alive",
@@ -67,7 +69,8 @@ async function proxy(request: NextRequest, ctx: RouteContext<"/api/[...path]">):
   let body: ArrayBuffer | undefined;
   if (request.method !== "GET" && request.method !== "HEAD") {
     body = await request.arrayBuffer();
-    if (body.byteLength > MAX_BODY_BYTES) return json(413, proxyErrors(request).tooLarge);
+    const limit = path.join("/") === "billing/stripe/webhook" ? MAX_WEBHOOK_BYTES : MAX_BODY_BYTES;
+    if (body.byteLength > limit) return json(413, proxyErrors(request).tooLarge);
   }
 
   let upstream: Response;

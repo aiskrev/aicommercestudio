@@ -1,3 +1,4 @@
+import { AdvisorBilling } from "@/components/account/AdvisorBilling";
 import { AdvisorWorkspace } from "@/components/account/AdvisorWorkspace";
 import { PageHero, Section } from "@/components/ui/primitives";
 import { workspaceTexts } from "@/i18n/workspace";
@@ -18,7 +19,10 @@ export default async function Page({ params }: PageProps<"/[locale]/konto/adviso
     <>
       <PageHero eyebrow={t.eyebrow} title={t.title} lead={t.lead} />
       <Section>
-        <AdvisorWorkspace locale={locale} />
+        <div className="space-y-10">
+          <AdvisorBilling locale={locale} />
+          <AdvisorWorkspace locale={locale} />
+        </div>
       </Section>
     </>
   );
