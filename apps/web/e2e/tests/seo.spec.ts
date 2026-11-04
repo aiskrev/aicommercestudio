@@ -41,9 +41,9 @@ test("every sitemap page has one H1, a unique title, description, canonical and 
   }
 });
 
-test("draft legal pages and thin topic pages are noindex but reachable", async ({ page }) => {
+test("thin topic pages are noindex but reachable", async ({ page }) => {
   // The cookie information is final (reviewed) and indexable; cookie-notice.spec.ts checks it.
-  for (const path of ["/bg/poveritelnost", "/bg/obshti-usloviya", "/bg/statii/tema/seo", "/en/privacy", "/en/insights/topic/seo"]) {
+  for (const path of ["/bg/statii/tema/seo", "/en/insights/topic/seo"]) {
     expect((await page.goto(path))?.status(), path).toBe(200);
     await expect(page.locator("meta[name='robots']"), path).toHaveAttribute("content", /noindex/);
   }

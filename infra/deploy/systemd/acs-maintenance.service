@@ -1,0 +1,9 @@
+[Unit]
+Description=A.I. Commerce Studio retention job (deletes expired data)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/ai-commerce-studio
+ExecStart=/bin/sh -c 'docker compose --project-directory /opt/ai-commerce-studio --env-file /opt/ai-commerce-studio/.env --env-file /opt/ai-commerce-studio/release.env -f /opt/ai-commerce-studio/compose.yml exec -T api python -m app.cli maintenance'

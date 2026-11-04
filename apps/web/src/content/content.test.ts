@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { getContent } from "@/content";
 import { LEVEL_DIMENSIONS } from "@/content/bg/ai-managed";
 import { locales } from "@/i18n/config";
+import { company } from "@/lib/company";
 
 // Must stay in sync with ServiceKey in apps/api/app/models.py (minus "other").
 const API_SERVICE_KEYS = [
@@ -82,11 +83,16 @@ describe.each(locales)("content integrity (%s)", (locale) => {
     for (const name of ["acs_locale", "acs_cookie_notice", "acs_session", "acs_csrf"]) expect(JSON.stringify(cookies)).toContain(name);
   });
 
-  it("marks the remaining legal texts as drafts", () => {
-    expect(content.legal.draftNotice).toMatch(locale === "bg" ? /Чернова/ : /Draft/);
-    for (const doc of [content.legal.privacyPolicy, content.legal.cookiePolicy, content.legal.termsOfUse]) {
+  it("publishes the privacy policy and the terms without placeholders, with the company's details", () => {
+    expect(content.legal.isDraft).toBe(false);
+    for (const doc of [content.legal.privacyPolicy, content.legal.termsOfUse]) {
       expect(doc.sections.length).toBeGreaterThan(2);
+      const texts = [doc.title, doc.intro, ...doc.sections.flatMap((x) => [x.heading, ...x.paragraphs, ...(x.bullets ?? [])])];
+      for (const text of texts) expect(text, "no [placeholder] left").not.toMatch(/\[[^\]]+\]/);
     }
+    for (const doc of [content.legal.privacyPolicy, content.legal.termsOfUse]) expect(JSON.stringify(doc)).toContain("207509557");
+    expect(JSON.stringify(content.legal.termsOfUse)).toContain(company.phoneDisplay);
+    expect(JSON.stringify(content.legal.privacyPolicy)).toContain(company.contactEmail);
   });
 
   it("AI Managed Services plans promise no unlimited work, 24/7 cover, SLA or public price", () => {
