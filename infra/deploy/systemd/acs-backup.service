@@ -1,0 +1,10 @@
+[Unit]
+Description=A.I. Commerce Studio database backup (pg_dump, verified, 14 kept)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/ai-commerce-studio
+Environment="COMPOSE=docker compose --project-directory /opt/ai-commerce-studio --env-file /opt/ai-commerce-studio/.env --env-file /opt/ai-commerce-studio/release.env -f /opt/ai-commerce-studio/compose.yml"
+ExecStart=/opt/ai-commerce-studio/backup-db.sh
