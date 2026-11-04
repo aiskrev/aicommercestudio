@@ -1,7 +1,7 @@
-# Production deployment (prepared, not executed)
+# Production deployment
 
-The application has not been deployed. The target server exists and is hardened; the current
-image-based procedure (GHCR images, separate migration job, Cloudflare in front) is in
+The site is live at https://ai-commercestudio.com since 2026-11-04. The current image-based procedure
+(GHCR images, separate migration job, Cloudflare in front) is in
 [`infra/deploy/README.md`](../infra/deploy/README.md) and takes precedence over the build-on-server
 commands below. This document still holds the checklists, secrets handling, backup plan and restore
 steps. Decisions marked **(owner)** need the business owner.
