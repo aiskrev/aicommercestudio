@@ -9,10 +9,10 @@ export const reference: typeof bgReference = {
   scenarios: {
     metaTitle: "Reference scenarios — how we approach AI, cloud and integration work",
     metaDescription:
-      "Twenty fictional, clearly labelled scenarios: business problem, assumptions, reference architecture, data flows, security and approval boundaries, phases and trade-offs.",
+      "Twenty fictional, clearly labelled scenarios: business problem, assumptions, reference architecture, data flows, security and approval points, phases and trade-offs.",
     eyebrow: "Resources · Reference scenarios",
     title: "Reference scenarios",
-    lead: "How we would approach typical problems in AI, data, commerce, cloud, delivery, operations and security — with architecture, boundaries and trade-offs, not promises.",
+    lead: "How we would approach typical problems in AI, data, commerce, cloud, delivery, operations and security — with the architecture, limits and trade-offs, not promises.",
     fictionalNotice:
       "Every scenario is fictional. None is a client project, a certified architecture or a measured result. Companies, systems and numbers in them are examples.",
     categoryNav: "Categories",

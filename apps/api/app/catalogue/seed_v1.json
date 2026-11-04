@@ -40,7 +40,7 @@
     "en": {
      "slug": "ai-strategy-and-transformation",
      "name": "AI Strategy & Transformation",
-     "summary": "Where AI is worth building, in what order and under which controls — before you invest in implementation.",
+     "summary": "Where AI is worth building, in what order and with which safeguards, before you invest in a project.",
      "body": "We work out where AI is worth building at all, in what order and with which safeguards, before any money goes into implementation. You get a plan engineers can act on, not a slide deck.",
      "cta_label": "Request an AI readiness assessment",
      "seo_title": "AI strategy and an implementation roadmap for your business",
@@ -197,11 +197,11 @@
     "en": {
      "slug": "ai-governance-security-and-assurance",
      "name": "AI Governance, Security & Assurance",
-     "summary": "Controls around AI systems that can be checked: permissions, data, quality evaluation and incident handling.",
+     "summary": "Safeguards around AI systems that can be checked: permissions, data, quality evaluation and incident handling.",
      "body": "We put safeguards around AI systems that a business, its customers and its auditors can check: who may do what, which data reaches which model, how quality is measured and what happens when something goes wrong. This is technical governance, not legal advice.",
      "cta_label": "Request an AI system risk review",
      "seo_title": "AI governance and security: risk, data protection, controls",
-     "seo_description": "Risk review, approval and permission design, data protection, prompt-injection defences and evaluation for AI systems — engineering controls, not legal advice.",
+     "seo_description": "Risk review, approval and permission design, data protection, prompt-injection defences and evaluation for AI systems — technical safeguards, not legal advice.",
      "primary_keyword": "AI governance",
      "deliverables": [
       "A risk register per AI system.",
@@ -1876,7 +1876,7 @@
      "capabilities": [
       {
        "title": "Агенти за обслужване на клиенти",
-       "body": "Проверяват статуса на поръчки, подготвят отговори и ескалират към служител, когато не са сигурни."
+       "body": "Проверяват статуса на поръчки, подготвят отговори и прехвърлят случая на служител, когато не са сигурни."
       },
       {
        "title": "Оперативни агенти",
@@ -2012,7 +2012,7 @@
      ],
      "deliverables": [
       "Карта на текущия процес и възможностите за автоматизация",
-      "Дефинирани точки за човешко одобрение",
+      "Ясни точки, в които одобрява човек",
       "Внедрена и тествана автоматизация",
       "Журнал на действията и документация"
      ]
@@ -2091,7 +2091,7 @@
      "name": "AI разработка по поръчка: асистенти, RAG и AI инструменти за бизнеса",
      "short_name": "AI разработка по поръчка",
      "summary": "AI асистенти, генериране на продуктови описания, вътрешни бази знания и RAG решения, вградени в работните ви процеси.",
-     "body": "Езиковите модели могат да спестят много часове работа, но само когато са свързани с вашите данни, процеси и правила. Разработваме практични AI инструменти с ясно дефинирана задача, контрол на качеството и защита на данните.",
+     "body": "Езиковите модели могат да спестят много часове работа, но само когато са свързани с вашите данни, процеси и правила. Разработваме практични AI инструменти с ясна задача, контрол на качеството и защита на данните.",
      "seo_title": "AI инструменти по поръчка: асистенти, RAG и анализ",
      "seo_description": "AI инструменти по поръчка за малки и средни бизнеси: асистенти за клиенти, RAG върху вашите документи, продуктови описания и анализ на документи с контрол на качеството.",
      "primary_keyword": "AI инструменти по поръчка",
@@ -2202,7 +2202,7 @@
      "name": "Техническа поддръжка на онлайн магазини на Shopify и WooCommerce",
      "short_name": "Поддръжка на онлайн магазини",
      "summary": "Shopify и WooCommerce поддръжка, мониторинг, производителност и сигурност — за да работи магазинът стабилно всеки ден.",
-     "body": "Онлайн магазинът е жива система: обновления на платформата, нови приложения и плъгини, интеграции и промени в каталога постоянно създават риск от грешки. Поемаме техническата грижа, за да може екипът ви да се фокусира върху продажбите.",
+     "body": "Онлайн магазинът е жива система: обновления на платформата, нови приложения и плъгини, интеграции и промени в каталога постоянно създават риск от грешки. Поемаме техническата грижа, за да може екипът ви да се занимава с продажбите.",
      "seo_title": "Поддръжка на онлайн магазин — Shopify и WooCommerce",
      "seo_description": "Поддръжка на онлайн магазин на Shopify или WooCommerce: безопасни обновления, мониторинг, скорост, сигурност и архиви. Месечен пакет или еднократна помощ.",
      "primary_keyword": "поддръжка на онлайн магазин",
