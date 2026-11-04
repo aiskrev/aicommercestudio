@@ -43,7 +43,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
       },
       {
         title: "Rules and human approval",
-        description: "Actions that affect customers, money or data pass deterministic checks and an approval step.",
+        description: "Actions that affect customers, money or data pass fixed checks and an approval step.",
       },
       {
         title: "Evaluation and monitoring",
@@ -88,7 +88,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
     metaDescription:
       "Online store maintenance for Shopify and WooCommerce: safe updates, monitoring, speed, security and backups. A monthly plan or one-off help.",
     intro:
-      "An online store is a living system: platform updates, new apps and plugins, integrations and catalog changes constantly create the risk of errors. We take care of the technical side so your team can focus on selling.",
+      "An online store is a living system: platform updates, new apps and plugins, integrations and catalogue changes constantly create the risk of errors. We take care of the technical side so your team can focus on selling.",
     signals: [
       "The store slows down or throws errors after updates.",
       "Nobody is available to react quickly to a technical problem.",
@@ -109,11 +109,11 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
         description: "Monitoring availability, response times and critical pages, with alerts when something deviates.",
       },
       {
-        title: "Performance optimization",
-        description: "Page-speed analysis and optimization of images, scripts and caching.",
+        title: "Performance optimisation",
+        description: "Page-speed analysis and optimisation of images, scripts and caching.",
       },
       {
-        title: "Product catalog upkeep",
+        title: "Product catalogue upkeep",
         description: "Bulk corrections to products, attributes and categories; data import and export.",
       },
       {
@@ -165,7 +165,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
     title: "SEO for online stores: technical SEO, categories and products",
     shortTitle: "SEO and organic growth",
     summary:
-      "Technical SEO audits, category and product optimization, structured data and Core Web Vitals with measurable progress.",
+      "Technical SEO audits, category and product optimisation, structured data and Core Web Vitals with measurable progress.",
     metaTitle: "E-commerce SEO and technical SEO for online stores",
     metaDescription:
       "E-commerce SEO for online stores: indexing, canonical URLs, category and product SEO, Core Web Vitals and monthly reporting — without ranking promises.",
@@ -183,12 +183,12 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
         description: "Indexing, crawling, canonical URLs, redirects, duplicate content and internal links.",
       },
       {
-        title: "On-page optimization",
+        title: "On-page optimisation",
         description: "Titles, meta descriptions, heading structure and content that matches search intent.",
       },
       {
         title: "Category and product SEO",
-        description: "Catalog structure, filters, descriptions and internal linking aimed at commercial-intent searches.",
+        description: "Catalogue structure, filters, descriptions and internal linking aimed at commercial-intent searches.",
       },
       {
         title: "Content strategy",
@@ -196,10 +196,10 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
       },
       {
         title: "Structured data",
-        description: "Product, BreadcrumbList, Organization and other schema.org markup that reflects the real content.",
+        description: "Product, BreadcrumbList, Organisation and other schema.org markup that reflects the real content.",
       },
       {
-        title: "Core Web Vitals optimization",
+        title: "Core Web Vitals optimisation",
         description: "Improving LCP, INP and CLS through specific technical changes.",
       },
       {
@@ -212,11 +212,11 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
       },
       {
         title: "Monthly SEO programs",
-        description: "A prioritized monthly plan of technical tasks, content and impact measurement.",
+        description: "A prioritised monthly plan of technical tasks, content and impact measurement.",
       },
     ],
     deliverables: [
-      "A technical SEO audit with a prioritized plan",
+      "A technical SEO audit with a prioritised plan",
       "Recommendations for the category structure",
       "A monthly report with key metrics",
       "A list of completed and upcoming tasks",
@@ -226,7 +226,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
       {
         question: "Do you guarantee first place on Google?",
         answer:
-          "No. Nobody can honestly guarantee specific rankings. What we commit to is a transparent process, prioritized actions and measured results.",
+          "No. Nobody can honestly guarantee specific rankings. What we commit to is a transparent process, prioritised actions and measured results.",
       },
       {
         question: "When do SEO results show?",
@@ -234,7 +234,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
           "Technical fixes can have an effect relatively quickly, but sustainable organic growth usually takes months of consistent work.",
       },
       {
-        question: "Do you optimize multilingual stores?",
+        question: "Do you optimise multilingual stores?",
         answer:
           "Yes. For multilingual stores we plan hreflang, the URL structure and the content for each market separately.",
       },
@@ -400,13 +400,13 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
     key: "analytics",
     slug: "analytics-and-conversion",
     icon: "chart",
-    title: "E-commerce analytics and conversion rate optimization",
+    title: "E-commerce analytics and conversion rate optimisation",
     shortTitle: "Analytics and conversion",
     summary:
       "Sales dashboards, funnel and abandoned-cart analysis, GA4 and recommendations for improving the customer journey.",
-    metaTitle: "Conversion rate optimization and e-commerce analytics with GA4",
+    metaTitle: "Conversion rate optimisation and e-commerce analytics with GA4",
     metaDescription:
-      "Conversion rate optimization for online stores: accurate GA4 measurement, funnel and abandoned-cart analysis, sales dashboards and prioritized tests.",
+      "Conversion rate optimisation for online stores: accurate GA4 measurement, funnel and abandoned-cart analysis, sales dashboards and prioritised tests.",
     intro:
       "Most online stores collect plenty of data, but little of it turns into decisions. We build clear reports and analyses that show where you lose customers and which changes have the greatest potential.",
     signals: [
@@ -442,7 +442,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
       },
       {
         title: "A/B test recommendations",
-        description: "Prioritized hypotheses with the expected effect and how it will be measured.",
+        description: "Prioritised hypotheses with the expected effect and how it will be measured.",
       },
       {
         title: "Customer journey improvements",
@@ -452,7 +452,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
     deliverables: [
       "An audit of measurement and data quality",
       "A dashboard with the key metrics",
-      "A funnel analysis with prioritized recommendations",
+      "A funnel analysis with prioritised recommendations",
       "A testing and measurement plan",
     ],
     engagement: ["Analysis and dashboard project", "Monthly analytics support"],
@@ -465,7 +465,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
       {
         question: "Is the tracking GDPR-compliant?",
         answer:
-          "We design measurement so that analytics tools only activate after consent where consent is required, and we recommend collecting as little data as possible. Compliance as a whole remains your organization's responsibility.",
+          "We design measurement so that analytics tools only activate after consent where consent is required, and we recommend collecting as little data as possible. Compliance as a whole remains your organisation's responsibility.",
       },
       {
         question: "Can you combine data from several sources?",
@@ -490,7 +490,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
     signals: [
       "Stock and orders drift apart between systems.",
       "Integrations stop without anyone noticing in time.",
-      "Access to systems is not organized or controlled.",
+      "Access to systems is not organised or controlled.",
       "The infrastructure is hard to update and scale.",
     ],
     capabilities: [
@@ -556,10 +556,10 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
     key: "ai_managed",
     slug: "ai-managed-services",
     icon: "activity",
-    title: "AI Managed Services — AI Agent Operations & Optimization",
+    title: "AI Managed Services — AI Agent Operations & Optimisation",
     shortTitle: "AI Managed Services & optimisation",
     summary:
-      "Monitoring, maintenance, quality evaluation, security and cost optimization for AI agents and automations that are already in production.",
+      "Monitoring, maintenance, quality evaluation, security and cost optimisation for AI agents and automations that are already in production.",
     metaTitle: "AI Agent Monitoring & Managed Services",
     metaDescription:
       "AI Managed Services: monitoring, maintenance, quality evaluation, security and cost control for AI agents, RAG assistants and AI-driven automations — custom quotes.",
@@ -585,7 +585,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
         description: "Test sets, golden cases, groundedness checks for RAG and quality trends across releases.",
       },
       {
-        title: "Cost optimization",
+        title: "Cost optimisation",
         description: "Model selection, prompt length, caching, budget alerts and a monthly cost report.",
       },
       {
@@ -608,7 +608,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
       {
         question: "How is this different from building an AI tool?",
         answer:
-          "Development is a project with a start and an end. AI Managed Services is an ongoing service after launch: monitoring, maintenance, quality evaluation, security and cost optimization.",
+          "Development is a project with a start and an end. AI Managed Services is an ongoing service after launch: monitoring, maintenance, quality evaluation, security and cost optimisation.",
       },
       {
         question: "Can you take over an agent built by another team?",
@@ -630,12 +630,12 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
     icon: "clipboard",
     title: "AI strategy & readiness: a technical audit of your processes, data and store",
     shortTitle: "AI strategy & readiness",
-    summary: "A structured assessment of your store, data and processes that ends with a prioritized improvement plan.",
+    summary: "A structured assessment of your store, data and processes that ends with a prioritised improvement plan.",
     metaTitle: "Technical audit of an online store and AI readiness",
     metaDescription:
-      "A technical audit of your online store: performance, SEO basics, security, integrations, data and AI opportunities — with a prioritized plan and effort estimates.",
+      "A technical audit of your online store: performance, SEO basics, security, integrations, data and AI opportunities — with a prioritised plan and effort estimates.",
     intro:
-      "An audit is a good first step when it is unclear where to start. Within an agreed scope we review your store, integrations, data and processes, and you receive a concrete, prioritized action plan.",
+      "An audit is a good first step when it is unclear where to start. Within an agreed scope we review your store, integrations, data and processes, and you receive a concrete, prioritised action plan.",
     signals: [
       "You have many ideas but it is unclear which should come first.",
       "You want an independent assessment of the current technical implementation.",
@@ -670,7 +670,7 @@ const baseServices: Omit<Service, keyof ServiceDepth | keyof ServiceTemplate>[] 
     ],
     deliverables: [
       "A written report of findings",
-      "A prioritized action plan — quick wins and longer-term measures",
+      "A prioritised action plan — quick wins and longer-term measures",
       "An effort estimate for each recommendation",
       "A meeting to present and discuss the results",
     ],

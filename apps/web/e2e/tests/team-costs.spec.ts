@@ -66,7 +66,7 @@ test("the PDF plan downloads and a saved link reopens the configuration", async 
   await page.waitForTimeout(3500);
 
   const report = page.getByTestId("team-report");
-  const [download] = await Promise.all([page.waitForEvent("download"), report.getByRole("button", { name: "Изтегли PDF плана" }).click()]);
+  const [download] = await Promise.all([page.waitForEvent("download"), report.getByRole("button", { name: "Изтеглете PDF плана" }).click()]);
   expect(download.suggestedFilename()).toBe("ai-ekip-plan.pdf");
   expect((await readFile((await download.path())!)).subarray(0, 5).toString()).toBe("%PDF-");
 

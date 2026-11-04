@@ -8,15 +8,15 @@ export const aiManaged: AiManagedContent = {
   hero: {
     eyebrow: "AI Managed Services",
     title: "Keep your AI agents running at their best.",
-    subtitle: "Monitoring, maintenance, security and continuous optimization for the AI systems your business relies on.",
+    subtitle: "Monitoring, maintenance, security and continuous optimisation for the AI systems your business relies on.",
     primaryCta: "Request an AI Assessment",
     secondaryCta: "Explore Our Services",
     positioning:
       "Building an AI agent is only the beginning. We help keep your AI systems reliable, secure, observable and effective.",
   },
   value: {
-    title: "Ongoing care for AI systems after they go live",
-    lead: "AI Managed Services is a recurring service for the technical operation and improvement of business AI systems — whether we built them or another team did.",
+    title: "What we do once your AI system is live",
+    lead: "AI Managed Services is a monthly service. We keep AI systems running and improve them, whether we built them or another team did.",
     items: [
       {
         icon: "activity",
@@ -47,7 +47,7 @@ export const aiManaged: AiManagedContent = {
       },
       {
         other: "Ordinary website maintenance",
-        difference: "A website can run perfectly while the agent gives wrong answers. We watch AI behavior, not just the server.",
+        difference: "A website can run perfectly while the agent gives wrong answers. We watch AI behaviour, not just the server.",
       },
       {
         other: "SEO retainers",
@@ -249,7 +249,7 @@ export const aiManaged: AiManagedContent = {
         criteria: [
           "Key fields (number, date, amount, counterparty) are extracted correctly.",
           "Uncertain fields are flagged for review.",
-          "Documents in an unrecognized format are never saved automatically.",
+          "Documents in an unrecognised format are never saved automatically.",
         ],
       },
       {
@@ -257,18 +257,18 @@ export const aiManaged: AiManagedContent = {
         criteria: [
           "The answer cites the source it is based on.",
           "When information is missing, the assistant says so instead of guessing.",
-          "Staff only see documents they are authorized to access.",
+          "Staff only see documents they are authorised to access.",
         ],
       },
     ],
   },
   cost: {
-    title: "AI cost optimization",
+    title: "AI cost optimisation",
     lead: "We review where model spend goes and how to reduce it without hurting quality:",
     items: [
       "Model selection analysis for each task",
       "Token consumption review",
-      "Prompt length optimization",
+      "Prompt length optimisation",
       "Caching feasibility",
       "Cheaper models where quality allows",
       "Usage and budget alerts",
@@ -295,14 +295,14 @@ export const aiManaged: AiManagedContent = {
       "Periodic access reviews",
     ],
     principle:
-      "Model output never bypasses deterministic authorization or business rules. AI may propose; the system checks whether an action is permitted, and actions with consequences require human approval.",
+      "Model output never bypasses permission checks or business rules. AI may propose; the system checks whether an action is permitted, and actions with consequences require human approval.",
   },
   improvement: {
     title: "Continuous improvement",
     items: [
       "Periodic operational reviews",
       "Evaluation-driven prompt improvements",
-      "Workflow optimization recommendations",
+      "Workflow optimisation recommendations",
       "Knowledge base quality reviews",
       "A monthly improvement backlog",
       "Performance reporting",

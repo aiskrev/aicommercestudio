@@ -35,7 +35,7 @@ test("the PDF report downloads from the result without any personal data", async
   await report.getByLabel("Име на фирмата върху отчета").fill("E2E Фирма");
   const [download] = await Promise.all([
     page.waitForEvent("download"),
-    report.getByRole("button", { name: "Изтегли PDF отчета" }).click(),
+    report.getByRole("button", { name: "Изтеглете PDF отчета" }).click(),
   ]);
   expect(download.suggestedFilename()).toBe("ai-gotovnost-otchet.pdf");
   const bytes = await readFile((await download.path())!);

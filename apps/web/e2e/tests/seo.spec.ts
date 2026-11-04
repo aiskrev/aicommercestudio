@@ -77,7 +77,7 @@ test("quote CTAs open the quote form for the right service", async ({ page }) =>
 
 test("message outline helper and inline validation", async ({ page }) => {
   await page.goto("/bg/kontakti");
-  await page.getByRole("button", { name: "Попълни примерна структура" }).click();
+  await page.getByRole("button", { name: "Попълнете примерна структура" }).click();
   await expect(page.getByLabel(/Описание на проекта/)).toHaveValue(/Платформа и адрес на магазина/);
   await page.getByLabel(/^Имейл/).fill("not-an-email");
   await page.getByLabel(/^Имейл/).blur();

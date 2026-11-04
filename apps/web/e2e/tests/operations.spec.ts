@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 /** AI Managed Services operating areas, the planned portal, and the staff-only operations scaffold. */
 
 for (const [path, operations, portal, planned] of [
-  ["/bg/uslugi/ai-managed-services", "Какво включва управлението на AI системите", "AI Operations Portal — в разработка", "Планирано"],
+  ["/bg/uslugi/ai-managed-services", "Какво включва поддръжката", "AI Operations Portal — в разработка", "Планирано"],
   ["/en/services/ai-managed-services", "What operating your AI systems covers", "AI Operations Portal — in development", "Planned"],
 ] as const) {
   test(`the AI Managed Services page explains operations and shows the portal as planned (${path.slice(1, 3)})`, async ({ page }) => {

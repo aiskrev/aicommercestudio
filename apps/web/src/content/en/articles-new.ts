@@ -66,7 +66,7 @@ export const newArticles: Article[] = [
         heading: "2. Slow category and product pages",
         paragraphs: [
           "Speed is rarely the same across the whole store. The homepage may be fast while categories with many products and filters, or product pages with galleries and reviews, load slowly. Measuring only the homepage gives a false picture.",
-          "The most common causes are unoptimized images, scripts from apps that are no longer used, slow database queries when filtering, and hosting without caching.",
+          "The most common causes are unoptimised images, scripts from apps that are no longer used, slow database queries when filtering, and hosting without caching.",
         ],
         bullets: [
           "Measure the homepage, a category, a product and the cart separately.",
@@ -191,7 +191,7 @@ export const newArticles: Article[] = [
         heading: "Classic automation or AI automation",
         paragraphs: [
           "Classic automation follows rules: \"when an order arrives, create a task in the CRM\". It is reliable, fast and cheap to maintain, but it needs structured data. AI automation adds the ability to work with unstructured input — free text in an email, a scanned document, different phrasings of the same question.",
-          "In practice the best solutions combine the two: AI recognizes and structures the input, and rules decide what happens next.",
+          "In practice the best solutions combine the two: AI recognises and structures the input, and rules decide what happens next.",
         ],
         table: {
           caption: "When each kind of automation fits",
@@ -211,7 +211,7 @@ export const newArticles: Article[] = [
           "Classifying incoming inquiries by topic and urgency and routing them to the right person.",
           "Extracting data from invoices and documents, checked by a staff member before it is saved.",
           "Drafting replies to frequent questions, which a staff member reviews and sends.",
-          "Summarizing long email threads or documents.",
+          "Summarising long email threads or documents.",
           "Drafting product descriptions to a set structure and tone.",
           "Weekly reports generated from real data, with a short explanation of anomalies.",
         ],
@@ -311,7 +311,7 @@ export const newArticles: Article[] = [
       {
         heading: "Comparison on key criteria",
         paragraphs: [
-          "The table summarizes the typical differences. Specific prices and terms change, so check current plans and fees directly with the providers.",
+          "The table summarises the typical differences. Specific prices and terms change, so check current plans and fees directly with the providers.",
         ],
         table: {
           caption: "Shopify and WooCommerce — typical differences",

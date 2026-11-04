@@ -31,7 +31,7 @@ const foundationArticles: Article[] = [
       "Technical SEO answers the question of what is holding you back before you invest in new content.",
       "The biggest risks in online stores are filters, duplicate URLs and slow templates.",
       "Measure by page type — category, product, cart — not just the homepage.",
-      "A good audit ends with a prioritized plan, not just a list of problems.",
+      "A good audit ends with a prioritised plan, not just a list of problems.",
     ],
     sections: [
       {
@@ -66,7 +66,7 @@ const foundationArticles: Article[] = [
       {
         heading: "Speed and Core Web Vitals",
         paragraphs: [
-          "LCP, INP and CLS measure how quickly the main content appears, how quickly the page responds and how stable the layout is. In online stores the most common causes of poor values are unoptimized images, heavy app scripts and fonts that load late.",
+          "LCP, INP and CLS measure how quickly the main content appears, how quickly the page responds and how stable the layout is. In online stores the most common causes of poor values are unoptimised images, heavy app scripts and fonts that load late.",
           "Measure with real-user data where it is available, not only with lab tests.",
         ],
       },
@@ -127,7 +127,7 @@ const foundationArticles: Article[] = [
       {
         heading: "Escalation to a person",
         paragraphs: [
-          "The assistant must recognize when it is unsure, when the customer is unhappy and when the question involves payment or personal data. In those cases the conversation is handed to a staff member with the full context.",
+          "The assistant must recognise when it is unsure, when the customer is unhappy and when the question involves payment or personal data. In those cases the conversation is handed to a staff member with the full context.",
         ],
       },
       {
@@ -172,7 +172,7 @@ const foundationArticles: Article[] = [
           "Classifying an incoming email is different from sending a reply to a customer or changing a price in the store. Good automation separates actions by risk and applies a different control to each of them.",
         ],
         bullets: [
-          "Low risk: reading, summarizing, classifying, drafting.",
+          "Low risk: reading, summarising, classifying, drafting.",
           "High risk: sending messages, changing products.",
           "Critical risk: prices, orders, payments, access to sensitive data.",
         ],

@@ -79,7 +79,7 @@ test("navigation labels are localized", async ({ page }) => {
 test.describe("language switcher", () => {
   test("desktop switcher opens the equivalent page and remembers the choice", async ({ page, context }) => {
     await page.goto("/bg/uslugi/ai-managed-services");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("AI агентите ви заслужават професионална поддръжка.");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Поддържаме AI агентите ви, след като заработят.");
     await page.locator("header").getByRole("link", { name: "Switch to English" }).first().click();
     await expect(page).toHaveURL(/\/en\/services\/ai-managed-services$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Keep your AI agents running at their best.");
@@ -102,7 +102,7 @@ test.describe("language switcher", () => {
   test("mobile menu contains the switcher", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/bg/uslugi");
-    await page.getByRole("button", { name: "Отвори менюто" }).click();
+    await page.getByRole("button", { name: "Отворете менюто" }).click();
     const close = page.getByRole("button", { name: "Затвори менюто" });
     const panel = page.locator(`[id="${await close.getAttribute("aria-controls")}"]`);
     await panel.getByRole("link", { name: "Switch to English" }).click();

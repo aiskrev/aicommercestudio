@@ -146,7 +146,7 @@ export const tools: typeof bgTools = {
       icon: "bot",
       category: "Agents",
       title: "AI agent library",
-      description: "Browse typical agents by business function — tasks, tools and limits — and configure them for your case.",
+      description: "Browse typical agent roles by business function: tasks, tools and limits. The catalogue is for planning, and the agents are not connected to your systems.",
       audience: "Teams looking for ideas for their first agent",
       output: "Profiles of typical agents: tasks, tools, boundaries and approvals.",
       cta: "Browse the agents",

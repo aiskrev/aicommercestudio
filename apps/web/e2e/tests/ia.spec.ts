@@ -152,7 +152,7 @@ test("desktop services mega-menu: three bands, ten domains, keyboard and navigat
 test("mobile menu at 360px groups services and keeps keyboard focus inside", async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 740 });
   await page.goto("/bg");
-  const toggle = page.getByRole("button", { name: "Отвори менюто" });
+  const toggle = page.getByRole("button", { name: "Отворете менюто" });
   await toggle.click();
   const close = page.getByRole("button", { name: "Затвори менюто" });
   const panel = page.locator(`[id="${await close.getAttribute("aria-controls")}"]`);

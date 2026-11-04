@@ -35,9 +35,9 @@ test("AI readiness assessment runs end to end in Bulgarian", async ({ page }) =>
     "href",
     "/bg/rabotni-sreshti/ai-strategiya-rabotna-sreshta",
   );
-  await expect(result.getByRole("link", { name: "Заяви консултация" })).toHaveAttribute("href", "/bg/kontakti?usluga=audit");
-  await expect(result.getByRole("button", { name: "Изтегли PDF отчета" })).toBeVisible();
-  await expect(result.getByRole("button", { name: "Изтегли обобщение (.txt)" })).toHaveCount(0);
+  await expect(result.getByRole("link", { name: "Заявете консултация" })).toHaveAttribute("href", "/bg/kontakti?usluga=audit");
+  await expect(result.getByRole("button", { name: "Изтеглете PDF отчета" })).toBeVisible();
+  await expect(result.getByRole("button", { name: "Изтеглете обобщение (.txt)" })).toHaveCount(0);
 });
 
 test("a shared readiness link restores the result without a form", async ({ page }) => {
@@ -101,6 +101,6 @@ test("the basic result needs no contact details; sending it to the team is an ex
   await expect(result.getByRole("textbox")).toHaveCount(1); // only the optional company name for the PDF
   const send = page.getByTestId("readiness-send");
   await expect(send.getByRole("textbox")).toHaveCount(0); // the contact form stays closed until requested
-  await send.getByRole("button", { name: "Изпрати резултата на екипа" }).click();
+  await send.getByRole("button", { name: "Изпратете резултата на екипа" }).click();
   await expect(send.getByLabel(/^Служебен имейл/)).toBeVisible();
 });

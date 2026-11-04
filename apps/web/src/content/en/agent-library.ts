@@ -6,7 +6,7 @@ export const agentLibrary: typeof bgAgentLibrary = {
     "Typical AI agents by business function: purpose, inputs and outputs, required data and integrations, human approval, risk level and complexity, with example workflows.",
   eyebrow: "Tools · Agents",
   title: "AI agent library",
-  lead: "Twelve typical AI agent roles with clear boundaries: purpose, inputs and outputs, prerequisites, integrations, risks, where a person must approve and how complex they are to implement.",
+  lead: "Twelve typical AI agent roles. For each one you'll see its purpose, what goes in and comes out, what you need first, the risks, where a person approves and how complex it is to implement.",
   note: "A planning catalogue. The agents here are not connected to your systems and do not take actions.",
   agents: {
     proposal_generation: {
@@ -19,10 +19,10 @@ export const agentLibrary: typeof bgAgentLibrary = {
       sensitivityNote: "Customer data and commercial terms — access only to the records and templates needed.",
     },
     catalog_assistant: {
-      name: "E-commerce catalog assistant",
+      name: "E-commerce catalogue assistant",
       short: "Completes and checks product data.",
       purpose: "Completes product descriptions, attributes and categories from supplier data, checks them against your rules and prepares the changes for approval before they are published in the store.",
-      inputs: ["Product data and supplier files", "Rules for attributes, categories and style", "The current catalog in the store"],
+      inputs: ["Product data and supplier files", "Rules for attributes, categories and style", "The current catalogue in the store"],
       outputs: ["Draft descriptions and attributes", "List of missing or conflicting data", "Changes prepared for approval"],
       oversight: "A person approves changes before they are published; the model never changes prices or stock.",
       sensitivityNote: "Mostly product information — no customer data.",
@@ -30,7 +30,7 @@ export const agentLibrary: typeof bgAgentLibrary = {
   },
   workflows: {
     proposal_drafting: { title: "Preparing a proposal", trigger: "Qualified inquiry", outcome: "Approved proposal sent by a salesperson" },
-    catalog_enrichment: { title: "Catalog enrichment", trigger: "New or changed product", outcome: "Approved product data in the store" },
+    catalog_enrichment: { title: "Catalogue enrichment", trigger: "New or changed product", outcome: "Approved product data in the store" },
   },
   profiles: {
     lead_qualification: {
@@ -59,7 +59,7 @@ export const agentLibrary: typeof bgAgentLibrary = {
       approvals: ["Every publication is approved before it goes out"],
     },
     catalog_assistant: {
-      prerequisites: ["Rules for attributes and categories", "Catalog access limited to drafts", "A catalog owner"],
+      prerequisites: ["Rules for attributes and categories", "Catalogue access limited to drafts", "A catalogue owner"],
       risks: ["Wrong product details in the store", "Unchecked supplier data"],
       approvals: ["Changes are approved before they are published in the store"],
     },
@@ -133,7 +133,7 @@ export const agentLibrary: typeof bgAgentLibrary = {
     outputs: "Outputs",
     dataSources: "Required data",
     noDataSources: "Data from the system it works in",
-    integrations: "Supported integrations",
+    integrations: "Integrations needed for implementation",
     requiredMark: "required",
     approval: "Human approval",
     approvalMinimum: "Minimum: {checkpoint}",

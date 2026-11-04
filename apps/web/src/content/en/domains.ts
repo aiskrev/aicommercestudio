@@ -13,7 +13,7 @@ export const domains: DomainContent[] = [
     name: "AI Strategy & Transformation",
     summary: "Where AI is worth building, in what order and under which controls — before you invest in implementation.",
     positioning:
-      "This domain decides where AI is worth building at all, in what order, and under which controls, before any money goes into implementation. The output is a plan that engineering can execute, not a slide deck.",
+      "We work out where AI is worth building at all, in what order and with which safeguards, before any money goes into implementation. You get a plan engineers can act on, not a slide deck.",
     idealCustomers: [
       "Owners and managers of SMEs and online retailers with several candidate AI use cases and no internal AI team.",
       "Operations or IT leads who need a defensible order of work and a budget envelope they can set themselves.",
@@ -71,7 +71,7 @@ export const domains: DomainContent[] = [
     name: "AI Agents & Business Automation",
     summary: "Agents and automated workflows inside your systems — with permission checks and human approval.",
     positioning:
-      "This domain builds agents and automated workflows that act inside your systems. Every action with an external effect goes through a deterministic permission check and, where the rules require it, a human approval. It does not build autonomous systems with unbounded authority.",
+      "We build agents and automated workflows that act inside your systems. Every action with an external effect goes through a fixed permission check and, where the rules require it, approval by a person. We don't build autonomous systems with unlimited authority.",
     idealCustomers: [
       "Teams that move information between e-mail, CRM, helpdesk, documents and ERP by hand.",
       "Support, sales operations, back office and finance teams with repetitive, rule-bound work.",
@@ -134,7 +134,7 @@ export const domains: DomainContent[] = [
     name: "AI Applications & Knowledge Systems",
     summary: "AI assistants and features on your own documents and data — with sources, permissions and measured quality.",
     positioning:
-      "This domain builds AI applications that answer from your own documents and data, with sources, permissions and measured quality. It covers internal assistants, document analysis, and AI features inside existing products.",
+      "We build AI applications that answer from your own documents and data, with sources, permissions and measured quality. That includes internal assistants, document analysis and AI features inside existing products.",
     idealCustomers: [
       "Companies whose knowledge sits in documents, wikis and tickets.",
       "Teams that process contracts, invoices or forms.",
@@ -199,7 +199,7 @@ export const domains: DomainContent[] = [
     name: "Commerce Engineering",
     summary: "Stability, speed, search visibility, measurement and integrations for Shopify and WooCommerce stores.",
     positioning:
-      "This domain is the technical foundation of online stores: stability, speed, search visibility, measurement and integrations for Shopify and WooCommerce. It is the original core of the studio, and it is where AI features for commerce are applied.",
+      "We look after the technical side of online stores on Shopify and WooCommerce: stability, speed, search visibility, measurement and integrations. This is where the studio started, and it is where AI features for online stores are put to use.",
     idealCustomers: [
       "Small and mid-sized online stores without an in-house developer.",
       "Merchants with app or plugin sprawl.",
@@ -275,7 +275,7 @@ export const domains: DomainContent[] = [
     name: "Cloud & Platform Engineering",
     summary: "Cloud infrastructure as code: environments, containers, databases, secrets, backups and cost control.",
     positioning:
-      "This domain designs and builds the infrastructure that applications and AI workloads run on: containers, managed databases, networking, identity, secrets and cost control on your chosen cloud or an EU hosting provider, all described as code and handed over with documentation. It is a substantial engineering offering in its own right, not an accessory to AI.",
+      "We design and build the infrastructure your applications and AI workloads run on: containers, managed databases, networking, identity, secrets and cost control on your chosen cloud or an EU hosting provider, all described as code and handed over with documentation. It is a substantial engineering offering in its own right, not an accessory to AI.",
     idealCustomers: [
       "SMEs moving from a single server or shared hosting to a managed platform.",
       "Product teams that need a production-ready environment for a new application or AI workload.",
@@ -355,7 +355,7 @@ export const domains: DomainContent[] = [
     name: "DevOps, SRE & Observability",
     summary: "Repeatable software delivery and visible production behaviour: pipelines, monitoring, incident practice.",
     positioning:
-      "This domain makes software delivery repeatable and production behaviour visible: pipelines, release safety, monitoring, alerting and incident practice. SRE here means service-level objectives, error budgets and blameless reviews, applied at the scale of your team. It is not a 24/7 operations centre.",
+      "We make software releases repeatable and show you how your systems behave in real use: pipelines, safe releases, monitoring, alerts and incident practice. By SRE we mean service-level objectives, error budgets and blameless reviews, scaled to your team. This is not a 24/7 operations centre.",
     idealCustomers: [
       "Teams that deploy by hand or rarely.",
       "Applications whose failures are discovered by customers.",
@@ -429,7 +429,7 @@ export const domains: DomainContent[] = [
     name: "Data & Integration Engineering",
     summary: "Connected systems and usable data: API integrations, synchronisation, event flows and data models.",
     positioning:
-      "This domain connects systems and makes their data usable: API integrations, sync jobs, event flows and analytical data models with clear ownership and error handling. Agents, assistants and reporting depend on it.",
+      "We connect your systems and make their data usable: API integrations, sync jobs, event flows and data models for analysis, with clear ownership and error handling. Agents, assistants and reporting all depend on this work.",
     idealCustomers: [
       "Companies with a store, CRM, ERP, accounting and helpdesk that do not talk to each other.",
       "Teams preparing data for AI or reporting.",
@@ -495,7 +495,7 @@ export const domains: DomainContent[] = [
     name: "AI Governance, Security & Assurance",
     summary: "Controls around AI systems that can be checked: permissions, data, quality evaluation and incident handling.",
     positioning:
-      "This domain puts controls around AI systems that a business, its customers and its auditors can check: who may do what, which data reaches which model, how quality is evaluated, and what happens when something goes wrong. It is engineering governance, not legal advice.",
+      "We put safeguards around AI systems that a business, its customers and its auditors can check: who may do what, which data reaches which model, how quality is measured and what happens when something goes wrong. This is technical governance, not legal advice.",
     idealCustomers: [
       "Companies putting AI in front of customers or into decisions.",
       "Teams that must answer data-protection or customer security questionnaires.",
@@ -567,7 +567,7 @@ export const domains: DomainContent[] = [
     name: "Managed AI & Platform Operations",
     summary: "Ongoing operation of what has been built: monitoring, maintenance, evaluation, cost and incidents.",
     positioning:
-      "This domain is the ongoing operation of what has been built, by us or by others: monitoring, maintenance, evaluation, cost control, incident response and continuous improvement, under a written scope. Data comes from your systems once access is agreed. Nothing is reported before it is actually connected.",
+      "We keep running what has been built, by us or by others: monitoring, maintenance, quality checks, cost control, incident response and ongoing improvements, under a written scope. Data comes from your systems once access is agreed. We report nothing until it is actually connected.",
     idealCustomers: [
       "Companies with an AI assistant, agent or automation in daily use and no one responsible for it.",
       "Stores and applications without in-house operations.",
@@ -635,9 +635,9 @@ export const domains: DomainContent[] = [
     key: "advisory_enablement",
     slug: "advisory-assessments-and-enablement",
     name: "Advisory, Assessments & Enablement",
-    summary: "Short, fixed-scope work that produces decisions: audits, architecture reviews and hands-on enablement.",
+    summary: "Short, fixed-scope work that helps you decide: audits, architecture reviews and hands-on training.",
     positioning:
-      "This domain covers short, fixed-scope work that produces decisions and capability in your own team: audits, architecture reviews, second opinions and hands-on enablement. It is the recommended first step before most implementations.",
+      "Short, fixed-scope work that helps you decide and builds skills in your own team: audits, architecture reviews, second opinions and hands-on training. We recommend it as the first step before most projects.",
     idealCustomers: [
       "Decision makers who need an independent technical view before they commit.",
       "Teams that want to build in-house with expert review.",
@@ -693,8 +693,8 @@ export const domains: DomainContent[] = [
       "Training is not a substitute for production experience.",
     ],
     cta: "Request a technical audit",
-    metaTitle: "Technical advisory, audits and enablement for AI and DevOps",
+    metaTitle: "Technical advisory, audits and training for AI and DevOps",
     metaDescription:
-      "Technical audits, architecture and code reviews, workshops and hands-on team enablement for AI, integrations and DevOps — the first step before implementation.",
+      "Technical audits, architecture and code reviews, workshops and hands-on team training for AI, integrations and DevOps: the first step before a project.",
   },
 ];

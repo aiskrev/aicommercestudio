@@ -66,7 +66,7 @@ test("an enquiry about a workshop is stored with it", async ({ page }) => {
   await page.waitForTimeout(3500); // the anti-bot timing check
   const [request] = await Promise.all([
     page.waitForRequest((r) => r.url().endsWith("/api/public/leads") && r.method() === "POST"),
-    page.getByRole("button", { name: "Изпрати запитването" }).click(),
+    page.getByRole("button", { name: "Изпратете запитването" }).click(),
   ]);
   expect(JSON.parse(request.postData() ?? "{}").workshop).toBe("ai_strategy_discovery");
   await expect(page.getByTestId("contact-success")).toBeVisible();

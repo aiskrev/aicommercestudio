@@ -44,7 +44,7 @@ test("pages fit the mobile viewport without horizontal scrolling", async ({ page
 
 test("mobile menu opens, navigates and closes", async ({ page }) => {
   await page.goto("/bg");
-  const toggle = page.getByRole("button", { name: "Отвори менюто" });
+  const toggle = page.getByRole("button", { name: "Отворете менюто" });
   await expect(toggle).toBeVisible();
   await toggle.click();
   const close = page.getByRole("button", { name: "Затвори менюто" });
@@ -59,7 +59,7 @@ test("mobile menu opens, navigates and closes", async ({ page }) => {
   await expect(link).toBeVisible();
   await link.click();
   await expect(page).toHaveURL(/\/proces$/);
-  await expect(page.getByRole("button", { name: "Отвори менюто" })).toHaveAttribute("aria-expanded", "false");
+  await expect(page.getByRole("button", { name: "Отворете менюто" })).toHaveAttribute("aria-expanded", "false");
 });
 
 test("sticky quote bar appears after scrolling, hides at CTAs, never on the contact page", async ({ page }) => {
@@ -91,7 +91,7 @@ test("sticky quote bar can be dismissed for the session", async ({ page }) => {
 
 test("contact form is usable on mobile", async ({ page }) => {
   await page.goto("/bg/kontakti");
-  await expect(page.getByRole("button", { name: "Изпрати запитването" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Изпратете запитването" })).toBeVisible();
   const box = await page.getByLabel(/Описание на проекта/).boundingBox();
   const viewport = page.viewportSize();
   expect(box && viewport && box.width <= viewport.width).toBeTruthy();

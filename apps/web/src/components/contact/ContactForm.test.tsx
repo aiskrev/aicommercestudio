@@ -196,7 +196,7 @@ describe("ContactForm — quote requests", () => {
   });
 
   it("sends the workshop the enquiry is about, and drops it when the visitor removes it", async () => {
-    const workshopLabels = { about: "Запитване за: {title}", remove: "Премахни" };
+    const workshopLabels = { about: "Запитване за: {title}", remove: "Премахнете" };
     const props = {
       labels: bg.form,
       messages: bg.validation,
@@ -219,7 +219,7 @@ describe("ContactForm — quote requests", () => {
 
     fetchMock.mockClear();
     render(<ContactForm {...props} initialWorkshop={{ key: "kubernetes_review", title: "Преглед на Kubernetes платформата" }} />);
-    await user.click(screen.getByRole("button", { name: "Премахни" }));
+    await user.click(screen.getByRole("button", { name: "Премахнете" }));
     expect(screen.queryByTestId("contact-workshop")).toBeNull();
     await fillValid(user);
     await user.click(screen.getByRole("button", { name: bg.form.submit }));
