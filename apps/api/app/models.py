@@ -55,6 +55,12 @@ class ServiceKey(enum.StrEnum):
     AUDIT = "audit"
     AI_MANAGED = "ai_managed"
     AI_AGENTS = "ai_agents"
+    BUSINESS_WEBSITES = "business_websites"
+    STORE_DEVELOPMENT = "store_development"
+    PORTALS_WEB_APPS = "portals_web_apps"
+    PAYMENTS_SUBSCRIPTIONS = "payments_subscriptions"
+    SECURITY_PERFORMANCE = "security_performance"
+    INTEGRATION_CARE = "integration_care"
     OTHER = "other"
 
 

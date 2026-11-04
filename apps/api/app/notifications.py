@@ -12,6 +12,12 @@ from app.config import Settings
 logger = logging.getLogger(__name__)
 
 SERVICE_LABELS = {
+    "business_websites": "Интерактивни бизнес сайтове",
+    "store_development": "Изработка на онлайн магазини",
+    "portals_web_apps": "Клиентски портали и уеб приложения",
+    "payments_subscriptions": "Абонаменти и онлайн плащания",
+    "security_performance": "Защита и ускоряване на сайтове",
+    "integration_care": "Поддръжка на интеграции и автоматизации",
     "maintenance": "Поддръжка на онлайн магазини",
     "seo": "SEO и органичен растеж",
     "ai_tools": "AI инструменти по поръчка",

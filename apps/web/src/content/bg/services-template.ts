@@ -1,4 +1,4 @@
-import type { Service, ServiceKey } from "@/content/types";
+import type { CoreServiceKey, Service } from "@/content/types";
 
 export type ServiceTemplate = Pick<Service, "approach" | "useCases">;
 
@@ -6,7 +6,7 @@ export type ServiceTemplate = Pick<Service, "approach" | "useCases">;
  * Service-page template content: the approach (how we solve the problem) and realistic use cases.
  * Scenarios only — no client names, results or promised percentages.
  */
-export const serviceTemplate: Record<ServiceKey, ServiceTemplate> = {
+export const serviceTemplate: Record<CoreServiceKey, ServiceTemplate> = {
   ai_agents: {
     approach: [
       { title: "Тясна задача, ясни граници", description: "Агентът получава една описана работа, списък с разрешени инструменти и правила кога да спре и да попита човек." },

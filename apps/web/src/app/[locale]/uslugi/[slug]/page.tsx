@@ -301,6 +301,29 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         </ul>
       </Section>
 
+      {service.limitations && service.acceptance && (
+        <Section labelledBy="terms-title">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="card p-6 sm:p-8">
+              <h2 id="terms-title" className="t-h2 text-2xl sm:text-3xl">
+                {dict.service.limitationsTitle}
+              </h2>
+              <CheckList items={service.limitations} className="mt-6" />
+            </div>
+            <div className="card p-6 sm:p-8">
+              <h2 className="t-h2 text-2xl sm:text-3xl">{dict.service.acceptanceTitle}</h2>
+              <CheckList items={service.acceptance} className="mt-6" />
+              {service.aftercare && (
+                <>
+                  <h3 className="t-h3 mt-8">{dict.service.aftercareTitle}</h3>
+                  <p className="mt-2 text-fg-muted">{service.aftercare}</p>
+                </>
+              )}
+            </div>
+          </div>
+        </Section>
+      )}
+
       {/* ------------------------------------------------------------ deliverables + engagement */}
       <Section labelledBy="deliverables-title" alt>
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">

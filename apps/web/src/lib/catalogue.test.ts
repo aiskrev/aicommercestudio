@@ -48,10 +48,10 @@ afterEach(() => {
 });
 
 describe("content entries", () => {
-  it("lists the nine existing services in domain order with reciprocal slugs", () => {
+  it("lists the existing services in domain order with reciprocal slugs", () => {
     const bg = contentEntries("bg");
     const en = contentEntries("en");
-    expect(bg).toHaveLength(9);
+    expect(bg).toHaveLength(15);
     expect(bg.map((e) => e.key)).toEqual(en.map((e) => e.key));
     expect(bg[0].domain).toBe("ai_agents_automation"); // the AI band comes first; ai_strategy has no primary service
     for (const [index, entry] of bg.entries()) {
@@ -66,7 +66,7 @@ describe("merging the published catalogue", () => {
   it("keeps the TypeScript content when the API is unavailable", () => {
     const result = mergeCatalogue(contentEntries("bg"), null, reserved());
     expect(result.source).toBe("content");
-    expect(result.entries).toHaveLength(9);
+    expect(result.entries).toHaveLength(15);
   });
 
   it("adds valid catalogue-only entries and never overrides the content", () => {
@@ -86,7 +86,7 @@ describe("merging the published catalogue", () => {
     expect(result.entries.find((e) => e.key === "seo")?.name).toBe(contentEntries("bg").find((e) => e.key === "seo")?.name);
     // The workshop sits after the services of its domain.
     const workshop = keys.indexOf("migration_workshop");
-    expect(keys[workshop - 1]).toBe("analytics");
+    expect(keys[workshop - 1]).toBe("payments_subscriptions");
     expect(result.entries[workshop]).toMatchObject({ origin: "catalogue", duration: { minDays: 0.5, maxDays: 1 } });
     expect(domainOfferings(result.entries, "commerce_engineering").map((e) => e.key)).toEqual(["migration_workshop"]);
     expect(domainOfferings(result.entries, "ai_strategy")).toEqual([]);
@@ -97,7 +97,7 @@ describe("fetching from the API", () => {
   it("falls back to the content when the API cannot be reached (as during next build)", async () => {
     const result = await getCatalogue("en");
     expect(result.source).toBe("content");
-    expect(result.entries).toHaveLength(9);
+    expect(result.entries).toHaveLength(15);
   });
 
   it("caches the list for the revalidation window under the catalogue tag", async () => {

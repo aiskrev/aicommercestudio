@@ -87,6 +87,9 @@ export const bg = {
     ],
   },
   service: {
+    limitationsTitle: "Какво не включва и не обещава",
+    acceptanceTitle: "Как приемаме работата",
+    aftercareTitle: "След приемането",
     conceptLabel: "Концептуална схема на работата",
     problemsEyebrow: "Кога ви е нужна",
     problemsTitle: "Проблемите, които решаваме",

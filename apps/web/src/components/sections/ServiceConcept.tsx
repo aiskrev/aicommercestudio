@@ -20,6 +20,12 @@ const LAYOUT: Record<ServiceKey, Layout> = {
   ai_managed: "cycle",
   ai_agents: "hub",
   audit: "checklist",
+  business_websites: "stack",
+  store_development: "funnel",
+  portals_web_apps: "stack",
+  payments_subscriptions: "flow",
+  security_performance: "checklist",
+  integration_care: "hub",
 };
 
 /**

@@ -15,6 +15,7 @@ import {
 } from "@/content/bg/legal";
 import { about, aiSolutions, industries, processPage, servicesPage, toolsPage } from "@/content/bg/pages";
 import { keywordMap } from "@/content/bg/seo";
+import { carePlans, demoCentre } from "@/content/bg/offer-pages";
 import { coreServices, services } from "@/content/bg/services";
 import { readinessTool } from "@/content/bg/tool-readiness";
 import { agentLibrary } from "@/content/bg/agent-library";
@@ -48,6 +49,7 @@ import {
   toolsPage as enToolsPage,
 } from "@/content/en/pages";
 import { keywordMap as enKeywordMap } from "@/content/en/seo";
+import { carePlans as enCarePlans, demoCentre as enDemoCentre } from "@/content/en/offer-pages";
 import { coreServices as enCoreServices, services as enServices } from "@/content/en/services";
 import { readinessTool as enReadinessTool } from "@/content/en/tool-readiness";
 import { agentLibrary as enAgentLibrary } from "@/content/en/agent-library";
@@ -68,6 +70,8 @@ import type { LocalizedPaths } from "@/lib/seo";
 const bg = {
   home,
   services,
+  carePlans,
+  demoCentre,
   coreServices,
   domains,
   servicesPage,
@@ -110,6 +114,8 @@ export type SiteContent = typeof bg;
 const en: SiteContent = {
   home: enHome,
   services: enServices,
+  carePlans: enCarePlans,
+  demoCentre: enDemoCentre,
   coreServices: enCoreServices,
   domains: enDomains,
   servicesPage: enServicesPage,

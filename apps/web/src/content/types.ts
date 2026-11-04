@@ -10,7 +10,20 @@ export type ServiceKey =
   | "integrations"
   | "ai_agents"
   | "audit"
-  | "ai_managed";
+  | "ai_managed"
+  | OfferServiceKey;
+
+/** Engineering services of the public offer (content/{bg,en}/services-offer.ts). */
+export type OfferServiceKey =
+  | "business_websites"
+  | "store_development"
+  | "portals_web_apps"
+  | "payments_subscriptions"
+  | "security_performance"
+  | "integration_care";
+
+/** The services whose depth and template texts live in services-depth.ts and services-template.ts. */
+export type CoreServiceKey = Exclude<ServiceKey, OfferServiceKey>;
 
 export type FormServiceKey = ServiceKey | "other";
 
@@ -64,7 +77,15 @@ export interface Service {
   approach: Capability[];
   /** Realistic use cases for this service — scenarios, never results or client names. */
   useCases: Capability[];
+  /** What the service does not include or promise. */
+  limitations?: string[];
+  /** How the work is accepted. */
+  acceptance?: string[];
+  /** What can follow after the work. */
+  aftercare?: string;
 }
+
+export type OfferService = Service & { key: OfferServiceKey };
 
 /** Texts of one service family inside a domain hub; status and links live in `lib/domains.ts`. */
 export interface DomainFamilyContent {
