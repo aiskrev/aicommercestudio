@@ -5,6 +5,7 @@ python -m app.cli create-admin --email x@y  # password read from ADMIN_PASSWORD 
 python -m app.cli set-password --email x@y  # reset a password, clear lockout, revoke sessions
 python -m app.cli reset-mfa --email x@y     # remove a lost second factor (TOTP + recovery codes), revoke sessions
 python -m app.cli maintenance [--dry-run]   # GDPR retention + expired session cleanup
+python -m app.cli outbox-run                # Send due transactional e-mail and report delivery status
 python -m app.cli purge-synthetic           # remove synthetic development data
 python -m app.cli ops-create-org --slug s --name n --owner-email x@y  # AI operations tenant + owner
 python -m app.cli ops-seed-demo --owner-email x@y   # labelled sample registry (not in production)
@@ -30,6 +31,8 @@ from sqlalchemy import delete, func, or_, select, update
 from sqlalchemy.orm import Session
 
 from app import audit
+from app.accounts import service as account_service
+from app.accounts.mail import dispatch_pending
 from app.advisor import service as advisor
 from app.assessments import service as assessment_service
 from app.catalogue import seed as catalogue
@@ -335,11 +338,13 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         configurations = team.purge_expired(db, dry_run=args.dry_run)
         saved_assessments = assessment_service.purge_expired(db, dry_run=args.dry_run)
         sessions_removed = 0
+        account_rows = 0
         if not args.dry_run:
             cutoff = utcnow() - timedelta(days=1)
             sessions_removed = db.execute(
                 delete(AdminSession).where(or_(AdminSession.expires_at < utcnow(), AdminSession.revoked_at < cutoff))
             ).rowcount
+            account_rows = account_service.purge_expired(db)
             db.commit()
     prefix = "[dry-run] would delete" if args.dry_run else "deleted"
     _print(
@@ -347,9 +352,15 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         f"advisor_assessments={assessments.due if args.dry_run else assessments.deleted} "
         f"team_configurations={configurations.due if args.dry_run else configurations.deleted} "
         f"assessment_results={saved_assessments.due if args.dry_run else saved_assessments.deleted} "
-        f"sessions={sessions_removed}"
+        f"sessions={sessions_removed} account_rows={account_rows}"
     )
     return 0
+
+
+def cmd_outbox_run(_args: argparse.Namespace) -> int:
+    result = dispatch_pending(limit=100)
+    _print("[outbox-run] " + " ".join(f"{key}={value}" for key, value in result.items()))
+    return 1 if result["blocked"] or result["failed"] else 0
 
 
 def cmd_ops_create_org(args: argparse.Namespace) -> int:
@@ -470,6 +481,7 @@ def main(argv: list[str] | None = None) -> int:
     maint = sub.add_parser("maintenance", help="Apply retention policy and remove expired sessions")
     maint.add_argument("--dry-run", action="store_true")
     maint.set_defaults(func=cmd_maintenance)
+    sub.add_parser("outbox-run", help="Send due transactional e-mail").set_defaults(func=cmd_outbox_run)
     sub.add_parser(
         "purge-synthetic", help="Delete all synthetic development leads (source=synthetic_seed)"
     ).set_defaults(func=cmd_purge_synthetic)

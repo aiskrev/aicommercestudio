@@ -53,6 +53,7 @@ const EN_SEGMENTS: Record<string, string> = {
   "referentni-stsenarii": "reference-scenarios",
   "integratsionni-modeli": "integration-patterns",
   "rabotni-sreshti": "workshops",
+  konto: "account",
   paketi: "care-plans",
   "demo-tsentar": "demo-centre",
 };
@@ -60,6 +61,14 @@ const EN_SEGMENTS: Record<string, string> = {
 const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
   statii: { tema: "topic" },
   "za-nas": { osnovatel: "founder" },
+  konto: {
+    registratsiya: "sign-up",
+    vhod: "sign-in",
+    potvardi: "verify",
+    "nov-link": "new-link",
+    "zabravena-parola": "forgot-password",
+    "nova-parola": "reset-password",
+  },
   // Tool pages (lib/tool-slugs.ts): live tools and the intro pages of planned ones.
   instrumenti: Object.fromEntries(Object.values(TOOL_PAGE_SLUGS).map(({ bg, en }) => [bg, en])),
   // Agent library pages (lib/agent-library.ts → AGENT_SLUGS).

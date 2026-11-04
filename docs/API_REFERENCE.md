@@ -530,6 +530,26 @@ See [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md), [AI_OBSERVABILITY.md](AI
 | POST | `/api/ops/organizations/{organization_id}/portal-users/{user_id}/recovery` | `portal_users.write` | one-time recovery link (resets password and second factor) |
 | POST | `/api/ops/organizations/{organization_id}/portal-users/{user_id}/disable` | `portal_users.write` | disable and revoke sessions |
 
+## Customer accounts (off by default)
+
+Only while `CUSTOMER_ACCOUNTS_ENABLED=true` (404 otherwise). See [CUSTOMER_ACCOUNTS.md](CUSTOMER_ACCOUNTS.md). Cookies `acs_account_session` / `acs_account_csrf`; signed-in changes need `X-CSRF-Token`. Routes that send e-mail answer 503 `email_unavailable` without a provider, and 429 with `Retry-After` over the shared limit.
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| POST | `/api/accounts/register` | `{email, password, display_name?, locale, privacy_acknowledged, marketing_consent?}` → always 202 |
+| POST | `/api/accounts/verification/resend` | `{email, locale}` → always 202 |
+| POST | `/api/accounts/verification/confirm` | `{token}` → 204; 400 `token_invalid` |
+| POST | `/api/accounts/login` | `{email, password}` → profile, sets cookies; 401 `invalid_credentials`, 403 `email_not_verified` after a correct password |
+| POST | `/api/accounts/logout` | closes this session → 204 |
+| POST | `/api/accounts/password/forgot` | `{email, locale}` → always 202 |
+| POST | `/api/accounts/password/reset` | `{token, password}` → 204, closes every session; 400 `token_invalid` |
+| POST | `/api/accounts/password/change` | `{current_password, new_password}` → 204, closes other sessions |
+| GET | `/api/accounts/me` | profile |
+| PATCH | `/api/accounts/me` | `{display_name?, locale?, marketing_consent?}` → profile |
+| GET | `/api/accounts/sessions` | active sessions of this account |
+| POST | `/api/accounts/sessions/revoke-others` | → 204 |
+| DELETE | `/api/accounts/sessions/{session_id}` | → 204; 404 for another account's session |
+
 ## Client portal (read-only, off by default)
 
 Only while `CLIENT_PORTAL_ENABLED=true` (404 otherwise). Separate client identities, cookies `acs_portal_session` / `acs_portal_csrf`; the organisation always comes from the session. See [CLIENT_PORTAL.md](CLIENT_PORTAL.md).
