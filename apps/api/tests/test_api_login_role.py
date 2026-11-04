@@ -4,17 +4,20 @@ outside a tenant binding. These tests run on the API's own engine, so they prove
 
 from __future__ import annotations
 
+from argparse import Namespace
 from datetime import timedelta
 
 import pytest
-from sqlalchemy import make_url, select, text
+from sqlalchemy import create_engine, make_url, select, text
 from sqlalchemy.exc import DBAPIError
 
+from app.cli import cmd_db_api_role
 from app.config import Settings, get_settings
 from app.db import get_engine, get_sessionmaker
 from app.models import AuditLog, utcnow
 from app.ops import rls
 from app.ops.models import TENANT_TABLES
+from tests.conftest import API_ROLE_PASSWORD
 
 API_ROLE = "acs_app_api"
 RLS_TABLES = (*TENANT_TABLES, "ops_memberships", "ops_organizations")
@@ -115,6 +118,27 @@ def test_every_other_table_is_a_deliberate_grant(db):
             assert not allowed, table
         else:
             assert allowed, table
+
+
+def test_db_api_role_sets_the_password_without_printing_it(db, monkeypatch, capsys):
+    secret = "pass'word-with-a-quote"
+    monkeypatch.setenv("API_DB_PASSWORD", secret)
+    try:
+        assert cmd_db_api_role(Namespace()) == 0
+        output = capsys.readouterr().out
+        assert secret not in output
+        url = make_url(get_settings().database_url).set(password=secret)
+        with create_engine(url).connect() as connection:
+            assert connection.execute(text("SELECT session_user")).scalar() == API_ROLE
+    finally:
+        db.execute(text(f"ALTER ROLE acs_app_api PASSWORD '{API_ROLE_PASSWORD}'"))
+        db.commit()
+
+
+def test_db_api_role_does_nothing_without_a_password(monkeypatch, capsys):
+    monkeypatch.delenv("API_DB_PASSWORD", raising=False)
+    assert cmd_db_api_role(Namespace()) == 0
+    assert "NOLOGIN" in capsys.readouterr().out
 
 
 def test_production_will_not_open_accounts_on_the_owner_connection():
