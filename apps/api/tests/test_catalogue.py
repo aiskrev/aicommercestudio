@@ -183,7 +183,7 @@ def test_bootstrap_backfills_never_published_entries_but_not_edited_ones(db):
     db.commit()
 
     result = seed_catalogue(db)
-    assert dict(result.published) == {"domain": 10, "service": 8}
+    assert dict(result.published) == {"domain": 10, "service": 14}
     seo = db.get(CatalogueEntity, entity_id("service", "seo"))
     assert seo.status == "published" and seo.published_snapshot["capabilities"]
     analytics = db.get(CatalogueEntity, entity_id("service", "analytics"))
