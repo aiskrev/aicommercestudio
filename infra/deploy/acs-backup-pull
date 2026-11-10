@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Forced command for the owner's backup-copy key, installed as /usr/local/sbin/acs-backup-pull (0755).
+# ~acsbackup/.ssh/authorized_keys:
+#   restrict,command="/usr/local/sbin/acs-backup-pull" ssh-ed25519 AAAA... acs-offsite-pull
+# The key can only list and read the encrypted dumps: no shell, no forwarding, no writes except the
+# timestamp that tells the self-check when the laptop last fetched a copy.
+set -euo pipefail
+
+OFFSITE_DIR=${OFFSITE_DIR:-/var/backups/ai-commerce-studio/offsite}
+STAMP=${STAMP:-/var/lib/acs-offsite/last-pull}
+
+command=${SSH_ORIGINAL_COMMAND:-}
+if [[ $command == list ]]; then
+  find "$OFFSITE_DIR" -maxdepth 1 -type f -name 'acs-*.dump.gpg' -printf '%f %s\n' | sort
+  exit 0
+fi
+if [[ $command =~ ^get\ (acs-[0-9]{8}-[0-9]{6}\.dump\.gpg)$ ]]; then
+  file="$OFFSITE_DIR/${BASH_REMATCH[1]}"
+  [ -f "$file" ] || { echo "no such file" >&2; exit 66; }
+  cat "$file"
+  exit 0
+fi
+if [[ $command == done ]]; then
+  touch "$STAMP"
+  exit 0
+fi
+echo "command not allowed" >&2
+exit 126

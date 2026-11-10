@@ -16,6 +16,9 @@ Visitor ─► Cloudflare ─► Caddy (host, 443) ─► 127.0.0.1:3000 web ─
 | `acs-deploy-gate` | `/usr/local/sbin/acs-deploy-gate` (root, `0755`) |
 | `../backup-db.sh` | `/opt/ai-commerce-studio/backup-db.sh` |
 | `acs-selfcheck` | `/usr/local/sbin/acs-selfcheck` (root, `0755`) |
+| `acs-backup-encrypt` | `/usr/local/sbin/acs-backup-encrypt` (root, `0755`) |
+| `acs-backup-pull` | `/usr/local/sbin/acs-backup-pull` (root, `0755`) |
+| `systemd/acs-backup.service.d/offsite.conf` | `/etc/systemd/system/acs-backup.service.d/offsite.conf` |
 | `../reverse-proxy/Caddyfile.cloudflare` | `/etc/caddy/Caddyfile` |
 
 ## Releases
@@ -87,7 +90,26 @@ destination provider itself can bounce, so test from a different provider.
 
 `systemd/` holds the timers, installed in `/etc/systemd/system`: database backup at 02:15 UTC and the
 retention job at 02:30 UTC. Dumps stay in `/var/backups/ai-commerce-studio` (14 kept). A restore into
-an isolated container was verified on 2026-11-04. There is no off-site copy yet **(owner: storage)**.
+an isolated container was verified on 2026-11-04.
+
+Off-site copy (encrypted, to the owner's laptop and OneDrive):
+
+1. On the laptop: `scripts/install-offsite-backup.ps1` (GnuPG key pair, pull key, daily task).
+2. On the server, as root:
+   ```
+   apt-get install -y gnupg
+   install -d -m 0755 /etc/acs-backup && install -m 0644 offsite.pub.asc /etc/acs-backup/offsite.pub.asc
+   useradd --system --create-home --shell /usr/sbin/nologin acsbackup
+   install -d -m 0750 -o root -g acsbackup /var/backups/ai-commerce-studio/offsite
+   install -d -m 0755 -o acsbackup -g acsbackup /var/lib/acs-offsite
+   install -d -m 0700 -o acsbackup -g acsbackup ~acsbackup/.ssh
+   echo 'restrict,command="/usr/local/sbin/acs-backup-pull" <acs_backup_pull.pub>' > ~acsbackup/.ssh/authorized_keys
+   chown acsbackup:acsbackup ~acsbackup/.ssh/authorized_keys && chmod 0600 ~acsbackup/.ssh/authorized_keys
+   ```
+   then install the two scripts and the drop-in, `systemctl daemon-reload`, and run
+   `systemctl start acs-backup` once to produce the first encrypted copy.
+3. `/var/backups/ai-commerce-studio` itself must stay `0750` or tighter for others: `acsbackup` reaches
+   only the `offsite` directory (group), never the plain dumps.
 
 ## Monitoring
 

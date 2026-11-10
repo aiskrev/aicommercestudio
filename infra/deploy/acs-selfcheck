@@ -39,6 +39,18 @@ else
   fi
 fi
 
+# Off-site copy: once the owner's laptop has fetched a copy (acs-backup-pull writes the stamp), it must
+# keep doing so. Laptops sleep and travel, so the limit is generous.
+OFFSITE_STAMP=${OFFSITE_STAMP:-/var/lib/acs-offsite/last-pull}
+OFFSITE_MAX_AGE_HOURS=${OFFSITE_MAX_AGE_HOURS:-72}
+if [ -f "$OFFSITE_STAMP" ]; then
+  pulled_hours=$(( ($(date +%s) - $(stat -c %Y "$OFFSITE_STAMP")) / 3600 ))
+  if [ "$pulled_hours" -ge "$OFFSITE_MAX_AGE_HOURS" ]; then
+    echo "offsite: last copy fetched ${pulled_hours} h ago (limit ${OFFSITE_MAX_AGE_HOURS} h)"
+    failed+=("offsite")
+  fi
+fi
+
 # Scheduled jobs: none of them may be in the failed state.
 for unit in $UNITS; do
   if [ "$(systemctl is-failed "$unit" 2>/dev/null || true)" = "failed" ]; then
