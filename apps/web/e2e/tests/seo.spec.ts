@@ -69,7 +69,7 @@ test("case study pages do not exist until a verified case study is published", a
 
 test("quote CTAs open the quote form for the right service", async ({ page }) => {
   await page.goto("/bg/uslugi/seo-optimizatsiya");
-  await page.getByRole("link", { name: "Поискай оферта" }).first().click();
+  await page.getByRole("link", { name: "Поискайте оферта" }).first().click();
   await expect(page).toHaveURL(/\/kontakti\?usluga=seo&tip=oferta/);
   await expect(page.getByRole("radio", { name: /Заявка за оферта/ })).toBeChecked();
   await expect(page.getByLabel(/Услуга/)).toHaveValue("seo");

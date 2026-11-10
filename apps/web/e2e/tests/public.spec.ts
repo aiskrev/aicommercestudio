@@ -5,7 +5,7 @@ test.describe("public website", () => {
     const response = await page.goto("/bg");
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(/A\.I\. Commerce Studio/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Превръщаме AI");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Изграждаме AI");
     const hero = page.locator("main").getByRole("link", { name: "Заявете консултация" }).first();
     await expect(hero).toHaveAttribute("href", "/bg/kontakti");
     await expect(page.getByRole("link", { name: "Оценете AI готовността си" })).toHaveAttribute("href", "/bg/ai-automation-advisor");

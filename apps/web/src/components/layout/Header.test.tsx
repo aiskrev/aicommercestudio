@@ -25,7 +25,7 @@ const props = {
   services: navigation.services,
   entries: navigation.entries,
   cta: { href: "/bg/kontakti", label: "Заявете консултация" },
-  labels: { nav: "Основна навигация", openMenu: "Отворете менюто", closeMenu: "Затвори менюто" },
+  labels: { nav: "Основна навигация", openMenu: "Отворете менюто", closeMenu: "Затворете менюто" },
   locale: "bg" as const,
   slugs: buildSlugMap(),
   languageLabels: bg.language,
@@ -82,7 +82,7 @@ describe("Header", () => {
     const toggle = screen.getByRole("button", { name: "Отворете менюто" });
     await user.click(toggle);
 
-    expect(screen.getByRole("button", { name: "Затвори менюто" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: "Затворете менюто" })).toHaveAttribute("aria-expanded", "true");
     expect(document.body.style.overflow).toBe("hidden");
     // The first control is the Services group, open because the current page is a service page.
     expect(document.activeElement).toHaveTextContent("Услуги");
@@ -152,7 +152,7 @@ describe("Header", () => {
     const desktop = screen.getAllByRole("navigation", { name: "Основна навигация" })[0];
     const desktopHrefs = new Set(Array.from(desktop.querySelectorAll("a")).map((a) => a.getAttribute("href")));
     await user.click(screen.getByRole("button", { name: "Отворете менюто" }));
-    const sheet = document.getElementById(screen.getByRole("button", { name: "Затвори менюто" }).getAttribute("aria-controls")!)!;
+    const sheet = document.getElementById(screen.getByRole("button", { name: "Затворете менюто" }).getAttribute("aria-controls")!)!;
     const mobileHrefs = new Set(Array.from(sheet.querySelectorAll("a")).map((a) => a.getAttribute("href")));
     for (const href of PREVIOUS_DESTINATIONS) {
       expect(desktopHrefs.has(href) || href === "/bg/kontakti", `desktop ${href}`).toBe(true);

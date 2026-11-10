@@ -103,7 +103,7 @@ test.describe("language switcher", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/bg/uslugi");
     await page.getByRole("button", { name: "Отворете менюто" }).click();
-    const close = page.getByRole("button", { name: "Затвори менюто" });
+    const close = page.getByRole("button", { name: "Затворете менюто" });
     const panel = page.locator(`[id="${await close.getAttribute("aria-controls")}"]`);
     await panel.getByRole("link", { name: "Switch to English" }).click();
     await expect(page).toHaveURL(/\/en\/services$/);
