@@ -284,7 +284,7 @@ export function DomainHub({
 
       <CtaBand
         title={domain.cta}
-        lead={labels.ctaLead}
+        lead={domain.ctaLead ?? labels.ctaLead}
         primary={{ href: contactHref, label: dict.nav.cta }}
         points={dict.cta.points}
       />
