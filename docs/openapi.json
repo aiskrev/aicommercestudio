@@ -6021,7 +6021,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Summary"
+                  "$ref": "#/components/schemas/app__ops__observability__Summary"
                 }
               }
             }
@@ -9925,6 +9925,140 @@
           }
         }
       }
+    },
+    "/api/public/analytics": {
+      "post": {
+        "tags": [
+          "analytics"
+        ],
+        "summary": "Collect",
+        "description": "Stores a few anonymous events. Answers `enabled: false` while statistics are switched off, so the\nbrowser can stop sending. A visitor who sends Do Not Track or Global Privacy Control, a robot and a signed-in\nstaff member are answered the same way as everyone else but nothing is stored.",
+        "operationId": "collect_api_public_analytics_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CollectIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/analytics/summary": {
+      "get": {
+        "tags": [
+          "admin-analytics"
+        ],
+        "summary": "Analytics Summary",
+        "description": "Views, visits, clicks, top pages, referrers and devices for the last `days` days (Sofia time).",
+        "operationId": "analytics_summary_api_admin_analytics_summary_get",
+        "parameters": [
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 180,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/app__analytics__schemas__Summary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/analytics/visits": {
+      "get": {
+        "tags": [
+          "admin-analytics"
+        ],
+        "summary": "Analytics Visits",
+        "description": "The latest visits of today as anonymous paths: which pages one visitor opened and what they clicked.\nThe visit id is a short part of a hash that changes every day; it identifies nobody.",
+        "operationId": "analytics_visits_api_admin_analytics_visits_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VisitsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -12987,6 +13121,41 @@
         ],
         "title": "ClassifiedOpportunity"
       },
+      "ClickRow": {
+        "properties": {
+          "page": {
+            "type": "string",
+            "title": "Page"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "clicks": {
+            "type": "integer",
+            "title": "Clicks"
+          }
+        },
+        "type": "object",
+        "required": [
+          "page",
+          "label",
+          "target",
+          "clicks"
+        ],
+        "title": "ClickRow"
+      },
       "CodeIn": {
         "properties": {
           "code": {
@@ -13002,6 +13171,37 @@
           "code"
         ],
         "title": "CodeIn"
+      },
+      "CollectIn": {
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/EventIn"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "events"
+        ],
+        "title": "CollectIn"
+      },
+      "CollectOut": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "title": "CollectOut"
       },
       "Commercial": {
         "properties": {
@@ -13188,6 +13388,24 @@
           "message"
         ],
         "title": "ConsultationOut"
+      },
+      "CountRow": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "count"
+        ],
+        "title": "CountRow"
       },
       "Dashboard": {
         "properties": {
@@ -13513,6 +13731,30 @@
           "locked_at"
         ],
         "title": "DatasetOut"
+      },
+      "DayPoint": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "views": {
+            "type": "integer",
+            "title": "Views"
+          },
+          "visits": {
+            "type": "integer",
+            "title": "Visits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "views",
+          "visits"
+        ],
+        "title": "DayPoint"
       },
       "DimensionScoreOut": {
         "properties": {
@@ -14581,6 +14823,75 @@
           "freshness"
         ],
         "title": "Evaluation"
+      },
+      "EventIn": {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "view",
+              "click",
+              "tool"
+            ],
+            "title": "Type"
+          },
+          "path": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Path"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "bg",
+              "en"
+            ],
+            "title": "Locale"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 300
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          },
+          "referrer": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referrer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "type",
+          "path",
+          "locale"
+        ],
+        "title": "EventIn"
       },
       "EventKind": {
         "type": "string",
@@ -18127,6 +18438,29 @@
           "agents_by_status"
         ],
         "title": "OverviewOut"
+      },
+      "PageRow": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "views": {
+            "type": "integer",
+            "title": "Views"
+          },
+          "visits": {
+            "type": "integer",
+            "title": "Visits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "path",
+          "views",
+          "visits"
+        ],
+        "title": "PageRow"
       },
       "Parameters": {
         "properties": {
@@ -21865,50 +22199,6 @@
         ],
         "title": "StatusStep"
       },
-      "Summary": {
-        "properties": {
-          "period_days": {
-            "type": "integer",
-            "title": "Period Days"
-          },
-          "period_start": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Period Start"
-          },
-          "group_by": {
-            "type": "string",
-            "enum": [
-              "agent",
-              "workspace"
-            ],
-            "title": "Group By"
-          },
-          "groups": {
-            "items": {
-              "$ref": "#/components/schemas/Group"
-            },
-            "type": "array",
-            "title": "Groups"
-          },
-          "totals": {
-            "$ref": "#/components/schemas/Group"
-          },
-          "freshness": {
-            "$ref": "#/components/schemas/Freshness"
-          }
-        },
-        "type": "object",
-        "required": [
-          "period_days",
-          "period_start",
-          "group_by",
-          "groups",
-          "totals",
-          "freshness"
-        ],
-        "title": "Summary"
-      },
       "SupportIn": {
         "properties": {
           "kind": {
@@ -23678,6 +23968,130 @@
         "type": "object",
         "title": "VersionUpdate"
       },
+      "VisitEvent": {
+        "properties": {
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "view",
+              "click",
+              "tool"
+            ],
+            "title": "Kind"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target"
+          }
+        },
+        "type": "object",
+        "required": [
+          "at",
+          "kind",
+          "path",
+          "label",
+          "target"
+        ],
+        "title": "VisitEvent"
+      },
+      "VisitOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "started_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Started At"
+          },
+          "device": {
+            "type": "string",
+            "title": "Device"
+          },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
+          "referrer_host": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Referrer Host"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/VisitEvent"
+            },
+            "type": "array",
+            "title": "Events"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "started_at",
+          "device",
+          "locale",
+          "referrer_host",
+          "events"
+        ],
+        "title": "VisitOut"
+      },
+      "VisitsOut": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "format": "date",
+            "title": "Day"
+          },
+          "visits": {
+            "items": {
+              "$ref": "#/components/schemas/VisitOut"
+            },
+            "type": "array",
+            "title": "Visits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "day",
+          "visits"
+        ],
+        "title": "VisitsOut"
+      },
       "WorkflowStep": {
         "properties": {
           "title": {
@@ -23813,6 +24227,118 @@
           "mitigation"
         ],
         "title": "Risk"
+      },
+      "app__analytics__schemas__Summary": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "retention_days": {
+            "type": "integer",
+            "title": "Retention Days"
+          },
+          "days": {
+            "type": "integer",
+            "title": "Days"
+          },
+          "first_event_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Event At"
+          },
+          "views": {
+            "type": "integer",
+            "title": "Views"
+          },
+          "visits": {
+            "type": "integer",
+            "title": "Visits"
+          },
+          "clicks": {
+            "type": "integer",
+            "title": "Clicks"
+          },
+          "tool_events": {
+            "type": "integer",
+            "title": "Tool Events"
+          },
+          "daily": {
+            "items": {
+              "$ref": "#/components/schemas/DayPoint"
+            },
+            "type": "array",
+            "title": "Daily"
+          },
+          "top_pages": {
+            "items": {
+              "$ref": "#/components/schemas/PageRow"
+            },
+            "type": "array",
+            "title": "Top Pages"
+          },
+          "top_clicks": {
+            "items": {
+              "$ref": "#/components/schemas/ClickRow"
+            },
+            "type": "array",
+            "title": "Top Clicks"
+          },
+          "referrers": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "type": "array",
+            "title": "Referrers"
+          },
+          "devices": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "type": "array",
+            "title": "Devices"
+          },
+          "locales": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "type": "array",
+            "title": "Locales"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/CountRow"
+            },
+            "type": "array",
+            "title": "Tools"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled",
+          "retention_days",
+          "days",
+          "first_event_at",
+          "views",
+          "visits",
+          "clicks",
+          "tool_events",
+          "daily",
+          "top_pages",
+          "top_clicks",
+          "referrers",
+          "devices",
+          "locales",
+          "tools"
+        ],
+        "title": "Summary"
       },
       "app__opportunities__schemas__Risk": {
         "properties": {
@@ -24028,6 +24554,50 @@
         ],
         "title": "RunIn",
         "description": "One execution record. Metadata and counters only — there is no field for prompt or output content."
+      },
+      "app__ops__observability__Summary": {
+        "properties": {
+          "period_days": {
+            "type": "integer",
+            "title": "Period Days"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period Start"
+          },
+          "group_by": {
+            "type": "string",
+            "enum": [
+              "agent",
+              "workspace"
+            ],
+            "title": "Group By"
+          },
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/Group"
+            },
+            "type": "array",
+            "title": "Groups"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/Group"
+          },
+          "freshness": {
+            "$ref": "#/components/schemas/Freshness"
+          }
+        },
+        "type": "object",
+        "required": [
+          "period_days",
+          "period_start",
+          "group_by",
+          "groups",
+          "totals",
+          "freshness"
+        ],
+        "title": "Summary"
       },
       "app__ops__registry__VersionCreate": {
         "properties": {

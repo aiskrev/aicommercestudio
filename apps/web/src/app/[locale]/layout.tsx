@@ -3,6 +3,7 @@ import "../globals.css";
 import type { Metadata, Viewport } from "next";
 
 import { fontVariables } from "@/lib/fonts";
+import { SiteTracker } from "@/components/analytics/SiteTracker";
 import { CookieNotice } from "@/components/layout/CookieNotice";
 import { Footer } from "@/components/layout/Footer";
 import { StickyQuoteBar } from "@/components/editorial/StickyQuoteBar";
@@ -73,6 +74,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         </main>
         <Footer locale={locale} dict={dict} />
         <CookieNotice labels={dict.cookieNotice} href={href(routes.cookies)} />
+        <SiteTracker locale={locale} />
         <StickyQuoteBar
           href={href(`${routes.contact}?tip=oferta`)}
           label={dict.quoteBar.label}
