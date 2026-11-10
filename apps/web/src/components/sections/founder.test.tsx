@@ -38,7 +38,7 @@ describe("founder content", () => {
     expect([en.profile.primaryCta, en.profile.secondaryCta]).toEqual(["Explore Our Services", "Request a Consultation"]);
     expect(en.profile.closing).toEqual(["Strategy grounded in engineering.", "Architecture designed for operations.", "AI built for real business."]);
     expect(en.contactCta.heading).toBe("Discuss Your Next Initiative");
-    expect(bg.contactCta.heading).toBe("Нека обсъдим следващата Ви инициатива");
+    expect(bg.contactCta.heading).toBe("Нека обсъдим проекта ви");
   });
 
   it("keeps both languages aligned and free of cross-language leakage", () => {

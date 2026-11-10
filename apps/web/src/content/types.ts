@@ -112,6 +112,8 @@ export interface DomainContent {
   prerequisites: string[];
   limitations: string[];
   cta: string;
+  /** Optional sentence under the call to action; the shared one is used when it is missing. */
+  ctaLead?: string;
   metaTitle: string;
   metaDescription: string;
   /** Optional one-sentence, domain-specific reference to the founder (links to the profile). */
