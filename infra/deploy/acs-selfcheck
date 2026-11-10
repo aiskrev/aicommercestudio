@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# Host self-check, installed as /usr/local/sbin/acs-selfcheck (root:root, 0755) and run every 15 minutes
+# by acs-selfcheck.timer. It checks what the public health endpoint cannot see and writes the result to
+# /var/lib/acs-selfcheck/status.json, which the API reads (read-only mount) and reports in
+# /api/health/ready as "host": "ok" | "degraded" | "stale". The public answer carries no details: the
+# reasons are in the journal (`journalctl -u acs-selfcheck`). The uptime workflow alerts on anything but "ok".
+set -euo pipefail
+
+STATE_DIR=${STATE_DIR:-/var/lib/acs-selfcheck}
+BACKUP_DIR=${BACKUP_DIR:-/var/backups/ai-commerce-studio}
+DISK_MAX_PERCENT=${DISK_MAX_PERCENT:-85}
+BACKUP_MAX_AGE_HOURS=${BACKUP_MAX_AGE_HOURS:-26}
+UNITS=${UNITS:-"acs-backup.service acs-maintenance.service acs-outbox.service"}
+CONTAINERS=${CONTAINERS:-"api web db"}
+PROJECT=${PROJECT:-ai-commerce-studio}
+
+failed=()
+
+# Disk: the root filesystem and the Docker data directory.
+for path in / /var/lib/docker; do
+  [ -d "$path" ] || continue
+  used=$(df --output=pcent "$path" | tail -n 1 | tr -dc '0-9')
+  if [ "${used:-0}" -ge "$DISK_MAX_PERCENT" ]; then
+    echo "disk: $path is ${used}% full (limit ${DISK_MAX_PERCENT}%)"
+    failed+=("disk")
+  fi
+done
+
+# Backup: the newest verified dump must be recent.
+newest=$(find "$BACKUP_DIR" -maxdepth 1 -name 'acs-*.dump' -type f -printf '%T@\n' 2>/dev/null | sort -n | tail -n 1)
+if [ -z "$newest" ]; then
+  echo "backup: no dump in $BACKUP_DIR"
+  failed+=("backup")
+else
+  age_hours=$(( ($(date +%s) - ${newest%.*}) / 3600 ))
+  if [ "$age_hours" -ge "$BACKUP_MAX_AGE_HOURS" ]; then
+    echo "backup: newest dump is ${age_hours} h old (limit ${BACKUP_MAX_AGE_HOURS} h)"
+    failed+=("backup")
+  fi
+fi
+
+# Scheduled jobs: none of them may be in the failed state.
+for unit in $UNITS; do
+  if [ "$(systemctl is-failed "$unit" 2>/dev/null || true)" = "failed" ]; then
+    echo "unit: $unit failed"
+    failed+=("units")
+  fi
+done
+
+# Containers: running and, where they have a health check, healthy.
+for service in $CONTAINERS; do
+  id=$(docker ps -q --filter "label=com.docker.compose.project=$PROJECT" --filter "label=com.docker.compose.service=$service")
+  if [ -z "$id" ]; then
+    echo "container: $service is not running"
+    failed+=("containers")
+    continue
+  fi
+  health=$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "$id")
+  if [ "$health" != "healthy" ] && [ "$health" != "none" ]; then
+    echo "container: $service is $health"
+    failed+=("containers")
+  fi
+done
+
+ok=true
+[ ${#failed[@]} -eq 0 ] || ok=false
+umask 022
+mkdir -p "$STATE_DIR"
+tmp=$(mktemp "$STATE_DIR/.status.XXXXXX")
+printf '{"checked_at": %s, "ok": %s}\n' "$(date +%s)" "$ok" > "$tmp"
+chmod 0644 "$tmp"
+mv -f "$tmp" "$STATE_DIR/status.json"
+
+if [ "$ok" = true ]; then
+  echo "self-check ok"
+else
+  echo "self-check FAILED: $(printf '%s\n' "${failed[@]}" | sort -u | paste -sd, -)"
+fi
