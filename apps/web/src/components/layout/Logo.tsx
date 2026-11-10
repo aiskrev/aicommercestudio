@@ -1,6 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
 
+import { HomeLink } from "@/components/layout/HomeLink";
 import logoMark from "@/assets/brand/logo-mark.webp";
 import { getDictionary } from "@/i18n";
 import { defaultLocale, splitLocale } from "@/i18n/config";
@@ -13,7 +13,7 @@ export function LogoMark({ className = "h-8 w-8" }: { className?: string }) {
 
 export function Logo({ href }: { href: string }) {
   return (
-    <Link
+    <HomeLink
       href={href}
       className="group inline-flex shrink-0 items-center gap-2.5"
       aria-label={`${site.name} — ${getDictionary(splitLocale(href)?.locale ?? defaultLocale).ui.logoHome}`}
@@ -22,6 +22,6 @@ export function Logo({ href }: { href: string }) {
       <span className="whitespace-nowrap font-display text-body-sm font-semibold tracking-tight text-fg">
         A.I. Commerce <span className="logo-gradient-text">Studio</span>
       </span>
-    </Link>
+    </HomeLink>
   );
 }
