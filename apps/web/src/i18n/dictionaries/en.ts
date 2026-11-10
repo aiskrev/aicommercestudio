@@ -429,6 +429,7 @@ export const en: Dictionary = {
     switchTo: { bg: "Превключи на български", en: "Switch to English" },
     current: "Current language",
   },
+  accountEntry: { signIn: "Sign in", createAccount: "Create account" },
   validation: {
     required: "This field is required.",
     selectAtLeastOne: "Select at least one option.",

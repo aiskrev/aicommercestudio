@@ -1,5 +1,7 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
+import { AccountLinks } from "@/components/layout/AccountEntry";
 import { Logo } from "@/components/layout/Logo";
 import { ContactDetails } from "@/components/sections/ContactDetails";
 import { ButtonLink, Container } from "@/components/ui/primitives";
@@ -65,7 +67,19 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <FooterColumn title={dict.nav.servicesAi} links={serviceLinks(AI_SERVICE_NAV)} />
         <FooterColumn title={dict.nav.servicesFoundation} links={[...serviceLinks(FOUNDATION_SERVICE_NAV), { href: href(routes.services), label: dict.common.allServices }]} />
         <FooterColumn title={dict.footer.resources} links={resources} />
-        <FooterColumn title={dict.footer.company} links={company} />
+        <FooterColumn
+          title={dict.footer.company}
+          links={company}
+          extra={
+            <AccountLinks
+              variant="footer"
+              links={{
+                signIn: { href: href(routes.accountSignIn), label: dict.accountEntry.signIn },
+                register: { href: href(routes.accountRegister), label: dict.accountEntry.createAccount },
+              }}
+            />
+          }
+        />
         <div>
           <FooterColumn title={dict.footer.legal} links={legal} />
         </div>
@@ -85,10 +99,13 @@ function FooterColumn({
   title,
   links,
   columns = 1,
+  extra,
 }: {
   title: string;
   links: { href: string; label: string }[];
   columns?: 1 | 2;
+  /** Extra list items rendered after the links (they appear only when their own condition holds). */
+  extra?: ReactNode;
 }) {
   return (
     <div>
@@ -101,6 +118,7 @@ function FooterColumn({
             </Link>
           </li>
         ))}
+        {extra}
       </ul>
     </div>
   );

@@ -427,6 +427,7 @@ export const bg = {
     switchTo: { bg: "Превключи на български", en: "Switch to English" },
     current: "Текущ език",
   },
+  accountEntry: { signIn: "Вход", createAccount: "Създайте акаунт" },
   validation: {
     required: "Полето е задължително.",
     selectAtLeastOne: "Изберете поне една възможност.",
