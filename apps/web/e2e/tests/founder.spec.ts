@@ -14,7 +14,7 @@ const LOCALES = [
     services: { label: "Разгледайте услугите", path: "/bg/uslugi" },
     consult: { label: "Заявете консултация", path: "/bg/kontakti" },
     closing: "AI, създаден за реалния бизнес.",
-    contactHeading: "Нека обсъдим следващата Ви инициатива",
+    contactHeading: "Нека обсъдим проекта ви",
     call: "Обадете се на +359 882 377 753",
     phoneLabel: "Телефон",
     emailLabel: "Имейл",
