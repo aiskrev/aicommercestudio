@@ -200,9 +200,9 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
       expect(content.legal.isDraft).toBe(false);
       expect(content.legal.cookiesDraft).toBe(false);
       for (const path of [routes.privacy, routes.terms, routes.cookies]) expect(sitemapPaths).toContain(url(path));
-      // The subscription terms are a draft until a lawyer has read them: not listed.
-      expect(content.legal.subscriptionDraft).toBe(true);
-      expect(sitemapPaths).not.toContain(url(routes.subscriptionTerms));
+      // The subscription terms were reviewed by a lawyer: listed too.
+      expect(content.legal.subscriptionDraft).toBe(false);
+      expect(sitemapPaths).toContain(url(routes.subscriptionTerms));
       for (const category of content.editorialCategories) {
         const path = url(routes.insightsCategory(category.slug));
         if (isIndexableCategory(locale, category.key)) expect(sitemapPaths).toContain(path);
