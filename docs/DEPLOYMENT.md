@@ -106,7 +106,9 @@ Verify after go-live: `curl -I https://example.bg` (HSTS, CSP, `X-Frame-Options:
 | --- | --- |
 | Method | `infra/backup-db.sh`: `pg_dump --format=custom`, verified with `pg_restore --list`, private directory (`umask 077`) |
 | Schedule | daily 02:15 UTC via cron (`15 2 * * * cd /opt/ai-commerce-studio && ./infra/backup-db.sh >> /var/log/acs-backup.log 2>&1`) and before every deployment |
-| Retention | 14 daily dumps on the server (`KEEP=14`); encrypted off-site copy (`OFFSITE_CMD`, e.g. restic/rclone to an EU object store) with 30 daily + 6 monthly **(owner: storage provider)** |
+| Retention | 14 daily dumps on the server (`KEEP=14`) |
+| Off-site copy | After each verified dump `acs-backup-encrypt` (`OFFSITE_CMD`) encrypts it with GnuPG to the owner's public key into `/var/backups/ai-commerce-studio/offsite` (14 kept). The owner's laptop fetches the encrypted files daily into `OneDrive\ACS-backups` (30 kept) with a key that can only list and read them (`acs-backup-pull`, user `acsbackup`). Only the laptop holds the private key (`~/.acs-backup/gnupg`); keep its exported copy offline. The self-check alerts when no copy was fetched for 72 h. Set-up: `scripts/install-offsite-backup.ps1` on the laptop, server steps in `infra/deploy/README.md` |
+| Restore from OneDrive | Git Bash: `GNUPGHOME=~/.acs-backup/gnupg gpg -d acs-<date>.dump.gpg > acs-<date>.dump` (or import `PRIVATE-KEY-BACKUP.asc` on a new machine first), then the restore steps below |
 | RPO / RTO | up to 24 h of data loss / about 1 h to restore on a fresh server |
 | Restore | `docker compose stop web api` → copy the dump into the db container → `dropdb --force` + `createdb` + `pg_restore --no-owner --exit-on-error` → `docker compose up -d api web` (the same steps as `scripts/restore-db.ps1`, verified locally) |
 | Test | restore the latest dump into a staging copy once a month and record the result |
@@ -169,5 +171,4 @@ Each release:
 
 ## 10. Not covered / to decide
 
-* Off-site storage for the backups **(owner)**.
 * Real e-mail sending (SMTP) and the Anthropic provider remain disabled until configured and approved.

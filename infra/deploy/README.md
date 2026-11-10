@@ -16,6 +16,9 @@ Visitor ─► Cloudflare ─► Caddy (host, 443) ─► 127.0.0.1:3000 web ─
 | `acs-deploy-gate` | `/usr/local/sbin/acs-deploy-gate` (root, `0755`) |
 | `../backup-db.sh` | `/opt/ai-commerce-studio/backup-db.sh` |
 | `acs-selfcheck` | `/usr/local/sbin/acs-selfcheck` (root, `0755`) |
+| `acs-backup-encrypt` | `/usr/local/sbin/acs-backup-encrypt` (root, `0755`) |
+| `acs-backup-pull` | `/usr/local/sbin/acs-backup-pull` (root, `0755`) |
+| `systemd/acs-backup.service.d/offsite.conf` | `/etc/systemd/system/acs-backup.service.d/offsite.conf` |
 | `../reverse-proxy/Caddyfile.cloudflare` | `/etc/caddy/Caddyfile` |
 
 ## Releases
@@ -87,7 +90,29 @@ destination provider itself can bounce, so test from a different provider.
 
 `systemd/` holds the timers, installed in `/etc/systemd/system`: database backup at 02:15 UTC and the
 retention job at 02:30 UTC. Dumps stay in `/var/backups/ai-commerce-studio` (14 kept). A restore into
-an isolated container was verified on 2026-11-04. There is no off-site copy yet **(owner: storage)**.
+an isolated container was verified on 2026-11-04.
+
+Off-site copy (encrypted, to the owner's laptop and OneDrive):
+
+1. On the laptop: `scripts/install-offsite-backup.ps1` (GnuPG key pair, pull key, daily task).
+2. On the server, as root:
+   ```
+   apt-get install -y gnupg
+   install -d -m 0755 /etc/acs-backup && install -m 0644 offsite.pub.asc /etc/acs-backup/offsite.pub.asc
+   # A real shell is needed for the forced command to run; the key can still run only acs-backup-pull.
+   useradd --system --create-home --shell /bin/sh acsbackup
+   chgrp acsbackup /var/backups/ai-commerce-studio && chmod 0710 /var/backups/ai-commerce-studio
+   install -d -m 0750 -o root -g acsbackup /var/backups/ai-commerce-studio/offsite
+   install -d -m 0755 -o acsbackup -g acsbackup /var/lib/acs-offsite
+   install -d -m 0700 -o acsbackup -g acsbackup ~acsbackup/.ssh
+   echo 'restrict,command="/usr/local/sbin/acs-backup-pull" <acs_backup_pull.pub>' > ~acsbackup/.ssh/authorized_keys
+   chown acsbackup:acsbackup ~acsbackup/.ssh/authorized_keys && chmod 0600 ~acsbackup/.ssh/authorized_keys
+   ```
+   then install the two scripts and the drop-in, `systemctl daemon-reload`, and run
+   `systemctl start acs-backup` once to produce the first encrypted copy.
+3. `/var/backups/ai-commerce-studio` is `0710 root:acsbackup`: `acsbackup` can pass through it but not
+   list it, and the plain dumps stay `0600 root`. It reaches only the `offsite` directory.
+4. Installed on the server on 2026-11-10; the first copy was fetched and decrypted on the laptop.
 
 ## Monitoring
 
@@ -127,6 +152,11 @@ Switching on is a production change: it needs the owner's approval and a backup 
    `select usename from pg_stat_activity where application_name = '' and usename = 'acs_app_api'` shows the API.
 
 To go back: remove the two lines from `.env` and restart the API. Nothing else changes.
+
+Switched on in production on 2026-11-10 (release `sha-7f0bf95`): backup, `db-api-role`, a test login,
+then the restart. `pg_stat_activity` shows the API only as `acs_app_api`; the maintenance timer runs
+as the owner in the `migrate` image and succeeded afterwards. Staff MFA is required there
+(`ADMIN_MFA_REQUIRED=true`) and every staff account has it.
 
 `python -m app.cli` commands that manage data run as the owner: use
 `docker compose --profile migrate run --rm -T migrate python -m app.cli <command>`, not `exec api`.
