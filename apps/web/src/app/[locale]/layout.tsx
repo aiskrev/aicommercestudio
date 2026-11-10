@@ -57,6 +57,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           cta={{ href: href(routes.contact), label: dict.nav.cta }}
           locale={locale}
           slugs={buildSlugMap()}
+          searchLabels={dict.search}
           languageLabels={dict.language}
           account={{
             signIn: { href: href(routes.accountSignIn), label: dict.accountEntry.signIn },

@@ -6,6 +6,7 @@ import { type ComponentProps, type KeyboardEvent, type ReactNode, useEffect, use
 import { AccountLinks, type AccountLinksData } from "@/components/layout/AccountEntry";
 import { LanguageSwitcher, type LanguageSwitcherLabels } from "@/components/layout/LanguageSwitcher";
 import { Logo } from "@/components/layout/Logo";
+import { type SearchLabels, SiteSearch } from "@/components/layout/SiteSearch";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClass, Container, cx } from "@/components/ui/primitives";
 import type { Locale, SlugMap } from "@/i18n/config";
@@ -65,6 +66,7 @@ export function Header({
   labels,
   locale,
   slugs,
+  searchLabels,
   languageLabels,
   account,
 }: {
@@ -75,6 +77,8 @@ export function Header({
   labels: Labels;
   locale: Locale;
   slugs: SlugMap;
+  /** Search box (button + dialog); left out where the header is rendered without it. */
+  searchLabels?: SearchLabels;
   languageLabels: LanguageSwitcherLabels;
   /** Sign-in and sign-up links; shown only while customer accounts are switched on. */
   account?: AccountLinksData;
@@ -350,6 +354,7 @@ export function Header({
           </nav>
 
           <div className="flex items-center gap-3">
+            {searchLabels && <SiteSearch locale={locale} labels={searchLabels} />}
             <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="hidden lg:block" />
             {account && <AccountLinks links={account} variant="header" />}
             <div className="hidden sm:block lg:hidden xl:block">
