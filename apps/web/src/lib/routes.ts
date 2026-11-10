@@ -30,6 +30,7 @@ export const routes = {
   privacy: "/poveritelnost",
   cookies: "/biskvitki",
   terms: "/obshti-usloviya",
+  subscriptionTerms: "/usloviya-za-abonament",
   account: "/konto",
   accountRegister: "/konto/registratsiya",
   accountSignIn: "/konto/vhod",

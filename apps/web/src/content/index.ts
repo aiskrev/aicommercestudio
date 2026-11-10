@@ -11,6 +11,9 @@ import {
   LEGAL_TEXTS_ARE_DRAFTS,
   legalDraftNotice,
   privacyPolicy,
+  SUBSCRIPTION_TERMS_ARE_DRAFT,
+  subscriptionTerms,
+  subscriptionTermsDraftNotice,
   termsOfUse,
 } from "@/content/bg/legal";
 import { about, aiSolutions, industries, processPage, servicesPage, toolsPage } from "@/content/bg/pages";
@@ -38,6 +41,8 @@ import {
   cookiePolicy as enCookiePolicy,
   legalDraftNotice as enLegalDraftNotice,
   privacyPolicy as enPrivacyPolicy,
+  subscriptionTerms as enSubscriptionTerms,
+  subscriptionTermsDraftNotice as enSubscriptionTermsDraftNotice,
   termsOfUse as enTermsOfUse,
 } from "@/content/en/legal";
 import {
@@ -102,9 +107,12 @@ const bg = {
     privacyPolicy,
     cookiePolicy,
     termsOfUse,
+    subscriptionTerms,
     draftNotice: legalDraftNotice,
     isDraft: LEGAL_TEXTS_ARE_DRAFTS,
     cookiesDraft: COOKIE_POLICY_IS_DRAFT,
+    subscriptionDraft: SUBSCRIPTION_TERMS_ARE_DRAFT,
+    subscriptionDraftNotice: subscriptionTermsDraftNotice,
   },
 };
 
@@ -147,9 +155,12 @@ const en: SiteContent = {
     privacyPolicy: enPrivacyPolicy,
     cookiePolicy: enCookiePolicy,
     termsOfUse: enTermsOfUse,
+    subscriptionTerms: enSubscriptionTerms,
     draftNotice: enLegalDraftNotice,
     isDraft: LEGAL_TEXTS_ARE_DRAFTS,
     cookiesDraft: COOKIE_POLICY_IS_DRAFT,
+    subscriptionDraft: SUBSCRIPTION_TERMS_ARE_DRAFT,
+    subscriptionDraftNotice: enSubscriptionTermsDraftNotice,
   },
 };
 

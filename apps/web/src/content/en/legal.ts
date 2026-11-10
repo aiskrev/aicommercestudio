@@ -208,3 +208,114 @@ export const termsOfUse: LegalDocument = {
     },
   ],
 };
+
+export { SUBSCRIPTION_TERMS_ARE_DRAFT } from "@/content/bg/legal";
+
+export const subscriptionTermsDraftNotice =
+  "Draft: these terms have not yet been reviewed by a lawyer and do not apply until paid plans are released.";
+
+export const subscriptionTerms: LegalDocument = {
+  title: "Subscription and payment terms",
+  metaDescription:
+    "Terms for A.I. Commerce Studio paid plans: ordering, prices, payment, renewal, cancellation, withdrawal, refunds and invoices.",
+  updated: "2026-11-10",
+  intro:
+    "These terms govern paid plans and online payments in the A.I. Commerce Studio client area. They supplement the Terms of use and the Privacy policy. Services under an individual quote and contract are governed by that quote and contract.",
+  sections: [
+    {
+      heading: "1. Provider",
+      paragraphs: [
+        `“ISKREV CONSULTING” Ltd., UIC 207509557, registered office and address of management: bl. 457, entr. 1, fl. 13, apt. 75, Mladost 4 housing estate, Mladost district, 1715 Sofia, Bulgaria, email: ${company.contactEmail}, phone: ${company.phoneDisplay}.`,
+        "The company is not registered for VAT and does not charge VAT on its prices.",
+      ],
+    },
+    {
+      heading: "2. Subject and customers",
+      paragraphs: [
+        "Paid plans give access to additional features and higher limits in the client area workspace. The contents and limits of each plan are shown before ordering.",
+        "A customer may be a natural person (consumer) or a legal entity or sole trader (business customer). These terms do not limit consumers' rights under the Bulgarian Consumer Protection Act.",
+      ],
+    },
+    {
+      heading: "3. Ordering and conclusion of the contract",
+      paragraphs: [
+        "Orders are placed from a registered account with a confirmed email address. Before paying, the customer sees the plan, the price, the billing period and these terms, and accepts them expressly.",
+        "The contract is concluded when the payment provider confirms the payment. A confirmation is sent to the account's email address and is available in the client area.",
+        "Some services require the scope to be agreed first. They can be paid only after the scope has been agreed in writing.",
+      ],
+    },
+    {
+      heading: "4. Prices",
+      paragraphs: [
+        "Prices are shown in euro (EUR) before ordering and are final for the chosen period. The company is not registered for VAT and no VAT is charged.",
+        "Plan prices may change. A change does not affect a period already paid. Subscribers are told by email at least 30 days before a new price applies to their next period and may cancel before it does.",
+      ],
+    },
+    {
+      heading: "5. Payment",
+      paragraphs: [
+        "Payments are processed by Stripe Payments Europe Ltd. Card details are entered directly with Stripe and never reach us. The available methods (for example card, Apple Pay, Google Pay) depend on the device and browser and are shown at checkout.",
+        "Subscriptions are paid in advance at the start of each period.",
+      ],
+    },
+    {
+      heading: "6. Renewal, failed payments and cancellation",
+      paragraphs: [
+        "A subscription renews automatically for the same period (month or year) until it is cancelled. The amount for the new period is charged to the same payment method.",
+        "If a payment fails, the customer is notified and has 7 days to update the payment method. After that, paid features are suspended until a payment succeeds.",
+        "A subscription can be cancelled at any time in the client area. Cancellation takes effect at the end of the period already paid, and paid features remain available until then. An unused part of a period is not refunded unless the law requires it (section 7).",
+        "When a plan ends, no data is deleted: the workspace moves to the free plan, projects are kept, and results that need a paid plan are locked until it is renewed. Deleting an account and its data is covered by the Privacy policy.",
+      ],
+    },
+    {
+      heading: "7. Consumers' right of withdrawal",
+      paragraphs: [
+        "A consumer may withdraw from the contract without giving a reason within 14 days of its conclusion by sending a statement to the email address in section 1 or from the client area.",
+        "If the consumer expressly asked for the service to start before the 14 days end, a consumer who withdraws owes an amount proportionate to the use up to the withdrawal. Refunds are made to the same payment method within 14 days of receiving the withdrawal.",
+        "Business customers have no right of withdrawal under this section.",
+      ],
+    },
+    {
+      heading: "8. Refunds and disputed payments",
+      paragraphs: [
+        "Outside section 7, amounts paid are not refunded, except for incorrect charges or when the service was not provided through our fault. Such refunds are made to the same payment method and a credit note is issued.",
+        "Before disputing a payment with their bank, customers can contact us by email so that we can resolve the matter quickly.",
+      ],
+    },
+    {
+      heading: "9. Invoices",
+      paragraphs: [
+        "An electronic accounting document is issued for each payment, based on the billing details the customer enters in the client area. Documents are available there to the workspace owner and to users with the billing role.",
+        "The customer is responsible for the accuracy of the billing details. A change applies only to documents issued after it.",
+      ],
+    },
+    {
+      heading: "10. Use and limits",
+      paragraphs: [
+        "Each plan has monthly limits, shown in the client area. When a limit is reached, the feature stops until the next calendar month begins or until the customer moves to a higher plan.",
+        "Results generated with artificial intelligence are indicative and are not professional advice or a guarantee of any outcome.",
+        "We may suspend access in case of abuse, attempts to circumvent the limits or a breach of the system's security, telling the customer the reason.",
+      ],
+    },
+    {
+      heading: "11. Liability",
+      paragraphs: [
+        "Towards business customers, our liability for damage related to a paid plan is limited to the amount paid for the plan in the previous 12 months, except in cases of intent or gross negligence. Towards consumers, statutory liability applies.",
+      ],
+    },
+    {
+      heading: "12. Complaints and disputes",
+      paragraphs: [
+        "Complaints are sent to the email address in section 1. We reply within 14 days.",
+        "Consumers may also turn to the Bulgarian Commission for Consumer Protection (www.kzp.bg) and its conciliation committees for out-of-court dispute resolution.",
+        "Matters not covered here are governed by Bulgarian law. Disputes not settled by agreement are resolved by the competent Bulgarian court.",
+      ],
+    },
+    {
+      heading: "13. Changes to these terms",
+      paragraphs: [
+        "Subscribers are told about changes to these terms by email at least 30 days before they take effect. A subscriber who does not agree may cancel before that date.",
+      ],
+    },
+  ],
+};
