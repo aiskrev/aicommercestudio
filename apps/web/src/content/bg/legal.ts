@@ -221,11 +221,11 @@ export const termsOfUse: LegalDocument = {
 };
 
 /**
- * Terms for paid plans and online payments. Written on 2026-11-10 to match the billing code
- * (docs/STRIPE_BILLING.md, docs/INVOICING.md). Not yet read by a lawyer: while this is true the page is
- * noindex, out of the sitemap and shows the draft notice. Set it to false only after that review.
+ * Terms for paid plans and online payments, written on 2026-11-10 to match the billing code
+ * (docs/STRIPE_BILLING.md, docs/INVOICING.md). Reviewed by a lawyer and approved for publication by the
+ * owner (2026-11-10): indexed, in the sitemap and linked from the footer. A draft would be noindex.
  */
-export const SUBSCRIPTION_TERMS_ARE_DRAFT = true;
+export const SUBSCRIPTION_TERMS_ARE_DRAFT = false;
 
 export const subscriptionTermsDraftNotice =
   "Чернова: тези условия все още не са прегледани от юрист и не се прилагат, докато платените планове не бъдат пуснати.";

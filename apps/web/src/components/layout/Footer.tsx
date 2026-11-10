@@ -39,6 +39,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     { href: href(routes.privacy), label: dict.footer.privacy },
     { href: href(routes.cookies), label: dict.footer.cookies },
     { href: href(routes.terms), label: dict.footer.terms },
+    { href: href(routes.subscriptionTerms), label: dict.footer.subscriptionTerms },
   ];
 
   return (

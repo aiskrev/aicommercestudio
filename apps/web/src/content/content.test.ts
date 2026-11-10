@@ -101,9 +101,9 @@ describe.each(locales)("content integrity (%s)", (locale) => {
     expect(JSON.stringify(content.legal.privacyPolicy)).toContain(company.contactEmail);
   });
 
-  it("has subscription terms that match the billing rules and stay a draft until a lawyer reviews them", () => {
+  it("publishes the reviewed subscription terms, matching the billing rules", () => {
     const doc = content.legal.subscriptionTerms;
-    expect(content.legal.subscriptionDraft).toBe(true);
+    expect(content.legal.subscriptionDraft).toBe(false);
     expect(content.legal.subscriptionDraftNotice.length).toBeGreaterThan(20);
     expect(doc.sections).toHaveLength(13);
     const text = JSON.stringify(doc);

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Off-site step of the database backup, installed as /usr/local/sbin/acs-backup-encrypt (root:root, 0755)
+# and called by backup-db.sh through OFFSITE_CMD with the path of the new, verified dump.
+#
+# The dump is encrypted to the owner's public key (/etc/acs-backup/offsite.pub.asc). Only the owner's
+# laptop holds the private key, so the server, the copy channel and OneDrive see ciphertext only. The
+# encrypted copy goes to $OFFSITE_DIR, readable by the `acsbackup` user, whose forced SSH command
+# (acs-backup-pull) lets the laptop list and fetch those files and nothing else.
+set -euo pipefail
+
+src=${1:?usage: acs-backup-encrypt <dump file>}
+PUBKEY=${PUBKEY:-/etc/acs-backup/offsite.pub.asc}
+OFFSITE_DIR=${OFFSITE_DIR:-/var/backups/ai-commerce-studio/offsite}
+KEEP=${OFFSITE_KEEP:-14}
+GROUP=${OFFSITE_GROUP:-acsbackup}
+
+name=$(basename "$src")
+[[ $name =~ ^acs-[0-9]{8}-[0-9]{6}\.dump$ ]] || { echo "unexpected dump name: $name" >&2; exit 64; }
+
+umask 027
+install -d -m 0750 -o root -g "$GROUP" "$OFFSITE_DIR"
+gnupg_home=$(mktemp -d)
+trap 'rm -rf "$gnupg_home"' EXIT
+tmp="$OFFSITE_DIR/.$name.gpg.part"
+gpg --homedir "$gnupg_home" --batch --yes --quiet --trust-model always \
+  --recipient-file "$PUBKEY" --output "$tmp" --encrypt "$src"
+chgrp "$GROUP" "$tmp"
+chmod 0640 "$tmp"
+mv -f "$tmp" "$OFFSITE_DIR/$name.gpg"
+echo "$(date -u +%FT%TZ) off-site copy encrypted: $OFFSITE_DIR/$name.gpg"
+
+ls -1t "$OFFSITE_DIR"/acs-*.dump.gpg | tail -n +$((KEEP + 1)) | xargs -r rm -f
