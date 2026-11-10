@@ -154,7 +154,7 @@ test("mobile menu at 360px groups services and keeps keyboard focus inside", asy
   await page.goto("/bg");
   const toggle = page.getByRole("button", { name: "Отворете менюто" });
   await toggle.click();
-  const close = page.getByRole("button", { name: "Затвори менюто" });
+  const close = page.getByRole("button", { name: "Затворете менюто" });
   const panel = page.locator(`[id="${await close.getAttribute("aria-controls")}"]`);
   // Accordion groups in the header order; Services expands into the three bands.
   const services = panel.getByRole("button", { name: "Услуги" });

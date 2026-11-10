@@ -188,9 +188,9 @@ describe("SEO helpers", () => {
     }
   });
 
-  it("robots.txt blocks admin and API paths", () => {
+  it("robots.txt blocks admin, API and Cloudflare paths", () => {
     const rules = robots().rules;
     const rule = Array.isArray(rules) ? rules[0] : rules;
-    expect(rule.disallow).toEqual(expect.arrayContaining(["/admin", "/api/"]));
+    expect(rule.disallow).toEqual(expect.arrayContaining(["/admin", "/api/", "/cdn-cgi/"]));
   });
 });

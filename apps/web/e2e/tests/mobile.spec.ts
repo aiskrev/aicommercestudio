@@ -47,7 +47,7 @@ test("mobile menu opens, navigates and closes", async ({ page }) => {
   const toggle = page.getByRole("button", { name: "Отворете менюто" });
   await expect(toggle).toBeVisible();
   await toggle.click();
-  const close = page.getByRole("button", { name: "Затвори менюто" });
+  const close = page.getByRole("button", { name: "Затворете менюто" });
   await expect(close).toHaveAttribute("aria-expanded", "true");
   // The link must be visible inside the opened panel (not the footer link further down).
   const panel = page.locator(`[id="${await close.getAttribute("aria-controls")}"]`);
@@ -68,7 +68,7 @@ test("sticky quote bar appears after scrolling, hides at CTAs, never on the cont
   await expect(bar).toHaveAttribute("aria-hidden", "true");
   await page.evaluate(() => window.scrollTo(0, 1600));
   await expect(bar).toHaveAttribute("aria-hidden", "false");
-  await expect(bar.getByRole("link", { name: "Поискай оферта" })).toHaveAttribute("href", "/bg/kontakti?tip=oferta");
+  await expect(bar.getByRole("link", { name: "Поискайте оферта" })).toHaveAttribute("href", "/bg/kontakti?tip=oferta");
 
   await page.locator("footer").scrollIntoViewIfNeeded();
   await expect(bar).toHaveAttribute("aria-hidden", "true");

@@ -87,6 +87,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [PLATFORM_VISION.md](docs/PLATFORM_VISION.md) | Next-generation positioning, product architecture, principles, outstanding decisions |
 | [SERVICE_TAXONOMY.md](docs/SERVICE_TAXONOMY.md) | Ten service domains: names, slugs, families, deliverables, engagement models, status, SEO texts |
 | [CONTENT_STRATEGY_BG_EN.md](docs/CONTENT_STRATEGY_BG_EN.md) | Voice, claims policy, keywords, page templates, navigation, roll-out phases (BG/EN) |
+| [BG-LANGUAGE-STYLE-REVIEW.md](docs/BG-LANGUAGE-STYLE-REVIEW.md) | Bulgarian copy review 2026-11-10: voice, glossary, changes, coverage and open questions |
 | [INFORMATION_ARCHITECTURE_V2.md](docs/INFORMATION_ARCHITECTURE_V2.md) | Next IA: site map, mega-menu, mobile nav, breadcrumbs, recommendations, canonical/hreflang/indexability rules, route-by-route matrix, migration risks |
 | [PRODUCT_MODULES.md](docs/PRODUCT_MODULES.md) | Product modules (foundation, public, staff, client portal): routes, code, API, status, relations |
 | [SERVICE_CATALOGUE_ARCHITECTURE.md](docs/SERVICE_CATALOGUE_ARCHITECTURE.md) | Service catalogue design: conflicts with the current schema, model, lifecycle, locale policy, caching, migration and backfill plan (V1 slice implemented) |

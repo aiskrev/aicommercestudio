@@ -72,11 +72,11 @@ test("the PDF plan downloads and a saved link reopens the configuration", async 
 
   // Nothing is stored until the visitor explicitly agrees.
   const save = page.getByTestId("team-save");
-  await save.getByRole("button", { name: "Запази и вземи връзка" }).click();
+  await save.getByRole("button", { name: "Запазете и вземете връзка" }).click();
   await expect(save.getByRole("alert")).toContainText("Потвърдете, че конфигурацията може да бъде запазена.");
   await expect(page.getByTestId("team-saved-link")).toHaveCount(0);
   await save.getByTestId("team-save-consent").check();
-  await save.getByRole("button", { name: "Запази и вземи връзка" }).click();
+  await save.getByRole("button", { name: "Запазете и вземете връзка" }).click();
   const link = await page.getByTestId("team-saved-link").inputValue();
   expect(link).toMatch(/\/bg\/instrumenti\/ai-ekip\?c=[\w-]{40,}$/);
 
