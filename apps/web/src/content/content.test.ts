@@ -101,6 +101,19 @@ describe.each(locales)("content integrity (%s)", (locale) => {
     expect(JSON.stringify(content.legal.privacyPolicy)).toContain(company.contactEmail);
   });
 
+  it("has subscription terms that match the billing rules and stay a draft until a lawyer reviews them", () => {
+    const doc = content.legal.subscriptionTerms;
+    expect(content.legal.subscriptionDraft).toBe(true);
+    expect(content.legal.subscriptionDraftNotice.length).toBeGreaterThan(20);
+    expect(doc.sections).toHaveLength(13);
+    const text = JSON.stringify(doc);
+    for (const value of ["207509557", company.contactEmail, company.phoneDisplay, "Stripe", "14", "30", "7"]) expect(text).toContain(value);
+    const texts = [doc.title, doc.intro, ...doc.sections.flatMap((x) => [x.heading, ...x.paragraphs, ...(x.bullets ?? [])])];
+    for (const value of texts) expect(value, "no [placeholder] left").not.toMatch(/\[[^\]]+\]/);
+    // Billing keeps data and has no invented price, VAT rate or ODR platform (closed in 2025).
+    expect(text).not.toMatch(/€\s?\d|\d\s?(€|EUR\b)|ДДС от|VAT of \d|\d+\s?%|ec\.europa\.eu\/consumers\/odr/i);
+  });
+
   it("AI Managed Services plans promise no unlimited work, 24/7 cover, SLA or public price", () => {
     const { packages } = content.aiManaged;
     const offered = JSON.stringify([packages.items, packages.comparison]);

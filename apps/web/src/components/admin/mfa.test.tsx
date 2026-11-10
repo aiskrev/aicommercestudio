@@ -26,6 +26,8 @@ afterEach(() => {
   Object.defineProperty(window, "location", { configurable: true, value: originalLocation });
   assign.mockReset();
   fetchMock.mockReset();
+  // A reload still pending from the previous test must not receive `undefined` (it calls `.then`).
+  fetchMock.mockImplementation(() => new Promise(() => {}));
 });
 
 function signIn() {

@@ -49,6 +49,7 @@ const EN_SEGMENTS: Record<string, string> = {
   poveritelnost: "privacy",
   biskvitki: "cookies",
   "obshti-usloviya": "terms",
+  "usloviya-za-abonament": "subscription-terms",
   "ai-agenti": "ai-agents",
   "referentni-stsenarii": "reference-scenarios",
   "integratsionni-modeli": "integration-patterns",

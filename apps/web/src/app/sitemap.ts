@@ -27,7 +27,7 @@ export const CONTENT_REVISED = "2026-10-27";
 
 type Freq = "weekly" | "monthly" | "yearly";
 
-const STATIC_PATHS: { path: string; priority: number; changeFrequency: Freq; legal?: "cookies" | "other" }[] = [
+const STATIC_PATHS: { path: string; priority: number; changeFrequency: Freq; legal?: "cookies" | "subscription" | "other" }[] = [
   { path: routes.home, priority: 1, changeFrequency: "weekly" },
   { path: routes.services, priority: 0.9, changeFrequency: "monthly" },
   { path: routes.aiSolutions, priority: 0.8, changeFrequency: "monthly" },
@@ -44,6 +44,7 @@ const STATIC_PATHS: { path: string; priority: number; changeFrequency: Freq; leg
   { path: routes.privacy, priority: 0.2, changeFrequency: "yearly", legal: "other" },
   { path: routes.cookies, priority: 0.2, changeFrequency: "yearly", legal: "cookies" },
   { path: routes.terms, priority: 0.2, changeFrequency: "yearly", legal: "other" },
+  { path: routes.subscriptionTerms, priority: 0.2, changeFrequency: "yearly", legal: "subscription" },
 ];
 
 function alternates(paths: LocalizedPaths, availableIn: readonly Locale[] = locales) {
@@ -68,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { services, domains, articles, editorialCategories, caseStudies, legal } = getContent(locale);
     const url = (path: string) => absoluteUrl(localizePath(locale, path));
     return [
-      ...STATIC_PATHS.filter((entry) => !(entry.legal && (entry.legal === "cookies" ? legal.cookiesDraft : legal.isDraft))).map((entry) => ({
+      ...STATIC_PATHS.filter((entry) => !(entry.legal && { cookies: legal.cookiesDraft, subscription: legal.subscriptionDraft, other: legal.isDraft }[entry.legal])).map((entry) => ({
         url: url(entry.path),
         lastModified: CONTENT_REVISED,
         changeFrequency: entry.changeFrequency,
