@@ -36,6 +36,7 @@ from app import audit
 from app.accounts import service as account_service
 from app.accounts.mail import dispatch_pending
 from app.advisor import service as advisor
+from app.analytics import service as analytics
 from app.assessments import service as assessment_service
 from app.billing import service as billing
 from app.billing.gateway import get_gateway
@@ -344,6 +345,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         assessments = advisor.purge_expired(db, dry_run=args.dry_run)
         configurations = team.purge_expired(db, dry_run=args.dry_run)
         saved_assessments = assessment_service.purge_expired(db, dry_run=args.dry_run)
+        analytics_events = analytics.purge_expired(db, settings.analytics_retention_days, dry_run=args.dry_run)
         sessions_removed = 0
         account_rows = 0
         if not args.dry_run:
@@ -359,6 +361,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         f"advisor_assessments={assessments.due if args.dry_run else assessments.deleted} "
         f"team_configurations={configurations.due if args.dry_run else configurations.deleted} "
         f"assessment_results={saved_assessments.due if args.dry_run else saved_assessments.deleted} "
+        f"analytics_events={analytics_events} "
         f"sessions={sessions_removed} account_rows={account_rows}"
     )
     return 0

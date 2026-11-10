@@ -154,6 +154,11 @@ class Settings(BaseSettings):
     # Set only from the accountant's answer. Empty means no retention date is written.
     accounting_retention_years: int | None = Field(default=None, ge=1, le=30)
     turnstile_secret_key: str | None = None
+    # Site statistics (docs/ANALYTICS.md): cookieless and anonymous, off until the privacy notice describes it.
+    analytics_enabled: bool = False
+    analytics_retention_days: int = Field(default=180, ge=7, le=730)
+    analytics_rate_limit: int = Field(default=240, ge=10)
+    analytics_rate_window_seconds: int = Field(default=60, ge=10)
     # Customer accounts (docs/CUSTOMER_ACCOUNTS.md). Off until a release review.
     customer_accounts_enabled: bool = False
     account_session_hours: int = Field(default=12, ge=1, le=72)

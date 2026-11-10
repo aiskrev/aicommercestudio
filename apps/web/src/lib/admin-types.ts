@@ -503,3 +503,48 @@ export interface CataloguePreview {
   related?: { services: { key: string; name: string }[]; assessments: { key: string; name: string }[]; workshops: { key: string; name: string }[] };
   related_domains?: { key: string; name: string }[];
 }
+
+// ---------------------------------------------------------------------------- site statistics
+
+export interface AnalyticsDay {
+  date: string;
+  views: number;
+  visits: number;
+}
+
+export interface AnalyticsCount {
+  name: string;
+  count: number;
+}
+
+export interface AnalyticsSummary {
+  enabled: boolean;
+  retention_days: number;
+  days: number;
+  first_event_at: string | null;
+  views: number;
+  visits: number;
+  clicks: number;
+  tool_events: number;
+  daily: AnalyticsDay[];
+  top_pages: { path: string; views: number; visits: number }[];
+  top_clicks: { page: string; label: string; target: string | null; clicks: number }[];
+  referrers: AnalyticsCount[];
+  devices: AnalyticsCount[];
+  locales: AnalyticsCount[];
+  tools: AnalyticsCount[];
+}
+
+export interface AnalyticsVisit {
+  id: string;
+  started_at: string;
+  device: string;
+  locale: string;
+  referrer_host: string | null;
+  events: { at: string; kind: "view" | "click" | "tool"; path: string; label: string | null; target: string | null }[];
+}
+
+export interface AnalyticsVisits {
+  day: string;
+  visits: AnalyticsVisit[];
+}

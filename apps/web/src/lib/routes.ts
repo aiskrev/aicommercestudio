@@ -52,6 +52,7 @@ export const routes = {
   adminLeads: "/admin/leads",
   adminLead: (id: string) => `/admin/leads/${id}`,
   adminActivity: "/admin/activity",
+  adminAnalytics: "/admin/analytics",
   adminAiActions: "/admin/ai",
   adminAccount: "/admin/account",
   adminOperations: "/admin/operations",

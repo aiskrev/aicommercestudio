@@ -629,3 +629,13 @@ Only while `CLIENT_PORTAL_ENABLED=true` (404 otherwise). Separate client identit
 anonymous 401 → login → find/view → status change without CSRF (403) → with CSRF (200) → stale update (409) →
 audit trail via API and SQL) against the running stack. See the recorded output in
 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md).
+
+## Site statistics
+
+Anonymous, cookieless page views and clicks (see [ANALYTICS.md](ANALYTICS.md)). Off until `ANALYTICS_ENABLED=true`.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| POST | `/api/public/analytics` | Body `{"events": [{"type": "view" \| "click" \| "tool", "path", "locale", "label"?, "target"?, "referrer"?}]}` (1–20 events). Always answers `{"enabled": bool}`; nothing is stored while the feature is off, for Do Not Track / Global Privacy Control, robots, signed-in staff and paths that are not public pages. Rate limited per client (`ANALYTICS_RATE_LIMIT`) |
+| GET | `/api/admin/analytics/summary` | Administrators. Query `days` 1–180 (default 30, Sofia time). Views, visits, clicks, daily series, top pages, top clicks (page, label, target), referrers, devices, languages and tool events |
+| GET | `/api/admin/analytics/visits` | Administrators. Query `limit` ≤ 50. The latest visits of today as anonymous paths: the pages one visitor opened and what they clicked, in order |

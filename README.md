@@ -138,6 +138,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [ADVISOR_WORKSPACE.md](docs/ADVISOR_WORKSPACE.md) | Advisor Workspace (off, not released): plans, entitlements, quota policy, projects and versions |
 | [STRIPE_BILLING.md](docs/STRIPE_BILLING.md) | Stripe in test mode: checkout, webhooks, access policy, reconciliation and live activation steps |
 | [INVOICING.md](docs/INVOICING.md) | Who issues documents, snapshots, the retry queue and the tax gate; nothing real is issued yet |
+| [ANALYTICS.md](docs/ANALYTICS.md) | Anonymous, cookieless site statistics: what is collected, what is not, the admin dashboard, how to switch it on, retention |
 | [ACCOUNTS_GO_LIVE.md](docs/ACCOUNTS_GO_LIVE.md) | Steps to switch customer accounts on at the live site: Brevo, Turnstile, server `.env`, release, checks, rollback |
 | [ACCOUNTS_RELEASE_CHECKLIST.md](docs/ACCOUNTS_RELEASE_CHECKLIST.md) | Gates G0–G7 and the order of switching on accounts, paid plans and billing (2026-11-10) |
 | [SERVICES_DEMO_PLAN.md](docs/SERVICES_DEMO_PLAN.md) | Plan: demo of the services for free, paid for more; two tracks, stages, decisions for the owner |

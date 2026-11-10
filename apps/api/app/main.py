@@ -20,11 +20,13 @@ from app.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
 from app.routers import (
     accounts,
     admin,
+    admin_analytics,
     admin_auth,
     admin_catalogue,
     admin_opportunities,
     admin_staff,
     advisor,
+    analytics,
     assessments,
     billing,
     catalogue,
@@ -151,6 +153,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(workspace.router)
     app.include_router(billing.router)
     app.include_router(zone.router)
+    app.include_router(analytics.router)
+    app.include_router(admin_analytics.router)
     return app
 
 
