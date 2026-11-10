@@ -28,7 +28,7 @@ test("the AI team configurator runs end to end in Bulgarian", async ({ page }) =
   await page.keyboard.press("ArrowRight");
   await expect(form.getByRole("radio", { name: "Професионални услуги" })).toBeChecked();
   await form.getByRole("radio", { name: "11–50 души" }).check();
-  await form.getByRole("group", { name: "Отдел, който води инициативата" }).getByRole("radio", { name: "Обслужване на клиенти" }).check();
+  await form.getByRole("group", { name: "Отдел, който води проекта" }).getByRole("radio", { name: "Обслужване на клиенти" }).check();
   await form.getByRole("radio", { name: "Бавни отговори на клиенти" }).check();
   await form.getByRole("radio", { name: "1 000–10 000" }).check();
   await form.getByRole("button", { name: "Напред" }).click();
