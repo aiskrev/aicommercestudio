@@ -99,7 +99,9 @@ Off-site copy (encrypted, to the owner's laptop and OneDrive):
    ```
    apt-get install -y gnupg
    install -d -m 0755 /etc/acs-backup && install -m 0644 offsite.pub.asc /etc/acs-backup/offsite.pub.asc
-   useradd --system --create-home --shell /usr/sbin/nologin acsbackup
+   # A real shell is needed for the forced command to run; the key can still run only acs-backup-pull.
+   useradd --system --create-home --shell /bin/sh acsbackup
+   chgrp acsbackup /var/backups/ai-commerce-studio && chmod 0710 /var/backups/ai-commerce-studio
    install -d -m 0750 -o root -g acsbackup /var/backups/ai-commerce-studio/offsite
    install -d -m 0755 -o acsbackup -g acsbackup /var/lib/acs-offsite
    install -d -m 0700 -o acsbackup -g acsbackup ~acsbackup/.ssh
@@ -108,8 +110,9 @@ Off-site copy (encrypted, to the owner's laptop and OneDrive):
    ```
    then install the two scripts and the drop-in, `systemctl daemon-reload`, and run
    `systemctl start acs-backup` once to produce the first encrypted copy.
-3. `/var/backups/ai-commerce-studio` itself must stay `0750` or tighter for others: `acsbackup` reaches
-   only the `offsite` directory (group), never the plain dumps.
+3. `/var/backups/ai-commerce-studio` is `0710 root:acsbackup`: `acsbackup` can pass through it but not
+   list it, and the plain dumps stay `0600 root`. It reaches only the `offsite` directory.
+4. Installed on the server on 2026-11-10; the first copy was fetched and decrypted on the laptop.
 
 ## Monitoring
 
