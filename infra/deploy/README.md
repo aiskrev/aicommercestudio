@@ -153,5 +153,10 @@ Switching on is a production change: it needs the owner's approval and a backup 
 
 To go back: remove the two lines from `.env` and restart the API. Nothing else changes.
 
+Switched on in production on 2026-11-10 (release `sha-7f0bf95`): backup, `db-api-role`, a test login,
+then the restart. `pg_stat_activity` shows the API only as `acs_app_api`; the maintenance timer runs
+as the owner in the `migrate` image and succeeded afterwards. Staff MFA is required there
+(`ADMIN_MFA_REQUIRED=true`) and every staff account has it.
+
 `python -m app.cli` commands that manage data run as the owner: use
 `docker compose --profile migrate run --rm -T migrate python -m app.cli <command>`, not `exec api`.
