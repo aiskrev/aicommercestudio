@@ -11,6 +11,7 @@ import { type Locale, localizePath } from "@/i18n/config";
 import type { Dictionary } from "@/i18n";
 import { AI_SERVICE_NAV, FOUNDATION_SERVICE_NAV } from "@/lib/navigation";
 import { routes } from "@/lib/routes";
+import { company } from "@/lib/company";
 import { site } from "@/lib/site";
 
 export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
@@ -31,7 +32,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     { href: href(routes.patterns), label: reference.patterns.title },
     { href: href(routes.insights), label: dict.nav.insights },
   ];
-  const company = [
+  const companyLinks = [
     { href: href(routes.about), label: dict.nav.about },
     { href: href(routes.process), label: dict.nav.approach },
     { href: href(routes.industries), label: dict.nav.industries },
@@ -42,6 +43,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
     { href: href(routes.cookies), label: dict.footer.cookies },
     { href: href(routes.terms), label: dict.footer.terms },
     { href: href(routes.subscriptionTerms), label: dict.footer.subscriptionTerms },
+    { href: href(routes.withdrawalInfo), label: dict.footer.withdrawal },
   ];
 
   return (
@@ -69,7 +71,7 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <FooterColumn title={dict.footer.resources} links={resources} />
         <FooterColumn
           title={dict.footer.company}
-          links={company}
+          links={companyLinks}
           extra={
             <AccountLinks
               variant="footer"
@@ -89,7 +91,11 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
         <p>
           © {new Date().getFullYear()} {site.name}. {dict.footer.rights}
         </p>
-        <p>{dict.footer.provisional}</p>
+        <p>
+          {dict.footer.provisional
+            .replace("{entity}", locale === "bg" ? company.legalNameBg : company.legalNameEn)
+            .replace("{uic}", company.uic)}
+        </p>
       </Container>
     </footer>
   );

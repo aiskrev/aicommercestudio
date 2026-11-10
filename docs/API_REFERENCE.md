@@ -241,6 +241,12 @@ a pilot, the optional roadmap and a provenance note). Every insight carries `bas
 Errors: `422 validation_error`, `400 form_token_invalid`, `429 rate_limited`, `504 advisor_timeout`,
 `503 advisor_busy`, `503 advisor_unavailable`, `422 advisor_declined`, `502 advisor_invalid_output`.
 
+## Public: withdrawing marketing consent (no account)
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| POST | `/api/public/marketing/withdraw` | `{token, locale}` → `{status: "withdrawn" \| "already_withdrawn"}`; 404 `token_invalid` for a missing, tampered or never-issued token (one generic answer); rate-limited per client and for the whole endpoint. The token is the opaque value from the link a staff member prepared with `POST /api/admin/compliance/leads/{lead_id}/marketing-withdrawal-link`; it carries no lead id or personal data and is stored only as a hash. The withdrawal is idempotent, recorded as an append-only `legal_events` row (source `self_service`), and leaves the inquiry itself untouched. A page that merely opens the link changes nothing: the browser page asks for one click |
+
 ## Public: AI readiness assessment
 
 | Method | Path | Description |
@@ -530,6 +536,25 @@ See [AI_OPERATIONS_PORTAL.md](AI_OPERATIONS_PORTAL.md), [AI_OBSERVABILITY.md](AI
 | POST | `/api/ops/organizations/{organization_id}/portal-users/{user_id}/recovery` | `portal_users.write` | one-time recovery link (resets password and second factor) |
 | POST | `/api/ops/organizations/{organization_id}/portal-users/{user_id}/disable` | `portal_users.write` | disable and revoke sessions |
 
+## Admin: legal compliance
+
+Staff-only (administrator session, CSRF on writes). See [LEGAL_COMPLIANCE_REMEDIATION_2026-11-10.md](LEGAL_COMPLIANCE_REMEDIATION_2026-11-10.md).
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/api/admin/compliance/versions` | version id, kind and lawyer-review status of every legal document |
+| GET | `/api/admin/compliance/withdrawals` | withdrawal requests, newest first; `open_only=true` for the open ones |
+| POST | `/api/admin/compliance/withdrawals/{request_id}/decide` | `{status: refund_review\|refunded\|closed, note?, refund_reference?, refund_amount_minor?}`; `refunded` needs the Stripe refund reference and amount entered by hand — nothing is refunded by the system; 409 once closed |
+| GET | `/api/admin/compliance/data-requests` | data-subject requests with a `deadline` block (`state`: on_track, due_soon, overdue, closed; received, base, extended and effective due dates); filters `kind`, `status` |
+| POST | `/api/admin/compliance/data-requests/{request_id}/handle` | `{action: done\|reject\|execute_deletion, note?, stripe_checked?}`; `execute_deletion` deletes the account, or anonymises it when billing or accounting records exist. It fails closed: 409 `subscription_active` or `billing_state_open` while the local billing state is not final (see docs/LEGAL_RETENTION.md), 409 `stripe_check_required` when a Stripe customer exists and `stripe_checked` is not true |
+| POST | `/api/admin/compliance/data-requests/{request_id}/extend` | `{months: 1\|2, reason (10–500), notified?}`: a staff decision to extend the working due date, once; 409 when closed or already extended; audited. Never automatic |
+| POST | `/api/admin/compliance/data-requests/{request_id}/extension-notified` | records that the person was told about the extension (idempotent; 409 without an extension); audited |
+| POST | `/api/admin/compliance/leads/{lead_id}/marketing-consent/withdraw` | → 204, idempotent; the consent history is kept |
+| GET | `/api/admin/compliance/leads/{lead_id}/consent-history` | acknowledgements, consents and withdrawals with the version of each text |
+| GET | `/api/admin/compliance/withdrawals/{request_id}` | one request with the statement, the account e-mail, the contract reference and the audit trail |
+| GET | `/api/admin/compliance/data-requests/{request_id}` | one request with the message, the account e-mail, `deletion_blockers` (what stands in the way of a deletion now), `stripe_attestation_required` and the audit trail |
+| POST | `/api/admin/compliance/leads/{lead_id}/marketing-withdrawal-link` | for a campaign: `{url}` with an opaque token in the fragment (`?locale=bg\|en`); 409 `no_marketing_consent` if the inquiry gave none. Stable, carries no lead id or personal data, stored only as a hash |
+
 ## Customer accounts (off by default)
 
 Only while `CUSTOMER_ACCOUNTS_ENABLED=true` (404 otherwise). See [CUSTOMER_ACCOUNTS.md](CUSTOMER_ACCOUNTS.md). Cookies `acs_account_session` / `acs_account_csrf`; signed-in changes need `X-CSRF-Token`. Routes that send e-mail answer 503 `email_unavailable` without a provider, and 429 with `Retry-After` over the shared limit.
@@ -546,6 +571,9 @@ Only while `CUSTOMER_ACCOUNTS_ENABLED=true` (404 otherwise). See [CUSTOMER_ACCOU
 | POST | `/api/accounts/password/change` | `{current_password, new_password}` → 204, closes other sessions |
 | GET | `/api/accounts/me` | profile |
 | PATCH | `/api/accounts/me` | `{display_name?, locale?, marketing_consent?}` → profile |
+| GET | `/api/accounts/data/export` | the account holder's own data as a JSON download; no password or token hashes |
+| POST | `/api/accounts/data/requests` | `{kind: deletion\|correction\|restriction\|objection, message?}` → 202 `{reference, status: "open", created}`; a repeat of an open request returns the same reference. An administrator carries out deletion; accounting records are kept where the law requires |
+| GET | `/api/accounts/data/requests` | this account's requests |
 | GET | `/api/accounts/sessions` | active sessions of this account |
 | POST | `/api/accounts/sessions/revoke-others` | → 204 |
 | DELETE | `/api/accounts/sessions/{session_id}` | → 204; 404 for another account's session |
@@ -578,9 +606,13 @@ Only with `BILLING_PROVIDER=stripe` and the workspace on (404 otherwise). See [S
 | --- | --- | --- |
 | GET | `/api/billing/offers` | approved offers |
 | GET | `/api/billing/status` | subscriptions and purchases of this workspace |
-| POST | `/api/billing/checkout` | `{offer, locale}` → `{url, reused}`; 409 `subscription_exists`, `scope_not_confirmed`, `offer_unavailable` |
+| POST | `/api/billing/checkout` | `{offer, locale, acceptance}` → `{url, reused}`. `acceptance` is required: `{terms, subscription_terms, order_acceptance, privacy, customer_kind, early_start?, early_start_version?}` with the version ids of docs/LEGAL_COMPLIANCE_REMEDIATION_2026-11-10.md; 422 without it, 409 `terms_version_changed` when a version is not the current one, 409 `subscription_exists`, `scope_not_confirmed`, `offer_unavailable` |
 | POST | `/api/billing/portal` | `{locale}` → `{url}`; billing owner only, otherwise 404 |
 | POST | `/api/billing/stripe/webhook` | Stripe only; needs a valid `Stripe-Signature` |
+| GET | `/api/billing/contracts` | purchases of this workspace a withdrawal can name, each with the system's first reading of the withdrawal period. The four withdrawal routes do NOT count against the shared per-workspace request limit; they have dedicated limits (429 with `Retry-After`) |
+| POST | `/api/billing/withdrawals/preview` | `{ref}` → summary (customer kind, concluded date, period end, `eligibility`, `existing_reference`); 404 for another workspace's purchase |
+| POST | `/api/billing/withdrawals` | `{ref, statement, locale, confirmed}` → 201 `{reference, status, eligibility, created}`; 422 `confirmation_required` unless `confirmed`; a repeat returns 200 with the open request. Records the statement and queues the confirmation e-mail; never refunds |
+| GET | `/api/billing/withdrawals` | this workspace's withdrawal requests |
 
 ## Client zone (off by default)
 

@@ -7,7 +7,15 @@ from datetime import timedelta
 from sqlalchemy import delete, or_
 from sqlalchemy.orm import Session
 
-from app.accounts.models import CustomerSession, CustomerToken, OutboxMessage, OutboxStatus, RateLimitBucket
+from app.accounts.models import (
+    CustomerAccount,
+    CustomerSession,
+    CustomerToken,
+    OutboxMessage,
+    OutboxStatus,
+    RateLimitBucket,
+)
+from app.config import get_settings
 from app.models import utcnow
 from app.workspace.models import WorkspaceInvitation
 from app.workspace.usage import sweep_expired
@@ -32,6 +40,12 @@ def purge_expired(db: Session) -> int:
         ),
         delete(RateLimitBucket).where(RateLimitBucket.window_start < now - timedelta(days=1)),
         delete(WorkspaceInvitation).where(WorkspaceInvitation.expires_at < cutoff),
+        # An account whose e-mail was never confirmed is not kept (docs: privacy policy, retention).
+        delete(CustomerAccount).where(
+            CustomerAccount.email_verified_at.is_(None),
+            CustomerAccount.erased_at.is_(None),
+            CustomerAccount.created_at < now - timedelta(days=get_settings().account_unverified_days),
+        ),
     ):
         removed += db.execute(statement).rowcount
     removed += sweep_expired(db)

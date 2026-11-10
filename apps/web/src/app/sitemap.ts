@@ -45,6 +45,7 @@ const STATIC_PATHS: { path: string; priority: number; changeFrequency: Freq; leg
   { path: routes.cookies, priority: 0.2, changeFrequency: "yearly", legal: "cookies" },
   { path: routes.terms, priority: 0.2, changeFrequency: "yearly", legal: "other" },
   { path: routes.subscriptionTerms, priority: 0.2, changeFrequency: "yearly", legal: "subscription" },
+  { path: routes.withdrawalInfo, priority: 0.2, changeFrequency: "yearly", legal: "other" },
 ];
 
 function alternates(paths: LocalizedPaths, availableIn: readonly Locale[] = locales) {

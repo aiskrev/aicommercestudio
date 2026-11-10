@@ -12,6 +12,7 @@ from datetime import timedelta
 import pytest
 from sqlalchemy import select
 
+from app import legal
 from app.billing import service
 from app.billing.models import (
     BillingCheckout,
@@ -29,6 +30,13 @@ from app.workspace.models import CustomerWorkspace, WorkspaceProject
 from tests.test_accounts import PASSWORD, Inbox, csrf
 
 API = "/api/billing"
+ACCEPT = {
+    "terms": legal.version("terms"),
+    "subscription_terms": legal.version("subscription_terms"),
+    "order_acceptance": legal.version("order_acceptance"),
+    "privacy": legal.version("privacy"),
+    "customer_kind": "consumer",
+}
 SECRET = "whsec_test_only"
 PRICE = {"active": True, "unit_amount": 2900, "currency": "eur", "recurring": {"interval": "month"}}
 
@@ -169,7 +177,7 @@ def user(client, fake, offers) -> None:
 
 
 def checkout(client, offer="pro_monthly"):
-    return client.post(f"{API}/checkout", json={"offer": offer}, headers=csrf(client))
+    return client.post(f"{API}/checkout", json={"offer": offer, "acceptance": ACCEPT}, headers=csrf(client))
 
 
 def plan_of(client) -> str:
@@ -265,7 +273,7 @@ def test_nothing_is_on_sale_without_approval(client, fake, db):
 
 
 def test_the_browser_chooses_an_offer_and_nothing_else(client, user, fake):
-    body = {"offer": "pro_monthly", "price": "price_cheap", "amount": 1}
+    body = {"offer": "pro_monthly", "acceptance": ACCEPT, "price": "price_cheap", "amount": 1}
     assert client.post(f"{API}/checkout", json=body, headers=csrf(client)).status_code == 422
     assert checkout(client).status_code == 200
     params = fake.created[0]
@@ -330,7 +338,9 @@ def test_parallel_clicks_open_one_checkout(client, user, fake):
     headers = csrf(client)
 
     def call(_):
-        return client.post(f"{API}/checkout", json={"offer": "pro_monthly"}, headers=headers).status_code
+        return client.post(
+            f"{API}/checkout", json={"offer": "pro_monthly", "acceptance": ACCEPT}, headers=headers
+        ).status_code
 
     with ThreadPoolExecutor(max_workers=5) as pool:
         assert set(pool.map(call, range(5))) == {200}

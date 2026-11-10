@@ -42,6 +42,8 @@ from app.billing import service as billing
 from app.billing.gateway import get_gateway
 from app.billing.models import BillingOffer, ScopeConfirmation
 from app.catalogue import seed as catalogue
+from app.compliance import events as _compliance_events  # noqa: F401
+from app.compliance import service as compliance_service
 from app.config import get_settings
 from app.db import get_sessionmaker
 from app.invoicing import service as invoicing
@@ -348,12 +350,14 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         analytics_events = analytics.purge_expired(db, settings.analytics_retention_days, dry_run=args.dry_run)
         sessions_removed = 0
         account_rows = 0
+        legal_removed = {"withdrawals": 0, "data_requests": 0, "events": 0, "kept_for_accounting": 0}
         if not args.dry_run:
             cutoff = utcnow() - timedelta(days=1)
             sessions_removed = db.execute(
                 delete(AdminSession).where(or_(AdminSession.expires_at < utcnow(), AdminSession.revoked_at < cutoff))
             ).rowcount
             account_rows = account_service.purge_expired(db)
+            legal_removed = compliance_service.purge_legal_records(db, settings)
             db.commit()
     prefix = "[dry-run] would delete" if args.dry_run else "deleted"
     _print(
@@ -362,7 +366,8 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         f"team_configurations={configurations.due if args.dry_run else configurations.deleted} "
         f"assessment_results={saved_assessments.due if args.dry_run else saved_assessments.deleted} "
         f"analytics_events={analytics_events} "
-        f"sessions={sessions_removed} account_rows={account_rows}"
+        f"sessions={sessions_removed} account_rows={account_rows} "
+        f"withdrawal_requests={legal_removed['withdrawals']} data_requests={legal_removed['data_requests']}"
     )
     return 0
 
@@ -419,6 +424,24 @@ def cmd_billing_offer(args: argparse.Namespace) -> int:
         db.merge(offer)
         db.commit()
     _print(f"[billing-offer] {args.key}: {price['unit_amount']} {price['currency']} approved={args.approve}")
+    return 0
+
+
+def cmd_legal_e2e_seed(_args: argparse.Namespace) -> int:
+    """Synthetic accounts and contracts for the browser tests of the legal workflows. Refuses in production."""
+    from app.compliance import e2e_seed
+
+    password = os.environ.get("E2E_ACCOUNT_PASSWORD", "")
+    if not password:
+        _print("[legal-e2e-seed] E2E_ACCOUNT_PASSWORD is not set")
+        return 1
+    try:
+        with get_sessionmaker()() as db:
+            created = e2e_seed.seed(db, password)
+    except RuntimeError as exc:
+        _print(f"[legal-e2e-seed] {exc}")
+        return 1
+    _print(f"[legal-e2e-seed] created {len(created)} synthetic accounts")
     return 0
 
 
@@ -587,6 +610,9 @@ def main(argv: list[str] | None = None) -> int:
     scope.add_argument("--offer", required=True)
     scope.add_argument("--by", required=True)
     scope.set_defaults(func=cmd_billing_confirm_scope)
+    sub.add_parser(
+        "legal-e2e-seed", help="Synthetic accounts for the legal browser tests (never production)"
+    ).set_defaults(func=cmd_legal_e2e_seed)
     sub.add_parser("db-api-role", help="Enable the API login role from API_DB_PASSWORD").set_defaults(
         func=cmd_db_api_role
     )

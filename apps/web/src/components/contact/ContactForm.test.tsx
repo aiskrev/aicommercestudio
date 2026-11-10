@@ -60,7 +60,7 @@ async function fillValid(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText(/^Фирма/), "Примерна Фирма ЕООД");
   await user.type(screen.getByLabelText(/^Имейл/), "ivan@example.com");
   await user.type(screen.getByLabelText(/Описание на проекта/), "Нуждаем се от технически SEO одит на магазина.");
-  await user.click(screen.getByRole("checkbox", { name: /информацията за поверителност/ }));
+  await user.click(screen.getByRole("checkbox", { name: /Запознах се с Политиката за поверителност/ }));
 }
 
 describe("ContactForm", () => {
@@ -69,7 +69,7 @@ describe("ContactForm", () => {
     for (const label of [/Услуга/, /Име и фамилия/, /^Фирма/, /^Имейл/, /Телефон/, /Описание на проекта/]) {
       expect(screen.getByLabelText(label)).toBeInTheDocument();
     }
-    expect(screen.getByRole("link", { name: "информацията за поверителност" })).toHaveAttribute("href", "/poveritelnost");
+    expect(screen.getByRole("link", { name: "Политиката за поверителност" })).toHaveAttribute("href", "/poveritelnost");
   });
 
   it("pre-selects a valid initial service and ignores unknown ones", () => {

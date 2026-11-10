@@ -76,6 +76,28 @@ TEXTS = {
             "If you didn't ask for this, ignore this message.\n",
         ),
     },
+    OutboxKind.WITHDRAWAL_RECEIVED: {
+        "bg": (
+            "Получихме изявлението ви за отказ от договор",
+            f"{_HELLO['bg']}\n\nПолучихме изявлението ви за отказ от договор.\n\n"
+            "Референтен номер: {reference}\nПодадено на: {when}\nПокупка: {offer}\nВашето изявление:\n{statement}\n\n"
+            "Това писмо потвърждава получаването. Ще проверим договора и срока и ще ви отговорим. "
+            "Ако отказът е в срок и сте потребител, сумите се връщат по същия метод на плащане "
+            "не по-късно от 14 дни след получаването му, като се съобразим с евентуална пропорционална част, "
+            "ако сте поискали услугата да започне в срока за отказ.\n"
+            "Запазете писмото като доказателство.\n",
+        ),
+        "en": (
+            "We received your withdrawal statement",
+            f"{_HELLO['en']}\n\nWe received your statement withdrawing from the contract.\n\n"
+            "Reference: {reference}\nSubmitted: {when}\nPurchase: {offer}\nYour statement:\n{statement}\n\n"
+            "This message confirms receipt. We will check the contract and the period and reply to you. "
+            "If the withdrawal "
+            "is within the period and you are a consumer, refunds go to the same payment method no later than 14 days "
+            "after we received it, taking into account any proportionate amount if you asked for the service to start "
+            "within the withdrawal period.\nKeep this message as evidence.\n",
+        ),
+    },
     OutboxKind.ACCOUNT_EXISTS: {
         "bg": (
             "Вече имате акаунт",
@@ -191,6 +213,18 @@ def _render(db: Session, settings: Settings, row: OutboxMessage) -> tuple[str, s
         hours = settings.account_reset_token_hours
         token = _issue_token(db, row.account_id, TokenPurpose.RESET_PASSWORD, hours)
         return subject, template.format(link=f"{origin}{PATHS[('reset', locale)]}#token={token}", hours=hours)
+    if kind is OutboxKind.WITHDRAWAL_RECEIVED:
+        from app.compliance.models import WithdrawalRequest
+
+        request = db.scalar(select(WithdrawalRequest).where(WithdrawalRequest.reference == row.reference))
+        if request is None:
+            raise LookupError("withdrawal_missing")
+        return subject, template.format(
+            reference=request.reference,
+            when=request.created_at.strftime("%Y-%m-%d %H:%M UTC"),
+            offer=request.offer_key,
+            statement=request.statement,
+        )
     return subject, template.format(
         link=f"{origin}{PATHS[('signin', locale)]}", forgot=f"{origin}{PATHS[('forgot', locale)]}"
     )

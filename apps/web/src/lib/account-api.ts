@@ -9,6 +9,8 @@ export class AccountError extends Error {
     public status: number,
     public code: string,
     message: string,
+    /** Seconds from the Retry-After header of a 429 answer, when the server sent one. */
+    public retryAfter: number | null = null,
   ) {
     super(message);
   }
@@ -74,7 +76,13 @@ async function request<T>(
   const data: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const { code, detail } = (data ?? {}) as { code?: string; detail?: unknown };
-    throw new AccountError(response.status, code ?? "error", typeof detail === "string" ? detail : networkMessage);
+    const retry = Number(response.headers.get("Retry-After"));
+    throw new AccountError(
+      response.status,
+      code ?? "error",
+      typeof detail === "string" ? detail : networkMessage,
+      Number.isFinite(retry) && retry > 0 ? retry : null,
+    );
   }
   return data as T;
 }
@@ -85,6 +93,7 @@ async function request<T>(
  */
 export function takeTokenFromUrl(): string | null {
   const token = new URLSearchParams(window.location.hash.slice(1)).get("token");
-  if (token) window.history.replaceState(null, "", window.location.pathname);
+  // Keep the router's own history state: with `null` the Next.js router restores the old URL, fragment included.
+  if (token) window.history.replaceState(window.history.state, "", window.location.pathname + window.location.search);
   return token;
 }

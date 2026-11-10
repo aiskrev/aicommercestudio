@@ -93,14 +93,14 @@ test("a consultation request needs explicit consent and returns a reference", as
   await consult.getByRole("button", { name: "Request a consultation" }).click();
   await expect(consult.getByTestId("team-consult-storage")).toContainText("We do not send automatic e-mails");
   await consult.getByRole("button", { name: "Send the request" }).click();
-  await expect(consult.getByText("Please confirm that you have read the privacy information.")).toBeVisible();
+  await expect(consult.getByText("Please confirm that you have read the Privacy Policy.")).toBeVisible();
 
   await page.waitForTimeout(3500);
   await consult.getByLabel(/^Full name/).fill("E2E Team");
   await consult.getByLabel(/^Work e-mail/).fill("e2e.team@example.com");
   await consult.getByLabel(/^Company \*/).fill(`E2E Team ${Date.now()}`);
   await consult.getByLabel(/^Role/).fill("CTO");
-  await consult.getByRole("checkbox", { name: /privacy information/ }).check();
+  await consult.getByRole("checkbox", { name: /I have read the Privacy Policy/ }).check();
   await consult.getByRole("button", { name: "Send the request" }).click();
   const success = page.getByTestId("team-consult-success");
   await expect(success).toBeFocused();

@@ -531,7 +531,7 @@ export function ContactForm({
               {labels.privacy}{" "}
               <Link href={privacyHref} className="font-medium text-brand underline underline-offset-4" target="_blank">
                 {labels.privacyLink}
-              </Link>{" "}
+              </Link>
               {labels.privacySuffix} <span className="field-required">*</span>
             </span>
           </label>

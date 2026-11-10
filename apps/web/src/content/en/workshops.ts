@@ -16,7 +16,7 @@ export const workshops: typeof bgWorkshops = {
     title: "Workshops and advisory assessments",
     lead: "Short, clearly bounded formats we start with before any larger project: who they are for, what they solve, what is needed beforehand, the agenda, what you receive and what is not included.",
     notice:
-      "Prices are indicative and final for clients in the EU and elsewhere (we are not VAT registered). The exact price, scope and length are agreed in writing after a short call. We do not promise specific outcomes. Every format is scoped individually.",
+      "Prices are indicative, in euro and the same in every language; they are final (we are not VAT registered). The exact price, scope and length are agreed in writing after a short call. We do not promise specific outcomes. Every format is scoped individually.",
     bandNav: "Groups",
     bands: {
       ai: { title: "AI strategy, agents and governance", text: "Opportunity discovery, readiness, agent architecture, RAG and responsible AI." },

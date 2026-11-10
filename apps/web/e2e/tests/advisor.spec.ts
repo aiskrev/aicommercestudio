@@ -51,7 +51,7 @@ test("advisor works in demo mode end to end: assessment → consultation → adm
   await consultation.getByLabel(/^Фирма/).fill(company);
   await consultation.getByLabel(/^Имейл/).fill("e2e.advisor@example.com");
   await consultation.getByLabel(/Описание на проекта/).pressSequentially("поръчки и товарителници.");
-  await consultation.getByRole("checkbox", { name: /информацията за поверителност/ }).check();
+  await consultation.getByRole("checkbox", { name: /Запознах се с Политиката за поверителност/ }).check();
   await humanPause();
   await consultation.getByRole("button", { name: "Изпратете запитването" }).click();
   await expect(page.getByTestId("contact-success")).toBeVisible();

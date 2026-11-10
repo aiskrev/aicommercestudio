@@ -176,6 +176,7 @@ export function ConsultationForm({
                 <Link href={privacyHref} className="link">
                   {c.privacyLink}
                 </Link>
+                .
               </span>
             </label>
             {errors.privacy && (

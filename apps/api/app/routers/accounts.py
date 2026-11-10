@@ -22,6 +22,7 @@ from app import audit
 from app.accounts import limits
 from app.accounts.mail import dispatch_pending, email_available, enqueue
 from app.accounts.models import CustomerAccount, CustomerSession, CustomerToken, OutboxKind, TokenPurpose
+from app.compliance.service import record_event
 from app.config import Settings, get_settings
 from app.deps import CSRF_HEADER, SAFE_METHODS, AppSettings, DbSession, client_ip, client_ip_hash
 from app.errors import ApiError
@@ -391,6 +392,10 @@ def me(ctx: Account) -> ProfileOut:
 @router.patch("/me", response_model=ProfileOut)
 def update_profile(payload: ProfileIn, ctx: Account, db: DbSession, settings: AppSettings) -> ProfileOut:
     account = ctx.account
+    if payload.marketing_consent is not None:
+        # Lock the row first (before any change is staged: a refresh discards them), so two parallel saves cannot both
+        # record the same change in the consent history.
+        db.refresh(account, with_for_update=True)
     if "display_name" in payload.model_fields_set:
         account.display_name = payload.display_name or None
     if payload.locale is not None:
@@ -398,7 +403,25 @@ def update_profile(payload: ProfileIn, ctx: Account, db: DbSession, settings: Ap
     if payload.marketing_consent is True and account.marketing_consent_at is None:
         account.marketing_consent_at = utcnow()
         account.marketing_consent_version = settings.marketing_consent_version
-    if payload.marketing_consent is False:
+        record_event(
+            db,
+            document="marketing_consent",
+            action="consented",
+            version=settings.marketing_consent_version,
+            account_id=account.id,
+            locale=account.locale,
+            source="account_settings",
+        )
+    if payload.marketing_consent is False and account.marketing_consent_at is not None:
+        record_event(
+            db,
+            document="marketing_consent",
+            action="withdrawn",
+            version=account.marketing_consent_version,
+            account_id=account.id,
+            locale=account.locale,
+            source="account_settings",
+        )
         account.marketing_consent_at = None
         account.marketing_consent_version = None
     db.commit()

@@ -38,7 +38,8 @@ export const en: Dictionary = {
     cookies: "Cookies",
     terms: "Terms of use",
     subscriptionTerms: "Subscriptions and payments",
-    provisional: "A.I. Commerce Studio is a platform of Iskrev Consulting Ltd.",
+    withdrawal: "Withdrawal and refunds",
+    provisional: "A.I. Commerce Studio is a trade name of {entity}, UIC {uic}.",
     rights: "All rights reserved.",
   },
   cookieNotice: {
@@ -92,7 +93,7 @@ export const en: Dictionary = {
   },
   prices: {
     label: "Indicative price",
-    note: "Prices for clients in the EU and elsewhere. They are final: we are not VAT registered, so no VAT is added. Hosting, licences and AI model usage are not included. The exact price is set in a written quote once the scope is agreed.",
+    note: "Indicative prices in euro, the same in every language. They are final: we are not VAT registered, so no VAT is added. Hosting, licences and AI model usage are not included. The exact price is set in a written quote once the scope is agreed.",
   },
   service: {
     limitationsTitle: "What it doesn't include or promise",
@@ -293,9 +294,9 @@ export const en: Dictionary = {
     messageTemplate:
       "Platform and store address: \nWhat you want to achieve: \nCurrent problem or constraint: \nPreferred timing: ",
     privacy: "I have read the",
-    privacyLink: "privacy information",
-    privacySuffix: "and agree that my details are used to respond to this inquiry.",
-    marketing: "I would like to receive information about services and useful materials (optional, can be withdrawn at any time).",
+    privacyLink: "Privacy Policy",
+    privacySuffix: ".",
+    marketing: "I would like to receive news, useful resources and service offers from A.I. Commerce Studio by email. I can withdraw my consent at any time.",
     submit: "Send inquiry",
     submitting: "Sending…",
     required: "required",
@@ -440,7 +441,7 @@ export const en: Dictionary = {
     email: "Enter a valid email address.",
     phone: "Invalid phone number.",
     service: "Select a service.",
-    privacy: "Please confirm that you have read the privacy information.",
+    privacy: "Please confirm that you have read the Privacy Policy.",
     noLinks: "This field cannot contain links or HTML.",
     select: "Select a value from the list.",
     url: "Enter a valid website address, for example https://example.com.",

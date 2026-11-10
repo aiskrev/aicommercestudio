@@ -5,7 +5,9 @@ import { useCallback, useEffect, useState } from "react";
 import { Alert, Button } from "@/components/ui/primitives";
 import type { Locale } from "@/i18n/config";
 import { billingTexts } from "@/i18n/billing";
-import { billingFetch } from "@/lib/account-api";
+import { AccountError, billingFetch } from "@/lib/account-api";
+import { OrderReview, type Acceptance } from "@/components/account/OrderReview";
+import { Withdrawal } from "@/components/account/Withdrawal";
 
 type Offer = {
   key: string;
@@ -42,6 +44,7 @@ export function AdvisorBilling({ locale }: { locale: Locale }) {
   const [state, setState] = useState<Status | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [reviewing, setReviewing] = useState<Offer | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -68,20 +71,32 @@ export function AdvisorBilling({ locale }: { locale: Locale }) {
       const { url } = await billingFetch<{ url: string }>(path, locale, t.network, { method: "POST", body });
       window.location.assign(url);
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : t.network);
+      setError(
+        reason instanceof AccountError && reason.code === "terms_version_changed"
+          ? t.review.errors.changed
+          : reason instanceof Error
+            ? reason.message
+            : t.network,
+      );
       setBusy(false);
     }
   }
 
-  if (offers === null || state === null) return null;
-  const subscription = state.subscriptions.find((item) => !["canceled", "incomplete_expired"].includes(item.status));
+  function order(offer: Offer, acceptance: Acceptance) {
+    void go("/checkout", { offer: offer.key, locale, acceptance });
+  }
 
-  return (
+  // The withdrawal function stays reachable even when the plan list cannot load (for example while the shared
+  // per-workspace request limit is used up): it has its own routes and limits.
+  const ready = offers !== null && state !== null;
+  const subscription = ready ? state.subscriptions.find((item) => !["canceled", "incomplete_expired"].includes(item.status)) : undefined;
+
+  const billing = ready ? (
     <section aria-labelledby="billing-title" className="space-y-4" data-testid="workspace-billing">
       <h2 id="billing-title" className="text-xl font-semibold">
         {t.title}
       </h2>
-      {error && (
+      {error && !reviewing && (
         <Alert tone="error" role="alert">
           {error}
         </Alert>
@@ -96,7 +111,23 @@ export function AdvisorBilling({ locale }: { locale: Locale }) {
         </div>
       )}
       {!subscription && offers.length === 0 && <p className="text-sm">{t.noOffers}</p>}
-      {!subscription && (
+      {!subscription && reviewing && (
+        <OrderReview
+          locale={locale}
+          productLabel={reviewing.plan ? t.plans[reviewing.plan as keyof typeof t.plans] : t.oneTime}
+          priceLabel={money(reviewing, locale)}
+          intervalLabel={reviewing.interval ? t.intervals[reviewing.interval] : null}
+          requiresScope={reviewing.requires_scope}
+          busy={busy}
+          error={error}
+          onConfirm={(acceptance) => order(reviewing, acceptance)}
+          onBack={() => {
+            setReviewing(null);
+            setError(null);
+          }}
+        />
+      )}
+      {!subscription && !reviewing && (
         <ul className="space-y-2">
           {offers.map((offer) => (
             <li key={offer.key} className="flex flex-wrap items-center justify-between gap-3 text-sm">
@@ -105,13 +136,7 @@ export function AdvisorBilling({ locale }: { locale: Locale }) {
                 {offer.interval ? ` / ${t.intervals[offer.interval]}` : ""}
                 {offer.requires_scope ? ` · ${t.scopeFirst}` : ""}
               </span>
-              <Button
-                type="button"
-                size="sm"
-                loading={busy}
-                loadingLabel={t.wait}
-                onClick={() => void go("/checkout", { offer: offer.key, locale })}
-              >
+              <Button type="button" size="sm" onClick={() => setReviewing(offer)}>
                 {t.buy}
               </Button>
             </li>
@@ -119,12 +144,24 @@ export function AdvisorBilling({ locale }: { locale: Locale }) {
         </ul>
       )}
       {state.has_customer && (
-        <Button type="button" variant="secondary" size="sm" onClick={() => void go("/portal", { locale })}>
-          {t.manage}
-        </Button>
+        <div className="space-y-2">
+          <Button type="button" variant="secondary" size="sm" onClick={() => void go("/portal", { locale })}>
+            {t.manage}
+          </Button>
+          <p className="text-xs text-fg-muted">{t.manageNote}</p>
+        </div>
       )}
       <p className="text-sm">{t.methodsNote}</p>
     </section>
+  ) : null;
+
+  // One stable position for the withdrawal function, so it is never unmounted and remounted while the plan list
+  // loads or fails: it stays reachable whatever happens to the rest of this section.
+  return (
+    <>
+      {billing}
+      <Withdrawal locale={locale} />
+    </>
   );
 }
 

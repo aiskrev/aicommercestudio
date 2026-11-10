@@ -88,7 +88,7 @@ test("a qualified inquiry is categorised for the administrator", async ({ page }
   await q.getByLabel(/^Can you grant read-only access/).selectOption("read_access");
   await q.getByLabel(/^Is there a non-production environment/).selectOption("no");
   await form.getByLabel(/^Main operational problems/).fill("Synthetic E2E test: several workflow agents, frequent prompt changes, no test environment.");
-  await form.getByRole("checkbox", { name: /privacy information/ }).check();
+  await form.getByRole("checkbox", { name: /I have read the Privacy Policy/ }).check();
   await humanPause();
   const response = page.waitForResponse((r) => r.url().endsWith("/api/public/leads") && r.request().method() === "POST");
   await form.getByRole("button", { name: "Request an AI assessment" }).click();

@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 
+import { DataRights } from "@/components/account/DataRights";
 import { Alert, Button } from "@/components/ui/primitives";
 import { accountTexts } from "@/i18n/account";
 import { type Locale, localizePath } from "@/i18n/config";
@@ -198,6 +199,8 @@ export function AccountHome({ locale }: { locale: Locale }) {
           </Button>
         )}
       </section>
+
+      <DataRights locale={locale} />
 
       <Button type="button" variant="secondary" onClick={() => void signOut()}>
         {t.home.signOut}

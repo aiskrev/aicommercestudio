@@ -400,8 +400,7 @@ function SendToTeam({
                   {content.privacy}{" "}
                   <Link href={privacyHref} className="font-medium text-brand underline underline-offset-4" target="_blank">
                     {content.privacyLink}
-                  </Link>{" "}
-                  {content.privacySuffix} <span className="field-required">*</span>
+                  </Link>{content.privacySuffix} <span className="field-required">*</span>
                 </span>
               </label>
               {errors.privacy_acknowledged && (

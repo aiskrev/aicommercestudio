@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.assessments.registry import registry as assessment_registry
+from app.compliance import events as _compliance_events  # noqa: F401
 from app.config import Settings, get_settings
 from app.errors import error_body
 from app.i18n import Locale, error_message, request_locale, validation_message
@@ -23,6 +24,7 @@ from app.routers import (
     admin_analytics,
     admin_auth,
     admin_catalogue,
+    admin_compliance,
     admin_opportunities,
     admin_staff,
     advisor,
@@ -30,7 +32,9 @@ from app.routers import (
     assessments,
     billing,
     catalogue,
+    compliance,
     health,
+    marketing,
     ops,
     ops_platform,
     portal,
@@ -155,6 +159,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(zone.router)
     app.include_router(analytics.router)
     app.include_router(admin_analytics.router)
+    app.include_router(compliance.router)
+    app.include_router(admin_compliance.router)
+    app.include_router(marketing.router)
     return app
 
 

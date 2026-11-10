@@ -15,6 +15,7 @@ import {
   subscriptionTerms,
   subscriptionTermsDraftNotice,
   termsOfUse,
+  withdrawalInfo,
 } from "@/content/bg/legal";
 import { about, aiSolutions, industries, processPage, servicesPage, toolsPage } from "@/content/bg/pages";
 import { keywordMap } from "@/content/bg/seo";
@@ -44,6 +45,7 @@ import {
   subscriptionTerms as enSubscriptionTerms,
   subscriptionTermsDraftNotice as enSubscriptionTermsDraftNotice,
   termsOfUse as enTermsOfUse,
+  withdrawalInfo as enWithdrawalInfo,
 } from "@/content/en/legal";
 import {
   about as enAbout,
@@ -108,6 +110,7 @@ const bg = {
     cookiePolicy,
     termsOfUse,
     subscriptionTerms,
+    withdrawalInfo,
     draftNotice: legalDraftNotice,
     isDraft: LEGAL_TEXTS_ARE_DRAFTS,
     cookiesDraft: COOKIE_POLICY_IS_DRAFT,
@@ -156,6 +159,7 @@ const en: SiteContent = {
     cookiePolicy: enCookiePolicy,
     termsOfUse: enTermsOfUse,
     subscriptionTerms: enSubscriptionTerms,
+    withdrawalInfo: enWithdrawalInfo,
     draftNotice: enLegalDraftNotice,
     isDraft: LEGAL_TEXTS_ARE_DRAFTS,
     cookiesDraft: COOKIE_POLICY_IS_DRAFT,

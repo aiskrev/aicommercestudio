@@ -220,7 +220,7 @@ describe("AdvisorTool", () => {
     await user.type(within(consultation).getByLabelText(/^Фирма/), "Примерна Фирма ЕООД");
     await user.type(within(consultation).getByLabelText(/^Имейл/), "ivan@example.com");
     await user.type(within(consultation).getByLabelText(/Описание на проекта/), "поръчки и товарителници.");
-    await user.click(within(consultation).getByRole("checkbox", { name: /информацията за поверителност/ }));
+    await user.click(within(consultation).getByRole("checkbox", { name: /Запознах се с Политиката за поверителност/ }));
     await user.click(within(consultation).getByRole("button", { name: bg.form.submit }));
 
     await waitFor(() => expect(screen.getByTestId("contact-success")).toBeInTheDocument());

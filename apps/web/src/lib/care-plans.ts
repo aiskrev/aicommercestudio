@@ -4,7 +4,7 @@ export type CarePlanKey = "website" | "commerce" | "automation" | "cloud" | "sec
 
 /**
  * Commercial terms stay out of the public site until the owner confirms them: `null` is shown as
- * "Agreed in writing". Setting one here is a decision, not an edit: the test in care-plans.test.ts fails
+ * "Agreed in the individual contract". Setting one here is a decision, not an edit: the test in care-plans.test.ts fails
  * while any value is published without that decision. Prices were decided on 2026-11-10 and live in
  * lib/prices.ts (CARE_PLAN_PRICES); included hours and response times are still not published.
  */

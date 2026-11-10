@@ -19,7 +19,7 @@ export const carePlans: typeof bgCarePlans = {
     cta: "Request an assessment",
     service: "Related service",
   },
-  responseValue: "Agreed in writing",
+  responseValue: "Agreed in the individual contract",
   plans: {
     website: {
       name: "Website Care",

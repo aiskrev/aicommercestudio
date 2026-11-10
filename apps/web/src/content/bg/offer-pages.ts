@@ -29,7 +29,7 @@ export const carePlans = {
     cta: "Заявете оценка",
     service: "Свързана услуга",
   },
-  responseValue: "Договаря се писмено",
+  responseValue: "Договаря се в индивидуалния договор",
   plans: {
     website: {
       name: "Website Care",

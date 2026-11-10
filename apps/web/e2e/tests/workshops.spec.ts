@@ -64,7 +64,7 @@ test("an enquiry about a workshop is stored with it", async ({ page }) => {
   await page.getByLabel(/^Фирма/).fill(`E2E Среща ${Date.now()}`);
   await page.getByLabel(/^Имейл/).fill("e2e.workshop@example.com");
   await page.getByLabel(/Описание на проекта/).fill("Автоматизиран E2E тест: искаме работна среща за AI стратегия за екипа.");
-  await page.getByRole("checkbox", { name: /информацията за поверителност/ }).check();
+  await page.getByRole("checkbox", { name: /Запознах се с Политиката за поверителност/ }).check();
   await page.waitForTimeout(3500); // the anti-bot timing check
   const [request] = await Promise.all([
     page.waitForRequest((r) => r.url().endsWith("/api/public/leads") && r.method() === "POST"),

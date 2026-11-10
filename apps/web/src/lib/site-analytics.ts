@@ -16,7 +16,7 @@ export interface AnalyticsEvent {
 }
 
 /** The customer area is private; it is never measured (the API refuses these paths as well). */
-const PRIVATE_PREFIXES = ["/bg/konto", "/en/account"];
+const PRIVATE_PREFIXES = ["/bg/konto", "/en/account", "/bg/otkaz-ot-marketing", "/en/marketing-opt-out"];
 const MAX_LABEL = 80;
 const DIGITS = /\d/g;
 
