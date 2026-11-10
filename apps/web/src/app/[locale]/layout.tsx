@@ -58,6 +58,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           locale={locale}
           slugs={buildSlugMap()}
           languageLabels={dict.language}
+          account={{
+            signIn: { href: href(routes.accountSignIn), label: dict.accountEntry.signIn },
+            register: { href: href(routes.accountRegister), label: dict.accountEntry.createAccount },
+          }}
           labels={{
             nav: dict.nav.label,
             openMenu: dict.nav.openMenu,

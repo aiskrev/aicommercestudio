@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { type ComponentProps, type KeyboardEvent, type ReactNode, useEffect, useId, useRef, useState } from "react";
 
+import { AccountLinks, type AccountLinksData } from "@/components/layout/AccountEntry";
 import { LanguageSwitcher, type LanguageSwitcherLabels } from "@/components/layout/LanguageSwitcher";
 import { Logo } from "@/components/layout/Logo";
 import { Icon } from "@/components/ui/Icon";
@@ -65,6 +66,7 @@ export function Header({
   locale,
   slugs,
   languageLabels,
+  account,
 }: {
   homeHref: string;
   services: ServiceMenu;
@@ -74,6 +76,8 @@ export function Header({
   locale: Locale;
   slugs: SlugMap;
   languageLabels: LanguageSwitcherLabels;
+  /** Sign-in and sign-up links; shown only while customer accounts are switched on. */
+  account?: AccountLinksData;
 }) {
   const pathname = usePublicPathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -347,6 +351,7 @@ export function Header({
 
           <div className="flex items-center gap-3">
             <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="hidden lg:block" />
+            {account && <AccountLinks links={account} variant="header" />}
             <div className="hidden sm:block lg:hidden xl:block">
               <Link href={cta.href} className={buttonClass("primary")}>
                 {cta.label}
@@ -456,6 +461,7 @@ export function Header({
             <Link href={cta.href} className={cx(buttonClass("primary", "lg"), "w-full")}>
               {cta.label}
             </Link>
+            {account && <AccountLinks links={account} variant="sheet" />}
           </div>
         </Container>
       </div>
