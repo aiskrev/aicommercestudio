@@ -455,8 +455,7 @@ function ConsultCard({
                   {t.privacy}{" "}
                   <Link href={privacyHref} className="font-medium text-brand underline underline-offset-4" target="_blank">
                     {t.privacyLink}
-                  </Link>{" "}
-                  {t.privacySuffix} <span className="field-required">*</span>
+                  </Link>{t.privacySuffix} <span className="field-required">*</span>
                 </span>
               </label>
               {errors.privacy_acknowledged && (

@@ -5,9 +5,11 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import make_url
+
+from app import legal, release_gates
 
 _WEAK_SECRET_MARKERS = ("change-me", "changeme", "secret", "password", "example")
 
@@ -54,9 +56,12 @@ class Settings(BaseSettings):
 
     lead_retention_days: int = Field(default=730, ge=30)
     audit_retention_days: int = Field(default=1095, ge=30)
-    privacy_notice_version: str = "2026-10-draft"
-    # Version of the marketing-consent wording shown next to the opt-in checkbox (recorded with consent).
-    marketing_consent_version: str = "2026-10-v1"
+    # Versions of the texts the web shows; the default is the registry (app/legal_versions.json), so what is recorded
+    # with a consent is the version of the displayed text. An environment value is ignored (see the validator below).
+    privacy_notice_version: str = legal.version("privacy")
+    marketing_consent_version: str = legal.version("marketing_consent")
+    # Customer accounts whose e-mail was never confirmed are deleted after this many days.
+    account_unverified_days: int = Field(default=30, ge=7, le=365)
 
     admin_bootstrap_email: str | None = None
     admin_bootstrap_password: str | None = None
@@ -170,6 +175,35 @@ class Settings(BaseSettings):
     account_ip_rate_limit: int = Field(default=20, ge=1)
     account_email_rate_limit: int = Field(default=5, ge=1)
     account_rate_window_seconds: int = Field(default=900, ge=60)
+    # Owner attestation, set only after every item of docs/DNS_MAILBOX_VERIFICATION.md is checked with a date. Without
+    # it a production start with accounts or billing on is refused (the acknowledgements depend on working mail).
+    email_delivery_verified: bool = False
+    # Rate limits of the legal workflows (app/accounts/limits.py: one shared PostgreSQL window, hashed keys, no IP
+    # stored). Per authenticated account or workspace, not per IP. Technical limits, not business deadlines.
+    # TEST STACK ONLY (docker-compose.legal-e2e.yml): raises the plan-based per-workspace request limit so a browser
+    # test that reloads pages quickly is not throttled.
+    # 0 = off. A production start refuses any other value.
+    workspace_rate_limit_floor: int = Field(default=0, ge=0)
+    # Working target for answering a data-subject request: N calendar months after receipt (docs/LEGAL_RETENTION.md).
+    # An operational aid for staff, not a legal decision; the lawyer confirms the period.
+    data_request_due_months: int = Field(default=1, ge=1, le=3)
+    data_request_due_soon_days: int = Field(default=7, ge=1, le=30)
+    legal_action_rate_limit: int = Field(default=5, ge=1)
+    legal_action_rate_window_seconds: int = Field(default=3600, ge=60)
+    legal_read_rate_limit: int = Field(default=60, ge=1)
+    legal_read_rate_window_seconds: int = Field(default=3600, ge=60)
+    staff_action_rate_limit: int = Field(default=60, ge=1)
+    staff_action_rate_window_seconds: int = Field(default=600, ge=60)
+    marketing_withdraw_rate_limit: int = Field(default=20, ge=1)
+    marketing_withdraw_rate_window_seconds: int = Field(default=900, ge=60)
+    # Retention of the legal workflow records (docs/LEGAL_RETENTION.md). None = not approved: nothing is deleted and,
+    # when accounts or billing are switched on in production, the configuration is refused. The periods are NOT
+    # set here: they need the lawyer's and the accountant's confirmation. Deletion also needs the switch below.
+    withdrawal_retention_years: int | None = Field(default=None, ge=1, le=30)
+    data_request_retention_years: int | None = Field(default=None, ge=1, le=30)
+    legal_cleanup_enabled: bool = False
+    # An open checkout younger than this blocks deleting the account (Checkout sessions expire well before).
+    billing_open_checkout_block_hours: int = Field(default=48, ge=1, le=240)
     # "disabled": nothing is sent and sign-up is refused. "dev_file": .eml files, never in production.
     email_provider: Literal["disabled", "smtp", "dev_file"] = "disabled"
     email_dev_dir: str = "/tmp/acs-mail"  # noqa: S108 - development only
@@ -216,6 +250,19 @@ class Settings(BaseSettings):
     def email_enabled(self) -> bool:
         return bool(self.smtp_host and self.smtp_from and self.lead_notification_email)
 
+    @field_validator("withdrawal_retention_years", "data_request_retention_years", mode="before")
+    @classmethod
+    def _empty_means_not_approved(cls, value: object) -> object:
+        return None if value in ("", None) else value
+
+    @model_validator(mode="after")
+    def _recorded_versions_follow_the_registry(self) -> Settings:
+        """The version stored with a consent must be the version of the text the web shows. A stale
+        PRIVACY_NOTICE_VERSION or MARKETING_CONSENT_VERSION left in an .env file must not win over the registry."""
+        self.privacy_notice_version = legal.version("privacy")
+        self.marketing_consent_version = legal.version("marketing_consent")
+        return self
+
     @model_validator(mode="after")
     def _stripe_test_mode_only(self) -> Settings:
         key = self.stripe_secret_key or ""
@@ -243,6 +290,8 @@ class Settings(BaseSettings):
             problems.append("CORS_ORIGINS must only contain https:// origins in production")
         if self.advisor_workspace_enabled:
             problems.append("ADVISOR_WORKSPACE_ENABLED is not released for production")
+        if self.workspace_rate_limit_floor:
+            problems.append("WORKSPACE_RATE_LIMIT_FLOOR is for the test stack only")
         if self.invoicing_source == "demo":
             problems.append("INVOICING_SOURCE=demo is not allowed in production")
         if self.billing_provider == "stripe":
@@ -257,6 +306,24 @@ class Settings(BaseSettings):
             make_url(self.database_url).username != "acs_app_api"
         ):
             problems.append("customer accounts and the client portal need the restricted database role")
+        problems.extend(release_gates.open_blockers(customer_accounts_enabled=self.customer_accounts_enabled))
+        if self.customer_accounts_enabled or self.billing_provider != "disabled":
+            if not self.email_delivery_verified:
+                problems.append(
+                    "EMAIL_DELIVERY_VERIFIED is not set: mailbox, inbound and outbound delivery, SPF, DKIM and DMARC "
+                    "must be checked first (docs/DNS_MAILBOX_VERIFICATION.md)"
+                )
+            if self.withdrawal_retention_years is None or self.data_request_retention_years is None:
+                problems.append(
+                    "WITHDRAWAL_RETENTION_YEARS and DATA_REQUEST_RETENTION_YEARS are not approved "
+                    "(needs the lawyer and the accountant; docs/LEGAL_RETENTION.md)"
+                )
+            pending = legal.pending_review()
+            if pending:
+                problems.append(
+                    "legal texts still pending lawyer review cannot back live contractual acceptance: "
+                    + ", ".join(pending)
+                )
         if problems:
             raise ValueError("Unsafe production configuration: " + "; ".join(problems))
         return self

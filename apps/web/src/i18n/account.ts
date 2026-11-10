@@ -28,7 +28,8 @@ const bg = {
     privacyBefore: "Прочетох ",
     privacyLink: "политиката за поверителност",
     privacyAfter: ".",
-    marketing: "Искам да получавам новини и предложения по имейл. Това е по желание и мога да се откажа по всяко време.",
+    marketing:
+      "Желая да получавам новини, полезни материали и предложения за услугите на A.I. Commerce Studio по имейл. Мога да оттегля съгласието си по всяко време.",
     haveAccount: "Вече имате акаунт? Вход",
     done: "Ако имейлът може да се използва, ще получите писмо с линк за потвърждение. Проверете и папката за спам.",
   },
@@ -64,7 +65,8 @@ const bg = {
     profile: "Профил",
     save: "Запази",
     saved: "Промените са запазени.",
-    marketing: "Новини и предложения по имейл (по желание)",
+    marketing:
+      "Желая да получавам новини, полезни материали и предложения за услугите на A.I. Commerce Studio по имейл. Мога да оттегля съгласието си по всяко време.",
     passwordTitle: "Смяна на паролата",
     passwordSubmit: "Смени паролата",
     passwordDone: "Паролата е сменена. Другите сесии са затворени.",
@@ -76,6 +78,29 @@ const bg = {
     revoke: "Затвори",
     revokeOthers: "Затвори всички други",
     signOut: "Изход",
+  },
+  data: {
+    title: "Вашите данни",
+    lead: "Можете да изтеглите данните от акаунта си и да поискате корекция, ограничаване, възражение или изтриване. Отказът от маркетинг е в профила по-горе: махнете отметката и запазете.",
+    export: "Изтеглете данните си (JSON)",
+    exportDone: "Файлът е изтеглен.",
+    request: "Подайте искане",
+    kind: "Вид искане",
+    kinds: {
+      deletion: "Изтриване на акаунта и данните",
+      correction: "Корекция на данни",
+      restriction: "Ограничаване на обработването",
+      objection: "Възражение срещу обработването",
+    },
+    message: "Съобщение (по желание)",
+    send: "Изпратете искането",
+    received: "Искането е получено. Референтен номер:",
+    repeat: "Вече има отворено искане от този вид. Референтен номер:",
+    deletionNote:
+      "Изтриването се извършва от служител, не веднага. Данни, които сме длъжни да пазим по закон (например за плащания и фактури), се запазват за срока, изискван от закона, и се изтриват или обезличават след това.",
+    mine: "Вашите искания",
+    status: { open: "отворено", done: "изпълнено", rejected: "отхвърлено" },
+    error: "Искането не можа да бъде изпратено. Опитайте отново.",
   },
 };
 
@@ -108,7 +133,8 @@ const en: AccountTexts = {
     privacyBefore: "I have read the ",
     privacyLink: "privacy policy",
     privacyAfter: ".",
-    marketing: "I'd like news and offers by e-mail. This is optional and I can opt out at any time.",
+    marketing:
+      "I would like to receive news, useful resources and service offers from A.I. Commerce Studio by email. I can withdraw my consent at any time.",
     haveAccount: "Already have an account? Sign in",
     done: "If this e-mail can be used, you'll receive a message with a confirmation link. Check your spam folder too.",
   },
@@ -144,7 +170,8 @@ const en: AccountTexts = {
     profile: "Profile",
     save: "Save",
     saved: "Your changes are saved.",
-    marketing: "News and offers by e-mail (optional)",
+    marketing:
+      "I would like to receive news, useful resources and service offers from A.I. Commerce Studio by email. I can withdraw my consent at any time.",
     passwordTitle: "Change password",
     passwordSubmit: "Change password",
     passwordDone: "Your password is changed. Other sessions are closed.",
@@ -156,6 +183,29 @@ const en: AccountTexts = {
     revoke: "Close",
     revokeOthers: "Close all others",
     signOut: "Sign out",
+  },
+  data: {
+    title: "Your data",
+    lead: "You can download the data in your account and ask for correction, restriction, objection or deletion. To stop marketing e-mails, untick the box in your profile above and save.",
+    export: "Download your data (JSON)",
+    exportDone: "The file was downloaded.",
+    request: "Make a request",
+    kind: "Type of request",
+    kinds: {
+      deletion: "Delete the account and data",
+      correction: "Correct data",
+      restriction: "Restrict processing",
+      objection: "Object to processing",
+    },
+    message: "Message (optional)",
+    send: "Send the request",
+    received: "Your request was received. Reference number:",
+    repeat: "There is already an open request of this kind. Reference number:",
+    deletionNote:
+      "Deletion is carried out by a staff member, not instantly. Data we are required by law to keep (for example about payments and invoices) is kept for the period the law requires and is deleted or anonymised afterwards.",
+    mine: "Your requests",
+    status: { open: "open", done: "done", rejected: "rejected" },
+    error: "The request could not be sent. Please try again.",
   },
 };
 

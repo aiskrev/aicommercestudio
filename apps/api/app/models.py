@@ -225,6 +225,7 @@ class Lead(Base):
         CheckConstraint(_in_check("locale", LeadLocale), name="locale"),
         CheckConstraint(_in_check("workshop_key", WorkshopKey, nullable=True), name="workshop_key"),
         Index("ix_leads_locale", "locale"),
+        Index("uq_leads_marketing_token_hash", "marketing_token_hash", unique=True),
         Index("ix_leads_created_at", "created_at"),
         Index("ix_leads_status", "status"),
         Index("ix_leads_updated_at", "updated_at"),
@@ -264,6 +265,10 @@ class Lead(Base):
     marketing_consent_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
     # Version of the marketing-consent wording the visitor agreed to (set only with consent).
     marketing_consent_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    # Set when the consent is withdrawn (staff action on request); the history is in legal_events.
+    marketing_consent_withdrawn_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    # SHA-256 of the opaque token in the self-service withdrawal link (never the token itself, never the lead id).
+    marketing_token_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     ip_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow, onupdate=utcnow)

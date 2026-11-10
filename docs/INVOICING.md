@@ -82,3 +82,10 @@ is not built.
 * No real issuer and no proforma flow.
 * A document is a plain text copy, not a PDF.
 * Staff have no screen for blocked documents: use the logs, the audit entries and the CLI.
+
+## Withdrawals, refunds and credit notes (2026-11-10)
+
+A withdrawal request does not create or change an accounting document. A refund made by hand in Stripe for a withdrawal is recorded on the
+request (`refund_reference`); whether and how it produces a credit note (`kind = credit_note`, linked by `parent_id`) is a decision for the
+accountant, as are the VAT treatment, the numbering and the retention period. A refunded withdrawal is kept at least as long as
+`ACCOUNTING_RETENTION_YEARS` (docs/LEGAL_RETENTION.md). Nothing in this branch issues, edits or deletes an invoice.

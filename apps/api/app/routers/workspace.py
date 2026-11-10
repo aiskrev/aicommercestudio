@@ -55,11 +55,7 @@ def _error(exc: WorkspaceError) -> ApiError:
     return ApiError(exc.status, exc.detail, exc.code, errors=exc.extra or None)
 
 
-def workspace_context(
-    account: Account,
-    db: DbSession,
-    x_workspace: Annotated[uuid.UUID | None, Header()] = None,
-) -> Context:
+def _resolve_workspace(account, db, x_workspace: uuid.UUID | None) -> Context:
     """The caller's own workspace, or one named in X-Workspace if they are a member of it."""
     workspace = entitlements.workspace_for(db, account.account.id)
     db.commit()
@@ -69,12 +65,33 @@ def workspace_context(
         if member is None:  # the same answer as a workspace that doesn't exist
             raise ApiError(status.HTTP_404_NOT_FOUND, "Not found.", "not_found")
         workspace, role = db.get(CustomerWorkspace, x_workspace), member.role
-    rights = entitlements.resolve(db, workspace.id)
-    limits.hit("workspace", str(workspace.id), rights.limit("limit_requests_per_minute"), 60)
-    return Context(workspace=workspace, rights=rights, role=role)
+    return Context(workspace=workspace, rights=entitlements.resolve(db, workspace.id), role=role)
+
+
+def workspace_context(
+    account: Account,
+    db: DbSession,
+    x_workspace: Annotated[uuid.UUID | None, Header()] = None,
+) -> Context:
+    """The workspace, counted against the plan's shared per-workspace request limit."""
+    ctx = _resolve_workspace(account, db, x_workspace)
+    allowed = max(ctx.rights.limit("limit_requests_per_minute"), get_settings().workspace_rate_limit_floor)
+    limits.hit("workspace", str(ctx.workspace.id), allowed, 60)
+    return ctx
+
+
+def workspace_context_without_shared_limit(
+    account: Account,
+    db: DbSession,
+    x_workspace: Annotated[uuid.UUID | None, Header()] = None,
+) -> Context:
+    """The workspace WITHOUT the shared per-workspace limit. Only for the statutory withdrawal function: a burst of
+    ordinary page loads must never hide or block it. Those routes apply their own dedicated limits instead."""
+    return _resolve_workspace(account, db, x_workspace)
 
 
 WorkspaceCtx = Annotated[Context, Depends(workspace_context)]
+WithdrawalWorkspaceCtx = Annotated[Context, Depends(workspace_context_without_shared_limit)]
 
 
 def gated(feature: str):

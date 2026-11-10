@@ -80,7 +80,7 @@ describe("workshops & advisory catalogue", () => {
     }
     // The notices say the published prices are indicative and the exact price is agreed in writing.
     expect(getContent("bg").workshops.page.notice).toMatch(/ориентировъчни и крайни.*писмено/);
-    expect(getContent("en").workshops.page.notice).toMatch(/indicative and final.*in writing/);
+    expect(getContent("en").workshops.page.notice).toMatch(/indicative.*final.*in writing/);
   });
 
   it("meets the SEO limits: title ≤ 60 characters, description 120–160 (CONTENT_STRATEGY §9)", () => {
@@ -146,7 +146,7 @@ describe("workshops & advisory catalogue", () => {
       label: "Cloud Landing Zone Assessment",
       kind: "assessment",
       kindLabel: "Assessment",
-      priceFrom: "From €2,150",
+      priceFrom: "From €1,800",
     });
   });
 });

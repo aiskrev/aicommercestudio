@@ -50,6 +50,8 @@ const EN_SEGMENTS: Record<string, string> = {
   biskvitki: "cookies",
   "obshti-usloviya": "terms",
   "usloviya-za-abonament": "subscription-terms",
+  "otkaz-i-vazstanovyavane": "withdrawal-and-refunds",
+  "otkaz-ot-marketing": "marketing-opt-out",
   "ai-agenti": "ai-agents",
   "referentni-stsenarii": "reference-scenarios",
   "integratsionni-modeli": "integration-patterns",

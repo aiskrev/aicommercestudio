@@ -101,6 +101,8 @@ class BillingCheckout(Base):
     stripe_session_id: Mapped[str | None] = mapped_column(String(100), unique=True)
     status: Mapped[str] = mapped_column(String(12), nullable=False, default="open")
     created_at: Mapped[datetime] = mapped_column(TS, nullable=False, default=utcnow)
+    # When Stripe reported the checkout complete: the contract is concluded then (starts the withdrawal period).
+    completed_at: Mapped[datetime | None] = mapped_column(TS)
 
 
 class BillingSubscription(Base):

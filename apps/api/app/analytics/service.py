@@ -45,7 +45,7 @@ BOT_RE = re.compile(
 )
 DIGITS_RE = re.compile(r"\d")
 SPECIAL_TARGETS = frozenset({"mailto", "tel"})
-PRIVATE_PREFIXES = ("/bg/konto", "/en/account")
+PRIVATE_PREFIXES = ("/bg/konto", "/en/account", "/bg/otkaz-ot-marketing", "/en/marketing-opt-out")
 
 
 def is_bot(user_agent: str | None) -> bool:

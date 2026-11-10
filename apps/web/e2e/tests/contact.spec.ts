@@ -40,7 +40,7 @@ test.describe("contact form", () => {
     await page.getByLabel(/Желан срок/).selectOption("within_3_months");
     await page.getByLabel(/Адрес на сайта/).fill("example-shop.bg");
     await page.getByLabel(/Описание на проекта/).fill("Автоматизиран E2E тест: искаме оферта за AI асистент.");
-    await page.getByRole("checkbox", { name: /информацията за поверителност/ }).check();
+    await page.getByRole("checkbox", { name: /Запознах се с Политиката за поверителност/ }).check();
     await page.waitForTimeout(3500);
 
     const response = page.waitForResponse((r) => r.url().endsWith("/api/public/quote-requests"));
@@ -57,7 +57,7 @@ test.describe("contact form", () => {
     await page.getByLabel(/^Фирма/).fill(`E2E Тест ${Date.now()}`);
     await page.getByLabel(/^Имейл/).fill("e2e.test@example.com");
     await page.getByLabel(/Описание на проекта/).fill("Автоматизиран E2E тест: искаме автоматизация на обработката на поръчки.");
-    await page.getByRole("checkbox", { name: /информацията за поверителност/ }).check();
+    await page.getByRole("checkbox", { name: /Запознах се с Политиката за поверителност/ }).check();
     // The API rejects forms submitted faster than FORM_TOKEN_MIN_SECONDS (anti-bot timing check).
     await page.waitForTimeout(3500);
     await page.getByRole("button", { name: "Изпратете запитването" }).click();

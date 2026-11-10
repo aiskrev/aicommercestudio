@@ -1,0 +1,29 @@
+# TEST-ONLY override for the browser tests of the legal workflows (scripts/test-legal-e2e.ps1).
+# It switches customer accounts, the Advisor Workspace and the Stripe-shaped billing routes ON and sends mail to files,
+# so the order review, withdrawal, data-rights and deletion screens can be driven in a real browser.
+#
+# Nothing here talks to Stripe: the key and the webhook secret are placeholders, no price or customer exists at
+# Stripe, and the browser specs never complete a checkout (the redirect to Stripe is intercepted). The API refuses a
+# production start with any of these flags (app/config.py), and the seed command refuses to run in production.
+# NEVER use this file for a deployment.
+services:
+  api:
+    environment:
+      CUSTOMER_ACCOUNTS_ENABLED: "true"
+      ADVISOR_WORKSPACE_ENABLED: "true"
+      BILLING_PROVIDER: "stripe"
+      STRIPE_SECRET_KEY: "sk_test_placeholder_never_used_against_stripe"
+      STRIPE_WEBHOOK_SECRET: "whsec_placeholder_never_used"
+      EMAIL_PROVIDER: "dev_file"
+      INVOICING_SOURCE: "none"
+      LOGIN_RATE_LIMIT: "500"
+      ACCOUNT_IP_RATE_LIMIT: "500"
+      ACCOUNT_EMAIL_RATE_LIMIT: "500"
+      WORKSPACE_RATE_LIMIT_FLOOR: "5000"
+      LEGAL_ACTION_RATE_LIMIT: "200"
+      LEGAL_READ_RATE_LIMIT: "400"
+      STAFF_ACTION_RATE_LIMIT: "400"
+  web:
+    environment:
+      CUSTOMER_ACCOUNTS_ENABLED: "true"
+      ADVISOR_WORKSPACE_ENABLED: "true"

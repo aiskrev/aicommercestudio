@@ -27,6 +27,7 @@ class OutboxKind(enum.StrEnum):
     VERIFY_EMAIL = "verify_email"
     RESET_PASSWORD = "reset_password"  # noqa: S105 - a message kind, not a secret
     ACCOUNT_EXISTS = "account_exists"
+    WITHDRAWAL_RECEIVED = "withdrawal_received"
 
 
 class OutboxStatus(enum.StrEnum):
@@ -45,6 +46,8 @@ class CustomerAccount(Base):
     display_name: Mapped[str | None] = mapped_column(String(120))
     locale: Mapped[str] = mapped_column(String(2), nullable=False, default="bg", server_default=text("'bg'"))
     email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Set when the personal data was erased on request (the row stays only because accounting data refers to it).
+    erased_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     privacy_notice_version: Mapped[str] = mapped_column(String(32), nullable=False)
     privacy_acknowledged_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow)
     marketing_consent_version: Mapped[str | None] = mapped_column(String(32))
@@ -100,7 +103,16 @@ class OutboxMessage(Base):
     """A transactional e-mail to send. Holds no address, body or token: those are built at send time."""
 
     __tablename__ = "outbox_messages"
-    __table_args__ = (Index("ix_outbox_due", "status", "next_attempt_at"),)
+    __table_args__ = (
+        Index("ix_outbox_due", "status", "next_attempt_at"),
+        Index(
+            "uq_outbox_messages_kind_reference",
+            "kind",
+            "reference",
+            unique=True,
+            postgresql_where=text("reference IS NOT NULL"),
+        ),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     account_id: Mapped[uuid.UUID] = mapped_column(
@@ -111,6 +123,8 @@ class OutboxMessage(Base):
     status: Mapped[str] = mapped_column(String(12), nullable=False, default=OutboxStatus.PENDING.value)
     attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default=text("0"))
     next_attempt_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow)
+    # A public reference the message talks about (for example a withdrawal reference); never personal data.
+    reference: Mapped[str | None] = mapped_column(String(24))
     last_error: Mapped[str | None] = mapped_column(String(60))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow)
     sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

@@ -1,0 +1,125 @@
+{
+  "_note": "Version ids of the legal texts and consent wordings (docs/LEGAL_CONTENT_RELEASE.md). status: draft (a working text; its hashes follow it under the same id) | approved (a lawyer signed this exact BG and EN text off; approved_content_sha256 freezes it, any change needs a new id) | published (approved and live). review: pending_lawyer_review | reviewed. A draft is never described as approved, and the API refuses to use a draft for a live contractual acceptance. content_sha256 covers both languages; content_sha256_bg and content_sha256_en are per language. Refresh the hashes of DRAFTS with UPDATE_LEGAL_VERSIONS=1 and copy this file to apps/api/app/legal_versions.json.",
+  "documents": {
+    "privacy": {
+      "version": "2026-11-10",
+      "kind": "notice",
+      "review": "pending_lawyer_review",
+      "previous_reviewed_version": "2026-11-04",
+      "content_sha256": "2bd90fb6a96f5b416b1692c73ab892d32d9b1407e6ea48728ccec1199773800e",
+      "status": "draft",
+      "languages": [
+        "bg",
+        "en"
+      ],
+      "content_sha256_bg": "14b1bd81af544085f11ab753e770ec63176990ab4266e9ace952a33f4b392492",
+      "content_sha256_en": "a40e3d4c59eb896b8cc34243e70fac39023377546ac4cdda72b94b2cd065cb11",
+      "approved_content_sha256": null
+    },
+    "cookies": {
+      "version": "2026-11-10",
+      "kind": "notice",
+      "review": "pending_lawyer_review",
+      "previous_reviewed_version": "2026-11-03",
+      "content_sha256": "19618f0bb9d9125443b66a643e87d5fb87bbb02eb7ddae14c2f6832c8d8e7938",
+      "status": "draft",
+      "languages": [
+        "bg",
+        "en"
+      ],
+      "content_sha256_bg": "8d4faa20aaffc96e421efbd86471fa9693f80aa20fbd0ca6e471606d84f6f879",
+      "content_sha256_en": "d0060bc267390a035f4d71c1456d011814730b71e3e4d43a636bb3064bc1fb16",
+      "approved_content_sha256": null
+    },
+    "terms": {
+      "version": "2026-11-10",
+      "kind": "contract",
+      "review": "pending_lawyer_review",
+      "previous_reviewed_version": "2026-11-04",
+      "content_sha256": "2413c7949c0cbaa3cb7cb1d120bb2adb47fe8b35ff47c4f8214b617d7dd336a0",
+      "status": "draft",
+      "languages": [
+        "bg",
+        "en"
+      ],
+      "content_sha256_bg": "094a1b8baab8c56f9c682e0bc8b6e7d07e21f4574c627cd2ad1b6f3c0e959f0a",
+      "content_sha256_en": "59cd3805e16ecdabc2d68404e3596186ecd39c162b637d644cdad539f2745541",
+      "approved_content_sha256": null
+    },
+    "subscription_terms": {
+      "version": "2026-11-10",
+      "kind": "contract",
+      "review": "pending_lawyer_review",
+      "previous_reviewed_version": "2026-11-10",
+      "content_sha256": "8dcf3f9229bda6783e1c646b347f1cc8e49d6399d459aa43647daf15282f425d",
+      "status": "draft",
+      "languages": [
+        "bg",
+        "en"
+      ],
+      "content_sha256_bg": "611725958064360022747b14c8d62e9b0e9f2848fcb3b33d3a055de92b705cb0",
+      "content_sha256_en": "55a1a5463f9cea2abd4251a81715245627399f29c7794553984fd260c5d0c34c",
+      "approved_content_sha256": null
+    },
+    "withdrawal_info": {
+      "version": "2026-11-10",
+      "kind": "notice",
+      "review": "pending_lawyer_review",
+      "previous_reviewed_version": null,
+      "content_sha256": "3b067392222c367f0b2c31eb6c2155b7d369f057da95fe95e19012be4bc3a062",
+      "status": "draft",
+      "languages": [
+        "bg",
+        "en"
+      ],
+      "content_sha256_bg": "54f9d9332fe6777b197bd7d7eda3e10e0a8734fa6e54391490cfccd61b7ee41a",
+      "content_sha256_en": "709143d9572b4d6d8bd5ed4773ca2b1da06d49a8c36d4d5cf7e81aff8b804a4f",
+      "approved_content_sha256": null
+    },
+    "marketing_consent": {
+      "version": "2026-11-10",
+      "kind": "consent",
+      "review": "pending_lawyer_review",
+      "previous_reviewed_version": null,
+      "content_sha256": "bcb16c28468f18b6adf6f9cb12e844a5445d77ab98939ee1adc3f66fb357e48d",
+      "status": "draft",
+      "languages": [
+        "bg",
+        "en"
+      ],
+      "content_sha256_bg": "1fcf3412f2ebc39c70f0cdb0e3e1ffb937e3e7496d1495251a4f3b02462dc913",
+      "content_sha256_en": "06cf690ae724a1210e20e635ccf895f1d8fe3b277957c2a55544834592b62534",
+      "approved_content_sha256": null
+    },
+    "order_acceptance": {
+      "version": "2026-11-10",
+      "kind": "consent",
+      "review": "pending_lawyer_review",
+      "previous_reviewed_version": null,
+      "content_sha256": "6a61fab62180f4306c39cb90368c9465ee3ed8092bd085c2d254fa7e86f83d63",
+      "status": "draft",
+      "languages": [
+        "bg",
+        "en"
+      ],
+      "content_sha256_bg": "89477dcda2653467387789139e74d7ef18c9ebcaa8d24708951865ee1561da61",
+      "content_sha256_en": "8e49e4dc83b84c0e09236a4acf4b225ef350bfa48e57dabb1584d1673fbc6599",
+      "approved_content_sha256": null
+    },
+    "early_start": {
+      "version": "2026-11-10",
+      "kind": "consent",
+      "review": "pending_lawyer_review",
+      "previous_reviewed_version": null,
+      "content_sha256": "03468eaa16e19eb8cfbad475ca233af1f2b36a73c9dec063949af8088789b214",
+      "status": "draft",
+      "languages": [
+        "bg",
+        "en"
+      ],
+      "content_sha256_bg": "ab44277245a796604a617e1e9ef9897994d39f4b74de063de2bb30abf1f77f3d",
+      "content_sha256_en": "cef72ce91fa92bafb0aec0616fd8e37c79c2a6578186013997f98dfd957e544e",
+      "approved_content_sha256": null
+    }
+  }
+}

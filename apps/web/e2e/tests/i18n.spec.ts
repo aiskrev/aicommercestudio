@@ -195,7 +195,7 @@ test.describe("AI Managed Services", () => {
     await form
       .getByLabel(/^Main operational problems/)
       .fill("Synthetic E2E test: answers degraded after a prompt change and token costs increased.");
-    await form.getByRole("checkbox", { name: /privacy information/ }).check();
+    await form.getByRole("checkbox", { name: /I have read the Privacy Policy/ }).check();
     await humanPause();
     const response = page.waitForResponse((r) => r.url().endsWith("/api/public/leads") && r.request().method() === "POST");
     await form.getByRole("button", { name: "Request an AI assessment" }).click();

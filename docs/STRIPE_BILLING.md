@@ -157,3 +157,17 @@ Each step needs the owner. None is done.
 * Staff have no billing screen: incidents and scope confirmation are through the database and CLI.
 * A customer who changes plan in the portal needs a Stripe price mapped to an offer; the portal must
   offer only those prices, or the event fails and appears in `billing_events`.
+
+## Order review, acceptance and withdrawal (2026-11-10, technical foundation; legal texts pending review)
+
+* **Before Stripe**: the customer sees an order review (product, price in EUR, interval, renewal, how to cancel, seller identification
+  from `lib/company.ts`, links to the terms and the privacy notice), chooses consumer or business, and ticks the terms.
+  The browser sends the version ids it showed; `POST /api/billing/checkout` REQUIRES the `acceptance` block and refuses a
+  stale version with `terms_version_changed`. With payments on in production, every legal text must be approved
+  (`legal_text_not_approved`; docs/LEGAL_CONTENT_RELEASE.md). The acceptance is stored in `legal_events` against the checkout, once.
+* **Withdrawal** from the contract ("Откажете се от договора тук") is separate from cancelling in the Stripe portal. The system records
+  the statement and sends the acknowledgement; it never refunds. A staff member decides and, if a refund is due, makes it by hand
+  in Stripe and records its reference (`refund_reference`, `refund_amount_minor`).
+* **Stripe-side data** (customer, payment methods, invoices) is not erased or corrected by this system: see docs/LEGAL_RETENTION.md section 4.
+* **Account deletion** is refused while any local subscription or checkout state is not final, and asks the staff member to confirm
+  they checked Stripe (docs/LEGAL_RETENTION.md section 3). A late subscription event for an erased account is flagged in the audit log.

@@ -203,3 +203,16 @@ production when the items marked (enforced) are wrong.
 ## Reporting
 
 Security issues should be reported privately to the site owner ([security contact to be defined]).
+
+## Legal workflows (2026-11-10)
+
+* **Rate limits** (shared PostgreSQL windows, hashed keys, no IP stored), per account or workspace and not per IP alone: data export,
+  data requests, withdrawal preview and confirmation, contract and request lists, every staff action in the legal queues, and the public
+  marketing withdrawal (per client and for the whole endpoint). Defaults and names: `LEGAL_ACTION_RATE_LIMIT`, `LEGAL_READ_RATE_LIMIT`,
+  `STAFF_ACTION_RATE_LIMIT`, `MARKETING_WITHDRAW_RATE_LIMIT` (app/config.py).
+* **Duplicates and races**: a partial unique index allows one open withdrawal per contract and one open data request per account and kind;
+  an acceptance is recorded once per checkout (partial unique index); one confirmation message per reference; consent changes lock the row;
+  an erasure locks the account and fails closed on any billing state that is not final.
+* **Marketing withdrawal link**: an opaque HMAC token of the lead id with the server secret, stored only as a SHA-256 hash, carried in the URL
+  fragment, posted by one click; invalid, tampered, never-issued and unknown tokens get one generic answer. It does not expire, by design.
+* **Evidence**: `legal_events` is append-only for the API role (insert and select only); the API role cannot delete withdrawal or data requests.

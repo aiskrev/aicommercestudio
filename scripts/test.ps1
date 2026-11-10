@@ -3,10 +3,11 @@
   Runs the test suites inside Docker (no local Python/Node required).
 .PARAMETER Suite
   api | web | e2e | portal | audit | all (default: all except portal and audit)
+  legal: browser tests of the legal workflows on a test-only stack with accounts and billing routes on (no Stripe)
   portal: the client portal browser e2e on a stack started with the portal switched ON
   (docker-compose.portal-e2e.yml, test only); the stack is switched back to the default afterwards.
 #>
-param([ValidateSet("api", "web", "e2e", "portal", "audit", "all")][string]$Suite = "all")
+param([ValidateSet("api", "web", "e2e", "portal", "legal", "audit", "all")][string]$Suite = "all")
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
@@ -43,6 +44,13 @@ if ($Suite -in @("api", "web", "all")) {
         $api = (Get-FileHash "apps/api/app/catalogue/seed_v1.json").Hash
         $web = (Get-FileHash "apps/web/src/lib/catalogue-seed.json").Hash
         if ($api -ne $web) { Write-Host "catalogue seed differs between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
+        $global:LASTEXITCODE = [int]($api -ne $web)
+    }
+    # Legal document versions: the web shows them, the API validates and stores them (lib/legal-versions.test.ts hashes the texts).
+    Invoke-Suite "Legal document versions (API = web copy)" {
+        $api = (Get-FileHash "apps/api/app/legal_versions.json").Hash
+        $web = (Get-FileHash "apps/web/src/lib/legal-versions.json").Hash
+        if ($api -ne $web) { Write-Host "legal versions differ between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
         $global:LASTEXITCODE = [int]($api -ne $web)
     }
     # Workshop keys and titles: the API accepts them on enquiries and uses the titles in proposal drafts.
@@ -83,6 +91,9 @@ if ($Suite -in @("e2e", "all")) {
         docker compose exec -T api sh -c 'python -m app.cli ops-seed-demo --owner-email "$ADMIN_BOOTSTRAP_EMAIL"' | Out-Null
         docker compose --profile test run --rm --build -e E2E_STAFF_PASSWORD=$staffPassword e2e
     }
+}
+if ($Suite -eq "legal") {
+    Invoke-Suite "Legal workflows e2e (accounts and billing routes on, no Stripe; test stack only)" { & "$PSScriptRoot/test-legal-e2e.ps1" }
 }
 if ($Suite -eq "portal") {
     Invoke-Suite "Client portal e2e (portal switched on, test stack only)" {

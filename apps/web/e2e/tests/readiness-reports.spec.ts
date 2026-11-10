@@ -68,11 +68,11 @@ test("sending the result to the team validates consent and returns a reference",
   const send = page.getByTestId("readiness-send");
   await send.getByRole("button", { name: "Send the result to our team" }).click();
   await expect(send.getByTestId("readiness-send-storage")).toContainText("We do not send automatic e-mails");
-  await expect(send.getByRole("checkbox", { name: /receive information about services/ })).not.toBeChecked();
+  await expect(send.getByRole("checkbox", { name: /I would like to receive news, useful resources and service offers/ })).not.toBeChecked();
 
   await send.getByRole("button", { name: "Send the result" }).click();
   await expect(send.getByRole("alert")).toHaveText("Please correct the highlighted fields.");
-  await expect(send.getByText("Please confirm that you have read the privacy information.")).toBeVisible();
+  await expect(send.getByText("Please confirm that you have read the Privacy Policy.")).toBeVisible();
 
   await page.waitForTimeout(3500);
   await send.getByLabel(/^Full name/).fill("E2E Readiness");
@@ -80,7 +80,7 @@ test("sending the result to the team validates consent and returns a reference",
   await send.getByLabel(/^Company/).fill(`E2E Readiness ${Date.now()}`);
   await send.getByLabel(/^Role/).fill("Operations director");
   await send.getByRole("checkbox", { name: "I would like a consultation about the result" }).check();
-  await send.getByRole("checkbox", { name: /privacy information/ }).check();
+  await send.getByRole("checkbox", { name: /I have read the Privacy Policy/ }).check();
   await send.getByRole("button", { name: "Send the result" }).click();
 
   const success = page.getByTestId("readiness-send-success");

@@ -8,6 +8,7 @@ from sqlalchemy import engine_from_config, pool
 import app.accounts.models  # noqa: F401
 import app.analytics.models  # noqa: F401
 import app.billing.models  # noqa: F401
+import app.compliance.models  # noqa: F401
 import app.invoicing.models  # noqa: F401
 import app.models  # noqa: F401  (registers tables on Base.metadata)
 import app.workspace.models  # noqa: F401

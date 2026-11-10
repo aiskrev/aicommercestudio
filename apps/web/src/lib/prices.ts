@@ -4,14 +4,23 @@ import type { CarePlanKey } from "@/lib/care-plans";
 import type { WorkshopKey } from "@/lib/workshop-slugs";
 
 /**
- * Published indicative prices, decided by the owner on 2026-11-10.
+ * Published indicative prices (docs/PRICING.md).
  *
  * The baseline of each row is the recommendation of the pricing report of 2026-11-10 ("Пазарни цени на
  * услугите", kept by the owner, not in this public repository): the lowest sensible scope ("from") and the
- * typical range. The owner's rule:
- *   * Bulgarian pages (clients in Bulgaria): the report's figures 10 % lower.
- *   * English pages (clients in the EU and elsewhere): the report's EU uplift (+20 %, the middle of its
- *     15–25 %) and then the same 10 % lower, i.e. +8 % on the baseline.
+ * typical range. Two schedules are kept:
+ *   * `bg`: the report's figures 10 % lower (BG_FACTOR).
+ *   * `eu`: the report's EU uplift (+20 %, the middle of its 15–25 %) and then the same 10 % lower, +8 % on
+ *     the baseline (EU_FACTOR).
+ *
+ * THE LANGUAGE OF A PAGE DOES NOT CHOOSE THE PRICE. A visitor may open either language version from anywhere;
+ * charging by language would price by the visitor's place of residence or establishment (see Regulation (EU)
+ * 2018/302 on unjustified geo-blocking, to be confirmed by a lawyer), so `ACTIVE_PRICE_SCHEDULE` is one value
+ * for every language and country. It is the Bulgarian schedule, the conservative default. The `eu` schedule is
+ * kept only so the owner can decide on a transparent, lawful basis for a different price (for example a
+ * separately approved price list by country of the contracting party) — it is not shown anywhere.
+ * `PRICE_SCHEDULE_OWNER_APPROVAL` records that this decision is still the owner's.
+ *
  * Amounts are final: the company is not VAT registered, so nothing is added. Third-party costs (hosting,
  * licences, AI model usage) are never included. The exact price is always set in a written quote.
  *
@@ -21,6 +30,15 @@ export const BG_FACTOR = 0.9;
 export const EU_FACTOR = 1.2 * 0.9;
 
 export type PriceMarket = "bg" | "eu";
+
+/** The one schedule shown in every language. */
+export const ACTIVE_PRICE_SCHEDULE: PriceMarket = "bg";
+
+/**
+ * Whether the owner has approved this arrangement in writing. "pending" until recorded in docs/PRICING.md; it
+ * is a status for the release review, not something the site displays.
+ */
+export const PRICE_SCHEDULE_OWNER_APPROVAL: "pending" | "approved" = "pending";
 export type PriceUnit = "project" | "month";
 
 /** Baseline in EUR: [from, typical low, typical high]. */
@@ -102,8 +120,13 @@ export const AI_MANAGED_PRICES: Record<"essential" | "managed" | "advanced", Pri
   advanced: item("month", [1800, 2200, 3000]),
 };
 
+/**
+ * The schedule to show. The locale is accepted only so call sites stay explicit about formatting; it never
+ * changes the amount. Do not make this depend on the language, the browser, the IP address or the country.
+ */
 export function marketFor(locale: Locale): PriceMarket {
-  return locale === "bg" ? "bg" : "eu";
+  void locale;
+  return ACTIVE_PRICE_SCHEDULE;
 }
 
 export interface PriceText {

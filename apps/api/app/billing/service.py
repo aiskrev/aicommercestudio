@@ -31,6 +31,7 @@ from app.billing.models import (
     Onboarding,
     ScopeConfirmation,
 )
+from app.compliance.service import Acceptance, record_acceptance
 from app.config import Settings, get_settings
 from app.db import get_sessionmaker
 from app.invoicing import service as invoicing
@@ -119,7 +120,12 @@ def _paths(settings: Settings, locale: str) -> tuple[str, str]:
 
 
 def start_checkout(
-    db: Session, settings: Settings, workspace: CustomerWorkspace, offer_key: str, locale: str
+    db: Session,
+    settings: Settings,
+    workspace: CustomerWorkspace,
+    offer_key: str,
+    locale: str,
+    acceptance: Acceptance | None = None,
 ) -> Checkout:
     gateway = get_gateway()
     _lock(db, workspace.id)
@@ -151,6 +157,8 @@ def start_checkout(
     for row in open_rows:
         session = gateway.retrieve_checkout(row.stripe_session_id)
         if row.offer_key == offer.key and session.get("status") == "open":
+            if acceptance is not None:
+                record_acceptance(db, row.id, acceptance, locale)
             db.commit()
             return Checkout(url=session["url"], reused=True)
         if session.get("status") == "open":  # a second tab must not leave two ways to pay
@@ -160,6 +168,8 @@ def start_checkout(
     checkout = BillingCheckout(workspace_id=workspace.id, offer_key=offer.key)
     db.add(checkout)
     db.flush()
+    if acceptance is not None:
+        record_acceptance(db, checkout.id, acceptance, locale)
     metadata = {"workspace_id": str(workspace.id), "offer_key": offer.key, "checkout_id": str(checkout.id)}
     success, cancel = _paths(settings, locale)
     params: dict[str, Any] = {
@@ -269,7 +279,39 @@ def sync_subscription(db: Session, settings: Settings, gateway: Gateway, subscri
     row.action_required = action
     row.synced_at = now
     db.flush()
+    _flag_subscription_of_erased_account(db, workspace_id, subscription_id, data["status"])
     sync_access(db, settings, workspace_id)
+
+
+def _flag_subscription_of_erased_account(
+    db: Session, workspace_id: uuid.UUID, subscription_id: str, status: str
+) -> None:
+    """A webhook can arrive after the owner's account was erased or anonymised (the erasure refuses a non-final billing
+    state, but a late event or a missed cancellation can still produce one). Never guess: record it loudly so a person
+    ends the subscription at Stripe (docs/LEGAL_RETENTION.md)."""
+    if status in ("canceled", "incomplete_expired"):
+        return
+    from app import audit
+    from app.accounts.models import CustomerAccount
+    from app.workspace.models import CustomerWorkspace
+
+    erased = db.scalar(
+        select(CustomerAccount.erased_at)
+        .join(CustomerWorkspace, CustomerWorkspace.owner_account_id == CustomerAccount.id)
+        .where(CustomerWorkspace.id == workspace_id)
+    )
+    if erased is not None:
+        logger.error(
+            "billing_subscription_on_erased_account", extra={"subscription": subscription_id, "status": status}
+        )
+        audit.record(
+            db,
+            "billing.subscription_on_erased_account",
+            actor_label="system",
+            entity_type="billing_subscription",
+            entity_id=subscription_id,
+            details={"status": status},
+        )
 
 
 def sync_checkout(db: Session, settings: Settings, gateway: Gateway, session_id: str) -> None:
@@ -279,6 +321,8 @@ def sync_checkout(db: Session, settings: Settings, gateway: Gateway, session_id:
         raise LookupError("checkout_unknown")
     _lock(db, checkout.workspace_id)
     checkout.status = {"complete": "complete", "expired": "expired"}.get(data.get("status"), checkout.status)
+    if checkout.status == "complete" and checkout.completed_at is None:
+        checkout.completed_at = utcnow()
     if data.get("mode") == "subscription":
         if data.get("subscription"):
             sync_subscription(db, settings, gateway, data["subscription"])

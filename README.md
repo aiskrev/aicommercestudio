@@ -144,6 +144,15 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [ACCOUNTS_RELEASE_CHECKLIST.md](docs/ACCOUNTS_RELEASE_CHECKLIST.md) | Gates G0–G7 and the order of switching on accounts, paid plans and billing (2026-11-10) |
 | [SERVICES_DEMO_PLAN.md](docs/SERVICES_DEMO_PLAN.md) | Plan: demo of the services for free, paid for more; two tracks, stages, decisions for the owner |
 | [PRICING.md](docs/PRICING.md) | Published indicative prices: Bulgarian and EU markets, the rule, where they appear, open checks |
+| [LEGAL_COMPLIANCE_REMEDIATION_2026-11-10.md](docs/LEGAL_COMPLIANCE_REMEDIATION_2026-11-10.md) | Legal compliance remediation: issue-by-issue status, blockers, legal and accounting review packages, verification, commands |
+| [legal-templates/](docs/legal-templates/) | Draft (not lawyer-reviewed) structure templates: maintenance / managed services agreement and Article 28 GDPR schedule |
+| [LEGAL_SOURCES.md](docs/LEGAL_SOURCES.md) | Legal source package for the Bulgarian lawyer: official sources, what was verified and what was not, open questions |
+| [LEGAL_RETENTION.md](docs/LEGAL_RETENTION.md) | Retention of withdrawal and data requests (no period approved), the deletion rules by billing state, Stripe-side data |
+| [LEGAL_CONTENT_RELEASE.md](docs/LEGAL_CONTENT_RELEASE.md) | Draft, approved, published and accepted legal text revisions; hashes; how a legal text is released |
+| [DNS_MAILBOX_VERIFICATION.md](docs/DNS_MAILBOX_VERIFICATION.md) | DNS and mailbox evidence, its limits, and the owner's verification checklist |
+| [COOKIE_AUDIT.md](docs/COOKIE_AUDIT.md) | Cookie and browser-storage audit procedure and results, with the evidence class of every item |
+| [ACCESSIBILITY.md](docs/ACCESSIBILITY.md) | Automated accessibility checks of the legal flows, results, and what still needs a manual review |
+| [OWNER_DECISION_PRICE_SCHEDULE.md](docs/OWNER_DECISION_PRICE_SCHEDULE.md) | Owner decision record (not taken): one price list for Bulgarian and English pages, with the exact before/after amounts |
 | [RELEASE_REVIEW_ACCOUNTS_BILLING.md](docs/RELEASE_REVIEW_ACCOUNTS_BILLING.md) | Release review: evidence, gaps, rollback and readiness by area |
 | [OPPORTUNITY_WORKFLOW.md](docs/OPPORTUNITY_WORKFLOW.md) | Engineering opportunity record, proposal and SOW drafts, review checks, human approval, retention |
 | [INTEGRATION_AUDIT_V2.md](docs/INTEGRATION_AUDIT_V2.md) | Integration and quality audit of the V2 platform: capability matrix, findings by severity, executed tests, launch blockers, V2 document map |
