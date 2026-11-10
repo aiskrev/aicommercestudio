@@ -90,6 +90,10 @@ export const en: Dictionary = {
       "Your data is used only to reply to you",
     ],
   },
+  prices: {
+    label: "Indicative price",
+    note: "Prices for clients in the EU and elsewhere. They are final: we are not VAT registered, so no VAT is added. Hosting, licences and AI model usage are not included. The exact price is set in a written quote once the scope is agreed.",
+  },
   service: {
     limitationsTitle: "What it doesn't include or promise",
     acceptanceTitle: "How the work is accepted",

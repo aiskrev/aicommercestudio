@@ -137,6 +137,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [ADVISOR_WORKSPACE.md](docs/ADVISOR_WORKSPACE.md) | Advisor Workspace (off, not released): plans, entitlements, quota policy, projects and versions |
 | [STRIPE_BILLING.md](docs/STRIPE_BILLING.md) | Stripe in test mode: checkout, webhooks, access policy, reconciliation and live activation steps |
 | [INVOICING.md](docs/INVOICING.md) | Who issues documents, snapshots, the retry queue and the tax gate; nothing real is issued yet |
+| [PRICING.md](docs/PRICING.md) | Published indicative prices: Bulgarian and EU markets, the rule, where they appear, open checks |
 | [RELEASE_REVIEW_ACCOUNTS_BILLING.md](docs/RELEASE_REVIEW_ACCOUNTS_BILLING.md) | Release review: evidence, gaps, rollback and readiness by area |
 | [OPPORTUNITY_WORKFLOW.md](docs/OPPORTUNITY_WORKFLOW.md) | Engineering opportunity record, proposal and SOW drafts, review checks, human approval, retention |
 | [INTEGRATION_AUDIT_V2.md](docs/INTEGRATION_AUDIT_V2.md) | Integration and quality audit of the V2 platform: capability matrix, findings by severity, executed tests, launch blockers, V2 document map |

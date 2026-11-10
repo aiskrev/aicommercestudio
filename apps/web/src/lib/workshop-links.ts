@@ -3,6 +3,7 @@ import { type Locale, localizePath } from "@/i18n/config";
 import { topicsForDomains } from "@/lib/insight-topics";
 import { routes } from "@/lib/routes";
 import { workshop, WORKSHOP_SLUGS, type WorkshopKey, type WorkshopKind } from "@/lib/workshops";
+import { priceText, WORKSHOP_PRICES } from "@/lib/prices";
 
 export interface WorkshopLink {
   key: WorkshopKey;
@@ -11,6 +12,8 @@ export interface WorkshopLink {
   summary: string;
   kind: WorkshopKind;
   kindLabel: string;
+  /** "from" price in the market of the locale (lib/prices.ts). */
+  priceFrom: string;
 }
 
 /** Card links to workshop pages, in the order given. */
@@ -25,6 +28,7 @@ export function workshopLinks(locale: Locale, keys: readonly WorkshopKey[]): Wor
       summary: texts[key].summary,
       kind,
       kindLabel: page.kinds[kind],
+      priceFrom: priceText(locale, WORKSHOP_PRICES[key]).from,
     };
   });
 }

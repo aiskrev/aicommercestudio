@@ -1,5 +1,6 @@
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { PriceTag } from "@/components/sections/PriceTag";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Alert, ButtonLink, PageHero, Section } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
@@ -7,6 +8,7 @@ import { getDictionary } from "@/i18n";
 import { localizePath } from "@/i18n/config";
 import { CARE_PLANS } from "@/lib/care-plans";
 import { resolveLocale } from "@/lib/params";
+import { CARE_PLAN_PRICES } from "@/lib/prices";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata, collectionPageJsonLd } from "@/lib/seo";
 
@@ -69,7 +71,9 @@ export default async function CarePlansPage({ params }: PageProps<"/[locale]/pak
                   </div>
                   <div>
                     <dt className="t-label">{t.labels.price}</dt>
-                    <dd className="mt-1 text-fg-secondary">{plan.terms.price ?? t.priceValue}</dd>
+                    <dd className="mt-1">
+                      <PriceTag locale={locale} price={CARE_PLAN_PRICES[plan.key]} testId={`care-plan-price-${plan.key}`} />
+                    </dd>
                   </div>
                 </dl>
                 <ButtonLink href={href(contactWithService(plan.contactService))} icon="arrowRight" className="mt-6 w-full">

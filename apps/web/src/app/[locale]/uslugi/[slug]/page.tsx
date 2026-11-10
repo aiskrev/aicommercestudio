@@ -10,6 +10,7 @@ import { Faq } from "@/components/sections/Faq";
 import { hasManagedFollowUp, OfferingPage } from "@/components/sections/OfferingPage";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
 import { RelatedTools } from "@/components/home/ToolsPreview";
+import { PriceTag } from "@/components/sections/PriceTag";
 import { ServiceCard } from "@/components/sections/ServiceCard";
 import { ServiceConcept } from "@/components/sections/ServiceConcept";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -41,6 +42,7 @@ import { getDictionary } from "@/i18n";
 import { domainDefinition, isDomainPublished, primaryDomainOf } from "@/lib/domains";
 import { type CatalogueEntry, domainOfferings, getCatalogue, getCatalogueDetail } from "@/lib/catalogue";
 import { resolveLocale } from "@/lib/params";
+import { SERVICE_PRICES } from "@/lib/prices";
 import { contactWithService, quoteWithService, routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
 import { SERVICE_TOOLS, toolHrefs, toolMinutes } from "@/lib/tools";
@@ -188,8 +190,14 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         <Container className="relative pb-10">
           <dl
             aria-label={dict.service.summaryTitle}
-            className="grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line-subtle bg-line-subtle md:grid-cols-3"
+            className="grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line-subtle bg-line-subtle md:grid-cols-2 xl:grid-cols-4"
           >
+            <div className="bg-surface-1 p-5">
+              <dt className="t-label">{dict.prices.label}</dt>
+              <dd className="mt-2">
+                <PriceTag locale={locale} price={SERVICE_PRICES[service.key]} testId="service-price" />
+              </dd>
+            </div>
             <div className="bg-surface-1 p-5">
               <dt className="t-label">{dict.service.engagement}</dt>
               <dd className="mt-2 flex flex-wrap gap-2">
@@ -209,6 +217,9 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
               <dd className="mt-2 text-body-sm text-fg-secondary">{dict.service.firstStep}</dd>
             </div>
           </dl>
+          <p className="mt-3 text-xs text-fg-subtle" data-testid="price-note">
+            {dict.prices.note}
+          </p>
         </Container>
       </div>
 

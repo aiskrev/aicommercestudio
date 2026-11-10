@@ -114,7 +114,7 @@ describe.each(locales)("content integrity (%s)", (locale) => {
     expect(text).not.toMatch(/€\s?\d|\d\s?(€|EUR\b)|ДДС от|VAT of \d|\d+\s?%|ec\.europa\.eu\/consumers\/odr/i);
   });
 
-  it("AI Managed Services plans promise no unlimited work, 24/7 cover, SLA or public price", () => {
+  it("AI Managed Services plans promise no unlimited work, 24/7 cover or SLA; prices come from lib/prices.ts", () => {
     const { packages } = content.aiManaged;
     const offered = JSON.stringify([packages.items, packages.comparison]);
     expect(offered).not.toMatch(/unlimited|неограничен|24\/7|SLA|uptime|€|лв\.|\$\d/i);
@@ -123,7 +123,7 @@ describe.each(locales)("content integrity (%s)", (locale) => {
     expect(packages.items.map((p) => p.name)).toEqual(["Essential Monitoring & Advisory", "Managed AI Operations", "Advanced AI Reliability & Optimization"]);
     expect(packages.proposedNote).toBeTruthy();
     expect(packages.noSlaNote).toMatch(/SLA/);
-    expect(packages.priceLabel).toBe(locale === "bg" ? "По индивидуална оферта" : "Custom quote");
+    expect(packages.priceLabel).toMatch(locale === "bg" ? /Ориентировъчно.*без разходи на трети страни/ : /Indicative.*without third-party costs/);
   });
 
   it("AI Managed Services defines every level on every dimension and separates current from planned capability", () => {

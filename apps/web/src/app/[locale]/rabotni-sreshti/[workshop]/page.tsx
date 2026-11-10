@@ -4,12 +4,14 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Bullets, LinkList, TextBlock } from "@/components/reference/ReferenceBlocks";
 import { CtaBand } from "@/components/sections/CtaBand";
+import { PriceTag } from "@/components/sections/PriceTag";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Alert, buttonClass, Container, Eyebrow, Section } from "@/components/ui/primitives";
 import { getContent } from "@/content";
 import { isLocale, localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
+import { WORKSHOP_PRICES } from "@/lib/prices";
 import { assessmentLinks, patternLinks, scenarioLinks, serviceLinks } from "@/lib/reference-links";
 import { contactAboutWorkshop, routes } from "@/lib/routes";
 import { buildMetadata, serviceJsonLd } from "@/lib/seo";
@@ -69,6 +71,7 @@ export default async function WorkshopPage({ params }: PageProps<"/[locale]/rabo
             <span className="badge badge-accent">{t.kinds[def.kind]}</span>
             <span className="badge">{t.custom}</span>
           </p>
+          <PriceTag locale={locale} price={WORKSHOP_PRICES[key]} testId="workshop-detail-price" className="mt-6" />
           <Alert tone="info" role="note" className="mt-8 max-w-3xl">
             <span data-testid="workshop-notice">{d.notice}</span>
           </Alert>

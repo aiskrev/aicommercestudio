@@ -26,15 +26,17 @@ async function seoBasics(page: Page, path: string, other: string) {
   expect(blob).not.toMatch(/"offers"|"price"|"aggregateRating"/);
 }
 
-test("the Bulgarian catalogue lists ten offers by group and states that nothing is priced", async ({ page }) => {
+test("the Bulgarian catalogue lists ten offers by group, each with an indicative price", async ({ page }) => {
   expect((await page.goto("/bg/rabotni-sreshti"))?.status()).toBe(200);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Работни срещи и консултантски оценки");
-  await expect(page.getByTestId("workshops-notice")).toContainText("Не публикуваме цени");
+  await expect(page.getByTestId("workshops-notice")).toContainText("ориентировъчни и крайни");
+  await expect(page.locator("[data-workshop] [data-testid='workshop-price']")).toHaveCount(10);
+  await expect(page.locator("[data-workshop] [data-testid='workshop-price']").first()).toContainText(/^от [\d\s]+€/);
   await expect(page.locator("[data-workshop]")).toHaveCount(10);
   // Grouped by the band of each offer's primary domain: AI, and engineering (observability's primary
   // domain is DevOps/SRE); the operations band has no offer of its own, so it is not listed.
   await expect(page.getByTestId("workshop-bands").getByRole("link")).toHaveCount(2);
-  await expect(page.locator("main")).not.toContainText(/€|лв\.|BGN|гарантира/);
+  await expect(page.locator("main")).not.toContainText(/лв\.|BGN|гарантира/);
   await seoBasics(page, "/bg/rabotni-sreshti", "/en/workshops");
   await noOverflow(page);
 });

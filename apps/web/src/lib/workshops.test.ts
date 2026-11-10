@@ -73,14 +73,14 @@ describe("workshops & advisory catalogue", () => {
     }
   });
 
-  it("states no price, currency, percentage or guarantee", () => {
+  it("keeps prices out of the texts (they come from lib/prices.ts) and states no percentage or guarantee", () => {
     for (const locale of LOCALES) {
       const blob = JSON.stringify(getContent(locale).workshops.texts);
       expect(blob).not.toMatch(FORBIDDEN);
     }
-    // The page notices say the opposite, explicitly.
-    expect(getContent("bg").workshops.page.notice).toMatch(/Не публикуваме цени/);
-    expect(getContent("en").workshops.page.notice).toMatch(/do not publish prices/);
+    // The notices say the published prices are indicative and the exact price is agreed in writing.
+    expect(getContent("bg").workshops.page.notice).toMatch(/ориентировъчни и крайни.*писмено/);
+    expect(getContent("en").workshops.page.notice).toMatch(/indicative and final.*in writing/);
   });
 
   it("meets the SEO limits: title ≤ 60 characters, description 120–160 (CONTENT_STRATEGY §9)", () => {
@@ -146,6 +146,7 @@ describe("workshops & advisory catalogue", () => {
       label: "Cloud Landing Zone Assessment",
       kind: "assessment",
       kindLabel: "Assessment",
+      priceFrom: "From €2,150",
     });
   });
 });
