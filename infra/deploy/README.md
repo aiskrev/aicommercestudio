@@ -15,6 +15,7 @@ Visitor ─► Cloudflare ─► Caddy (host, 443) ─► 127.0.0.1:3000 web ─
 | `acs-deploy` | `/usr/local/sbin/acs-deploy` (root, `0750`) |
 | `acs-deploy-gate` | `/usr/local/sbin/acs-deploy-gate` (root, `0755`) |
 | `../backup-db.sh` | `/opt/ai-commerce-studio/backup-db.sh` |
+| `acs-selfcheck` | `/usr/local/sbin/acs-selfcheck` (root, `0755`) |
 | `../reverse-proxy/Caddyfile.cloudflare` | `/etc/caddy/Caddyfile` |
 
 ## Releases
@@ -87,6 +88,16 @@ destination provider itself can bounce, so test from a different provider.
 `systemd/` holds the timers, installed in `/etc/systemd/system`: database backup at 02:15 UTC and the
 retention job at 02:30 UTC. Dumps stay in `/var/backups/ai-commerce-studio` (14 kept). A restore into
 an isolated container was verified on 2026-11-04. There is no off-site copy yet **(owner: storage)**.
+
+## Monitoring
+
+`acs-selfcheck.timer` (every 15 minutes) runs `/usr/local/sbin/acs-selfcheck`: disk, age of the newest
+backup, failed `acs-*` jobs and container health. It writes `/var/lib/acs-selfcheck/status.json`, which
+the API reads through a read-only mount and reports as `"host"` in `/api/health/ready`. The GitHub
+workflow `Uptime` checks that answer from outside every 10 minutes and alerts (e-mail and an `uptime`
+issue). Install: copy the script and both units, then
+`systemctl daemon-reload && systemctl enable --now acs-selfcheck.timer`. Details:
+`journalctl -u acs-selfcheck -n 50`.
 
 ## Rehearsal record
 

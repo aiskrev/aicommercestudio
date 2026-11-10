@@ -1,0 +1,85 @@
+# External uptime check of the live site (no third-party account needed).
+# Every 10 minutes GitHub checks the home page and /api/health/ready from outside. A failure makes the run
+# fail (GitHub e-mails the repository owner) and opens one issue labelled `uptime`, which gets a comment
+# on each further failure and is closed automatically when the site is healthy again.
+# `host` in the readiness answer is the server's own self-check (disk, backup age, jobs, containers;
+# infra/deploy/acs-selfcheck): anything but "ok" counts as a failure; the reasons are in
+# `journalctl -u acs-selfcheck` on the server.
+# GitHub disables scheduled workflows after 60 days without any repository activity; re-enable it in the
+# Actions tab if that happens. Schedules can start a few minutes late.
+name: Uptime
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+env:
+  SITE: https://ai-commercestudio.com
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check the site (three attempts, 20 s apart)
+        id: probe
+        run: |
+          set -u
+          probe() {
+            home=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 -A "acs-uptime-check" "$SITE/bg" || echo 000)
+            ready=$(curl -sS --max-time 20 -A "acs-uptime-check" "$SITE/api/health/ready" || true)
+            status=$(jq -r '.status // "missing"' <<<"$ready" 2>/dev/null || echo invalid)
+            database=$(jq -r '.database // "missing"' <<<"$ready" 2>/dev/null || echo invalid)
+            host=$(jq -r '.host // "not reported"' <<<"$ready" 2>/dev/null || echo invalid)
+            summary="home page HTTP $home; API $status; database $database; server self-check $host"
+            [ "$home" = 200 ] && [ "$status" = ok ] && [ "$database" = ok ] && { [ "$host" = ok ] || [ "$host" = "not reported" ]; }
+          }
+          for attempt in 1 2 3; do
+            if probe; then
+              echo "healthy: $summary"
+              echo "healthy=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "attempt $attempt: $summary"
+            [ "$attempt" = 3 ] || sleep 20
+          done
+          echo "healthy=false" >> "$GITHUB_OUTPUT"
+          echo "summary=$summary" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the uptime issue
+        if: steps.probe.outputs.healthy == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUMMARY: ${{ steps.probe.outputs.summary }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create uptime --repo "$GITHUB_REPOSITORY" --color B60205 --description "Live site check failed" 2>/dev/null || true
+          body="$(date -u '+%Y-%m-%d %H:%M UTC'): $SUMMARY. Run: $RUN_URL"
+          issue=$(gh issue list --repo "$GITHUB_REPOSITORY" --label uptime --state open --json number --jq '.[0].number // empty')
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" --repo "$GITHUB_REPOSITORY" --body "Still failing. $body"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --label uptime --title "Live site check failing" \
+              --body "The scheduled check of $SITE failed three times in a row. $body
+
+          Server-side reasons, if the self-check is not ok: \`journalctl -u acs-selfcheck -n 50\` on the server."
+          fi
+          exit 1
+
+      - name: Close the uptime issue after recovery
+        if: steps.probe.outputs.healthy == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for issue in $(gh issue list --repo "$GITHUB_REPOSITORY" --label uptime --state open --json number --jq '.[].number'); do
+            gh issue close "$issue" --repo "$GITHUB_REPOSITORY" --comment "Healthy again at $(date -u '+%Y-%m-%d %H:%M UTC')."
+          done

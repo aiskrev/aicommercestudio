@@ -1,0 +1,8 @@
+[Unit]
+Description=A.I. Commerce Studio host self-check (disk, backup age, jobs, containers)
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/acs-selfcheck

@@ -92,6 +92,10 @@ services:
     env_file: .env
     environment:
       <<: *api-env
+      # Written by the host self-check (acs-selfcheck.timer); reported in /api/health/ready.
+      HOST_SELFCHECK_FILE: /run/acs-selfcheck/status.json
+    volumes:
+      - /var/lib/acs-selfcheck:/run/acs-selfcheck:ro
     depends_on:
       db:
         condition: service_healthy

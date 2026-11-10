@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     admin_mfa_required: bool = False
     trust_proxy_headers: bool = True
     enable_api_docs: bool | None = None
+    # Result file of the host self-check (infra/deploy/acs-selfcheck), mounted read-only on the server.
+    # When set, /api/health/ready adds "host": ok | degraded | stale | unknown (no details).
+    host_selfcheck_file: str | None = None
     max_request_body_bytes: int = 64 * 1024
 
     contact_rate_limit: int = Field(default=5, ge=1)

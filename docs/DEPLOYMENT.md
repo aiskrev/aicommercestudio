@@ -116,13 +116,14 @@ Verify after go-live: `curl -I https://example.bg` (HSTS, CSP, `X-Frame-Options:
 
 | What | How |
 | --- | --- |
-| Uptime | external monitor (e.g. UptimeRobot, Better Stack) on `https://example.bg/api/health/ready` every 1–5 min; alert by e-mail **(owner: account)** |
+| Uptime | GitHub Actions workflow `Uptime` (`.github/workflows/uptime.yml`), every 10 min from outside: `/bg` and `/api/health/ready` (API, database and the server self-check), three attempts 20 s apart. A failure fails the run (GitHub e-mails the owner) and opens one `uptime` issue, closed automatically on recovery. No third-party account. GitHub pauses schedules after 60 days without repository activity |
+| Server self-check | `acs-selfcheck.timer` every 15 min (`infra/deploy/acs-selfcheck`): disk ≥ 85 %, newest backup older than 26 h, a failed backup / maintenance / outbox job, a container that is not running or not healthy. The result reaches the uptime check as `"host"` in `/api/health/ready` (`ok`, `degraded`, `stale`, `unknown`, no details); the reasons are in `journalctl -u acs-selfcheck` |
 | Container health | built-in healthchecks; `docker compose ps` shows `(healthy)`; `restart: unless-stopped` |
 | Application logs | structured JSON on stdout with request IDs; no request bodies, prompts or personal data; Docker log rotation 5 × 10 MB per container |
 | Proxy logs | Caddy access log with `roll_size 50mb`, `roll_keep 10`, `roll_keep_for 720h` (30 days) |
 | Audit trail | `audit_logs` table, `AUDIT_RETENTION_DAYS=1095` |
 | Retention job | daily `docker compose exec -T api python -m app.cli maintenance` (cron 02:30) |
-| Disk | alert at 80 % (`df -h`); Docker images: `docker image prune -f` monthly |
+| Disk | alert at 85 % through the self-check; Docker images: `docker image prune -f` monthly |
 | Security | `pip-audit` / `npm audit` before every release (`scripts/test.ps1 -Suite audit`); subscribe to Next.js, FastAPI and PostgreSQL security advisories |
 
 ## 8. Deployment checklist
@@ -168,5 +169,5 @@ Each release:
 
 ## 10. Not covered / to decide
 
-* Uptime-monitor and off-site storage accounts **(owner)**.
+* Off-site storage for the backups **(owner)**.
 * Real e-mail sending (SMTP) and the Anthropic provider remain disabled until configured and approved.
