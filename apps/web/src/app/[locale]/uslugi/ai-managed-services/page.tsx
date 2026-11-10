@@ -4,6 +4,7 @@ import { ContactForm } from "@/components/contact/ContactForm";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { AiOpsDiagram } from "@/components/sections/AiOpsDiagram";
 import { Faq } from "@/components/sections/Faq";
+import { PriceTag } from "@/components/sections/PriceTag";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon, type IconName } from "@/components/ui/Icon";
@@ -25,6 +26,7 @@ import { getDictionary } from "@/i18n";
 import { contactFormProps } from "@/lib/contact-form-props";
 import { isDomainPublished } from "@/lib/domains";
 import { resolveLocale } from "@/lib/params";
+import { AI_MANAGED_PRICES } from "@/lib/prices";
 import { routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
 
@@ -399,7 +401,10 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
               <p className="font-display text-[1.7rem] font-bold tracking-[-0.02em] text-fg">{pkg.name}</p>
               <p className="mt-2 text-nav text-fg-muted">{pkg.audience}</p>
               <p className="mt-4 text-fg-secondary">{pkg.summary}</p>
-              <p className="mt-5 border-y border-line-subtle py-3 font-mono text-sm text-brand">{page.packages.priceLabel}</p>
+              <div className="mt-5 border-y border-line-subtle py-3">
+                <PriceTag locale={locale} price={AI_MANAGED_PRICES[pkg.key]} testId={`package-price-${pkg.key}`} />
+                <p className="mt-1 font-mono text-xs text-brand">{page.packages.priceLabel}</p>
+              </div>
               <CheckList items={pkg.includes} className="mt-5 flex-1 text-sm" />
               <ButtonLink href={inquiryHref} variant={index === 1 ? "primary" : "secondary"} className="mt-6 w-full">
                 {page.packages.cta}

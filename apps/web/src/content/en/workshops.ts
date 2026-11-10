@@ -16,7 +16,7 @@ export const workshops: typeof bgWorkshops = {
     title: "Workshops and advisory assessments",
     lead: "Short, clearly bounded formats we start with before any larger project: who they are for, what they solve, what is needed beforehand, the agenda, what you receive and what is not included.",
     notice:
-      "We do not publish prices or promise specific outcomes. Scope, length and price are agreed in writing after a short call. Every format is scoped individually.",
+      "Prices are indicative and final for clients in the EU and elsewhere (we are not VAT registered). The exact price, scope and length are agreed in writing after a short call. We do not promise specific outcomes. Every format is scoped individually.",
     bandNav: "Groups",
     bands: {
       ai: { title: "AI strategy, agents and governance", text: "Opportunity discovery, readiness, agent architecture, RAG and responsible AI." },
@@ -51,7 +51,7 @@ export const workshops: typeof bgWorkshops = {
     relatedInsights: "Related articles",
     noInsights: "No articles on this topic have been published yet.",
     backToList: "All workshops and assessments",
-    notice: "Price, length and scope are agreed in writing. We do not guarantee specific outcomes: the findings depend on the information available and on your team's participation.",
+    notice: "The price is indicative and final; the exact price, length and scope are agreed in writing. We do not guarantee specific outcomes: the findings depend on the information available and on your team's participation.",
     ctaTitle: "Would this format suit your team?",
     ctaText: "Send an enquiry. We will clarify the goal, the participants and the material needed, and propose a written scope.",
     ctaButton: "Send an enquiry",

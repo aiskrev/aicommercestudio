@@ -1,6 +1,6 @@
 import type { OfferService } from "@/content/types";
 
-const pricing = "След оценка и индивидуална оферта";
+const pricing = "Точна цена в писмена оферта";
 
 /**
  * Engineering services added to the public offer. Same shape as `services.ts`, plus limitations,

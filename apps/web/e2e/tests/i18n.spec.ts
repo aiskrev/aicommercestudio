@@ -156,17 +156,18 @@ test.describe("English forms", () => {
 });
 
 test.describe("AI Managed Services", () => {
-  test("service page in both languages: packages without prices or SLA, no live telemetry claims", async ({ page }) => {
+  test("service page in both languages: packages with indicative prices, without SLA or live telemetry claims", async ({ page }) => {
     for (const [path, priceLabel] of [
-      ["/bg/uslugi/ai-managed-services", "По индивидуална оферта"],
-      ["/en/services/ai-managed-services", "Custom quote"],
+      ["/bg/uslugi/ai-managed-services", "без разходи на трети страни"],
+      ["/en/services/ai-managed-services", "without third-party costs"],
     ] as const) {
       expect((await page.goto(path))?.status(), path).toBe(200);
       for (const key of ["essential", "managed", "advanced"]) {
         const card = page.getByTestId(`package-${key}`);
         await expect(card, `${path} ${key}`).toBeVisible();
         await expect(card).toContainText(priceLabel);
-        await expect(card).not.toContainText(/€|лв\.|\$\d|24\/7|unlimited|неограничен/i);
+        await expect(page.getByTestId(`package-price-${key}`)).toContainText(path.startsWith("/bg") ? /^от [\d\s]+€ на месец/ : /^From €[\d,]+ per month/);
+        await expect(card).not.toContainText(/лв\.|\$\d|24\/7|unlimited|неограничен/i);
       }
       await expect(page.getByTestId("no-sla-note")).toBeVisible();
       await expect(page.getByTestId("secrets-warning")).toBeVisible();

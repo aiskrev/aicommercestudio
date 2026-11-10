@@ -3,10 +3,12 @@ import { describe, expect, it } from "vitest";
 import { getContent, serviceByKey } from "@/content";
 import { locales } from "@/i18n/config";
 import { CARE_PLANS } from "@/lib/care-plans";
+import { CARE_PLAN_PRICES } from "@/lib/prices";
 
 describe("care plans", () => {
-  it("publishes no price, included hours or response time until the owner confirms them", () => {
-    for (const plan of CARE_PLANS) expect(plan.terms).toEqual({ price: null, includedHours: null, responseTime: null });
+  it("publishes no included hours or response time until the owner confirms them; prices are decided", () => {
+    for (const plan of CARE_PLANS) expect(plan.terms).toEqual({ includedHours: null, responseTime: null });
+    for (const plan of CARE_PLANS) expect(CARE_PLAN_PRICES[plan.key].unit).toBe("month");
   });
 
   it.each(locales)("has text for every plan and links real services (%s)", (locale) => {

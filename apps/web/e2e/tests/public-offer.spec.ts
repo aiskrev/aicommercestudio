@@ -17,7 +17,10 @@ for (const [key, bg, en] of SERVICES) {
       const lang = other.startsWith("/en") ? "en" : "bg";
       await expect(page.locator(`link[rel='alternate'][hreflang^='${lang}']`).first()).toHaveAttribute("href", new RegExp(`${other}$`));
       await expect(page.locator("h1")).toBeVisible();
-      await expect(page.locator("main")).not.toContainText(/24\/7|€|лв\./);
+      await expect(page.locator("main")).not.toContainText(/24\/7|лв\./);
+      // Indicative prices from lib/prices.ts: Bulgarian prices on /bg, EU prices on /en.
+      await expect(page.getByTestId("service-price")).toContainText(path.startsWith("/bg") ? /^от [\d\s]+€/ : /^From €\d/);
+      await expect(page.getByTestId("price-note")).toContainText(path.startsWith("/bg") ? "не е регистрирано по ДДС" : "not VAT registered");
     }
     const sitemap = await (await request.get("/sitemap.xml")).text();
     expect(sitemap).toContain(bg);
@@ -29,10 +32,12 @@ for (const [key, bg, en] of SERVICES) {
 }
 
 test("care plans: five comparable plans, no invented terms, AI Managed Services linked and unchanged", async ({ page }) => {
-  for (const [path, price] of [["/bg/paketi", "След оценка и индивидуална оферта"], ["/en/care-plans", "After an assessment and an individual quote"]] as const) {
+  for (const [path, price] of [["/bg/paketi", /^от [\d\s]+€ на месец/], ["/en/care-plans", /^From €\d+ per month/]] as const) {
     expect((await page.goto(path))?.status()).toBe(200);
     await expect(page.getByTestId("care-plans").locator("article")).toHaveCount(5);
-    await expect(page.getByTestId("care-plans").getByText(price)).toHaveCount(5);
+    for (const key of ["website", "commerce", "automation", "cloud", "security"]) {
+      await expect(page.getByTestId(`care-plan-price-${key}`)).toContainText(price);
+    }
     await expect(page.getByTestId("ai-managed-tiers").locator("li")).toHaveText(["Essential Monitoring & Advisory", "Managed AI Operations", "Advanced AI Reliability & Optimization"]);
   }
   await page.goto("/bg/paketi");

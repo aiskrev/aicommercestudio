@@ -22,9 +22,12 @@ import { getDictionary } from "@/i18n";
 import { isDomainPublished } from "@/lib/domains";
 import { SCENARIO_SLUGS } from "@/lib/reference";
 import { resolveLocale } from "@/lib/params";
+import { AI_MANAGED_PRICES, priceText } from "@/lib/prices";
 import { routes } from "@/lib/routes";
 import { toolHrefs, toolMinutes } from "@/lib/tools";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
+
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
@@ -185,7 +188,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             ))}
           </ul>
           <p className="mt-4 text-sm text-fg-subtle">
-            {aiManaged.packages.priceLabel}. {aiManaged.packages.lead}
+            {capitalize(priceText(locale, AI_MANAGED_PRICES.essential).from)}. {aiManaged.packages.lead}
           </p>
         </div>
       </Section>

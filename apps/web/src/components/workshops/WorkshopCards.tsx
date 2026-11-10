@@ -6,7 +6,7 @@ import type { WorkshopLink } from "@/lib/workshop-links";
 /**
  * Cards linking to workshop and assessment pages (domain hubs, service pages, topic pages,
  * assessment results, scenarios, industries). Each card states the format kind and that the scope is
- * individual; nothing here mentions a price or a duration promise.
+ * individual, with the indicative "from" price (lib/prices.ts); nothing here promises a duration.
  */
 export function WorkshopCards({
   items,
@@ -37,6 +37,9 @@ export function WorkshopCards({
               </Link>
             </h3>
             <p className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{item.summary}</p>
+            <p className="mt-auto pt-3 text-sm font-semibold text-fg" data-testid="workshop-price">
+              {item.priceFrom}
+            </p>
           </article>
         </li>
       ))}

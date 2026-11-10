@@ -1,6 +1,6 @@
 import type { OfferService } from "@/content/types";
 
-const pricing = "After an assessment and an individual quote";
+const pricing = "Exact price in a written quote";
 
 /** See content/bg/services-offer.ts. Same services, limits and terms; written separately in English. */
 export const offerServices: OfferService[] = [

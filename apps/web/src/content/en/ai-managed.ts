@@ -360,7 +360,7 @@ export const aiManaged: AiManagedContent = {
     title: "Proposed service levels",
     lead: "Three levels with a typical scope — from periodic reviews to managed operations. Exact terms, volume and pricing are agreed in writing for each system.",
     proposedNote: "The level names are working proposals, not a commercial commitment. Scope is agreed in writing for each system.",
-    priceLabel: "Custom quote",
+    priceLabel: "Indicative, per system, without third-party costs",
     cta: "Request an assessment",
     contactCta: "Contact us",
     items: [

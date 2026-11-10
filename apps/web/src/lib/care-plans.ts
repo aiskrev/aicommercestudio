@@ -3,12 +3,12 @@ import type { ServiceKey } from "@/content/types";
 export type CarePlanKey = "website" | "commerce" | "automation" | "cloud" | "security";
 
 /**
- * Commercial values stay out of the public site until the owner confirms them: `null` is shown as
- * "After an assessment and an individual quote". Setting one here is a decision, not an edit: the
- * test in care-plans.test.ts fails while any value is published without that decision.
+ * Commercial terms stay out of the public site until the owner confirms them: `null` is shown as
+ * "Agreed in writing". Setting one here is a decision, not an edit: the test in care-plans.test.ts fails
+ * while any value is published without that decision. Prices were decided on 2026-11-10 and live in
+ * lib/prices.ts (CARE_PLAN_PRICES); included hours and response times are still not published.
  */
 export interface CarePlanTerms {
-  price: string | null;
   includedHours: number | null;
   responseTime: string | null;
 }
@@ -22,7 +22,7 @@ export interface CarePlanDefinition {
   terms: CarePlanTerms;
 }
 
-const UNCONFIRMED: CarePlanTerms = { price: null, includedHours: null, responseTime: null };
+const UNCONFIRMED: CarePlanTerms = { includedHours: null, responseTime: null };
 
 export const CARE_PLANS: readonly CarePlanDefinition[] = [
   { key: "website", contactService: "business_websites", service: "business_websites", terms: UNCONFIRMED },
