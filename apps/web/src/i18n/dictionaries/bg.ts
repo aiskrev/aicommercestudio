@@ -34,6 +34,7 @@ export const bg = {
     privacy: "Поверителност",
     cookies: "Бисквитки",
     terms: "Общи условия",
+    subscriptionTerms: "Абонамент и плащане",
     provisional: "A.I. Commerce Studio е платформа на Iskrev Consulting Ltd.",
     rights: "Всички права запазени.",
   },

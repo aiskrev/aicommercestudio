@@ -37,6 +37,7 @@ export const en: Dictionary = {
     privacy: "Privacy",
     cookies: "Cookies",
     terms: "Terms of use",
+    subscriptionTerms: "Subscriptions and payments",
     provisional: "A.I. Commerce Studio is a platform of Iskrev Consulting Ltd.",
     rights: "All rights reserved.",
   },
