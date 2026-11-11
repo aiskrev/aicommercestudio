@@ -49,7 +49,7 @@ const START_TOOLS: ToolKey[] = ["readiness", "finder"];
 
 export function buildNavigation(locale: Locale, dict: Dictionary): { services: ServiceMenu; entries: NavEntry[] } {
   const href = (path: string) => localizePath(locale, path);
-  const { tools, workshops, demoCentre, carePlans } = getContent(locale);
+  const { tools, workshops, demoCentre, carePlans, projectPackages, pricingPage } = getContent(locale);
   const toolLinks = toolHrefs(locale);
   const serviceLink = (key: Parameters<typeof serviceByKey>[1]): NavItem => {
     const service = serviceByKey(locale, key);
@@ -86,7 +86,9 @@ export function buildNavigation(locale: Locale, dict: Dictionary): { services: S
   const solutions: NavItem[] = [
     { href: href(routes.aiSolutions), label: dict.nav.aiSolutions },
     { href: href(routes.demoCentre), label: demoCentre.eyebrow },
+    { href: href(routes.projectPackages), label: projectPackages.navLabel },
     { href: href(routes.carePlans), label: carePlans.title },
+    { href: href(routes.pricing), label: pricingPage.navLabel },
     ...(isToolAvailable(toolByKey("agents"))
       ? [{ href: href(routes.agentLibrary), label: tools.items.find((item) => item.key === "agents")!.title }]
       : []),

@@ -21,11 +21,13 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
       const service = serviceByKey(locale, key);
       return { href: href(routes.service(service.slug)), label: service.shortTitle };
     });
-  const { workshops, reference, demoCentre, carePlans } = getContent(locale);
+  const { workshops, reference, demoCentre, carePlans, projectPackages, pricingPage } = getContent(locale);
   const resources = [
     { href: href(routes.aiSolutions), label: dict.nav.aiSolutions },
     { href: href(routes.tools), label: dict.nav.tools },
     { href: href(routes.demoCentre), label: demoCentre.eyebrow },
+    { href: href(routes.pricing), label: pricingPage.navLabel },
+    { href: href(routes.projectPackages), label: projectPackages.navLabel },
     { href: href(routes.carePlans), label: carePlans.title },
     { href: href(routes.workshops), label: workshops.page.title },
     { href: href(routes.scenarios), label: reference.scenarios.title },

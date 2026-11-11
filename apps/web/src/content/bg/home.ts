@@ -1,5 +1,5 @@
 import type { IconName } from "@/components/ui/Icon";
-import type { FaqItem } from "@/content/types";
+import type { FaqItem, ServiceKey } from "@/content/types";
 import type { DomainKey } from "@/lib/domains";
 import type { ScenarioKey } from "@/lib/reference";
 
@@ -42,6 +42,22 @@ export const home = {
       { icon: "database", title: "Облачна инфраструктура", items: ["Docker", "PostgreSQL", "Резервни копия"] },
       { icon: "shield", title: "Наблюдение и сигурност", items: ["Журнали и известия", "Минимални права", "GDPR практики"] },
     ] satisfies { icon: IconName; title: string; items: string[] }[],
+  },
+  entry: {
+    eyebrow: "Започнете проект",
+    title: "Какво искате да изградите?",
+    lead: "Изберете посока. Всяка води до страница с обхват, включени дейности и ориентировъчна цена. Окончателната цена зависи от писмен обхват, който уточняваме преди старт.",
+    detailsLabel: "Вижте обхвата",
+    compareLabel: "Сравнете пакетите",
+    quoteLabel: "Поискайте оферта",
+    priceNote: "Ориентировъчна цена, не е оферта.",
+    items: [
+      { key: "business_websites", icon: "globe", title: "Уебсайт за бизнеса", text: "Фирмен сайт или лендинг страница, която обяснява какво предлагате и води до запитване." },
+      { key: "store_development", icon: "cart", title: "Онлайн магазин", text: "Shopify или WooCommerce: от първоначална настройка до пълен магазин с плащане и доставка." },
+      { key: "portals_web_apps", icon: "layers", title: "Уеб приложение по поръчка", text: "Клиентски портал, административен панел или вътрешен инструмент по вашия процес." },
+      { key: "automation", icon: "bot", title: "AI автоматизация", text: "Агенти, процеси и интеграции, които спестяват ръчна работа. Важните действия одобрява човек." },
+      { key: "ai_managed", icon: "activity", title: "AI Managed Services", text: "Наблюдение, поддръжка и оптимизация на AI система, след като вече работи." },
+    ] satisfies { key: ServiceKey; icon: IconName; title: string; text: string }[],
   },
   offer: {
     eyebrow: "Какво правим",

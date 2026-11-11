@@ -50,6 +50,7 @@ from app.invoicing import service as invoicing
 from app.invoicing.models import AccountingDocument
 from app.models import AdminRole, AdminSession, AdminUser, Lead, LeadNote, LeadStatus, utcnow
 from app.ops import service as ops
+from app.quotes import service as quote_service
 from app.security import hash_password, validate_password_strength
 from app.services import admin_mfa, ai_actions, leads, staff
 from app.team import service as team
@@ -348,6 +349,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         configurations = team.purge_expired(db, dry_run=args.dry_run)
         saved_assessments = assessment_service.purge_expired(db, dry_run=args.dry_run)
         analytics_events = analytics.purge_expired(db, settings.analytics_retention_days, dry_run=args.dry_run)
+        quote_baskets = quote_service.purge_expired(db, dry_run=args.dry_run)
         sessions_removed = 0
         account_rows = 0
         legal_removed = {"withdrawals": 0, "data_requests": 0, "events": 0, "kept_for_accounting": 0}
@@ -366,6 +368,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         f"team_configurations={configurations.due if args.dry_run else configurations.deleted} "
         f"assessment_results={saved_assessments.due if args.dry_run else saved_assessments.deleted} "
         f"analytics_events={analytics_events} "
+        f"quote_baskets={quote_baskets} "
         f"sessions={sessions_removed} account_rows={account_rows} "
         f"withdrawal_requests={legal_removed['withdrawals']} data_requests={legal_removed['data_requests']}"
     )

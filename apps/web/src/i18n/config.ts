@@ -58,6 +58,10 @@ const EN_SEGMENTS: Record<string, string> = {
   "rabotni-sreshti": "workshops",
   konto: "account",
   paketi: "care-plans",
+  "proektni-paketi": "project-packages",
+  tseni: "pricing",
+  konfigurator: "configurator",
+  zayavka: "quote-request",
   "demo-tsentar": "demo-centre",
 };
 /** Second-level segments (e.g. `/statii/tema/<topic>`). */

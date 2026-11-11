@@ -1,0 +1,107 @@
+{
+ "version": "2026-11.1",
+ "project_types": ["landing_page", "business_website", "online_store", "custom_application"],
+ "pages": ["one", "up_to_5", "up_to_15", "more_than_15"],
+ "products": ["none", "up_to_50", "up_to_500", "more_than_500"],
+ "languages": ["one", "two", "three_plus"],
+ "build": ["new", "redesign"],
+ "features": [
+  "cms",
+  "blog",
+  "search",
+  "product_filters",
+  "customer_accounts",
+  "user_dashboard",
+  "payments",
+  "shipping",
+  "invoicing",
+  "booking",
+  "crm",
+  "erp",
+  "analytics",
+  "seo",
+  "ai_assistant",
+  "marketing"
+ ],
+ "branding": ["existing", "new"],
+ "design_level": ["standard", "bespoke"],
+ "operations": ["hosting", "maintenance", "backups", "security", "monitoring", "support"],
+ "timeline": ["asap", "within_1_month", "within_3_months", "flexible"],
+ "budget_range": ["undisclosed", "under_2500", "2500_10000", "10000_25000", "over_25000"],
+ "packages": {
+  "landing_page": { "service": "business_websites", "priced": false, "delivery": "fixed_scope", "care_plan": "website" },
+  "business_website": { "service": "business_websites", "priced": true, "delivery": "fixed_scope", "care_plan": "website" },
+  "store_setup": { "service": "store_development", "priced": false, "delivery": "fixed_scope", "care_plan": "commerce" },
+  "store_complete": { "service": "store_development", "priced": true, "delivery": "fixed_scope", "care_plan": "commerce" },
+  "custom_web_app": { "service": "portals_web_apps", "priced": true, "delivery": "staged", "care_plan": null }
+ },
+ "unavailable_features": {
+  "landing_page": ["blog", "search", "product_filters", "customer_accounts", "user_dashboard", "payments", "shipping", "invoicing", "erp"],
+  "business_website": ["product_filters", "shipping"],
+  "online_store": [],
+  "custom_application": []
+ },
+ "included_features": {
+  "landing_page": [],
+  "business_website": [],
+  "store_setup": ["payments", "shipping"],
+  "store_complete": ["payments", "shipping", "product_filters"],
+  "custom_web_app": ["customer_accounts", "user_dashboard"]
+ },
+ "priced_features": {
+  "payments": "payments_subscriptions",
+  "invoicing": "integrations",
+  "crm": "integrations",
+  "erp": "integrations",
+  "analytics": "analytics",
+  "seo": "seo",
+  "ai_assistant": "ai_tools"
+ },
+ "store_complete_triggers": ["invoicing", "crm", "erp", "customer_accounts", "user_dashboard", "ai_assistant", "booking"],
+ "budget_upper_bound": { "under_2500": 2500, "2500_10000": 10000, "10000_25000": 25000 },
+ "unpriced_keys": [
+  "package_scope",
+  "additional_languages",
+  "redesign",
+  "content_migration",
+  "large_site",
+  "large_catalogue",
+  "new_branding",
+  "bespoke_design",
+  "accessibility_requirements",
+  "interactive_elements",
+  "care_for_application",
+  "operation:backups",
+  "operation:monitoring",
+  "operation:support"
+ ],
+ "assumption_keys": [
+  "written_scope_before_start",
+  "content_from_client",
+  "one_site_or_system",
+  "client_contracts_with_providers",
+  "accountant_confirms_tax_settings"
+ ],
+ "exclusion_keys": ["hosting", "licences", "ai_model_usage", "delivery_time_not_published", "no_results_promised"],
+ "review_reasons": [
+  "indicative_only",
+  "custom_application",
+  "migration",
+  "integrations",
+  "ai_assistant",
+  "bespoke_design",
+  "new_branding",
+  "large_scope",
+  "asap_timeline",
+  "budget_below_starting_price",
+  "unpriced_requirements"
+ ],
+ "rules": [
+  "landing_single_page",
+  "products_need_store",
+  "store_needs_products",
+  "store_migration_needs_store",
+  "dashboard_needs_accounts",
+  "feature_not_for_type"
+ ]
+}

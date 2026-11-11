@@ -164,6 +164,18 @@ class Settings(BaseSettings):
     analytics_retention_days: int = Field(default=180, ge=7, le=730)
     analytics_rate_limit: int = Field(default=240, ge=10)
     analytics_rate_window_seconds: int = Field(default=60, ge=10)
+    # Project configurator (docs/PROJECT_CONFIGURATOR.md): off by default; while off its routes answer 404.
+    project_configurator_enabled: bool = False
+    configurator_review_rate_limit: int = Field(default=60, ge=1)
+    configurator_global_rate_limit: int = Field(default=600, ge=1)
+    configurator_rate_window_seconds: int = Field(default=600, ge=1)
+    # Quote basket (docs/QUOTE_BASKET.md): off by default; while off its routes answer 404. Drafts expire.
+    quote_basket_enabled: bool = False
+    quote_basket_days: int = Field(default=30, ge=1, le=180)
+    quote_basket_rate_limit: int = Field(default=120, ge=1)
+    quote_basket_create_rate_limit: int = Field(default=10, ge=1)
+    quote_basket_global_rate_limit: int = Field(default=1200, ge=1)
+    quote_basket_rate_window_seconds: int = Field(default=600, ge=1)
     # Customer accounts (docs/CUSTOMER_ACCOUNTS.md). Off until a release review.
     customer_accounts_enabled: bool = False
     account_session_hours: int = Field(default=12, ge=1, le=72)
@@ -306,7 +318,13 @@ class Settings(BaseSettings):
             make_url(self.database_url).username != "acs_app_api"
         ):
             problems.append("customer accounts and the client portal need the restricted database role")
-        problems.extend(release_gates.open_blockers(customer_accounts_enabled=self.customer_accounts_enabled))
+        problems.extend(
+            release_gates.open_blockers(
+                customer_accounts_enabled=self.customer_accounts_enabled,
+                project_configurator_enabled=self.project_configurator_enabled,
+                quote_basket_enabled=self.quote_basket_enabled,
+            )
+        )
         if self.customer_accounts_enabled or self.billing_provider != "disabled":
             if not self.email_delivery_verified:
                 problems.append(

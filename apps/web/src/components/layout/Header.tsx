@@ -209,7 +209,7 @@ export function Header({
             : "border-transparent bg-ink-950/70 backdrop-blur-md",
         )}
       >
-        <Container className="flex h-16 items-center justify-between gap-4 xl:gap-6">
+        <Container className="flex h-16 items-center justify-between gap-4 lg:gap-3 xl:gap-6">
           <Logo href={homeHref} />
 
           <nav aria-label={labels.nav} className="hidden lg:block">
@@ -353,7 +353,7 @@ export function Header({
             </ul>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 lg:gap-2 xl:gap-3">
             {searchLabels && <SiteSearch locale={locale} labels={searchLabels} />}
             <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="hidden lg:block" />
             {account && <AccountLinks links={account} variant="header" />}

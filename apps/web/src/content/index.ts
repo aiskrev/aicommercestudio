@@ -20,6 +20,10 @@ import {
 import { about, aiSolutions, industries, processPage, servicesPage, toolsPage } from "@/content/bg/pages";
 import { keywordMap } from "@/content/bg/seo";
 import { carePlans, demoCentre } from "@/content/bg/offer-pages";
+import { configurator } from "@/content/bg/configurator";
+import { pricingPage } from "@/content/bg/pricing-page";
+import { projectPackages } from "@/content/bg/project-packages";
+import { quoteBasket } from "@/content/bg/quote-basket";
 import { coreServices, services } from "@/content/bg/services";
 import { readinessTool } from "@/content/bg/tool-readiness";
 import { agentLibrary } from "@/content/bg/agent-library";
@@ -57,6 +61,10 @@ import {
 } from "@/content/en/pages";
 import { keywordMap as enKeywordMap } from "@/content/en/seo";
 import { carePlans as enCarePlans, demoCentre as enDemoCentre } from "@/content/en/offer-pages";
+import { configurator as enConfigurator } from "@/content/en/configurator";
+import { pricingPage as enPricingPage } from "@/content/en/pricing-page";
+import { projectPackages as enProjectPackages } from "@/content/en/project-packages";
+import { quoteBasket as enQuoteBasket } from "@/content/en/quote-basket";
 import { coreServices as enCoreServices, services as enServices } from "@/content/en/services";
 import { readinessTool as enReadinessTool } from "@/content/en/tool-readiness";
 import { agentLibrary as enAgentLibrary } from "@/content/en/agent-library";
@@ -78,6 +86,10 @@ const bg = {
   home,
   services,
   carePlans,
+  projectPackages,
+  pricingPage,
+  configurator,
+  quoteBasket,
   demoCentre,
   coreServices,
   domains,
@@ -126,6 +138,10 @@ const en: SiteContent = {
   home: enHome,
   services: enServices,
   carePlans: enCarePlans,
+  projectPackages: enProjectPackages,
+  pricingPage: enPricingPage,
+  configurator: enConfigurator,
+  quoteBasket: enQuoteBasket,
   demoCentre: enDemoCentre,
   coreServices: enCoreServices,
   domains: enDomains,

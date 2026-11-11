@@ -26,6 +26,9 @@ quote" everywhere.
 | `/bg/rabotni-sreshti` and each workshop | "from" on every card; "from" and typical range on the page | `WORKSHOP_PRICES` |
 | `/bg/paketi` · `/en/care-plans` | per plan, per month and per system | `CARE_PLAN_PRICES` |
 | `/bg/uslugi/ai-managed-services` and the home page | per level, per month and per system | `AI_MANAGED_PRICES` |
+| The home page, section "What do you want to build?" | "from" and typical range of five services, labelled "indicative, not a quote" | `SERVICE_PRICES` |
+| `/bg/proektni-paketi` · `/en/project-packages` | the band of the package's service for three packages; "price in a written quote" for the landing page and the starter store, which have no separately approved price (`lib/project-packages.ts`); the two care plans | `SERVICE_PRICES`, `CARE_PLAN_PRICES` |
+| `/bg/tseni` · `/en/pricing` | every band, grouped by one-time and monthly | all four tables |
 
 Everything comes from `apps/web/src/lib/prices.ts`. To change a price, change its baseline row or a factor
 there; `lib/prices.test.ts` checks coverage, ordering, rounding and the rule. Included hours and response
@@ -102,3 +105,29 @@ Generated from `lib/prices.ts` on 2026-11-10 (amounts in euro, rounded as the mo
 * **Lawyer:** a consumer may open either language version; check that showing different prices per language
   (market) is acceptable under the EU geo-blocking rules for the B2C cases.
 * Review the prices after the first 5–10 quotes (won against lost).
+
+## One schedule for the pages and the API (2026-11-11, commercial expansion Phase 04)
+
+`lib/prices.ts` is still the only place where an amount is written. Added around it:
+
+* **A schedule document.** `lib/price-schedule.ts` renders the active schedule as one JSON document
+  (`lib/price-schedule.json`): version, currency, active schedule, owner approval, tax treatment, `binding: false`,
+  the excluded third-party costs and every band in four groups (`service`, `workshop`, `care_plan`, `ai_managed`).
+  `lib/price-schedule.test.ts` fails when the file and `prices.ts` differ; regenerate with `UPDATE_PRICE_SCHEDULE=1`.
+* **The API reads a copy.** `apps/api/app/price_schedule.json` is a byte-for-byte copy, loaded and validated by
+  `app/pricing.py` (`schedule()`, `band(group, key)`, `is_owner_approved()`). `scripts/test.ps1` fails when the two
+  files differ. No function takes a language, country or address. Nothing here is a checkout amount: Stripe prices
+  stay in `billing_offers`. The module has no route yet; the project configurator (Phase 05) is its first user.
+* **Version.** `PRICE_SCHEDULE_VERSION` (now `2026-11-10.1`) changes with any amount, factor, active schedule,
+  approval or tax treatment, so a stored estimate can name the schedule it came from.
+* **Tax treatment is a stated fact, not an assumption.** `PRICE_TAX_TREATMENT = "not_vat_registered"`. On VAT
+  registration this value, `dict.prices.note` and the legal texts change together (the test ties the note to the
+  value), and the accountant decides whether published amounts become net or gross.
+* **A pricing page.** `/bg/tseni` ↔ `/en/pricing` lists every band grouped by how it is charged: one-time projects,
+  monthly services, AI Managed Services levels, care plans, workshops. It shows the general note, what is never
+  included (hosting and domain, licences, usage-billed services such as AI models, payment and courier fees,
+  integrations outside the described scope) and how the exact price is set. It adds no price of its own.
+
+To change a price: edit the baseline in `lib/prices.ts`, bump `PRICE_SCHEDULE_VERSION`, run the web tests with
+`UPDATE_PRICE_SCHEDULE=1`, copy `lib/price-schedule.json` to `apps/api/app/price_schedule.json`, and update the
+table above. Owner approval of the schedule is still pending (`PRICE_SCHEDULE_OWNER_APPROVAL`).

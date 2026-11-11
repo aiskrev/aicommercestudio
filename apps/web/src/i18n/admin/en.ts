@@ -396,6 +396,21 @@ export const adminEn: AdminDictionary = {
     filterLevel: "Level (AI Managed)",
     filterReadiness: "Readiness (AI Managed)",
   },
+  configurator: {
+    title: "Configuration from the project configurator",
+    note: "A guide computed by the server when the enquiry arrived, from the published indicative prices. It is not a quote and not a promised price: it is input for the written quote.",
+    schedule: "Price schedule",
+    answers: "Answers",
+  },
+  quoteBasket: {
+    title: "Quote request (basket)",
+    note: "The items and sums were computed by the server when the request was sent, from the published indicative prices. They are not a quote. The configured projects are shown below.",
+    extras: "Extra services",
+    oneTime: "One-time, from",
+    monthly: "Monthly, from",
+    unpriced: "Without a published price",
+    none: "none",
+  },
   solution: {
     title: "Design from the AI solution builder",
     note: "Enumerated choices only; the server checked the compatibility and safety rules. Not a running system.",

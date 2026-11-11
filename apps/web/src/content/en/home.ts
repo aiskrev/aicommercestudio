@@ -40,6 +40,22 @@ export const home: typeof bgHome = {
       { icon: "shield", title: "Observability & security", items: ["Logging and alerts", "Least privilege", "GDPR practices"] },
     ],
   },
+  entry: {
+    eyebrow: "Start a project",
+    title: "What do you want to build?",
+    lead: "Pick a direction. Each leads to a page with the scope, what is included and an indicative price. The final price depends on a written scope that we agree before we start.",
+    detailsLabel: "See the scope",
+    compareLabel: "Compare the packages",
+    quoteLabel: "Request a quote",
+    priceNote: "Indicative price, not a quote.",
+    items: [
+      { key: "business_websites", icon: "globe", title: "Business website", text: "A company site or landing page that explains what you offer and leads to an enquiry." },
+      { key: "store_development", icon: "cart", title: "Online store", text: "Shopify or WooCommerce: from first setup to a complete store with payment and shipping." },
+      { key: "portals_web_apps", icon: "layers", title: "Custom web application", text: "A client portal, admin panel or internal tool built around your process." },
+      { key: "automation", icon: "bot", title: "AI automation", text: "Agents, workflows and integrations that save manual work. A person approves the actions that matter." },
+      { key: "ai_managed", icon: "activity", title: "AI Managed Services", text: "Monitoring, maintenance and optimisation of an AI system once it is running." },
+    ],
+  },
   offer: {
     eyebrow: "What we do",
     title: "How we can help",

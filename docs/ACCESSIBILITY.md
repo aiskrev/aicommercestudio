@@ -39,7 +39,11 @@ sizes on real phones. No real device was used.
 | Legal pages, contact form, footer, opt-out | Playwright capture (default stack, accounts off); also inspected by the agent in a browser (withdrawal page at 375; contact page overflow at 390, 768, 1024, 1440); no human review | capture | capture | capture | capture |
 | Order review, withdrawal steps, data rights, staff queues | Playwright capture (accounts stack); **not manually inspected** | same | same | same | same |
 
-**Known defect, not caused by this work (found by the capture), now release blocker BLOCKER-ACC-HEADER-01:** with customer accounts switched on, the Bulgarian site
+**Update 2026-11-11: BLOCKER-ACC-HEADER-01 is closed.** The desktop bar now shows one compact sign-in control instead of
+a text link plus a sign-up button, the header fits at 1024 and 1440 px with accounts on, and the test below runs without
+`test.fail()`. The original finding is kept for the record.
+
+**Known defect (as found), not caused by this work (found by the capture), release blocker BLOCKER-ACC-HEADER-01:** with customer accounts switched on, the Bulgarian site
 header is wider than the screen at 1024 px (about 14 px) and at 1440 px (about 150 px), because the sign-in and sign-up links
 were added to an already full bar. It is invisible while accounts are off (the production state) and must be fixed — a design
 decision about which links move into the menu — before accounts are switched on. `responsive-legal.spec.ts` keeps a

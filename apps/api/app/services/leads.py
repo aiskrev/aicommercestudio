@@ -354,6 +354,8 @@ READINESS_SOURCE = "readiness_assessment"
 TEAM_SOURCE = "team_configurator"
 SOLUTION_SOURCE = "solution_builder"
 ASSESSMENT_SOURCE = "engineering_assessment"
+CONFIGURATOR_SOURCE = "project_configurator"
+QUOTE_BASKET_SOURCE = "quote_basket"
 
 
 def _expired_leads(

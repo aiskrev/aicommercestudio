@@ -88,7 +88,11 @@ def seed(db: Session, password: str) -> list[str]:
     created: list[str] = []
     for name, (kind, days, state, ending, checkout_state) in SCENARIOS.items():
         email = email_of(name)
-        if db.scalar(select(CustomerAccount).where(CustomerAccount.email == email)):
+        existing = db.scalar(select(CustomerAccount).where(CustomerAccount.email == email))
+        if existing:
+            # The runner draws a new random password each time; an account kept from an earlier run must accept it,
+            # or every sign-in of a re-run fails. Nothing else about the kept account changes.
+            existing.password_hash = hash_password(password)
             continue
         account = CustomerAccount(
             email=email,

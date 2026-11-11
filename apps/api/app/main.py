@@ -33,12 +33,14 @@ from app.routers import (
     billing,
     catalogue,
     compliance,
+    configurator,
     health,
     marketing,
     ops,
     ops_platform,
     portal,
     public,
+    quote_basket,
     readiness,
     solution,
     team,
@@ -143,6 +145,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(readiness.router)
     app.include_router(team.router)
     app.include_router(solution.router)
+    app.include_router(configurator.router)
+    app.include_router(quote_basket.router)
     app.include_router(assessments.router)
     app.include_router(admin_auth.router)
     app.include_router(admin.router)

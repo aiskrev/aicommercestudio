@@ -29,6 +29,7 @@ from app.schemas import (
     AiManagedQualificationOut,
     AuditLogOut,
     AuditPage,
+    ConfiguratorDetailsOut,
     DashboardStats,
     IntegrationStatus,
     LeadDetailOut,
@@ -38,6 +39,7 @@ from app.schemas import (
     LeadSummaryOut,
     LeadTriageOut,
     LeadUpdate,
+    QuoteBasketDetailsOut,
     ReadinessDetailsOut,
     RetentionPreview,
     RetentionRunIn,
@@ -158,6 +160,32 @@ def _solution_details(lead: Lead) -> SolutionDetailsOut | None:
         return None
 
 
+def _configurator_details(lead: Lead) -> ConfiguratorDetailsOut | None:
+    """The stored project-configurator answers and review, or None (other leads, unexpected data)."""
+    details = lead.service_details or {}
+    if details.get("kind") != "project_configurator":
+        return None
+    try:
+        return ConfiguratorDetailsOut.model_validate(
+            {key: details.get(key) for key in ("model_version", "answers", "review")}
+        )
+    except ValidationError:
+        logger.warning("lead_service_details_invalid", extra={"lead": lead.reference})
+        return None
+
+
+def _quote_basket_details(lead: Lead) -> QuoteBasketDetailsOut | None:
+    """The basket view stored with a quote-basket lead, or None (other leads, unexpected data)."""
+    details = lead.service_details or {}
+    if details.get("kind") != "quote_basket":
+        return None
+    try:
+        return QuoteBasketDetailsOut.model_validate({key: details.get(key) for key in ("model_version", "basket")})
+    except ValidationError:
+        logger.warning("lead_service_details_invalid", extra={"lead": lead.reference})
+        return None
+
+
 def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
     base = LeadSummaryOut.model_validate(lead).model_dump()
     ai_managed = _ai_managed_details(lead)
@@ -183,6 +211,8 @@ def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
         readiness=_readiness_details(lead),
         team=_team_details(db, lead),
         solution=_solution_details(lead),
+        configurator=_configurator_details(lead),
+        quote_basket=_quote_basket_details(lead),
     )
 
 

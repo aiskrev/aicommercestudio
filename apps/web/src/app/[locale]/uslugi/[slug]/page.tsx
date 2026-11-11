@@ -43,6 +43,7 @@ import { domainDefinition, isDomainPublished, primaryDomainOf } from "@/lib/doma
 import { type CatalogueEntry, domainOfferings, getCatalogue, getCatalogueDetail } from "@/lib/catalogue";
 import { resolveLocale } from "@/lib/params";
 import { SERVICE_PRICES } from "@/lib/prices";
+import { PROJECT_PACKAGES } from "@/lib/project-packages";
 import { contactWithService, quoteWithService, routes } from "@/lib/routes";
 import { buildMetadata, faqJsonLd, serviceJsonLd } from "@/lib/seo";
 import { SERVICE_TOOLS, toolHrefs, toolMinutes } from "@/lib/tools";
@@ -136,6 +137,8 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
     .filter((a): a is NonNullable<typeof a> => Boolean(a));
   const contactHref = href(contactWithService(service.key));
   const quoteHref = href(quoteWithService(service.key));
+  const firstPackage = PROJECT_PACKAGES.find((item) => item.service === service.key);
+  const packagesLabel = getContent(locale).projectPackages.navLabel;
   const parentDomain = primaryDomainOf(service.key);
   const parent = parentDomain?.published ? domainByKey(locale, parentDomain.key) : undefined;
   const offerings = parentDomain ? domainOfferings((await getCatalogue(locale)).entries, parentDomain.key) : [];
@@ -196,6 +199,11 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
               <dt className="t-label">{dict.prices.label}</dt>
               <dd className="mt-2">
                 <PriceTag locale={locale} price={SERVICE_PRICES[service.key]} testId="service-price" />
+                {firstPackage && (
+                  <Link href={`${href(routes.projectPackages)}#${firstPackage.key}`} className="link mt-2 inline-block text-body-sm" data-testid="service-packages-link">
+                    {packagesLabel}
+                  </Link>
+                )}
               </dd>
             </div>
             <div className="bg-surface-1 p-5">
