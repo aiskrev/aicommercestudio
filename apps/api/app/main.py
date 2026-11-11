@@ -40,6 +40,7 @@ from app.routers import (
     ops_platform,
     portal,
     public,
+    quotations,
     quote_basket,
     readiness,
     solution,
@@ -147,6 +148,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(solution.router)
     app.include_router(configurator.router)
     app.include_router(quote_basket.router)
+    app.include_router(quotations.public)
+    app.include_router(quotations.staff)
     app.include_router(assessments.router)
     app.include_router(admin_auth.router)
     app.include_router(admin.router)

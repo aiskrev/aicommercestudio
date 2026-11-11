@@ -68,6 +68,13 @@ if ($Suite -in @("api", "web", "all")) {
         if ($api -ne $web) { Write-Host "price schedule differs between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
         $global:LASTEXITCODE = [int]($api -ne $web)
     }
+    # Words behind the configurator keys, used by the API for proposal drafts from configured enquiries (generated from the site content).
+    Invoke-Suite "Configurator labels (API = web copy)" {
+        $api = (Get-FileHash "apps/api/app/configurator/labels.json").Hash
+        $web = (Get-FileHash "apps/web/src/lib/configurator-labels.json").Hash
+        if ($api -ne $web) { Write-Host "configurator labels differ between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
+        $global:LASTEXITCODE = [int]($api -ne $web)
+    }
     # Project configurator model: option lists, packages and feature tables (the web draws the form, the API evaluates).
     Invoke-Suite "Configurator model (API = web copy)" {
         $api = (Get-FileHash "apps/api/app/configurator/model.json").Hash

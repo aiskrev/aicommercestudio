@@ -4,6 +4,7 @@ import { type FormEvent, useState } from "react";
 
 import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { EmptyState, ErrorState, LoadingState, Panel, Pill } from "@/components/admin/ui";
+import { QuotationPanel } from "@/components/admin/QuotationPanel";
 import { buttonClass, cx } from "@/components/ui/primitives";
 import { fmt } from "@/i18n/admin";
 import { adminFetch, ApiError } from "@/lib/admin-api";
@@ -573,6 +574,8 @@ function ProposalEditor({ proposal, onChanged, onReload }: { proposal: Proposal;
           )}
         </p>
       )}
+
+      <QuotationPanel leadId={proposal.lead_id} proposalId={proposal.id} proposalRevision={proposal.revision} approved={proposal.status === "approved"} />
 
       <section aria-label={t.history}>
         <h3 className="text-sm font-semibold">{t.history}</h3>

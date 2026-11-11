@@ -62,6 +62,7 @@ const EN_SEGMENTS: Record<string, string> = {
   tseni: "pricing",
   konfigurator: "configurator",
   zayavka: "quote-request",
+  oferta: "quotation",
   "demo-tsentar": "demo-centre",
 };
 /** Second-level segments (e.g. `/statii/tema/<topic>`). */

@@ -176,6 +176,12 @@ class Settings(BaseSettings):
     quote_basket_create_rate_limit: int = Field(default=10, ge=1)
     quote_basket_global_rate_limit: int = Field(default=1200, ge=1)
     quote_basket_rate_window_seconds: int = Field(default=600, ge=1)
+    # Customer-facing quotations (docs/QUOTATIONS.md): off by default; while off its routes answer 404.
+    quotations_enabled: bool = False
+    quotation_view_rate_limit: int = Field(default=60, ge=1)
+    quotation_decision_rate_limit: int = Field(default=10, ge=1)
+    quotation_global_rate_limit: int = Field(default=600, ge=1)
+    quotation_rate_window_seconds: int = Field(default=600, ge=1)
     # Customer accounts (docs/CUSTOMER_ACCOUNTS.md). Off until a release review.
     customer_accounts_enabled: bool = False
     account_session_hours: int = Field(default=12, ge=1, le=72)
@@ -323,6 +329,7 @@ class Settings(BaseSettings):
                 customer_accounts_enabled=self.customer_accounts_enabled,
                 project_configurator_enabled=self.project_configurator_enabled,
                 quote_basket_enabled=self.quote_basket_enabled,
+                quotations_enabled=self.quotations_enabled,
             )
         )
         if self.customer_accounts_enabled or self.billing_provider != "disabled":

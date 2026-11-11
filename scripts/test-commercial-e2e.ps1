@@ -17,7 +17,7 @@ Set-Location $root
 $files = @("-f", "docker-compose.yml", "-f", "docker-compose.commercial-e2e.yml")
 if (-not $env:CATALOGUE_REVALIDATE_SECRET) { $env:CATALOGUE_REVALIDATE_SECRET = [guid]::NewGuid().ToString("N") }
 $default = -not $Specs
-if ($default) { $Specs = @("tests/configurator.spec.ts", "tests/quote-basket.spec.ts") }
+if ($default) { $Specs = @("tests/configurator.spec.ts", "tests/quote-basket.spec.ts", "tests/quotation.spec.ts") }
 $result = 1
 
 try {

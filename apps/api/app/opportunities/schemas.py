@@ -77,7 +77,14 @@ class OpportunityUpdate(BaseModel):
 
 class LinkedRecord(BaseModel):
     kind: Literal[
-        "advisor_assessment", "assessment_result", "team_configuration", "readiness", "solution", "ai_managed"
+        "advisor_assessment",
+        "assessment_result",
+        "team_configuration",
+        "readiness",
+        "solution",
+        "ai_managed",
+        "project_configurator",
+        "quote_basket",
     ]
     reference: str
     detail: str | None = None

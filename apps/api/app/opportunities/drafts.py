@@ -17,6 +17,7 @@ import re
 from typing import Any
 
 from app.models import Lead
+from app.opportunities import configured
 from app.opportunities.models import LeadOpportunity, ProposalKind
 from app.opportunities.schemas import SECTIONS, Commercial, Finding, ProposalContent
 from app.workshops import workshop_title
@@ -95,25 +96,31 @@ def generate(lead: Lead, opportunity: LeadOpportunity | None, kind: ProposalKind
     t = _TEXT[locale]
     placeholder = PLACEHOLDER[locale]
     o = opportunity
-    scope_parts = [part for part in [(o.scope_summary if o else None) or t["scope_missing"]] if part]
+    # A lead from the project configurator or the quote basket brings its own facts: the package, what the client
+    # chose and what needs an assessment (app/opportunities/configured.py). Still nothing commercial.
+    configured_sections = configured.sections(lead, locale) or {}
+    scope_parts = [(o.scope_summary if o else None) or configured_sections.get("scope") or t["scope_missing"]]
     if o and o.problem_summary:
         scope_parts.append(t["problem"].format(value=o.problem_summary))
     if o and o.technical_constraints:
         scope_parts.append(t["constraints"].format(value=o.technical_constraints))
-    assumptions = list(t["assumptions"])
+    assumptions = list(t["assumptions"]) + [
+        item for item in configured_sections.get("assumptions", []) if item not in t["assumptions"]
+    ]
     if o and o.recommended_workshop:
         assumptions.append(t["workshop"].format(value=workshop_title(o.recommended_workshop, locale)))
     if o and o.recommended_assessment:
         assumptions.append(t["assessment"].format(value=o.recommended_assessment))
     content: dict[str, Any] = {
         "scope": "\n\n".join(scope_parts),
-        "deliverables": t["deliverables"],
+        "deliverables": configured_sections.get("deliverables") or t["deliverables"],
         "assumptions": assumptions,
-        "exclusions": t["exclusions"],
-        "dependencies": t["dependencies"],
+        "exclusions": (configured_sections.get("exclusions", []) + t["exclusions"])[:40],
+        "dependencies": configured_sections.get("dependencies") or t["dependencies"],
         "responsibilities": [{"party": p, "item": i} for p, i in t["responsibilities"]],
         "acceptance_criteria": t["acceptance"],
-        "milestones": [
+        "milestones": configured_sections.get("milestones")
+        or [
             {"title": a, "description": b, "indicative_timing": c}
             for a, b, c in (t["milestones"] if kind == ProposalKind.SOW else t["milestones"][:1])
         ],

@@ -134,3 +134,10 @@ a four-eyes rule (approver ≠ author of the latest version) can be added in `se
 
 The UI tests are `apps/web/src/components/admin/opportunity.test.tsx`. The lead regression suite
 (`test_admin_leads.py`, `test_public_leads.py`) is unchanged and passing.
+
+## Configured enquiries and client-facing quotations (Phase 07)
+
+A lead created by the project configurator or the quote basket carries its answers and the server's review in
+`service_details`. The opportunity form is pre-filled from it (not saved), "generate a first draft" uses it, and an
+approved version can be shown to the client behind a flag. None of this changes the rules above: a person completes
+the commercial terms and approves, and nothing is sent. See [QUOTATIONS.md](QUOTATIONS.md).

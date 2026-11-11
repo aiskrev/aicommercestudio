@@ -314,6 +314,22 @@ unknown token and an expired basket both answer 404 `basket_not_found`.
 
 Ownership, concurrency, expiry and storage: [QUOTE_BASKET.md](QUOTE_BASKET.md).
 
+## Quotations (client-facing and staff)
+
+Off by default (`QUOTATIONS_ENABLED=false`): while off, every route below answers 404. A quotation shows one approved,
+immutable version of a proposal. The client's secret is sent in a request body (the page keeps it in the URL fragment),
+never in a URL. The system sends nothing: staff send the link themselves.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| POST | `/api/public/quotations/view` | `{token}` → `{reference, status, kind, title, company, locale, published_at, valid_until, version, content, decision, open}`. `content` is the approved version, or null once withdrawn. Counts as a view. 404 `quotation_not_found` for an unknown link; own rate limit. |
+| POST | `/api/public/quotations/decision` | `{token, decision: accept\|decline, name, note?, confirmed: true}` → the same view. Records the answer once; the same answer again changes nothing; 409 `quotation_closed` for a different answer, a withdrawn or an expired quotation; 404, 422 and the stricter rate limit as above. |
+| GET | `/api/admin/leads/{lead_id}/proposals/{proposal_id}/quotation` | Administrator. The latest quotation of the proposal (status, version, validity, views, answer) or null. The link is never returned. |
+| POST | `/api/admin/leads/{lead_id}/proposals/{proposal_id}/quotation` → 201 | Administrator. `{expected_revision, valid_until?}` → `{token, quotation}`; the link token is shown once. 409 `proposal_not_approved`, `quotation_exists`, `quotation_accepted`, `opportunity_stale`; 422 `validity_in_the_past`. |
+| POST | `/api/admin/leads/{lead_id}/proposals/{proposal_id}/quotation/withdraw` | Administrator. `{expected_revision, note}` → the quotation. 409 `quotation_closed`, `opportunity_stale`; 404 `quotation_not_found`. |
+
+Pipeline, rules, gate and tests: [QUOTATIONS.md](QUOTATIONS.md).
+
 ## Public: assessment engine
 
 Deterministic questionnaire assessments ([ASSESSMENT_PLATFORM_ARCHITECTURE.md](ASSESSMENT_PLATFORM_ARCHITECTURE.md)).

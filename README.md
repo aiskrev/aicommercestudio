@@ -85,6 +85,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [COMMERCIAL_EXPANSION_DECISIONS.md](docs/COMMERCIAL_EXPANSION_DECISIONS.md) | Commercial expansion decisions taken and decisions still pending with the owner |
 | [PROJECT_CONFIGURATOR.md](docs/PROJECT_CONFIGURATOR.md) | Project configurator (off by default): model, rules, prices, human review, security, tests |
 | [QUOTE_BASKET.md](docs/QUOTE_BASKET.md) | Quote basket (off by default): server-side draft request, ownership by token, concurrency, expiry, storage, tests |
+| [QUOTATIONS.md](docs/QUOTATIONS.md) | Quotations (off by default): configured enquiry to human-approved, client-facing offer; secret link, one answer, audit, gate |
 
 **Strategy and positioning**
 
