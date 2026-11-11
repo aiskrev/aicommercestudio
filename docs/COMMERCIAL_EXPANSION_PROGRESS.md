@@ -12,7 +12,7 @@ Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Nothing
 | 05 | Project configurator | TESTED | 2026-11-11 | Behind `PROJECT_CONFIGURATOR_ENABLED` (off); server-side review, quote request creates a lead; see checkpoint and PROJECT_CONFIGURATOR.md |
 | 06 | Quote basket | TESTED | 2026-11-11 | Behind `QUOTE_BASKET_ENABLED` (off); migration 0026 (local only); see checkpoint and QUOTE_BASKET.md |
 | 07 | Quotations and leads | TESTED | 2026-11-11 | Behind `QUOTATIONS_ENABLED` (off); migration 0027 (local only); acceptance wording unapproved (BLOCKER-COM-ACCEPT-01); see checkpoint and QUOTATIONS.md |
-| 08 | Customer accounts hardening | NOT_STARTED | | |
+| 08 | Customer accounts hardening | TESTED | 2026-11-11 | Verified against the list; account status, own quote requests by verified ownership, go-live prerequisites tested; customer MFA not built (D-22); see ACCOUNTS_HARDENING.md |
 | 09 | Commercial project portal | NOT_STARTED | | |
 | 10 | Documents, uploads, approvals | NOT_STARTED | | Uploads stay disabled |
 | 11 | Transactional e-mail | NOT_STARTED | | Real sending blocked by R2 |
@@ -220,3 +220,36 @@ Executed on this state:
 
 Not verified: a look at the quotation page and the admin panel by a person, a screen-reader pass, real devices, the
 upgrade to `0027` on a copy of production data (new empty table).
+
+### Phase 08 — 2026-11-11
+
+Verified and hardened the **existing** customer identity layer (details and the full matrix:
+[ACCOUNTS_HARDENING.md](ACCOUNTS_HARDENING.md)). No second authentication system, no database migration, public
+registration still off (`CUSTOMER_ACCOUNTS_ENABLED=false`).
+
+* Verified against the programme list: registration, e-mail verification, sign-in, sign-out, password reset, sessions,
+  profile, language, marketing consent, export and the deletion request, workspace membership.
+* Gaps closed: an erased account can never use a session; account status on `/me` (`email_verified`, `created_at`,
+  `privacy_notice_version`, `status`) and in the account page; cookie attributes tested in production; every route
+  that needs a customer session is now discovered from the application and checked for 401 without sign-in, 403
+  without CSRF and for a staff cookie (about 100 parametrised tests).
+* **Quote requests and accounts** (`GET /api/accounts/quote-requests`, read-only): a request belongs to an account only
+  when it was sent from the account's own *verified* address; never by company, name, phone or domain; no contact
+  details, free text, pipeline status, quotation link or content. The anonymous routes are unchanged.
+* The go-live prerequisites are tests: a satisfying production configuration is broken one prerequisite at a time.
+* The legal e2e stack is hermetic: a throwaway database per run, dropped afterwards (the earlier known limitation, a
+  failing re-run, is gone; two consecutive runs passed).
+
+Not done: customer MFA (D-22), changing the sign-in address, bounce handling.
+
+Executed on this state:
+
+| Check | Result |
+| --- | --- |
+| `scripts/test.ps1 -Suite web` | 79 files, 1060 tests passed |
+| `scripts/test.ps1 -Suite api` | 1407 passed, 1 skipped. Ruff reported one over-long comment line in the new test file; fixed and re-checked (ruff check and format clean, docs sync clean). The pytest run was not repeated after that one-line comment change |
+| `scripts/test.ps1 -Suite e2e` (flags off) | 323 passed, 77 skipped |
+| `scripts/test.ps1 -Suite commercial` | pass 1: 32 passed, 3 skipped; pass 2: 12 passed, 1 skipped |
+| `scripts/test.ps1 -Suite legal` (throwaway database), run twice | 50 passed, 1 skipped, both times |
+
+Not verified: a person's review of the account page, screen reader, real devices; customer sign-in on a real mailbox.

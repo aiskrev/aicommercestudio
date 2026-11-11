@@ -16,7 +16,26 @@ export class AccountError extends Error {
   }
 }
 
-export type Profile = { email: string; display_name: string | null; locale: Locale; marketing_consent: boolean };
+export type Profile = {
+  email: string;
+  display_name: string | null;
+  locale: Locale;
+  marketing_consent: boolean;
+  /** Read-only account status. */
+  email_verified: boolean;
+  created_at: string | null;
+  privacy_notice_version: string | null;
+  status: "active" | "deletion_requested";
+};
+
+/** A quote or contact request sent from the account's own verified address (GET /api/accounts/quote-requests). */
+export type QuoteRequestRow = {
+  reference: string;
+  created_at: string;
+  kind: "contact" | "quote" | "configurator" | "basket" | "tool";
+  service: string;
+  quotation_status: "published" | "accepted" | "declined" | "withdrawn" | "expired" | null;
+};
 export type AccountSession = {
   id: string;
   created_at: string;

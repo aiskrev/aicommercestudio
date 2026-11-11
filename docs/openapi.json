@@ -8864,6 +8864,31 @@
         }
       }
     },
+    "/api/accounts/quote-requests": {
+      "get": {
+        "tags": [
+          "accounts"
+        ],
+        "summary": "Quote and contact requests sent from the account's address",
+        "operationId": "my_quote_requests_api_accounts_quote_requests_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuoteRequestOut"
+                  },
+                  "type": "array",
+                  "title": "Response My Quote Requests Api Accounts Quote Requests Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/workspace/demo": {
       "get": {
         "tags": [
@@ -21784,6 +21809,42 @@
           "marketing_consent": {
             "type": "boolean",
             "title": "Marketing Consent"
+          },
+          "email_verified": {
+            "type": "boolean",
+            "title": "Email Verified",
+            "default": true
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "privacy_notice_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Privacy Notice Version"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "deletion_requested"
+            ],
+            "title": "Status",
+            "default": "active"
           }
         },
         "additionalProperties": false,
@@ -22916,6 +22977,59 @@
         ],
         "title": "QuoteRequestCreate",
         "description": "Request for a written quote: the contact fields plus structured project information."
+      },
+      "QuoteRequestOut": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "contact",
+              "quote",
+              "configurator",
+              "basket",
+              "tool"
+            ],
+            "title": "Kind"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "quotation_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "published",
+                  "accepted",
+                  "declined",
+                  "withdrawn",
+                  "expired"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quotation Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "created_at",
+          "kind",
+          "service"
+        ],
+        "title": "QuoteRequestOut"
       },
       "RateCardIn": {
         "properties": {

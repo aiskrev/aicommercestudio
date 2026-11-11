@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useCallback, useEffect, useState } from "react";
 
 import { DataRights } from "@/components/account/DataRights";
+import { QuoteRequests } from "@/components/account/QuoteRequests";
 import { Alert, Button } from "@/components/ui/primitives";
 import { accountTexts } from "@/i18n/account";
 import { type Locale, localizePath } from "@/i18n/config";
@@ -146,6 +147,24 @@ export function AccountHome({ locale }: { locale: Locale }) {
         </form>
       </section>
 
+      <section aria-labelledby="account-status" className="space-y-2 text-sm" data-testid="account-status">
+        <h2 id="account-status" className="text-xl font-semibold">
+          {t.home.statusTitle}
+        </h2>
+        <p>{profile.status === "deletion_requested" ? t.home.statusDeletion : t.home.statusActive}</p>
+        <p>{profile.email_verified ? t.home.verified : t.home.unverified}</p>
+        {profile.created_at && (
+          <p>
+            {t.home.since}: {date(profile.created_at)}
+          </p>
+        )}
+        {profile.privacy_notice_version && (
+          <p>
+            {t.home.privacyVersion}: {profile.privacy_notice_version}
+          </p>
+        )}
+      </section>
+
       <section aria-labelledby="account-password" className="space-y-4">
         <h2 id="account-password" className="text-xl font-semibold">
           {t.home.passwordTitle}
@@ -199,6 +218,8 @@ export function AccountHome({ locale }: { locale: Locale }) {
           </Button>
         )}
       </section>
+
+      <QuoteRequests locale={locale} />
 
       <DataRights locale={locale} />
 

@@ -111,6 +111,12 @@ class ProfileOut(StrictModel):
     display_name: str | None
     locale: str
     marketing_consent: bool
+    # Account status, read-only: whether the address is confirmed, since when the account exists, which privacy
+    # notice it acknowledged and whether a deletion request is open (the request is carried out by staff).
+    email_verified: bool = True
+    created_at: str | None = None
+    privacy_notice_version: str | None = None
+    status: Literal["active", "deletion_requested"] = "active"
 
 
 class SessionOut(StrictModel):
@@ -121,12 +127,29 @@ class SessionOut(StrictModel):
     current: bool
 
 
-def _profile(account: CustomerAccount) -> ProfileOut:
+def _profile(account: CustomerAccount, *, deletion_requested: bool = False) -> ProfileOut:
     return ProfileOut(
         email=account.email,
         display_name=account.display_name,
         locale=account.locale,
         marketing_consent=account.marketing_consent_at is not None,
+        email_verified=account.email_verified_at is not None,
+        created_at=account.created_at.isoformat() if account.created_at else None,
+        privacy_notice_version=account.privacy_notice_version,
+        status="deletion_requested" if deletion_requested else "active",
+    )
+
+
+def _deletion_requested(db: Session, account: CustomerAccount) -> bool:
+    from app.compliance.models import DataRequest
+
+    return (
+        db.scalar(
+            select(DataRequest.id).where(
+                DataRequest.account_id == account.id, DataRequest.kind == "deletion", DataRequest.status == "open"
+            )
+        )
+        is not None
     )
 
 
@@ -178,6 +201,11 @@ def require_account(request: Request, db: DbSession, settings: AppSettings) -> A
     session = db.scalar(select(CustomerSession).where(CustomerSession.token_hash == hash_token(token)))
     now = utcnow()
     if session is None or session.revoked_at is not None or session.expires_at <= now:
+        raise _unauthorized()
+    if session.account.erased_at is not None:
+        # Erasure removes every session; this is the second line of defence, not the first.
+        session.revoked_at = now
+        db.commit()
         raise _unauthorized()
     if now - session.last_seen_at > timedelta(minutes=settings.account_session_idle_minutes):
         session.revoked_at = now
@@ -385,8 +413,8 @@ def change_password(payload: PasswordIn, ctx: Account, request: Request, db: DbS
 
 
 @router.get("/me", response_model=ProfileOut)
-def me(ctx: Account) -> ProfileOut:
-    return _profile(ctx.account)
+def me(ctx: Account, db: DbSession) -> ProfileOut:
+    return _profile(ctx.account, deletion_requested=_deletion_requested(db, ctx.account))
 
 
 @router.patch("/me", response_model=ProfileOut)
@@ -425,7 +453,7 @@ def update_profile(payload: ProfileIn, ctx: Account, db: DbSession, settings: Ap
         account.marketing_consent_at = None
         account.marketing_consent_version = None
     db.commit()
-    return _profile(account)
+    return _profile(account, deletion_requested=_deletion_requested(db, account))
 
 
 @router.get("/sessions", response_model=list[SessionOut])

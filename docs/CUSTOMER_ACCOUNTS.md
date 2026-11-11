@@ -88,6 +88,11 @@ sessions and tokens, delivery records older than 30 days and stale rate-limit wi
 
 ## Known limits
 
-* Account deletion and data export are not built; both are needed before a real public launch.
-* No customer MFA yet.
+* Data export and the deletion request are built (`/api/accounts/data`, [LEGAL_RETENTION.md](LEGAL_RETENTION.md)); deletion is carried out by an administrator.
+* No customer MFA yet (decision D-22).
+* No change of the sign-in e-mail address.
 * Delivery status stops at provider acceptance: bounces need a provider webhook.
+
+Phase 08 verified this layer against the programme list, added the account status and a read-only view of the
+customer's own quote requests (by verified ownership), and tests the go-live prerequisites:
+[ACCOUNTS_HARDENING.md](ACCOUNTS_HARDENING.md).

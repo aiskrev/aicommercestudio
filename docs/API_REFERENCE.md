@@ -314,6 +314,17 @@ unknown token and an expired basket both answer 404 `basket_not_found`.
 
 Ownership, concurrency, expiry and storage: [QUOTE_BASKET.md](QUOTE_BASKET.md).
 
+## Customer account: own quote requests
+
+Off with customer accounts. Needs a signed-in customer with a verified e-mail; ownership is the account's own address
+(see [ACCOUNTS_HARDENING.md](ACCOUNTS_HARDENING.md)).
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/accounts/quote-requests` | The account's own quote and contact requests, newest first (50 at most): `[{reference, created_at, kind: contact\|quote\|configurator\|basket\|tool, service, quotation_status: published\|accepted\|declined\|withdrawn\|expired\|null}]`. `quotation_status` only while quotations are on, and only a state: never a link or content. 401 without a session; read rate limit. |
+
+`GET /api/accounts/me` also returns `email_verified`, `created_at`, `privacy_notice_version` and `status` (`active` or `deletion_requested`), read-only.
+
 ## Quotations (client-facing and staff)
 
 Off by default (`QUOTATIONS_ENABLED=false`): while off, every route below answers 404. A quotation shows one approved,

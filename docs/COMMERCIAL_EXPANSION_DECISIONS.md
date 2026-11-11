@@ -27,3 +27,6 @@ treated as approved; the code uses the safest default and says so.
 | D-20 | 07 | Who may publish a quotation to a client: administrators only (editors and viewers cannot) | Taken in code; owner may widen it | Administrator |
 | D-21 | 07 | Quotations carry a validity date only when staff set one; the system never invents a validity or a guarantee | Taken in code | No date unless staff choose one |
 | D-06 | 07 | (update) Wording and legal meaning of a client's answer. The page says the answer states the company's intention and does not replace a written agreement. **BLOCKER-COM-ACCEPT-01**: production refuses `QUOTATIONS_ENABLED` until the wording is approved | Pending, owner and lawyer | Non-binding wording; feature off |
+| D-22 | 08 | Customer MFA before accounts go live | Pending, owner. Not built; staff MFA is unchanged | No second factor for customers |
+| D-23 | 08 | A request belongs to an account when it was sent from the account's own verified address (and nothing else) | Taken in code; owner may add a stricter or looser rule | Verified address only |
+| D-24 | 08 | Session cookies use `SameSite=Lax`, not `Strict`, because sign-in links land on a page of the site | Taken in code | Lax |
