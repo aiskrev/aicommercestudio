@@ -19,6 +19,7 @@ export const routes = {
   pricing: "/tseni",
   configurator: "/konfigurator",
   quoteBasket: "/zayavka",
+  quotation: "/oferta",
   demoCentre: "/demo-tsentar",
   workshop: (slug: string) => `/rabotni-sreshti/${slug}`,
   industries: "/za-kogo",

@@ -1,0 +1,71 @@
+/**
+ * Customer-facing quotation page. The content of a quotation is what staff approved; this file only labels it.
+ * No amount, validity or guarantee is written here. The wording of the client's answer is NOT approved by a
+ * lawyer (decision D-06, BLOCKER-COM-ACCEPT-01): it says plainly that the answer does not replace a written
+ * agreement.
+ */
+export const quotation = {
+  metaTitle: "Оферта",
+  metaDescription: "Оферта, подготвена за вас.",
+  eyebrow: "Оферта",
+  loading: "Зареждаме офертата…",
+  notFound: {
+    title: "Офертата не е намерена",
+    text: "Връзката е непълна, невалидна или офертата вече не е достъпна. Проверете връзката, която сте получили, или се свържете с нас.",
+    contact: "Към контактите",
+  },
+  failed: "Офертата не можа да се зареди. Опитайте отново след малко.",
+  rateLimited: "Твърде много заявки. Опитайте отново след малко.",
+  reference: "Референтен номер",
+  for: "Подготвена за",
+  published: "Публикувана на",
+  validUntil: "Валидна до",
+  version: "Версия",
+  status: {
+    published: "Очаква отговор",
+    accepted: "Приета",
+    declined: "Отказана",
+    withdrawn: "Оттеглена",
+    expired: "С изтекла валидност",
+  },
+  kinds: { proposal: "Оферта", sow: "Описание на работата" },
+  withdrawn: "Тази оферта е оттеглена и вече не се показва. Свържете се с нас, ако имате въпрос.",
+  expired: "Срокът, до който офертата е валидна, е изтекъл. Свържете се с нас за нова оферта.",
+  sections: {
+    scope: "Обхват",
+    deliverables: "Какво получавате",
+    assumptions: "Допускания",
+    exclusions: "Не е включено",
+    dependencies: "Зависимости",
+    responsibilities: "Отговорности",
+    acceptance_criteria: "Как се приема работата",
+    milestones: "Етапи",
+    risks: "Рискове",
+    commercial: "Търговски условия",
+  },
+  parties: { client: "Клиентът", provider: "Изпълнителят", shared: "Общо" },
+  commercial: { pricing_basis: "Основа на цената", payment_terms: "Условия за плащане", validity: "Валидност", notes: "Бележки" },
+  milestone: { timing: "Ориентировъчно" },
+  risk: { mitigation: "Как се ограничава" },
+  answer: {
+    title: "Вашият отговор",
+    lead: "Можете да отговорите веднъж. Ако имате въпроси или искате промяна, свържете се с нас, вместо да отговаряте.",
+    name: "Вашето име",
+    note: "Бележка (по желание)",
+    noteHint: "До 1000 символа. Не въвеждайте пароли или ключове.",
+    statement: "Потвърждавам, че мога да отговарям от името на фирмата. Отговорът изразява намерението на фирмата и не замества писмен договор.",
+    accept: "Искаме да продължим",
+    decline: "Отказваме",
+    sending: "Изпращане…",
+    required: "Въведете име.",
+    confirm: "Потвърдете изявлението, за да изпратите отговор.",
+    closed: "На тази оферта вече е отговорено или вече не може да се отговаря.",
+    failed: "Отговорът не беше изпратен. Опитайте отново.",
+    spam: "Бележката не може да съдържа връзки или пароли.",
+    nothingSent: "Системата не изпраща съобщения. Ние ще се свържем с вас лично.",
+  },
+  decided: {
+    accepted: "Отговорът „Искаме да продължим“ е записан от {name} на {date}. Ще се свържем с вас лично.",
+    declined: "Отговорът „Отказваме“ е записан от {name} на {date}.",
+  },
+};

@@ -9,6 +9,11 @@ services:
       PROJECT_CONFIGURATOR_ENABLED: "true"
       # The runner's second pass sets E2E_QUOTE_BASKET=false to test the configurator's own quote form.
       QUOTE_BASKET_ENABLED: "${E2E_QUOTE_BASKET:-true}"
+      # Every spec signs in as staff through the API.
+      LOGIN_RATE_LIMIT: "500"
+      QUOTATIONS_ENABLED: "true"
+      QUOTATION_VIEW_RATE_LIMIT: "2000"
+      QUOTATION_DECISION_RATE_LIMIT: "500"
       QUOTE_BASKET_CREATE_RATE_LIMIT: "500"
       QUOTE_BASKET_RATE_LIMIT: "5000"
       # The specs submit several forms in a row from one address.
@@ -19,4 +24,5 @@ services:
   web:
     environment:
       PROJECT_CONFIGURATOR_ENABLED: "true"
+      QUOTATIONS_ENABLED: "true"
       QUOTE_BASKET_ENABLED: "${E2E_QUOTE_BASKET:-true}"

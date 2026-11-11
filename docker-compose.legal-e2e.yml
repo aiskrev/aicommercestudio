@@ -9,6 +9,10 @@
 services:
   api:
     environment:
+      # A database of its own, created empty by scripts/test-legal-e2e.ps1 for every run and dropped afterwards: the
+      # synthetic accounts and their withdrawals never carry over from an earlier run, and the default database is
+      # never touched.
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-acs}:${POSTGRES_PASSWORD}@db:5432/acs_legal_e2e
       CUSTOMER_ACCOUNTS_ENABLED: "true"
       ADVISOR_WORKSPACE_ENABLED: "true"
       BILLING_PROVIDER: "stripe"
@@ -20,6 +24,9 @@ services:
       ACCOUNT_IP_RATE_LIMIT: "500"
       ACCOUNT_EMAIL_RATE_LIMIT: "500"
       WORKSPACE_RATE_LIMIT_FLOOR: "5000"
+      # Specs send several anonymous requests from one address.
+      CONTACT_RATE_LIMIT: "200"
+      FORM_TOKEN_MIN_SECONDS: "0"
       LEGAL_ACTION_RATE_LIMIT: "200"
       LEGAL_READ_RATE_LIMIT: "400"
       STAFF_ACTION_RATE_LIMIT: "400"

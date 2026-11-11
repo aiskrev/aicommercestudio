@@ -28,7 +28,7 @@ from app.models import (
     TeamConfiguration,
     utcnow,
 )
-from app.opportunities import drafts
+from app.opportunities import configured, drafts
 from app.opportunities.models import LeadOpportunity, LeadProposal, LeadProposalVersion, ProposalStatus, VersionOrigin
 from app.opportunities.schemas import (
     LinkedRecord,
@@ -101,7 +101,7 @@ def linked_records(db: Session, lead: Lead) -> list[LinkedRecord]:
     for row in db.scalars(select(TeamConfiguration).where(TeamConfiguration.lead_id == lead.id)):
         linked.append(LinkedRecord(kind="team_configuration", reference=row.reference, created_at=row.created_at))
     kind = (lead.service_details or {}).get("kind")
-    if kind in ("readiness", "solution", "ai_managed"):
+    if kind in ("readiness", "solution", "ai_managed", "project_configurator", "quote_basket"):
         linked.append(LinkedRecord(kind=kind, reference=lead.reference, detail=lead.source))
     return linked
 
@@ -120,8 +120,15 @@ def opportunity_out(db: Session, lead: Lead) -> OpportunityOut:
     )
     row = get_opportunity(db, lead)
     if row is None:
-        # Defaults, pre-filled from the enquiry where that is a fact (the workshop it was sent about).
-        return OpportunityOut(exists=False, lead_id=lead.id, source=source, recommended_workshop=lead.workshop_key)
+        # Defaults, pre-filled from the enquiry where that is a fact: the workshop it was sent about, and for a
+        # configured project the package and the client's choices. Nothing is saved until staff save the record.
+        return OpportunityOut(
+            exists=False,
+            lead_id=lead.id,
+            source=source,
+            recommended_workshop=lead.workshop_key,
+            scope_summary=configured.summary(lead, lead.locale),
+        )
     return OpportunityOut(
         exists=True,
         lead_id=lead.id,

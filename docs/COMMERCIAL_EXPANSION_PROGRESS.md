@@ -1,7 +1,7 @@
 # Commercial expansion — progress
 
 Statuses: NOT_STARTED, IN_PROGRESS, IMPLEMENTED, TESTED, BLOCKED, DEFERRED, FAILED.
-Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Nothing committed, pushed or deployed. Migration `0026` exists only in the working tree and the local test databases.
+Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Nothing committed, pushed or deployed. Migrations `0026` (committed) and `0027` exist only in the local test databases; neither was applied anywhere else.
 
 | Phase | Name | Status | Last update | Notes |
 | --- | --- | --- | --- | --- |
@@ -11,8 +11,8 @@ Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Nothing
 | 04 | Centralised pricing | TESTED | 2026-11-11 | Schedule document shared by web and API, `/tseni` page; owner approval of the schedule still pending (D-04) |
 | 05 | Project configurator | TESTED | 2026-11-11 | Behind `PROJECT_CONFIGURATOR_ENABLED` (off); server-side review, quote request creates a lead; see checkpoint and PROJECT_CONFIGURATOR.md |
 | 06 | Quote basket | TESTED | 2026-11-11 | Behind `QUOTE_BASKET_ENABLED` (off); migration 0026 (local only); see checkpoint and QUOTE_BASKET.md |
-| 07 | Quotations and leads | NOT_STARTED | | |
-| 08 | Customer accounts hardening | NOT_STARTED | | |
+| 07 | Quotations and leads | TESTED | 2026-11-11 | Behind `QUOTATIONS_ENABLED` (off); migration 0027 (local only); acceptance wording unapproved (BLOCKER-COM-ACCEPT-01); see checkpoint and QUOTATIONS.md |
+| 08 | Customer accounts hardening | TESTED | 2026-11-11 | Verified against the list; account status, own quote requests by verified ownership, go-live prerequisites tested; customer MFA not built (D-22); see ACCOUNTS_HARDENING.md |
 | 09 | Commercial project portal | NOT_STARTED | | |
 | 10 | Documents, uploads, approvals | NOT_STARTED | | Uploads stay disabled |
 | 11 | Transactional e-mail | NOT_STARTED | | Real sending blocked by R2 |
@@ -187,3 +187,69 @@ Executed on this state:
 Not verified: a look at the basket page by a person (covered by axe, keyboard and width tests only), a screen-reader
 pass, real devices, the upgrade to `0026` on a copy of production data (the table is new and empty, nothing existing
 is touched).
+
+### Phase 07 — 2026-11-11
+
+Implemented (details: [QUOTATIONS.md](QUOTATIONS.md)):
+
+* **Configured enquiries into the existing workflow.** A lead from the configurator or the basket already holds the
+  versioned snapshot (model version, answers, the server's review or the basket view). Linked records in the admin
+  now name both kinds. The opportunity form is pre-filled from the configuration (not saved); "generate a first
+  draft" uses it (`app/opportunities/configured.py`, labels file shared with the web). The indicative bands are not
+  copied into a draft and the commercial section stays the placeholder. Retries create no duplicate lead or
+  opportunity (submission id, one-time basket send, `lead_opportunities.lead_id` as primary key).
+* **Client-facing quotation** behind `QUOTATIONS_ENABLED` (off): migration `0027` (`quotations`), staff publish an
+  approved version and get a secret link once (administrators only), the client reads it at `/bg/oferta` ↔
+  `/en/quotation` (secret in the URL fragment, sent in a request body, no storage) and answers once. Withdrawal,
+  optional validity date set by staff, view marks, audit events. Nothing is sent by the system.
+* Admin: a quotation panel in the approved proposal.
+* Release gate **BLOCKER-COM-ACCEPT-01**: production refuses the flag until the meaning and wording of the client's
+  answer are approved (D-06).
+
+Not done in this phase: linking an accepted quotation to a customer project (the project object arrives in
+Phase 09, D-19); any automatic sending (no approved notification workflow).
+
+Executed on this state:
+
+| Check | Result |
+| --- | --- |
+| `scripts/test.ps1 -Suite web` | 78 files, 1056 tests passed |
+| `scripts/test.ps1 -Suite api` | 1292 passed, 1 skipped; ruff, format and docs sync clean (199 paths in `openapi.json`); model/migration match and round trip included |
+| `scripts/test.ps1 -Suite e2e` (default stack, flags off) | 322 passed, 74 skipped, 1 failed: the new switched-off test expected 401 where the staff route correctly answers 404; fixed, the three flagged specs re-run on the default stack: 3 passed, 32 skipped. The full suite was not repeated after this one-line test fix |
+| `scripts/test.ps1 -Suite commercial` | pass 1 (all flags on): 32 passed, 3 skipped; pass 2 (basket off): 12 passed, 1 skipped |
+
+Not verified: a look at the quotation page and the admin panel by a person, a screen-reader pass, real devices, the
+upgrade to `0027` on a copy of production data (new empty table).
+
+### Phase 08 — 2026-11-11
+
+Verified and hardened the **existing** customer identity layer (details and the full matrix:
+[ACCOUNTS_HARDENING.md](ACCOUNTS_HARDENING.md)). No second authentication system, no database migration, public
+registration still off (`CUSTOMER_ACCOUNTS_ENABLED=false`).
+
+* Verified against the programme list: registration, e-mail verification, sign-in, sign-out, password reset, sessions,
+  profile, language, marketing consent, export and the deletion request, workspace membership.
+* Gaps closed: an erased account can never use a session; account status on `/me` (`email_verified`, `created_at`,
+  `privacy_notice_version`, `status`) and in the account page; cookie attributes tested in production; every route
+  that needs a customer session is now discovered from the application and checked for 401 without sign-in, 403
+  without CSRF and for a staff cookie (about 100 parametrised tests).
+* **Quote requests and accounts** (`GET /api/accounts/quote-requests`, read-only): a request belongs to an account only
+  when it was sent from the account's own *verified* address; never by company, name, phone or domain; no contact
+  details, free text, pipeline status, quotation link or content. The anonymous routes are unchanged.
+* The go-live prerequisites are tests: a satisfying production configuration is broken one prerequisite at a time.
+* The legal e2e stack is hermetic: a throwaway database per run, dropped afterwards (the earlier known limitation, a
+  failing re-run, is gone; two consecutive runs passed).
+
+Not done: customer MFA (D-22), changing the sign-in address, bounce handling.
+
+Executed on this state:
+
+| Check | Result |
+| --- | --- |
+| `scripts/test.ps1 -Suite web` | 79 files, 1060 tests passed |
+| `scripts/test.ps1 -Suite api` | 1407 passed, 1 skipped. Ruff reported one over-long comment line in the new test file; fixed and re-checked (ruff check and format clean, docs sync clean). The pytest run was not repeated after that one-line comment change |
+| `scripts/test.ps1 -Suite e2e` (flags off) | 323 passed, 77 skipped |
+| `scripts/test.ps1 -Suite commercial` | pass 1: 32 passed, 3 skipped; pass 2: 12 passed, 1 skipped |
+| `scripts/test.ps1 -Suite legal` (throwaway database), run twice | 50 passed, 1 skipped, both times |
+
+Not verified: a person's review of the account page, screen reader, real devices; customer sign-in on a real mailbox.

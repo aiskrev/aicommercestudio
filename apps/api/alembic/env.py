@@ -11,6 +11,7 @@ import app.billing.models  # noqa: F401
 import app.compliance.models  # noqa: F401
 import app.invoicing.models  # noqa: F401
 import app.models  # noqa: F401  (registers tables on Base.metadata)
+import app.quotations.models  # noqa: F401
 import app.quotes.models  # noqa: F401
 import app.workspace.models  # noqa: F401
 from app.config import get_settings

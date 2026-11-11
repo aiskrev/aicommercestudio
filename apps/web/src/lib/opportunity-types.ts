@@ -63,7 +63,7 @@ export interface Stakeholder {
 }
 
 export interface LinkedRecord {
-  kind: "advisor_assessment" | "assessment_result" | "team_configuration" | "readiness" | "solution" | "ai_managed";
+  kind: "advisor_assessment" | "assessment_result" | "team_configuration" | "readiness" | "solution" | "ai_managed" | "project_configurator" | "quote_basket";
   reference: string;
   detail: string | null;
   created_at: string | null;

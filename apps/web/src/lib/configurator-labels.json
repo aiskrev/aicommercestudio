@@ -1,0 +1,585 @@
+{
+ "version": "2026-11.1",
+ "bg": {
+  "packages": {
+   "landing_page": {
+    "name": "Лендинг страница",
+    "objective": "Посетителят да разбере предложението и да изпрати запитване.",
+    "includes": [
+     "Една страница с няколко секции по договорена структура",
+     "Форма за запитване с проверка на данните и защита от спам",
+     "Изглед за телефон и компютър",
+     "Основни SEO настройки: заглавие, описание и карта на сайта",
+     "Измерване на запитванията без бисквитки за реклама"
+    ],
+    "excludes": [
+     "Допълнителни страници и блог",
+     "Онлайн плащания",
+     "Писане на текстове и фотография, освен ако са договорени"
+    ],
+    "prerequisites": [
+     "Ясна цел на страницата",
+     "Текстове, лого и снимки",
+     "Достъп до домейна"
+    ],
+    "stages": [
+     "Оценка и обхват",
+     "Структура и прототип",
+     "Разработка на етапи",
+     "Приемане и пускане"
+    ]
+   },
+   "business_website": {
+    "name": "Бизнес сайт",
+    "objective": "Клиентът да намери услугата, да получи ориентир и да заяви.",
+    "includes": [
+     "Няколко страници по договорена структура",
+     "Отделни адреси по език, ако сайтът е двуезичен",
+     "Форми за запитване и запис на запитванията в админ панел или CRM",
+     "Интерактивен елемент по вашите правила, например калкулатор или формуляр на няколко стъпки",
+     "Проверка на достъпността и скоростта на телефон и компютър",
+     "Изходен код в хранилище на ваше име, документация и инструкции за редакция"
+    ],
+    "excludes": [
+     "Онлайн магазин и плащания",
+     "Клиентски вход и защитени зони",
+     "Не обещаваме позиции в Google или брой запитвания"
+    ],
+    "prerequisites": [
+     "Цели и примерни клиенти",
+     "Лого, снимки и фактически данни",
+     "Правилата за калкулатори и форми",
+     "Достъп до домейна и съществуващия сайт"
+    ],
+    "stages": [
+     "Оценка и обхват",
+     "Структура и прототип",
+     "Разработка на етапи",
+     "Приемане и пускане"
+    ]
+   },
+   "store_setup": {
+    "name": "Стартов онлайн магазин",
+    "objective": "Работещ магазин с тествана поръчка от край до край.",
+    "includes": [
+     "Настройка на Shopify или WooCommerce с готова тема във вашите цветове",
+     "Структура на категориите и импорт на продуктите от подготвен от вас файл",
+     "Настройка на избрания платежен доставчик и куриери, с тестови поръчки",
+     "Имейли за поръчката и данъчни настройки, потвърдени от вашия счетоводител",
+     "Обучение на екипа: как се добавя продукт и как се обработва поръчка"
+    ],
+    "excludes": [
+     "Тема по поръчка и нестандартни функции",
+     "Връзка със склад, ERP или счетоводен софтуер",
+     "Миграция от друга платформа"
+    ],
+    "prerequisites": [
+     "Продуктови данни и снимки",
+     "Договори с платежен доставчик и куриери",
+     "Условия за доставка и връщане"
+    ],
+    "stages": [
+     "Оценка и избор на платформа",
+     "Изграждане и данни",
+     "Интеграции и тестови поръчки",
+     "Приемане и пускане"
+    ]
+   },
+   "store_complete": {
+    "name": "Пълен онлайн магазин",
+    "objective": "Магазин, който работи с вашия склад, счетоводство и процеси.",
+    "includes": [
+     "Всичко от стартовия онлайн магазин",
+     "Каталог с атрибути, вариации и филтри",
+     "Интеграции със склад, ERP, счетоводство или CRM през наличните им API",
+     "Миграция на продукти, клиенти и поръчки, с план за пренасочване на адресите",
+     "Тестова поръчка с всеки избран начин за плащане и доставка",
+     "Документирани настройки и достъпи"
+    ],
+    "excludes": [
+     "Договорите с платежни доставчици и куриери са ваши",
+     "Не обещаваме приходи, продажби или запазване на позиции",
+     "Маркетинг и реклама"
+    ],
+    "prerequisites": [
+     "Продуктови данни и снимки",
+     "Достъп до настоящия магазин при миграция",
+     "Достъп и документация за системите, които се свързват",
+     "Данъчни настройки, потвърдени от вашия счетоводител"
+    ],
+    "stages": [
+     "Оценка и избор на платформа",
+     "Изграждане и данни",
+     "Интеграции и тестови поръчки",
+     "Приемане и пускане"
+    ]
+   },
+   "custom_web_app": {
+    "name": "Уеб приложение по поръчка",
+    "objective": "Първа работеща версия на най-важния процес, която се разширява на етапи.",
+    "includes": [
+     "Анализ на потребителите, данните и правилата",
+     "Вход, роли и разделяне на данните, проверени с тестове",
+     "Работен процес със заявки, статуси, одобрения и известия",
+     "Административен панел за вашия екип",
+     "Журнал на действията за чувствителните операции",
+     "Изходен код, документация и план за резервни копия"
+    ],
+    "excludes": [
+     "Не предлагаме готов портал: всяко приложение се изгражда след оценка",
+     "Външен тест за сигурност се договаря отделно",
+     "Правната оценка и договорите за лични данни са ваша отговорност"
+    ],
+    "prerequisites": [
+     "Описание на потребителите и правата",
+     "Примерни данни без лична информация",
+     "Достъп до свързваните системи",
+     "Човек от екипа, който взема решения"
+    ],
+    "stages": [
+     "Анализ на процеса",
+     "Първа работеща версия",
+     "Разширяване на етапи",
+     "Проверка и приемане"
+    ]
+   }
+  },
+  "delivery": {
+   "fixed_scope": "Фиксиран обхват",
+   "staged": "На етапи"
+  },
+  "questions": {
+   "project_type": {
+    "landing_page": "Лендинг страница",
+    "business_website": "Бизнес сайт",
+    "online_store": "Онлайн магазин",
+    "custom_application": "Уеб приложение по поръчка"
+   },
+   "pages": {
+    "one": "Една",
+    "up_to_5": "До 5",
+    "up_to_15": "До 15",
+    "more_than_15": "Повече от 15"
+   },
+   "products": {
+    "none": "Няма продукти",
+    "up_to_50": "До 50",
+    "up_to_500": "До 500",
+    "more_than_500": "Повече от 500"
+   },
+   "languages": {
+    "one": "Един",
+    "two": "Два",
+    "three_plus": "Три или повече"
+   },
+   "build": {
+    "new": "Нов проект",
+    "redesign": "Преработка на съществуващ"
+   },
+   "branding": {
+    "existing": "Да, имаме лого и цветове",
+    "new": "Не, нужна е нова"
+   },
+   "design_level": {
+    "standard": "Стандартна дизайн система",
+    "bespoke": "Дизайн по поръчка"
+   }
+  },
+  "flags": {
+   "content_migration": "Има съществуващо съдържание за пренасяне",
+   "store_migration": "Има съществуващ магазин за миграция",
+   "accessibility": "Имаме конкретни изисквания за достъпност",
+   "interactive_elements": "Нужни са интерактивни елементи, например калкулатор"
+  },
+  "features": {
+   "cms": "Редактиране на съдържанието (CMS)",
+   "blog": "Блог",
+   "search": "Търсене в сайта",
+   "product_filters": "Продуктови филтри",
+   "customer_accounts": "Клиентски акаунти",
+   "user_dashboard": "Потребителско табло",
+   "payments": "Онлайн плащания",
+   "shipping": "Интеграция с куриери",
+   "invoicing": "Интеграция за фактуриране",
+   "booking": "Резервации и записване на час",
+   "crm": "Връзка със CRM",
+   "erp": "Връзка с ERP",
+   "analytics": "Анализ и измерване",
+   "seo": "SEO",
+   "ai_assistant": "AI асистент",
+   "marketing": "Маркетингови интеграции"
+  },
+  "operations": {
+   "hosting": "Хостинг",
+   "maintenance": "Поддръжка",
+   "backups": "Резервни копия",
+   "security": "Защита",
+   "monitoring": "Наблюдение",
+   "support": "Помощ за екипа"
+  },
+  "unpriced": {
+   "package_scope": "Обхватът на избрания пакет",
+   "additional_languages": "Допълнителни езици",
+   "redesign": "Преработка на съществуващ сайт",
+   "content_migration": "Пренасяне на съществуващо съдържание",
+   "large_site": "Голям брой страници",
+   "large_catalogue": "Голям каталог",
+   "new_branding": "Нова визуална идентичност",
+   "bespoke_design": "Дизайн по поръчка",
+   "accessibility_requirements": "Изисквания за достъпност",
+   "interactive_elements": "Интерактивни елементи",
+   "care_for_application": "Поддръжка на приложението",
+   "operation:backups": "Резервни копия",
+   "operation:monitoring": "Наблюдение",
+   "operation:support": "Помощ за екипа"
+  },
+  "assumptions": {
+   "written_scope_before_start": "Обхватът се записва в писмена оферта, преди да започнем.",
+   "content_from_client": "Текстовете, снимките и фактите идват от вас.",
+   "one_site_or_system": "Ориентирът е за един сайт или една система.",
+   "client_contracts_with_providers": "Договорите с платежни доставчици и куриери са ваши.",
+   "accountant_confirms_tax_settings": "Данъчните настройки се потвърждават от вашия счетоводител."
+  },
+  "exclusions": {
+   "hosting": "Хостинг и домейн",
+   "licences": "Лицензи за платформи, теми и приложения",
+   "ai_model_usage": "Използване на AI модели",
+   "delivery_time_not_published": "Срок за изпълнение: договаря се след оценка",
+   "no_results_promised": "Не обещаваме позиции, продажби или брой запитвания"
+  },
+  "offers": {
+   "service": {
+    "ai_agents": "Разработка на AI агенти",
+    "maintenance": "Поддръжка на онлайн магазини",
+    "seo": "SEO и органичен растеж",
+    "ai_tools": "AI разработка по поръчка",
+    "automation": "AI автоматизация на процеси",
+    "analytics": "Анализи и конверсии",
+    "integrations": "AI интеграции и данни",
+    "ai_managed": "AI Managed Services и оптимизация",
+    "audit": "AI стратегия и готовност",
+    "business_websites": "Интерактивни бизнес сайтове",
+    "store_development": "Изработка на онлайн магазини",
+    "portals_web_apps": "Клиентски портали и уеб приложения",
+    "payments_subscriptions": "Абонаменти и онлайн плащания",
+    "security_performance": "Защита и ускоряване на сайтове",
+    "integration_care": "Поддръжка на интеграции и автоматизации"
+   },
+   "care_plan": {
+    "website": "Website Care",
+    "commerce": "Commerce Care",
+    "automation": "Automation Care",
+    "cloud": "Cloud & Platform Care",
+    "security": "Security & Performance Care"
+   },
+   "ai_managed": {
+    "essential": "Essential Monitoring & Advisory",
+    "managed": "Managed AI Operations",
+    "advanced": "Advanced AI Reliability & Optimization"
+   },
+   "workshop": {
+    "ai_strategy_discovery": "Работна среща за AI стратегия",
+    "ai_readiness_mapping": "Оценка на AI готовността и картата на възможностите",
+    "agent_architecture": "Работна среща за архитектура на AI агенти",
+    "landing_zone_assessment": "Оценка на cloud landing zone",
+    "kubernetes_review": "Преглед на Kubernetes платформата",
+    "devops_gitops_assessment": "Оценка на DevOps и GitOps практиките",
+    "observability_sre": "Работна среща за наблюдаемост и SRE",
+    "ecommerce_integration_discovery": "Анализ на интеграциите на онлайн магазина",
+    "rag_data_readiness": "Работна среща за RAG и готовност на данните",
+    "responsible_ai_review": "Преглед на управлението на отговорен AI"
+   }
+  }
+ },
+ "en": {
+  "packages": {
+   "landing_page": {
+    "name": "Landing page",
+    "objective": "The visitor understands the offer and sends an enquiry.",
+    "includes": [
+     "One page with several sections to an agreed structure",
+     "An enquiry form with validation and spam protection",
+     "Layouts for phone and desktop",
+     "Basic SEO settings: title, description and sitemap",
+     "Enquiry measurement without advertising cookies"
+    ],
+    "excludes": [
+     "Additional pages and a blog",
+     "Online payments",
+     "Copywriting and photography, unless agreed"
+    ],
+    "prerequisites": [
+     "A clear goal for the page",
+     "Copy, logo and images",
+     "Access to the domain"
+    ],
+    "stages": [
+     "Assessment and scope",
+     "Structure and prototype",
+     "Building in stages",
+     "Acceptance and launch"
+    ]
+   },
+   "business_website": {
+    "name": "Business website",
+    "objective": "The customer finds the service, gets a first estimate and sends a request.",
+    "includes": [
+     "Several pages to an agreed structure",
+     "Separate URLs per language, if the site is bilingual",
+     "Enquiry forms, with enquiries stored in an admin panel or a CRM",
+     "An interactive element built to your rules, such as a calculator or a multi-step form",
+     "Accessibility and speed checks on phone and desktop",
+     "Source code in a repository in your name, documentation and editing instructions"
+    ],
+    "excludes": [
+     "An online store and payments",
+     "Customer sign-in and protected areas",
+     "We don't promise Google rankings or a number of enquiries"
+    ],
+    "prerequisites": [
+     "Goals and example customers",
+     "Logo, images and factual data",
+     "The rules for calculators and forms",
+     "Access to the domain and the existing site"
+    ],
+    "stages": [
+     "Assessment and scope",
+     "Structure and prototype",
+     "Building in stages",
+     "Acceptance and launch"
+    ]
+   },
+   "store_setup": {
+    "name": "Starter online store",
+    "objective": "A working store with an order tested end to end.",
+    "includes": [
+     "Shopify or WooCommerce set up with a ready-made theme in your colours",
+     "Category structure and product import from a file you prepare",
+     "Set-up of the chosen payment provider and couriers, with test orders",
+     "Order emails and tax settings confirmed by your accountant",
+     "Team training: how to add a product and how to process an order"
+    ],
+    "excludes": [
+     "A custom theme and non-standard features",
+     "A connection to a warehouse, ERP or accounting software",
+     "Migration from another platform"
+    ],
+    "prerequisites": [
+     "Product data and images",
+     "Contracts with a payment provider and couriers",
+     "Delivery and returns terms"
+    ],
+    "stages": [
+     "Assessment and platform choice",
+     "Build and data",
+     "Integrations and test orders",
+     "Acceptance and launch"
+    ]
+   },
+   "store_complete": {
+    "name": "Complete online store",
+    "objective": "A store that works with your warehouse, accounting and processes.",
+    "includes": [
+     "Everything in the starter online store",
+     "A catalogue with attributes, variations and filters",
+     "Integrations with a warehouse, ERP, accounting or CRM through their available APIs",
+     "Migration of products, customers and orders, with a redirect plan for the URLs",
+     "A test order with every chosen payment and delivery method",
+     "Documented settings and access"
+    ],
+    "excludes": [
+     "Contracts with payment providers and couriers are yours",
+     "We don't promise revenue, sales or preserved rankings",
+     "Marketing and advertising"
+    ],
+    "prerequisites": [
+     "Product data and images",
+     "Access to the current store for a migration",
+     "Access and documentation for the systems to be connected",
+     "Tax settings confirmed by your accountant"
+    ],
+    "stages": [
+     "Assessment and platform choice",
+     "Build and data",
+     "Integrations and test orders",
+     "Acceptance and launch"
+    ]
+   },
+   "custom_web_app": {
+    "name": "Custom web application",
+    "objective": "A first working version of the most important process, extended in stages.",
+    "includes": [
+     "Analysis of the users, the data and the rules",
+     "Sign-in, roles and data separation, verified by tests",
+     "A workflow with requests, statuses, approvals and notifications",
+     "An admin panel for your team",
+     "An activity log for sensitive operations",
+     "Source code, documentation and a backup plan"
+    ],
+    "excludes": [
+     "We don't offer a ready-made portal: every application is built after an assessment",
+     "An external security test is agreed separately",
+     "The legal assessment and personal-data agreements are your responsibility"
+    ],
+    "prerequisites": [
+     "A description of the users and their rights",
+     "Sample data without personal information",
+     "Access to the connected systems",
+     "A person on your team who makes decisions"
+    ],
+    "stages": [
+     "Process analysis",
+     "First working version",
+     "Growing in stages",
+     "Checks and acceptance"
+    ]
+   }
+  },
+  "delivery": {
+   "fixed_scope": "Fixed scope",
+   "staged": "In stages"
+  },
+  "questions": {
+   "project_type": {
+    "landing_page": "Landing page",
+    "business_website": "Business website",
+    "online_store": "Online store",
+    "custom_application": "Custom web application"
+   },
+   "pages": {
+    "one": "One",
+    "up_to_5": "Up to 5",
+    "up_to_15": "Up to 15",
+    "more_than_15": "More than 15"
+   },
+   "products": {
+    "none": "No products",
+    "up_to_50": "Up to 50",
+    "up_to_500": "Up to 500",
+    "more_than_500": "More than 500"
+   },
+   "languages": {
+    "one": "One",
+    "two": "Two",
+    "three_plus": "Three or more"
+   },
+   "build": {
+    "new": "New project",
+    "redesign": "Redesign of an existing one"
+   },
+   "branding": {
+    "existing": "Yes, we have a logo and colours",
+    "new": "No, we need a new one"
+   },
+   "design_level": {
+    "standard": "Standard design system",
+    "bespoke": "Bespoke design"
+   }
+  },
+  "flags": {
+   "content_migration": "There is existing content to move",
+   "store_migration": "There is an existing store to migrate",
+   "accessibility": "We have specific accessibility requirements",
+   "interactive_elements": "We need interactive elements, such as a calculator"
+  },
+  "features": {
+   "cms": "Content editing (CMS)",
+   "blog": "Blog",
+   "search": "Site search",
+   "product_filters": "Product filters",
+   "customer_accounts": "Customer accounts",
+   "user_dashboard": "User dashboard",
+   "payments": "Online payments",
+   "shipping": "Courier integration",
+   "invoicing": "Invoicing integration",
+   "booking": "Bookings and appointments",
+   "crm": "CRM connection",
+   "erp": "ERP connection",
+   "analytics": "Analytics and measurement",
+   "seo": "SEO",
+   "ai_assistant": "AI assistant",
+   "marketing": "Marketing integrations"
+  },
+  "operations": {
+   "hosting": "Hosting",
+   "maintenance": "Maintenance",
+   "backups": "Backups",
+   "security": "Security",
+   "monitoring": "Monitoring",
+   "support": "Help for the team"
+  },
+  "unpriced": {
+   "package_scope": "The scope of the chosen package",
+   "additional_languages": "Additional languages",
+   "redesign": "Redesign of an existing site",
+   "content_migration": "Moving existing content",
+   "large_site": "A large number of pages",
+   "large_catalogue": "A large catalogue",
+   "new_branding": "A new visual identity",
+   "bespoke_design": "Bespoke design",
+   "accessibility_requirements": "Accessibility requirements",
+   "interactive_elements": "Interactive elements",
+   "care_for_application": "Care for the application",
+   "operation:backups": "Backups",
+   "operation:monitoring": "Monitoring",
+   "operation:support": "Help for the team"
+  },
+  "assumptions": {
+   "written_scope_before_start": "The scope is set in a written quote before we start.",
+   "content_from_client": "The copy, the images and the facts come from you.",
+   "one_site_or_system": "The guide is for one site or one system.",
+   "client_contracts_with_providers": "Contracts with payment providers and couriers are yours.",
+   "accountant_confirms_tax_settings": "Tax settings are confirmed by your accountant."
+  },
+  "exclusions": {
+   "hosting": "Hosting and the domain",
+   "licences": "Licences for platforms, themes and apps",
+   "ai_model_usage": "AI model usage",
+   "delivery_time_not_published": "Delivery time: agreed after an assessment",
+   "no_results_promised": "We don't promise rankings, sales or a number of enquiries"
+  },
+  "offers": {
+   "service": {
+    "ai_agents": "AI agent development",
+    "maintenance": "E-commerce maintenance",
+    "seo": "SEO and organic growth",
+    "ai_tools": "Custom AI engineering",
+    "automation": "AI workflow automation",
+    "analytics": "Analytics and conversion",
+    "integrations": "AI integrations & data systems",
+    "ai_managed": "AI Managed Services & optimisation",
+    "audit": "AI strategy & readiness",
+    "business_websites": "Interactive Business Websites",
+    "store_development": "Online Store Development",
+    "portals_web_apps": "Customer Portals & Web Applications",
+    "payments_subscriptions": "Subscription & Payment Integration",
+    "security_performance": "Website Security & Performance",
+    "integration_care": "Integration & Automation Care"
+   },
+   "care_plan": {
+    "website": "Website Care",
+    "commerce": "Commerce Care",
+    "automation": "Automation Care",
+    "cloud": "Cloud & Platform Care",
+    "security": "Security & Performance Care"
+   },
+   "ai_managed": {
+    "essential": "Essential Monitoring & Advisory",
+    "managed": "Managed AI Operations",
+    "advanced": "Advanced AI Reliability & Optimization"
+   },
+   "workshop": {
+    "ai_strategy_discovery": "AI Strategy Discovery Workshop",
+    "ai_readiness_mapping": "AI Readiness and Opportunity Mapping",
+    "agent_architecture": "Agent Architecture Workshop",
+    "landing_zone_assessment": "Cloud Landing Zone Assessment",
+    "kubernetes_review": "Kubernetes Platform Review",
+    "devops_gitops_assessment": "DevOps and GitOps Assessment",
+    "observability_sre": "Observability and SRE Workshop",
+    "ecommerce_integration_discovery": "E-commerce Integration Discovery",
+    "rag_data_readiness": "RAG and Data Readiness Workshop",
+    "responsible_ai_review": "Responsible AI Governance Review"
+   }
+  }
+ }
+}

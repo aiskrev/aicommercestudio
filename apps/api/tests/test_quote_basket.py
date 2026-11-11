@@ -161,8 +161,11 @@ def test_add_edit_and_remove_recompute_the_lines_from_the_schedule(client, enabl
         "unpriced_lines": 0,
     }
     # What is stored is inputs only: no amount anywhere in the row.
-    stored = json.dumps(db.scalar(select(QuoteBasket)).items)
-    assert str(care.from_) not in stored and "band" not in stored and "typical" not in stored
+    items = db.scalar(select(QuoteBasket)).items
+    stored = json.dumps(items)
+    assert "band" not in stored and "typical" not in stored and "from" not in stored
+    # Structurally: an extra holds only text (its id, kind, group and key), never a number.
+    assert all(isinstance(value, str) for entry in items for value in entry.values())
 
 
 def test_invalid_identifiers_and_unknown_offers_are_refused(client, enabled):

@@ -24,13 +24,27 @@ ACCOUNT_HEADER_LAYOUT_FIXED = True
 COMMERCIAL_STORAGE_DISCLOSED = False
 
 
+# BLOCKER-COM-ACCEPT-01 (docs/QUOTATIONS.md, docs/COMMERCIAL_EXPANSION_DECISIONS.md D-06) - OPEN.
+# A client can answer a published quotation with "we want to proceed" or "we decline". What that answer means in law
+# (an expression of intent, or acceptance that forms a contract) and the exact wording next to the button are for the
+# owner and a lawyer to decide. Until then the page says the answer does not replace a written contract, and the
+# feature stays out of production. Set to True in the change that records the approved wording.
+QUOTATION_ACCEPTANCE_WORDING_APPROVED = False
+
+
 def open_blockers(
     *,
     customer_accounts_enabled: bool,
     project_configurator_enabled: bool = False,
     quote_basket_enabled: bool = False,
+    quotations_enabled: bool = False,
 ) -> list[str]:
     blockers: list[str] = []
+    if quotations_enabled and not QUOTATION_ACCEPTANCE_WORDING_APPROVED:
+        blockers.append(
+            "BLOCKER-COM-ACCEPT-01: the wording and the legal meaning of a client's answer to a quotation are not "
+            "approved (docs/QUOTATIONS.md)"
+        )
     if (project_configurator_enabled or quote_basket_enabled) and not COMMERCIAL_STORAGE_DISCLOSED:
         blockers.append(
             "BLOCKER-COM-STORAGE-01: the cookie policy does not yet describe the browser storage of the project "

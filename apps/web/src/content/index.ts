@@ -23,6 +23,7 @@ import { carePlans, demoCentre } from "@/content/bg/offer-pages";
 import { configurator } from "@/content/bg/configurator";
 import { pricingPage } from "@/content/bg/pricing-page";
 import { projectPackages } from "@/content/bg/project-packages";
+import { quotation } from "@/content/bg/quotation";
 import { quoteBasket } from "@/content/bg/quote-basket";
 import { coreServices, services } from "@/content/bg/services";
 import { readinessTool } from "@/content/bg/tool-readiness";
@@ -64,6 +65,7 @@ import { carePlans as enCarePlans, demoCentre as enDemoCentre } from "@/content/
 import { configurator as enConfigurator } from "@/content/en/configurator";
 import { pricingPage as enPricingPage } from "@/content/en/pricing-page";
 import { projectPackages as enProjectPackages } from "@/content/en/project-packages";
+import { quotation as enQuotation } from "@/content/en/quotation";
 import { quoteBasket as enQuoteBasket } from "@/content/en/quote-basket";
 import { coreServices as enCoreServices, services as enServices } from "@/content/en/services";
 import { readinessTool as enReadinessTool } from "@/content/en/tool-readiness";
@@ -90,6 +92,7 @@ const bg = {
   pricingPage,
   configurator,
   quoteBasket,
+  quotation,
   demoCentre,
   coreServices,
   domains,
@@ -142,6 +145,7 @@ const en: SiteContent = {
   pricingPage: enPricingPage,
   configurator: enConfigurator,
   quoteBasket: enQuoteBasket,
+  quotation: enQuotation,
   demoCentre: enDemoCentre,
   coreServices: enCoreServices,
   domains: enDomains,

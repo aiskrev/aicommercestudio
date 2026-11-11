@@ -19,6 +19,7 @@ from app.i18n import Locale, error_message, request_locale, validation_message
 from app.logging_config import configure_logging
 from app.middleware import BodySizeLimitMiddleware, RequestContextMiddleware
 from app.routers import (
+    account_requests,
     accounts,
     admin,
     admin_analytics,
@@ -40,6 +41,7 @@ from app.routers import (
     ops_platform,
     portal,
     public,
+    quotations,
     quote_basket,
     readiness,
     solution,
@@ -147,6 +149,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(solution.router)
     app.include_router(configurator.router)
     app.include_router(quote_basket.router)
+    app.include_router(quotations.public)
+    app.include_router(quotations.staff)
     app.include_router(assessments.router)
     app.include_router(admin_auth.router)
     app.include_router(admin.router)
@@ -158,6 +162,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(portal.staff)
     app.include_router(portal.client)
     app.include_router(accounts.router)
+    app.include_router(account_requests.router)
     app.include_router(workspace.router)
     app.include_router(billing.router)
     app.include_router(zone.router)

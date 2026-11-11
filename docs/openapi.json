@@ -1664,6 +1664,282 @@
         }
       }
     },
+    "/api/public/quotations/view": {
+      "post": {
+        "tags": [
+          "quotations"
+        ],
+        "summary": "The approved quotation behind a link (the secret is in the body, never in a URL)",
+        "operationId": "view_quotation_api_public_quotations_view_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuotationView"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotationPublicOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/quotations/decision": {
+      "post": {
+        "tags": [
+          "quotations"
+        ],
+        "summary": "The client's answer, recorded once (the same answer again changes nothing)",
+        "operationId": "decide_quotation_api_public_quotations_decision_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuotationDecision"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotationPublicOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The quotation was already answered differently, withdrawn or has expired"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/leads/{lead_id}/proposals/{proposal_id}/quotation": {
+      "get": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "The latest quotation of a proposal, or null",
+        "operationId": "get_quotation_api_admin_leads__lead_id__proposals__proposal_id__quotation_get",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/QuotationStaffOut"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Get Quotation Api Admin Leads  Lead Id  Proposals  Proposal Id  Quotation Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "Publish the approved version for the client; returns the secret link token once",
+        "operationId": "publish_quotation_api_admin_leads__lead_id__proposals__proposal_id__quotation_post",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuotationPublish"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotationPublished"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`expected_revision` is stale, or the quotation or proposal is in another state"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/leads/{lead_id}/proposals/{proposal_id}/quotation/withdraw": {
+      "post": {
+        "tags": [
+          "admin-opportunities"
+        ],
+        "summary": "Withdraw the live quotation",
+        "operationId": "withdraw_quotation_api_admin_leads__lead_id__proposals__proposal_id__quotation_withdraw_post",
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Lead Id"
+            }
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Proposal Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuotationWithdraw"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuotationStaffOut"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`expected_revision` is stale, or the quotation or proposal is in another state"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/public/assessments": {
       "get": {
         "tags": [
@@ -8581,6 +8857,31 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/accounts/quote-requests": {
+      "get": {
+        "tags": [
+          "accounts"
+        ],
+        "summary": "Quote and contact requests sent from the account's address",
+        "operationId": "my_quote_requests_api_accounts_quote_requests_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuoteRequestOut"
+                  },
+                  "type": "array",
+                  "title": "Response My Quote Requests Api Accounts Quote Requests Get"
                 }
               }
             }
@@ -15922,6 +16223,25 @@
         ],
         "title": "DecideIn"
       },
+      "DecisionOut": {
+        "properties": {
+          "decided_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Decided At"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "decided_at",
+          "name"
+        ],
+        "title": "DecisionOut"
+      },
       "DesignLevel": {
         "type": "string",
         "enum": [
@@ -19658,7 +19978,9 @@
               "team_configuration",
               "readiness",
               "solution",
-              "ai_managed"
+              "ai_managed",
+              "project_configurator",
+              "quote_basket"
             ],
             "title": "Kind"
           },
@@ -21487,6 +21809,42 @@
           "marketing_consent": {
             "type": "boolean",
             "title": "Marketing Consent"
+          },
+          "email_verified": {
+            "type": "boolean",
+            "title": "Email Verified",
+            "default": true
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "privacy_notice_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Privacy Notice Version"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "deletion_requested"
+            ],
+            "title": "Status",
+            "default": "active"
           }
         },
         "additionalProperties": false,
@@ -22065,6 +22423,405 @@
         ],
         "title": "QuestionOut"
       },
+      "QuotationDecision": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 20,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Token"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "accept",
+              "decline"
+            ],
+            "title": "Decision"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Note",
+            "default": ""
+          },
+          "confirmed": {
+            "type": "boolean",
+            "title": "Confirmed"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token",
+          "decision",
+          "name",
+          "confirmed"
+        ],
+        "title": "QuotationDecision"
+      },
+      "QuotationPublicOut": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "accepted",
+              "declined",
+              "withdrawn",
+              "expired"
+            ],
+            "title": "Status"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "proposal",
+              "sow"
+            ],
+            "title": "Kind"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "company": {
+            "type": "string",
+            "title": "Company"
+          },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Published At"
+          },
+          "valid_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid Until"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "content": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProposalContent-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "decision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DecisionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "open": {
+            "type": "boolean",
+            "title": "Open"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "status",
+          "kind",
+          "title",
+          "company",
+          "locale",
+          "published_at",
+          "valid_until",
+          "version",
+          "content",
+          "decision",
+          "open"
+        ],
+        "title": "QuotationPublicOut",
+        "description": "What the holder of the link sees. `content` is the approved version, or null once withdrawn."
+      },
+      "QuotationPublish": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "valid_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid Until"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision"
+        ],
+        "title": "QuotationPublish"
+      },
+      "QuotationPublished": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "quotation": {
+            "$ref": "#/components/schemas/QuotationStaffOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "quotation"
+        ],
+        "title": "QuotationPublished"
+      },
+      "QuotationStaffOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "proposal_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Proposal Id"
+          },
+          "version_number": {
+            "type": "integer",
+            "title": "Version Number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "published",
+              "accepted",
+              "declined",
+              "withdrawn",
+              "expired"
+            ],
+            "title": "Status"
+          },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
+          "valid_until": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid Until"
+          },
+          "published_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published By"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Published At"
+          },
+          "first_viewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Viewed At"
+          },
+          "last_viewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Viewed At"
+          },
+          "view_count": {
+            "type": "integer",
+            "title": "View Count"
+          },
+          "decided_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decided At"
+          },
+          "decision_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Name"
+          },
+          "decision_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decision Note"
+          },
+          "withdrawn_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Withdrawn At"
+          },
+          "withdrawal_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Withdrawal Note"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "proposal_id",
+          "version_number",
+          "status",
+          "locale",
+          "valid_until",
+          "published_by",
+          "published_at",
+          "first_viewed_at",
+          "last_viewed_at",
+          "view_count",
+          "decided_at",
+          "decision_name",
+          "decision_note",
+          "withdrawn_at",
+          "withdrawal_note",
+          "revision"
+        ],
+        "title": "QuotationStaffOut"
+      },
+      "QuotationView": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 20,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "QuotationView"
+      },
+      "QuotationWithdraw": {
+        "properties": {
+          "expected_revision": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Revision"
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Note"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "note"
+        ],
+        "title": "QuotationWithdraw"
+      },
       "QuoteBasketDetailsOut": {
         "properties": {
           "model_version": {
@@ -22220,6 +22977,59 @@
         ],
         "title": "QuoteRequestCreate",
         "description": "Request for a written quote: the contact fields plus structured project information."
+      },
+      "QuoteRequestOut": {
+        "properties": {
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "created_at": {
+            "type": "string",
+            "title": "Created At"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "contact",
+              "quote",
+              "configurator",
+              "basket",
+              "tool"
+            ],
+            "title": "Kind"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "quotation_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "published",
+                  "accepted",
+                  "declined",
+                  "withdrawn",
+                  "expired"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quotation Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "created_at",
+          "kind",
+          "service"
+        ],
+        "title": "QuoteRequestOut"
       },
       "RateCardIn": {
         "properties": {

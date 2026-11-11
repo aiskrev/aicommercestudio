@@ -123,3 +123,23 @@ describe("keeping a draft inside the supported combinations", () => {
     expect(isComplete(EMPTY_DRAFT)).toBe(false);
   });
 });
+
+describe("configurator labels (the copy the API uses for proposal drafts)", () => {
+  it("equals the site content (regenerate with UPDATE_CONFIGURATOR_LABELS=1, then copy to apps/api/app/configurator/labels.json)", async () => {
+    const { readFileSync, writeFileSync } = await import("node:fs");
+    const { resolve } = await import("node:path");
+    const { configuratorLabelsSnapshot } = await import("@/lib/configurator-labels");
+    const file = resolve(__dirname, "configurator-labels.json");
+    const current = configuratorLabelsSnapshot();
+    if (process.env.UPDATE_CONFIGURATOR_LABELS === "1") writeFileSync(file, `${JSON.stringify(current, null, 1)}\n`, "utf-8");
+    const stored = JSON.parse(readFileSync(file, "utf-8"));
+    expect(stored).toEqual(JSON.parse(JSON.stringify(current)));
+    expect(stored.version).toBe(CONFIGURATOR_MODEL_VERSION);
+    for (const locale of locales) {
+      expect(Object.keys(stored[locale].packages)).toEqual(Object.keys(MODEL_PACKAGES));
+      expect(Object.keys(stored[locale].features)).toEqual(OPTIONS.features);
+      expect(Object.keys(stored[locale].unpriced)).toEqual(UNPRICED_KEYS);
+      expect(JSON.stringify(stored[locale])).not.toMatch(/€/); // labels only, never an amount
+    }
+  });
+});
