@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { Icon } from "@/components/ui/Icon";
 import { buttonClass, cx } from "@/components/ui/primitives";
 
 export interface AccountLinkItem {
@@ -54,26 +55,27 @@ function useAccountsEnabled(): boolean {
 
 /**
  * Sign-in and sign-up entry points. Rendered only when customer accounts are switched on, so with the flag
- * off nothing changes anywhere on the site. `header`: desktop bar (sign-up from the xl breakpoint, like the
- * main call to action); `sheet`: the mobile menu; `footer`: list items for the company column.
+ * off nothing changes anywhere on the site. `header`: desktop bar (one icon link to sign-in; sign-up is on that
+ * page); `sheet`: the mobile menu; `footer`: list items for the company column.
  */
 export function AccountLinks({ links, variant }: { links: AccountLinksData; variant: "header" | "sheet" | "footer" }) {
   const enabled = useAccountsEnabled();
   if (!enabled) return null;
 
   if (variant === "header") {
+    // One compact control instead of a text link plus a button: the Bulgarian bar has no spare width at 1024 and
+    // 1440 px (BLOCKER-ACC-HEADER-01). Sign-up stays one step away: the sign-in page offers it, and so do the
+    // mobile menu and the footer.
     return (
-      <>
-        <Link
-          href={links.signIn.href}
-          className="hidden min-h-11 items-center whitespace-nowrap px-2.5 text-nav font-medium text-fg-muted transition-colors hover:text-fg lg:inline-flex"
-        >
-          {links.signIn.label}
-        </Link>
-        <Link href={links.register.href} className={cx(buttonClass("secondary"), "hidden xl:inline-flex")}>
-          {links.register.label}
-        </Link>
-      </>
+      <Link
+        href={links.signIn.href}
+        aria-label={links.signIn.label}
+        title={links.signIn.label}
+        data-testid="header-account"
+        className="hidden h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-line-default text-fg-secondary transition-colors hover:border-line-strong hover:text-fg lg:inline-flex"
+      >
+        <Icon name="users" className="h-5 w-5" />
+      </Link>
     );
   }
 

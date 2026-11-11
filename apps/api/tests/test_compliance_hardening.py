@@ -733,6 +733,12 @@ def test_the_browser_test_seed_builds_the_scenarios_and_refuses_production(db, m
         assert service.deletion_blockers(db, settings, workspace_of(name)[0]), name
     for name in ("plain", "canceled"):
         assert service.deletion_blockers(db, settings, workspace_of(name)[0]) == [], name
+    # A re-run draws a new password: the kept accounts must accept it, or every sign-in of that run fails.
+    from app.security import verify_password
+
+    assert e2e_seed.seed(db, "Other-Password-2027") == []
+    db.expire_all()
+    assert verify_password(workspace_of("shopper")[0].password_hash, "Other-Password-2027")
     monkeypatch.setattr(settings, "app_env", "production")
     with pytest.raises(RuntimeError):
         e2e_seed.seed(db, "Seed-Password-2026")
@@ -820,21 +826,28 @@ def test_the_deadline_routes_need_an_administrator(client):
 # ------------------------------------------------------------------------------------------ release gates
 
 
-def test_accounts_cannot_start_in_production_while_the_header_blocker_is_open():
+def test_accounts_cannot_start_in_production_while_a_release_blocker_is_open(monkeypatch):
     from app import release_gates
 
-    assert release_gates.ACCOUNT_HEADER_LAYOUT_FIXED is False  # flip only together with the header fix
+    # BLOCKER-ACC-HEADER-01 was closed together with the header fix (responsive-legal.spec.ts keeps it fixed).
+    assert release_gates.ACCOUNT_HEADER_LAYOUT_FIXED is True
+    assert release_gates.open_blockers(customer_accounts_enabled=True) == []
+    # The mechanism itself: an open blocker refuses a production start with the feature on.
+    monkeypatch.setattr(release_gates, "ACCOUNT_HEADER_LAYOUT_FIXED", False)
     with pytest.raises(ValidationError) as error:
         _production(customer_accounts_enabled=True)
     assert "BLOCKER-ACC-HEADER-01" in str(error.value)
     assert release_gates.open_blockers(customer_accounts_enabled=False) == []
 
 
-def test_accounts_or_billing_need_the_owner_attestation_that_mail_delivery_was_verified():
+def test_accounts_or_billing_need_the_owner_attestation_that_mail_delivery_was_verified(monkeypatch):
+    from app import release_gates
+
     for overrides in ({"customer_accounts_enabled": True}, {"billing_provider": "sandbox"}):
         with pytest.raises(ValidationError) as error:
             _production(**overrides)
         assert "EMAIL_DELIVERY_VERIFIED" in str(error.value)
+    monkeypatch.setattr(release_gates, "ACCOUNT_HEADER_LAYOUT_FIXED", False)
     with pytest.raises(ValidationError) as error:  # the attestation alone does not open the gate
         _production(customer_accounts_enabled=True, email_delivery_verified=True)
     assert "EMAIL_DELIVERY_VERIFIED" not in str(error.value) and "BLOCKER-ACC-HEADER-01" in str(error.value)

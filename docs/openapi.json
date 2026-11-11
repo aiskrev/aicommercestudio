@@ -1203,6 +1203,467 @@
         }
       }
     },
+    "/api/public/configurator/meta": {
+      "get": {
+        "tags": [
+          "configurator"
+        ],
+        "summary": "Model and price schedule versions the server evaluates with",
+        "operationId": "configurator_meta_api_public_configurator_meta_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetaOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/configurator/review": {
+      "post": {
+        "tags": [
+          "configurator"
+        ],
+        "summary": "Deterministic review of a configuration (indicative, stores nothing)",
+        "operationId": "configurator_review_api_public_configurator_review_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/configurator/submissions": {
+      "post": {
+        "tags": [
+          "configurator"
+        ],
+        "summary": "Quote request with the configuration attached (creates one lead per submission id)",
+        "operationId": "configurator_submit_api_public_configurator_submissions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmissionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/quote-basket": {
+      "post": {
+        "tags": [
+          "quote-basket"
+        ],
+        "summary": "Start a basket (optionally with a first item); returns the secret token once",
+        "operationId": "create_basket_api_public_quote_basket_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BasketCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasketCreated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "quote-basket"
+        ],
+        "summary": "The basket this token owns",
+        "operationId": "read_basket_api_public_quote_basket_get",
+        "parameters": [
+          {
+            "name": "X-Basket-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "X-Basket-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasketOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "quote-basket"
+        ],
+        "summary": "Discard the basket",
+        "operationId": "discard_basket_api_public_quote_basket_delete",
+        "parameters": [
+          {
+            "name": "X-Basket-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "X-Basket-Token"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/quote-basket/items": {
+      "post": {
+        "tags": [
+          "quote-basket"
+        ],
+        "summary": "Add a configured project or an optional extra",
+        "operationId": "add_item_api_public_quote_basket_items_post",
+        "parameters": [
+          {
+            "name": "X-Basket-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "X-Basket-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemWrite"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasketOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/quote-basket/items/{item_id}": {
+      "put": {
+        "tags": [
+          "quote-basket"
+        ],
+        "summary": "Replace an item (edit a configuration)",
+        "operationId": "replace_item_api_public_quote_basket_items__item_id__put",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "X-Basket-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "X-Basket-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemWrite"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasketOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "quote-basket"
+        ],
+        "summary": "Remove an item",
+        "operationId": "remove_item_api_public_quote_basket_items__item_id__delete",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$",
+              "title": "Item Id"
+            }
+          },
+          {
+            "name": "expected_version",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "title": "Expected Version"
+            }
+          },
+          {
+            "name": "X-Basket-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "X-Basket-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasketOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/public/quote-basket/submit": {
+      "post": {
+        "tags": [
+          "quote-basket"
+        ],
+        "summary": "Send the basket as one quote request (creates one lead; a repeat returns the same reference)",
+        "operationId": "submit_basket_api_public_quote_basket_submit_post",
+        "parameters": [
+          {
+            "name": "X-Basket-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 20,
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "X-Basket-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BasketSubmit"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasketSubmitted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/public/assessments": {
       "get": {
         "tags": [
@@ -12643,6 +13104,87 @@
         ],
         "title": "AlternateSlugs"
       },
+      "AnswersIn": {
+        "properties": {
+          "project_type": {
+            "$ref": "#/components/schemas/ProjectType"
+          },
+          "pages": {
+            "$ref": "#/components/schemas/Pages"
+          },
+          "products": {
+            "$ref": "#/components/schemas/Products"
+          },
+          "languages": {
+            "$ref": "#/components/schemas/Languages"
+          },
+          "build": {
+            "$ref": "#/components/schemas/Build"
+          },
+          "content_migration": {
+            "type": "boolean",
+            "title": "Content Migration",
+            "default": false
+          },
+          "store_migration": {
+            "type": "boolean",
+            "title": "Store Migration",
+            "default": false
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/Feature"
+            },
+            "type": "array",
+            "maxItems": 16,
+            "title": "Features"
+          },
+          "branding": {
+            "$ref": "#/components/schemas/Branding"
+          },
+          "design_level": {
+            "$ref": "#/components/schemas/DesignLevel"
+          },
+          "accessibility": {
+            "type": "boolean",
+            "title": "Accessibility",
+            "default": false
+          },
+          "interactive_elements": {
+            "type": "boolean",
+            "title": "Interactive Elements",
+            "default": false
+          },
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/Operation"
+            },
+            "type": "array",
+            "maxItems": 6,
+            "title": "Operations"
+          },
+          "timeline": {
+            "$ref": "#/components/schemas/Timeline"
+          },
+          "budget_range": {
+            "$ref": "#/components/schemas/BudgetRange"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "project_type",
+          "pages",
+          "products",
+          "languages",
+          "build",
+          "branding",
+          "design_level",
+          "timeline",
+          "budget_range"
+        ],
+        "title": "AnswersIn"
+      },
       "Assertion": {
         "properties": {
           "type": {
@@ -13253,6 +13795,43 @@
         ],
         "title": "AutomationAssessment"
       },
+      "BandOut": {
+        "properties": {
+          "unit": {
+            "type": "string",
+            "enum": [
+              "project",
+              "month"
+            ],
+            "title": "Unit"
+          },
+          "from": {
+            "type": "integer",
+            "title": "From"
+          },
+          "typical": {
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Typical"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unit",
+          "from",
+          "typical"
+        ],
+        "title": "BandOut"
+      },
       "Basis": {
         "properties": {
           "source": {
@@ -13284,6 +13863,385 @@
         ],
         "title": "Basis",
         "description": "Where an insight comes from: an input the visitor chose, the assessment, or a named rule."
+      },
+      "BasketCreate": {
+        "properties": {
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "item": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ConfigurationItemIn"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ExtraItemIn"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "kind",
+                  "mapping": {
+                    "configuration": "#/components/schemas/ConfigurationItemIn",
+                    "extra": "#/components/schemas/ExtraItemIn"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Item"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "BasketCreate"
+      },
+      "BasketCreated": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "basket": {
+            "$ref": "#/components/schemas/BasketOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "basket"
+        ],
+        "title": "BasketCreated"
+      },
+      "BasketItemOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "configuration",
+              "extra"
+            ],
+            "title": "Kind"
+          },
+          "needs_update": {
+            "type": "boolean",
+            "title": "Needs Update",
+            "default": false
+          },
+          "answers": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answers"
+          },
+          "review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReviewOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extra": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExtraOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind"
+        ],
+        "title": "BasketItemOut"
+      },
+      "BasketOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "submitted"
+            ],
+            "title": "Status"
+          },
+          "version": {
+            "type": "integer",
+            "title": "Version"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "locale": {
+            "type": "string",
+            "title": "Locale"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "schedule_version": {
+            "type": "string",
+            "title": "Schedule Version"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "owner_approval": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved"
+            ],
+            "title": "Owner Approval"
+          },
+          "tax_treatment": {
+            "type": "string",
+            "title": "Tax Treatment"
+          },
+          "binding": {
+            "type": "boolean",
+            "const": false,
+            "title": "Binding",
+            "default": false
+          },
+          "max_items": {
+            "type": "integer",
+            "title": "Max Items",
+            "default": 8
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BasketItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/BasketTotalsOut"
+          },
+          "unpriced": {
+            "items": {
+              "$ref": "#/components/schemas/UnpricedOut"
+            },
+            "type": "array",
+            "title": "Unpriced"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Assumptions"
+          },
+          "exclusions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Exclusions"
+          },
+          "human_review": {
+            "$ref": "#/components/schemas/HumanReviewOut"
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "expires_at",
+          "locale",
+          "model_version",
+          "schedule_version",
+          "currency",
+          "owner_approval",
+          "tax_treatment",
+          "items",
+          "totals",
+          "unpriced",
+          "assumptions",
+          "exclusions",
+          "human_review"
+        ],
+        "title": "BasketOut"
+      },
+      "BasketSubmit": {
+        "properties": {
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "goals": {
+            "type": "string",
+            "maxLength": 600,
+            "title": "Goals",
+            "default": ""
+          },
+          "special_requirements": {
+            "type": "string",
+            "maxLength": 600,
+            "title": "Special Requirements",
+            "default": ""
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email",
+            "title": "Email"
+          },
+          "company": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Company"
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 40,
+            "pattern": "^[0-9+()\\s.-]*$",
+            "title": "Phone",
+            "default": ""
+          },
+          "privacy_acknowledged": {
+            "type": "boolean",
+            "title": "Privacy Acknowledged"
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "default": false
+          },
+          "website": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Website",
+            "default": ""
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          },
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "company",
+          "privacy_acknowledged",
+          "expected_version"
+        ],
+        "title": "BasketSubmit",
+        "description": "Send the basket as one quote request. Contact details arrive only here and go to the lead, not the basket."
+      },
+      "BasketSubmitted": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "received",
+            "title": "Status",
+            "default": "received"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "message"
+        ],
+        "title": "BasketSubmitted"
+      },
+      "BasketTotalsOut": {
+        "properties": {
+          "one_time_from": {
+            "type": "integer",
+            "title": "One Time From"
+          },
+          "monthly_from": {
+            "type": "integer",
+            "title": "Monthly From"
+          },
+          "priced_lines": {
+            "type": "integer",
+            "title": "Priced Lines"
+          },
+          "unpriced_lines": {
+            "type": "integer",
+            "title": "Unpriced Lines"
+          }
+        },
+        "type": "object",
+        "required": [
+          "one_time_from",
+          "monthly_from",
+          "priced_lines",
+          "unpriced_lines"
+        ],
+        "title": "BasketTotalsOut",
+        "description": "Sums of the starting prices of the priced lines. One-time and monthly are never added together."
+      },
+      "Branding": {
+        "type": "string",
+        "enum": [
+          "existing",
+          "new"
+        ],
+        "title": "Branding"
       },
       "BudgetIn": {
         "properties": {
@@ -13449,6 +14407,14 @@
           "missing_rate_runs"
         ],
         "title": "BudgetStatus"
+      },
+      "Build": {
+        "type": "string",
+        "enum": [
+          "new",
+          "redesign"
+        ],
+        "title": "Build"
       },
       "BusinessType": {
         "type": "string",
@@ -14393,6 +15359,32 @@
         ],
         "title": "Complexity"
       },
+      "ConfigurationItemIn": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "configuration",
+            "title": "Kind"
+          },
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "answers": {
+            "$ref": "#/components/schemas/AnswersIn"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "model_version",
+          "answers"
+        ],
+        "title": "ConfigurationItemIn",
+        "description": "A configured project: the same answers the project configurator reviews."
+      },
       "ConfigurationLookup": {
         "properties": {
           "token": {
@@ -14408,6 +15400,32 @@
           "token"
         ],
         "title": "ConfigurationLookup"
+      },
+      "ConfiguratorDetailsOut": {
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "answers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Answers"
+          },
+          "review": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Review"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_version",
+          "answers",
+          "review"
+        ],
+        "title": "ConfiguratorDetailsOut",
+        "description": "A project-configurator quote request as the admin sees it: the enumerated answers and the review the\nserver computed when the lead was created (keys only; labels client-side). Indicative, never a quote."
       },
       "ConfirmIn": {
         "properties": {
@@ -14903,6 +15921,14 @@
           "status"
         ],
         "title": "DecideIn"
+      },
+      "DesignLevel": {
+        "type": "string",
+        "enum": [
+          "standard",
+          "bespoke"
+        ],
+        "title": "DesignLevel"
       },
       "DimensionScoreOut": {
         "properties": {
@@ -15579,14 +16605,14 @@
           },
           "capabilities": {
             "items": {
-              "$ref": "#/components/schemas/ItemOut"
+              "$ref": "#/components/schemas/app__catalogue__api_schemas__ItemOut"
             },
             "type": "array",
             "title": "Capabilities"
           },
           "deliverables": {
             "items": {
-              "$ref": "#/components/schemas/ItemOut"
+              "$ref": "#/components/schemas/app__catalogue__api_schemas__ItemOut"
             },
             "type": "array",
             "title": "Deliverables"
@@ -16161,6 +17187,63 @@
         ],
         "title": "ExtendIn"
       },
+      "ExtraItemIn": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "const": "extra",
+            "title": "Kind"
+          },
+          "group": {
+            "type": "string",
+            "enum": [
+              "service",
+              "workshop",
+              "care_plan",
+              "ai_managed"
+            ],
+            "title": "Group"
+          },
+          "key": {
+            "type": "string",
+            "maxLength": 48,
+            "minLength": 1,
+            "pattern": "^[a-z0-9_]+$",
+            "title": "Key"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "kind",
+          "group",
+          "key"
+        ],
+        "title": "ExtraItemIn",
+        "description": "An optional extra: one published offer, named by its group and key in the price schedule."
+      },
+      "ExtraOut": {
+        "properties": {
+          "group": {
+            "type": "string",
+            "title": "Group"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "band": {
+            "$ref": "#/components/schemas/BandOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "group",
+          "key",
+          "band"
+        ],
+        "title": "ExtraOut"
+      },
       "Factor": {
         "properties": {
           "effect": {
@@ -16440,6 +17523,28 @@
           "factors"
         ],
         "title": "Feasibility"
+      },
+      "Feature": {
+        "type": "string",
+        "enum": [
+          "cms",
+          "blog",
+          "search",
+          "product_filters",
+          "customer_accounts",
+          "user_dashboard",
+          "payments",
+          "shipping",
+          "invoicing",
+          "booking",
+          "crm",
+          "erp",
+          "analytics",
+          "seo",
+          "ai_assistant",
+          "marketing"
+        ],
+        "title": "Feature"
       },
       "FieldChange": {
         "properties": {
@@ -16834,6 +17939,28 @@
           "reason"
         ],
         "title": "HumanApproval"
+      },
+      "HumanReviewOut": {
+        "properties": {
+          "required": {
+            "type": "boolean",
+            "const": true,
+            "title": "Required",
+            "default": true
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reasons"
+        ],
+        "title": "HumanReviewOut"
       },
       "Impact": {
         "type": "string",
@@ -17597,23 +18724,6 @@
         "title": "ItemEdit",
         "description": "One list entry in both locales (the lists stay aligned between BG and EN)."
       },
-      "ItemOut": {
-        "properties": {
-          "bg": {
-            "$ref": "#/components/schemas/ItemTextOut"
-          },
-          "en": {
-            "$ref": "#/components/schemas/ItemTextOut"
-          }
-        },
-        "additionalProperties": false,
-        "type": "object",
-        "required": [
-          "bg",
-          "en"
-        ],
-        "title": "ItemOut"
-      },
       "ItemTextEdit": {
         "properties": {
           "title": {
@@ -17678,6 +18788,40 @@
         ],
         "title": "ItemTextOut"
       },
+      "ItemWrite": {
+        "properties": {
+          "expected_version": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Expected Version"
+          },
+          "item": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ConfigurationItemIn"
+              },
+              {
+                "$ref": "#/components/schemas/ExtraItemIn"
+              }
+            ],
+            "title": "Item",
+            "discriminator": {
+              "propertyName": "kind",
+              "mapping": {
+                "configuration": "#/components/schemas/ConfigurationItemIn",
+                "extra": "#/components/schemas/ExtraItemIn"
+              }
+            }
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "expected_version",
+          "item"
+        ],
+        "title": "ItemWrite"
+      },
       "LabelIn": {
         "properties": {
           "label": {
@@ -17697,6 +18841,15 @@
           "label"
         ],
         "title": "LabelIn"
+      },
+      "Languages": {
+        "type": "string",
+        "enum": [
+          "one",
+          "two",
+          "three_plus"
+        ],
+        "title": "Languages"
       },
       "LeadCreate": {
         "properties": {
@@ -18095,6 +19248,26 @@
             "anyOf": [
               {
                 "$ref": "#/components/schemas/SolutionDetailsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "configurator": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConfiguratorDetailsOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quote_basket": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuoteBasketDetailsOut"
               },
               {
                 "type": "null"
@@ -18652,6 +19825,24 @@
         ],
         "title": "MemberUpdate"
       },
+      "MetaOut": {
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "schedule_version": {
+            "type": "string",
+            "title": "Schedule Version"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_version",
+          "schedule_version"
+        ],
+        "title": "MetaOut"
+      },
       "Metric": {
         "type": "string",
         "enum": [
@@ -18902,6 +20093,18 @@
           "body"
         ],
         "title": "NoteIn"
+      },
+      "Operation": {
+        "type": "string",
+        "enum": [
+          "hosting",
+          "maintenance",
+          "backups",
+          "security",
+          "monitoring",
+          "support"
+        ],
+        "title": "Operation"
       },
       "Opportunity": {
         "properties": {
@@ -19676,6 +20879,16 @@
         ],
         "title": "PageRow"
       },
+      "Pages": {
+        "type": "string",
+        "enum": [
+          "one",
+          "up_to_5",
+          "up_to_15",
+          "more_than_15"
+        ],
+        "title": "Pages"
+      },
       "Parameters": {
         "properties": {
           "temperature": {
@@ -20240,6 +21453,16 @@
         ],
         "title": "Prerequisite"
       },
+      "Products": {
+        "type": "string",
+        "enum": [
+          "none",
+          "up_to_50",
+          "up_to_500",
+          "more_than_500"
+        ],
+        "title": "Products"
+      },
       "ProfileOut": {
         "properties": {
           "email": {
@@ -20291,6 +21514,16 @@
           "name"
         ],
         "title": "ProjectIn"
+      },
+      "ProjectType": {
+        "type": "string",
+        "enum": [
+          "landing_page",
+          "business_website",
+          "online_store",
+          "custom_application"
+        ],
+        "title": "ProjectType"
       },
       "ProposalContent-Input": {
         "properties": {
@@ -20831,6 +22064,26 @@
           "unit"
         ],
         "title": "QuestionOut"
+      },
+      "QuoteBasketDetailsOut": {
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "basket": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Basket"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_version",
+          "basket"
+        ],
+        "title": "QuoteBasketDetailsOut",
+        "description": "A quote basket as it was when the visitor sent it: the view the server computed (keys only; labels\nclient-side). Indicative, never a quote."
       },
       "QuoteRequestCreate": {
         "properties": {
@@ -21970,6 +23223,136 @@
           "decision"
         ],
         "title": "ReviewDecision"
+      },
+      "ReviewOut": {
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "schedule_version": {
+            "type": "string",
+            "title": "Schedule Version"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "owner_approval": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved"
+            ],
+            "title": "Owner Approval"
+          },
+          "tax_treatment": {
+            "type": "string",
+            "title": "Tax Treatment"
+          },
+          "binding": {
+            "type": "boolean",
+            "const": false,
+            "title": "Binding",
+            "default": false
+          },
+          "package": {
+            "type": "string",
+            "title": "Package"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "delivery": {
+            "type": "string",
+            "enum": [
+              "fixed_scope",
+              "staged"
+            ],
+            "title": "Delivery"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/app__configurator__schemas__ItemOut"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "included": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Included"
+          },
+          "unpriced": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unpriced"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Assumptions"
+          },
+          "exclusions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Exclusions"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/TotalsOut"
+          },
+          "human_review": {
+            "$ref": "#/components/schemas/HumanReviewOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "model_version",
+          "schedule_version",
+          "currency",
+          "owner_approval",
+          "tax_treatment",
+          "package",
+          "service",
+          "delivery",
+          "items",
+          "included",
+          "unpriced",
+          "assumptions",
+          "exclusions",
+          "totals",
+          "human_review"
+        ],
+        "title": "ReviewOut"
+      },
+      "ReviewRequest": {
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "answers": {
+            "$ref": "#/components/schemas/AnswersIn"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "model_version",
+          "answers"
+        ],
+        "title": "ReviewRequest",
+        "description": "Answers only: nothing personal, no free text, no amounts."
       },
       "Risk-Input": {
         "properties": {
@@ -23413,6 +24796,122 @@
         ],
         "title": "StatusStep"
       },
+      "SubmissionCreate": {
+        "properties": {
+          "locale": {
+            "$ref": "#/components/schemas/LeadLocale",
+            "default": "bg"
+          },
+          "goals": {
+            "type": "string",
+            "maxLength": 600,
+            "title": "Goals",
+            "default": ""
+          },
+          "special_requirements": {
+            "type": "string",
+            "maxLength": 600,
+            "title": "Special Requirements",
+            "default": ""
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "format": "email",
+            "title": "Email"
+          },
+          "company": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 2,
+            "title": "Company"
+          },
+          "phone": {
+            "type": "string",
+            "maxLength": 40,
+            "pattern": "^[0-9+()\\s.-]*$",
+            "title": "Phone",
+            "default": ""
+          },
+          "privacy_acknowledged": {
+            "type": "boolean",
+            "title": "Privacy Acknowledged"
+          },
+          "marketing_consent": {
+            "type": "boolean",
+            "title": "Marketing Consent",
+            "default": false
+          },
+          "website": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Website",
+            "default": ""
+          },
+          "form_token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Form Token",
+            "default": ""
+          },
+          "model_version": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Model Version"
+          },
+          "answers": {
+            "$ref": "#/components/schemas/AnswersIn"
+          },
+          "submission_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Submission Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "company",
+          "privacy_acknowledged",
+          "model_version",
+          "answers",
+          "submission_id"
+        ],
+        "title": "SubmissionCreate",
+        "description": "Quote request with the configuration attached. Creates a lead for a person to review."
+      },
+      "SubmissionOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "received",
+            "title": "Status",
+            "default": "received"
+          },
+          "reference": {
+            "type": "string",
+            "title": "Reference"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "reference",
+          "message"
+        ],
+        "title": "SubmissionOut"
+      },
       "SupportIn": {
         "properties": {
           "kind": {
@@ -24506,6 +26005,30 @@
         ],
         "title": "ToolKind"
       },
+      "TotalsOut": {
+        "properties": {
+          "one_time_from": {
+            "type": "integer",
+            "title": "One Time From"
+          },
+          "monthly_from": {
+            "type": "integer",
+            "title": "Monthly From"
+          },
+          "primary_priced": {
+            "type": "boolean",
+            "title": "Primary Priced"
+          }
+        },
+        "type": "object",
+        "required": [
+          "one_time_from",
+          "monthly_from",
+          "primary_priced"
+        ],
+        "title": "TotalsOut",
+        "description": "Sums of the starting prices of the priced items; `primary_priced` is false when the package itself has none."
+      },
       "Transition": {
         "properties": {
           "to": {
@@ -24779,6 +26302,24 @@
           "en"
         ],
         "title": "TranslationsEdit"
+      },
+      "UnpricedOut": {
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "title": "Item Id"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          }
+        },
+        "type": "object",
+        "required": [
+          "item_id",
+          "key"
+        ],
+        "title": "UnpricedOut"
       },
       "ValidationError": {
         "properties": {
@@ -25631,6 +27172,62 @@
           "tools"
         ],
         "title": "Summary"
+      },
+      "app__catalogue__api_schemas__ItemOut": {
+        "properties": {
+          "bg": {
+            "$ref": "#/components/schemas/ItemTextOut"
+          },
+          "en": {
+            "$ref": "#/components/schemas/ItemTextOut"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "bg",
+          "en"
+        ],
+        "title": "ItemOut"
+      },
+      "app__configurator__schemas__ItemOut": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "package",
+              "service",
+              "care_plan"
+            ],
+            "title": "Kind"
+          },
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "band": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BandOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "key",
+          "reason",
+          "band"
+        ],
+        "title": "ItemOut"
       },
       "app__opportunities__schemas__Risk": {
         "properties": {

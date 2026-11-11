@@ -1,11 +1,13 @@
 import Link from "next/link";
 
+import { ConfiguratorEntry } from "@/components/configurator/ConfiguratorEntry";
 import { CapabilityAreas } from "@/components/home/CapabilityAreas";
 import { ControlLanes } from "@/components/home/ControlLanes";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { HeroWorkflow } from "@/components/home/HeroWorkflow";
 import { ManagedLifecycle } from "@/components/home/ManagedLifecycle";
 import { ProcessSteps } from "@/components/home/ProcessSteps";
+import { ProjectEntryPoints } from "@/components/home/ProjectEntryPoints";
 import { SolutionPatterns } from "@/components/home/SolutionPatterns";
 import { SystemMap } from "@/components/home/SystemMap";
 import { ToolsPreview } from "@/components/home/ToolsPreview";
@@ -22,8 +24,8 @@ import { getDictionary } from "@/i18n";
 import { isDomainPublished } from "@/lib/domains";
 import { SCENARIO_SLUGS } from "@/lib/reference";
 import { resolveLocale } from "@/lib/params";
-import { AI_MANAGED_PRICES, priceText } from "@/lib/prices";
-import { routes } from "@/lib/routes";
+import { AI_MANAGED_PRICES, SERVICE_PRICES, priceText } from "@/lib/prices";
+import { quoteWithService, routes } from "@/lib/routes";
 import { toolHrefs, toolMinutes } from "@/lib/tools";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
 
@@ -51,10 +53,19 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">) {
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
-  const { home, advisor, tools, founder, aiManaged, reference } = getContent(locale);
+  const { home, advisor, tools, founder, aiManaged, reference, configurator } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const managedHref = href(routes.service(serviceByKey(locale, "ai_managed").slug));
+  const entryPoints = home.entry.items.map((item) => {
+    const service = serviceByKey(locale, item.key);
+    return {
+      ...item,
+      detailsHref: href(routes.service(service.slug)),
+      quoteHref: href(quoteWithService(item.key)),
+      price: SERVICE_PRICES[item.key],
+    };
+  });
   const areas = home.offer.areas.map((area) => ({
     ...area,
     domains: area.domains.filter(isDomainPublished).map((key) => {
@@ -104,6 +115,31 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           <SystemMap content={home.hero.systemMap} />
         </Container>
       </div>
+
+      {/* 1b --------------------------------------------------------------- commercial entry points (what do you want to build?) */}
+      <Section labelledBy="entry-title" size="wide">
+        <SectionHeading
+          id="entry-title"
+          eyebrow={home.entry.eyebrow}
+          title={home.entry.title}
+          lead={home.entry.lead}
+          action={
+            <div className="flex flex-wrap gap-3">
+              <ConfiguratorEntry href={href(routes.configurator)} label={configurator.entryLabel} />
+              <ButtonLink href={href(routes.projectPackages)} variant="secondary" icon="arrowRight">
+                {home.entry.compareLabel}
+              </ButtonLink>
+            </div>
+          }
+        />
+        <div className="mt-stack">
+          <ProjectEntryPoints
+            locale={locale}
+            items={entryPoints}
+            labels={{ details: home.entry.detailsLabel, quote: home.entry.quoteLabel, priceNote: home.entry.priceNote }}
+          />
+        </div>
+      </Section>
 
       {/* 2 ---------------------------------------------------------------- capability narrative: three areas */}
       <Section labelledBy="offer-title">

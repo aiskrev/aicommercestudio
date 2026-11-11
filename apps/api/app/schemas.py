@@ -448,6 +448,23 @@ class AiManagedQualificationOut(BaseModel):
     matches_desired: bool | None = None
 
 
+class ConfiguratorDetailsOut(BaseModel):
+    """A project-configurator quote request as the admin sees it: the enumerated answers and the review the
+    server computed when the lead was created (keys only; labels client-side). Indicative, never a quote."""
+
+    model_version: str
+    answers: dict[str, Any]
+    review: dict[str, Any]
+
+
+class QuoteBasketDetailsOut(BaseModel):
+    """A quote basket as it was when the visitor sent it: the view the server computed (keys only; labels
+    client-side). Indicative, never a quote."""
+
+    model_version: str
+    basket: dict[str, Any]
+
+
 class SolutionDetailsOut(BaseModel):
     """The design of a solution-builder enquiry as the admin sees it (enumerated keys; labels client-side)."""
 
@@ -510,6 +527,10 @@ class LeadDetailOut(LeadSummaryOut):
     team: TeamDetailsOut | None = None
     # AI solution builder enquiry (source solution_builder); None otherwise.
     solution: SolutionDetailsOut | None = None
+    # Project configurator quote request (source project_configurator); None otherwise.
+    configurator: ConfiguratorDetailsOut | None = None
+    # Quote basket sent as one quote request (source quote_basket); None otherwise.
+    quote_basket: QuoteBasketDetailsOut | None = None
 
 
 class LeadPage(BaseModel):

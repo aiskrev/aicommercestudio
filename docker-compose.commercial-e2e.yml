@@ -1,0 +1,22 @@
+# TEST-ONLY override for the browser tests of the commercial expansion features (scripts/test-commercial-e2e.ps1).
+# It switches the feature flags that are OFF by default ON, so their pages can be driven in a real browser.
+# No payment provider, no customer accounts and no real mail are involved: leads created by the specs are synthetic
+# (example.com addresses) and stay in the local test database.
+# NEVER use this file for a deployment.
+services:
+  api:
+    environment:
+      PROJECT_CONFIGURATOR_ENABLED: "true"
+      # The runner's second pass sets E2E_QUOTE_BASKET=false to test the configurator's own quote form.
+      QUOTE_BASKET_ENABLED: "${E2E_QUOTE_BASKET:-true}"
+      QUOTE_BASKET_CREATE_RATE_LIMIT: "500"
+      QUOTE_BASKET_RATE_LIMIT: "5000"
+      # The specs submit several forms in a row from one address.
+      CONTACT_RATE_LIMIT: "200"
+      CONFIGURATOR_REVIEW_RATE_LIMIT: "2000"
+      # The browser fills the form faster than a person would.
+      FORM_TOKEN_MIN_SECONDS: "0"
+  web:
+    environment:
+      PROJECT_CONFIGURATOR_ENABLED: "true"
+      QUOTE_BASKET_ENABLED: "${E2E_QUOTE_BASKET:-true}"

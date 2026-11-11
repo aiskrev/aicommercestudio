@@ -249,7 +249,7 @@ developer's machine on 2026-11-10). Nothing was run against staging. Production 
 * `Secure`, `HttpOnly` and `SameSite` flags are verified locally and by the production configuration guard; they are NOT verified on the live site for the new build.
 * The marketing withdrawal token never expires (by design) and depends on `SECRET_KEY`; rotating the key invalidates links until staff prepare them again.
 * A late Stripe event for an erased account is only flagged, not prevented.
-* With accounts switched on the Bulgarian header overflows the screen at 1024 and 1440 px. It is release blocker **BLOCKER-ACC-HEADER-01**: the API refuses a production start with accounts on until the header is fixed in code (apps/api/app/release_gates.py).
+* With accounts switched on the Bulgarian header overflows the screen at 1024 and 1440 px. It is release blocker **BLOCKER-ACC-HEADER-01**: the API refuses a production start with accounts on until the header is fixed in code (apps/api/app/release_gates.py). **Closed on 2026-11-11** (commercial expansion, Phase 02): the header fits at both widths and the gate constant is `True`.
 
 ## 9. Owner decisions required (none was made for you)
 
@@ -262,7 +262,7 @@ developer's machine on 2026-11-10). Nothing was run against staging. Production 
 | 5 | Which verified mailbox is approved for public contact, privacy requests, withdrawal confirmations, billing and transactional mail? | None approved or verified | docs/DNS_MAILBOX_VERIFICATION.md |
 | 6 | Has a Bulgarian lawyer approved the exact BG and EN texts and their hashes? | No: every document is `draft` / `pending_lawyer_review` | docs/LEGAL_CONTENT_RELEASE.md |
 | 7 | What retention periods for withdrawal and data requests? | None; nothing is deleted | docs/LEGAL_RETENTION.md |
-| 8 | How should the header be laid out with accounts on (move the consultation button or the account links into a menu)? | Not decided; BLOCKER-ACC-HEADER-01 keeps accounts off in production | docs/ACCESSIBILITY.md |
+| 8 | How should the header be laid out with accounts on (move the consultation button or the account links into a menu)? | Update 2026-11-11: implemented as one compact sign-in control on desktop (blocker closed); the owner may still change the layout (D-01, docs/COMMERCIAL_EXPANSION_DECISIONS.md) | docs/ACCESSIBILITY.md |
 | 9 | Is a separate "disable sign-in only" state wanted? | Deferred | docs/LEGAL_RETENTION.md section 3 |
 | 10 | Which unified price schedule (decision record) | Not decided | docs/OWNER_DECISION_PRICE_SCHEDULE.md |
 

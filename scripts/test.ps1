@@ -4,10 +4,11 @@
 .PARAMETER Suite
   api | web | e2e | portal | audit | all (default: all except portal and audit)
   legal: browser tests of the legal workflows on a test-only stack with accounts and billing routes on (no Stripe)
+  commercial: browser tests of the commercial expansion features on a test-only stack with their flags on
   portal: the client portal browser e2e on a stack started with the portal switched ON
   (docker-compose.portal-e2e.yml, test only); the stack is switched back to the default afterwards.
 #>
-param([ValidateSet("api", "web", "e2e", "portal", "legal", "audit", "all")][string]$Suite = "all")
+param([ValidateSet("api", "web", "e2e", "portal", "legal", "commercial", "audit", "all")][string]$Suite = "all")
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
@@ -60,6 +61,20 @@ if ($Suite -in @("api", "web", "all")) {
         if ($api -ne $web) { Write-Host "workshop keys differ between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
         $global:LASTEXITCODE = [int]($api -ne $web)
     }
+    # Published price schedule: generated from lib/prices.ts (price-schedule.test.ts); the API reads the copy (app/pricing.py).
+    Invoke-Suite "Price schedule (API = web copy)" {
+        $api = (Get-FileHash "apps/api/app/price_schedule.json").Hash
+        $web = (Get-FileHash "apps/web/src/lib/price-schedule.json").Hash
+        if ($api -ne $web) { Write-Host "price schedule differs between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
+        $global:LASTEXITCODE = [int]($api -ne $web)
+    }
+    # Project configurator model: option lists, packages and feature tables (the web draws the form, the API evaluates).
+    Invoke-Suite "Configurator model (API = web copy)" {
+        $api = (Get-FileHash "apps/api/app/configurator/model.json").Hash
+        $web = (Get-FileHash "apps/web/src/lib/configurator-model.json").Hash
+        if ($api -ne $web) { Write-Host "configurator model differs between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
+        $global:LASTEXITCODE = [int]($api -ne $web)
+    }
 }
 if ($Suite -in @("api", "all")) {
     Invoke-Suite "API tests (pytest)" { docker compose --profile test run --rm --build api-tests }
@@ -94,6 +109,9 @@ if ($Suite -in @("e2e", "all")) {
 }
 if ($Suite -eq "legal") {
     Invoke-Suite "Legal workflows e2e (accounts and billing routes on, no Stripe; test stack only)" { & "$PSScriptRoot/test-legal-e2e.ps1" }
+}
+if ($Suite -eq "commercial") {
+    Invoke-Suite "Commercial expansion e2e (new feature flags on; test stack only)" { & "$PSScriptRoot/test-commercial-e2e.ps1" }
 }
 if ($Suite -eq "portal") {
     Invoke-Suite "Client portal e2e (portal switched on, test stack only)" {

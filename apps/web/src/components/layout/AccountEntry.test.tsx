@@ -41,11 +41,14 @@ describe("AccountLinks", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("shows sign-in and sign-up in the header once accounts are on", async () => {
+  it("shows one compact sign-in control in the header once accounts are on", async () => {
     answer({ enabled: true });
     render(<AccountLinks links={links} variant="header" />);
-    expect(await screen.findByRole("link", { name: "Вход" })).toHaveAttribute("href", "/bg/konto/vhod");
-    expect(screen.getByRole("link", { name: "Създайте акаунт" })).toHaveAttribute("href", "/bg/konto/registratsiya");
+    const signIn = await screen.findByRole("link", { name: "Вход" });
+    expect(signIn).toHaveAttribute("href", "/bg/konto/vhod");
+    expect(signIn).toHaveTextContent("");
+    // Sign-up is not repeated in the bar (it would overflow the Bulgarian header); the sheet and footer carry it.
+    expect(screen.queryByRole("link", { name: "Създайте акаунт" })).not.toBeInTheDocument();
   });
 
   it("renders list items for the footer and both links in the mobile sheet", async () => {

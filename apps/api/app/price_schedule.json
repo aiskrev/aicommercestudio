@@ -1,0 +1,287 @@
+{
+ "version": "2026-11-10.1",
+ "currency": "EUR",
+ "schedule": "bg",
+ "owner_approval": "pending",
+ "tax_treatment": "not_vat_registered",
+ "binding": false,
+ "excluded_costs": [
+  "hosting",
+  "licences",
+  "ai_model_usage"
+ ],
+ "groups": {
+  "service": {
+   "business_websites": {
+    "unit": "project",
+    "from": 810,
+    "typical": [
+     1350,
+     2250
+    ]
+   },
+   "store_development": {
+    "unit": "project",
+    "from": 1100,
+    "typical": [
+     2250,
+     3600
+    ]
+   },
+   "portals_web_apps": {
+    "unit": "project",
+    "from": 3600,
+    "typical": [
+     7200,
+     13500
+    ]
+   },
+   "payments_subscriptions": {
+    "unit": "project",
+    "from": 450,
+    "typical": [
+     720,
+     6300
+    ]
+   },
+   "security_performance": {
+    "unit": "project",
+    "from": 270,
+    "typical": [
+     450,
+     810
+    ]
+   },
+   "maintenance": {
+    "unit": "month",
+    "from": 80,
+    "typical": [
+     160,
+     320
+    ]
+   },
+   "seo": {
+    "unit": "month",
+    "from": 180,
+    "typical": [
+     270,
+     450
+    ]
+   },
+   "analytics": {
+    "unit": "project",
+    "from": 270,
+    "typical": [
+     450,
+     1350
+    ]
+   },
+   "integrations": {
+    "unit": "project",
+    "from": 1350,
+    "typical": [
+     2700,
+     7200
+    ]
+   },
+   "ai_agents": {
+    "unit": "project",
+    "from": 2250,
+    "typical": [
+     4500,
+     9000
+    ]
+   },
+   "automation": {
+    "unit": "project",
+    "from": 720,
+    "typical": [
+     1350,
+     3600
+    ]
+   },
+   "ai_tools": {
+    "unit": "project",
+    "from": 810,
+    "typical": [
+     1350,
+     10800
+    ]
+   },
+   "audit": {
+    "unit": "project",
+    "from": 810,
+    "typical": [
+     1800,
+     3150
+    ]
+   },
+   "ai_managed": {
+    "unit": "month",
+    "from": 230,
+    "typical": [
+     320,
+     2700
+    ]
+   },
+   "integration_care": {
+    "unit": "month",
+    "from": 140,
+    "typical": [
+     230,
+     410
+    ]
+   }
+  },
+  "workshop": {
+   "ai_strategy_discovery": {
+    "unit": "project",
+    "from": 720,
+    "typical": [
+     1100,
+     1600
+    ]
+   },
+   "ai_readiness_mapping": {
+    "unit": "project",
+    "from": 1600,
+    "typical": [
+     2250,
+     3150
+    ]
+   },
+   "agent_architecture": {
+    "unit": "project",
+    "from": 1800,
+    "typical": [
+     2700,
+     3600
+    ]
+   },
+   "landing_zone_assessment": {
+    "unit": "project",
+    "from": 1800,
+    "typical": [
+     2700,
+     4050
+    ]
+   },
+   "kubernetes_review": {
+    "unit": "project",
+    "from": 1350,
+    "typical": [
+     2250,
+     3600
+    ]
+   },
+   "devops_gitops_assessment": {
+    "unit": "project",
+    "from": 1350,
+    "typical": [
+     2250,
+     3600
+    ]
+   },
+   "observability_sre": {
+    "unit": "project",
+    "from": 1600,
+    "typical": [
+     2250,
+     3600
+    ]
+   },
+   "ecommerce_integration_discovery": {
+    "unit": "project",
+    "from": 900,
+    "typical": [
+     1350,
+     2700
+    ]
+   },
+   "rag_data_readiness": {
+    "unit": "project",
+    "from": 1600,
+    "typical": [
+     2250,
+     3150
+    ]
+   },
+   "responsible_ai_review": {
+    "unit": "project",
+    "from": 810,
+    "typical": [
+     1350,
+     2700
+    ]
+   }
+  },
+  "care_plan": {
+   "website": {
+    "unit": "month",
+    "from": 80,
+    "typical": [
+     160,
+     320
+    ]
+   },
+   "commerce": {
+    "unit": "month",
+    "from": 80,
+    "typical": [
+     160,
+     320
+    ]
+   },
+   "automation": {
+    "unit": "month",
+    "from": 140,
+    "typical": [
+     230,
+     410
+    ]
+   },
+   "cloud": {
+    "unit": "month",
+    "from": 230,
+    "typical": [
+     320,
+     450
+    ]
+   },
+   "security": {
+    "unit": "month",
+    "from": 80,
+    "typical": [
+     160,
+     320
+    ]
+   }
+  },
+  "ai_managed": {
+   "essential": {
+    "unit": "month",
+    "from": 230,
+    "typical": [
+     320,
+     450
+    ]
+   },
+   "managed": {
+    "unit": "month",
+    "from": 630,
+    "typical": [
+     810,
+     1250
+    ]
+   },
+   "advanced": {
+    "unit": "month",
+    "from": 1600,
+    "typical": [
+     2000,
+     2700
+    ]
+   }
+  }
+ }
+}

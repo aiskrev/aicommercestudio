@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
@@ -185,6 +185,22 @@ describe("SEO helpers", () => {
       const languages = entry.alternates?.languages ?? {};
       // Every alternate points back to a URL that is itself in the sitemap (reciprocity).
       for (const href of Object.values(languages)) expect(urls).toContain(new URL(String(href)).pathname);
+    }
+  });
+
+  it("sitemap lists the new commercial pages, and the configurator only while it is switched on", async () => {
+    const paths = async () => (await sitemap()).map((entry) => new URL(entry.url).pathname);
+    const off = await paths();
+    for (const path of ["/bg/proektni-paketi", "/en/project-packages", "/bg/tseni", "/en/pricing"]) expect(off).toContain(path);
+    expect(off.some((path) => path.includes("konfigurator") || path.includes("configurator"))).toBe(false);
+    vi.stubEnv("PROJECT_CONFIGURATOR_ENABLED", "true");
+    try {
+      const on = await paths();
+      expect(on).toContain("/bg/konfigurator");
+      expect(on).toContain("/en/configurator");
+      expect(new Set(on).size).toBe(on.length);
+    } finally {
+      vi.unstubAllEnvs();
     }
   });
 

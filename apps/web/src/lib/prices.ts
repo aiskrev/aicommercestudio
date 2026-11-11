@@ -39,6 +39,26 @@ export const ACTIVE_PRICE_SCHEDULE: PriceMarket = "bg";
  * is a status for the release review, not something the site displays.
  */
 export const PRICE_SCHEDULE_OWNER_APPROVAL: "pending" | "approved" = "pending";
+
+/** Every published amount is in this currency. */
+export const PRICE_CURRENCY = "EUR";
+
+/**
+ * Tax treatment of the published amounts. It is a fact about the company today, not a constant of the system:
+ * `not_vat_registered` = nothing is added and the site says so (`dict.prices.note`). On VAT registration this
+ * value, that note and the legal texts change together (lib/price-schedule.test.ts ties the note to this value),
+ * and the accountant decides whether the published amounts become net or gross.
+ */
+export type PriceTaxTreatment = "not_vat_registered" | "vat_exclusive" | "vat_inclusive";
+export const PRICE_TAX_TREATMENT: PriceTaxTreatment = "not_vat_registered";
+
+/**
+ * Version of the published schedule. Change it whenever an amount, a factor, the active schedule, the approval
+ * or the tax treatment changes; the API copy (apps/api/app/price_schedule.json) carries the same value, so a
+ * stored estimate can always name the schedule it was computed from.
+ */
+export const PRICE_SCHEDULE_VERSION = "2026-11-10.1";
+
 export type PriceUnit = "project" | "month";
 
 /** Baseline in EUR: [from, typical low, typical high]. */
@@ -132,6 +152,11 @@ export function marketFor(locale: Locale): PriceMarket {
 export interface PriceText {
   from: string;
   typical: string;
+}
+
+/** A whole euro amount in the notation of the locale ("1 350 €" / "€1,350"). Formatting only: it never changes the amount. */
+export function formatEuro(locale: Locale, value: number): string {
+  return euros(locale, value);
 }
 
 function euros(locale: Locale, value: number): string {

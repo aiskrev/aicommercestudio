@@ -37,7 +37,11 @@ describe("search index", () => {
   it("leads to the pages that publish prices when someone searches for prices", async () => {
     const bgUrls = search(await buildSearchIndex("bg"), "цени", 30).map((h) => h.entry.url);
     expect(bgUrls).toContain("/bg/paketi");
+    expect(bgUrls).toContain("/bg/proektni-paketi");
+    expect(bgUrls).toContain("/bg/tseni");
     const enUrls = search(await buildSearchIndex("en"), "prices", 30).map((h) => h.entry.url);
     expect(enUrls).toContain("/en/care-plans");
+    expect(enUrls).toContain("/en/project-packages");
+    expect(enUrls).toContain("/en/pricing");
   });
 });

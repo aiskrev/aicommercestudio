@@ -31,7 +31,14 @@ export async function buildSearchIndex(locale: Locale): Promise<SearchEntry[]> {
   page(routes.services, content.servicesPage.title, content.servicesPage.lead);
   page(routes.aiSolutions, content.aiSolutions.title, content.aiSolutions.lead);
   page(routes.tools, content.toolsPage.title, content.toolsPage.lead);
+  page(routes.pricing, content.pricingPage.title, content.pricingPage.lead, [priceWords]);
   page(routes.carePlans, content.carePlans.title, content.carePlans.lead, [priceWords]);
+  page(
+    routes.projectPackages,
+    content.projectPackages.title,
+    content.projectPackages.lead,
+    [priceWords, ...Object.values(content.projectPackages.packages).map((item) => item.name)],
+  );
   page(routes.demoCentre, content.demoCentre.title, content.demoCentre.lead);
   page(routes.industries, content.industries.title, content.industries.lead, content.industries.segments.map((s) => s.title));
   page(routes.process, content.processPage.title, content.processPage.lead, content.processPage.steps.map((s) => s.title));

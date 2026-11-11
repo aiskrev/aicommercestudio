@@ -17,6 +17,7 @@ import {
   type AiManagedDetails,
   type AiManagedQualification,
   type AuditEntry,
+  type ConfiguratorDetails,
   LEAD_STATUSES,
   type LeadDetail as Lead,
   type LeadNote,
@@ -28,6 +29,11 @@ import {
   type TeamDetails,
 } from "@/lib/admin-types";
 import { formatDateTime } from "@/lib/format";
+import { getContent } from "@/content";
+import { getDictionary } from "@/i18n";
+import type { FeatureKey } from "@/lib/configurator";
+import type { BasketView } from "@/lib/quote-basket";
+import { formatEuro } from "@/lib/prices";
 import { routes } from "@/lib/routes";
 import { useAdminData } from "@/lib/use-admin-data";
 
@@ -135,6 +141,8 @@ export function LeadDetail({ id }: { id: string }) {
           {data.ai_managed && <AiManagedPanel details={data.ai_managed} />}
           {data.ai_managed_qualification && <QualificationPanel qualification={data.ai_managed_qualification} />}
           {data.solution && <SolutionPanel details={data.solution} />}
+          {data.configurator && <ConfiguratorPanel details={data.configurator} />}
+          {data.quote_basket && <QuoteBasketPanel basket={data.quote_basket.basket} modelVersion={data.quote_basket.model_version} />}
           {data.readiness && <ReadinessPanel leadId={data.id} details={data.readiness} />}
           {data.team && <TeamPanel leadId={data.id} details={data.team} />}
           {data.advisor_assessment && <LinkedAssessmentPanel linked={data.advisor_assessment} />}
@@ -268,6 +276,123 @@ function QualificationPanel({ qualification: q }: { qualification: AiManagedQual
           </Info>
           <Info label={t.reasons}>{names(q.reasons, t.reasonNames as Record<string, string>)}</Info>
           <Info label={t.blockers}>{names(q.blockers, t.blockerNames as Record<string, string>)}</Info>
+        </dl>
+      </div>
+    </Panel>
+  );
+}
+
+/** Quote basket: the sums and extras, then one configurator panel per configured project. */
+function QuoteBasketPanel({ basket, modelVersion }: { basket: BasketView; modelVersion: string }) {
+  const { t: dict, locale } = useAdminI18n();
+  const t = dict.quoteBasket;
+  const content = getContent(locale);
+  const extraName = (group: string, key: string) =>
+    (group === "service"
+      ? content.services.find((service) => service.key === key)?.shortTitle
+      : group === "care_plan"
+        ? content.carePlans.plans[key as keyof typeof content.carePlans.plans]?.name
+        : group === "ai_managed"
+          ? content.aiManaged.packages.items.find((item) => item.key === key)?.name
+          : content.workshops.texts[key as keyof typeof content.workshops.texts]?.title) ?? key;
+  const extras = basket.items.filter((item) => item.extra);
+  return (
+    <>
+      <Panel title={t.title}>
+        <div className="grid gap-4 text-sm" data-testid="quote-basket-details">
+          <p className="text-xs text-slate-400">{t.note}</p>
+          <dl className="grid gap-4 sm:grid-cols-3">
+            <Info label={t.oneTime}>{basket.totals.one_time_from ? formatEuro(locale, basket.totals.one_time_from) : "—"}</Info>
+            <Info label={t.monthly}>{basket.totals.monthly_from ? formatEuro(locale, basket.totals.monthly_from) : "—"}</Info>
+            <Info label={t.unpriced}>{basket.totals.unpriced_lines}</Info>
+          </dl>
+          <Info label={t.extras}>
+            {extras.length
+              ? extras
+                  .map((item) => `${extraName(item.extra!.group, item.extra!.key)} (${formatEuro(locale, item.extra!.band.from)}${item.extra!.band.unit === "month" ? ` ${content.configurator.review.perMonth}` : ""})`)
+                  .join(", ")
+              : t.none}
+          </Info>
+        </div>
+      </Panel>
+      {basket.items.map((item) => item.review && item.answers && <ConfiguratorPanel key={item.id} details={{ model_version: modelVersion, answers: item.answers, review: item.review }} />)}
+    </>
+  );
+}
+
+/** Project configurator quote request: the answers and the review the server computed (indicative, never a quote). */
+function ConfiguratorPanel({ details }: { details: ConfiguratorDetails }) {
+  const { t: dict, locale } = useAdminI18n();
+  const t = dict.configurator;
+  const content = getContent(locale);
+  const c = content.configurator;
+  const inquiry = getDictionary(locale).inquiry;
+  const review = details.review;
+  const q = c.questions;
+  const feature = (key: string) => q.features.options[key as FeatureKey] ?? key;
+  const itemName = (kind: string, key: string) =>
+    (kind === "package"
+      ? content.projectPackages.packages[key as keyof typeof content.projectPackages.packages]?.name
+      : kind === "care_plan"
+        ? content.carePlans.plans[key as keyof typeof content.carePlans.plans]?.name
+        : content.services.find((service) => service.key === key)?.shortTitle) ?? key;
+  const unpriced = (key: string) => (key.startsWith("feature:") ? feature(key.slice(8)) : c.review.unpricedLabels[key]) ?? key;
+  const answers = details.answers as Record<string, string | boolean | string[] | undefined>;
+  const choice = (field: string, options: Record<string, string | { label: string }>) => {
+    const option = options[String(answers[field])];
+    return typeof option === "string" ? option : (option?.label ?? "—");
+  };
+  const list = (values: unknown, name: (key: string) => string) => (Array.isArray(values) && values.length ? values.map((value) => name(String(value))).join(", ") : "—");
+  const flags = [
+    answers.content_migration && q.content_migration,
+    answers.store_migration && q.store_migration,
+    answers.accessibility && q.accessibility,
+    answers.interactive_elements && q.interactive_elements,
+  ].filter(Boolean);
+  return (
+    <Panel title={t.title}>
+      <div className="grid gap-4 text-sm" data-testid="configurator-details">
+        <p className="text-xs text-slate-400">{t.note}</p>
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <Info label={c.review.package}>
+            {itemName("package", review.package)} · {c.review.delivery[review.delivery] ?? review.delivery}
+          </Info>
+          <Info label={t.schedule}>
+            {review.schedule_version} · {review.owner_approval}
+          </Info>
+        </dl>
+        <ul className="divide-y divide-white/[0.06] rounded-xl border border-white/[0.06]" data-testid="configurator-items">
+          {review.items.map((item) => (
+            <li key={`${item.kind}-${item.key}`} className="flex flex-wrap justify-between gap-2 px-4 py-2.5">
+              <span className="text-slate-200">{itemName(item.kind, item.key)}</span>
+              <span className="text-slate-300">
+                {item.band
+                  ? `${c.review.from} ${formatEuro(locale, item.band.from)}${item.band.unit === "month" ? ` ${c.review.perMonth}` : ""} · ${formatEuro(locale, item.band.typical[0])}–${formatEuro(locale, item.band.typical[1])}`
+                  : c.review.requiresAssessment}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <Info label={c.review.unpriced}>{list(review.unpriced, unpriced)}</Info>
+          <Info label={c.review.humanReview}>{list(review.human_review.reasons, (key) => c.review.reasonLabels[key] ?? key)}</Info>
+          <Info label={c.review.included}>{list(review.included, feature)}</Info>
+          <Info label={c.review.assumptions}>{list(review.assumptions, (key) => c.review.assumptionLabels[key] ?? key)}</Info>
+        </dl>
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t.answers}</p>
+        <dl className="grid gap-4 sm:grid-cols-2">
+          <Info label={q.project_type.label}>{choice("project_type", q.project_type.options)}</Info>
+          <Info label={q.pages.label}>{choice("pages", q.pages.options)}</Info>
+          <Info label={q.products.label}>{choice("products", q.products.options)}</Info>
+          <Info label={q.languages.label}>{choice("languages", q.languages.options)}</Info>
+          <Info label={q.build.label}>{choice("build", q.build.options)}</Info>
+          <Info label={q.branding.label}>{choice("branding", q.branding.options)}</Info>
+          <Info label={q.design_level.label}>{choice("design_level", q.design_level.options)}</Info>
+          <Info label={q.features.label}>{list(answers.features, feature)}</Info>
+          <Info label={q.operations.label}>{list(answers.operations, (key) => (q.operations.options as Record<string, string>)[key] ?? key)}</Info>
+          <Info label={inquiry.timeline}>{choice("timeline", inquiry.timelines)}</Info>
+          <Info label={inquiry.budget}>{choice("budget_range", inquiry.budgets)}</Info>
+          {flags.length > 0 && <Info label={c.review.yes}>{flags.join(" · ")}</Info>}
         </dl>
       </div>
     </Panel>

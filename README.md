@@ -79,6 +79,12 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md) | What is done, latest executed test results, known limitations |
 | [RELEASE_REPORT.md](docs/RELEASE_REPORT.md) | Release review: gates, fixes, performance, migration/deployment, verdict |
 | [ROADMAP.md](docs/ROADMAP.md) | Next versions |
+| [COMMERCIAL_EXPANSION_AUDIT.md](docs/COMMERCIAL_EXPANSION_AUDIT.md) | Commercial expansion baseline: inventory, identity boundaries, flags, target architecture, risks |
+| [COMMERCIAL_EXPANSION_ROADMAP.md](docs/COMMERCIAL_EXPANSION_ROADMAP.md) | Commercial expansion phases, dependencies, data model, API and route plan, flags, migrations |
+| [COMMERCIAL_EXPANSION_PROGRESS.md](docs/COMMERCIAL_EXPANSION_PROGRESS.md) | Commercial expansion phase statuses and checkpoints |
+| [COMMERCIAL_EXPANSION_DECISIONS.md](docs/COMMERCIAL_EXPANSION_DECISIONS.md) | Commercial expansion decisions taken and decisions still pending with the owner |
+| [PROJECT_CONFIGURATOR.md](docs/PROJECT_CONFIGURATOR.md) | Project configurator (off by default): model, rules, prices, human review, security, tests |
+| [QUOTE_BASKET.md](docs/QUOTE_BASKET.md) | Quote basket (off by default): server-side draft request, ownership by token, concurrency, expiry, storage, tests |
 
 **Strategy and positioning**
 

@@ -282,6 +282,38 @@ The builder runs in the browser and calls no API. Only an explicit enquiry does.
 
 Rules, vectors and the admin view: [SOLUTION_BUILDER.md](SOLUTION_BUILDER.md#api).
 
+## Public: project configurator
+
+Off by default (`PROJECT_CONFIGURATOR_ENABLED=false`): while off, every route below answers 404. No route accepts
+an amount; prices are read from the published schedule on the server and are indicative.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/public/configurator/meta` | `{model_version, schedule_version}`; `Cache-Control: no-store`. |
+| POST | `/api/public/configurator/review` | `{model_version, answers}` → the deterministic review: `{model_version, schedule_version, currency, owner_approval, tax_treatment, binding: false, package, service, delivery, items[{kind, key, reason, band{unit, from, typical} \| null}], included[], unpriced[], assumptions[], exclusions[], totals{one_time_from, monthly_from, primary_priced}, human_review{required: true, reasons[]}}`. `answers` holds enumerations and booleans only (unknown fields are refused). 422 `unsupported_combination` (`errors[].type` = the rule, for example `feature_not_for_type:shipping`), 422 `configurator_model` for a stale `model_version`; own rate limit (`CONFIGURATOR_REVIEW_RATE_LIMIT`). Stores nothing. |
+| POST | `/api/public/configurator/submissions` → 201 | `{model_version, answers, submission_id (UUID), locale, goals?, special_requirements?, name, email, company, phone?, privacy_acknowledged: true, marketing_consent (default false), website (honeypot), form_token}` → `{status, reference, message}`. Creates one lead per `submission_id` (`inquiry_type = quote`, `source = project_configurator`) with the review computed on the server; the same `submission_id` again answers 200 with the first reference and creates nothing. 400 `form_token_invalid` / `spam_suspected`; contact-form rate limit. |
+
+Model, rules and the page: [PROJECT_CONFIGURATOR.md](PROJECT_CONFIGURATOR.md).
+
+## Public: quote basket
+
+Off by default (`QUOTE_BASKET_ENABLED=false`): while off, every route below answers 404. A basket holds inputs only;
+every answer recomputes the lines from the published schedule. No route accepts an amount. All routes except the
+first need the `X-Basket-Token` header (the token returned once on creation; never in a URL, never a cookie); an
+unknown token and an expired basket both answer 404 `basket_not_found`.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| POST | `/api/public/quote-basket` → 201 | `{locale, item?}` → `{token, basket}`. Starts a basket, optionally with a first item. Own creation rate limit. |
+| GET | `/api/public/quote-basket` | The basket: `{status, version, expires_at, locale, model_version, schedule_version, currency, owner_approval, tax_treatment, binding: false, max_items, items[{id, kind, needs_update, answers, review, extra{group, key, band}}], totals{one_time_from, monthly_from, priced_lines, unpriced_lines}, unpriced[{item_id, key}], assumptions[], exclusions[], human_review{required: true, reasons[]}, reference}`. |
+| POST | `/api/public/quote-basket/items` → 201 | `{expected_version, item}` where `item` is `{kind: "configuration", model_version, answers}` or `{kind: "extra", group, key}` → the basket. 409 `basket_changed` (stale version) or `basket_submitted`; 422 `basket_full`, `duplicate_item`, `unknown_offer`, `unsupported_combination`. |
+| PUT | `/api/public/quote-basket/items/{item_id}` | `{expected_version, item}` → the basket. Replaces an item (edit a configuration). 404 `item_not_found`; otherwise as above. |
+| DELETE | `/api/public/quote-basket/items/{item_id}` | `?expected_version=` → the basket. |
+| DELETE | `/api/public/quote-basket` → 204 | Discards the basket. |
+| POST | `/api/public/quote-basket/submit` → 201 | `{expected_version, locale, goals?, special_requirements?, name, email, company, phone?, privacy_acknowledged: true, marketing_consent (default false), website (honeypot), form_token}` → `{status, reference, message}`. Creates one lead (`inquiry_type = quote`, `source = quote_basket`) with the view computed on the server; sending the same basket again answers 200 with the first reference. 422 `basket_empty` or `basket_needs_update`; 409 `basket_changed`; 400 `form_token_invalid` / `spam_suspected`; contact-form rate limit. |
+
+Ownership, concurrency, expiry and storage: [QUOTE_BASKET.md](QUOTE_BASKET.md).
+
 ## Public: assessment engine
 
 Deterministic questionnaire assessments ([ASSESSMENT_PLATFORM_ARCHITECTURE.md](ASSESSMENT_PLATFORM_ARCHITECTURE.md)).

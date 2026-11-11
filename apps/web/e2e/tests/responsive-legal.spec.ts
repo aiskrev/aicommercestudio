@@ -164,17 +164,14 @@ for (const size of WIDTHS) {
   });
 }
 
-// KNOWN DEFECT = release blocker BLOCKER-ACC-HEADER-01 (apps/api/app/release_gates.py; docs/ACCOUNTS_RELEASE_CHECKLIST.md).
-// The API refuses to start in production with accounts on while it is open. Found by this spec, NOT caused by the legal remediation: when customer accounts are switched on, the
-// header of the Bulgarian site is wider than the screen at 1024 px (by about 14 px) and at 1440 px (by about 150 px),
-// because the sign-in and sign-up links were added to a bar that was already full. It is invisible while accounts are
-// off, which is the production state. It must be fixed (a design decision: which links move into the menu) before
-// accounts are switched on. test.fail() keeps this test green while the defect exists and turns it red the day the
-// header is fixed, so the marker cannot be forgotten.
+// Regression guard for release blocker BLOCKER-ACC-HEADER-01 (apps/api/app/release_gates.py, closed 2026-11-11). With
+// customer accounts on, the header of the Bulgarian site used to be wider than the screen at 1024 px (about 14 px) and
+// at 1440 px (about 150 px), because sign-in and sign-up were added to a bar that was already full. The desktop bar now
+// shows one compact sign-in control (components/layout/AccountEntry.tsx). If this test fails, the blocker is open again:
+// set ACCOUNT_HEADER_LAYOUT_FIXED back to False until the header fits.
 for (const width of [1024, 1440]) {
-  test(`KNOWN DEFECT BLOCKER-ACC-HEADER-01: the Bulgarian header fits at ${width}px with accounts on`, async ({ browser }) => {
+  test(`BLOCKER-ACC-HEADER-01: the Bulgarian header fits at ${width}px with accounts on`, async ({ browser }) => {
     test.skip(!legalStack, "only meaningful with accounts switched on (the legal e2e stack)");
-    test.fail(true, "header overflow with accounts on (docs/ACCESSIBILITY.md)");
     const context = await browser.newContext({ viewport: { width, height: 900 } });
     const page = await context.newPage();
     await page.goto("/bg");

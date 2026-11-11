@@ -17,6 +17,7 @@ import { isDomainPublished } from "@/lib/domains";
 import { routes } from "@/lib/routes";
 import { isToolAvailable, toolByKey, TOOLS } from "@/lib/tools";
 import { type LocalizedPaths, samePathEverywhere } from "@/lib/seo";
+import { projectConfiguratorEnabled } from "@/lib/configurator-flag";
 import { absoluteUrl } from "@/lib/site";
 
 /** Regenerated like the catalogue pages, so published catalogue-only entries are listed (lib/catalogue.ts). */
@@ -33,6 +34,8 @@ const STATIC_PATHS: { path: string; priority: number; changeFrequency: Freq; leg
   { path: routes.aiSolutions, priority: 0.8, changeFrequency: "monthly" },
   { path: routes.tools, priority: 0.7, changeFrequency: "monthly" },
   { path: routes.carePlans, priority: 0.7, changeFrequency: "monthly" },
+  { path: routes.projectPackages, priority: 0.8, changeFrequency: "monthly" },
+  { path: routes.pricing, priority: 0.8, changeFrequency: "monthly" },
   { path: routes.demoCentre, priority: 0.7, changeFrequency: "monthly" },
   { path: routes.advisor, priority: 0.8, changeFrequency: "monthly" },
   { path: routes.industries, priority: 0.6, changeFrequency: "monthly" },
@@ -77,6 +80,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: entry.priority,
         alternates: alternates(samePathEverywhere(entry.path)),
       })),
+      // The project configurator is listed only while it is switched on (its page is a 404 otherwise).
+      ...(projectConfiguratorEnabled()
+        ? [
+            {
+              url: url(routes.configurator),
+              lastModified: CONTENT_REVISED,
+              changeFrequency: "monthly" as const,
+              priority: 0.8,
+              alternates: alternates(samePathEverywhere(routes.configurator)),
+            },
+          ]
+        : []),
       // Tool pages under /instrumenti that are available (implemented + flag on).
       ...TOOLS.filter(isToolAvailable)
         .filter((tool) => tool.path.startsWith(`${routes.tools}/`))

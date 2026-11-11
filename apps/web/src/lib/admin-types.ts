@@ -131,6 +131,16 @@ export interface LeadDetail extends LeadSummary {
   readiness?: ReadinessDetails | null;
   /** AI team configurator consultation (source team_configurator). */
   team?: TeamDetails | null;
+  /** Project configurator quote request (source project_configurator): answers and the server's review. */
+  configurator?: ConfiguratorDetails | null;
+  /** Quote basket sent as one quote request (source quote_basket): the view the server computed. */
+  quote_basket?: { model_version: string; basket: import("@/lib/quote-basket").BasketView } | null;
+}
+
+export interface ConfiguratorDetails {
+  model_version: string;
+  answers: Record<string, unknown>;
+  review: import("@/lib/configurator").ConfiguratorReview;
 }
 
 export interface TeamDetails {
