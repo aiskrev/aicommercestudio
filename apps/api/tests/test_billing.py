@@ -543,6 +543,17 @@ def test_a_bad_signature_is_refused_and_stored_nowhere(client, user, db):
     assert db.scalars(select(BillingEvent)).all() == []
 
 
+def test_a_signature_made_with_an_empty_secret_is_refused(client, user, db, monkeypatch):
+    """Audit F-01 (hardening; not exploitable: the Stripe library rejects an empty secret): a missing secret is an
+    operator error and must say so (503, logged) instead of looking like a failed signature (400)."""
+    monkeypatch.setattr(get_settings(), "stripe_webhook_secret", None)
+    body = b'{"id":"evt_forged","type":"invoice.paid","livemode":false,"data":{"object":{"id":"in_1"}}}'
+    for secret in ("", "x"):
+        response = client.post(f"{API}/stripe/webhook", content=body, headers=signed(body, secret))
+        assert response.status_code == 503 and response.json()["code"] == "webhook_not_configured"
+    assert db.scalars(select(BillingEvent)).all() == []
+
+
 def test_an_old_signature_is_refused(client, user):
     body = b'{"id":"evt_x","type":"invoice.paid","data":{"object":{"id":"in_1"}}}'
     stale = signed(body, at=int(time.time()) - 3600)

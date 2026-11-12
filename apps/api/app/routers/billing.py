@@ -139,9 +139,16 @@ async def webhook(
     settings: AppSettings,
     stripe_signature: Annotated[str | None, Header()] = None,
 ) -> dict[str, bool]:
+    if not settings.stripe_webhook_secret:
+        # Not exploitable (the Stripe library refuses an empty secret), but a missing secret is a configuration error
+        # and must not be reported as a bad signature.
+        logger.error("billing_webhook_secret_missing")
+        raise ApiError(
+            status.HTTP_503_SERVICE_UNAVAILABLE, "The webhook isn't configured.", "webhook_not_configured"
+        )
     payload = await request.body()
     try:
-        event = verify_event(payload, stripe_signature, settings.stripe_webhook_secret or "")
+        event = verify_event(payload, stripe_signature, settings.stripe_webhook_secret)
     except ValueError as exc:
         logger.warning("billing_webhook_rejected")
         raise ApiError(status.HTTP_400_BAD_REQUEST, "Invalid signature.", "invalid_signature") from exc

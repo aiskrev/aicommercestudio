@@ -147,3 +147,36 @@ def test_production_will_not_open_accounts_on_the_owner_connection():
     base.update(app_env="production", customer_accounts_enabled=True, database_url=owner)
     with pytest.raises(ValueError, match="restricted database role"):
         Settings(**base)
+
+
+def test_db_role_check_passes_for_the_restricted_role_and_prints_no_secret(monkeypatch, capsys):
+    from app.cli import cmd_db_role_check
+
+    # The test suite points the CLI at the owner; this check must run on the API's own connection.
+    monkeypatch.setattr("app.cli.get_sessionmaker", get_sessionmaker)
+
+    assert cmd_db_role_check(Namespace()) == 0
+    output = capsys.readouterr().out
+    assert "connected as acs_app_api" in output and "restricted role: OK" in output
+    assert API_ROLE_PASSWORD not in output and "postgresql" not in output
+
+
+def test_db_role_check_fails_for_the_schema_owner(monkeypatch, capsys):
+    """The owner (what production must not use) is reported as not restricted, with a non-zero exit."""
+    from app.cli import cmd_db_role_check
+    from tests.conftest import owner_sessionmaker
+
+    monkeypatch.setattr("app.cli.get_sessionmaker", lambda: owner_sessionmaker)
+    assert cmd_db_role_check(Namespace()) == 1
+    assert "NOT restricted" in capsys.readouterr().out
+
+
+def test_production_logs_a_warning_when_the_api_is_not_on_the_restricted_role():
+    from app.main import database_role_warning
+    from tests.test_security import _production
+
+    assert database_role_warning(get_settings()) is None  # not production
+    owner = _production(database_url="postgresql+psycopg://acs:p@db/acs")
+    assert "acs_app_api" in (database_role_warning(owner) or "")
+    restricted = _production(database_url="postgresql+psycopg://acs_app_api:p@db/acs")
+    assert database_role_warning(restricted) is None
