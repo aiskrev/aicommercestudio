@@ -270,7 +270,9 @@ export function Header({
                     <Icon name="chevronDown" className={cx("h-3.5 w-3.5 transition-transform duration-200", openMenu === menu.id && "rotate-180")} />
                   </button>
                   {/* Positioned against the sticky header, so the panel spans the full width below it. */}
+                  {/* The panel is mounted only while it is open: a closed one used to put the links, icons and previews of all six menus (about 700 elements) into the HTML, the data payload and the hydration of every page. */}
                   <div id={panelId(menu.id)} hidden={openMenu !== menu.id} className="absolute inset-x-0 top-full z-50" data-testid={`panel-${menu.id}`}>
+                    {openMenu === menu.id && (
                     <div className="menu-enter max-h-[calc(100dvh-4.5rem)] origin-top overflow-y-auto border-b border-line-subtle bg-ink-950 shadow-[var(--shadow-panel)]">
                       <Container size="wide" className="grid gap-6 py-7 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,2.2fr)_minmax(0,0.9fr)] xl:gap-8">
                         <div className="min-w-0 xl:border-r xl:border-line-subtle xl:pr-6">
@@ -341,6 +343,7 @@ export function Header({
                         </div>
                       )}
                     </div>
+                    )}
                   </div>
                 </li>
               ))}
@@ -385,6 +388,9 @@ export function Header({
         data-mobile-sheet
         data-compact={compact || undefined}
       >
+        {/* Mounted only while the sheet is open (see the desktop panels): on a phone it was the whole menu, twice, in every page. */}
+        {mobileOpen && (
+          <>
         <div className="flex-1 overflow-y-auto overscroll-contain">
           <Container className="py-4">
             <nav aria-label={labels.nav}>
@@ -446,6 +452,8 @@ export function Header({
             </Link>
           </Container>
         </div>
+          </>
+        )}
       </div>
     </>
   );
