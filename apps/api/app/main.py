@@ -102,6 +102,7 @@ def database_role_warning(settings: Settings) -> str | None:
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
+    explicit_settings = settings  # None: the size guard then reads the live settings on every request
     settings = settings or get_settings()
     configure_logging(settings.log_level)
     if warning := database_role_warning(settings):
@@ -128,7 +129,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         max_age=600,
     )
     app.add_middleware(RequestContextMiddleware, settings=settings)
-    app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_body_bytes, settings=settings)
+    app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_body_bytes, settings=explicit_settings)
 
     def _request_id(request: Request) -> str | None:
         return getattr(request.state, "request_id", None)

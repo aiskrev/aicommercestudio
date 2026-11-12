@@ -13,7 +13,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-from app.config import Settings
+from app.config import Settings, get_settings
 from app.errors import error_body
 from app.i18n import error_message, parse_locale, request_locale
 from app.logging_config import request_id_ctx
@@ -136,9 +136,9 @@ class BodySizeLimitMiddleware:
             await self.app(scope, receive, send)
             return
         limit = self.max_bytes
-        if self.settings is not None:
-            # Never below the general cap: a file between the two limits then gets the route's own, clearer answer.
-            limit = max(limit, upload_limit(scope, self.settings) or 0)
+        # Live settings unless a test or a caller passed its own object (the cached one can be replaced at run time).
+        # Never below the general cap: a file between the two limits then gets the route's own, clearer answer.
+        limit = max(limit, upload_limit(scope, self.settings or get_settings()) or 0)
         for name, value in scope.get("headers", []):
             if name == b"content-length" and (not value.isdigit() or int(value) > limit):
                 await self._reject(scope, receive, send)

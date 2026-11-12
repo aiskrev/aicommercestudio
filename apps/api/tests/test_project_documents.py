@@ -1110,7 +1110,9 @@ def test_the_larger_cap_applies_to_the_upload_routes_only(customer, admin_client
     assert patched.status_code in (404, 405, 413)
 
 
-def test_the_upload_cap_is_not_granted_while_uploads_are_off(customer, admin_client, configured_lead, docs, monkeypatch):
+def test_the_upload_cap_is_not_granted_while_uploads_are_off(
+    customer, admin_client, configured_lead, docs, monkeypatch
+):
     project = active_project(admin_client, configured_lead)
     monkeypatch.setattr(get_settings(), "project_uploads_enabled", False)
     response = staff_upload(admin_client, project["id"], pdf() + b"x" * LARGE)

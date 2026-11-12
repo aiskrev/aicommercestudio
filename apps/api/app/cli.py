@@ -438,7 +438,8 @@ def cmd_db_role_check(_args: argparse.Namespace) -> int:
     for name, value in checks.items():
         _print(f"[db-role-check] {name}: {'YES' if value else 'no'}")
     restricted = not any(checks.values())
-    _print("[db-role-check] " + ("restricted role: OK" if restricted else "NOT restricted: the API runs with more rights than it needs"))
+    verdict = "restricted role: OK" if restricted else "NOT restricted: the API runs with more rights than it needs"
+    _print(f"[db-role-check] {verdict}")
     return 0 if restricted else 1
 
 

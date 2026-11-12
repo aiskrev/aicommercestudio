@@ -29,8 +29,9 @@ def _staff_routes() -> list[tuple[str, str]]:
         if not path.startswith(STAFF_PREFIXES):
             continue
         for method in operations:
-            if method.upper() in {"GET", "POST", "PUT", "PATCH", "DELETE"} and (method.upper(), path) not in ANONYMOUS_ON_PURPOSE:
-                found.append((method.upper(), path))
+            verb = method.upper()
+            if verb in {"GET", "POST", "PUT", "PATCH", "DELETE"} and (verb, path) not in ANONYMOUS_ON_PURPOSE:
+                found.append((verb, path))
     return sorted(found)
 
 
