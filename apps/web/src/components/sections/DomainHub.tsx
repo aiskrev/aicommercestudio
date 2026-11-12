@@ -64,7 +64,9 @@ export function DomainHub({
     <>
       {/* ------------------------------------------------------------ hero */}
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="fc-backdrop" aria-hidden="true">
+          <div className="fc-grid" />
+        </div>
         <Container className="relative grid gap-12 pb-14 pt-10 sm:pb-16 sm:pt-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:pb-20">
           <div>
             <div className="flex flex-wrap items-center gap-3">

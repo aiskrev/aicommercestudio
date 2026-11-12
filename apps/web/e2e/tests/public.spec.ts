@@ -1,12 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("public website", () => {
-  // V5 homepage (docs/V5_VISUAL_DIRECTION.md §6): websites, stores and AI first; every CTA works with the default flags.
+  // Future Commerce homepage (docs/FUTURE_COMMERCE_REDESIGN_REPORT.md), on V5: websites, stores and AI first; every CTA works with the default flags.
   test("homepage renders the hero, its two working CTAs, the four directions and the labelled previews", async ({ page }) => {
     const response = await page.goto("/bg");
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(/A\.I\. Commerce Studio/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Изработваме сайтове, онлайн магазини");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Създаваме сайтове, онлайн магазини");
     await expect(page.getByTestId("hero-primary")).toHaveAttribute("href", "/bg/uslugi");
     await expect(page.getByTestId("hero-secondary")).toHaveAttribute("href", "/bg/kontakti?tip=oferta");
     // The configurator is switched off by default: no link to it anywhere on the page.
@@ -15,10 +15,11 @@ test.describe("public website", () => {
     await expect(page.getByTestId("hero-preview")).toContainText("Демонстрация");
     const showcase = page.getByTestId("home-showcase");
     await expect(showcase.locator(":scope > li")).toHaveCount(4);
-    await expect(showcase.getByRole("heading", { level: 3 })).toHaveText(["Уебсайт", "Онлайн магазин", "Интерактивна платформа", "AI автоматизация"]);
-    // Static vs interactive, the three store platforms, the six stages and the entry offers.
+    await expect(showcase.getByRole("heading", { level: 3 })).toHaveText(["Бизнес сайтове", "Онлайн магазини", "Интерактивни уеб приложения", "AI автоматизация"]);
+    // Static vs interactive, the three store platforms (store tab of the showcase), the six stages and the entry offers.
     await expect(page.getByTestId("static-vs-interactive")).toContainText("Статичен");
-    await expect(page.locator("section[aria-labelledby='stores-title'] ul > li")).toHaveCount(3);
+    await page.getByTestId("product-showcase").getByRole("tab", { name: "Онлайн магазин" }).click();
+    await expect(page.getByTestId("showcase-panel-store").locator("a[href^='/bg/online-magazini#']")).toHaveCount(3);
     await expect(page.getByTestId("home-timeline").locator(":scope > li")).toHaveCount(6);
     await expect(page.getByTestId("home-offer-landing_page")).toContainText("Цена в писмена оферта");
     await expect(page.getByTestId("home-offer-business_website")).toContainText("€");
@@ -27,10 +28,10 @@ test.describe("public website", () => {
 
   test("English homepage mirrors the structure with English destinations", async ({ page }) => {
     await page.goto("/en");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Websites, e-commerce stores");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("We build websites, e-commerce platforms");
     await expect(page.getByTestId("hero-primary")).toHaveAttribute("href", "/en/services");
     await expect(page.getByTestId("hero-secondary")).toHaveAttribute("href", "/en/contact?type=quote");
-    for (const id of ["showcase-title", "websites-title", "stores-title", "process-title", "tools-title", "offers-title", "credibility-title", "founder-title", "faq-title"]) {
+    for (const id of ["showcase-title", "product-title", "websites-title", "process-title", "flow-title", "offers-title", "ai-demo-title", "tools-title", "credibility-title", "founder-title", "faq-title"]) {
       await expect(page.locator(`[id="${id}"]`)).toBeVisible();
     }
     await expect(page.getByTestId("home-timeline").locator(":scope > li")).toHaveCount(6);
@@ -67,7 +68,9 @@ test.describe("public website", () => {
     const tools = page.locator("section[aria-labelledby='tools-title']");
     await expect(tools.getByTestId("tool-start-here")).toHaveText("Започнете оттук");
 
-    await page.locator("section[aria-labelledby='websites-title']").getByRole("link", { name: "Статичен фирмен сайт" }).click();
+    const compare = page.locator("section[aria-labelledby='websites-title']");
+    await compare.getByTestId("compare-pick-static").check();
+    await compare.getByRole("link", { name: "Подробно: Статичен сайт" }).click();
     await expect(page).toHaveURL(/\/bg\/izrabotka-na-saytove#static$/);
     await expect(page.locator("#static")).toBeVisible();
 

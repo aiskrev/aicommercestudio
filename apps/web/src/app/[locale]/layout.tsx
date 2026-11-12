@@ -55,6 +55,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
           homeHref={href(routes.home)}
           menus={navigation.menus}
           cta={navigation.cta}
+          quick={navigation.quick}
           locale={locale}
           slugs={buildSlugMap()}
           searchLabels={dict.search}

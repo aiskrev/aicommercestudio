@@ -88,6 +88,24 @@ describe("design tokens", () => {
       ["ink", "surface-light"],
       ["ink-muted", "surface-light"],
       ["brand-ink", "surface-light"],
+      // Future Commerce paper theme (.surface-light maps fg*, brand*, status colours onto these).
+      ["ink", "surface-paper-card"],
+      ["ink-muted", "surface-paper-card"],
+      ["paper-fg-secondary", "surface-light"],
+      ["paper-fg-subtle", "surface-light"],
+      ["paper-fg-subtle", "surface-paper-card"],
+      ["paper-fg-subtle", "paper-surface-3"],
+      ["paper-brand", "surface-light"],
+      ["paper-brand", "surface-paper-card"],
+      ["paper-brand-soft", "surface-light"],
+      ["brand-ink", "surface-paper-card"],
+      ["paper-success", "surface-light"],
+      ["paper-warning", "surface-light"],
+      ["paper-danger", "surface-light"],
+      ["on-brand-fill", "brand-fill"],
+      ["fg", "graphite"],
+      ["fg-muted", "graphite"],
+      ["brand", "graphite"],
     ]) {
       expect(contrast(fg, bg), `${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
     }

@@ -87,7 +87,7 @@ export default async function ToolsPage({ params }: PageProps<"/[locale]/instrum
         </Section>
       )}
 
-      <Section labelledBy="tools-all-title" tone="raised">
+      <Section labelledBy="tools-all-title" tone="light">
         <SectionHeading id="tools-all-title" size="sm" title={tools.hub.allTitle} lead={tools.hub.allLead} />
         <div className="mt-8">
           <ToolsDirectory tools={directory} categories={TOOL_CATEGORIES} labels={tools.hub} cardLabels={cardLabels} />

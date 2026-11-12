@@ -40,6 +40,28 @@ describe("approved founder portrait", () => {
   });
 });
 
+/**
+ * The logo mark: the "orbital A" artwork the owner supplied on 2026-11-12 (it replaced the earlier mark at the
+ * owner's explicit request), cropped without the outer glow. Header mark, browser-tab icon and iOS icon.
+ */
+const LOGO_FILES: [string, string][] = [
+  ["assets/brand/logo-mark.webp", "a10022bfd0e2e8759b326686239979f4a20becdaaf64e6d5e81be0bc8f56f94e"],
+  ["app/icon.png", "4cb660acc8f916a124c08fe2c77228d43980b8762b49c4d0183bde4b602254ae"],
+  ["app/apple-icon.png", "7cd263b9bee38c1e8468d25b078ff93a6734e3cf4426f4c17db2470fdac98216"],
+];
+
+describe("approved logo", () => {
+  it.each(LOGO_FILES)("%s is the exact approved file", (file, sha256) => {
+    const path = resolve(SRC, file);
+    expect(existsSync(path)).toBe(true);
+    expect(createHash("sha256").update(readFileSync(path)).digest("hex")).toBe(sha256);
+  });
+
+  it("is the mark the logo component renders", () => {
+    expect(read("components/layout/Logo.tsx")).toContain('from "@/assets/brand/logo-mark.webp"');
+  });
+});
+
 describe("public contact surfaces", () => {
   it.each([
     ["contact page", "app/[locale]/kontakti/page.tsx"],

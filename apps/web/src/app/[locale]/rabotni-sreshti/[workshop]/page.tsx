@@ -62,7 +62,9 @@ export default async function WorkshopPage({ params }: PageProps<"/[locale]/rabo
         ]}
       />
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="fc-backdrop" aria-hidden="true">
+          <div className="fc-grid" />
+        </div>
         <Container className="relative pb-12 pt-12 sm:pt-16">
           <Eyebrow>{t.kinds[def.kind]}</Eyebrow>
           <h1 className="t-h1 mt-5 max-w-4xl">{w.title}</h1>

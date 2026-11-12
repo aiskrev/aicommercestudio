@@ -101,6 +101,8 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [V5_DESIGN_SYSTEM.md](docs/V5_DESIGN_SYSTEM.md) | V5 design system (Bulgarian): new tokens, component classes and components added to the existing system; header, footer, motion, weight |
 | [V5_LINK_AUDIT.md](docs/V5_LINK_AUDIT.md) | V5 navigation and link audit (Bulgarian): new menus, programmatic audit of every header, footer and page link, before/after counts, tests |
 | [V5_PROGRESS.md](docs/V5_PROGRESS.md) | V5 programme progress per phase (Bulgarian): status, changed files, test results, remaining issues |
+| [FUTURE_COMMERCE_PROGRESS.md](docs/FUTURE_COMMERCE_PROGRESS.md) | Future Commerce premium redesign (Bulgarian): checkpoint per phase — status, stack used, results |
+| [FUTURE_COMMERCE_REDESIGN_REPORT.md](docs/FUTURE_COMMERCE_REDESIGN_REPORT.md) | Future Commerce report (Bulgarian): original problems, design-system extension, references and licence check, redesigned pages, navigation, interactive features, screenshots, tests, Lighthouse before/after, accessibility, limitations, files, deployment prerequisites |
 | [V5_FINAL_IMPLEMENTATION_REPORT.md](docs/V5_FINAL_IMPLEMENTATION_REPORT.md) | V5 final report (Bulgarian): what changed, links, flags and blockers, pricing decisions, visual QA, accessibility, SEO, exact test results, deployment prerequisites |
 | [COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md](docs/COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md) | Independent forensic audit of the 18-phase commercial expansion (Bulgarian): evidence, overstated claims, gaps, release decision NO_GO for activation |
 

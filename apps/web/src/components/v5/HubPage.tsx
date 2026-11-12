@@ -9,7 +9,7 @@ import { Icon } from "@/components/ui/Icon";
 import { EditorialSplit } from "@/components/ui/patterns";
 import { ButtonLink, Container, Eyebrow, Section, SectionHeading, cx } from "@/components/ui/primitives";
 import { ArrowLink, CompareTable, JumpNav, Timeline, TickList } from "@/components/v5/blocks";
-import { UiPreview } from "@/components/v5/UiPreview";
+import { ShowcaseMock } from "@/components/future/ShowcaseMock";
 import { getContent, serviceByKey } from "@/content";
 import type { HubContent } from "@/content/v5-types";
 import { type Locale, localizePath } from "@/i18n/config";
@@ -28,7 +28,7 @@ import { faqJsonLd, serviceJsonLd } from "@/lib/seo";
 export function HubPage({ locale, hub, path, primaryService }: { locale: Locale; hub: HubContent; path: string; primaryService: Parameters<typeof quoteWithService>[0] }) {
   const href = (target: string) => localizePath(locale, target);
   const dict = getDictionary(locale);
-  const { projectPackages } = getContent(locale);
+  const { projectPackages, v5 } = getContent(locale);
   const url = href(path);
   const secondaryAnchor = hub.costs ? "costs" : "compare";
   const jump = [
@@ -38,7 +38,8 @@ export function HubPage({ locale, hub, path, primaryService }: { locale: Locale;
     { id: "packages", label: hub.packages.title },
     { id: "faq", label: hub.faq.title },
   ];
-  const heroPreview = hub.offers.find((offer) => offer.preview)?.preview ?? "static";
+  // Hero mock-up: the storefront for the e-commerce hub (it has the costs table), the corporate site otherwise.
+  const heroMock = v5.future.showcase.items.find((item) => item.key === (hub.costs ? "store" : "corporate"))!;
 
   return (
     <>
@@ -51,8 +52,10 @@ export function HubPage({ locale, hub, path, primaryService }: { locale: Locale;
       />
 
       {/* ------------------------------------------------------------ hero */}
-      <div className="hero-v5 relative overflow-hidden border-b border-line-subtle">
-        <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
+      <div className="relative isolate overflow-hidden border-b border-line-subtle">
+        <div className="fc-backdrop" aria-hidden="true">
+          <div className="fc-grid" />
+        </div>
         <Container className="relative grid items-center gap-12 pb-14 pt-10 sm:pt-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:pb-20">
           <div className="min-w-0">
             <Eyebrow>{hub.eyebrow}</Eyebrow>
@@ -67,7 +70,10 @@ export function HubPage({ locale, hub, path, primaryService }: { locale: Locale;
               </ButtonLink>
             </div>
           </div>
-          <UiPreview kind={heroPreview} caption={hub.previewCaption} className="lg:pl-6" />
+          <figure className="fc-enter min-w-0 lg:pl-6" data-testid="hub-preview">
+            <ShowcaseMock item={heroMock} />
+            <figcaption className="t-label mt-3">{hub.previewCaption}</figcaption>
+          </figure>
         </Container>
         <Container className="relative pb-10">
           <JumpNav label={hub.jumpLabel} items={jump} />
@@ -75,7 +81,7 @@ export function HubPage({ locale, hub, path, primaryService }: { locale: Locale;
       </div>
 
       {/* ------------------------------------------------------------ offers, one section each */}
-      <Section labelledBy="offers-title">
+      <Section labelledBy="offers-title" tone="light">
         <SectionHeading id="offers-title" eyebrow={hub.eyebrow} title={hub.offersTitle} lead={hub.offersLead} />
         <div className="mt-stack grid gap-6">
           {hub.offers.map((offer, index) => {

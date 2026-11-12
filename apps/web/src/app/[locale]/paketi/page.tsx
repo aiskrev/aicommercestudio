@@ -5,6 +5,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import Link from "next/link";
 
 import { Alert, ButtonLink, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
+import { UiPreview } from "@/components/v5/UiPreview";
 import { getContent, serviceByKey } from "@/content";
 import { getDictionary } from "@/i18n";
 import { localizePath } from "@/i18n/config";
@@ -34,7 +35,7 @@ export default async function CarePlansPage({ params }: PageProps<"/[locale]/pak
     <>
       <JsonLd data={collectionPageJsonLd({ name: t.title, description: t.metaDescription, path: href(routes.carePlans) }, locale)} />
       <Breadcrumbs items={[{ name: dict.common.home, path: href(routes.home) }, { name: t.title, path: href(routes.carePlans) }]} />
-      <PageHero eyebrow={t.eyebrow} title={t.title} lead={t.lead}>
+      <PageHero eyebrow={t.eyebrow} title={t.title} lead={t.lead} aside={<UiPreview kind="portal" caption={getContent(locale).v5.home.hero.previewCaption} />}>
         <Alert tone="info" role="note" className="mt-8 max-w-3xl">
           {t.note}
         </Alert>
@@ -89,7 +90,7 @@ export default async function CarePlansPage({ params }: PageProps<"/[locale]/pak
         </div>
       </Section>
       {/* V5 phase 11: every recurring and secondary service, split into covered / billing / third-party / unconfirmed. */}
-      <Section labelledBy={`${CARE_MATRIX_ANCHOR}-title`} size="wide">
+      <Section labelledBy={`${CARE_MATRIX_ANCHOR}-title`} tone="light" size="wide">
         <div id={CARE_MATRIX_ANCHOR}>
           <SectionHeading id={`${CARE_MATRIX_ANCHOR}-title`} title={care.title} lead={care.lead} />
           <div className="compare-scroll mt-stack" tabIndex={0} role="region" aria-label={care.caption} data-testid="care-matrix">

@@ -62,7 +62,9 @@ export default async function ScenarioPage({ params }: PageProps<"/[locale]/refe
         ]}
       />
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="fc-backdrop" aria-hidden="true">
+          <div className="fc-grid" />
+        </div>
         <Container className="relative pb-12 pt-12 sm:pt-16">
           <Eyebrow>{t.categories[def.category].title}</Eyebrow>
           <h1 className="t-h1 mt-5 max-w-4xl">{s.title}</h1>

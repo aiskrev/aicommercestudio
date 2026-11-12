@@ -60,7 +60,9 @@ export function OfferingPage({ entry, locale, dict }: { entry: CatalogueDetail; 
 
       {/* ------------------------------------------------------------ hero */}
       <div className="relative overflow-hidden border-b border-line-subtle" data-testid="offering-page" data-offering-type={entry.offeringType}>
-        <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="fc-backdrop" aria-hidden="true">
+          <div className="fc-grid" />
+        </div>
         <Container className="relative pb-12 pt-10 sm:pb-14 sm:pt-12">
           <div className="flex flex-wrap items-center gap-2">
             <span className="badge badge-accent">{labels.types[entry.offeringType]}</span>

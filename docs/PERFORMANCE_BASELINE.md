@@ -115,3 +115,31 @@ improved: LCP stays above the 3.0 s budget candidate on every route, before and 
 (just above the ~0.3 s noise band) while its TBT and transfer went down. The two new hubs are in the same band as the
 existing pages (LCP 3.9–4.0 s). Accessibility 100 everywhere; best-practices 74 everywhere (unchanged); SEO 92 on `/en`
 before and after (pre-existing, not investigated here). The mobile LCP work stays an open item (D-47).
+
+## Future Commerce redesign (2026-11-12)
+
+`scripts/lighthouse.ps1` equivalent (Lighthouse 13.5.0 in the Playwright container, mobile and desktop presets, median
+of 3 runs), run twice in the same session on the same isolated compose project (`acs-fc`), production builds:
+**before** = `9138294` (branch `fix/v5-header-fit`), **after** = the Future Commerce branch after the accessibility
+fixes. Result files (not committed): `apps/web/e2e/perf-results/fc-before/` and `apps/web/e2e/perf-results/fc-after-final/`
+(intermediate runs `fc-after`, `fc-after2`–`fc-after4` are the iterations described in
+`docs/FUTURE_COMMERCE_REDESIGN_REPORT.md` §9).
+
+| Preset | Route | Perf before → after | A11y | LCP before → after | TBT before → after | CLS | Transfer before → after |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| mobile | `/bg` | 85 → 85 | 100 → 100 | 3.64 s → 3.77 s | 240 ms → 228 ms | 0 | 532 KB → 615 KB |
+| mobile | `/en` | 87 → 82 | 100 → 100 | 3.68 s → 4.08 s | 193 ms → 253 ms | 0 | 518 KB → 599 KB |
+| mobile | `/bg/uslugi` | 87 → 86 | 100 → 100 | 3.18 s → 3.32 s | 292 ms → 280 ms | 0 | 522 KB → 584 KB |
+| mobile | `/bg/izrabotka-na-saytove` | 83 → 88 | 100 → 100 | 3.91 s → 3.69 s | 238 ms → 141 ms | 0 | 516 KB → 583 KB |
+| mobile | `/bg/online-magazini` | 83 → 87 | 100 → 100 | 3.96 s → 3.96 s | 233 ms → 106 ms | 0 | 516 KB → 583 KB |
+| mobile | `/bg/proektni-paketi` | 88 → 88 | 100 → 100 | 3.18 s → 3.77 s | 259 ms → 115 ms | 0 | 510 KB → 578 KB |
+| mobile | `/bg/tseni` | 85 → 88 | 100 → 100 | 3.75 s → 3.81 s | 220 ms → 107 ms | 0 | 491 KB → 558 KB |
+| mobile | `/bg/kontakti` | 84 → 90 | 100 → 100 | 3.11 s → 3.10 s | 397 ms → 208 ms | 0 | 480 KB → 546 KB |
+| desktop | all eight routes | 99 → 99–100 | 100 → 100 | 0.84–0.92 s → 0.82–0.97 s | 17–52 ms → 6–35 ms | 0 | 480–560 KB → 555–636 KB |
+
+Reading (honest): accessibility stays 100 everywhere (an intermediate run dropped to 94–97; the causes were fixed, see
+the report), CLS stays 0, desktop stays 99–100. Transfer grew by 60–85 KB per page (the new client components — tabs,
+selector, comparison, demo — and larger HTML). Mobile LCP is **still above the 3.0 s budget candidate on every route**
+and is not improved overall: it moved by −0.22 s to +0.59 s per route, several of these inside the run-to-run noise seen
+in the three runs. Mobile TBT went down on six of eight routes. Best practices 74 and `/en` SEO 92 are unchanged from
+before (pre-existing). The mobile LCP work stays an open item (D-47).

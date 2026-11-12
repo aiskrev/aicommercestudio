@@ -19,7 +19,9 @@ on every surface where they appear. If a change seems to require touching them, 
    `ContactDetails` or `company`. Never hard-code these values anywhere else, and never remove
    `ContactDetails` from the contact page, the footer or the founder profile.
 3. **Founder profile content** — `content/{bg,en}/founder.ts` and the founder page.
-4. **The logo** — do not change it.
+4. **The logo** — do not change it. Current mark (owner's request, 2026-11-12): the "orbital A" artwork in
+   `apps/web/src/assets/brand/logo-mark.webp`, the browser-tab icon `apps/web/src/app/icon.png` and the iOS icon
+   `apps/web/src/app/apple-icon.png` (SHA-256 pinned in `lib/protected-content.test.ts`).
 
 `lib/protected-content.test.ts` and `lib/company.test.ts` fail if any of this disappears or is
 duplicated. Do not weaken or delete those tests to make another change pass.

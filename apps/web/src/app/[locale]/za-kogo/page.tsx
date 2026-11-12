@@ -83,7 +83,7 @@ export default async function IndustriesPage({ params }: PageProps<"/[locale]/za
         </ul>
       </Section>
 
-      <Section labelledBy="sectors-title" alt>
+      <Section labelledBy="sectors-title" tone="light">
         <SectionHeading id="sectors-title" title={page.sectorsTitle} lead={page.sectorsLead} />
         <ul className="mt-8 flex flex-wrap gap-3">
           {page.sectors.map((sector) => (
