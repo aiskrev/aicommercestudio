@@ -1126,3 +1126,11 @@
   .motion-decorative { display: none !important; }
   .skeleton { animation: none; }
 }
+
+/* ---------------------------------------------------------------- header fit fallback (V5) */
+/* Set by components/layout/Header.tsx when the full desktop bar would not fit (fonts, scrollbar, zoom, the
+   optional sign-in icon): the bar gives way to the menu button and the sheet instead of overlapping. Unlayered,
+   so it wins over the breakpoint utilities. */
+header[data-compact] [data-desktop-nav] { display: none; }
+header[data-compact] [data-menu-toggle] { display: inline-flex; }
+[data-mobile-sheet][data-compact]:not([hidden]) { display: flex; }

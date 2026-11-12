@@ -31,7 +31,20 @@ export function decideRoute(
   hasSessionCookie: boolean,
   preferredLocale?: string | null,
   search = "",
+  /**
+   * This locale's slug of a service (or service hub) whose slug in the other language is `slug`, or `null`
+   * (lib/service-slugs.ts). A service URL with the other language's slug is sent, in one permanent redirect, to
+   * the right page instead of a 404 (Search Console reported /uslugi/technical-audit, 2026-11-12).
+   */
+  serviceSlugFor?: (locale: Locale, slug: string) => string | null,
 ): RoutingDecision {
+  const wrongLanguageService = (locale: Locale, canonical: string): string | null => {
+    const [section, slug, ...rest] = canonical.split("/").filter(Boolean);
+    if (section !== "uslugi" || !slug || rest.length > 0 || !serviceSlugFor) return null;
+    const translated = serviceSlugFor(locale, slug);
+    return translated && translated !== slug ? `${localizePath(locale, `/uslugi/${translated}`)}${search}` : null;
+  };
+
   if (pathname === "/admin" || pathname.startsWith("/admin/")) {
     if (pathname === "/admin/login") return { type: "next" };
     if (!hasSessionCookie) {
@@ -50,8 +63,12 @@ export function decideRoute(
 
   const parsed = splitLocale(pathname);
   if (!parsed) {
+    const service = wrongLanguageService(defaultLocale, pathname);
+    if (service) return { type: "redirect", location: service, permanent: true };
     return { type: "redirect", location: `${localizePath(defaultLocale, pathname)}${search}`, permanent: true };
   }
+  const service = wrongLanguageService(parsed.locale, toCanonicalPath(pathname));
+  if (service) return { type: "redirect", location: service, permanent: true };
   if (parsed.locale === "bg") return { type: "next" };
 
   if (usesInternalSegments(pathname)) {

@@ -101,6 +101,12 @@ describe("locale path mapping", () => {
     ["en", "/za-kogo", "/en/industries"],
     ["en", "/statii/tema/seo", "/en/insights/topic/seo"],
     ["en", "/kontakti?usluga=ai_managed&tip=oferta", "/en/contact?service=ai_managed&type=quote"],
+    // In-page anchors keep the segment mapping (the English demo centre once linked /en/ai-resheniya#…).
+    ["en", "/ai-resheniya#orchestration-title", "/en/ai-solutions#orchestration-title"],
+    ["bg", "/ai-resheniya#orchestration-title", "/bg/ai-resheniya#orchestration-title"],
+    ["en", "/izrabotka-na-saytove#static", "/en/website-development#static"],
+    ["en", "/#faq", "/en#faq"],
+    ["en", "/kontakti?usluga=seo#form", "/en/contact?service=seo#form"],
   ] as const)("localizePath(%s, %s) -> %s", (locale, path, expected) => {
     expect(localizePath(locale, path)).toBe(expected);
   });
@@ -208,5 +214,33 @@ describe("SEO helpers", () => {
     const rules = robots().rules;
     const rule = Array.isArray(rules) ? rules[0] : rules;
     expect(rule.disallow).toEqual(expect.arrayContaining(["/admin", "/api/", "/cdn-cgi/"]));
+  });
+});
+
+describe("wrong-language service slugs", () => {
+  // Search Console reported /uslugi/technical-audit → /bg/uslugi/technical-audit → 404 (2026-11-12).
+  it("maps a service or hub slug of the other language to this language's slug", async () => {
+    const { slugInThisLocale } = await import("@/lib/service-slugs");
+    expect(slugInThisLocale("bg", "technical-audit")).toBe("tehnicheski-odit");
+    expect(slugInThisLocale("en", "tehnicheski-odit")).toBe("technical-audit");
+    expect(slugInThisLocale("bg", "commerce-engineering")).toBe("inzhenering-za-elektronna-targoviya");
+    expect(slugInThisLocale("bg", "does-not-exist")).toBeNull();
+    // The dedicated AI Managed Services page has its own route and is never a redirect target here.
+    expect(slugInThisLocale("bg", "ai-managed-services")).toBeNull();
+    // A slug valid in this language is never redirected.
+    expect(slugInThisLocale("bg", "tehnicheski-odit")).toBeNull();
+  });
+
+  it("redirects in one permanent hop from the proxy (legacy, /bg and /en)", async () => {
+    const { slugInThisLocale } = await import("@/lib/service-slugs");
+    const decide = (path: string, search = "") => decideRoute(path, false, null, search, slugInThisLocale);
+    expect(decide("/uslugi/technical-audit")).toEqual({ type: "redirect", location: "/bg/uslugi/tehnicheski-odit", permanent: true });
+    expect(decide("/bg/uslugi/technical-audit", "?a=1")).toEqual({ type: "redirect", location: "/bg/uslugi/tehnicheski-odit?a=1", permanent: true });
+    expect(decide("/en/services/tehnicheski-odit")).toEqual({ type: "redirect", location: "/en/services/technical-audit", permanent: true });
+    // Unchanged: valid pages, unknown slugs (404 later) and other sections.
+    expect(decide("/bg/uslugi/tehnicheski-odit")).toEqual({ type: "next" });
+    expect(decide("/en/services/technical-audit")).toEqual({ type: "rewrite", pathname: "/en/uslugi/technical-audit" });
+    expect(decide("/bg/uslugi/does-not-exist")).toEqual({ type: "next" });
+    expect(decide("/bg/statii/technical-audit")).toEqual({ type: "next" });
   });
 });

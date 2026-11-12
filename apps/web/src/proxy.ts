@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { LOCALE_COOKIE } from "@/i18n/config";
 import { decideRoute } from "@/lib/locale-routing";
+import { slugInThisLocale } from "@/lib/service-slugs";
 import { site } from "@/lib/site";
 
 export function proxy(request: NextRequest) {
@@ -11,6 +12,7 @@ export function proxy(request: NextRequest) {
     request.cookies.has(site.sessionCookieName),
     request.cookies.get(LOCALE_COOKIE)?.value,
     search,
+    slugInThisLocale,
   );
 
   if (decision.type === "redirect") {

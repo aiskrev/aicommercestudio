@@ -149,6 +149,9 @@ export function localizeSearch(search: string, locale: Locale): string {
  *   localizePath("en", "/kontakti?usluga=seo")    → "/en/contact?service=seo"
  */
 export function localizePath(locale: Locale, path: string): string {
+  // An in-page anchor is never part of a segment: `/ai-resheniya#x` → `/en/ai-solutions#x`.
+  const hashAt = path.indexOf("#");
+  if (hashAt !== -1) return `${localizePath(locale, path.slice(0, hashAt) || "/")}${path.slice(hashAt)}`;
   const [rawPath, ...queryParts] = (path.startsWith("/") ? path : `/${path}`).split("?");
   const search = queryParts.length ? `?${queryParts.join("?")}` : "";
   const segments = rawPath.split("/").filter(Boolean);
