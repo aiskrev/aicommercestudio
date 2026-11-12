@@ -25,7 +25,7 @@ import { absoluteUrl } from "@/lib/site";
 export const revalidate = 300;
 
 /** Date of the last substantive content revision of the static pages. */
-export const CONTENT_REVISED = "2026-10-27";
+export const CONTENT_REVISED = "2026-11-12";
 
 type Freq = "weekly" | "monthly" | "yearly";
 

@@ -102,14 +102,21 @@ for (const width of WIDTHS) {
   });
 }
 
-test("every in-page anchor linked anywhere in the sitemap exists on its target page", async ({ request }) => {
-  test.setTimeout(240_000);
+test("every internal link answers 200 without a redirect, and every in-page anchor exists", async ({ request }) => {
+  test.setTimeout(300_000);
   const sitemap = await (await request.get("/sitemap.xml")).text();
   const pages = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]).pathname);
   const ids = new Map<string, Set<string>>();
+  const statuses = new Map<string, number>();
+  // A redirect is not a broken page, but a link that only works through one is a wrong link (e.g. a Bulgarian
+  // segment under /en): links.spec.ts follows redirects, so this check does not.
+  const statusOf = async (path: string) => {
+    if (!statuses.has(path)) statuses.set(path, (await request.get(path, { maxRedirects: 0 })).status());
+    return statuses.get(path)!;
+  };
   const idsOf = async (path: string) => {
     if (!ids.has(path)) {
-      const html = await (await request.get(path)).text();
+      const html = await (await request.get(path, { maxRedirects: 0 })).text();
       ids.set(path, new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1])));
     }
     return ids.get(path)!;
@@ -117,6 +124,12 @@ test("every in-page anchor linked anywhere in the sitemap exists on its target p
   const broken: string[] = [];
   for (const page of pages) {
     const html = await (await request.get(page)).text();
+    for (const [, href] of html.matchAll(/<a[^>]+href="(\/(?:bg|en)(?:[/?#][^"]*)?)"/g)) {
+      const decoded = href.replaceAll("&amp;", "&");
+      const target = decoded.split("#")[0];
+      const status = await statusOf(target);
+      if (status !== 200) broken.push(`${page} → ${decoded} (${status})`);
+    }
     for (const [, href] of html.matchAll(/<a[^>]+href="(\/[^"#]*#[^"]+)"/g)) {
       const decoded = href.replaceAll("&amp;", "&");
       const [path, hash] = decoded.split("#");
@@ -128,6 +141,82 @@ test("every in-page anchor linked anywhere in the sitemap exists on its target p
     }
   }
   expect([...new Set(broken)]).toEqual([]);
+});
+
+// The labels of the desktop bar never run under the controls on the right (the "Студио ↔ search" overlap):
+// either the whole bar fits with space to spare, or the header falls back to the menu button.
+for (const [locale, width] of [
+  ["bg", 1440],
+  ["bg", 1460],
+  ["bg", 1536],
+  ["en", 1440],
+  ["bg", 1920],
+] as const) {
+  test(`the header never overlaps at ${width}px (${locale})`, async ({ browser, baseURL }) => {
+    const context = await browser.newContext({
+      viewport: { width, height: 900 },
+      storageState: { cookies: [{ name: "acs_cookie_notice", value: "1", domain: new URL(baseURL!).hostname, path: "/", expires: -1, httpOnly: false, secure: false, sameSite: "Lax" }], origins: [] },
+    });
+    const page = await context.newPage();
+    await page.goto(`/${locale}`);
+    await page.evaluate(() => document.fonts.ready);
+    const layout = () =>
+      page.evaluate(() => {
+        const box = (selector: string) => document.querySelector(selector)?.getBoundingClientRect();
+        const nav = document.querySelector<HTMLElement>("header [data-desktop-nav]")!;
+        const list = nav.querySelector("ul")!.getBoundingClientRect();
+        const controls = box("header [data-header-controls]")!;
+        const logo = (document.querySelector("header")!.firstElementChild!.firstElementChild as HTMLElement).getBoundingClientRect();
+        const toggle = document.querySelector<HTMLElement>("header [data-menu-toggle]")!;
+        return {
+          navShown: nav.offsetWidth > 0,
+          toggleShown: toggle.offsetWidth > 0,
+          gapLeft: list.left - logo.right,
+          gapRight: controls.left - list.right,
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        };
+      });
+    const before = await layout();
+    expect(before.overflow).toBeLessThanOrEqual(0);
+    if (before.navShown) {
+      expect(before.toggleShown).toBe(false);
+      expect(before.gapLeft, "space between the logo and the menu").toBeGreaterThanOrEqual(8);
+      expect(before.gapRight, "space between the menu and the search button").toBeGreaterThanOrEqual(8);
+    } else {
+      expect(before.toggleShown).toBe(true);
+    }
+    // Make the labels much wider (as a larger font or browser zoom would): the bar must give way, not overlap.
+    await page.addStyleTag({ content: "header [data-desktop-nav] button { letter-spacing: 0.25em !important; }" });
+    await expect.poll(async () => {
+      const after = await layout();
+      return after.navShown ? after.gapRight >= 8 : after.toggleShown;
+    }).toBe(true);
+    await context.close();
+  });
+}
+
+test("a service URL with the other language's slug redirects permanently instead of answering 404", async ({ request }) => {
+  // Search Console: /uslugi/technical-audit → /bg/uslugi/technical-audit → 404 (2026-11-12).
+  // One permanent hop with exactly one Location header (the proxy answers, not the page).
+  for (const [path, target] of [
+    ["/uslugi/technical-audit", "/bg/uslugi/tehnicheski-odit"],
+    ["/bg/uslugi/technical-audit", "/bg/uslugi/tehnicheski-odit"],
+    ["/en/services/tehnicheski-odit", "/en/services/technical-audit"],
+  ] as const) {
+    const first = await request.get(path, { maxRedirects: 0 });
+    expect(first.status(), path).toBe(308);
+    const locations = first.headersArray().filter((header) => header.name.toLowerCase() === "location");
+    expect(locations.map((header) => new URL(header.value, "http://x").pathname), path).toEqual([target]);
+  }
+  for (const [path, final] of [
+    ["/uslugi/technical-audit", "/bg/uslugi/tehnicheski-odit"],
+    ["/en/services/tehnicheski-odit", "/en/services/technical-audit"],
+  ] as const) {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(200);
+    expect(new URL(response.url()).pathname, path).toBe(final);
+  }
+  expect((await request.get("/bg/uslugi/does-not-exist")).status()).toBe(404);
 });
 
 test("the mobile menu follows an in-page anchor and closes", async ({ browser }) => {

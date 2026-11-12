@@ -123,6 +123,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
   const service = findService(locale, slug);
   if (!service) {
     const entry = await getCatalogueDetail(locale, slug);
+    // A slug of the other language never reaches this point: src/proxy.ts redirects it (lib/service-slugs.ts).
     if (!entry) notFound();
     return <OfferingPage entry={entry} locale={locale} dict={dict} />;
   }

@@ -96,6 +96,13 @@ export function Header({
   const menuButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const mobileButtonRef = useRef<HTMLButtonElement>(null);
   const mobilePanelRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const rightRef = useRef<HTMLDivElement>(null);
+  // Natural width of the desktop menu row, measured while it is shown (labels change only with the language).
+  const navNatural = useRef(0);
+  // True when the full desktop bar does not fit next to the logo and the right-hand controls: the bar then
+  // falls back to the menu button instead of letting the labels run under the search button.
+  const [compact, setCompact] = useState(false);
 
   const menuHrefs = (menu: NavMenu) => [menu.overview.href, ...menu.columns.flatMap((column) => column.items.map((item) => item.href))].map(pathOf);
   const current = activeHref(pathname, menus.flatMap(menuHrefs));
@@ -113,6 +120,47 @@ export function Header({
     setOpenMenu(null);
     setExpanded(currentGroup ?? null);
   }
+
+  // Fit check. The CSS breakpoint (90rem) shows the full bar where it normally fits; this measures the real widths
+  // (fonts, scrollbar, zoom, the optional sign-in icon) and switches to the menu button when the row would not fit
+  // with a safety margin, so the labels can never overlap the controls on the right.
+  useEffect(() => {
+    const bar = headerRef.current?.firstElementChild as HTMLElement | null;
+    const nav = navRef.current;
+    const right = rightRef.current;
+    if (!bar || !nav || !right || typeof ResizeObserver === "undefined") return;
+    navNatural.current = 0;
+    const SAFETY = 16;
+    const measure = () => {
+      const list = nav.querySelector("ul");
+      // While the bar is folded the menu row is not rendered; show it for this synchronous read (no paint happens
+      // in between), so a width taken before the web font loaded can never keep the bar folded for good.
+      const header = headerRef.current!;
+      const folded = header.hasAttribute("data-compact");
+      if (folded) header.removeAttribute("data-compact");
+      if (nav.offsetWidth > 0 && list) navNatural.current = list.scrollWidth;
+      if (folded) header.setAttribute("data-compact", "true");
+      if (!navNatural.current) return; // the bar is not shown at this width: nothing to decide
+      const style = getComputedStyle(bar);
+      const gap = parseFloat(style.columnGap) || 12;
+      const available = bar.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const logo = (bar.firstElementChild as HTMLElement | null)?.getBoundingClientRect().width ?? 0;
+      const toggleButton = mobileButtonRef.current;
+      const toggleWidth = toggleButton && toggleButton.offsetWidth > 0 ? toggleButton.offsetWidth + gap : 0;
+      const controls = right.getBoundingClientRect().width - toggleWidth;
+      const tooWide = logo + navNatural.current + controls + gap * 2 + SAFETY > available;
+      setCompact(tooWide);
+      if (tooWide) setOpenMenu(null);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(bar);
+    observer.observe(right);
+    const list = nav.querySelector("ul");
+    if (list) observer.observe(list);
+    void document.fonts?.ready.then(measure);
+    return () => observer.disconnect();
+  }, [menus]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -179,6 +227,7 @@ export function Header({
     <>
       <header
         ref={headerRef}
+        data-compact={compact || undefined}
         className={cx(
           "sticky top-0 z-50 border-b transition-colors duration-300",
           scrolled || mobileOpen || openMenu
@@ -189,7 +238,7 @@ export function Header({
         <Container size="wide" className="flex h-16 items-center justify-between gap-3">
           <Logo href={homeHref} />
 
-          <nav aria-label={labels.nav} className="hidden min-w-0 min-[90rem]:block">
+          <nav ref={navRef} aria-label={labels.nav} className="hidden shrink-0 min-[90rem]:block" data-desktop-nav>
             <ul className="flex items-center">
               {menus.map((menu) => (
                 <li
@@ -209,7 +258,7 @@ export function Header({
                     data-active={menuActive(menu) || undefined}
                     data-testid={`menu-${menu.id}`}
                     className={cx(
-                      "nav-link inline-flex min-h-11 items-center gap-0.5 whitespace-nowrap px-1.5 text-sm font-medium transition-colors min-[100rem]:px-2.5",
+                      "nav-link inline-flex min-h-11 items-center gap-0.5 whitespace-nowrap px-1 text-sm font-medium transition-colors",
                       menuActive(menu) || openMenu === menu.id ? "text-fg" : "text-fg-muted hover:text-fg",
                     )}
                   >
@@ -275,12 +324,12 @@ export function Header({
             </ul>
           </nav>
 
-          <div className="flex shrink-0 items-center gap-2">
+          <div ref={rightRef} className="flex shrink-0 items-center gap-1.5" data-header-controls>
             {searchLabels && <SiteSearch locale={locale} labels={searchLabels} />}
             <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="hidden lg:block" />
             {account && <AccountLinks links={account} variant="header" />}
             <div className="hidden sm:block">
-              <Link href={cta.href} className={buttonClass("primary")} data-testid="header-cta">
+              <Link href={cta.href} className={buttonClass("primary", "sm")} data-testid="header-cta">
                 {cta.label}
               </Link>
             </div>
@@ -292,6 +341,7 @@ export function Header({
               aria-controls={mobilePanelId}
               aria-label={mobileOpen ? labels.closeMenu : labels.openMenu}
               onClick={() => setMobileOpen((value) => !value)}
+              data-menu-toggle
             >
               <Icon key={mobileOpen ? "close" : "menu"} name={mobileOpen ? "close" : "menu"} className="menu-enter h-5 w-5" />
             </button>
@@ -306,6 +356,8 @@ export function Header({
         hidden={!mobileOpen}
         className="menu-sheet-enter fixed inset-x-0 bottom-0 top-16 z-40 flex flex-col border-t border-line-subtle bg-ink-950 min-[90rem]:hidden"
         data-testid="mobile-menu"
+        data-mobile-sheet
+        data-compact={compact || undefined}
       >
         <div className="flex-1 overflow-y-auto overscroll-contain">
           <Container className="py-4">
