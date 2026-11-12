@@ -7,6 +7,7 @@ const bg = {
   nav: {
     dashboard: "Табло",
     projects: "Проекти и отчети",
+    delivery: "Проекти за изработка",
     plan: "План и използване",
     subscriptions: "Абонаменти",
     invoices: "Фактури",
@@ -72,6 +73,7 @@ const en: ZoneTexts = {
   nav: {
     dashboard: "Dashboard",
     projects: "Projects & Reports",
+    delivery: "Delivery projects",
     plan: "Plan & Usage",
     subscriptions: "Subscriptions",
     invoices: "Invoices",

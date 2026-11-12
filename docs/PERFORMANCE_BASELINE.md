@@ -62,3 +62,32 @@ Same method, routes `/bg`, `/en`, `/bg/uslugi` (the pages that render the audit 
   motif). Together with `is-on-https` / `redirects-http` it keeps Best Practices at 74 locally; all
   three are expected to clear behind HTTPS.
 * Performance differences versus the baseline are within lab noise (no performance change intended).
+
+## Phase 15 check (2026-11-12): what was and was not measured
+
+* **Measured, as tests**: the new public pages (pricing, project packages, demo centre, two demonstrations) load no third-party host
+  and their scripts stay under 520 KB encoded (`e2e/tests/seo-commercial.spec.ts`). The demonstrations add one client component and
+  no library; their data is two small JSON files and one text module.
+* **Not re-run**: Lighthouse (LCP, INP, CLS, total weight). It needs a quiet machine and a rebuilt stack; run `.\scripts\lighthouse.ps1`
+  and compare with the table above before a release (D-47). No claim is made here about the new pages' Core Web Vitals.
+* **Layout stability**: the demonstration result area is a fixed-structure ordered list that appears after a user action, not during
+  load; the e2e checks at 360 px confirm no horizontal scroll before and after a run.
+
+## Commercial expansion pages (forensic audit follow-up, 2026-11-12)
+
+Lab measurement with `scripts/lighthouse.ps1 -Label forensic-fix` (production build in Docker, Lighthouse 13.5.0, median of 3
+runs, mobile = simulated slow 4G; numbers vary between sessions). Result files: `apps/web/e2e/perf-results/forensic-fix/` (not committed).
+
+| Preset | Route | Perf | LCP | TBT | CLS |
+| --- | --- | --- | --- | --- | --- |
+| Mobile | `/bg/proektni-paketi` | 86 | 3549 ms | 232 ms | 0 |
+| Mobile | `/bg/tseni` | 85 | 3766 ms | 242 ms | 0 |
+| Mobile | `/bg/demo-tsentar` | 87 | 3474 ms | 215 ms | 0 |
+| Mobile | `/bg/demo-tsentar/opisanie-na-produkt` | 81 | 4275 ms | 241 ms | 0 |
+| Desktop | the same four routes | 100 | 795-822 ms | 8-14 ms | 0 |
+
+Reading: CLS is 0 and desktop is fast. On mobile the new pages are **slower than the older pages** (baseline mobile LCP 2.9-3.6 s, TBT
+113-191 ms) and miss the budget candidates written above (mobile LCP <= 3.0 s, TBT <= 200 ms); the demonstration scenario page is the
+slowest (LCP 4.3 s). Only these four routes were measured; the configurator, the basket and the account pages (behind flags and sessions) were not.
+No optimisation was made in this follow-up: the numbers are recorded as they are, and a mobile improvement of the scenario page and the
+price page is an open item (decision D-47).

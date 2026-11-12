@@ -87,6 +87,16 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [QUOTE_BASKET.md](docs/QUOTE_BASKET.md) | Quote basket (off by default): server-side draft request, ownership by token, concurrency, expiry, storage, tests |
 | [QUOTATIONS.md](docs/QUOTATIONS.md) | Quotations (off by default): configured enquiry to human-approved, client-facing offer; secret link, one answer, audit, gate |
 | [ACCOUNTS_HARDENING.md](docs/ACCOUNTS_HARDENING.md) | Customer accounts verified against the programme list: matrix, gaps closed, quote requests by verified ownership, go-live prerequisites tested |
+| [COMMERCIAL_PROJECTS.md](docs/COMMERCIAL_PROJECTS.md) | Commercial customer projects (off by default): lifecycle, roles, scope snapshot from the accepted quotation, customer and staff screens |
+| [PROJECT_DOCUMENTS.md](docs/PROJECT_DOCUMENTS.md) | Project documents, uploads and approvals (off by default): versions, publication, private storage, file checks, approvals, retention, upload release gate |
+| [PROJECT_NOTIFICATIONS.md](docs/PROJECT_NOTIFICATIONS.md) | E-mail about a customer's project (off by default): events, recipients, once-per-event outbox, retry, redaction, what is not sent |
+| [ADMIN_CRM.md](docs/ADMIN_CRM.md) | Admin CRM on the existing admin: owner, follow-up tasks, overview of real counts, timeline, customer links, safe export |
+| [BILLING_SANDBOX_MATRIX.md](docs/BILLING_SANDBOX_MATRIX.md) | Billing validation: the sandbox matrix mapped to tests (real sandbox blocked: no keys), the four kinds of sale, no deposit, no quote-to-price path |
+| [AI_DEMONSTRATIONS.md](docs/AI_DEMONSTRATIONS.md) | Interactive AI demonstrations on simulated data: eight scenarios, six steps, the platform approval policy, no provider, notes that cannot steer |
+| [COMMERCIAL_STAGING_RUNBOOK.md](docs/COMMERCIAL_STAGING_RUNBOOK.md) | Staging runbook, order of switching features on, Cloudflare and Hetzner checklists, release gates and rollback for the commercial expansion (a document: nothing was changed on any server) |
+| [SECURITY_GDPR_REVIEW_COMMERCIAL.md](docs/SECURITY_GDPR_REVIEW_COMMERCIAL.md) | Security and GDPR review of the commercial expansion: data map, findings and fixes, export and erasure, retention jobs, what was not checked |
+| [COMMERCIAL_RELEASE_REVIEW.md](docs/COMMERCIAL_RELEASE_REVIEW.md) | Release review of the commercial expansion: what was built, executed results, open gates, owner decisions, what was not verified, how to commit and deploy (stops at the approval gate) |
+| [COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md](docs/COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md) | Independent forensic audit of the 18-phase commercial expansion (Bulgarian): evidence, overstated claims, gaps, release decision NO_GO for activation |
 
 **Strategy and positioning**
 

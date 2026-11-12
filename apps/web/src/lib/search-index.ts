@@ -4,6 +4,8 @@ import { AGENT_SLUGS, agentText, LIBRARY_KEYS } from "@/lib/agent-library";
 import { getCatalogue } from "@/lib/catalogue";
 import { isDomainPublished } from "@/lib/domains";
 import { PATTERN_KEYS, PATTERN_SLUGS, SCENARIO_KEYS, SCENARIO_SLUGS } from "@/lib/reference";
+import { demoTexts } from "@/i18n/demos";
+import { DEMO_KEYS, DEMO_SLUGS } from "@/lib/demo-slugs";
 import { routes } from "@/lib/routes";
 import type { SearchEntry, SearchType } from "@/lib/search";
 import { isToolAvailable, TOOLS } from "@/lib/tools";
@@ -40,6 +42,7 @@ export async function buildSearchIndex(locale: Locale): Promise<SearchEntry[]> {
     [priceWords, ...Object.values(content.projectPackages.packages).map((item) => item.name)],
   );
   page(routes.demoCentre, content.demoCentre.title, content.demoCentre.lead);
+  for (const key of DEMO_KEYS) page(routes.demoScenario(DEMO_SLUGS[key].bg), demoTexts[locale].scenarios[key].title, demoTexts[locale].scenarios[key].lead);
   page(routes.industries, content.industries.title, content.industries.lead, content.industries.segments.map((s) => s.title));
   page(routes.process, content.processPage.title, content.processPage.lead, content.processPage.steps.map((s) => s.title));
   page(routes.about, content.about.title, content.about.lead);

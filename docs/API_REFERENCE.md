@@ -341,6 +341,102 @@ never in a URL. The system sends nothing: staff send the link themselves.
 
 Pipeline, rules, gate and tests: [QUOTATIONS.md](QUOTATIONS.md).
 
+## Commercial customer projects (customer and staff)
+
+Off by default (`COMMERCIAL_PROJECTS_ENABLED=false`; the customer routes also need `CUSTOMER_ACCOUNTS_ENABLED`): while off,
+every route below answers 404. Customer routes need a customer session (`X-CSRF-Token` on POST), act on the caller's own
+workspace (or one they belong to, `X-Workspace`), answer `Cache-Control: no-store` and never take a workspace id or an
+amount. A project of another workspace and a draft answer 404 `project_not_found`. Staff routes need the `admin` role (editors and
+viewers reach only the catalogue, never customer data).
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/projects` | The workspace's projects, newest first, drafts excluded: `[{id, reference, title, status, updated_at, open_requests}]`. |
+| GET | `/api/projects/{project_id}` | One project: summary, `scope` (copy of the accepted quotation's approved version) and `scope_version`, `milestones`, `events` (staff appear as `team`, internal notes never), contract and invoice references, maintenance plan, `revision`, and `allowed_actions` decided by the server. |
+| POST | `/api/projects/{project_id}/decision` | `{expected_revision, action: approve_scope\|accept_completion\|request_changes, note?}` → the project. Owner and `billing` only (403 `role_not_allowed`); a repeat returns the recorded result; 409 `project_stale`, `project_transition`; 422 `note_required`. |
+| POST | `/api/projects/{project_id}/requests` → 201 | `{kind: change_request\|support, body}` (3–2000 characters) → the project. Every member may send. |
+| GET | `/api/admin/projects` | Administrator. All projects, newest activity first, with the customer's e-mail; `?status=` and `?lead_id=` filters; 422 `invalid_status`. |
+| GET | `/api/admin/projects/{project_id}` | Administrator. One project with internal notes, the customer, the inquiry and the possible staff moves. |
+| POST | `/api/admin/leads/{lead_id}/projects` → 201 | Administrator. `{account_email, title, summary?, quotation_id?, contract_reference?}` creates a draft for a verified, non-erased account; the same request again returns the first project (200). 422 `account_not_found`; 409 `quotation_not_accepted`. |
+| PATCH | `/api/admin/projects/{project_id}` | Administrator. `{expected_revision, title?, summary?, contract_reference?, clear_contract_reference?, invoice_references?, maintenance_plan?, maintenance_note?}`. 409 `project_stale`. |
+| PUT | `/api/admin/projects/{project_id}/milestones` | Administrator. `{expected_revision, milestones: [{id?, title, description?, indicative_timing?, status}]}` (20 at most) replaces the plan. |
+| POST | `/api/admin/projects/{project_id}/transition` | Administrator. `{expected_revision, to, note?}`; `to` never includes `approved` (422). 409 `project_transition`, `project_stale`; 422 `note_required`. |
+| POST | `/api/admin/projects/{project_id}/events` → 201 | Administrator. `{kind: update\|delivery, visibility: client\|internal, body}`; a client-visible note on a draft is refused (409 `project_draft`). |
+| POST | `/api/admin/projects/{project_id}/requests/{request_id}/reply` | Administrator. `{body, state: answered\|closed}` answers a customer's request. |
+
+Lifecycle, roles, data and tests: [COMMERCIAL_PROJECTS.md](COMMERCIAL_PROJECTS.md).
+
+## Project documents (customer and staff)
+
+Off by default (`PROJECT_DOCUMENTS_ENABLED=false`, needs `COMMERCIAL_PROJECTS_ENABLED`; the customer routes also need
+`CUSTOMER_ACCOUNTS_ENABLED`): while off, every route below answers 404. Uploading needs `PROJECT_UPLOADS_ENABLED`, and a
+customer's upload also `PROJECT_CLIENT_UPLOADS_ENABLED` (404 while off). A file is the **raw body** of an upload
+(`Content-Type: application/octet-stream`, 415 otherwise); its details are URL-encoded headers `X-File-Name`,
+`X-Document-Title`, `X-Document-Category`, `X-Version-Note` and, for a new version, `X-Expected-Version`. Answers are
+`no-store`. A project or document of another workspace, a draft and an archived document answer 404.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/projects/{project_id}/documents` | The published documents of the project with their versions, the current approval of each version, feedback, `limits` (allowed types, size, whether uploads are offered) and `can_decide`. |
+| POST | `/api/projects/{project_id}/documents` → 201 | Upload a file as a new document (customer; category `brief`, `feedback` or `other`). 413 `file_too_large`; 422 `file_type_not_allowed`, `file_content_invalid`, `category_not_allowed`; 409 `document_limit`. The same bytes again: 200. |
+| POST | `/api/projects/{project_id}/documents/{document_id}/versions` → 201 | A new version of a document the customer's side started; `X-Expected-Version` required. 409 `version_conflict`, `version_limit`, `document_origin`. |
+| GET | `/api/projects/{project_id}/documents/{document_id}/versions/{number}/download` | The file as an attachment (authorized and logged). 409 `document_not_scanned`, `document_infected`; 410 `document_purged`. |
+| POST | `/api/projects/{project_id}/documents/{document_id}/comments` → 201 | `{version, body}` feedback on a published version. |
+| POST | `/api/projects/{project_id}/approvals/{approval_id}/decision` | `{expected_version, decision: approve\|reject, comment?}`. Owner and `billing` only (403 `role_not_allowed`); once: a repeat returns the recorded result; 409 `approval_closed`, `approval_superseded`, `version_conflict`; 422 `note_required`. |
+| GET | `/api/admin/projects/{project_id}/documents` | Administrator. Every document, drafts, scan results and uploader included. |
+| POST | `/api/admin/projects/{project_id}/documents` → 201 | Administrator. Upload a draft (raw body, as above; any category). |
+| POST | `/api/admin/projects/{project_id}/documents/{document_id}/versions` → 201 | Administrator. A new draft version of a team document; `X-Expected-Version` required. |
+| GET | `/api/admin/projects/{project_id}/documents/{document_id}/versions/{number}/download` | Administrator. Any version not found infected (logged). |
+| POST | `/api/admin/projects/{project_id}/documents/{document_id}/versions/{number}/publish` | Administrator. Makes a draft visible to the customer; a repeat changes nothing. 409 `project_draft`, `document_not_scanned`, `document_infected`, `version_state`. |
+| POST | `/api/admin/projects/{project_id}/documents/{document_id}/versions/{number}/withdraw` | Administrator. Takes a version back; closes its open approval request. |
+| POST | `/api/admin/projects/{project_id}/documents/{document_id}/versions/{number}/scan` | Administrator. `{result: clean\|infected\|failed}` records a scan result (the system runs no scanner). An infected result withdraws the version. |
+| POST | `/api/admin/projects/{project_id}/documents/{document_id}/versions/{number}/approvals` → 201 | Administrator. `{message?}` asks the customer to decide on the latest published version; a repeat returns the open request (200). 409 `version_not_current`, `document_origin`. |
+| POST | `/api/admin/projects/{project_id}/approvals/{approval_id}/withdraw` | Administrator. Withdraws an open request. |
+| POST | `/api/admin/projects/{project_id}/documents/{document_id}/archive` | Administrator. Hides the document from the customer and closes its open request. |
+| POST | `/api/admin/projects/{project_id}/documents/{document_id}/comments` → 201 | Administrator. `{version, body}`. |
+
+Security, retention and tests: [PROJECT_DOCUMENTS.md](PROJECT_DOCUMENTS.md).
+
+### Delivery of project e-mail (staff)
+
+Off by default (`PROJECT_NOTIFICATIONS_ENABLED=false`; the route needs `COMMERCIAL_PROJECTS_ENABLED`). The e-mail itself is
+queued in the outbox and sent by `python -m app.cli outbox-run`; see [PROJECT_NOTIFICATIONS.md](PROJECT_NOTIFICATIONS.md).
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/admin/projects/{project_id}/notifications` | Administrator. The project's outbox rows, newest first (100 at most): `[{id, kind, locale, status: pending\|sent\|failed\|blocked, attempts, last_error, created_at, sent_at}]`. Never an address, a subject or a text. |
+
+## Admin CRM (administrators)
+
+Every route needs the `admin` role (editors and viewers reach only the catalogue); answers are `no-store`; changes are
+audited with ids only. Rules, limits and tests: [ADMIN_CRM.md](ADMIN_CRM.md).
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/admin/crm/admins` | Active administrators `[{id, name}]`, for choosing an owner or an assignee. |
+| PUT | `/api/admin/leads/{lead_id}/owner` | `{owner_id: uuid\|null}` sets or clears the owner of an enquiry; a repeat changes nothing. 422 `assignee_invalid` for anyone who is not an active administrator. |
+| GET | `/api/admin/leads/{lead_id}/tasks` | The follow-up tasks of an enquiry. |
+| POST | `/api/admin/leads/{lead_id}/tasks` → 201 | `{title, due_on?, assignee_id?}`; the assignee defaults to the owner, else the caller. 422 `due_in_past`, `assignee_invalid`; 409 `task_limit` (50 open per enquiry). |
+| PATCH | `/api/admin/tasks/{task_id}` | `{expected_revision, title?, due_on?, clear_due?, assignee_id?, clear_assignee?, state?: open\|done\|cancelled}`. 409 `task_stale`; a repeat changes nothing. |
+| GET | `/api/admin/crm/tasks` | Follow-ups across enquiries: `?assignee=me\|none\|<id>&state=&due=overdue\|week\|none&page=&page_size=`; open work first. Shows the enquiry's reference and service, never the customer's details. |
+| GET | `/api/admin/crm/overview` | `?days=` (1 to 365). Counts of real records: enquiries, pipeline, quotations, projects, follow-ups, workload per owner. No amounts, no forecast, no rates. |
+| GET | `/api/admin/leads/{lead_id}/timeline` | Audit, notes, proposals, quotations, projects and tasks of one enquiry, newest first (300 at most). |
+| GET | `/api/admin/leads/{lead_id}/customer` | Whether a customer account exists behind the enquiry and is verified, and its projects and quotations. |
+| GET | `/api/admin/crm/leads.csv` | The pipeline export (CSV attachment): the lead filters plus `owner` and `qualification`; a whitelist of columns without personal data; formula-safe; at most 5000 rows; audited. |
+
+`GET /api/admin/leads` also takes `owner` (`me`, `none` or an administrator id) and `qualification`
+(`unassessed`, `qualified`, `not_qualified`, `on_hold`), and every lead has `owner_id` and `owner_name`.
+
+## Interactive demonstrations (public)
+
+Public, stateless and deterministic; no cookie, no storage, no AI provider. Limited per address (`DEMO_RATE_LIMIT`). See
+[AI_DEMONSTRATIONS.md](AI_DEMONSTRATIONS.md).
+
+| Method | Path | Description |
+| --- | --- | --- |
+| GET | `/api/public/demos` | The eight scenarios: `[{key, fields: [{key, options}], service, configurator}]` (cacheable). |
+| POST | `/api/public/demos/{scenario}/run` | `{inputs: {<field>: <option>, ...}, note?}` (exactly the scenario's fields, each one of its options; a note of at most 280 plain-text characters that is only flagged, never obeyed or echoed) → `{scenario, simulated: true, executed: false, steps: [6 × {key, status, code, items}], risk, requires_approval, params, service, configurator, limitations}`. 404 `demo_not_found`; 422 `fields_mismatch`, `option_not_allowed` or a validation error; 429. |
+
 ## Public: assessment engine
 
 Deterministic questionnaire assessments ([ASSESSMENT_PLATFORM_ARCHITECTURE.md](ASSESSMENT_PLATFORM_ARCHITECTURE.md)).
@@ -663,7 +759,7 @@ Only with `BILLING_PROVIDER=stripe` and the workspace on (404 otherwise). See [S
 
 | Method | Path | Notes |
 | --- | --- | --- |
-| GET | `/api/billing/offers` | approved offers |
+| GET | `/api/billing/offers` | approved offers `[{key, kind, category: saas_subscription\|managed_service\|one_time_service, plan, interval, currency, amount_minor, requires_scope}]`; a `project_deposit` offer can never be approved ([BILLING_SANDBOX_MATRIX.md](BILLING_SANDBOX_MATRIX.md)) |
 | GET | `/api/billing/status` | subscriptions and purchases of this workspace |
 | POST | `/api/billing/checkout` | `{offer, locale, acceptance}` → `{url, reused}`. `acceptance` is required: `{terms, subscription_terms, order_acceptance, privacy, customer_kind, early_start?, early_start_version?}` with the version ids of docs/LEGAL_COMPLIANCE_REMEDIATION_2026-11-10.md; 422 without it, 409 `terms_version_changed` when a version is not the current one, 409 `subscription_exists`, `scope_not_confirmed`, `offer_unavailable` |
 | POST | `/api/billing/portal` | `{locale}` → `{url}`; billing owner only, otherwise 404 |

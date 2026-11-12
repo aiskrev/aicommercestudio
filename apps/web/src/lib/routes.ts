@@ -21,6 +21,7 @@ export const routes = {
   quoteBasket: "/zayavka",
   quotation: "/oferta",
   demoCentre: "/demo-tsentar",
+  demoScenario: (slug: string) => `/demo-tsentar/${slug}`,
   workshop: (slug: string) => `/rabotni-sreshti/${slug}`,
   industries: "/za-kogo",
   about: "/za-nas",
@@ -52,6 +53,7 @@ export const routes = {
   accountSupport: "/konto/zapitvaniya",
   accountOrganisation: "/konto/organizatsiya",
   accountSecurity: "/konto/sigurnost",
+  accountDelivery: "/konto/izrabotka",
   accountAdvisorDemo: "/konto/advisor/demo",
   accountAdvisorPayment: "/konto/advisor/payment",
   adminLogin: "/admin/login",
@@ -68,6 +70,8 @@ export const routes = {
   adminCatalogueNew: "/admin/catalogue/new",
   adminCatalogueEntry: (id: string) => `/admin/catalogue/${id}`,
   adminStaff: "/admin/staff",
+  adminProjects: "/admin/projects",
+  adminCrm: "/admin/crm",
 } as const;
 
 export function contactWithService(serviceKey: string): string {

@@ -1,7 +1,7 @@
 # Commercial expansion — progress
 
 Statuses: NOT_STARTED, IN_PROGRESS, IMPLEMENTED, TESTED, BLOCKED, DEFERRED, FAILED.
-Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Nothing committed, pushed or deployed. Migrations `0026` (committed) and `0027` exist only in the local test databases; neither was applied anywhere else.
+Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Phases 01-08 are committed and pushed (PR #75 and #76 are merged); Phases 09-18 are committed locally in `42df564` and `592decd` (not pushed, not merged). **In production** (GitHub Actions history): Release run `43033986686` (2026-11-11 13:58 UTC) deployed `03e62c4` (phases 01-06) and applied migration `0026`; no Release has run since, so phases 07-08 (`954bba9`, in `main`) are not deployed and `0027` to `0032` exist only in local and test databases. An earlier version of this line said nothing was deployed; that was wrong (corrected 2026-11-12).
 
 | Phase | Name | Status | Last update | Notes |
 | --- | --- | --- | --- | --- |
@@ -10,19 +10,19 @@ Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Nothing
 | 03 | Service packages | TESTED | 2026-11-11 | `/proektni-paketi` page with five packages; two prices pending with the owner (D-09), see checkpoint |
 | 04 | Centralised pricing | TESTED | 2026-11-11 | Schedule document shared by web and API, `/tseni` page; owner approval of the schedule still pending (D-04) |
 | 05 | Project configurator | TESTED | 2026-11-11 | Behind `PROJECT_CONFIGURATOR_ENABLED` (off); server-side review, quote request creates a lead; see checkpoint and PROJECT_CONFIGURATOR.md |
-| 06 | Quote basket | TESTED | 2026-11-11 | Behind `QUOTE_BASKET_ENABLED` (off); migration 0026 (local only); see checkpoint and QUOTE_BASKET.md |
-| 07 | Quotations and leads | TESTED | 2026-11-11 | Behind `QUOTATIONS_ENABLED` (off); migration 0027 (local only); acceptance wording unapproved (BLOCKER-COM-ACCEPT-01); see checkpoint and QUOTATIONS.md |
+| 06 | Quote basket | TESTED | 2026-11-11 | Behind `QUOTE_BASKET_ENABLED` (off); migration 0026 (applied in production by the Release of `03e62c4`, flag off); see checkpoint and QUOTE_BASKET.md |
+| 07 | Quotations and leads | TESTED | 2026-11-11 | Behind `QUOTATIONS_ENABLED` (off); migration 0027 (in `main`, not deployed); acceptance wording unapproved (BLOCKER-COM-ACCEPT-01); see checkpoint and QUOTATIONS.md |
 | 08 | Customer accounts hardening | TESTED | 2026-11-11 | Verified against the list; account status, own quote requests by verified ownership, go-live prerequisites tested; customer MFA not built (D-22); see ACCOUNTS_HARDENING.md |
-| 09 | Commercial project portal | NOT_STARTED | | |
-| 10 | Documents, uploads, approvals | NOT_STARTED | | Uploads stay disabled |
-| 11 | Transactional e-mail | NOT_STARTED | | Real sending blocked by R2 |
-| 12 | Admin CRM | NOT_STARTED | | |
-| 13 | Stripe sandbox billing | NOT_STARTED | | Needs sandbox keys (R7) |
-| 14 | AI demos | NOT_STARTED | | |
-| 15 | SEO, performance, analytics | NOT_STARTED | | |
-| 16 | Security and GDPR review | NOT_STARTED | | |
-| 17 | Staging and release gates | NOT_STARTED | | Documents only |
-| 18 | Full QA and release review | NOT_STARTED | | Stops at release approval |
+| 09 | Commercial project portal | TESTED | 2026-11-11 | Behind `COMMERCIAL_PROJECTS_ENABLED` (off, needs accounts); migration 0028 (local only); lifecycle, roles, cross-tenant tests; see checkpoint and COMMERCIAL_PROJECTS.md |
+| 10 | Documents, uploads, approvals | TESTED | 2026-11-12 | Behind `PROJECT_DOCUMENTS_ENABLED`, `PROJECT_UPLOADS_ENABLED`, `PROJECT_CLIENT_UPLOADS_ENABLED` (all off); migration 0029 (local only); upload gate BLOCKER-COM-UPLOAD-01 open; see checkpoint and PROJECT_DOCUMENTS.md |
+| 11 | Transactional e-mail | TESTED (PARTIAL: 6 project message kinds; quote, billing and some internal events are not e-mailed, see D-38) | 2026-11-12 | Project e-mail on the existing outbox behind `PROJECT_NOTIFICATIONS_ENABLED` (off); migration 0030 (local only); no real mail sent; see checkpoint and PROJECT_NOTIFICATIONS.md |
+| 12 | Admin CRM | TESTED | 2026-11-12 | Extends the existing admin (admin role only, no flag): lead owner, follow-up tasks, overview of real counts, timeline, customer links, safe CSV export; migration 0031 (local only); see checkpoint and ADMIN_CRM.md |
+| 13 | Stripe sandbox billing | TESTED (mocked); REAL SANDBOX BLOCKED | 2026-11-12 | Validation of the existing billing: sandbox matrix mapped to tests, four kinds of sale, a deposit can never be approved (migration 0032, local only); no test keys, no live call; see checkpoint and BILLING_SANDBOX_MATRIX.md |
+| 14 | AI demos | TESTED (PARTIAL: no AI provider call, D-44) | 2026-11-12 | Eight public interactive simulations on invented data, deterministic, no provider, the platform approval policy, notes cannot steer; no flag, no migration; see checkpoint and AI_DEMONSTRATIONS.md |
+| 15 | SEO, performance, analytics | TESTED (Lighthouse NOT RE-RUN) | 2026-11-12 | Six anonymous funnel events (no registration event, D-46); indexing rules and sitemap tested; no third-party host and a script budget as tests; Core Web Vitals not re-measured (D-47) |
+| 16 | Security and GDPR review | TESTED | 2026-11-12 | Data map in code with a guard test; findings F1 to F9 (admin-only reads, staff view logging, scheduled retention of stored files); dependency audits clean; see SECURITY_GDPR_REVIEW_COMMERCIAL.md |
+| 17 | Staging and release gates | DOCUMENT WRITTEN | 2026-11-12 | COMMERCIAL_STAGING_RUNBOOK.md; nothing was changed on any server |
+| 18 | Full QA and release review | DONE WITH GAPS; STOPS AT THE APPROVAL GATE (no real Stripe sandbox run, no Lighthouse, no staging; see COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md) | 2026-11-12 | COMMERCIAL_RELEASE_REVIEW.md; phases 09-18 not pushed or deployed (phases 01-06 are deployed, see the line under the title) |
 
 ## Checkpoints
 
@@ -253,3 +253,160 @@ Executed on this state:
 | `scripts/test.ps1 -Suite legal` (throwaway database), run twice | 50 passed, 1 skipped, both times |
 
 Not verified: a person's review of the account page, screen reader, real devices; customer sign-in on a real mailbox.
+
+### Phase 09 — 2026-11-11
+
+Commercial customer projects: the customer workspace gets a **delivery** side (details and the lifecycle table:
+[COMMERCIAL_PROJECTS.md](COMMERCIAL_PROJECTS.md)). Separate from the AI Operations portal and the Advisor Workspace, which
+are unchanged. Behind `COMMERCIAL_PROJECTS_ENABLED=false` (the customer side also needs `CUSTOMER_ACCOUNTS_ENABLED`;
+production refuses the first without the second). Migration `0028` (local only; 0026 is in production, 0027 in `main` but not deployed).
+
+* Lifecycle defined first and enforced in one table: draft, quotation, awaiting approval, approved, in progress, client
+  review, completed, maintenance. Only the customer (owner or `billing`) approves a scope or accepts a result; staff
+  cannot approve on their behalf (the schema has no such move).
+* The workspace is always the caller's own (or one they belong to); a project of another workspace and a draft answer 404
+  `project_not_found`; staff pick the customer by the e-mail of a verified, non-erased account, never by an id.
+* The scope is an immutable copy of the accepted quotation's approved version. Contract and invoice **numbers** only: no
+  amounts, no documents (Phase 10). Staff names, e-mail addresses and internal notes never reach a customer.
+* Optimistic concurrency (`expected_revision`), row locks for simultaneous decisions, idempotent repeats, audit records.
+* Customer page `/bg/konto/izrabotka` ↔ `/en/account/delivery` (noindex, no-store, 404 while off); staff `/admin/projects`
+  and a panel on the inquiry page. Export includes the customer's projects; an account that owns projects is anonymised.
+* D-19 resolved, D-25 to D-30 recorded in [COMMERCIAL_EXPANSION_DECISIONS.md](COMMERCIAL_EXPANSION_DECISIONS.md).
+
+Not done: documents and uploads (Phase 10), customer e-mail (Phase 11), amounts and invoices (Phase 13), customer MFA (D-22).
+
+Executed on this state:
+
+| Check | Result |
+| --- | --- |
+| `scripts/test.ps1 -Suite web` (typecheck, lint, unit) | 80 files, 1070 tests passed |
+| `scripts/test.ps1 -Suite api` | 1456 passed, 1 skipped. Ruff reported an import order and one line wrap in the new test file; fixed, then `ruff check` and `ruff format --check` re-run clean (the pytest run was not repeated after that whitespace-only change); docs sync clean |
+| `scripts/test.ps1 -Suite e2e` (flags off) | 323 passed, 85 skipped |
+| `scripts/test.ps1 -Suite commercial` | pass 1: 32 passed, 3 skipped; pass 2: 12 passed, 1 skipped |
+| `scripts/test.ps1 -Suite legal` | 50 passed, 1 skipped (before the new spec was added to its default list) |
+| `tests/delivery-projects.spec.ts` on the legal stack | 8 passed (sign-in required and 401, list without the draft, internal note and staff e-mail never shown, request and reply, another customer gets the same 404 as for a missing project, English page, axe and no horizontal scroll at 360 px, staff list). The first run found a wrong comparison in the test itself (white space), fixed |
+
+Not verified: a person's review of the new pages, screen reader, real devices, the member role in the browser (covered by the
+API tests and the component tests only), the wording of D-25.
+
+### Phase 10 — 2026-11-12
+
+Project documents, uploads and approvals on top of the commercial projects ([PROJECT_DOCUMENTS.md](PROJECT_DOCUMENTS.md)).
+Three flags, all off: documents, team uploads, customer uploads. Production refuses a flag without its prerequisite and
+refuses uploads until the security review is recorded (release gate **BLOCKER-COM-UPLOAD-01**, open). Migration `0029`
+(local only).
+
+* Private storage behind a four-method interface (`put`, `open`, `delete`, `exists`); a local directory outside every web
+  root today, a Docker volume owned by the API user. Server-made hex keys, strict key pattern, resolved path inside the
+  root, atomic writes, modes 0600/0700. No signed or public URL: every download is authorized by the API.
+* Strict allowlist by name and by content (pdf, png, jpg, webp, txt, md, csv, docx, xlsx, pptx); the stored type comes from
+  the check; Office files are inspected (no macros, no parent paths, size bomb limits); size limited by header and while
+  streaming; attachments only, `nosniff`, `no-store`.
+* Versions are immutable and numbered; a new file must name the version the uploader saw; the same bytes change nothing.
+  The team's upload is a draft until an administrator publishes it; a customer's own upload is visible at once.
+* Approvals record who, project, version, decision, note and time; made once by the owner or a `billing` member; repeats
+  are idempotent, contradictions, superseded and stale versions are refused; simultaneous decisions record one.
+* Malware scanning readiness: a scan result per version, required before publication and customer download by default.
+  **No scanner is bundled**; nothing claims a file is safe.
+* Retention: `project-documents-purge` removes the bytes after the retention date, keeps records, skips open requests.
+* Export and erasure cover the customer's uploads, decisions and comments.
+* Review finding fixed: the first version let any staff role (editor, viewer) read customer projects and documents. All
+  project, document and delivery routes are now `admin` only (D-39).
+
+Not done: a scanner, a private object store, backup of the storage volume, viewing files in the browser, e-signature.
+Decisions D-31 to D-35, D-39.
+
+### Phase 11 — 2026-11-12
+
+Service e-mail about a customer's own project through the **existing** outbox ([PROJECT_NOTIFICATIONS.md](PROJECT_NOTIFICATIONS.md)).
+Behind `PROJECT_NOTIFICATIONS_ENABLED=false`; migration `0030` (two nullable columns and a unique index on the outbox). No
+real e-mail was sent: the tests inject a sender, the legal stack uses the development file provider and nobody runs
+`outbox-run` there; production still needs verified delivery before accounts (and so these messages) can start.
+
+* Nine events become six kinds, queued in the same transaction as the event, once per account and event (unique index), to
+  the verified address of the owner and members (decisions go to the owner and `billing` members only). A draft, an
+  internal note and the customer's own actions send nothing.
+* A message holds a reference, a title and a link to the signed-in page: never a note, a file name, a token or an amount.
+  BG/EN by the account's language; not marketing, no consent involved (D-36, D-37).
+* Provider outage retries with backoff to six attempts; a refused recipient or a 5xx answer fails at once; a vanished
+  project or erased account fails cleanly; no provider means `blocked`. Logs carry no address or text.
+* Staff see the delivery state per project (kind, state, attempts, error code), admin only.
+* Not sent, on purpose: the quotation link (D-38), the visitor acknowledgement (prepared only), internal assignment and
+  staff notices (Phase 12), billing notices (Phase 13).
+
+Executed on this state (before the admin-only change of the project read routes, which the next full run re-checks):
+
+| Check | Result |
+| --- | --- |
+| `scripts/test.ps1 -Suite api` | 1546 passed, 1 skipped; ruff check and format clean; docs sync clean |
+| `scripts/test.ps1 -Suite web` | 81 files, 1081 tests passed |
+| `scripts/test.ps1 -Suite legal` (now with the delivery, documents and notification specs) | 66 passed |
+| Focused: `test_project_documents.py` 62, `test_project_notifications.py` 16 | passed |
+
+Not verified: real devices, a screen reader, a real mailbox, the wording of D-25 and D-37, backup of the storage volume.
+
+### Phase 12 — 2026-11-12
+
+Admin CRM, built **on the existing admin** and not as a second CRM ([ADMIN_CRM.md](ADMIN_CRM.md)). Admin role only, like leads
+(editors and viewers still reach only the catalogue); no flag, because nothing customer-facing is added. Migration `0031`
+(local only): `leads.owner_id` and `lead_tasks`.
+
+* Owner on every enquiry (an active administrator), filter by owner and qualification, owner on every list row.
+* Follow-up tasks: text, date, assignee, state, revision; open work first; overdue and this-week views; no customer details
+  in the task list; cancelled, never deleted; removed with their lead.
+* Overview of **real counts only**: enquiries, open opportunities, approved proposals, quotations waiting and accepted, active
+  projects, follow-ups, workload per owner. No revenue, no forecast, no conversion rate (a test fixes the exact fields).
+* One timeline per enquiry joining audit, notes, proposals, quotations, projects and tasks; the customer account, projects and
+  quotations behind an enquiry for navigation.
+* Safe export: a whitelist of 13 pipeline columns, no personal data, formula-injection safe, audited, 5000 rows at most.
+* Decisions D-40, D-41.
+
+### Phase 13 — 2026-11-12
+
+Validation of the **existing** Stripe billing, no second integration and no live key ([BILLING_SANDBOX_MATRIX.md](BILLING_SANDBOX_MATRIX.md)).
+Migration `0032` (local only): `billing_offers.category`.
+
+* The sandbox matrix (13 cases) is mapped to the tests of the fake gateway; gaps got tests: a declined first payment, an
+  asynchronous failure, another account reaching a workspace it does not belong to, a price differing from Stripe.
+* **MOCKED TESTED; REAL SANDBOX BLOCKED**: the project has no Stripe test keys (D-43). Nothing was called in Stripe.
+* The four kinds of sale are kept apart (`saas_subscription`, `managed_service`, `one_time_service`, `project_deposit`); a
+  **project deposit can never be approved** (database CHECK, checkout refusal, CLI refusal; D-42).
+* An indicative quote can never become a price: tests fail if billing imports quotations, basket, configurator, pricing,
+  projects, opportunities or CRM, or exposes a route about them.
+* Not touched: production refusals in `app/config.py`, the live-key refusal, VAT and legal text (owner, accountant, lawyer).
+
+### Phase 14 — 2026-11-12
+
+Eight public **interactive simulations** of AI automation ([AI_DEMONSTRATIONS.md](AI_DEMONSTRATIONS.md)): product description,
+lead qualification, support routing, order workflow, inventory warning, CRM automation, quotation drafting and human approval.
+No flag, no migration, no storage, no cookie.
+
+* Six steps each (trigger, input check, AI / rules, output check, human approval, proposed action), on invented data,
+  clearly labelled "Simulation"; `executed` is always false.
+* Deterministic plain rules, **no AI provider** (D-44); the approval step uses the platform's real policy (`app.ai.policy`).
+* A free-text note is data: validated, only flagged, never echoed or obeyed; eleven steering attempts are tested against all
+  scenarios; an approval cannot be talked away.
+* Rate limits, blocked-input states, empty and error states, BG and EN pages at their own addresses, sitemap and site search,
+  a shared scenario list and code list with a hash check between API and web.
+
+Executed on this state: see the table below (the suites run in one sequence after Phase 14).
+
+### Phases 15 to 18 — 2026-11-12
+
+* **15** — six anonymous funnel events, SEO rules and sitemap tests, page-weight and no-third-party tests ([ANALYTICS.md](ANALYTICS.md), [SEO_IMPLEMENTATION.md](SEO_IMPLEMENTATION.md), [PERFORMANCE_BASELINE.md](PERFORMANCE_BASELINE.md)). Lighthouse was **not** re-run (D-47).
+* **16** — security and GDPR review with a data map in code ([SECURITY_GDPR_REVIEW_COMMERCIAL.md](SECURITY_GDPR_REVIEW_COMMERCIAL.md)); findings F1 to F9; audits clean.
+* **17** — [COMMERCIAL_STAGING_RUNBOOK.md](COMMERCIAL_STAGING_RUNBOOK.md). Nothing was changed on any server.
+* **18** — [COMMERCIAL_RELEASE_REVIEW.md](COMMERCIAL_RELEASE_REVIEW.md). The programme **stops at the release approval gate**: Phases 09 to 18 are committed locally in `42df564`; they are not pushed, merged or deployed (phases 01-06 are deployed, see the line under the title).
+
+### Executed results of the final run (Phases 09 to 18, one sequence, then re-runs of what failed)
+
+| Check | Result |
+| --- | --- |
+| API suite, ruff, docs sync, shared-file hash checks | 1628 passed, 1 skipped |
+| Web typecheck, lint, unit | 84 files, 1099 tests passed (one failing test fixed, re-run green) |
+| End-to-end, flags off | Sequence run: 338 passed, 93 skipped, 1 failed (CRM spec sign-in timeout), fixed with one shared sign-in; fresh full run on the committed tree (forensic audit): **341 passed, 93 skipped, 0 failed** |
+| Commercial stack, two passes | 32 passed / 3 skipped, and 12 passed / 1 skipped |
+| Legal stack | 61 passed and 1 failure in the sequence (`legal-workflows`, marketing consent); the spec alone 25 passed, the whole suite again 66 passed, 1 skipped: recorded as an unexplained flake |
+| Audits (pip-audit, npm audit) | no known vulnerabilities, 0 vulnerabilities |
+
+Not verified: a real Stripe sandbox, real e-mail delivery, real devices and a screen reader, Core Web Vitals, a scanner for uploads, backup of `project_files`, any scheduled timer.

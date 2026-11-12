@@ -44,6 +44,9 @@ export interface LeadSummary {
   ams_readiness?: AmsReadiness | null;
   /** Catalogue workshop or assessment the enquiry was sent about (lib/workshops.ts), if any. */
   workshop_key?: string | null;
+  /** The administrator responsible for the enquiry (CRM). */
+  owner_id?: string | null;
+  owner_name?: string | null;
 }
 
 /** Descriptive AI-system information from an AI Managed Services inquiry (never credentials). */

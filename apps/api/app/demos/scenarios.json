@@ -1,0 +1,248 @@
+{
+  "product_description": {
+    "fields": [
+      {
+        "key": "category",
+        "options": [
+          "apparel",
+          "electronics",
+          "home",
+          "beauty"
+        ]
+      },
+      {
+        "key": "tone",
+        "options": [
+          "neutral",
+          "premium",
+          "friendly"
+        ]
+      },
+      {
+        "key": "source",
+        "options": [
+          "complete",
+          "partial",
+          "missing_facts"
+        ]
+      }
+    ],
+    "service": "store_development",
+    "packages": true
+  },
+  "lead_qualification": {
+    "fields": [
+      {
+        "key": "budget",
+        "options": [
+          "none",
+          "low",
+          "mid",
+          "high"
+        ]
+      },
+      {
+        "key": "timeline",
+        "options": [
+          "unknown",
+          "later",
+          "quarter",
+          "urgent"
+        ]
+      },
+      {
+        "key": "need",
+        "options": [
+          "vague",
+          "clear"
+        ]
+      }
+    ],
+    "service": "ai_agents",
+    "packages": false
+  },
+  "support_routing": {
+    "fields": [
+      {
+        "key": "topic",
+        "options": [
+          "shipping",
+          "returns",
+          "payment",
+          "product_question",
+          "account"
+        ]
+      },
+      {
+        "key": "urgency",
+        "options": [
+          "low",
+          "normal",
+          "high"
+        ]
+      },
+      {
+        "key": "sentiment",
+        "options": [
+          "calm",
+          "upset"
+        ]
+      },
+      {
+        "key": "personal_data",
+        "options": [
+          "no",
+          "yes"
+        ]
+      }
+    ],
+    "service": "automation",
+    "packages": false
+  },
+  "order_workflow": {
+    "fields": [
+      {
+        "key": "value",
+        "options": [
+          "small",
+          "medium",
+          "large"
+        ]
+      },
+      {
+        "key": "payment",
+        "options": [
+          "paid",
+          "pending",
+          "failed"
+        ]
+      },
+      {
+        "key": "address",
+        "options": [
+          "valid",
+          "unclear"
+        ]
+      },
+      {
+        "key": "stock",
+        "options": [
+          "available",
+          "partial",
+          "none"
+        ]
+      }
+    ],
+    "service": "store_development",
+    "packages": true
+  },
+  "inventory_warning": {
+    "fields": [
+      {
+        "key": "stock",
+        "options": [
+          "ok",
+          "low",
+          "empty"
+        ]
+      },
+      {
+        "key": "trend",
+        "options": [
+          "rising",
+          "stable",
+          "falling"
+        ]
+      },
+      {
+        "key": "lead_time",
+        "options": [
+          "short",
+          "long"
+        ]
+      }
+    ],
+    "service": "integrations",
+    "packages": false
+  },
+  "crm_automation": {
+    "fields": [
+      {
+        "key": "event",
+        "options": [
+          "form_submitted",
+          "quote_opened",
+          "no_reply_7d"
+        ]
+      },
+      {
+        "key": "segment",
+        "options": [
+          "new",
+          "existing"
+        ]
+      },
+      {
+        "key": "consent",
+        "options": [
+          "yes",
+          "no"
+        ]
+      }
+    ],
+    "service": "automation",
+    "packages": false
+  },
+  "quotation_drafting": {
+    "fields": [
+      {
+        "key": "service",
+        "options": [
+          "website",
+          "store",
+          "integration"
+        ]
+      },
+      {
+        "key": "scope",
+        "options": [
+          "clear",
+          "partial",
+          "vague"
+        ]
+      }
+    ],
+    "service": "business_websites",
+    "packages": true
+  },
+  "human_approval": {
+    "fields": [
+      {
+        "key": "action",
+        "options": [
+          "message",
+          "price_change",
+          "refund",
+          "data_change"
+        ]
+      },
+      {
+        "key": "amount",
+        "options": [
+          "none",
+          "small",
+          "large"
+        ]
+      },
+      {
+        "key": "reversible",
+        "options": [
+          "yes",
+          "no"
+        ]
+      }
+    ],
+    "service": "ai_managed",
+    "packages": false
+  }
+}

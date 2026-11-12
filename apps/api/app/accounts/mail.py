@@ -29,6 +29,7 @@ from app.accounts.models import CustomerAccount, CustomerToken, OutboxKind, Outb
 from app.config import Settings, get_settings
 from app.db import get_sessionmaker
 from app.models import utcnow
+from app.projects.notify_texts import PROJECT_TEXTS
 from app.security import generate_token, hash_token
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,8 @@ logger = logging.getLogger(__name__)
 MAX_ATTEMPTS = 6
 BACKOFF_MINUTES = (1, 5, 15, 60, 240)
 PATHS = {
+    ("project", "bg"): "/bg/konto/izrabotka",
+    ("project", "en"): "/en/account/delivery",
     ("verify", "bg"): "/bg/konto/potvardi",
     ("verify", "en"): "/en/account/verify",
     ("reset", "bg"): "/bg/konto/nova-parola",
@@ -111,6 +114,10 @@ TEXTS = {
         ),
     },
 }
+
+
+# Service messages about a customer's own project (Phase 11).
+TEXTS.update(PROJECT_TEXTS)
 
 
 class EmailNotConfigured(RuntimeError):
@@ -213,6 +220,16 @@ def _render(db: Session, settings: Settings, row: OutboxMessage) -> tuple[str, s
         hours = settings.account_reset_token_hours
         token = _issue_token(db, row.account_id, TokenPurpose.RESET_PASSWORD, hours)
         return subject, template.format(link=f"{origin}{PATHS[('reset', locale)]}#token={token}", hours=hours)
+    if kind in PROJECT_TEXTS:
+        from app.projects.models import CommercialProject
+
+        project = db.get(CommercialProject, row.project_id) if row.project_id else None
+        if project is None or project.status == "draft":
+            raise LookupError("project_missing")
+        link = f"{origin}{PATHS[('project', locale)]}?p={project.id}"
+        return subject.format(reference=project.reference), template.format(
+            reference=project.reference, title=project.title, link=link
+        )
     if kind is OutboxKind.WITHDRAWAL_RECEIVED:
         from app.compliance.models import WithdrawalRequest
 
@@ -228,6 +245,13 @@ def _render(db: Session, settings: Settings, row: OutboxMessage) -> tuple[str, s
     return subject, template.format(
         link=f"{origin}{PATHS[('signin', locale)]}", forgot=f"{origin}{PATHS[('forgot', locale)]}"
     )
+
+
+def _permanent(error: Exception) -> bool:
+    """A refusal that retrying cannot fix: the provider rejected the recipient or answered with a 5xx code."""
+    if isinstance(error, smtplib.SMTPRecipientsRefused):
+        return True
+    return isinstance(error, smtplib.SMTPResponseException) and 500 <= error.smtp_code < 600
 
 
 def dispatch_pending(sender: EmailSender | None = None, limit: int = 20) -> dict[str, int]:
@@ -252,14 +276,24 @@ def dispatch_pending(sender: EmailSender | None = None, limit: int = 20) -> dict
                 logger.error("outbox_blocked", extra={"outbox_id": str(row.id), "kind": row.kind})
                 continue
             account = db.get(CustomerAccount, row.account_id)
+            if account is None or account.erased_at is not None or not account.email:
+                row.status = OutboxStatus.FAILED.value
+                row.last_error = "recipient_invalid"
+                result["failed"] += 1
+                continue
             row.attempts += 1
             try:
                 with db.begin_nested():
                     subject, body = _render(db, settings, row)
                     active.send(account.email, subject, body)
+            except LookupError:
+                row.status = OutboxStatus.FAILED.value
+                row.last_error = "source_missing"
+                result["failed"] += 1
+                logger.warning("outbox_source_missing", extra={"outbox_id": str(row.id), "kind": row.kind})
             except (smtplib.SMTPException, OSError) as error:
                 row.last_error = type(error).__name__[:60]
-                if row.attempts >= MAX_ATTEMPTS:
+                if row.attempts >= MAX_ATTEMPTS or _permanent(error):
                     row.status = OutboxStatus.FAILED.value
                     result["failed"] += 1
                 else:

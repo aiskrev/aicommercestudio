@@ -7,6 +7,8 @@ import type { DemoKind } from "@/content/bg/offer-pages";
 import type { ServiceKey } from "@/content/types";
 import { getDictionary } from "@/i18n";
 import { localizePath } from "@/i18n/config";
+import { demoTexts } from "@/i18n/demos";
+import { DEMO_KEYS, DEMO_SLUGS } from "@/lib/demo-slugs";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
 import { buildMetadata, collectionPageJsonLd } from "@/lib/seo";
@@ -66,6 +68,27 @@ export default async function DemoCentrePage({ params }: PageProps<"/[locale]/de
             </li>
           ))}
         </ul>
+      </Section>
+
+      <Section size="wide" labelledBy="interactive-title">
+        <section id="interactive" aria-labelledby="interactive-title" className="scroll-mt-28" data-testid="demo-section-interactive">
+          <h2 id="interactive-title" className="t-h2">
+            {demoTexts[locale].listTitle}
+          </h2>
+          <p className="mt-2 max-w-3xl text-fg-muted">{demoTexts[locale].listLead}</p>
+          <ul className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {DEMO_KEYS.map((key) => (
+              <li key={key} className="card flex flex-col p-6">
+                <span className="badge badge-warning">{demoTexts[locale].badge}</span>
+                <h3 className="t-h3 mt-4">{demoTexts[locale].scenarios[key].title}</h3>
+                <p className="mt-2 flex-1 text-body-sm text-fg-muted">{demoTexts[locale].scenarios[key].lead}</p>
+                <ButtonLink href={href(routes.demoScenario(DEMO_SLUGS[key].bg))} variant="secondary" icon="arrowRight" className="mt-5">
+                  {demoTexts[locale].open}
+                </ButtonLink>
+              </li>
+            ))}
+          </ul>
+        </section>
       </Section>
 
       <Section size="wide">

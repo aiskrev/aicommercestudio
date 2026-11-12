@@ -273,6 +273,10 @@ class Lead(Base):
     created_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(TZDateTime, nullable=False, default=utcnow, onupdate=utcnow)
     status_changed_at: Mapped[datetime | None] = mapped_column(TZDateTime, nullable=True)
+    # The administrator responsible for the enquiry (CRM, docs/ADMIN_CRM.md); none until someone takes it.
+    owner_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("admin_users.id", ondelete="SET NULL"), nullable=True, index=True
+    )
 
     notes: Mapped[list[LeadNote]] = relationship(
         back_populates="lead",

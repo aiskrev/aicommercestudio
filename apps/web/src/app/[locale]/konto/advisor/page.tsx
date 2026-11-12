@@ -1,4 +1,5 @@
 import { AdvisorWorkspace } from "@/components/account/AdvisorWorkspace";
+import { commercialProjectsEnabled } from "@/lib/account-flag";
 import { ZoneNav } from "@/components/account/ZonePanels";
 import { PageHero, Section } from "@/components/ui/primitives";
 import { workspaceTexts } from "@/i18n/workspace";
@@ -19,7 +20,7 @@ export default async function Page({ params }: PageProps<"/[locale]/konto/adviso
     <>
       <PageHero eyebrow={t.eyebrow} title={t.title} lead={t.lead} />
       <Section>
-        <ZoneNav locale={locale} />
+        <ZoneNav locale={locale} delivery={commercialProjectsEnabled()} />
         <AdvisorWorkspace locale={locale} />
       </Section>
     </>

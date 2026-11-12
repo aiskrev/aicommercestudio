@@ -32,14 +32,18 @@ def enabled(monkeypatch):
     monkeypatch.setattr(get_settings(), "quotations_enabled", True)
 
 
-@pytest.fixture
-def configured_lead(client, admin_client, monkeypatch) -> str:
+def make_configured_lead(client, admin_client, monkeypatch) -> str:
     """A lead created by the project configurator (a business website with SEO and a blog)."""
     monkeypatch.setattr(get_settings(), "project_configurator_enabled", True)
     body = configurator_submission(answers=answers(features=["seo", "blog"], operations=["maintenance"]), locale="en")
     response = client.post("/api/public/configurator/submissions", json=body)
     assert response.status_code == 201, response.text
     return admin_client.get("/api/admin/leads").json()["items"][0]["id"]
+
+
+@pytest.fixture
+def configured_lead(client, admin_client, monkeypatch) -> str:
+    return make_configured_lead(client, admin_client, monkeypatch)
 
 
 def create_proposal(admin_client, lead, **body) -> dict:

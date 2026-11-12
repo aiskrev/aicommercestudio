@@ -6,9 +6,9 @@
   from an earlier run (accounts, withdrawals, data requests) carries over and the default database is never touched.
   The default configuration (everything off) is restored afterwards.
 .PARAMETER Specs
-  Playwright spec files to run (default: the legal workflows, accessibility, cookie audit and account requests).
+  Playwright spec files to run (default: the legal workflows, accessibility, cookie audit, account requests, delivery projects and project documents).
 #>
-param([string[]]$Specs = @("tests/legal-workflows.spec.ts", "tests/accessibility.spec.ts", "tests/cookie-audit.spec.ts", "tests/account-requests.spec.ts"))
+param([string[]]$Specs = @("tests/legal-workflows.spec.ts", "tests/accessibility.spec.ts", "tests/cookie-audit.spec.ts", "tests/account-requests.spec.ts", "tests/delivery-projects.spec.ts", "tests/project-documents.spec.ts"))
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot

@@ -7,6 +7,7 @@ import { type FormEvent, useState } from "react";
 import { ActivityList } from "@/components/admin/ActivityList";
 import { useAdminI18n } from "@/components/admin/AdminI18n";
 import { AdminPageHeader } from "@/components/admin/AdminShell";
+import { LeadCrm } from "@/components/admin/LeadCrm";
 import { OpportunityPanel, ProposalsPanel } from "@/components/admin/Opportunity";
 import { EmptyState, ErrorState, LoadingState, Panel, Pill, StatusBadge } from "@/components/admin/ui";
 import { Icon } from "@/components/ui/Icon";
@@ -149,6 +150,7 @@ export function LeadDetail({ id }: { id: string }) {
 
           <OpportunityPanel leadId={data.id} onSaved={() => history.reload()} />
           <ProposalsPanel leadId={data.id} onChanged={() => history.reload()} />
+          <LeadCrm leadId={data.id} ownerId={data.owner_id ?? null} onOwnerChanged={() => refresh()} />
 
           <Notes lead={data} onAdded={(note) => refresh({ ...data, notes: [note, ...data.notes] })} />
           <AiTriage lead={data} onDone={() => history.reload()} onApplied={(updated) => refresh(updated)} />

@@ -152,3 +152,17 @@ real-device testing, and a CDN with HTTP/2+ and long-lived caching for `/_next/s
 4. Submit `sitemap.xml` in Search Console; monitor coverage and the Core Web Vitals report.
 5. Add articles to reach ≥ 2 per topic so topic pages become indexable.
 6. Add a case study only with written client approval and sourced results.
+
+## Commercial pages (Phase 15, 2026-11-12)
+
+* **Indexed and in the sitemap**, with a canonical address, both language alternates and `x-default`: the pricing page, the project
+  packages, the demo centre and its eight interactive demonstrations (`/bg/demo-tsentar/<slug>` ↔ `/en/demo-centre/<slug>`).
+* **Never indexed**: the customer area (including `/konto/izrabotka`, projects, documents and invoices), the admin, the portal, the
+  quotation page (a secret link) and the pages behind switched-off flags (the quote basket and the configurator answer 404 while
+  off). `robots.txt` disallows `/admin`, `/portal`, `/api/`, `/bg/konto`, `/en/account`; the private pages carry `noindex`; none of
+  them is in the sitemap. `e2e/tests/seo-commercial.spec.ts` checks all of this on the default stack.
+* **Structured data and metadata** for the new pages are checked by the existing "every sitemap page has one H1, a unique title,
+  description, canonical and valid JSON-LD" test, which now covers the eight demonstrations too.
+* **No third-party host** is loaded by the new public pages, and their scripts stay under a budget of 520 KB (encoded): both are tests.
+* **Funnel measurement** uses the existing anonymous statistics with six allowed event names ([ANALYTICS.md](ANALYTICS.md)); there is
+  no registration event because the customer area is never measured (D-46).

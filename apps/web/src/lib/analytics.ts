@@ -11,11 +11,26 @@ import type { ToolKey } from "@/lib/tools";
  */
 export type ToolEventName = "tool_opened" | "tool_started" | "step_completed" | "tool_completed" | "export_requested";
 
+/**
+ * The funnel events of the commercial pages (docs/ANALYTICS.md). Each says only that a step happened: no answer, no
+ * contact detail, no amount. They use the same anonymous, cookieless, consent-free pipeline as the tool events (the
+ * site never measures the customer area, so there is no registration event: D-46), and are labelled `funnel:<name>`.
+ */
+export const FUNNEL_EVENTS = [
+  "configurator_started",
+  "configurator_step_completed",
+  "configurator_completed",
+  "quote_basket_updated",
+  "quote_request_submitted",
+  "consultation_requested",
+] as const;
+export type FunnelEventName = (typeof FUNNEL_EVENTS)[number];
+
 export type ExportFormat = "print" | "text" | "link" | "pdf";
 
 export interface ToolEvent {
-  name: ToolEventName;
-  tool: ToolKey;
+  name: ToolEventName | FunnelEventName;
+  tool: ToolKey | "funnel";
   locale: Locale;
   /** 1-based step number (step_completed). */
   step?: number;
@@ -42,6 +57,12 @@ export function sanitizeToolEvent(input: ToolEvent & Record<string, unknown>): T
   if (typeof input.result === "string" && RESULT_PATTERN.test(input.result)) event.result = input.result;
   if (typeof input.format === "string" && FORMATS.has(input.format)) event.format = input.format as ExportFormat;
   return event;
+}
+
+/** One funnel step. Only the allow-listed names are accepted; anything else is dropped. */
+export function trackFunnelEvent(name: FunnelEventName, locale: Locale, step?: number): void {
+  if (!(FUNNEL_EVENTS as readonly string[]).includes(name)) return;
+  trackToolEvent({ name, tool: "funnel", locale, ...(step !== undefined ? { step } : {}) });
 }
 
 export function registerAnalyticsSink(sink: Sink): () => void {

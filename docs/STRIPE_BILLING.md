@@ -1,5 +1,7 @@
 # Stripe billing
 
+See also [BILLING_SANDBOX_MATRIX.md](BILLING_SANDBOX_MATRIX.md) (Phase 13: the matrix mapped to tests, the four kinds of sale).
+
 Status: built for **test mode only**, behind `BILLING_PROVIDER=stripe`. A live key is refused in every
 environment and production refuses to start with it. Nothing is on sale until an offer is added and
 approved. **It has not been run against a real Stripe sandbox yet**: there are no test keys in this

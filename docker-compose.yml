@@ -47,6 +47,9 @@ services:
     environment:
       <<: *api-env
       RUN_MIGRATIONS_ON_START: "true"
+    volumes:
+      # Private storage of project documents: not served by any web server, owned by the API user.
+      - project_files:/var/lib/acs/project-files
     depends_on:
       db:
         condition: service_healthy
@@ -77,6 +80,7 @@ services:
       PROJECT_CONFIGURATOR_ENABLED: ${PROJECT_CONFIGURATOR_ENABLED:-false}
       QUOTE_BASKET_ENABLED: ${QUOTE_BASKET_ENABLED:-false}
       QUOTATIONS_ENABLED: ${QUOTATIONS_ENABLED:-false}
+      COMMERCIAL_PROJECTS_ENABLED: ${COMMERCIAL_PROJECTS_ENABLED:-false}
       TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
       # Enables POST /api/catalogue-revalidate (on-demand regeneration of the catalogue pages); empty = disabled.
       CATALOGUE_REVALIDATE_SECRET: ${CATALOGUE_REVALIDATE_SECRET:-}
@@ -130,3 +134,4 @@ services:
 
 volumes:
   pgdata:
+  project_files:

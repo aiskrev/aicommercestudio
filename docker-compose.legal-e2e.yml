@@ -15,6 +15,17 @@ services:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-acs}:${POSTGRES_PASSWORD}@db:5432/acs_legal_e2e
       CUSTOMER_ACCOUNTS_ENABLED: "true"
       ADVISOR_WORKSPACE_ENABLED: "true"
+      COMMERCIAL_PROJECTS_ENABLED: "true"
+      PROJECT_NOTIFICATIONS_ENABLED: "true"
+      PROJECT_DOCUMENTS_ENABLED: "true"
+      PROJECT_UPLOADS_ENABLED: "true"
+      PROJECT_CLIENT_UPLOADS_ENABLED: "true"
+      # The test stack has no scanner: a customer may download a published file without a scan result.
+      PROJECT_UPLOAD_REQUIRE_SCAN: "false"
+      PROJECT_UPLOAD_RATE_LIMIT: "200"
+      PROJECT_DOWNLOAD_RATE_LIMIT: "300"
+      PROJECT_READ_RATE_LIMIT: "2000"
+      PROJECT_ACTION_RATE_LIMIT: "500"
       BILLING_PROVIDER: "stripe"
       STRIPE_SECRET_KEY: "sk_test_placeholder_never_used_against_stripe"
       STRIPE_WEBHOOK_SECRET: "whsec_placeholder_never_used"
@@ -34,3 +45,4 @@ services:
     environment:
       CUSTOMER_ACCOUNTS_ENABLED: "true"
       ADVISOR_WORKSPACE_ENABLED: "true"
+      COMMERCIAL_PROJECTS_ENABLED: "true"

@@ -35,6 +35,9 @@ def inbox(monkeypatch) -> Inbox:
     monkeypatch.setattr(settings, "customer_accounts_enabled", True)
     # The workspace, zone and billing areas have their own flags; switched on so their routes are checked too.
     monkeypatch.setattr(settings, "advisor_workspace_enabled", True)
+    monkeypatch.setattr(settings, "commercial_projects_enabled", True)
+    for flag in ("project_documents_enabled", "project_uploads_enabled", "project_client_uploads_enabled"):
+        monkeypatch.setattr(settings, flag, True)
     monkeypatch.setattr(settings, "billing_provider", "stripe")
     monkeypatch.setattr(settings, "email_provider", "smtp")
     monkeypatch.setattr(settings, "smtp_host", "mail.test")
@@ -44,7 +47,7 @@ def inbox(monkeypatch) -> Inbox:
     return box
 
 
-ACCOUNT_PREFIXES = ("/api/accounts", "/api/workspace", "/api/zone", "/api/billing")
+ACCOUNT_PREFIXES = ("/api/accounts", "/api/workspace", "/api/zone", "/api/billing", "/api/projects")
 UNSAFE = {"POST", "PUT", "PATCH", "DELETE"}
 
 

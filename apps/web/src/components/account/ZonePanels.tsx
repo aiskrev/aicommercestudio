@@ -355,6 +355,7 @@ export function ZoneMembers({ locale }: { locale: Locale }) {
 const SECTIONS = [
   ["dashboard", routes.account],
   ["projects", routes.accountAdvisor],
+  ["delivery", routes.accountDelivery],
   ["plan", routes.accountPlan],
   ["subscriptions", routes.accountSubscriptions],
   ["invoices", routes.accountInvoices],
@@ -363,12 +364,12 @@ const SECTIONS = [
   ["security", routes.accountSecurity],
 ] as const;
 
-export function ZoneNav({ locale }: { locale: Locale }) {
+export function ZoneNav({ locale, delivery = false }: { locale: Locale; delivery?: boolean }) {
   const t = zoneTexts[locale];
   return (
     <nav aria-label={t.navLabel} className="mb-8">
       <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
-        {SECTIONS.map(([key, path]) => (
+        {SECTIONS.filter(([key]) => key !== "delivery" || delivery).map(([key, path]) => (
           <li key={key}>
             <Link href={localizePath(locale, path)}>{t.nav[key]}</Link>
           </li>

@@ -10,6 +10,7 @@ import type { Dictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
 import type { FeatureKey } from "@/lib/configurator";
 import type { QuoteContact } from "@/lib/configurator-api";
+import { trackFunnelEvent } from "@/lib/analytics";
 import { formatEuro } from "@/lib/prices";
 import { addExtra, type BasketFailure, type BasketItem, type BasketResult, type BasketView, discardBasket, type ExtraGroup, fetchBasket, removeItem, submitBasket } from "@/lib/quote-basket";
 
@@ -93,7 +94,10 @@ export function QuoteBasket({
     setBusy(true);
     setNotice(null);
     const result = await action();
-    if (result.ok) setBasket(result.basket);
+    if (result.ok) {
+      setBasket(result.basket);
+      trackFunnelEvent("quote_basket_updated", locale);
+    }
     else {
       if (result.kind === "changed" || result.kind === "none") await refresh();
       setNotice({ tone: result.kind === "changed" ? "info" : "error", text: message(result.kind) });
@@ -107,6 +111,7 @@ export function QuoteBasket({
     const result = await submitBasket(contact, basket.version, formToken, locale);
     if (result.ok) {
       setState("sent");
+      trackFunnelEvent("quote_request_submitted", locale);
       return result;
     }
     if (result.kind === "validation") return { ok: false, message: t.errors.summary, fieldErrors: result.fieldErrors };

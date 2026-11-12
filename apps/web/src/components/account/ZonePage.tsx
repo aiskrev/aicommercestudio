@@ -5,7 +5,7 @@ import { ZoneDashboard, ZoneInvoices, ZoneMembers, ZoneNav, ZonePlan, ZoneSuppor
 import { PageHero, Section } from "@/components/ui/primitives";
 import type { Locale } from "@/i18n/config";
 import { zoneTexts } from "@/i18n/zone";
-import { advisorWorkspaceEnabled } from "@/lib/account-flag";
+import { advisorWorkspaceEnabled, commercialProjectsEnabled } from "@/lib/account-flag";
 import { routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
 
@@ -43,7 +43,7 @@ export function ZonePage({ locale, view }: { locale: Locale; view: View }) {
     <>
       <PageHero eyebrow={t.eyebrow} title={title} lead={lead} />
       <Section>
-        <ZoneNav locale={locale} />
+        <ZoneNav locale={locale} delivery={commercialProjectsEnabled()} />
         <Panel locale={locale} />
       </Section>
     </>

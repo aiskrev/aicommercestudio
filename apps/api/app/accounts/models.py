@@ -28,6 +28,14 @@ class OutboxKind(enum.StrEnum):
     RESET_PASSWORD = "reset_password"  # noqa: S105 - a message kind, not a secret
     ACCOUNT_EXISTS = "account_exists"
     WITHDRAWAL_RECEIVED = "withdrawal_received"
+    # Commercial projects (Phase 11): service messages about a customer's own project, to the verified address of
+    # the owner and members of its workspace. Never marketing; they carry a reference and a link, no file or note.
+    PROJECT_AVAILABLE = "project_available"
+    PROJECT_UPDATE = "project_update"
+    APPROVAL_REQUESTED = "approval_requested"
+    REVIEW_REQUESTED = "review_requested"
+    DOCUMENT_PUBLISHED = "document_published"
+    SUPPORT_REPLY = "support_reply"
 
 
 class OutboxStatus(enum.StrEnum):
@@ -112,6 +120,15 @@ class OutboxMessage(Base):
             unique=True,
             postgresql_where=text("reference IS NOT NULL"),
         ),
+        Index(
+            "uq_outbox_messages_project_event",
+            "account_id",
+            "kind",
+            "event_ref",
+            unique=True,
+            postgresql_where=text("event_ref IS NOT NULL"),
+        ),
+        Index("ix_outbox_project", "project_id", "created_at"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -125,6 +142,12 @@ class OutboxMessage(Base):
     next_attempt_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow)
     # A public reference the message talks about (for example a withdrawal reference); never personal data.
     reference: Mapped[str | None] = mapped_column(String(24))
+    # The commercial project a project message is about, and the event that caused it (a message is queued once per
+    # account and event, so a retry or a repeated action cannot send it twice).
+    project_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("commercial_projects.id", ondelete="CASCADE"), nullable=True
+    )
+    event_ref: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
     last_error: Mapped[str | None] = mapped_column(String(60))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utcnow)
     sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
