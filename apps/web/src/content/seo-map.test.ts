@@ -21,7 +21,10 @@ describe.each(locales)("SEO structure (%s)", (locale) => {
 
   /** The full <title> rendered for each mapped path (mirrors the page metadata). */
   const titles: Record<string, string> = {
-    [routes.home]: withBrand(content.home.metaTitle),
+    // The homepage and the two hubs render the V5 metadata (app/[locale]/page.tsx, izrabotka-na-saytove, online-magazini).
+    [routes.home]: withBrand(content.v5.home.metaTitle),
+    [routes.websites]: withBrand(content.v5.websites.metaTitle),
+    [routes.ecommerce]: withBrand(content.v5.ecommerce.metaTitle),
     [routes.services]: withBrand(content.servicesPage.metaTitle),
     [routes.aiSolutions]: withBrand(content.aiSolutions.metaTitle),
     [routes.advisor]: withBrand(content.advisor.metaTitle),

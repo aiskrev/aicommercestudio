@@ -32,6 +32,8 @@ type Freq = "weekly" | "monthly" | "yearly";
 const STATIC_PATHS: { path: string; priority: number; changeFrequency: Freq; legal?: "cookies" | "subscription" | "other" }[] = [
   { path: routes.home, priority: 1, changeFrequency: "weekly" },
   { path: routes.services, priority: 0.9, changeFrequency: "monthly" },
+  { path: routes.websites, priority: 0.9, changeFrequency: "monthly" },
+  { path: routes.ecommerce, priority: 0.9, changeFrequency: "monthly" },
   { path: routes.aiSolutions, priority: 0.8, changeFrequency: "monthly" },
   { path: routes.tools, priority: 0.7, changeFrequency: "monthly" },
   { path: routes.carePlans, priority: 0.7, changeFrequency: "monthly" },

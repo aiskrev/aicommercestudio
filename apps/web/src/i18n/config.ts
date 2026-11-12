@@ -39,6 +39,8 @@ export function isLocale(value: string | null | undefined): value is Locale {
 /** Bulgarian route segment (= folder name) → English public segment. Identical segments are omitted. */
 const EN_SEGMENTS: Record<string, string> = {
   uslugi: "services",
+  "izrabotka-na-saytove": "website-development",
+  "online-magazini": "ecommerce",
   "ai-resheniya": "ai-solutions",
   "za-kogo": "industries",
   proces: "process",

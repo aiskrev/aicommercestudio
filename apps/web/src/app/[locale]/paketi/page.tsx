@@ -2,7 +2,9 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { PriceTag } from "@/components/sections/PriceTag";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { Alert, ButtonLink, PageHero, Section } from "@/components/ui/primitives";
+import Link from "next/link";
+
+import { Alert, ButtonLink, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
 import { getDictionary } from "@/i18n";
 import { localizePath } from "@/i18n/config";
@@ -11,6 +13,7 @@ import { resolveLocale } from "@/lib/params";
 import { CARE_PLAN_PRICES } from "@/lib/prices";
 import { contactWithService, routes } from "@/lib/routes";
 import { buildMetadata, collectionPageJsonLd } from "@/lib/seo";
+import { CARE_MATRIX_ANCHOR } from "@/lib/site-nav";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/paketi">) {
   const locale = await resolveLocale(params);
@@ -21,7 +24,8 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/paketi">
 /** Comparable care plans. Unconfirmed commercial values are never shown (lib/care-plans.ts). */
 export default async function CarePlansPage({ params }: PageProps<"/[locale]/paketi">) {
   const locale = await resolveLocale(params);
-  const { carePlans: t, aiManaged } = getContent(locale);
+  const { carePlans: t, aiManaged, v5 } = getContent(locale);
+  const care = v5.care;
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const managed = serviceByKey(locale, "ai_managed");
@@ -82,6 +86,48 @@ export default async function CarePlansPage({ params }: PageProps<"/[locale]/pak
               </article>
             );
           })}
+        </div>
+      </Section>
+      {/* V5 phase 11: every recurring and secondary service, split into covered / billing / third-party / unconfirmed. */}
+      <Section labelledBy={`${CARE_MATRIX_ANCHOR}-title`} size="wide">
+        <div id={CARE_MATRIX_ANCHOR}>
+          <SectionHeading id={`${CARE_MATRIX_ANCHOR}-title`} title={care.title} lead={care.lead} />
+          <div className="compare-scroll mt-stack" tabIndex={0} role="region" aria-label={care.caption} data-testid="care-matrix">
+            <table className="compare-table">
+              <caption>{care.caption}</caption>
+              <thead>
+                <tr>
+                  <th scope="col">{care.corner}</th>
+                  {care.columns.map((column) => (
+                    <th key={column.key} scope="col">
+                      {column.label}
+                    </th>
+                  ))}
+                  <th scope="col">
+                    <span className="sr-only">{care.enquire}</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {care.rows.map((row) => (
+                  <tr key={row.label}>
+                    <th scope="row">{row.label}</th>
+                    {row.cells.map((cell, index) => (
+                      <td key={care.columns[index].key}>{cell}</td>
+                    ))}
+                    <td>
+                      {row.service && (
+                        <Link href={href(contactWithService(row.service))} className="link whitespace-nowrap text-sm" aria-label={`${care.enquire}: ${row.label}`}>
+                          {care.enquire}
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 text-sm text-fg-subtle">{care.legend}</p>
         </div>
       </Section>
       <Section tone="raised" labelledBy="ai-managed-title">

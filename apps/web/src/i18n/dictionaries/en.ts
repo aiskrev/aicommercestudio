@@ -28,7 +28,7 @@ export const en: Dictionary = {
   },
   footer: {
     tagline:
-      "E-commerce engineering, SEO, automation and AI solutions for small and mid-sized businesses in Bulgaria and the European Union.",
+      "Websites, online stores, web applications and AI automation for small and mid-sized businesses in Bulgaria and the European Union.",
     areaServed: ["Bulgaria", "European Union"],
     services: "Services",
     company: "Company",

@@ -80,6 +80,10 @@
   --color-viz-1: #3987e5;
   --color-viz-2: #d95926;
   --color-viz-3: #199e70;
+  /* V5 (docs/V5_DESIGN_SYSTEM.md): the screen inside a product preview frame and the decorative
+     skeleton lines drawn on it. Neither carries text, so the contrast table is unchanged. */
+  --color-surface-4: #1c3250;
+  --color-ui-skeleton: rgb(169 185 201 / 0.22);
 
   /* Brand-tuned Tailwind scales (see header comment) */
   --color-slate-50: #f4f7fb;
@@ -140,11 +144,14 @@
   --radius-md: 0.625rem;
   --radius-lg: 0.875rem;
   --radius-xl: 1.25rem;
+  --radius-2xl: 1.75rem;
 
   /* Elevation: depth from borders first, shadows are quiet. */
   --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 30px 60px -30px rgb(0 0 0 / 0.65);
   --shadow-lift: 0 18px 40px -26px rgb(0 0 0 / 0.85), 0 10px 30px -24px rgb(96 165 250 / 0.28);
   --shadow-paper: 0 1px 2px rgb(20 35 45 / 0.06), 0 14px 32px -22px rgb(20 35 45 / 0.28);
+  /* V5: product preview frames float a little above the section. */
+  --shadow-frame: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 40px 80px -40px rgb(0 0 0 / 0.8), 0 18px 40px -30px rgb(37 99 235 / 0.35);
 
   /* Motion */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
@@ -198,6 +205,7 @@
     --container: 76rem;
 
     /* Type scale (fluid, 360 → 1440 px). Display + section headings: Manrope; the rest: Inter. */
+    --type-hero: clamp(2.3rem, 1.5rem + 3.2vw, 4rem);
     --type-display: clamp(2.1rem, 1.5rem + 2.4vw, 3.35rem);
     --type-h1: clamp(2rem, 1.55rem + 1.9vw, 3.05rem);
     --type-h2: clamp(1.7rem, 1.35rem + 1.45vw, 2.55rem);
@@ -873,6 +881,206 @@
     transition: block-size 250ms var(--ease-out-soft), content-visibility 250ms allow-discrete;
   }
   .accordion details[open]::details-content { block-size: auto; }
+
+  /* ============================================================ V5 (docs/V5_DESIGN_SYSTEM.md) */
+  /* Hero headline: the largest type on the site, used once per page. */
+  .t-hero {
+    font-family: var(--font-display);
+    font-size: var(--type-hero);
+    line-height: 1.04;
+    font-weight: 700;
+    letter-spacing: -0.032em;
+    color: var(--text-primary);
+    font-feature-settings: "locl" 0;
+    text-wrap: balance;
+  }
+  /* Quiet radial tone behind a hero; never repeated lower on the page. */
+  .hero-v5 {
+    background:
+      radial-gradient(48rem 26rem at 78% 8%, color-mix(in oklab, var(--color-brand-fill) 16%, transparent), transparent 70%),
+      radial-gradient(36rem 22rem at 8% 92%, color-mix(in oklab, var(--color-brand-2) 6%, transparent), transparent 70%);
+  }
+
+  /* Product preview frame: a browser or app window drawn in CSS. Decorative (aria-hidden); the
+     caption below it carries the meaning ("Demonstration · sample data"). */
+  .ui-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-default);
+    background: var(--color-surface-2);
+    box-shadow: var(--shadow-frame);
+  }
+  .ui-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.8rem;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--color-surface-1);
+  }
+  .ui-dots { display: inline-flex; gap: 0.3rem; }
+  .ui-dots > i { width: 0.5rem; height: 0.5rem; border-radius: 9999px; background: var(--color-window-chrome); }
+  .ui-url {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 9999px;
+    padding: 0.15rem 0.7rem;
+    background: var(--color-surface-page);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--color-fg-subtle);
+  }
+  .ui-screen { background: var(--color-surface-4); }
+  /* Skeleton line / block on a preview screen (never text). */
+  .ui-line { display: block; height: 0.45rem; border-radius: 9999px; background: var(--color-ui-skeleton); }
+  .ui-block { display: block; border-radius: var(--radius-sm); background: var(--color-ui-skeleton); }
+  .ui-accent { background: var(--color-brand-fill); }
+  .ui-cyan { background: color-mix(in oklab, var(--color-brand-2) 70%, transparent); }
+  .ui-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 9999px;
+    border: 1px solid var(--border-default);
+    background: var(--color-surface-1);
+    padding: 0.2rem 0.6rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--color-fg-secondary);
+    white-space: nowrap;
+  }
+
+  /* Bento grid of the main offers: asymmetric on wide screens, one column on phones. */
+  .bento { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 48rem) { .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 64rem) {
+    .bento { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.25rem; }
+    .bento > .bento-wide { grid-column: span 4; }
+    .bento > .bento-narrow { grid-column: span 2; }
+    .bento > .bento-half { grid-column: span 3; }
+  }
+  .offer-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--border-subtle);
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--color-brand) 5%, transparent), transparent 38%),
+      var(--color-surface-1);
+    transition:
+      border-color var(--duration-base) var(--ease-standard),
+      transform var(--duration-base) var(--ease-out-soft),
+      box-shadow var(--duration-base) var(--ease-standard);
+  }
+  .offer-card:has(:focus-visible) { border-color: var(--color-brand); box-shadow: 0 0 0 2px var(--color-brand); }
+  @media (hover: hover) and (pointer: fine) {
+    .offer-card:hover {
+      border-color: color-mix(in oklab, var(--color-brand) 45%, transparent);
+      box-shadow: var(--shadow-lift);
+      transform: translateY(var(--lift-card));
+    }
+  }
+  /* The preview area at the top of an offer card. */
+  .offer-stage {
+    position: relative;
+    padding: 1.25rem 1.25rem 0;
+    border-bottom: 1px solid var(--border-subtle);
+    background-image:
+      linear-gradient(rgb(169 185 201 / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(169 185 201 / 0.04) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  /* Comparison table: semantic <table>, scrolls inside its own focusable frame on phones. */
+  .compare-scroll {
+    position: relative;
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    background: var(--color-surface-1);
+  }
+  .compare-scroll:focus-visible { outline: var(--ring-width) solid var(--ring); outline-offset: 3px; }
+  .compare-table { width: 100%; min-width: 40rem; table-layout: fixed; border-collapse: collapse; font-size: 0.9375rem; }
+  .compare-table caption { text-align: left; padding: 1rem 1.25rem 0; font-size: var(--type-small); color: var(--color-fg-subtle); }
+  .compare-table th, .compare-table td { padding: 0.9rem 1.25rem; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border-subtle); }
+  .compare-table thead th { font-weight: 600; color: var(--text-primary); background: var(--color-surface-2); }
+  .compare-table tbody th { font-weight: 600; color: var(--color-fg-secondary); width: 22%; }
+  .compare-table td { color: var(--color-fg-muted); line-height: 1.55; }
+  .compare-table tr:last-child > * { border-bottom: 0; }
+  .compare-table .is-recommended { color: var(--text-primary); }
+
+  /* Price card: one offer, its price or "price on request", what is included and one action. */
+  .price-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-default);
+    background: var(--color-surface-1);
+    padding: 1.5rem;
+  }
+  .price-card-featured {
+    border-color: color-mix(in oklab, var(--color-brand) 45%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--color-brand) 9%, transparent), transparent 45%),
+      var(--color-surface-1);
+  }
+  .price-amount { font-family: var(--font-display); font-size: 1.75rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); }
+
+  /* Process timeline: numbered steps on a hairline, horizontal from 64rem. */
+  .timeline { display: grid; gap: 0; counter-reset: step; }
+  .timeline > li { position: relative; padding: 0 0 1.75rem 2.75rem; }
+  .timeline > li::before {
+    counter-increment: step;
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in oklab, var(--color-brand) 45%, transparent);
+    background: var(--color-surface-page);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-brand);
+  }
+  .timeline > li::after { content: ""; position: absolute; left: 1rem; top: 2rem; bottom: 0; width: 1px; background: var(--border-default); }
+  .timeline > li:last-child::after { display: none; }
+  @media (min-width: 64rem) {
+    .timeline { grid-template-columns: repeat(var(--steps, 6), minmax(0, 1fr)); gap: 1.25rem; }
+    .timeline > li { padding: 3rem 0 0; }
+    .timeline > li::after { left: 2.5rem; right: -1.25rem; top: 1rem; bottom: auto; width: auto; height: 1px; }
+  }
+
+  /* Segmented in-page navigation (jump links to the sections of a hub page). */
+  .jump-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .jump-nav a {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    border-radius: 9999px;
+    border: 1px solid var(--border-default);
+    background: var(--color-surface-1);
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-fg-secondary);
+    transition: border-color var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .jump-nav a:hover { border-color: color-mix(in oklab, var(--color-brand) 55%, transparent); color: var(--text-primary); }
+  }
 }
 
 /* ---------------------------------------------------------------- interaction: typed properties */
@@ -913,7 +1121,7 @@
   }
   /* No movement: state is still shown through colour, border and focus rings. */
   .card-interactive:hover, .card-interactive:active,
-  .btn:hover, .btn:active, .btn .btn-icon, .arrow-nudge { transform: none !important; }
+  .btn:hover, .btn:active, .btn .btn-icon, .arrow-nudge, .offer-card:hover { transform: none !important; }
   .menu-enter, .menu-sheet-enter, .reveal { animation: none !important; }
   .motion-decorative { display: none !important; }
   .skeleton { animation: none; }

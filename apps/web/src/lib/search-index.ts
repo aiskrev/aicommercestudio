@@ -42,6 +42,9 @@ export async function buildSearchIndex(locale: Locale): Promise<SearchEntry[]> {
     [priceWords, ...Object.values(content.projectPackages.packages).map((item) => item.name)],
   );
   page(routes.demoCentre, content.demoCentre.title, content.demoCentre.lead);
+  for (const [path, hub] of [[routes.websites, content.v5.websites], [routes.ecommerce, content.v5.ecommerce]] as const) {
+    page(path, hub.title, hub.lead, [priceWords, hub.breadcrumb, ...hub.offers.map((offer) => offer.name)]);
+  }
   for (const key of DEMO_KEYS) page(routes.demoScenario(DEMO_SLUGS[key].bg), demoTexts[locale].scenarios[key].title, demoTexts[locale].scenarios[key].lead);
   page(routes.industries, content.industries.title, content.industries.lead, content.industries.segments.map((s) => s.title));
   page(routes.process, content.processPage.title, content.processPage.lead, content.processPage.steps.map((s) => s.title));

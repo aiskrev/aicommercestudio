@@ -10,16 +10,15 @@ import { type SearchLabels, SiteSearch } from "@/components/layout/SiteSearch";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClass, Container, cx } from "@/components/ui/primitives";
 import type { Locale, SlugMap } from "@/i18n/config";
-import type { NavEntry, NavItem, ServiceMenu } from "@/lib/site-nav";
+import type { NavItem, NavLink, NavMenu } from "@/lib/site-nav";
 import { usePublicPathname } from "@/lib/use-public-pathname";
 
 interface Labels {
   nav: string;
   openMenu: string;
   closeMenu: string;
+  overview: string;
 }
-
-const SERVICES = "services";
 
 /** The href among `hrefs` that best matches the current page: exact, else the longest parent path. */
 export function activeHref(pathname: string, hrefs: string[]): string | undefined {
@@ -27,6 +26,9 @@ export function activeHref(pathname: string, hrefs: string[]): string | undefine
     .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
     .sort((a, b) => b.length - a.length)[0];
 }
+
+/** Path part of a menu href (anchors and queries never mark a page as current). */
+const pathOf = (href: string) => href.split(/[?#]/)[0];
 
 /**
  * Arrow keys move focus between the links of one menu column (`data-nav-column`); Home/End jump to
@@ -50,18 +52,17 @@ function onColumnKeyDown(event: KeyboardEvent<HTMLElement>) {
 }
 
 /**
- * Site header (docs/INFORMATION_ARCHITECTURE_V2.md §4, phase IA-1).
+ * Site header, V5 (docs/V5_LINK_AUDIT.md).
  *
- * Desktop: "Services" opens a mega-menu with the published domains in three bands and a "Start here"
- * column; "Solutions" and "Company" open small menus; the rest are plain links. One panel at a time;
- * outside click and Escape close it and Escape returns focus to the trigger; arrow keys move within
- * a column. Mobile: a full-height sheet with accordion groups in the same order. While it is open the
- * rest of the page is `inert`, page scroll is locked and focus moves into the sheet.
+ * Desktop (from 90rem = 1440 px, where the six Bulgarian labels fit): six menu buttons, each opening a full-width panel with an overview link, one or two
+ * columns of links and a featured card; the quote button on the right. One panel at a time; outside click and
+ * Escape close it and Escape returns focus to the trigger; arrow keys move within a column. Below 90rem: a
+ * full-height sheet with one accordion per menu and a persistent quote button at the bottom. While the sheet is
+ * open the rest of the page is `inert`, page scroll is locked and focus moves into the sheet.
  */
 export function Header({
   homeHref,
-  services,
-  entries,
+  menus,
   cta,
   labels,
   locale,
@@ -71,8 +72,7 @@ export function Header({
   account,
 }: {
   homeHref: string;
-  services: ServiceMenu;
-  entries: NavEntry[];
+  menus: NavMenu[];
   cta: NavItem;
   labels: Labels;
   locale: Locale;
@@ -97,21 +97,13 @@ export function Header({
   const mobileButtonRef = useRef<HTMLButtonElement>(null);
   const mobilePanelRef = useRef<HTMLDivElement>(null);
 
-  const serviceHrefs = [
-    services.href,
-    ...services.bands.flatMap((band) => band.domains.flatMap((domain) => [domain.href, ...domain.services.map((s) => s.href)])),
-    ...services.startHere.items.map((item) => item.href),
-  ];
-  const allHrefs = [
-    ...serviceHrefs,
-    ...entries.flatMap((entry) => (entry.kind === "link" ? [entry.href] : entry.items.map((item) => item.href))),
-  ];
-  const current = activeHref(pathname, allHrefs);
-  const isCurrent = (href: string) => href === current;
-  const servicesActive = pathname === services.href || pathname.startsWith(`${services.href}/`);
-  const menuActive = (entry: NavEntry) => entry.kind === "menu" && entry.items.some((item) => isCurrent(item.href));
+  const menuHrefs = (menu: NavMenu) => [menu.overview.href, ...menu.columns.flatMap((column) => column.items.map((item) => item.href))].map(pathOf);
+  const current = activeHref(pathname, menus.flatMap(menuHrefs));
+  // Only a link to the page itself (no anchor) carries aria-current.
+  const isCurrent = (href: string) => href === current && pathOf(href) === href;
+  const menuActive = (menu: NavMenu) => current !== undefined && menuHrefs(menu).includes(current);
   // The mobile accordion opens on the group of the current page.
-  const currentGroup = servicesActive ? SERVICES : entries.find(menuActive)?.label;
+  const currentGroup = menus.find(menuActive)?.id;
   const [expanded, setExpanded] = useState<string | null>(currentGroup ?? null);
 
   // Close menus after navigation (state adjusted during render instead of in an effect).
@@ -174,26 +166,11 @@ export function Header({
   }, [mobileOpen]);
 
   const toggle = (id: string) => setOpenMenu((open) => (open === id ? null : id));
-
-  const menuButton = (id: string, label: string, active: boolean) => (
-    <button
-      ref={(el) => {
-        menuButtonRefs.current[id] = el;
-      }}
-      type="button"
-      aria-expanded={openMenu === id}
-      aria-controls={panelId(id)}
-      onClick={() => toggle(id)}
-      data-active={active || undefined}
-      className={cx(
-        "nav-link inline-flex min-h-11 items-center gap-1 whitespace-nowrap px-2.5 text-nav font-medium transition-colors xl:px-3",
-        active || openMenu === id ? "text-fg" : "text-fg-muted hover:text-fg",
-      )}
-    >
-      {label}
-      <Icon name="chevronDown" className={cx("h-4 w-4 transition-transform duration-200", openMenu === id && "rotate-180")} />
-    </button>
-  );
+  // Following an in-page anchor of the current page does not change the path: close the menus explicitly.
+  const closeAll = () => {
+    setOpenMenu(null);
+    setMobileOpen(false);
+  };
 
   const menuLinkClass =
     "rounded-[var(--radius-md)] transition-colors duration-150 hover:bg-surface-2 focus-visible:bg-surface-2 aria-[current=page]:bg-surface-2";
@@ -209,163 +186,108 @@ export function Header({
             : "border-transparent bg-ink-950/70 backdrop-blur-md",
         )}
       >
-        <Container className="flex h-16 items-center justify-between gap-4 lg:gap-3 xl:gap-6">
+        <Container size="wide" className="flex h-16 items-center justify-between gap-3">
           <Logo href={homeHref} />
 
-          <nav aria-label={labels.nav} className="hidden lg:block">
-            <ul className="flex items-center gap-0.5 xl:gap-1">
-              {/* ---------------------------------------------------------------- Services mega-menu */}
-              <li
-                ref={(el) => {
-                  menuRefs.current[SERVICES] = el;
-                }}
-              >
-                {menuButton(SERVICES, services.label, servicesActive)}
-                {/* Positioned against the sticky header, so the panel spans the full width below it. */}
-                <div id={panelId(SERVICES)} hidden={openMenu !== SERVICES} className="absolute inset-x-0 top-full z-50">
-                  <div className="menu-enter max-h-[calc(100dvh-4.5rem)] origin-top overflow-y-auto border-b border-line-subtle bg-ink-950 shadow-[var(--shadow-panel)] backdrop-blur-xl">
-                    <Container className="grid gap-6 py-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,0.85fr)] xl:gap-8">
-                      {services.bands.map((band) => (
-                        <div key={band.key} className="min-w-0" data-testid={`menu-band-${band.key}`}>
-                          <p className="t-label px-3 pb-2">{band.title}</p>
-                          <ul className="grid gap-1" data-nav-column onKeyDown={onColumnKeyDown}>
-                            {band.domains.map((domain) => (
-                              <li key={domain.href}>
-                                <Link
-                                  href={domain.href}
-                                  aria-current={isCurrent(domain.href) ? "page" : undefined}
-                                  className={cx("group flex min-h-11 gap-3 p-3", menuLinkClass)}
-                                >
-                                  <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand transition-colors group-hover:border-brand/50">
-                                    <Icon name={domain.icon} className="h-4 w-4" />
-                                  </span>
-                                  <span className="min-w-0">
-                                    <span className="block text-sm font-semibold leading-snug text-fg">{domain.label}</span>
-                                    <span className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-fg-muted">{domain.description}</span>
-                                  </span>
-                                </Link>
-                                {domain.services.length > 0 && (
-                                  <ul className="mb-1 ml-[1.625rem] grid border-l border-line-subtle pl-[1.125rem]">
-                                    {domain.services.map((service) => (
-                                      <li key={service.href}>
-                                        <Link
-                                          href={service.href}
-                                          aria-current={isCurrent(service.href) ? "page" : undefined}
-                                          className={cx(
-                                            "flex min-h-11 items-center px-3 text-caption text-fg-secondary hover:text-fg aria-[current=page]:text-fg",
-                                            menuLinkClass,
-                                          )}
-                                        >
-                                          {service.label}
-                                        </Link>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                      <div className="min-w-0 lg:border-l lg:border-line-subtle lg:pl-6" data-testid="menu-start-here">
-                        <p className="t-label px-3 pb-2">{services.startHere.title}</p>
-                        <ul className="grid gap-1" data-nav-column onKeyDown={onColumnKeyDown}>
-                          {services.startHere.items.map((item) => (
-                            <li key={item.href}>
-                              <Link
-                                href={item.href}
-                                aria-current={isCurrent(item.href) ? "page" : undefined}
-                                className={cx("group flex min-h-11 gap-3 p-3", menuLinkClass)}
-                              >
-                                <Icon name={item.icon} className="mt-0.5 h-4.5 w-4.5 shrink-0 text-brand-2" />
-                                <span className="min-w-0">
-                                  <span className="block text-sm font-semibold leading-snug text-fg">{item.label}</span>
-                                  <span className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-fg-muted">{item.description}</span>
-                                </span>
-                              </Link>
-                            </li>
-                          ))}
-                          <li>
-                            <Link
-                              href={services.href}
-                              aria-current={pathname === services.href ? "page" : undefined}
-                              className={cx(
-                                "group mt-2 flex min-h-11 items-center justify-between border-t border-line-subtle px-3 text-sm font-semibold text-brand",
-                                menuLinkClass,
-                              )}
-                            >
-                              {services.allLabel}
-                              <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
-                            </Link>
-                          </li>
-                        </ul>
-                      </div>
-                    </Container>
-                  </div>
-                </div>
-              </li>
-
-              {/* ---------------------------------------------------------------- other entries */}
-              {entries.map((entry) =>
-                entry.kind === "link" ? (
-                  <li key={entry.href}>
-                    <Link
-                      href={entry.href}
-                      aria-current={isCurrent(entry.href) ? "page" : undefined}
-                      className={cx(
-                        "nav-link inline-flex min-h-11 items-center whitespace-nowrap px-2.5 text-nav font-medium transition-colors xl:px-3",
-                        isCurrent(entry.href) ? "text-fg" : "text-fg-muted hover:text-fg",
-                      )}
-                    >
-                      {entry.label}
-                    </Link>
-                  </li>
-                ) : (
-                  <li
-                    key={entry.id}
+          <nav aria-label={labels.nav} className="hidden min-w-0 min-[90rem]:block">
+            <ul className="flex items-center">
+              {menus.map((menu) => (
+                <li
+                  key={menu.id}
+                  ref={(el) => {
+                    menuRefs.current[menu.id] = el;
+                  }}
+                >
+                  <button
                     ref={(el) => {
-                      menuRefs.current[entry.id] = el;
+                      menuButtonRefs.current[menu.id] = el;
                     }}
-                    className="relative"
+                    type="button"
+                    aria-expanded={openMenu === menu.id}
+                    aria-controls={panelId(menu.id)}
+                    onClick={() => toggle(menu.id)}
+                    data-active={menuActive(menu) || undefined}
+                    data-testid={`menu-${menu.id}`}
+                    className={cx(
+                      "nav-link inline-flex min-h-11 items-center gap-0.5 whitespace-nowrap px-1.5 text-sm font-medium transition-colors min-[100rem]:px-2.5",
+                      menuActive(menu) || openMenu === menu.id ? "text-fg" : "text-fg-muted hover:text-fg",
+                    )}
                   >
-                    {menuButton(entry.id, entry.label, menuActive(entry))}
-                    <div id={panelId(entry.id)} hidden={openMenu !== entry.id} className="absolute right-0 top-full z-50 mt-3 w-64">
-                      <ul className="panel menu-enter origin-top-right grid gap-1 p-2" data-nav-column onKeyDown={onColumnKeyDown}>
-                        {entry.items.map((item) => (
-                          <li key={item.href}>
-                            <Link
-                              href={item.href}
-                              aria-current={isCurrent(item.href) ? "page" : undefined}
-                              className={cx(
-                                "flex min-h-11 items-center px-3 text-sm font-medium text-fg-secondary hover:text-fg aria-[current=page]:text-fg",
-                                menuLinkClass,
-                              )}
-                            >
-                              {item.label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
+                    {menu.label}
+                    <Icon name="chevronDown" className={cx("h-3.5 w-3.5 transition-transform duration-200", openMenu === menu.id && "rotate-180")} />
+                  </button>
+                  {/* Positioned against the sticky header, so the panel spans the full width below it. */}
+                  <div id={panelId(menu.id)} hidden={openMenu !== menu.id} className="absolute inset-x-0 top-full z-50" data-testid={`panel-${menu.id}`}>
+                    <div className="menu-enter max-h-[calc(100dvh-4.5rem)] origin-top overflow-y-auto border-b border-line-subtle bg-ink-950 shadow-[var(--shadow-panel)]">
+                      <Container size="wide" className="grid gap-6 py-7 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,2.2fr)_minmax(0,0.9fr)] xl:gap-8">
+                        <div className="min-w-0 xl:border-r xl:border-line-subtle xl:pr-6">
+                          <Link
+                            href={menu.overview.href}
+                            onClick={closeAll}
+                            aria-current={isCurrent(menu.overview.href) ? "page" : undefined}
+                            className={cx("group block p-3", menuLinkClass)}
+                            data-testid={`overview-${menu.id}`}
+                          >
+                            <span className="t-label">{labels.overview}</span>
+                            <span className="mt-2 flex items-center gap-2 text-base font-semibold leading-snug text-fg">
+                              {menu.overview.label}
+                              <Icon name="arrowRight" className="arrow-nudge h-4 w-4 text-brand" />
+                            </span>
+                            {menu.overview.description && (
+                              <span className="mt-2 line-clamp-4 block text-caption leading-relaxed text-fg-muted">{menu.overview.description}</span>
+                            )}
+                          </Link>
+                        </div>
+                        <div className={cx("grid min-w-0 gap-6", menu.columns.length > 1 && "lg:grid-cols-2")}>
+                          {menu.columns.map((column) => (
+                            <div key={column.title} className="min-w-0">
+                              <p className="t-label px-3 pb-2">{column.title}</p>
+                              <ul className="grid gap-0.5" data-nav-column onKeyDown={onColumnKeyDown}>
+                                {column.items.map((item) => (
+                                  <li key={item.href}>
+                                    <MenuLink item={item} current={isCurrent(item.href)} onNavigate={closeAll} className={menuLinkClass} />
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                        <Link
+                          href={menu.featured.href}
+                          onClick={closeAll}
+                          className="feature-panel group flex min-w-0 flex-col justify-between gap-4 self-start p-5"
+                          data-testid={`featured-${menu.id}`}
+                        >
+                          <span>
+                            <span className="block text-base font-semibold leading-snug text-fg">{menu.featured.title}</span>
+                            <span className="mt-2 block text-caption leading-relaxed text-fg-muted">{menu.featured.text}</span>
+                          </span>
+                          <span className="inline-flex items-center gap-2 text-sm font-semibold text-brand">
+                            {menu.featured.cta}
+                            <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
+                          </span>
+                        </Link>
+                      </Container>
                     </div>
-                  </li>
-                ),
-              )}
+                  </div>
+                </li>
+              ))}
             </ul>
           </nav>
 
-          <div className="flex items-center gap-3 lg:gap-2 xl:gap-3">
+          <div className="flex shrink-0 items-center gap-2">
             {searchLabels && <SiteSearch locale={locale} labels={searchLabels} />}
             <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="hidden lg:block" />
             {account && <AccountLinks links={account} variant="header" />}
-            <div className="hidden sm:block lg:hidden xl:block">
-              <Link href={cta.href} className={buttonClass("primary")}>
+            <div className="hidden sm:block">
+              <Link href={cta.href} className={buttonClass("primary")} data-testid="header-cta">
                 {cta.label}
               </Link>
             </div>
             <button
               ref={mobileButtonRef}
               type="button"
-              className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-line-default text-fg transition-colors hover:border-brand/50 lg:hidden"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] border border-line-default text-fg transition-colors hover:border-brand/50 min-[90rem]:hidden"
               aria-expanded={mobileOpen}
               aria-controls={mobilePanelId}
               aria-label={mobileOpen ? labels.closeMenu : labels.openMenu}
@@ -382,95 +304,72 @@ export function Header({
         id={mobilePanelId}
         ref={mobilePanelRef}
         hidden={!mobileOpen}
-        className="menu-sheet-enter fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto overscroll-contain border-t border-line-subtle bg-ink-950 lg:hidden"
+        className="menu-sheet-enter fixed inset-x-0 bottom-0 top-16 z-40 flex flex-col border-t border-line-subtle bg-ink-950 min-[90rem]:hidden"
+        data-testid="mobile-menu"
       >
-        <Container className="flex min-h-full flex-col py-5">
-          <nav aria-label={labels.nav}>
-            <ul className="grid gap-0.5">
-              <li>
-                <MobileGroup
-                  id={`${mobilePanelId}-${SERVICES}`}
-                  label={services.label}
-                  active={servicesActive}
-                  expanded={expanded === SERVICES}
-                  onToggle={() => setExpanded((open) => (open === SERVICES ? null : SERVICES))}
-                >
-                  {services.bands.map((band) => (
-                    <div key={band.key} className="mt-2">
-                      <p className="t-label px-4 pb-1.5 pt-2">{band.title}</p>
-                      <ul className="grid gap-0.5">
-                        {band.domains.map((domain) => (
-                          <li key={domain.href}>
-                            <MobileLink item={domain} current={isCurrent(domain.href)} icon={domain.icon} strong />
-                            {domain.services.length > 0 && (
-                              <ul className="ml-6 grid border-l border-line-subtle pl-2">
-                                {domain.services.map((service) => (
-                                  <li key={service.href}>
-                                    <MobileLink item={service} current={isCurrent(service.href)} small />
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                  <p className="t-label mt-2 px-4 pb-1.5 pt-2">{services.startHere.title}</p>
-                  <ul className="grid gap-0.5">
-                    {services.startHere.items.map((item) => (
-                      <li key={item.href}>
-                        <MobileLink item={item} current={isCurrent(item.href)} icon={item.icon} />
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={services.href}
-                    aria-current={pathname === services.href ? "page" : undefined}
-                    className="mt-1 flex min-h-11 items-center gap-2 rounded-xl px-4 py-2.5 text-body-sm font-semibold text-brand hover:bg-surface-2"
-                  >
-                    {services.allLabel}
-                    <Icon name="arrowRight" className="h-4 w-4" />
-                  </Link>
-                </MobileGroup>
-              </li>
-              {entries.map((entry) =>
-                entry.kind === "link" ? (
-                  <li key={entry.href}>
-                    <MobileLink item={entry} current={isCurrent(entry.href)} chevron />
-                  </li>
-                ) : (
-                  <li key={entry.id}>
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          <Container className="py-4">
+            <nav aria-label={labels.nav}>
+              <ul className="grid gap-0.5">
+                {menus.map((menu) => (
+                  <li key={menu.id}>
                     <MobileGroup
-                      id={`${mobilePanelId}-${entry.id}`}
-                      label={entry.label}
-                      active={menuActive(entry)}
-                      expanded={expanded === entry.label}
-                      onToggle={() => setExpanded((open) => (open === entry.label ? null : entry.label))}
+                      id={`${mobilePanelId}-${menu.id}`}
+                      label={menu.label}
+                      active={menuActive(menu)}
+                      expanded={expanded === menu.id}
+                      onToggle={() => setExpanded((open) => (open === menu.id ? null : menu.id))}
                     >
-                      <ul className="grid gap-0.5">
-                        {entry.items.map((item) => (
-                          <li key={item.href}>
-                            <MobileLink item={item} current={isCurrent(item.href)} />
-                          </li>
-                        ))}
-                      </ul>
+                      <MobileLink item={{ ...menu.overview, label: `${labels.overview}: ${menu.overview.label}` }} current={isCurrent(menu.overview.href)} icon={menu.overview.icon} strong onNavigate={closeAll} />
+                      {menu.columns.map((column) => (
+                        <div key={column.title} className="mt-1">
+                          <p className="t-label px-4 pb-1 pt-2">{column.title}</p>
+                          <ul className="grid gap-0.5">
+                            {column.items.map((item) => (
+                              <li key={item.href}>
+                                <MobileLink item={item} current={isCurrent(item.href)} icon={item.icon} onNavigate={closeAll} />
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                     </MobileGroup>
                   </li>
-                ),
-              )}
-            </ul>
-          </nav>
-          <div className="mt-auto flex flex-col gap-4 pt-6">
-            <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="self-start" />
-            <Link href={cta.href} className={cx(buttonClass("primary", "lg"), "w-full")}>
+                ))}
+              </ul>
+            </nav>
+            <div className="mt-5 flex flex-col gap-4 border-t border-line-subtle pt-5">
+              <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="self-start" />
+              {account && <AccountLinks links={account} variant="sheet" />}
+            </div>
+          </Container>
+        </div>
+        {/* Persistent quote action: always visible at the bottom of the sheet. */}
+        <div className="border-t border-line-subtle bg-ink-950 py-3">
+          <Container>
+            <Link href={cta.href} onClick={closeAll} className={cx(buttonClass("primary", "lg"), "w-full")} data-testid="mobile-cta">
               {cta.label}
             </Link>
-            {account && <AccountLinks links={account} variant="sheet" />}
-          </div>
-        </Container>
+          </Container>
+        </div>
       </div>
     </>
+  );
+}
+
+function MenuLink({ item, current, onNavigate, className }: { item: NavLink; current: boolean; onNavigate: () => void; className: string }) {
+  return (
+    <Link href={item.href} onClick={onNavigate} aria-current={current ? "page" : undefined} className={cx("group flex min-h-11 gap-3 px-3 py-2.5", className)}>
+      {item.icon && (
+        <span className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand transition-colors group-hover:border-brand/50">
+          <Icon name={item.icon} className="h-3.5 w-3.5" />
+        </span>
+      )}
+      <span className="min-w-0 self-center">
+        <span className="block text-sm font-semibold leading-snug text-fg">{item.label}</span>
+        {item.description && <span className="mt-0.5 line-clamp-2 block text-xs leading-relaxed text-fg-muted">{item.description}</span>}
+      </span>
+    </Link>
   );
 }
 
@@ -499,7 +398,7 @@ function MobileGroup({
         onClick={onToggle}
         data-active={active || undefined}
         className={cx(
-          "flex min-h-11 w-full items-center justify-between rounded-xl px-4 py-3 text-left text-base font-medium transition-colors",
+          "flex min-h-12 w-full items-center justify-between rounded-xl px-4 py-3 text-left text-base font-semibold transition-colors",
           active || expanded ? "text-fg" : "text-fg-secondary hover:bg-surface-2",
           expanded && "bg-surface-2",
         )}
@@ -507,7 +406,7 @@ function MobileGroup({
         {label}
         <Icon name="chevronDown" className={cx("h-4 w-4 text-fg-subtle transition-transform duration-200", expanded && "rotate-180")} />
       </button>
-      <div id={id} hidden={!expanded} className="pb-2">
+      <div id={id} hidden={!expanded} className="pb-3 pt-1">
         {children}
       </div>
     </>
@@ -519,30 +418,26 @@ function MobileLink({
   current,
   icon,
   strong = false,
-  small = false,
-  chevron = false,
+  onNavigate,
 }: {
   item: NavItem;
   current: boolean;
   icon?: ComponentProps<typeof Icon>["name"];
   strong?: boolean;
-  small?: boolean;
-  chevron?: boolean;
+  onNavigate: () => void;
 }) {
   return (
     <Link
       href={item.href}
+      onClick={onNavigate}
       aria-current={current ? "page" : undefined}
       className={cx(
-        "flex min-h-11 items-center gap-3 rounded-xl px-4 py-2.5 transition-colors hover:bg-surface-2 aria-[current=page]:bg-surface-3 aria-[current=page]:text-fg",
-        small ? "text-sm text-fg-muted" : "text-body-sm text-fg-secondary",
-        strong && "font-semibold text-fg",
-        chevron && "justify-between text-base font-medium",
+        "flex min-h-11 items-center gap-3 rounded-xl px-4 py-2.5 text-body-sm transition-colors hover:bg-surface-2 aria-[current=page]:bg-surface-3 aria-[current=page]:text-fg",
+        strong ? "font-semibold text-fg" : "text-fg-secondary",
       )}
     >
       {icon && <Icon name={icon} className="h-4 w-4 shrink-0 text-brand" />}
       <span className="min-w-0">{item.label}</span>
-      {chevron && <Icon name="chevronRight" className="h-4 w-4 shrink-0 text-fg-subtle" />}
     </Link>
   );
 }

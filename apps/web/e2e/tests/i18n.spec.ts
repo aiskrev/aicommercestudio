@@ -68,12 +68,12 @@ test.describe("language routing", () => {
 });
 
 test("navigation labels are localized", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 }); // the full desktop bar is shown from 1440 px
+  // The six V5 menus (lib/site-nav.ts); their buttons, in order, in each language.
   const nav = (path: string) =>
-    page.goto(path).then(() => page.locator("header nav").first().innerText());
-  const bg = await nav("/bg");
-  for (const label of ["Услуги", "Решения", "Инструменти", "За кого", "Статии", "Компания"]) expect(bg).toContain(label);
-  const en = await nav("/en");
-  for (const label of ["Services", "Solutions", "Tools", "Industries", "Insights", "Company"]) expect(en).toContain(label);
+    page.goto(path).then(() => page.locator("header nav").first().getByRole("button").evaluateAll((els) => els.map((el) => el.textContent?.trim())));
+  expect(await nav("/bg")).toEqual(["Изработка на сайтове", "Онлайн магазини", "AI и автоматизация", "Поддръжка", "Пакети и цени", "Студио"]);
+  expect(await nav("/en")).toEqual(["Website Development", "E-commerce", "AI & Automation", "Maintenance", "Packages & Pricing", "Studio"]);
 });
 
 test.describe("language switcher", () => {

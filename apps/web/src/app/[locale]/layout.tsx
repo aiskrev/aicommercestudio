@@ -9,7 +9,7 @@ import { Footer } from "@/components/layout/Footer";
 import { StickyQuoteBar } from "@/components/editorial/StickyQuoteBar";
 import { Header } from "@/components/layout/Header";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { buildSlugMap } from "@/content";
+import { buildSlugMap, getContent } from "@/content";
 import { localeMeta, localizePath, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { resolveLocale } from "@/lib/params";
@@ -53,9 +53,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         </a>
         <Header
           homeHref={href(routes.home)}
-          services={navigation.services}
-          entries={navigation.entries}
-          cta={{ href: href(routes.contact), label: dict.nav.cta }}
+          menus={navigation.menus}
+          cta={navigation.cta}
           locale={locale}
           slugs={buildSlugMap()}
           searchLabels={dict.search}
@@ -68,6 +67,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
             nav: dict.nav.label,
             openMenu: dict.nav.openMenu,
             closeMenu: dict.nav.closeMenu,
+            overview: getContent(locale).v5.nav.overview,
           }}
         />
         <main id="main" className="flex-1">

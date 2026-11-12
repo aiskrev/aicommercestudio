@@ -2,6 +2,9 @@
 export const routes = {
   home: "/",
   services: "/uslugi",
+  /** V5 hubs: website development and e-commerce (docs/V5_FINAL_IMPLEMENTATION_REPORT.md). */
+  websites: "/izrabotka-na-saytove",
+  ecommerce: "/online-magazini",
   service: (slug: string) => `/uslugi/${slug}`,
   aiSolutions: "/ai-resheniya",
   advisor: "/ai-automation-advisor",

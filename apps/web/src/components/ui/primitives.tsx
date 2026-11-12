@@ -201,6 +201,7 @@ export function ButtonLink({
   size = "md",
   icon,
   className,
+  testId,
 }: {
   href: string;
   children: ReactNode;
@@ -208,9 +209,10 @@ export function ButtonLink({
   size?: ButtonSize;
   icon?: IconName;
   className?: string;
+  testId?: string;
 }) {
   return (
-    <Link href={href} className={cx(buttonClass(variant, size), className)}>
+    <Link href={href} className={cx(buttonClass(variant, size), className)} data-testid={testId}>
       <span className="btn-label">{children}</span>
       {icon && <Icon name={icon} className="btn-icon h-4 w-4" />}
     </Link>

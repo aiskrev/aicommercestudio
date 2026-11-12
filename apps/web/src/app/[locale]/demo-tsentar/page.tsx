@@ -15,7 +15,8 @@ import { buildMetadata, collectionPageJsonLd } from "@/lib/seo";
 import { isToolAvailable, type ToolKey, TOOLS, toolHrefs } from "@/lib/tools";
 
 const DEMO_LINKS: Record<string, string> = {
-  workflow: `${routes.home}#orchestration-title`,
+  // The workflow illustration moved from the V4 homepage to the AI solutions page (V5).
+  workflow: `${routes.aiSolutions}#orchestration-title`,
   scenarios: routes.scenarios,
   agents: routes.agentLibrary,
 };

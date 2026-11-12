@@ -51,10 +51,14 @@ test("both languages show the same amounts and point at each other", async ({ pa
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /\/bg\/proektni-paketi$/);
 });
 
-test("the packages are reachable from the homepage, the menu, a service page and the sitemap", async ({ page, request }) => {
+test("the packages are reachable from the homepage, the menu, a hub, a service page and the sitemap", async ({ page, request }) => {
   await page.goto("/bg");
-  await page.locator("section[aria-labelledby='entry-title']").getByRole("link", { name: "Сравнете пакетите" }).click();
+  await page.locator("section[aria-labelledby='offers-title']").getByRole("link", { name: "Сравнете всички пакети" }).click();
   await expect(page).toHaveURL(/\/bg\/proektni-paketi$/);
+  // The "Packages & pricing" menu of the V5 header and the packages section of the website hub.
+  await expect(page.getByTestId("panel-pricing").locator("a[href='/bg/proektni-paketi']")).toHaveText(/^Пакети за проекти/);
+  await page.goto("/bg/izrabotka-na-saytove");
+  await expect(page.getByTestId("hub-package-landing_page").getByRole("link", { name: /Технологии, дизайн/ })).toHaveAttribute("href", "/bg/proektni-paketi#landing_page");
 
   await page.goto("/bg/uslugi/izrabotka-na-online-magazini");
   await expect(page.getByTestId("service-packages-link")).toHaveAttribute("href", "/bg/proektni-paketi#store_setup");

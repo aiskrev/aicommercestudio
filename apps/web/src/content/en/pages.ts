@@ -22,9 +22,9 @@ export const servicesPage: typeof bgServicesPage = {
   metaDescription:
     "A.I. Commerce Studio services: AI strategy, AI agent development, workflow automation, custom AI engineering, integrations, managed AI, maintenance, SEO, analytics.",
   eyebrow: "Services",
-  title: "Services for AI, online commerce and cloud systems",
+  title: "Websites, online stores, AI and cloud systems",
   lead:
-    "We help from AI strategy and agent development through to support after launch. We also look after the technical side of an online business: maintenance, SEO and analytics.",
+    "We build websites, online stores, web applications and AI automation, and look after them after launch. Start from what you want to build, or browse every service area.",
   offeringTitle: "Not sure where to start?",
   offeringLead:
     "Start with a technical audit: a paid assessment of your store, data and processes. It ends with a prioritised plan that you can carry out with us or on your own.",
