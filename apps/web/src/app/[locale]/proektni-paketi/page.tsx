@@ -6,6 +6,7 @@ import { PriceTag } from "@/components/sections/PriceTag";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
 import { Alert, ButtonLink, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
+import { UiPreview } from "@/components/v5/UiPreview";
 import { getContent, serviceByKey } from "@/content";
 import { getDictionary } from "@/i18n";
 import { localizePath } from "@/i18n/config";
@@ -62,7 +63,7 @@ export default async function ProjectPackagesPage({ params }: PageProps<"/[local
       <JsonLd data={collectionPageJsonLd({ name: t.title, description: t.metaDescription, path: href(routes.projectPackages) }, locale)} />
       <JsonLd data={faqJsonLd(t.faq.items)} />
       <Breadcrumbs items={[{ name: dict.common.home, path: href(routes.home) }, { name: t.title, path: href(routes.projectPackages) }]} />
-      <PageHero eyebrow={t.eyebrow} title={t.title} lead={t.lead}>
+      <PageHero eyebrow={t.eyebrow} title={t.title} lead={t.lead} aside={<UiPreview kind="store" caption={getContent(locale).v5.home.hero.previewCaption} />}>
         <Alert tone="info" role="note" className="mt-8 max-w-3xl">
           {t.note}
         </Alert>
@@ -176,7 +177,7 @@ export default async function ProjectPackagesPage({ params }: PageProps<"/[local
         </div>
       </Section>
 
-      <Section tone="raised" labelledBy="compare-title" size="wide">
+      <Section tone="light" labelledBy="compare-title" size="wide">
         <SectionHeading id="compare-title" title={t.compare.title} lead={t.compare.lead} />
         <div
           className="mt-stack overflow-x-auto rounded-[var(--radius-lg)] border border-line-subtle"

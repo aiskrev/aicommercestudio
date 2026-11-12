@@ -64,7 +64,7 @@ export default async function ProcessPage({ params }: PageProps<"/[locale]/proce
         </ol>
       </Section>
 
-      <Section labelledBy="needs-title" alt>
+      <Section labelledBy="needs-title" tone="light">
         <EditorialSplit aside={<SectionHeading id="needs-title" title={page.needsTitle} />}>
           <ul className="grid gap-3 sm:grid-cols-2">
             {page.needs.map((need) => (

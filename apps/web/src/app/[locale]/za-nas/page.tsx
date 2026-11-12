@@ -47,7 +47,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/za-nas"
         <FeatureMatrix items={page.principles} />
       </Section>
 
-      <Section labelledBy="leadership-title" tone="raised">
+      <Section labelledBy="leadership-title" tone="light">
         <div className="grid items-center gap-8 md:grid-cols-[minmax(0,12rem)_minmax(0,1fr)] md:gap-10">
           <FounderPortrait alt={founder.portraitAlt} sizes="(min-width: 768px) 12rem, 10rem" className="aspect-[4/5] w-40 md:w-full" />
           <div className="min-w-0">

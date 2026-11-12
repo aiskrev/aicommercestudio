@@ -84,7 +84,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
         </div>
       </Section>
 
-      <Section labelledBy="ai-principles" tone="raised">
+      <Section labelledBy="ai-principles" tone="light">
         <SectionHeading id="ai-principles" title={page.principlesTitle} />
         <FeatureMatrix items={page.principles} className="mt-10" />
       </Section>
@@ -164,7 +164,7 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
         </div>
       </Section>
 
-      <Section labelledBy="ai-not-for" alt>
+      <Section labelledBy="ai-not-for" tone="light">
         <EditorialSplit aside={<SectionHeading id="ai-not-for" title={page.notForTitle} />}>
           <CheckList items={page.notFor} />
         </EditorialSplit>

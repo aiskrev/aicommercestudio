@@ -1,5 +1,9 @@
 import Link from "next/link";
 
+import { compareData } from "@/components/future/compare-data";
+import { buildSelectorLinks } from "@/components/future/selector-links";
+import { ServiceComparison } from "@/components/future/ServiceComparison";
+import { ServiceSelector } from "@/components/future/ServiceSelector";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CatalogueBrowser } from "@/components/sections/CatalogueBrowser";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -17,6 +21,7 @@ import { getCatalogue } from "@/lib/catalogue";
 import { BANDS, domainsInBand, isDomainPublished } from "@/lib/domains";
 import { resolveLocale } from "@/lib/params";
 import { routes } from "@/lib/routes";
+import { SELECTOR_ANCHOR } from "@/lib/site-nav";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildMetadata, itemListJsonLd } from "@/lib/seo";
 
@@ -37,6 +42,8 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/uslugi">
 export default async function ServicesPage({ params }: PageProps<"/[locale]/uslugi">) {
   const locale = await resolveLocale(params);
   const { servicesPage, coreServices, home, v5 } = getContent(locale);
+  const fc = v5.future;
+  const compare = compareData(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const audit = serviceByKey(locale, "audit");
@@ -65,7 +72,7 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
           { name: dict.nav.services, path: href(routes.services) },
         ]}
       />
-      <PageHero eyebrow={servicesPage.eyebrow} title={servicesPage.title} lead={servicesPage.lead} />
+      <PageHero eyebrow={servicesPage.eyebrow} title={servicesPage.title} lead={servicesPage.lead} aside={<UiPreview kind="portal" caption={v5.home.hero.previewCaption} />} />
 
       {/* V5: the four directions first, as on the homepage, then the ten service areas. */}
       <Section labelledBy="services-start-title" density="compact">
@@ -89,6 +96,21 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
             </li>
           ))}
         </ul>
+      </Section>
+
+      {/* Future Commerce: what to build → the matching package and services (the configurator's model, flag off). */}
+      <Section id={SELECTOR_ANCHOR} labelledBy="selector-title" tone="light">
+        <SectionHeading id="selector-title" eyebrow={fc.selector.eyebrow} title={fc.selector.title} lead={fc.selector.lead} />
+        <div className="mt-stack">
+          <ServiceSelector text={fc.selector} links={buildSelectorLinks(locale)} />
+        </div>
+      </Section>
+
+      <Section labelledBy="services-compare-title" tone="raised" size="wide">
+        <SectionHeading id="services-compare-title" eyebrow={fc.compare.eyebrow} title={fc.compare.title} lead={fc.compare.lead} />
+        <div className="mt-stack">
+          <ServiceComparison text={fc.compare} prices={compare.prices} links={compare.links} />
+        </div>
       </Section>
 
       <Section labelledBy="services-domains-title">

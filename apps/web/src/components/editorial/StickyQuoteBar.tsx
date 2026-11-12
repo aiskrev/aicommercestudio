@@ -41,6 +41,9 @@ export function StickyQuoteBar({
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.8);
+    // Read the position once on mount: an instant scroll (or a restored scroll position) that happened before the
+    // page hydrated fires no further scroll event.
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);

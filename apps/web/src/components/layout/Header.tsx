@@ -10,7 +10,8 @@ import { type SearchLabels, SiteSearch } from "@/components/layout/SiteSearch";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClass, Container, cx } from "@/components/ui/primitives";
 import type { Locale, SlugMap } from "@/i18n/config";
-import type { NavItem, NavLink, NavMenu } from "@/lib/site-nav";
+import { UiPreview } from "@/components/v5/UiPreview";
+import type { Navigation, NavItem, NavLink, NavMenu } from "@/lib/site-nav";
 import { usePublicPathname } from "@/lib/use-public-pathname";
 
 interface Labels {
@@ -70,10 +71,13 @@ export function Header({
   searchLabels,
   languageLabels,
   account,
+  quick,
 }: {
   homeHref: string;
   menus: NavMenu[];
   cta: NavItem;
+  /** Quick-start strip under every desktop panel and in the mobile sheet (service selector + quote). */
+  quick?: Navigation["quick"];
   labels: Labels;
   locale: Locale;
   slugs: SlugMap;
@@ -304,9 +308,10 @@ export function Header({
                         <Link
                           href={menu.featured.href}
                           onClick={closeAll}
-                          className="feature-panel group flex min-w-0 flex-col justify-between gap-4 self-start p-5"
+                          className="feature-panel group flex min-w-0 flex-col justify-between gap-4 self-start overflow-hidden p-5"
                           data-testid={`featured-${menu.id}`}
                         >
+                          <UiPreview kind={menu.featured.preview} compact className="pointer-events-none -mx-1 hidden xl:block" />
                           <span>
                             <span className="block text-base font-semibold leading-snug text-fg">{menu.featured.title}</span>
                             <span className="mt-2 block text-caption leading-relaxed text-fg-muted">{menu.featured.text}</span>
@@ -317,6 +322,24 @@ export function Header({
                           </span>
                         </Link>
                       </Container>
+                      {quick && (
+                        <div className="border-t border-line-subtle bg-surface-1/60">
+                          <Container size="wide" className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-3.5">
+                            <p className="text-caption text-fg-muted">
+                              <span className="font-semibold text-fg">{quick.title}</span> {quick.text}
+                            </p>
+                            <span className="flex items-center gap-2">
+                              <Link href={quick.selector.href} onClick={closeAll} className={buttonClass("secondary", "sm")} data-testid={`quick-selector-${menu.id}`}>
+                                <Icon name="target" className="h-3.5 w-3.5 text-brand" />
+                                {quick.selector.label}
+                              </Link>
+                              <Link href={quick.quote.href} onClick={closeAll} className={buttonClass("primary", "sm")}>
+                                {quick.quote.label}
+                              </Link>
+                            </span>
+                          </Container>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </li>
@@ -349,6 +372,9 @@ export function Header({
         </Container>
       </header>
 
+      {/* Quiet scrim under an open desktop panel (decorative; a click on it is an outside click and closes the panel). */}
+      {openMenu && <div aria-hidden="true" className="menu-sheet-enter fixed inset-x-0 bottom-0 top-16 z-40 hidden bg-surface-deep/55 min-[90rem]:block" data-testid="menu-scrim" />}
+
       {/* Rendered outside <header>: its backdrop-filter would otherwise become the containing block of this fixed panel. */}
       <div
         id={mobilePanelId}
@@ -368,6 +394,7 @@ export function Header({
                     <MobileGroup
                       id={`${mobilePanelId}-${menu.id}`}
                       label={menu.label}
+                      icon={menu.overview.icon}
                       active={menuActive(menu)}
                       expanded={expanded === menu.id}
                       onToggle={() => setExpanded((open) => (open === menu.id ? null : menu.id))}
@@ -391,6 +418,21 @@ export function Header({
               </ul>
             </nav>
             <div className="mt-5 flex flex-col gap-4 border-t border-line-subtle pt-5">
+              {quick && (
+                <Link
+                  href={quick.selector.href}
+                  onClick={closeAll}
+                  className="flex min-h-12 items-center gap-3 rounded-xl border border-line-default bg-surface-1 px-4 py-3 text-body-sm"
+                  data-testid="mobile-selector"
+                >
+                  <Icon name="target" className="h-5 w-5 shrink-0 text-brand" />
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-fg">{quick.selector.label}</span>
+                    <span className="block text-xs text-fg-muted">{quick.title}</span>
+                  </span>
+                  <Icon name="arrowRight" className="ml-auto h-4 w-4 shrink-0 text-brand" />
+                </Link>
+              )}
               <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="self-start" />
               {account && <AccountLinks links={account} variant="sheet" />}
             </div>
@@ -429,6 +471,7 @@ function MenuLink({ item, current, onNavigate, className }: { item: NavLink; cur
 function MobileGroup({
   id,
   label,
+  icon,
   active,
   expanded,
   onToggle,
@@ -436,6 +479,7 @@ function MobileGroup({
 }: {
   id: string;
   label: string;
+  icon?: ComponentProps<typeof Icon>["name"];
   active: boolean;
   expanded: boolean;
   onToggle: () => void;
@@ -455,7 +499,14 @@ function MobileGroup({
           expanded && "bg-surface-2",
         )}
       >
-        {label}
+        <span className="flex items-center gap-3">
+          {icon && (
+            <span className={cx("inline-flex h-8 w-8 items-center justify-center rounded-[var(--radius-md)] border transition-colors", expanded || active ? "border-brand/50 bg-surface-3 text-brand" : "border-line-default bg-surface-1 text-fg-muted")} aria-hidden="true">
+              <Icon name={icon} className="h-4 w-4" />
+            </span>
+          )}
+          {label}
+        </span>
         <Icon name="chevronDown" className={cx("h-4 w-4 text-fg-subtle transition-transform duration-200", expanded && "rotate-180")} />
       </button>
       <div id={id} hidden={!expanded} className="pb-3 pt-1">

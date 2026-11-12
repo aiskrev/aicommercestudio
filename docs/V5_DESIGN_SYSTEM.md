@@ -72,3 +72,23 @@ V5 добавя токени и компоненти към **съществув
 
 Нищо ново не се зарежда: без изображения, шрифтове, икони или скриптове. Прегледите са няколко десетки `span`
 елемента. Мерките на Lighthouse са в `docs/V5_FINAL_IMPLEMENTATION_REPORT.md`.
+
+## 7. Разширение „Future Commerce“ (2026-11-12)
+
+Същата система, нови класове (подробно: `docs/FUTURE_COMMERCE_REDESIGN_REPORT.md`):
+
+* **Хартиена тема** — `Section tone="light"` (`.surface-light`) пренасочва семантичните токени (`fg*`, `surface-*`,
+  `line-*`, `brand*`, статусните цветове) към топлата „хартиена“ палитра (`--color-paper-*`), така че всеки
+  компонент работи и на светла секция без отделни класове. Контрастът е в `design-tokens.test.ts`.
+* **Графит** — `.surface-graphite` (`--color-graphite`), неутрална тъмна лента.
+* **Герой** — `.fc-backdrop` + `.fc-grid` (два бавно плаващи цветни полета под маскирана решетка, само `transform`),
+  `.fc-horizon`, `.fc-stage` (наслоени прегледи), `.fc-glass` + `.fc-chip`, `.fc-enter` (поява веднъж, никога върху H1).
+* **Карти** — `.fc-card`, `.fc-card-more` (подробностите се плъзгат нагоре при посочване и при фокус с клавиатура;
+  на телефон и при докосване са винаги видими), `.fc-card-icon`.
+* **Интерактивни блокове** — `.tabs-segmented` (вариант на `Tabs`), `.fc-mock*` (макети с примерен текст), `.fc-step`
+  и `.fc-steps-track` (етапи с линия, която се запълва при скролиране), `.fc-flow`/`.fc-node`/`.fc-beam` (поток с
+  „лъчи“), `.fc-run-*` (AI демонстрация), `.fc-choice` (избор с големи цели), `.compare-table .is-focus`, `.fc-portrait`, `.fc-cta`.
+* **Компоненти** — `components/future/*`: `ShowcaseMock`, `ProductShowcase`, `ProcessStepper`, `IntegrationFlow`,
+  `PackageExplorer`, `AiWorkflowDemo`, `ServiceComparison`, `ServiceSelector` (+ `lib/service-selector.ts`).
+
+Всичко анимирано е само `transform`/`opacity` и е изключено при `prefers-reduced-motion: reduce`. Няма нова зависимост.

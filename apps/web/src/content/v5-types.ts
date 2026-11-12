@@ -35,6 +35,8 @@ export interface V5Nav {
     examples: string;
     company: string;
   };
+  /** Quick-start strip at the bottom of every desktop panel and in the mobile sheet (Future Commerce). */
+  quick: { title: string; text: string; selector: string };
   /** Featured card at the end of a menu panel. */
   featured: Record<"websites" | "ecommerce" | "ai" | "maintenance" | "pricing" | "studio", { title: string; text: string; cta: string }>;
   labels: {
@@ -175,10 +177,175 @@ export interface CareMatrix {
   enquire: string;
 }
 
+/* ------------------------------------------------------------------ Future Commerce (docs/FUTURE_COMMERCE_REDESIGN_REPORT.md) */
+
+export type FutureCardKey = "website" | "store" | "platform" | "ai";
+
+export interface FutureServiceCard {
+  key: FutureCardKey;
+  service: ServiceKey;
+  icon: IconName;
+  title: string;
+  summary: string;
+  audience: string;
+  includes: string[];
+  more: string;
+}
+
+export type ShowcaseKey = "corporate" | "interactive" | "store" | "saas";
+
+export interface ShowcaseItem {
+  key: ShowcaseKey;
+  icon: IconName;
+  label: string;
+  title: string;
+  text: string;
+  points: string[];
+  link: string;
+  /** Sample text drawn inside the mock-up (decorative; the caption says it is a demonstration). */
+  mock: { brand: string; title: string; subtitle: string; items: string[]; action: string; meta: string[] };
+}
+
+export interface ProcessStage {
+  title: string;
+  text: string;
+  output: string;
+  input: string;
+}
+
+export interface FlowNode {
+  key: "website" | "api" | "crm" | "automation" | "analytics";
+  icon: IconName;
+  title: string;
+  text: string;
+}
+
+export type AiActor = "system" | "ai" | "human";
+
+export interface AiDemoSample {
+  key: "enquiry" | "order" | "invoice";
+  label: string;
+  input: string;
+  /** One output per step, in step order. */
+  outputs: string[];
+}
+
+export type CompareOptionKey = "static" | "cms" | "interactive" | "store" | "app";
+
+export interface FutureContent {
+  hero: {
+    eyebrow: string;
+    title: string;
+    titleHighlight: string;
+    lead: string;
+    primaryCta: string;
+    secondaryCta: string;
+    configureCta: string;
+    points: string[];
+    previewCaption: string;
+    chips: { icon: IconName; label: string }[];
+  };
+  services: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    audienceLabel: string;
+    includesLabel: string;
+    quoteLabel: string;
+    priceNote: string;
+    hint: string;
+    selectorTitle: string;
+    selectorText: string;
+    selectorCta: string;
+    cards: FutureServiceCard[];
+  };
+  showcase: { eyebrow: string; title: string; lead: string; tabsLabel: string; caption: string; platformsLabel: string; items: ShowcaseItem[] };
+  compare: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    focusLabel: string;
+    caption: string;
+    corner: string;
+    priceRow: string;
+    priceOnRequest: string;
+    priceNote: string;
+    quote: string;
+    more: string;
+    staticVsInteractive: { title: string; static: string; interactive: string };
+    options: { key: CompareOptionKey; service: ServiceKey; label: string; summary: string }[];
+    rows: { label: string; cells: string[] }[];
+  };
+  process: { eyebrow: string; title: string; lead: string; tabsLabel: string; outputLabel: string; inputLabel: string; link: string; steps: ProcessStage[] };
+  flow: { eyebrow: string; title: string; lead: string; caption: string; note: string; nodes: FlowNode[]; cta: string };
+  packages: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    filterLabel: string;
+    filters: { key: "all" | "websites" | "stores" | "custom"; label: string }[];
+    scopeLabel: string;
+    paymentsLabel: string;
+    integrationsLabel: string;
+    deliveryLabel: string;
+    careLabel: string;
+    compareCta: string;
+    pricingCta: string;
+    careTitle: string;
+    careText: string;
+    careCta: string;
+  };
+  aiDemo: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    disclaimer: string;
+    samplesLabel: string;
+    inputLabel: string;
+    start: string;
+    next: string;
+    approve: string;
+    reject: string;
+    restart: string;
+    waiting: string;
+    approved: string;
+    rejected: string;
+    actors: Record<AiActor, string>;
+    states: { pending: string; active: string; done: string; waiting: string };
+    steps: { key: string; actor: AiActor; title: string }[];
+    samples: AiDemoSample[];
+    toolsTitle: string;
+    toolsText: string;
+  };
+  about: { eyebrow: string; title: string; lead: string; points: string[] };
+  finalCta: { eyebrow: string; title: string; lead: string; primary: string; secondary: string; points: string[] };
+  selector: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    goalLabel: string;
+    goals: { key: "landing" | "website" | "store" | "app" | "automate"; label: string; hint: string }[];
+    needsLabel: string;
+    needs: { key: "payments" | "accounts" | "cms" | "integrations" | "languages" | "maintenance"; label: string }[];
+    resultLabel: string;
+    packageLabel: string;
+    serviceLabel: string;
+    relatedLabel: string;
+    careLabel: string;
+    noPackage: string;
+    adjusted: string;
+    disclaimer: string;
+    quote: string;
+    open: string;
+    reset: string;
+  };
+}
+
 export interface V5Content {
   nav: V5Nav;
   home: HomeV5;
   websites: HubContent;
   ecommerce: HubContent;
   care: CareMatrix;
+  future: FutureContent;
 }

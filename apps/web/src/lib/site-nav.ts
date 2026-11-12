@@ -1,4 +1,5 @@
 import type { IconName } from "@/components/ui/Icon";
+import type { PreviewKind } from "@/components/v5/UiPreview";
 import { domainByKey, getContent, serviceByKey } from "@/content";
 import type { ServiceKey } from "@/content/types";
 import type { Dictionary } from "@/i18n";
@@ -37,17 +38,35 @@ export interface NavMenu {
   /** Overview page of the group (first link of the panel). */
   overview: NavLink;
   columns: NavColumn[];
-  featured: { title: string; text: string; cta: string; href: string };
+  featured: { title: string; text: string; cta: string; href: string; preview: PreviewKind };
 }
 
 export interface Navigation {
   menus: NavMenu[];
+  /** Quick-start strip: the service selector and the quote form (Future Commerce). */
+  quick: { title: string; text: string; selector: NavItem; quote: NavItem };
   /** Header button: the working quote path. */
   cta: NavItem;
 }
 
 /** Anchor on the care plans page where the recurring-services matrix starts. */
 export const CARE_MATRIX_ANCHOR = "ongoing-services";
+
+/** Anchor of the service selector on the services overview page. */
+export const SELECTOR_ANCHOR = "selector";
+
+/** Icons of the hub offers (website types and store platforms) in the menus. */
+const OFFER_ICONS: Record<string, IconName> = {
+  landing: "target",
+  static: "fileText",
+  cms: "pen",
+  interactive: "activity",
+  corporate: "building",
+  redesign: "refresh",
+  shopify: "store",
+  woocommerce: "cart",
+  custom: "layers",
+};
 
 export function buildNavigation(locale: Locale, dict: Dictionary): Navigation {
   const href = (path: string) => localizePath(locale, path);
@@ -84,14 +103,14 @@ export function buildNavigation(locale: Locale, dict: Dictionary): Navigation {
       columns: [
         {
           title: nav.groups.websiteTypes,
-          items: v5.websites.offers.map((offer) => ({ href: hubAnchor(routes.websites, offer.id), label: offer.name, description: offer.value })),
+          items: v5.websites.offers.map((offer) => ({ href: hubAnchor(routes.websites, offer.id), label: offer.name, description: offer.value, icon: OFFER_ICONS[offer.id] })),
         },
         {
           title: nav.groups.websiteServices,
           items: [service("business_websites"), service("portals_web_apps"), service("security_performance")],
         },
       ],
-      featured: { ...nav.featured.websites, href: hubAnchor(routes.websites, "compare") },
+      featured: { ...nav.featured.websites, href: hubAnchor(routes.websites, "compare"), preview: "static" },
     },
     {
       id: "ecommerce",
@@ -100,7 +119,7 @@ export function buildNavigation(locale: Locale, dict: Dictionary): Navigation {
       columns: [
         {
           title: nav.groups.storePlatforms,
-          items: v5.ecommerce.offers.map((offer) => ({ href: hubAnchor(routes.ecommerce, offer.id), label: offer.name, description: offer.value })),
+          items: v5.ecommerce.offers.map((offer) => ({ href: hubAnchor(routes.ecommerce, offer.id), label: offer.name, description: offer.value, icon: OFFER_ICONS[offer.id] })),
         },
         {
           title: nav.groups.storeServices,
@@ -115,7 +134,7 @@ export function buildNavigation(locale: Locale, dict: Dictionary): Navigation {
           ],
         },
       ],
-      featured: { ...nav.featured.ecommerce, href: hubAnchor(routes.ecommerce, "costs") },
+      featured: { ...nav.featured.ecommerce, href: hubAnchor(routes.ecommerce, "costs"), preview: "store" },
     },
     {
       id: "ai",
@@ -145,7 +164,7 @@ export function buildNavigation(locale: Locale, dict: Dictionary): Navigation {
           ],
         },
       ],
-      featured: { ...nav.featured.ai, href: toolLinks.advisor ?? href(routes.tools) },
+      featured: { ...nav.featured.ai, href: toolLinks.advisor ?? href(routes.tools), preview: "ai" },
     },
     {
       id: "maintenance",
@@ -158,7 +177,7 @@ export function buildNavigation(locale: Locale, dict: Dictionary): Navigation {
         },
         { title: nav.groups.cloud, items: domains(["cloud_platform", "devops_sre", "managed_operations"]) },
       ],
-      featured: { ...nav.featured.maintenance, href: `${href(routes.carePlans)}#${CARE_MATRIX_ANCHOR}` },
+      featured: { ...nav.featured.maintenance, href: `${href(routes.carePlans)}#${CARE_MATRIX_ANCHOR}`, preview: "portal" },
     },
     {
       id: "pricing",
@@ -174,7 +193,7 @@ export function buildNavigation(locale: Locale, dict: Dictionary): Navigation {
           ],
         },
       ],
-      featured: { ...nav.featured.pricing, href: href(`${routes.contact}?tip=oferta`) },
+      featured: { ...nav.featured.pricing, href: href(`${routes.contact}?tip=oferta`), preview: "interactive" },
     },
     {
       id: "studio",
@@ -201,17 +220,20 @@ export function buildNavigation(locale: Locale, dict: Dictionary): Navigation {
           ],
         },
       ],
-      featured: { ...nav.featured.studio, href: href(routes.demoCentre) },
+      featured: { ...nav.featured.studio, href: href(routes.demoCentre), preview: "portal" },
     },
   ];
 
-  return { menus, cta: { href: href(`${routes.contact}?tip=oferta`), label: nav.quoteCta } };
+  const cta = { href: href(`${routes.contact}?tip=oferta`), label: nav.quoteCta };
+  const quick = { title: nav.quick.title, text: nav.quick.text, selector: { href: `${href(routes.services)}#${SELECTOR_ANCHOR}`, label: nav.quick.selector }, quote: cta };
+  return { menus, quick, cta };
 }
 
 /** Every href of the navigation (tests and the link audit). */
 export function navigationHrefs(navigation: Navigation): string[] {
   return [
     ...navigation.menus.flatMap((menu) => [menu.overview.href, ...menu.columns.flatMap((column) => column.items.map((item) => item.href)), menu.featured.href]),
+    navigation.quick.selector.href,
     navigation.cta.href,
   ];
 }

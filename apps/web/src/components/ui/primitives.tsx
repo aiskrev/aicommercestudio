@@ -332,26 +332,39 @@ export function Skeleton({ className }: { className?: string }) {
   return <div className={cx("skeleton", className)} aria-hidden="true" />;
 }
 
+/**
+ * Page hero (Future Commerce): the homepage's layered backdrop (drifting colour fields under a masked grid, CSS
+ * only, still with reduced motion) and a light hairline on the bottom edge. `aside` places a visual (a product
+ * preview, a key-facts panel) beside the text from `lg`; it eases in once and is never the LCP element.
+ */
 export function PageHero({
   eyebrow,
   title,
   lead,
   children,
+  aside,
 }: {
   eyebrow: string;
   title: string;
   lead: string;
   children?: ReactNode;
+  aside?: ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden border-b border-line-subtle">
-      <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
-      <Container className="relative pb-14 pt-12 sm:pb-20 sm:pt-16">
-        <Eyebrow>{eyebrow}</Eyebrow>
-        <h1 className="t-h1 mt-5 max-w-4xl">{title}</h1>
-        <p className="t-lead mt-6 max-w-3xl">{lead}</p>
-        {children}
+    <div className="relative isolate overflow-hidden border-b border-line-subtle">
+      <div className="fc-backdrop" aria-hidden="true">
+        <div className="fc-grid" />
+      </div>
+      <Container className={cx("relative pb-14 pt-12 sm:pb-20 sm:pt-16", Boolean(aside) && "grid items-center gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14")}>
+        <div className="min-w-0">
+          <Eyebrow>{eyebrow}</Eyebrow>
+          <h1 className="t-h1 mt-5 max-w-4xl">{title}</h1>
+          <p className="t-lead mt-6 max-w-3xl">{lead}</p>
+          {children}
+        </div>
+        {aside && <div className="fc-enter min-w-0">{aside}</div>}
       </Container>
+      <span className="fc-horizon" aria-hidden="true" />
     </div>
   );
 }

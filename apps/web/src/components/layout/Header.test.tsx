@@ -26,6 +26,7 @@ const props = {
   homeHref: "/bg",
   menus: navigation.menus,
   cta: navigation.cta,
+  quick: navigation.quick,
   labels: { nav: "Основна навигация", openMenu: "Отворете менюто", closeMenu: "Затворете менюто", overview: "Преглед" },
   locale: "bg" as const,
   slugs: buildSlugMap(),

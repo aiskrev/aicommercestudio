@@ -98,7 +98,9 @@ export default async function AgentPage({ params }: PageProps<"/[locale]/ai-agen
         ]}
       />
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="fc-backdrop" aria-hidden="true">
+          <div className="fc-grid" />
+        </div>
         <Container className="relative pb-14 pt-12 sm:pb-16 sm:pt-16">
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <div className="mt-5 flex items-start gap-4">

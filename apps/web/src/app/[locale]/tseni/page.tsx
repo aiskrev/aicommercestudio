@@ -4,6 +4,7 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Alert, ButtonLink, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
+import { UiPreview } from "@/components/v5/UiPreview";
 import { getContent, serviceByKey } from "@/content";
 import { getDictionary } from "@/i18n";
 import { localizePath } from "@/i18n/config";
@@ -84,7 +85,7 @@ export default async function PricingPage({ params }: PageProps<"/[locale]/tseni
     <>
       <JsonLd data={collectionPageJsonLd({ name: t.title, description: t.metaDescription, path: href(routes.pricing) }, locale)} />
       <Breadcrumbs items={[{ name: dict.common.home, path: href(routes.home) }, { name: t.navLabel, path: href(routes.pricing) }]} />
-      <PageHero eyebrow={t.eyebrow} title={t.title} lead={t.lead}>
+      <PageHero eyebrow={t.eyebrow} title={t.title} lead={t.lead} aside={<UiPreview kind="interactive" caption={getContent(locale).v5.home.hero.previewCaption} />}>
         <div className="mt-8 max-w-3xl" data-testid="pricing-note">
           <Alert tone="info" role="note">{dict.prices.note}</Alert>
         </div>
@@ -102,7 +103,7 @@ export default async function PricingPage({ params }: PageProps<"/[locale]/tseni
       </PageHero>
 
       {groups.map((group, index) => (
-        <Section key={group.id} labelledBy={`${group.id}-title`} tone={index % 2 === 1 ? "raised" : undefined} size="wide">
+        <Section key={group.id} labelledBy={`${group.id}-title`} tone={index % 2 === 1 ? "light" : undefined} size="wide">
           <div id={group.id} className="scroll-mt-24">
             <SectionHeading
               id={`${group.id}-title`}

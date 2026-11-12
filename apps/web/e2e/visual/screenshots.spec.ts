@@ -43,6 +43,17 @@ const PAGES: [string, string][] = [
   ["care-plans-en", "/en/care-plans"],
   ["demo-centre-bg", "/bg/demo-tsentar"],
   ["demo-centre-en", "/en/demo-centre"],
+  // Future Commerce (docs/FUTURE_COMMERCE_REDESIGN_REPORT.md)
+  ["websites-bg", "/bg/izrabotka-na-saytove"],
+  ["websites-en", "/en/website-development"],
+  ["ecommerce-bg", "/bg/online-magazini"],
+  ["ecommerce-en", "/en/ecommerce"],
+  ["packages-bg", "/bg/proektni-paketi"],
+  ["packages-en", "/en/project-packages"],
+  ["pricing-bg", "/bg/tseni"],
+  ["pricing-en", "/en/pricing"],
+  ["tools-bg", "/bg/instrumenti"],
+  ["founder-bg", "/bg/za-nas/osnovatel"],
 ];
 
 // Optional filters for quick iterations: SHOT_ONLY=home-bg,home-en  SHOT_WIDTHS=1440,390
@@ -50,7 +61,7 @@ const ONLY = (process.env.SHOT_ONLY ?? "").split(",").filter(Boolean);
 const WIDTHS = (process.env.SHOT_WIDTHS ?? "").split(",").filter(Boolean).map(Number);
 // SHOT_FULL=all also saves full-page screenshots at 1024 / 768 / 360 (default: overflow check only).
 const FULL_ALL = process.env.SHOT_FULL === "all";
-const FULL = (FULL_ALL ? [1440, 1024, 768, 390, 360] : [1440, 390]).filter((w) => !WIDTHS.length || WIDTHS.includes(w));
+const FULL = (FULL_ALL ? [1920, 1440, 1024, 768, 390, 360] : [1440, 390]).filter((w) => !WIDTHS.length || WIDTHS.includes(w));
 const CHECK_ONLY = (FULL_ALL ? [] : [1024, 768, 360]).filter((w) => !WIDTHS.length || WIDTHS.includes(w));
 const SELECTED = ONLY.length ? PAGES.filter(([name]) => ONLY.includes(name)) : PAGES;
 
@@ -104,4 +115,43 @@ test("capture pages", async ({ page }) => {
 
   fs.writeFileSync(path.join(OUT, "overflow.json"), JSON.stringify(overflow, null, 2));
   expect(Object.keys(overflow).length).toBe(SELECTED.length);
+});
+
+/** Navigation states (Future Commerce): desktop mega-menu panels and the mobile sheet with an open group. */
+test("capture navigation", async ({ page }) => {
+  test.setTimeout(300_000);
+  if (ONLY.length && !ONLY.includes("nav")) test.skip();
+  fs.mkdirSync(OUT, { recursive: true });
+  for (const width of [1920, 1440].filter((w) => !WIDTHS.length || WIDTHS.includes(w))) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const locale of ["bg", "en"]) {
+      await page.goto(`/${locale}`, { waitUntil: "networkidle" });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      for (const menu of ["websites", "ecommerce", "ai"]) {
+        const toggle = page.getByTestId(`menu-${menu}`);
+        if (!(await toggle.isVisible())) continue;
+        await expect(async () => {
+          if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
+          await expect(page.getByTestId(`panel-${menu}`)).toBeVisible({ timeout: 1500 });
+        }).toPass({ timeout: 30_000 });
+        await page.screenshot({ path: path.join(OUT, `nav-${menu}-${locale}-${width}.png`) });
+        await page.keyboard.press("Escape");
+      }
+    }
+  }
+  for (const width of [1024, 768, 390, 360].filter((w) => !WIDTHS.length || WIDTHS.includes(w))) {
+    await page.setViewportSize({ width, height: width < 768 ? 844 : 1024 });
+    for (const locale of ["bg", "en"]) {
+      await page.goto(`/${locale}`, { waitUntil: "networkidle" });
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      // Wait for hydration: retry until the sheet opens.
+      await expect(async () => {
+        await page.locator("[data-menu-toggle]").click();
+        await expect(page.getByTestId("mobile-menu")).toBeVisible({ timeout: 1500 });
+      }).toPass({ timeout: 30_000 });
+      await page.screenshot({ path: path.join(OUT, `nav-sheet-${locale}-${width}.png`) });
+      await page.getByTestId("mobile-menu").getByRole("button").nth(1).click();
+      await page.screenshot({ path: path.join(OUT, `nav-sheet-open-${locale}-${width}.png`) });
+    }
+  }
 });

@@ -68,7 +68,9 @@ export default async function FounderPage({ params }: PageProps<"/[locale]/za-na
 
       {/* executive introduction */}
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="fc-backdrop" aria-hidden="true">
+          <div className="fc-grid" />
+        </div>
         <Container className="relative grid items-center gap-10 pb-14 pt-10 sm:pb-16 md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] lg:gap-16 lg:pb-20">
           <div className="min-w-0">
             <Eyebrow>{profile.eyebrow}</Eyebrow>

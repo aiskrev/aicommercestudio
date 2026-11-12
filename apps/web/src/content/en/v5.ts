@@ -1,4 +1,5 @@
 import type { V5Content } from "@/content/v5-types";
+import { future } from "@/content/en/future";
 
 /**
  * V5: navigation, homepage, the "Website development" and "E-commerce" hubs and the recurring-services matrix.
@@ -29,6 +30,7 @@ export const v5: V5Content = {
       examples: "Examples",
       company: "The studio",
     },
+    quick: { title: "Not sure where to start?", text: "Answer a few questions or describe the project — you will get a written quote.", selector: "Service selector" },
     featured: {
       websites: { title: "Static or interactive?", text: "Compare the types of website: what each includes and when it is the right choice.", cta: "See the comparison" },
       ecommerce: { title: "What you pay, and to whom", text: "Platform subscription, hosting, extensions, payment fees and our work — listed separately.", cta: "See the costs" },
@@ -536,6 +538,8 @@ export const v5: V5Content = {
     },
     cta: { title: "What will you sell online?", lead: "Describe the catalogue, how you ship and the systems you use. We will propose a platform, a scope and a written quote." },
   },
+
+  future,
 
   care: {
     title: "Ongoing services: what is included and what is paid separately",

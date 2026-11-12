@@ -11,6 +11,7 @@ import { type Locale, localizePath } from "@/i18n/config";
 import type { Dictionary } from "@/i18n";
 import { AI_SERVICE_NAV, FOUNDATION_SERVICE_NAV } from "@/lib/navigation";
 import { routes } from "@/lib/routes";
+import { SELECTOR_ANCHOR } from "@/lib/site-nav";
 import { company } from "@/lib/company";
 import { site } from "@/lib/site";
 
@@ -61,16 +62,23 @@ export function Footer({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   return (
     <footer className="relative mt-auto border-t border-line-subtle bg-ink-950">
       {/* statement + primary action */}
-      <Container size="wide" className="grid gap-8 border-b border-line-subtle py-12 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end lg:py-16">
-        <div>
-          <Logo href={href(routes.home)} />
-          <p className="t-h3-lg mt-6 max-w-2xl text-fg">{dict.footer.tagline}</p>
-        </div>
-        <div className="flex flex-col gap-4 lg:items-end">
-          <ButtonLink href={href(`${routes.contact}?tip=oferta`)} icon="arrowRight">
-            {v5.nav.quoteCta}
-          </ButtonLink>
-          <ContactDetails labels={dict.contactDetails} align="end" />
+      <Container size="wide" className="py-12 lg:py-16">
+        <div className="fc-cta grid gap-8 p-6 sm:p-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end">
+          <div>
+            <Logo href={href(routes.home)} />
+            <p className="t-h3-lg mt-6 max-w-2xl text-fg">{dict.footer.tagline}</p>
+          </div>
+          <div className="flex flex-col gap-4 lg:items-end">
+            <div className="flex flex-wrap gap-3 lg:justify-end">
+              <ButtonLink href={`${href(routes.services)}#${SELECTOR_ANCHOR}`} variant="secondary" icon="target">
+                {v5.nav.quick.selector}
+              </ButtonLink>
+              <ButtonLink href={href(`${routes.contact}?tip=oferta`)} icon="arrowRight">
+                {v5.nav.quoteCta}
+              </ButtonLink>
+            </div>
+            <ContactDetails labels={dict.contactDetails} align="end" />
+          </div>
         </div>
       </Container>
 

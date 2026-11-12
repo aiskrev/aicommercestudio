@@ -22,7 +22,12 @@ export function Tabs<T extends string>({
   onChange,
   children,
   className,
+  variant = "underline",
+  panelClassName,
 }: {
+  /** `segmented`: pills on a quiet track (Future Commerce showcase and filters). */
+  variant?: "underline" | "segmented";
+  panelClassName?: string;
   id: string;
   /** Accessible name of the tab list. */
   label: string;
@@ -51,7 +56,7 @@ export function Tabs<T extends string>({
 
   return (
     <div className={className}>
-      <div role="tablist" aria-label={label} className="tabs" onKeyDown={onKeyDown}>
+      <div role="tablist" aria-label={label} className={variant === "segmented" ? "tabs tabs-segmented" : "tabs"} onKeyDown={onKeyDown}>
         {items.map((item, index) => (
           <button
             key={item.value}
@@ -72,7 +77,7 @@ export function Tabs<T extends string>({
           </button>
         ))}
       </div>
-      <div role="tabpanel" id={panelId} aria-labelledby={tabId(selected)} tabIndex={0} className="tab-panel">
+      <div role="tabpanel" id={panelId} aria-labelledby={tabId(selected)} tabIndex={0} className={panelClassName ? `tab-panel ${panelClassName}` : "tab-panel"}>
         {children}
       </div>
     </div>
