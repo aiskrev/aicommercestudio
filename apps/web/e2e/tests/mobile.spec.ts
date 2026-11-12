@@ -92,9 +92,14 @@ test("sticky quote bar can be dismissed for the session", async ({ page }) => {
 test("contact form is usable on mobile", async ({ page }) => {
   await page.goto("/bg/kontakti");
   await expect(page.getByRole("button", { name: "Изпратете запитването" })).toBeVisible();
-  const box = await page.getByLabel(/Описание на проекта/).boundingBox();
+  // `boundingBox()` does not wait for visibility and answers null while the form is still being hydrated: that, not the
+  // layout, is the most likely cause of the intermittent failure seen once in the Future Commerce run (audit F-24).
+  const field = page.getByLabel(/Описание на проекта/);
+  await expect(field).toBeVisible();
+  const box = await field.boundingBox();
   const viewport = page.viewportSize();
-  expect(box && viewport && box.width <= viewport.width).toBeTruthy();
+  expect(box, "the field has a box once it is visible").not.toBeNull();
+  expect(box!.width).toBeLessThanOrEqual(viewport!.width);
 });
 
 test("AI team configurator works on a phone: one-column agents, vertical diagram, no overflow", async ({ page }) => {
