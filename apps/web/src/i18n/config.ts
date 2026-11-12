@@ -11,6 +11,7 @@
  */
 
 import { AGENT_SLUGS } from "@/lib/agent-slugs";
+import { DEMO_SLUGS } from "@/lib/demo-slugs";
 import { PATTERN_SLUGS, SCENARIO_SLUGS } from "@/lib/reference-slugs";
 import { TOOL_PAGE_SLUGS } from "@/lib/tool-slugs";
 import { WORKSHOP_SLUGS } from "@/lib/workshop-slugs";
@@ -81,6 +82,7 @@ const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
     zapitvaniya: "support",
     organizatsiya: "organisation",
     sigurnost: "security",
+    izrabotka: "delivery",
   },
   // Tool pages (lib/tool-slugs.ts): live tools and the intro pages of planned ones.
   instrumenti: Object.fromEntries(Object.values(TOOL_PAGE_SLUGS).map(({ bg, en }) => [bg, en])),
@@ -91,6 +93,8 @@ const EN_SUBSEGMENTS: Record<string, Record<string, string>> = {
   "integratsionni-modeli": Object.fromEntries(Object.values(PATTERN_SLUGS).map(({ bg, en }) => [bg, en])),
   // Workshops & Advisory catalogue (lib/workshop-slugs.ts).
   "rabotni-sreshti": Object.fromEntries(Object.values(WORKSHOP_SLUGS).map(({ bg, en }) => [bg, en])),
+  // Interactive demonstrations (lib/demo-slugs.ts).
+  "demo-tsentar": Object.fromEntries(Object.values(DEMO_SLUGS).map(({ bg, en }) => [bg, en])),
 };
 
 const BG_SEGMENTS = Object.fromEntries(Object.entries(EN_SEGMENTS).map(([bg, en]) => [en, bg]));

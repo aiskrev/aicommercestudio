@@ -32,12 +32,21 @@ COMMERCIAL_STORAGE_DISCLOSED = False
 QUOTATION_ACCEPTANCE_WORDING_APPROVED = False
 
 
+# BLOCKER-COM-UPLOAD-01 (docs/PROJECT_DOCUMENTS.md, docs/COMMERCIAL_EXPANSION_DECISIONS.md D-31) - OPEN.
+# Uploading files is the riskiest feature of the customer area. The code checks the type by name and by content, limits
+# the size, stores files privately and authorizes every download, but no malware scanner is connected, the upload
+# policy (types, sizes, retention) is the owner's decision and the security review of uploads is not recorded. Until
+# then uploads stay out of production. Set to True in the change that records the review and the policy.
+PROJECT_UPLOAD_REVIEW_APPROVED = False
+
+
 def open_blockers(
     *,
     customer_accounts_enabled: bool,
     project_configurator_enabled: bool = False,
     quote_basket_enabled: bool = False,
     quotations_enabled: bool = False,
+    project_uploads_enabled: bool = False,
 ) -> list[str]:
     blockers: list[str] = []
     if quotations_enabled and not QUOTATION_ACCEPTANCE_WORDING_APPROVED:
@@ -49,6 +58,11 @@ def open_blockers(
         blockers.append(
             "BLOCKER-COM-STORAGE-01: the cookie policy does not yet describe the browser storage of the project "
             "configurator and the quote basket (docs/COOKIE_AUDIT.md)"
+        )
+    if project_uploads_enabled and not PROJECT_UPLOAD_REVIEW_APPROVED:
+        blockers.append(
+            "BLOCKER-COM-UPLOAD-01: the security review and the policy for project file uploads are not recorded "
+            "(docs/PROJECT_DOCUMENTS.md)"
         )
     if customer_accounts_enabled and not ACCOUNT_HEADER_LAYOUT_FIXED:
         blockers.append(

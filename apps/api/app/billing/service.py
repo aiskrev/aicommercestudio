@@ -132,6 +132,9 @@ def start_checkout(
     offer = db.get(BillingOffer, offer_key)
     if offer is None or offer.approved_at is None:
         raise BillingError(404, "offer_unavailable", "This offer isn't available.")
+    if offer.category == "project_deposit":
+        # Belt and braces: the database already refuses an approved deposit (it needs a legal design first, D-08).
+        raise BillingError(409, "category_not_released", "This kind of sale isn't available.")
     try:
         invoicing.require_sale_allowed(db, settings, workspace.id)
     except invoicing.ProfileMissing as exc:
@@ -601,6 +604,7 @@ def public_offers(db: Session) -> list[dict[str, Any]]:
         {
             "key": r.key,
             "kind": r.kind,
+            "category": r.category,
             "plan": r.plan_key,
             "interval": r.billing_interval,
             "currency": r.currency,

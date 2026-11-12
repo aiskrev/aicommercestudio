@@ -8,6 +8,8 @@ WORKDIR /app
 # DejaVu fonts: Latin + Cyrillic glyphs for the PDF readiness report (reportlab).
 RUN apt-get update && apt-get install -y --no-install-recommends fonts-dejavu-core && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system app && useradd --system --gid app --home-dir /app app && chown app:app /app
+# Private storage of project documents (a volume in compose): owned by the API user, outside every web root.
+RUN mkdir -p /var/lib/acs/project-files && chown -R app:app /var/lib/acs && chmod 700 /var/lib/acs/project-files
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 

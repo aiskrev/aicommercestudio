@@ -61,6 +61,15 @@ if ($Suite -in @("api", "web", "all")) {
         if ($api -ne $web) { Write-Host "workshop keys differ between apps/api and apps/web (copy the web file)" -ForegroundColor Red }
         $global:LASTEXITCODE = [int]($api -ne $web)
     }
+    # Interactive demonstrations: the scenarios and the codes come from the API (app/demos/engine.py); the web copies are
+    # the single source of the page's choices and texts.
+    Invoke-Suite "Demonstration scenarios and codes (API = web copy)" {
+        $bad = 0
+        foreach ($pair in @(@("apps/api/app/demos/scenarios.json", "apps/web/src/lib/demo-scenarios.json"), @("apps/api/app/demos/codes.json", "apps/web/src/lib/demo-codes.json"))) {
+            if ((Get-FileHash $pair[0]).Hash -ne (Get-FileHash $pair[1]).Hash) { Write-Host "$($pair[0]) differs from $($pair[1]) (copy the API file)" -ForegroundColor Red; $bad = 1 }
+        }
+        $global:LASTEXITCODE = $bad
+    }
     # Published price schedule: generated from lib/prices.ts (price-schedule.test.ts); the API reads the copy (app/pricing.py).
     Invoke-Suite "Price schedule (API = web copy)" {
         $api = (Get-FileHash "apps/api/app/price_schedule.json").Hash

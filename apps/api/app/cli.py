@@ -334,6 +334,16 @@ def cmd_purge_synthetic(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_project_documents_purge(_args: argparse.Namespace) -> int:
+    """Deletes the stored bytes of project documents past their retention date; the records stay."""
+    from app.projects import documents
+
+    with get_sessionmaker()() as db:
+        purged = documents.purge_expired(db)
+    _print(f"[project-documents-purge] versions purged: {purged}")
+    return 0
+
+
 def cmd_maintenance(args: argparse.Namespace) -> int:
     settings = get_settings()
     with get_sessionmaker()() as db:
@@ -350,6 +360,10 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         saved_assessments = assessment_service.purge_expired(db, dry_run=args.dry_run)
         analytics_events = analytics.purge_expired(db, settings.analytics_retention_days, dry_run=args.dry_run)
         quote_baskets = quote_service.purge_expired(db, dry_run=args.dry_run)
+        from app.projects import documents as project_documents
+
+        # The stored bytes of project documents past their retention date (the records stay); needs the storage volume.
+        document_versions = project_documents.count_expired(db) if args.dry_run else project_documents.purge_expired(db)
         sessions_removed = 0
         account_rows = 0
         legal_removed = {"withdrawals": 0, "data_requests": 0, "events": 0, "kept_for_accounting": 0}
@@ -369,6 +383,7 @@ def cmd_maintenance(args: argparse.Namespace) -> int:
         f"assessment_results={saved_assessments.due if args.dry_run else saved_assessments.deleted} "
         f"analytics_events={analytics_events} "
         f"quote_baskets={quote_baskets} "
+        f"project_document_files={document_versions} "
         f"sessions={sessions_removed} account_rows={account_rows} "
         f"withdrawal_requests={legal_removed['withdrawals']} data_requests={legal_removed['data_requests']}"
     )
@@ -423,6 +438,11 @@ def cmd_billing_offer(args: argparse.Namespace) -> int:
         requires_scope=args.requires_scope,
         approved_at=utcnow() if args.approve else None,
     )
+    if args.category:
+        offer.category = args.category
+    if offer.category == "project_deposit" and args.approve:
+        _print("[billing-offer] a project deposit cannot be approved: it needs a business and legal design first")
+        return 1
     with get_sessionmaker()() as db:
         db.merge(offer)
         db.commit()
@@ -606,6 +626,11 @@ def main(argv: list[str] | None = None) -> int:
     offer.add_argument("--price", required=True)
     offer.add_argument("--plan")
     offer.add_argument("--requires-scope", action="store_true")
+    offer.add_argument(
+        "--category",
+        choices=["saas_subscription", "managed_service", "one_time_service", "project_deposit"],
+        help="Kind of sale (default: from the shape). A project deposit cannot be approved.",
+    )
     offer.add_argument("--approve", action="store_true")
     offer.set_defaults(func=cmd_billing_offer)
     scope = sub.add_parser("billing-confirm-scope", help="Open payment after intake and agreed scope")
@@ -613,6 +638,9 @@ def main(argv: list[str] | None = None) -> int:
     scope.add_argument("--offer", required=True)
     scope.add_argument("--by", required=True)
     scope.set_defaults(func=cmd_billing_confirm_scope)
+    sub.add_parser(
+        "project-documents-purge", help="Delete the stored files of project documents past their retention date"
+    ).set_defaults(func=cmd_project_documents_purge)
     sub.add_parser(
         "legal-e2e-seed", help="Synthetic accounts for the legal browser tests (never production)"
     ).set_defaults(func=cmd_legal_e2e_seed)

@@ -9,8 +9,11 @@ import app.accounts.models  # noqa: F401
 import app.analytics.models  # noqa: F401
 import app.billing.models  # noqa: F401
 import app.compliance.models  # noqa: F401
+import app.crm.models  # noqa: F401
 import app.invoicing.models  # noqa: F401
 import app.models  # noqa: F401  (registers tables on Base.metadata)
+import app.projects.doc_models  # noqa: F401
+import app.projects.models  # noqa: F401
 import app.quotations.models  # noqa: F401
 import app.quotes.models  # noqa: F401
 import app.workspace.models  # noqa: F401

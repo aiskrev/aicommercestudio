@@ -26,7 +26,10 @@ from app.routers import (
     admin_auth,
     admin_catalogue,
     admin_compliance,
+    admin_crm,
     admin_opportunities,
+    admin_project_documents,
+    admin_projects,
     admin_staff,
     advisor,
     analytics,
@@ -35,11 +38,14 @@ from app.routers import (
     catalogue,
     compliance,
     configurator,
+    demos,
     health,
     marketing,
     ops,
     ops_platform,
     portal,
+    project_documents,
+    projects,
     public,
     quotations,
     quote_basket,
@@ -151,6 +157,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(quote_basket.router)
     app.include_router(quotations.public)
     app.include_router(quotations.staff)
+    app.include_router(projects.router)
+    app.include_router(admin_projects.router)
+    app.include_router(project_documents.router)
+    app.include_router(admin_project_documents.router)
+    app.include_router(admin_crm.router)
+    app.include_router(demos.router)
     app.include_router(assessments.router)
     app.include_router(admin_auth.router)
     app.include_router(admin.router)

@@ -19,7 +19,7 @@ from app.assessments import service as assessment_service
 from app.deps import Admin, AppSettings, DbSession
 from app.errors import ApiError
 from app.integrations import integration_status
-from app.models import AIActionStatus, InquiryType, Lead, LeadLocale, LeadNote, LeadStatus, ServiceKey
+from app.models import AdminUser, AIActionStatus, InquiryType, Lead, LeadLocale, LeadNote, LeadStatus, ServiceKey
 from app.readiness.report import ReportUnavailable, build_report
 from app.readiness.scoring import ReadinessResult
 from app.schemas import (
@@ -186,8 +186,16 @@ def _quote_basket_details(lead: Lead) -> QuoteBasketDetailsOut | None:
         return None
 
 
+def _summary(db: DbSession, lead: Lead) -> LeadSummaryOut:
+    out = LeadSummaryOut.model_validate(lead)
+    if lead.owner_id:
+        owner = db.get(AdminUser, lead.owner_id)
+        out.owner_name = owner.full_name if owner else None
+    return out
+
+
 def _lead_detail(db: DbSession, lead: Lead) -> LeadDetailOut:
-    base = LeadSummaryOut.model_validate(lead).model_dump()
+    base = _summary(db, lead).model_dump()
     ai_managed = _ai_managed_details(lead)
     return LeadDetailOut(
         **base,
@@ -358,6 +366,8 @@ def list_leads(
     q: Annotated[str | None, Query(max_length=100)] = None,
     created_from: datetime | None = None,
     created_to: datetime | None = None,
+    owner: Annotated[str | None, Query(pattern=r"^(none|me|[0-9a-fA-F-]{36})$")] = None,
+    qualification: Literal["unassessed", "qualified", "not_qualified", "on_hold"] | None = None,
     sort: Literal["newest", "oldest"] = "newest",
     page: Annotated[int, Query(ge=1, le=10_000)] = 1,
     page_size: Annotated[int, Query(ge=1, le=100)] = 20,
@@ -373,12 +383,12 @@ def list_leads(
         q=q or None,
         created_from=created_from,
         created_to=created_to,
+        owner=str(ctx.user.id) if owner == "me" else owner,
+        qualification=qualification,
         sort=sort,
     )
     items, total = leads.list_leads(db, filters, page, page_size)
-    return LeadPage(
-        items=[LeadSummaryOut.model_validate(i) for i in items], total=total, page=page, page_size=page_size
-    )
+    return LeadPage(items=[_summary(db, i) for i in items], total=total, page=page, page_size=page_size)
 
 
 @router.get("/leads/{lead_id}", response_model=LeadDetailOut)

@@ -62,3 +62,13 @@ Same method, routes `/bg`, `/en`, `/bg/uslugi` (the pages that render the audit 
   motif). Together with `is-on-https` / `redirects-http` it keeps Best Practices at 74 locally; all
   three are expected to clear behind HTTPS.
 * Performance differences versus the baseline are within lab noise (no performance change intended).
+
+## Phase 15 check (2026-11-12): what was and was not measured
+
+* **Measured, as tests**: the new public pages (pricing, project packages, demo centre, two demonstrations) load no third-party host
+  and their scripts stay under 520 KB encoded (`e2e/tests/seo-commercial.spec.ts`). The demonstrations add one client component and
+  no library; their data is two small JSON files and one text module.
+* **Not re-run**: Lighthouse (LCP, INP, CLS, total weight). It needs a quiet machine and a rebuilt stack; run `.\scripts\lighthouse.ps1`
+  and compare with the table above before a release (D-47). No claim is made here about the new pages' Core Web Vitals.
+* **Layout stability**: the demonstration result area is a fixed-structure ordered list that appears after a user action, not during
+  load; the e2e checks at 360 px confirm no horizontal scroll before and after a run.

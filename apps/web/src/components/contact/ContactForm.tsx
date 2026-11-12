@@ -21,6 +21,7 @@ import {
   toPayload,
   validateContact,
 } from "@/lib/contact-validation";
+import { trackFunnelEvent } from "@/lib/analytics";
 import { fetchFormToken, submitLead } from "@/lib/public-api";
 
 export interface ServiceOption {
@@ -166,6 +167,8 @@ export function ContactForm({
     if (result.ok) {
       setReference(result.reference);
       setStatus("success");
+      // A quote request and a consultation request are told apart by the kind the visitor chose; nothing else is read.
+      trackFunnelEvent(values.inquiry_type === "quote" ? "quote_request_submitted" : "consultation_requested", locale);
       return;
     }
 

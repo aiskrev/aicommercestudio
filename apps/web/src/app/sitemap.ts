@@ -11,6 +11,7 @@ import {
 import { type Locale, localeMeta, localizePath, locales } from "@/i18n/config";
 import { AGENT_SLUGS, LIBRARY_KEYS } from "@/lib/agent-library";
 import { PATTERN_KEYS, PATTERN_SLUGS, SCENARIO_KEYS, SCENARIO_SLUGS } from "@/lib/reference";
+import { DEMO_KEYS, DEMO_SLUGS } from "@/lib/demo-slugs";
 import { WORKSHOP_KEYS, WORKSHOP_SLUGS } from "@/lib/workshops";
 import { getCatalogue } from "@/lib/catalogue";
 import { isDomainPublished } from "@/lib/domains";
@@ -114,6 +115,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         : []),
       // Workshops, reference scenarios and integration patterns: indexes and one static page each.
       ...[
+        ...DEMO_KEYS.map((key) => routes.demoScenario(DEMO_SLUGS[key].bg)),
         routes.workshops,
         ...WORKSHOP_KEYS.map((key) => routes.workshop(WORKSHOP_SLUGS[key].bg)),
         routes.scenarios,

@@ -420,6 +420,9 @@ class LeadSummaryOut(BaseModel):
     ams_readiness: str | None = None
     # Catalogue workshop or assessment the enquiry was sent about (None otherwise).
     workshop_key: str | None = None
+    # The administrator responsible for the enquiry (CRM). `owner_name` is filled by the admin routes.
+    owner_id: uuid.UUID | None = None
+    owner_name: str | None = None
 
 
 class ReadinessDetailsOut(BaseModel):

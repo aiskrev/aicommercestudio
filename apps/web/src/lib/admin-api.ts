@@ -36,7 +36,8 @@ export async function adminFetch<T>(path: string, init: RequestInit = {}): Promi
   const common = adminDictionaries[locale].common;
   const headers = new Headers(init.headers);
   headers.set("Accept-Language", locale);
-  if (init.body !== undefined) headers.set("Content-Type", "application/json");
+  // JSON unless the caller sent its own type (a file goes as the raw body, application/octet-stream).
+  if (init.body !== undefined && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
   if (UNSAFE.has(method)) {
     const csrf = readCookie(site.csrfCookieName);
     if (csrf) headers.set("X-CSRF-Token", csrf);

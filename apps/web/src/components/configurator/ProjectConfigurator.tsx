@@ -28,6 +28,7 @@ import {
   STEPS,
 } from "@/lib/configurator";
 import { type QuoteContact, reviewConfiguration, submitConfiguration } from "@/lib/configurator-api";
+import { trackFunnelEvent } from "@/lib/analytics";
 import { fetchBasket, saveConfiguration } from "@/lib/quote-basket";
 import { formatEuro } from "@/lib/prices";
 
@@ -269,7 +270,12 @@ export function ProjectConfigurator({
     window.history.pushState(null, "", `#${STEPS[index]}`);
   }, []);
 
+  const startedTracked = useRef(false);
   const update = (patch: Partial<ConfiguratorDraft>) => {
+    if (!startedTracked.current) {
+      startedTracked.current = true;
+      trackFunnelEvent("configurator_started", locale);
+    }
     setDraft((previous) => normaliseDraft({ ...previous, ...patch }));
     setErrors((previous) => Object.fromEntries(Object.entries(previous).filter(([key]) => !(key in patch))));
     setReview(null);
@@ -292,6 +298,7 @@ export function ProjectConfigurator({
       if (!active) return;
       setLoading(false);
       if (result.ok) {
+        trackFunnelEvent("configurator_completed", locale);
         setReview(result.review);
         setSubmissionId(newSubmissionId()); // one id per review: a repeated click returns the same lead
         return;
@@ -313,6 +320,7 @@ export function ProjectConfigurator({
       first?.focus();
       return;
     }
+    trackFunnelEvent("configurator_step_completed", locale, step + 1);
     go(step + 1);
   }
 
@@ -331,6 +339,7 @@ export function ProjectConfigurator({
     const result = await submitConfiguration(draft as ConfiguratorAnswers, contact, submissionId, formToken, locale);
     if (result.ok) {
       saveDraft(null);
+      trackFunnelEvent("quote_request_submitted", locale);
       return result;
     }
     if (result.kind === "validation") return { ok: false, message: t.errors.summary, fieldErrors: result.fieldErrors };
@@ -346,6 +355,7 @@ export function ProjectConfigurator({
     const result = await saveConfiguration(draft as ConfiguratorAnswers, locale, editing ?? undefined);
     if (result.ok) {
       saveDraft(null);
+      trackFunnelEvent("quote_basket_updated", locale);
       router.push(basket.href);
       return;
     }

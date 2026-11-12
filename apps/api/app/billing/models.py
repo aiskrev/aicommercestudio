@@ -25,6 +25,19 @@ class OfferKind(enum.StrEnum):
     SUBSCRIPTION = "subscription"
 
 
+class OfferCategory(enum.StrEnum):
+    """The four kinds of sale, kept apart (docs/BILLING_SANDBOX_MATRIX.md).
+
+    A project deposit is never sold: it needs a business and legal design first (D-08), so no approved offer of that
+    category can exist (a database constraint) and checkout refuses it.
+    """
+
+    SAAS_SUBSCRIPTION = "saas_subscription"
+    MANAGED_SERVICE = "managed_service"
+    ONE_TIME_SERVICE = "one_time_service"
+    PROJECT_DEPOSIT = "project_deposit"
+
+
 class EventStatus(enum.StrEnum):
     RECEIVED = "received"
     PROCESSED = "processed"
@@ -38,10 +51,24 @@ class Onboarding(enum.StrEnum):
     COMPLETE = "complete"
 
 
+def _default_category(context) -> str:
+    params = context.get_current_parameters()
+    if params.get("kind") == "subscription":
+        return "managed_service" if params.get("requires_scope") else "saas_subscription"
+    return "one_time_service"
+
+
 class BillingOffer(Base):
     __tablename__ = "billing_offers"
     __table_args__ = (
         CheckConstraint("kind IN ('one_time', 'subscription')", name="kind"),
+        CheckConstraint(
+            "category IN ('saas_subscription', 'managed_service', 'one_time_service', 'project_deposit')",
+            name="category",
+        ),
+        CheckConstraint(
+            "NOT (category = 'project_deposit' AND approved_at IS NOT NULL)", name="deposit_never_approved"
+        ),
         CheckConstraint(
             "(kind = 'subscription' AND plan_key IS NOT NULL AND billing_interval IN ('month', 'year')) "
             "OR (kind = 'one_time' AND billing_interval IS NULL)",
@@ -51,6 +78,9 @@ class BillingOffer(Base):
 
     key: Mapped[str] = mapped_column(String(40), primary_key=True)
     kind: Mapped[str] = mapped_column(String(12), nullable=False)
+    # What kind of sale this is. Derived from the shape when not given: a subscription with a scope is a managed
+    # service, any other subscription a SaaS plan, a one-time offer a one-time service.
+    category: Mapped[str] = mapped_column(String(20), nullable=False, default=_default_category)
     plan_key: Mapped[str | None] = mapped_column(String(20))
     billing_interval: Mapped[str | None] = mapped_column(String(8))
     stripe_price_id: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)

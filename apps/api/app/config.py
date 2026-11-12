@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     contact_rate_window_seconds: int = Field(default=600, ge=1)
     # Backstop across all clients (per window) in case per-IP limits are bypassed via spoofed headers.
     contact_global_rate_limit: int = Field(default=60, ge=1)
+    # Interactive demonstrations (docs/AI_DEMONSTRATIONS.md): public, stateless, deterministic; limited per address.
+    demo_rate_limit: int = Field(default=30, ge=1)
+    demo_global_rate_limit: int = Field(default=600, ge=1)
+    demo_rate_window_seconds: int = Field(default=600, ge=1)
     login_rate_limit: int = Field(default=10, ge=1)
     login_rate_window_seconds: int = Field(default=900, ge=1)
     form_token_min_seconds: int = Field(default=3, ge=0)
@@ -182,6 +186,32 @@ class Settings(BaseSettings):
     quotation_decision_rate_limit: int = Field(default=10, ge=1)
     quotation_global_rate_limit: int = Field(default=600, ge=1)
     quotation_rate_window_seconds: int = Field(default=600, ge=1)
+    # Commercial customer projects (docs/COMMERCIAL_PROJECTS.md): off by default; while off its routes answer 404.
+    # The customer side also needs customer accounts.
+    commercial_projects_enabled: bool = False
+    project_read_rate_limit: int = Field(default=120, ge=1)
+    project_action_rate_limit: int = Field(default=30, ge=1)
+    project_rate_window_seconds: int = Field(default=600, ge=1)
+    # Project documents (docs/PROJECT_DOCUMENTS.md): off by default, each step behind its own flag. Documents
+    # need projects; staff uploads need documents; customer uploads need staff uploads. Production also needs
+    # the security review of uploads to be recorded (release_gates.PROJECT_UPLOAD_REVIEW_APPROVED).
+    project_documents_enabled: bool = False
+    project_uploads_enabled: bool = False
+    project_client_uploads_enabled: bool = False
+    # A directory outside every web root, owned by the API user (a Docker volume in compose).
+    project_storage_dir: str = "/var/lib/acs/project-files"
+    project_upload_max_bytes: int = Field(default=10 * 1024 * 1024, ge=1024, le=50 * 1024 * 1024)
+    project_documents_per_project: int = Field(default=100, ge=1)
+    project_versions_per_document: int = Field(default=20, ge=1)
+    # Nothing is downloadable by a customer until a scan result says "clean" (no scanner ships with the project).
+    project_upload_require_scan: bool = True
+    project_document_retention_days: int = Field(default=730, ge=30)
+    project_download_rate_limit: int = Field(default=60, ge=1)
+    project_upload_rate_limit: int = Field(default=20, ge=1)
+    # E-mail about a customer's own project (docs/PROJECT_NOTIFICATIONS.md): off by default; queued in the existing
+    # outbox and sent by `outbox-run` only through a configured provider. Needs projects and customer accounts, so
+    # production also needs verified delivery.
+    project_notifications_enabled: bool = False
     # Customer accounts (docs/CUSTOMER_ACCOUNTS.md). Off until a release review.
     customer_accounts_enabled: bool = False
     account_session_hours: int = Field(default=12, ge=1, le=72)
@@ -318,6 +348,20 @@ class Settings(BaseSettings):
             problems.append("BILLING_PROVIDER=sandbox is not allowed in production")
         if self.email_provider == "dev_file":
             problems.append("EMAIL_PROVIDER=dev_file is not allowed in production")
+        if self.commercial_projects_enabled and not self.customer_accounts_enabled:
+            problems.append(
+                "COMMERCIAL_PROJECTS_ENABLED needs customer accounts: customers reach their projects through them"
+            )
+        if self.project_notifications_enabled and not (
+            self.commercial_projects_enabled and self.customer_accounts_enabled
+        ):
+            problems.append("PROJECT_NOTIFICATIONS_ENABLED needs COMMERCIAL_PROJECTS_ENABLED and customer accounts")
+        if self.project_documents_enabled and not self.commercial_projects_enabled:
+            problems.append("PROJECT_DOCUMENTS_ENABLED needs COMMERCIAL_PROJECTS_ENABLED")
+        if self.project_uploads_enabled and not self.project_documents_enabled:
+            problems.append("PROJECT_UPLOADS_ENABLED needs PROJECT_DOCUMENTS_ENABLED")
+        if self.project_client_uploads_enabled and not self.project_uploads_enabled:
+            problems.append("PROJECT_CLIENT_UPLOADS_ENABLED needs PROJECT_UPLOADS_ENABLED")
         if self.customer_accounts_enabled and not (self.email_provider == "smtp" and self.smtp_host and self.smtp_from):
             problems.append("CUSTOMER_ACCOUNTS_ENABLED needs a configured e-mail provider")
         if (self.customer_accounts_enabled or self.client_portal_enabled) and (
@@ -330,6 +374,7 @@ class Settings(BaseSettings):
                 project_configurator_enabled=self.project_configurator_enabled,
                 quote_basket_enabled=self.quote_basket_enabled,
                 quotations_enabled=self.quotations_enabled,
+                project_uploads_enabled=self.project_uploads_enabled,
             )
         )
         if self.customer_accounts_enabled or self.billing_provider != "disabled":

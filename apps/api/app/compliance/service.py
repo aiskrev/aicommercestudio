@@ -42,6 +42,8 @@ from app.compliance.models import DataRequest, LegalEvent, WithdrawalRequest
 from app.config import Settings, get_settings
 from app.invoicing.models import AccountingDocument, BillingProfile
 from app.models import Lead, utcnow
+from app.projects.doc_models import DocumentApproval, DocumentComment, ProjectDocument, ProjectDocumentVersion
+from app.projects.models import CommercialProject, ProjectEvent
 from app.workspace.models import (
     AssessmentVersion,
     CustomerWorkspace,
@@ -506,8 +508,88 @@ def build_export(db: Session, account: CustomerAccount) -> dict[str, Any]:
             for d in documents
         ],
         "support_requests": [{"subject": s.subject, "message": s.message, "created_at": s.created_at} for s in support],
+        "commercial_projects": _project_export(db, workspace_ids, account.id),
+        "project_documents": _document_export(db, workspace_ids, account.id),
         "withdrawal_requests": [present_withdrawal(w) for w in withdrawals],
     }
+
+
+def _document_export(db: Session, workspace_ids: list, account_id) -> dict[str, list[dict[str, Any]]]:
+    """What the account itself did with project documents: its uploads, its decisions and its feedback. The files
+    themselves are the project's and are not part of this export."""
+    empty: dict[str, list[dict[str, Any]]] = {"uploads": [], "decisions": [], "comments": []}
+    if not workspace_ids:
+        return empty
+    projects = {
+        p.id: p
+        for p in db.scalars(select(CommercialProject).where(CommercialProject.workspace_id.in_(workspace_ids))).all()
+    }
+    if not projects:
+        return empty
+    documents = {
+        d.id: d for d in db.scalars(select(ProjectDocument).where(ProjectDocument.project_id.in_(projects))).all()
+    }
+    versions = {
+        v.id: v
+        for v in db.scalars(
+            select(ProjectDocumentVersion).where(ProjectDocumentVersion.document_id.in_(documents))
+        ).all()
+    }
+    out = empty
+    for v in versions.values():
+        if v.uploaded_by_account_id == account_id:
+            d = documents[v.document_id]
+            out["uploads"].append(
+                {
+                    "project": projects[d.project_id].reference,
+                    "document": d.title,
+                    "version": v.number,
+                    "file": v.filename,
+                    "at": v.created_at,
+                }
+            )
+    for a in db.scalars(select(DocumentApproval).where(DocumentApproval.project_id.in_(projects))).all():
+        if a.decided_by_account_id == account_id and a.version_id in versions:
+            out["decisions"].append(
+                {
+                    "project": projects[a.project_id].reference,
+                    "document": documents[a.document_id].title,
+                    "version": versions[a.version_id].number,
+                    "decision": a.state,
+                    "note": a.decision_note,
+                    "at": a.decided_at,
+                }
+            )
+    for c in db.scalars(select(DocumentComment).where(DocumentComment.document_id.in_(documents))).all():
+        if c.author_account_id == account_id:
+            out["comments"].append({"document": documents[c.document_id].title, "text": c.body, "at": c.created_at})
+    return out
+
+
+def _project_export(db: Session, workspace_ids: list, account_id) -> list[dict[str, Any]]:
+    """The commercial projects of the account's workspaces and what the account itself wrote in them. Staff-written
+    internal notes are not the customer's data and are not included."""
+    if not workspace_ids:
+        return []
+    rows = db.scalars(select(CommercialProject).where(CommercialProject.workspace_id.in_(workspace_ids))).all()
+    out: list[dict[str, Any]] = []
+    for project in rows:
+        written = db.scalars(
+            select(ProjectEvent).where(
+                ProjectEvent.project_id == project.id, ProjectEvent.author_account_id == account_id
+            )
+        ).all()
+        out.append(
+            {
+                "reference": project.reference,
+                "title": project.title,
+                "status": project.status,
+                "created_at": project.created_at,
+                "approved_at": project.approved_at,
+                "your_messages": [{"kind": e.kind, "text": e.body, "at": e.created_at} for e in written],
+            }
+        )
+    return out
 
 
 def open_data_request(
@@ -556,6 +638,9 @@ def _has_accounting_data(db: Session, account: CustomerAccount) -> bool:
         select(func.count()).select_from(BillingCustomer).where(BillingCustomer.workspace_id.in_(workspace_ids)),
         select(func.count()).select_from(BillingCheckout).where(BillingCheckout.workspace_id.in_(workspace_ids)),
         select(func.count()).select_from(WithdrawalRequest).where(WithdrawalRequest.workspace_id.in_(workspace_ids)),
+        # A commercial project is a contractual record: it stays (the account is anonymised), its customer-written
+        # text is erased below.
+        select(func.count()).select_from(CommercialProject).where(CommercialProject.workspace_id.in_(workspace_ids)),
     )
     return any((db.scalar(check) or 0) > 0 for check in checks)
 
@@ -669,6 +754,21 @@ def erase_account(db: Session, account: CustomerAccount) -> str:
         db.execute(delete(CustomerSession).where(CustomerSession.account_id == account.id))
         db.execute(delete(CustomerToken).where(CustomerToken.account_id == account.id))
         db.execute(delete(OutboxMessage).where(OutboxMessage.account_id == account.id))
+        db.execute(
+            update(ProjectEvent)
+            .where(ProjectEvent.author_account_id == account.id)
+            .values(body="[erased]", author_account_id=None)
+        )
+        db.execute(
+            update(DocumentComment)
+            .where(DocumentComment.author_account_id == account.id)
+            .values(body="[erased]", author_account_id=None)
+        )
+        db.execute(
+            update(DocumentApproval)
+            .where(DocumentApproval.decided_by_account_id == account.id, DocumentApproval.decision_note.is_not(None))
+            .values(decision_note="[erased]")
+        )
         db.execute(
             update(WithdrawalRequest).where(WithdrawalRequest.account_id == account.id).values(statement="[erased]")
         )

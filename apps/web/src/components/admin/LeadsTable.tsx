@@ -17,9 +17,19 @@ import { routes } from "@/lib/routes";
 import { useAdminData } from "@/lib/use-admin-data";
 
 const PAGE_SIZE = 20;
-type FilterKey = "status" | "service" | "inquiry_type" | "locale" | "ams_level" | "ams_readiness" | "from" | "to" | "q" | "sort" | "page";
+type FilterKey = "owner" | "status" | "service" | "inquiry_type" | "locale" | "ams_level" | "ams_readiness" | "from" | "to" | "q" | "sort" | "page";
 
 /** Local calendar date (YYYY-MM-DD) → ISO instant at the start or end of that day in the browser's zone. */
+/** The filters the CSV export understands (it takes no search text and no page). */
+function exportQuery(query: URLSearchParams): string {
+  const out = new URLSearchParams();
+  for (const key of ["owner", "status", "service", "inquiry_type", "locale", "created_from", "created_to"]) {
+    const value = query.get(key);
+    if (value) out.set(key, value);
+  }
+  return out.toString();
+}
+
 function dayBoundary(date: string, end: boolean): string {
   return new Date(`${date}T${end ? "23:59:59.999" : "00:00:00"}`).toISOString();
 }
@@ -32,6 +42,7 @@ export function LeadsTable() {
   const t = dict.leads;
   const common = dict.common;
 
+  const owner = searchParams.get("owner") ?? "";
   const status = searchParams.get("status") ?? "";
   const service = searchParams.get("service") ?? "";
   const inquiryType = searchParams.get("inquiry_type") ?? "";
@@ -46,6 +57,7 @@ export function LeadsTable() {
   const [search, setSearch] = useState(q);
 
   const query = new URLSearchParams({ page: String(page), page_size: String(PAGE_SIZE), sort });
+  if (owner) query.set("owner", owner);
   if (status) query.set("status", status);
   if (service) query.set("service", service);
   if (inquiryType) query.set("inquiry_type", inquiryType);
@@ -72,7 +84,7 @@ export function LeadsTable() {
     setFilters({ q: search.trim() });
   }
 
-  const filtered = Boolean(status || service || inquiryType || leadLocale || from || to || q);
+  const filtered = Boolean(owner || status || service || inquiryType || leadLocale || from || to || q);
   const totalPages = data ? Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : 1;
 
   return (
@@ -80,6 +92,11 @@ export function LeadsTable() {
       <AdminPageHeader
         title={t.title}
         description={data ? fmt(data.total === 1 ? t.countOne : t.countMany, { n: data.total }) : undefined}
+        actions={
+          <a className={buttonClass("secondary", "sm")} href={`/api/admin/crm/leads.csv?${exportQuery(query)}`} download="pipeline.csv" title={dict.crm.exportNote} data-testid="leads-export">
+            {dict.crm.export}
+          </a>
+        }
       />
 
       <Panel className="mb-6">
@@ -101,6 +118,17 @@ export function LeadsTable() {
               <Icon name="search" className="h-4 w-4" />
             </button>
           </form>
+          <select
+            aria-label={dict.crm.ownerFilter.label}
+            className="field xl:w-44"
+            value={owner}
+            onChange={(e) => setFilters({ owner: e.target.value })}
+            data-testid="owner-filter"
+          >
+            <option value="">{dict.crm.ownerFilter.label}: {dict.crm.ownerFilter.all}</option>
+            <option value="me">{dict.crm.ownerFilter.mine}</option>
+            <option value="none">{dict.crm.ownerFilter.none}</option>
+          </select>
           <select
             aria-label={t.statusFilter}
             className="field xl:w-48"

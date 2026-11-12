@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ContactForm } from "@/components/contact/ContactForm";
 import { bg } from "@/i18n/dictionaries/bg";
+import { registerAnalyticsSink } from "@/lib/analytics";
 
 vi.mock("next/link", () => ({
   default: ({ href, children, ...rest }: { href: string; children: ReactNode }) => (
@@ -112,6 +113,21 @@ describe("ContactForm", () => {
       website: "",
       form_token: "tok-1",
     });
+  });
+
+  it("reports a consultation request, and only its name, when a plain enquiry is sent", async () => {
+    const user = userEvent.setup();
+    const sink = vi.fn();
+    const unregister = registerAnalyticsSink(sink);
+    renderForm();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith("/api/public/form-token", expect.anything()));
+    await fillValid(user);
+    await user.click(screen.getByRole("button", { name: bg.form.submit }));
+    await screen.findByTestId("contact-success");
+    unregister();
+    expect(sink).toHaveBeenCalledTimes(1);
+    expect(sink.mock.calls[0][0]).toEqual({ name: "consultation_requested", tool: "funnel", locale: "bg" });
+    expect(JSON.stringify(sink.mock.calls)).not.toMatch(/ivan|AB12CD34|example.com/i);
   });
 
   it("maps server-side field errors onto the form", async () => {

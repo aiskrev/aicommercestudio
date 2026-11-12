@@ -109,6 +109,10 @@ class LeadFilters:
     q: str | None = None
     created_from: datetime | None = None
     created_to: datetime | None = None
+    # "none" for unassigned, or the id of an administrator.
+    owner: str | None = None
+    # The qualification of the opportunity behind the enquiry (`lead_opportunities.qualification_status`).
+    qualification: str | None = None
     sort: str = "newest"
 
 
@@ -139,6 +143,18 @@ def _filtered(filters: LeadFilters) -> Select[tuple[Lead]]:
         stmt = stmt.where(Lead.service_details["qualification"]["suggested_level"].astext == filters.ams_level)
     if filters.ams_readiness:
         stmt = stmt.where(Lead.service_details["qualification"]["readiness"].astext == filters.ams_readiness)
+    if filters.owner == "none":
+        stmt = stmt.where(Lead.owner_id.is_(None))
+    elif filters.owner:
+        stmt = stmt.where(Lead.owner_id == uuid.UUID(filters.owner))
+    if filters.qualification:
+        from app.opportunities.models import LeadOpportunity
+
+        stmt = stmt.where(
+            Lead.id.in_(
+                select(LeadOpportunity.lead_id).where(LeadOpportunity.qualification_status == filters.qualification)
+            )
+        )
     if filters.created_from:
         stmt = stmt.where(Lead.created_at >= filters.created_from)
     if filters.created_to:

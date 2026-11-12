@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { registerAnalyticsSink, sanitizeToolEvent, trackToolEvent, type ToolEvent } from "@/lib/analytics";
+import { FUNNEL_EVENTS, registerAnalyticsSink, sanitizeToolEvent, trackFunnelEvent, trackToolEvent, type ToolEvent } from "@/lib/analytics";
 import { parseFlagOverrides, isFlagEnabled } from "@/lib/feature-flags";
 import { isToolAvailable, TOOLS, toolHrefs } from "@/lib/tools";
 
@@ -94,5 +94,35 @@ describe("feature flags and tool registry", () => {
     expect(toolHrefs("bg").team).toBe("/bg/instrumenti/ai-ekip");
     expect(toolHrefs("bg").solution).toBe("/bg/instrumenti/ai-reshenie");
     expect(toolHrefs("bg").agents).toBe("/bg/ai-agenti");
+  });
+});
+
+describe("funnel events", () => {
+  it("are exactly the allowed names, without a registration event (the customer area is never measured)", () => {
+    expect([...FUNNEL_EVENTS]).toEqual(["configurator_started", "configurator_step_completed", "configurator_completed", "quote_basket_updated", "quote_request_submitted", "consultation_requested"]);
+    expect(FUNNEL_EVENTS.some((name) => name.includes("account") || name.includes("registration"))).toBe(false);
+  });
+
+  it("carry a name, a language and at most a step number, and reach a sink as funnel:<name>", () => {
+    const sink = vi.fn();
+    const unregister = registerAnalyticsSink(sink);
+    trackFunnelEvent("configurator_step_completed", "bg", 2);
+    trackFunnelEvent("quote_request_submitted", "en");
+    unregister();
+    expect(sink.mock.calls.map(([event]) => event)).toEqual([
+      { name: "configurator_step_completed", tool: "funnel", locale: "bg", step: 2 },
+      { name: "quote_request_submitted", tool: "funnel", locale: "en" },
+    ]);
+    expect(JSON.stringify(sink.mock.calls)).not.toMatch(/@|\d{6}|token|email|phone/i);
+  });
+
+  it("drop a name that is not on the list and any extra field", () => {
+    const sink = vi.fn();
+    const unregister = registerAnalyticsSink(sink);
+    trackFunnelEvent("registration_completed" as never, "bg");
+    unregister();
+    expect(sink).not.toHaveBeenCalled();
+    const clean = sanitizeToolEvent({ name: "quote_basket_updated", tool: "funnel", locale: "bg", email: "a@b.c", result: "free text here" } as never);
+    expect(clean).toEqual({ name: "quote_basket_updated", tool: "funnel", locale: "bg" });
   });
 });

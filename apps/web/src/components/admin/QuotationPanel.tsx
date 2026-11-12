@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useAdminI18n } from "@/components/admin/AdminI18n";
+import { ProjectPanel } from "@/components/admin/ProjectPanel";
 import { buttonClass, cx } from "@/components/ui/primitives";
 import { fmt } from "@/i18n/admin";
 import { adminFetch, ApiError } from "@/lib/admin-api";
@@ -111,6 +112,7 @@ export function QuotationPanel({ leadId, proposalId, proposalRevision, approved 
   const live = quotation?.status === "published" || quotation?.status === "expired";
 
   return (
+    <>
     <section aria-label={t.title} className="grid gap-3 rounded-lg border border-white/[0.08] p-4" data-testid="quotation-panel" data-status={quotation?.status ?? "none"}>
       <h3 className="text-sm font-semibold">{t.title}</h3>
       <p className="text-sm text-slate-400">{t.lead}</p>
@@ -181,5 +183,8 @@ export function QuotationPanel({ leadId, proposalId, proposalRevision, approved 
         </p>
       )}
     </section>
+    {/* The delivery project starts from the accepted quotation; hidden while projects are off. */}
+    <ProjectPanel leadId={leadId} acceptedQuotationId={quotation?.status === "accepted" ? quotation.id : null} />
+    </>
   );
 }

@@ -49,7 +49,13 @@ function csrfToken(): string | null {
   return part ? decodeURIComponent(part.slice(CSRF_COOKIE.length + 1)) : null;
 }
 
-type RequestOptions = { method?: string; body?: unknown; headers?: Record<string, string> };
+type RequestOptions = {
+  method?: string;
+  body?: unknown;
+  /** A file sent as the raw body (project documents); the details travel in URL-encoded headers. */
+  raw?: Blob;
+  headers?: Record<string, string>;
+};
 
 export function accountFetch<T>(path: string, locale: Locale, networkMessage: string, options?: RequestOptions) {
   return request<T>(`/api/accounts${path}`, locale, networkMessage, options);
@@ -63,6 +69,11 @@ export function zoneFetch<T>(path: string, locale: Locale, networkMessage: strin
   return request<T>(`/api/zone${path}`, locale, networkMessage, options);
 }
 
+/** The commercial delivery projects of the caller's workspace (GET /api/projects). */
+export function projectsFetch<T>(path: string, locale: Locale, networkMessage: string, options?: RequestOptions) {
+  return request<T>(`/api/projects${path}`, locale, networkMessage, options);
+}
+
 export function billingFetch<T>(path: string, locale: Locale, networkMessage: string, options?: RequestOptions) {
   return request<T>(`/api/billing${path}`, locale, networkMessage, options);
 }
@@ -71,10 +82,11 @@ async function request<T>(
   url: string,
   locale: Locale,
   networkMessage: string,
-  { method = "GET", body, headers: extra }: RequestOptions = {},
+  { method = "GET", body, raw, headers: extra }: RequestOptions = {},
 ): Promise<T> {
   const headers = new Headers({ "Accept-Language": locale, ...extra });
-  if (body !== undefined) headers.set("Content-Type", "application/json");
+  if (raw) headers.set("Content-Type", "application/octet-stream");
+  else if (body !== undefined) headers.set("Content-Type", "application/json");
   if (method !== "GET") {
     const csrf = csrfToken();
     if (csrf) headers.set("X-CSRF-Token", csrf);
@@ -84,7 +96,7 @@ async function request<T>(
     response = await fetch(url, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: raw ?? (body === undefined ? undefined : JSON.stringify(body)),
       credentials: "same-origin",
       cache: "no-store",
     });
