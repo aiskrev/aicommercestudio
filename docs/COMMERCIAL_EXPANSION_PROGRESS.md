@@ -1,7 +1,7 @@
 # Commercial expansion — progress
 
 Statuses: NOT_STARTED, IN_PROGRESS, IMPLEMENTED, TESTED, BLOCKED, DEFERRED, FAILED.
-Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Phases 01-08 are committed and pushed (PR #75 and #76 are merged); Phases 09-18 are committed locally in `42df564` (not pushed, not merged). Nothing is deployed. Migrations `0026` to `0032` exist only in local and test databases; none was applied to any server.
+Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Phases 01-08 are committed and pushed (PR #75 and #76 are merged); Phases 09-18 are committed locally in `42df564` and `592decd` (not pushed, not merged). **In production** (GitHub Actions history): Release run `43033986686` (2026-11-11 13:58 UTC) deployed `03e62c4` (phases 01-06) and applied migration `0026`; no Release has run since, so phases 07-08 (`954bba9`, in `main`) are not deployed and `0027` to `0032` exist only in local and test databases. An earlier version of this line said nothing was deployed; that was wrong (corrected 2026-11-12).
 
 | Phase | Name | Status | Last update | Notes |
 | --- | --- | --- | --- | --- |
@@ -10,8 +10,8 @@ Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Phases 
 | 03 | Service packages | TESTED | 2026-11-11 | `/proektni-paketi` page with five packages; two prices pending with the owner (D-09), see checkpoint |
 | 04 | Centralised pricing | TESTED | 2026-11-11 | Schedule document shared by web and API, `/tseni` page; owner approval of the schedule still pending (D-04) |
 | 05 | Project configurator | TESTED | 2026-11-11 | Behind `PROJECT_CONFIGURATOR_ENABLED` (off); server-side review, quote request creates a lead; see checkpoint and PROJECT_CONFIGURATOR.md |
-| 06 | Quote basket | TESTED | 2026-11-11 | Behind `QUOTE_BASKET_ENABLED` (off); migration 0026 (local only); see checkpoint and QUOTE_BASKET.md |
-| 07 | Quotations and leads | TESTED | 2026-11-11 | Behind `QUOTATIONS_ENABLED` (off); migration 0027 (local only); acceptance wording unapproved (BLOCKER-COM-ACCEPT-01); see checkpoint and QUOTATIONS.md |
+| 06 | Quote basket | TESTED | 2026-11-11 | Behind `QUOTE_BASKET_ENABLED` (off); migration 0026 (applied in production by the Release of `03e62c4`, flag off); see checkpoint and QUOTE_BASKET.md |
+| 07 | Quotations and leads | TESTED | 2026-11-11 | Behind `QUOTATIONS_ENABLED` (off); migration 0027 (in `main`, not deployed); acceptance wording unapproved (BLOCKER-COM-ACCEPT-01); see checkpoint and QUOTATIONS.md |
 | 08 | Customer accounts hardening | TESTED | 2026-11-11 | Verified against the list; account status, own quote requests by verified ownership, go-live prerequisites tested; customer MFA not built (D-22); see ACCOUNTS_HARDENING.md |
 | 09 | Commercial project portal | TESTED | 2026-11-11 | Behind `COMMERCIAL_PROJECTS_ENABLED` (off, needs accounts); migration 0028 (local only); lifecycle, roles, cross-tenant tests; see checkpoint and COMMERCIAL_PROJECTS.md |
 | 10 | Documents, uploads, approvals | TESTED | 2026-11-12 | Behind `PROJECT_DOCUMENTS_ENABLED`, `PROJECT_UPLOADS_ENABLED`, `PROJECT_CLIENT_UPLOADS_ENABLED` (all off); migration 0029 (local only); upload gate BLOCKER-COM-UPLOAD-01 open; see checkpoint and PROJECT_DOCUMENTS.md |
@@ -22,7 +22,7 @@ Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Phases 
 | 15 | SEO, performance, analytics | TESTED (Lighthouse NOT RE-RUN) | 2026-11-12 | Six anonymous funnel events (no registration event, D-46); indexing rules and sitemap tested; no third-party host and a script budget as tests; Core Web Vitals not re-measured (D-47) |
 | 16 | Security and GDPR review | TESTED | 2026-11-12 | Data map in code with a guard test; findings F1 to F9 (admin-only reads, staff view logging, scheduled retention of stored files); dependency audits clean; see SECURITY_GDPR_REVIEW_COMMERCIAL.md |
 | 17 | Staging and release gates | DOCUMENT WRITTEN | 2026-11-12 | COMMERCIAL_STAGING_RUNBOOK.md; nothing was changed on any server |
-| 18 | Full QA and release review | DONE WITH GAPS; STOPS AT THE APPROVAL GATE (no real Stripe sandbox run, no Lighthouse, no staging; see COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md) | 2026-11-12 | COMMERCIAL_RELEASE_REVIEW.md; nothing deployed, committed or pushed |
+| 18 | Full QA and release review | DONE WITH GAPS; STOPS AT THE APPROVAL GATE (no real Stripe sandbox run, no Lighthouse, no staging; see COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md) | 2026-11-12 | COMMERCIAL_RELEASE_REVIEW.md; phases 09-18 not pushed or deployed (phases 01-06 are deployed, see the line under the title) |
 
 ## Checkpoints
 
@@ -259,7 +259,7 @@ Not verified: a person's review of the account page, screen reader, real devices
 Commercial customer projects: the customer workspace gets a **delivery** side (details and the lifecycle table:
 [COMMERCIAL_PROJECTS.md](COMMERCIAL_PROJECTS.md)). Separate from the AI Operations portal and the Advisor Workspace, which
 are unchanged. Behind `COMMERCIAL_PROJECTS_ENABLED=false` (the customer side also needs `CUSTOMER_ACCOUNTS_ENABLED`;
-production refuses the first without the second). Migration `0028` (local only, like 0026 and 0027).
+production refuses the first without the second). Migration `0028` (local only; 0026 is in production, 0027 in `main` but not deployed).
 
 * Lifecycle defined first and enforced in one table: draft, quotation, awaiting approval, approved, in progress, client
   review, completed, maintenance. Only the customer (owner or `billing`) approves a scope or accepts a result; staff
@@ -396,7 +396,7 @@ Executed on this state: see the table below (the suites run in one sequence afte
 * **15** — six anonymous funnel events, SEO rules and sitemap tests, page-weight and no-third-party tests ([ANALYTICS.md](ANALYTICS.md), [SEO_IMPLEMENTATION.md](SEO_IMPLEMENTATION.md), [PERFORMANCE_BASELINE.md](PERFORMANCE_BASELINE.md)). Lighthouse was **not** re-run (D-47).
 * **16** — security and GDPR review with a data map in code ([SECURITY_GDPR_REVIEW_COMMERCIAL.md](SECURITY_GDPR_REVIEW_COMMERCIAL.md)); findings F1 to F9; audits clean.
 * **17** — [COMMERCIAL_STAGING_RUNBOOK.md](COMMERCIAL_STAGING_RUNBOOK.md). Nothing was changed on any server.
-* **18** — [COMMERCIAL_RELEASE_REVIEW.md](COMMERCIAL_RELEASE_REVIEW.md). The programme **stops at the release approval gate**: Phases 09 to 18 are committed locally in `42df564`; nothing is pushed, merged or deployed.
+* **18** — [COMMERCIAL_RELEASE_REVIEW.md](COMMERCIAL_RELEASE_REVIEW.md). The programme **stops at the release approval gate**: Phases 09 to 18 are committed locally in `42df564`; they are not pushed, merged or deployed (phases 01-06 are deployed, see the line under the title).
 
 ### Executed results of the final run (Phases 09 to 18, one sequence, then re-runs of what failed)
 

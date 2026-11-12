@@ -67,8 +67,8 @@ accepts a workspace id, an owner id or an amount.
 
 ## Data
 
-Tables `commercial_projects`, `project_milestones`, `project_events` (migration `0028`, local only like 0026/0027 until
-the owner approves a release). They are separate from `workspace_projects` (the AI Operations portal). A project keeps:
+Tables `commercial_projects`, `project_milestones`, `project_events` (migration `0028`, local only until
+the owner approves a release; 0026 is already in production, 0027 is in `main` but not deployed). They are separate from `workspace_projects` (the AI Operations portal). A project keeps:
 the workspace, the inquiry, the accepted quotation and the scope snapshot with its version, contract and invoice
 **references** (strings), a maintenance plan key and note, a revision for optimistic concurrency, who approved and when.
 There is no price, no amount and no document in this phase (documents and uploads: Phase 10, uploads stay disabled).

@@ -1,9 +1,18 @@
 # Commercial expansion: release review (Phase 18)
 
 Status on 2026-11-12. **The programme stops here, at the release approval gate.** Phases 01 to 18 are implemented and tested in the
-working tree. Phases 01 to 08 are committed and pushed (pull requests #75 and #76 are merged). **Phases 09 to 18 are committed locally in `42df564`, not
-pushed, not merged and not deployed.** Nothing was changed on any server, in Cloudflare, in Hetzner or in Stripe; no real e-mail was sent; no key was
-issued; production was not touched. The customer-facing commercial features (configurator, basket, quotations, projects, documents, project e-mail) are behind flags that are **off**. The admin CRM (admin role only), the stateless demonstrations and the anonymous funnel events have no flag by design (D-40, D-44, D-46).
+working tree. Phases 01 to 08 are committed and pushed (pull requests #75 and #76 are merged). **Phases 09 to 18 are committed locally (`42df564`,
+`592decd`), not pushed, not merged and not deployed.**
+
+**What is in production** (established from the GitHub Actions history, corrected on 2026-11-12): the Release workflow run `43033986686`
+(manual start, 2026-11-11 13:58 UTC) deployed `03e62c4` (phases 01 to 06, PR #75) to production and **applied migration `0026`
+(`quote_baskets`) to the production database** ("Apply migrations (backup first)", then "Deploy the release", "Verify from outside"). Phases 01 to 04
+are live; the configurator and the basket (05, 06) are in the deployed build behind flags that answer 404 on the live site. No Release has run
+since: phases 07 and 08 (`954bba9`, in `main`) are **not deployed**, and migrations `0027` to `0032` exist only in local and test databases. An
+earlier version of this paragraph said that nothing was deployed and no migration applied; that was wrong.
+
+The overnight work on phases 09 to 18 changed nothing on any server, in Cloudflare, in Hetzner or in Stripe; no real e-mail was sent; no key was
+issued. The customer-facing commercial features (configurator, basket, quotations, projects, documents, project e-mail) are behind flags that are **off**. The admin CRM (admin role only), the stateless demonstrations and the anonymous funnel events have no flag by design (D-40, D-44, D-46).
 
 The master prompt names this document `COMMERCIAL_EXPANSION_RELEASE_REVIEW.md`; the file kept its shorter name. An independent audit of it is in [COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md](COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md).
 
@@ -34,7 +43,8 @@ Read with: [COMMERCIAL_EXPANSION_PROGRESS.md](COMMERCIAL_EXPANSION_PROGRESS.md) 
 | 17 | staging runbook, Cloudflare and Hetzner checklists, release gates | – | – | COMMERCIAL_STAGING_RUNBOOK |
 | 18 | this review | – | – | – |
 
-All migrations are additive and exist only in local and test databases.
+All migrations are additive. `0026` is applied in production (Release of `03e62c4`, 2026-11-11); `0027` to `0032` exist only in local and test
+databases.
 
 ## 2. Executed on the final state
 
@@ -87,7 +97,8 @@ for the real sandbox run · D-47 Lighthouse before release · D-48 scheduling th
 1. **Review** the working tree (`git status`) and these documents. Phases 09 to 18 are one local commit (`42df564`); the branch is `feature/commercial-expansion`, which already contains phases 01 to 08.
 2. **Push** the branch (phases 09 to 18 are already committed locally in `42df564`); open a pull request against `main`. The pull request description can be built from the checkpoints of the progress file.
    CI runs the API, web, end-to-end and client-portal jobs; the commercial and legal suites are local (`scripts/test.ps1 -Suite commercial`, `-Suite legal`).
-3. **Deploy to staging only**, following [COMMERCIAL_STAGING_RUNBOOK.md](COMMERCIAL_STAGING_RUNBOOK.md): migrations `0026` to `0032` are additive; every feature starts off.
+3. **Deploy to staging only**, following [COMMERCIAL_STAGING_RUNBOOK.md](COMMERCIAL_STAGING_RUNBOOK.md): migrations `0027` to `0032` are additive (production already has `0026`); every feature starts off. Phases 07 and 08 are in `main`
+   but not deployed, so the next production Release would carry them (and `0027`) even before phases 09 to 18 are merged.
 4. **Production**: nothing in this work needs to be switched on for production, and three gates stay open on purpose. A production release needs the owner's approval and the
    decisions above; the commit that closes a gate is the commit that records its approval.
 
