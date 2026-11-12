@@ -72,3 +72,19 @@ Keep Cloudflare's IP list in the Caddyfile and UFW up to date.
   `DYNAMIC`.
 * `stripe trigger` or Resend reaches the webhook with 2xx, and no challenge appears in Security Events.
 * Sign-in with a wrong password many times hits the edge rule.
+
+## Additions from the 2026-11-12 security audit (proposals, not applied)
+
+* **Rate limits** now also name the staff sign-in and second-factor step (`rate-limits.json`, rule 2) and the public
+  forms (rule 3, a challenge instead of a block, so a real visitor behind a shared address can continue). The
+  application's own limits and the persistent account lockout stay the primary control.
+* **Cloudflare Access in front of `/admin`**: a free Zero Trust application for `ai-commercestudio.com/admin*` and
+  `/api/admin/*` (policy: allow the owner's identity, or the owner's e-mail with a one-time PIN) puts a second, independent
+  gate before the application sign-in and MFA. Exclude nothing else: public pages, the public API and the Stripe webhook
+  stay outside it. Test it from a private window before relying on it, and keep the break-glass route
+  (`acs-deploy-gate` over the tunnel) in mind: Access protects only the browser path.
+* **Authenticated Origin Pulls** (mutual TLS between Cloudflare and Caddy) would make the origin refuse any connection that
+  does not present Cloudflare's client certificate, on top of the UFW rule that already limits port 443 to Cloudflare ranges.
+  Optional; it needs a Caddy `client_auth` block and the Cloudflare setting switched on together.
+* **Stripe webhook source addresses**: Stripe publishes the addresses its webhooks come from. A custom rule that allows
+  `/api/billing/stripe/webhook` only from them is an extra layer once billing is released; the signature stays the proof.
