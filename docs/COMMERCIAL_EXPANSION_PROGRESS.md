@@ -1,7 +1,7 @@
 # Commercial expansion — progress
 
 Statuses: NOT_STARTED, IN_PROGRESS, IMPLEMENTED, TESTED, BLOCKED, DEFERRED, FAILED.
-Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Phases 01-08 are committed and pushed (PR #75 and #76 are merged); Phase 09 is in the working tree, not committed. Nothing is deployed. Migrations `0026` to `0032` exist only in local and test databases; none was applied to any server.
+Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Phases 01-08 are committed and pushed (PR #75 and #76 are merged); Phases 09-18 are committed locally in `42df564` (not pushed, not merged). Nothing is deployed. Migrations `0026` to `0032` exist only in local and test databases; none was applied to any server.
 
 | Phase | Name | Status | Last update | Notes |
 | --- | --- | --- | --- | --- |
@@ -15,14 +15,14 @@ Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Phases 
 | 08 | Customer accounts hardening | TESTED | 2026-11-11 | Verified against the list; account status, own quote requests by verified ownership, go-live prerequisites tested; customer MFA not built (D-22); see ACCOUNTS_HARDENING.md |
 | 09 | Commercial project portal | TESTED | 2026-11-11 | Behind `COMMERCIAL_PROJECTS_ENABLED` (off, needs accounts); migration 0028 (local only); lifecycle, roles, cross-tenant tests; see checkpoint and COMMERCIAL_PROJECTS.md |
 | 10 | Documents, uploads, approvals | TESTED | 2026-11-12 | Behind `PROJECT_DOCUMENTS_ENABLED`, `PROJECT_UPLOADS_ENABLED`, `PROJECT_CLIENT_UPLOADS_ENABLED` (all off); migration 0029 (local only); upload gate BLOCKER-COM-UPLOAD-01 open; see checkpoint and PROJECT_DOCUMENTS.md |
-| 11 | Transactional e-mail | TESTED | 2026-11-12 | Project e-mail on the existing outbox behind `PROJECT_NOTIFICATIONS_ENABLED` (off); migration 0030 (local only); no real mail sent; see checkpoint and PROJECT_NOTIFICATIONS.md |
+| 11 | Transactional e-mail | TESTED (PARTIAL: 6 project message kinds; quote, billing and some internal events are not e-mailed, see D-38) | 2026-11-12 | Project e-mail on the existing outbox behind `PROJECT_NOTIFICATIONS_ENABLED` (off); migration 0030 (local only); no real mail sent; see checkpoint and PROJECT_NOTIFICATIONS.md |
 | 12 | Admin CRM | TESTED | 2026-11-12 | Extends the existing admin (admin role only, no flag): lead owner, follow-up tasks, overview of real counts, timeline, customer links, safe CSV export; migration 0031 (local only); see checkpoint and ADMIN_CRM.md |
 | 13 | Stripe sandbox billing | TESTED (mocked); REAL SANDBOX BLOCKED | 2026-11-12 | Validation of the existing billing: sandbox matrix mapped to tests, four kinds of sale, a deposit can never be approved (migration 0032, local only); no test keys, no live call; see checkpoint and BILLING_SANDBOX_MATRIX.md |
-| 14 | AI demos | TESTED | 2026-11-12 | Eight public interactive simulations on invented data, deterministic, no provider, the platform approval policy, notes cannot steer; no flag, no migration; see checkpoint and AI_DEMONSTRATIONS.md |
+| 14 | AI demos | TESTED (PARTIAL: no AI provider call, D-44) | 2026-11-12 | Eight public interactive simulations on invented data, deterministic, no provider, the platform approval policy, notes cannot steer; no flag, no migration; see checkpoint and AI_DEMONSTRATIONS.md |
 | 15 | SEO, performance, analytics | TESTED (Lighthouse NOT RE-RUN) | 2026-11-12 | Six anonymous funnel events (no registration event, D-46); indexing rules and sitemap tested; no third-party host and a script budget as tests; Core Web Vitals not re-measured (D-47) |
 | 16 | Security and GDPR review | TESTED | 2026-11-12 | Data map in code with a guard test; findings F1 to F9 (admin-only reads, staff view logging, scheduled retention of stored files); dependency audits clean; see SECURITY_GDPR_REVIEW_COMMERCIAL.md |
 | 17 | Staging and release gates | DOCUMENT WRITTEN | 2026-11-12 | COMMERCIAL_STAGING_RUNBOOK.md; nothing was changed on any server |
-| 18 | Full QA and release review | DONE; STOPS AT THE APPROVAL GATE | 2026-11-12 | COMMERCIAL_RELEASE_REVIEW.md; nothing deployed, committed or pushed |
+| 18 | Full QA and release review | DONE WITH GAPS; STOPS AT THE APPROVAL GATE (no real Stripe sandbox run, no Lighthouse, no staging; see COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md) | 2026-11-12 | COMMERCIAL_RELEASE_REVIEW.md; nothing deployed, committed or pushed |
 
 ## Checkpoints
 
@@ -396,7 +396,7 @@ Executed on this state: see the table below (the suites run in one sequence afte
 * **15** — six anonymous funnel events, SEO rules and sitemap tests, page-weight and no-third-party tests ([ANALYTICS.md](ANALYTICS.md), [SEO_IMPLEMENTATION.md](SEO_IMPLEMENTATION.md), [PERFORMANCE_BASELINE.md](PERFORMANCE_BASELINE.md)). Lighthouse was **not** re-run (D-47).
 * **16** — security and GDPR review with a data map in code ([SECURITY_GDPR_REVIEW_COMMERCIAL.md](SECURITY_GDPR_REVIEW_COMMERCIAL.md)); findings F1 to F9; audits clean.
 * **17** — [COMMERCIAL_STAGING_RUNBOOK.md](COMMERCIAL_STAGING_RUNBOOK.md). Nothing was changed on any server.
-* **18** — [COMMERCIAL_RELEASE_REVIEW.md](COMMERCIAL_RELEASE_REVIEW.md). The programme **stops at the release approval gate**: nothing is committed (Phases 09 to 18), pushed or deployed.
+* **18** — [COMMERCIAL_RELEASE_REVIEW.md](COMMERCIAL_RELEASE_REVIEW.md). The programme **stops at the release approval gate**: Phases 09 to 18 are committed locally in `42df564`; nothing is pushed, merged or deployed.
 
 ### Executed results of the final run (Phases 09 to 18, one sequence, then re-runs of what failed)
 
@@ -404,7 +404,7 @@ Executed on this state: see the table below (the suites run in one sequence afte
 | --- | --- |
 | API suite, ruff, docs sync, shared-file hash checks | 1628 passed, 1 skipped |
 | Web typecheck, lint, unit | 84 files, 1099 tests passed (one failing test fixed, re-run green) |
-| End-to-end, flags off | 338 passed, 93 skipped, 1 failed (CRM spec sign-in timeout); fixed with one shared sign-in; CRM spec re-run: 5 passed |
+| End-to-end, flags off | Sequence run: 338 passed, 93 skipped, 1 failed (CRM spec sign-in timeout), fixed with one shared sign-in; fresh full run on the committed tree (forensic audit): **341 passed, 93 skipped, 0 failed** |
 | Commercial stack, two passes | 32 passed / 3 skipped, and 12 passed / 1 skipped |
 | Legal stack | 61 passed and 1 failure in the sequence (`legal-workflows`, marketing consent); the spec alone 25 passed, the whole suite again 66 passed, 1 skipped: recorded as an unexplained flake |
 | Audits (pip-audit, npm audit) | no known vulnerabilities, 0 vulnerabilities |

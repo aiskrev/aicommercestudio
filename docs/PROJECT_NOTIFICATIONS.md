@@ -30,7 +30,8 @@ What is **not** here, on purpose:
   acknowledgement to the visitor is still prepared only, not sent.
 * *Quote available / quote approved*: a quotation is shown through a secret link that is displayed to staff once and
   that they send themselves (D-38). The outbox stores no address and no token by design, so it cannot send that link.
-* *Internal lead assignment* and staff notices when a customer decides or writes: Phase 12 (admin CRM, tasks).
+* *Internal lead assignment*: built (audit follow-up). An administrator who is given an enquiry by someone else gets a staff mail (`notify_lead_assigned`, `app/notifications.py`) with the reference, the service and the admin link only; none for a repeat, for clearing the owner or for taking an enquiry yourself. It uses the same SMTP settings as the new-enquiry notice and sends nothing when e-mail is not configured (D-50).
+* Staff notices when a customer decides or writes: not built; staff see them in the project history. Billing notices: not built (the billing mail belongs to the accountant-approved wording, D-11/D-12).
 * *Billing notices*: Phase 13.
 * Real delivery: the provider, the domain and the mailbox are not verified (D-05).
 

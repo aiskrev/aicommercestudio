@@ -485,3 +485,107 @@ def test_the_export_filters_like_the_list_and_counts_tasks_and_stages(admin_clie
     assert admin_client.get(f"{ADMIN}/crm/leads.csv", params={"status": "NOPE"}).status_code == 422
     lead_filters = admin_client.get(f"{ADMIN}/leads", params={"qualification": "qualified"}).json()
     assert [i["id"] for i in lead_filters["items"]] == [three_leads[0]] and Lead is not None
+
+
+# --- Every staff write needs the CSRF token (discovered from the route table, not listed by hand) ----------------------
+
+
+def test_every_staff_write_refuses_a_missing_csrf_token_and_writes_nothing(
+    admin_client, three_leads, db, inbox, monkeypatch
+):
+    from app.config import get_settings
+
+    # Every flag on, so that no route answers 404 before the check; the guard is the CSRF dependency, not the flag.
+    for flag in (
+        "project_documents_enabled",
+        "project_uploads_enabled",
+        "project_client_uploads_enabled",
+        "project_notifications_enabled",
+        "project_configurator_enabled",
+        "quote_basket_enabled",
+    ):
+        monkeypatch.setattr(get_settings(), flag, True)
+    from app.main import app
+    from tests.test_accounts_hardening import _api_routes, _fill
+
+    before = db.scalar(select(func.count()).select_from(AuditLog))
+    checked = []
+    for route_path, route in _api_routes(app.routes):
+        if not route_path.startswith(f"{ADMIN}/"):
+            continue
+        for method in route.methods & {"POST", "PUT", "PATCH", "DELETE"}:
+            response = admin_client.request(method, _fill(route_path), json={}, headers={"X-CSRF-Token": ""})
+            checked.append((method, route_path, response.status_code))
+    # Sign-in, MFA and sign-out routes do not have a session to protect yet; every other write must refuse.
+    open_by_design = [
+        item
+        for item in checked
+        if item[2] != 403 and not any(part in item[1] for part in ("/auth", "/login", "/mfa", "/logout", "/session"))
+    ]
+    assert checked, "the route table was not discovered"
+    assert open_by_design == [], open_by_design
+    assert db.scalar(select(func.count()).select_from(AuditLog)) == before
+
+
+# --- The administrator who is given an enquiry is told (Phase 11: internal assignment) ------------------------------------
+
+
+class _Smtp:
+    """Records what would be sent; the test never opens a connection."""
+
+    sent: list = []
+
+    def __init__(self, *_a, **_k):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_a):
+        return False
+
+    def starttls(self, **_k):
+        pass
+
+    def login(self, *_a):
+        pass
+
+    def send_message(self, message):
+        _Smtp.sent.append(message)
+
+
+def test_the_new_owner_is_told_once_and_the_mail_holds_no_customer_data(
+    admin_client, three_leads, db, admin_user, monkeypatch
+):
+    from app.config import get_settings
+
+    settings = get_settings()
+    monkeypatch.setattr(settings, "smtp_host", "mail.test")
+    monkeypatch.setattr(settings, "smtp_from", "no-reply@example.com")
+    monkeypatch.setattr(settings, "lead_notification_email", "team@example.com")
+    monkeypatch.setattr(settings, "site_url", "https://trusted.example.com")
+    monkeypatch.setattr("app.notifications.smtplib.SMTP", _Smtp)
+    _Smtp.sent = []
+    _, other = second_admin(db)
+    lead = three_leads[0]
+    owner = f"{ADMIN}/leads/{lead}/owner"
+
+    assert admin_client.put(owner, json={"owner_id": str(other.id)}).status_code == 200
+    assert len(_Smtp.sent) == 1
+    mail = _Smtp.sent[0]
+    assert mail["To"] == other.email and mail["From"] == "no-reply@example.com"
+    body = mail.get_content()
+    assert f"https://trusted.example.com/admin/leads/{lead}" in body and "Референция:" in body
+    for private in ("anna.alpha@example.com", "Анна Петрова", "Алфа ООД", "+359 88 111 2222"):
+        assert private not in body and private not in str(mail["Subject"])
+
+    # A repeat, clearing the owner and taking an enquiry for yourself send nothing.
+    assert admin_client.put(owner, json={"owner_id": str(other.id)}).status_code == 200
+    assert admin_client.put(owner, json={"owner_id": None}).status_code == 200
+    assert admin_client.put(owner, json={"owner_id": str(admin_user.id)}).status_code == 200
+    assert len(_Smtp.sent) == 1
+
+    # Without a configured mail provider nothing is attempted and the change still succeeds.
+    monkeypatch.setattr(settings, "smtp_host", None)
+    assert admin_client.put(owner, json={"owner_id": str(other.id)}).status_code == 200
+    assert len(_Smtp.sent) == 1

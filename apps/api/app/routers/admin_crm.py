@@ -11,11 +11,12 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Query, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Query, Request, Response, status
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
 from app import audit
+from app.config import get_settings
 from app.crm import service
 from app.crm.models import LeadTask
 from app.crm.schemas import (
@@ -32,6 +33,7 @@ from app.crm.schemas import (
 from app.deps import Admin, DbSession, client_ip_hash
 from app.errors import ApiError
 from app.models import AdminRole, AdminUser, InquiryType, Lead, LeadLocale, LeadStatus, ServiceKey
+from app.notifications import notify_lead_assigned
 from app.services import leads
 
 router = APIRouter(prefix="/api/admin", tags=["admin-crm"])
@@ -64,14 +66,23 @@ def admins(ctx: Admin, db: DbSession, response: Response) -> list[PersonOut]:
 
 
 @router.put("/leads/{lead_id}/owner", response_model=OwnerOut, summary="Set or clear the owner of an enquiry")
-def set_owner(lead_id: uuid.UUID, payload: OwnerIn, request: Request, ctx: Admin, db: DbSession) -> OwnerOut:
+def set_owner(
+    lead_id: uuid.UUID, payload: OwnerIn, request: Request, ctx: Admin, db: DbSession, background: BackgroundTasks
+) -> OwnerOut:
     lead = _lead(db, lead_id, lock=True)
     try:
-        service.set_owner(db, lead, payload.owner_id, ctx.user, client_ip_hash(request))
+        changed = service.set_owner(db, lead, payload.owner_id, ctx.user, client_ip_hash(request))
     except service.CrmError as exc:
         db.rollback()
         raise _raise(exc) from exc
-    return OwnerOut(owner=service.person(db.get(AdminUser, lead.owner_id)) if lead.owner_id else None)
+    owner = db.get(AdminUser, lead.owner_id) if lead.owner_id else None
+    # An administrator who is given an enquiry by someone else is told; nobody is mailed for assigning to themselves,
+    # for a repeat, or for clearing the owner.
+    if changed and owner is not None and owner.id != ctx.user.id:
+        background.add_task(
+            notify_lead_assigned, get_settings(), owner.email, str(lead.id), lead.reference, lead.service
+        )
+    return OwnerOut(owner=service.person(owner) if owner else None)
 
 
 @router.get("/leads/{lead_id}/tasks", response_model=list[TaskOut], summary="The follow-up tasks of an enquiry")

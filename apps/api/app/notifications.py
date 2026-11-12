@@ -96,3 +96,34 @@ def notify_new_lead(
         logger.info("lead_notification_sent", extra={"lead": reference})
     except (smtplib.SMTPException, OSError):
         logger.exception("lead_notification_failed", extra={"lead": reference})
+
+
+def notify_lead_assigned(settings: Settings, to_email: str, lead_id: str, reference: str, service: str) -> None:
+    """Tell an administrator that an enquiry was assigned to them (Phase 11, internal assignment).
+
+    Staff-facing and transactional. Like the new-enquiry notice it holds no personal data of the customer: only the
+    reference, the service and a link to the admin panel, where the details are behind the session. The recipient is the
+    administrator's own sign-in address; nothing is sent when e-mail is not configured."""
+    if not settings.email_enabled:
+        logger.info("lead_assignment_skipped", extra={"reason": "email provider not configured", "lead": reference})
+        return
+    message = EmailMessage()
+    message["Subject"] = f"Назначено запитване {reference}: {SERVICE_LABELS.get(service, service)}"
+    message["From"] = settings.smtp_from
+    message["To"] = to_email
+    message.set_content(
+        "Запитване е назначено на вас.\n\n"
+        f"Референция: {reference}\n"
+        f"Услуга: {SERVICE_LABELS.get(service, service)}\n\n"
+        f"Преглед: {settings.site_url.rstrip('/')}/admin/leads/{lead_id}\n"
+    )
+    try:
+        with smtplib.SMTP(settings.smtp_host or "", settings.smtp_port, timeout=15) as smtp:
+            if settings.smtp_starttls:
+                smtp.starttls(context=ssl.create_default_context())
+            if settings.smtp_username and settings.smtp_password:
+                smtp.login(settings.smtp_username, settings.smtp_password)
+            smtp.send_message(message)
+        logger.info("lead_assignment_sent", extra={"lead": reference})
+    except (smtplib.SMTPException, OSError):
+        logger.exception("lead_assignment_failed", extra={"lead": reference})

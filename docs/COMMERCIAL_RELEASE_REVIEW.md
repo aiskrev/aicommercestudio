@@ -1,12 +1,14 @@
 # Commercial expansion: release review (Phase 18)
 
 Status on 2026-11-12. **The programme stops here, at the release approval gate.** Phases 01 to 18 are implemented and tested in the
-working tree. Phases 01 to 08 are committed and pushed (pull requests #75 and #76 are merged). **Phases 09 to 18 are not committed, not
-pushed and not deployed.** Nothing was changed on any server, in Cloudflare, in Hetzner or in Stripe; no real e-mail was sent; no key was
-issued; production was not touched. Everything new is behind a flag that is **off** or adds nothing customer-facing that needs approval.
+working tree. Phases 01 to 08 are committed and pushed (pull requests #75 and #76 are merged). **Phases 09 to 18 are committed locally in `42df564`, not
+pushed, not merged and not deployed.** Nothing was changed on any server, in Cloudflare, in Hetzner or in Stripe; no real e-mail was sent; no key was
+issued; production was not touched. The customer-facing commercial features (configurator, basket, quotations, projects, documents, project e-mail) are behind flags that are **off**. The admin CRM (admin role only), the stateless demonstrations and the anonymous funnel events have no flag by design (D-40, D-44, D-46).
+
+The master prompt names this document `COMMERCIAL_EXPANSION_RELEASE_REVIEW.md`; the file kept its shorter name. An independent audit of it is in [COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md](COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md).
 
 Read with: [COMMERCIAL_EXPANSION_PROGRESS.md](COMMERCIAL_EXPANSION_PROGRESS.md) (per-phase checkpoints and the executed results),
-[COMMERCIAL_EXPANSION_DECISIONS.md](COMMERCIAL_EXPANSION_DECISIONS.md) (D-01 to D-49), [COMMERCIAL_STAGING_RUNBOOK.md](COMMERCIAL_STAGING_RUNBOOK.md)
+[COMMERCIAL_EXPANSION_DECISIONS.md](COMMERCIAL_EXPANSION_DECISIONS.md) (D-01 to D-50), [COMMERCIAL_STAGING_RUNBOOK.md](COMMERCIAL_STAGING_RUNBOOK.md)
 (order of switching on, Cloudflare and Hetzner checklists, rollback) and [SECURITY_GDPR_REVIEW_COMMERCIAL.md](SECURITY_GDPR_REVIEW_COMMERCIAL.md).
 
 ## 1. What was built
@@ -43,7 +45,7 @@ failures were fixed and the affected parts re-run.
 | --- | --- |
 | API (`pytest`, ruff check and format, docs sync, the hash checks of the shared files) | **1628 passed, 1 skipped** (the skipped one needs the web copy mounted); ruff and docs sync clean |
 | Web (typecheck, lint, unit) | **84 files, 1099 tests passed** (one test of the sequence failed on a label that changed with a hint text; fixed and re-run) |
-| End-to-end, default stack (every commercial flag off) | **338 passed, 93 skipped** in the sequence; the one failure (a sign-in rate limit in the CRM spec) was fixed by one shared sign-in and the spec re-run: see the line below |
+| End-to-end, default stack (every commercial flag off) | **341 passed, 93 skipped, 0 failed** on the committed tree (the first sequence had 338 passed and one CRM sign-in timeout, fixed by one shared sign-in) |
 | CRM spec re-run after the fix | **5 passed** |
 | Commercial stack (flags on, two passes: basket on and off) | **32 passed, 3 skipped** and **12 passed, 1 skipped** |
 | Legal stack (accounts, projects, documents, notifications on; throwaway database) | **66 passed, 1 skipped**. In the sequence one test of `legal-workflows.spec.ts` failed (a contact form not confirming); the spec alone (25 passed) and the whole suite again (66 passed) were green, so it is recorded as an **unexplained flake**, not a fixed defect |
@@ -82,8 +84,8 @@ for the real sandbox run · D-47 Lighthouse before release · D-48 scheduling th
 
 ## 6. How to take it further (the owner's call)
 
-1. **Review** the working tree (`git status`) and these documents. Nothing is committed; the branch is `feature/commercial-expansion`, which already contains phases 01 to 08.
-2. **Commit** phases 09 to 18 (one commit, or one per phase) and **push** the branch; open a pull request against `main`. The pull request description can be built from the checkpoints of the progress file.
+1. **Review** the working tree (`git status`) and these documents. Phases 09 to 18 are one local commit (`42df564`); the branch is `feature/commercial-expansion`, which already contains phases 01 to 08.
+2. **Push** the branch (phases 09 to 18 are already committed locally in `42df564`); open a pull request against `main`. The pull request description can be built from the checkpoints of the progress file.
    CI runs the API, web, end-to-end and client-portal jobs; the commercial and legal suites are local (`scripts/test.ps1 -Suite commercial`, `-Suite legal`).
 3. **Deploy to staging only**, following [COMMERCIAL_STAGING_RUNBOOK.md](COMMERCIAL_STAGING_RUNBOOK.md): migrations `0026` to `0032` are additive; every feature starts off.
 4. **Production**: nothing in this work needs to be switched on for production, and three gates stay open on purpose. A production release needs the owner's approval and the

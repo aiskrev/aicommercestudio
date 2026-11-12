@@ -96,6 +96,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [COMMERCIAL_STAGING_RUNBOOK.md](docs/COMMERCIAL_STAGING_RUNBOOK.md) | Staging runbook, order of switching features on, Cloudflare and Hetzner checklists, release gates and rollback for the commercial expansion (a document: nothing was changed on any server) |
 | [SECURITY_GDPR_REVIEW_COMMERCIAL.md](docs/SECURITY_GDPR_REVIEW_COMMERCIAL.md) | Security and GDPR review of the commercial expansion: data map, findings and fixes, export and erasure, retention jobs, what was not checked |
 | [COMMERCIAL_RELEASE_REVIEW.md](docs/COMMERCIAL_RELEASE_REVIEW.md) | Release review of the commercial expansion: what was built, executed results, open gates, owner decisions, what was not verified, how to commit and deploy (stops at the approval gate) |
+| [COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md](docs/COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md) | Independent forensic audit of the 18-phase commercial expansion (Bulgarian): evidence, overstated claims, gaps, release decision NO_GO for activation |
 
 **Strategy and positioning**
 

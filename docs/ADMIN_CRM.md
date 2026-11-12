@@ -25,7 +25,7 @@ reachable with a customer session. No flag is needed: it adds no customer-facing
 
 ## Owner and follow-ups
 
-* `leads.owner_id` (an active administrator, or none). `PUT /api/admin/leads/{id}/owner` sets or clears it; the same value
+* `leads.owner_id` (an active administrator, or none). An administrator who is given an enquiry by someone else gets a staff mail with the reference, service and admin link only (D-50). `PUT /api/admin/leads/{id}/owner` sets or clears it; the same value
   again changes nothing; only an active administrator can be chosen (422 `assignee_invalid`), because only administrators
   can see enquiries. Every change is audited (`lead.owner_set`).
 * A task has a short plain-text title, an optional date, an assignee (default: the owner of the enquiry, else the person who

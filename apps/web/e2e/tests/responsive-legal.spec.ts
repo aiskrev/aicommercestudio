@@ -50,13 +50,11 @@ const PUBLIC_PATHS = [
   "/bg/otkaz-ot-marketing",
 ];
 
-const legalStackForPublic = process.env.E2E_LEGAL_STACK === "1";
 
 for (const size of WIDTHS) {
   test.describe(`${size.width}px`, () => {
     test.use({ viewport: size });
-    // The public pages are checked on the default stack (accounts off). With accounts on, the header overflows: see below.
-    test.skip(legalStackForPublic, "public pages run on the default stack; the account header overflow is a known defect (docs/ACCESSIBILITY.md)");
+    // The public pages are checked on every stack, including the one with accounts on (the account header is fixed: BLOCKER-ACC-HEADER-01).
 
     for (const path of PUBLIC_PATHS) {
       test(`${path} fits and is readable`, async ({ page }, testInfo) => {
