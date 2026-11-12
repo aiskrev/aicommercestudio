@@ -383,7 +383,7 @@ export function Header({
         id={mobilePanelId}
         ref={mobilePanelRef}
         hidden={!mobileOpen}
-        className="menu-sheet-enter fixed inset-x-0 bottom-0 top-16 z-40 flex flex-col border-t border-line-subtle bg-ink-950 min-[90rem]:hidden"
+        className="menu-sheet-enter fixed inset-x-0 bottom-0 top-16 z-[70] flex flex-col border-t border-line-subtle bg-ink-950 min-[90rem]:hidden"
         data-testid="mobile-menu"
         data-mobile-sheet
         data-compact={compact || undefined}
