@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
 
+import { bodyLimitFor, readLimitedBody } from "@/lib/proxy-limits";
+
 /**
  * Same-origin proxy to the FastAPI backend. The browser only ever talks to the web origin, so
  * the admin session cookie stays first-party (HttpOnly, SameSite) and no CORS is needed.
@@ -7,9 +9,7 @@ import type { NextRequest } from "next/server";
  */
 export const dynamic = "force-dynamic";
 
-const MAX_BODY_BYTES = 64 * 1024;
-/** A Stripe event can be larger than a form; its signature covers these exact bytes. */
-const MAX_WEBHOOK_BYTES = 1024 * 1024;
+// Body limits (forms 64 KiB, Stripe events 1 MiB, project document uploads PROJECT_UPLOAD_MAX_BYTES): lib/proxy-limits.ts.
 const HOP_BY_HOP = new Set([
   "connection",
   "keep-alive",
@@ -68,9 +68,10 @@ async function proxy(request: NextRequest, ctx: RouteContext<"/api/[...path]">):
 
   let body: ArrayBuffer | undefined;
   if (request.method !== "GET" && request.method !== "HEAD") {
-    body = await request.arrayBuffer();
-    const limit = path.join("/") === "billing/stripe/webhook" ? MAX_WEBHOOK_BYTES : MAX_BODY_BYTES;
-    if (body.byteLength > limit) return json(413, proxyErrors(request).tooLarge);
+    const limit = bodyLimitFor(request.method, path, request.headers.get("content-type"));
+    const read = await readLimitedBody(request, limit);
+    if (read === null) return json(413, proxyErrors(request).tooLarge);
+    body = read;
   }
 
   let upstream: Response;

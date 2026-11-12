@@ -96,6 +96,9 @@ services:
       HOST_SELFCHECK_FILE: /run/acs-selfcheck/status.json
     volumes:
       - /var/lib/acs-selfcheck:/run/acs-selfcheck:ro
+      # Private storage of project documents (PROJECT_STORAGE_DIR). The root file system is read-only, so uploads need
+      # their own writable volume; it is part of the backups (docs/PROJECT_DOCUMENTS.md) before uploads are switched on.
+      - project_files:/var/lib/acs/project-files
     depends_on:
       db:
         condition: service_healthy
@@ -119,6 +122,8 @@ services:
     environment:
       API_INTERNAL_URL: http://api:8000
       CUSTOMER_ACCOUNTS_ENABLED: ${CUSTOMER_ACCOUNTS_ENABLED:-false}
+      # The proxy lets a project document upload carry this many bytes (the API enforces its own limit).
+      PROJECT_UPLOAD_MAX_BYTES: ${PROJECT_UPLOAD_MAX_BYTES:-}
       TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
       CATALOGUE_REVALIDATE_SECRET: ${CATALOGUE_REVALIDATE_SECRET:-}
     depends_on:
@@ -143,3 +148,4 @@ networks:
 
 volumes:
   pgdata:
+  project_files:
