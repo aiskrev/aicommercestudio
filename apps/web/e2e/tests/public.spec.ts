@@ -1,68 +1,82 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("public website", () => {
-  test("homepage renders the hero, the consultation and assessment CTAs and the four capability groups", async ({ page }) => {
+  // V5 homepage (docs/V5_VISUAL_DIRECTION.md §6): websites, stores and AI first; every CTA works with the default flags.
+  test("homepage renders the hero, its two working CTAs, the four directions and the labelled previews", async ({ page }) => {
     const response = await page.goto("/bg");
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(/A\.I\. Commerce Studio/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Изграждаме AI");
-    const hero = page.locator("main").getByRole("link", { name: "Заявете консултация" }).first();
-    await expect(hero).toHaveAttribute("href", "/bg/kontakti");
-    await expect(page.getByRole("link", { name: "Оценете AI готовността си" })).toHaveAttribute("href", "/bg/ai-automation-advisor");
-    await expect(page.getByTestId("system-map")).toBeVisible();
-    const offer = page.locator("section[aria-labelledby='offer-title']");
-    await expect(offer.locator("article")).toHaveCount(3);
-    await expect(offer.getByRole("heading", { level: 3 })).toHaveText(["AI бизнес автоматизация", "Онлайн търговия, данни и облачни платформи", "AI Managed Services"]);
-    await expect(offer.locator("article a")).toHaveCount(10); // the ten domain hubs, not every service
-    // AI Managed Services lifecycle and the fictional, labelled solution patterns.
-    await expect(page.getByTestId("managed-lifecycle").getByRole("link")).toHaveCount(6);
-    await expect(page.getByTestId("solution-patterns").locator("[data-scenario]")).toHaveCount(3);
-    await expect(page.getByTestId("solution-patterns")).toContainText("Измислен сценарий");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Изработваме сайтове, онлайн магазини");
+    await expect(page.getByTestId("hero-primary")).toHaveAttribute("href", "/bg/uslugi");
+    await expect(page.getByTestId("hero-secondary")).toHaveAttribute("href", "/bg/kontakti?tip=oferta");
+    // The configurator is switched off by default: no link to it anywhere on the page.
+    await expect(page.locator("a[href*='konfigurator']")).toHaveCount(0);
+    await expect(page.getByTestId("configurator-entry")).toHaveCount(0);
+    await expect(page.getByTestId("hero-preview")).toContainText("Демонстрация");
+    const showcase = page.getByTestId("home-showcase");
+    await expect(showcase.locator(":scope > li")).toHaveCount(4);
+    await expect(showcase.getByRole("heading", { level: 3 })).toHaveText(["Уебсайт", "Онлайн магазин", "Интерактивна платформа", "AI автоматизация"]);
+    // Static vs interactive, the three store platforms, the six stages and the entry offers.
+    await expect(page.getByTestId("static-vs-interactive")).toContainText("Статичен");
+    await expect(page.locator("section[aria-labelledby='stores-title'] ul > li")).toHaveCount(3);
+    await expect(page.getByTestId("home-timeline").locator(":scope > li")).toHaveCount(6);
+    await expect(page.getByTestId("home-offer-landing_page")).toContainText("Цена в писмена оферта");
+    await expect(page.getByTestId("home-offer-business_website")).toContainText("€");
     await expect(page.locator("html")).toHaveAttribute("lang", "bg");
   });
 
   test("English homepage mirrors the structure with English destinations", async ({ page }) => {
     await page.goto("/en");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("We turn AI");
-    await expect(page.locator("main").getByRole("link", { name: "Book a consultation" }).first()).toHaveAttribute("href", "/en/contact");
-    await expect(page.getByRole("link", { name: "Assess your AI readiness" })).toHaveAttribute("href", "/en/ai-automation-advisor");
-    for (const id of ["offer-title", "tools-title", "managed-title", "orchestration-title", "credibility-title", "process-title", "proof-title", "founder-title", "faq-title"]) {
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Websites, e-commerce stores");
+    await expect(page.getByTestId("hero-primary")).toHaveAttribute("href", "/en/services");
+    await expect(page.getByTestId("hero-secondary")).toHaveAttribute("href", "/en/contact?type=quote");
+    for (const id of ["showcase-title", "websites-title", "stores-title", "process-title", "tools-title", "offers-title", "credibility-title", "founder-title", "faq-title"]) {
       await expect(page.locator(`[id="${id}"]`)).toBeVisible();
     }
-    await expect(page.locator("section[aria-labelledby='process-title'] ol > li")).toHaveCount(5);
+    await expect(page.getByTestId("home-timeline").locator(":scope > li")).toHaveCount(6);
+    await expect(page.getByTestId("home-showcase").locator(":scope > li")).toHaveCount(4);
   });
 
-  test("tools preview links only to the live tool; upcoming tools are labelled, not linked", async ({ page }) => {
+  test("tools preview links only to live tools and labelled demonstrations; upcoming tools are not linked", async ({ page }) => {
     await page.goto("/en");
     const tools = page.locator("section[aria-labelledby='tools-title']");
     const links = await tools.getByRole("link").evaluateAll((els) => els.map((el) => el.getAttribute("href")));
     expect(new Set(links)).toEqual(
-      new Set(["/en/tools", "/en/ai-automation-advisor", "/en/tools/ai-readiness", "/en/tools/ai-team", "/en/tools/roi-calculator"]),
+      new Set([
+        "/en/tools",
+        "/en/ai-automation-advisor",
+        "/en/tools/ai-readiness",
+        "/en/tools/ai-team",
+        "/en/tools/roi-calculator",
+        "/en/demo-centre",
+        "/en/reference-scenarios",
+      ]),
     );
     const planned = tools.locator("article[data-status='planned']");
     await expect(planned).toHaveCount(0);
     await expect(planned.getByRole("link")).toHaveCount(0);
   });
 
-  test("homepage journeys: consultation, first tool, a domain hub and AI Managed Services", async ({ page }) => {
+  test("homepage journeys: quote request, first tool, a website type and the care plans", async ({ page }) => {
     await page.goto("/bg");
-    await page.locator("main").getByRole("link", { name: "Заявете консултация" }).first().click();
-    await expect(page).toHaveURL(/\/bg\/kontakti$/);
+    await page.getByTestId("hero-secondary").click();
+    await expect(page).toHaveURL(/\/bg\/kontakti\?tip=oferta$/);
     await expect(page.locator("form").first()).toBeVisible();
 
     await page.goto("/bg");
     const tools = page.locator("section[aria-labelledby='tools-title']");
     await expect(tools.getByTestId("tool-start-here")).toHaveText("Започнете оттук");
 
-    await page.locator("section[aria-labelledby='offer-title']").getByRole("link", { name: "DevOps, SRE и наблюдаемост" }).click();
-    await expect(page).toHaveURL(/\/bg\/uslugi\/devops-sre-i-nablyudaemost$/);
+    await page.locator("section[aria-labelledby='websites-title']").getByRole("link", { name: "Статичен фирмен сайт" }).click();
+    await expect(page).toHaveURL(/\/bg\/izrabotka-na-saytove#static$/);
+    await expect(page.locator("#static")).toBeVisible();
 
     await page.goto("/en");
-    const managed = page.locator("section[aria-labelledby='managed-title']");
-    await expect(managed.getByTestId("managed-packages")).toContainText("Essential Monitoring & Advisory");
-    await managed.getByRole("link", { name: "Request an assessment" }).click();
-    await expect(page).toHaveURL(/\/en\/services\/ai-managed-services#ams-inquiry$/);
-    await expect(page.locator("#ams-inquiry")).toBeVisible();
+    const care = page.getByTestId("home-offer-care");
+    await expect(care).toContainText("Care after launch");
+    await care.getByRole("link", { name: "Care plans" }).click();
+    await expect(page).toHaveURL(/\/en\/care-plans$/);
+    await expect(page.getByTestId("care-matrix")).toBeVisible();
   });
 
   test("service pages have unique SEO metadata and structured data", async ({ page }) => {

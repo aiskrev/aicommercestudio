@@ -36,6 +36,8 @@ import { engineeringTool } from "@/content/bg/tool-engineering";
 import { solutionTool } from "@/content/bg/tool-solution";
 import { teamTool } from "@/content/bg/tool-team";
 import { tools } from "@/content/bg/tools";
+import { v5 } from "@/content/bg/v5";
+import { v5 as enV5 } from "@/content/en/v5";
 import { advisor as enAdvisor } from "@/content/en/advisor";
 import { aiManaged as enAiManaged } from "@/content/en/ai-managed";
 import { articles as enArticles, insightsPage as enInsightsPage } from "@/content/en/articles";
@@ -86,6 +88,7 @@ import type { LocalizedPaths } from "@/lib/seo";
 
 const bg = {
   home,
+  v5,
   services,
   carePlans,
   projectPackages,
@@ -139,6 +142,7 @@ export type SiteContent = typeof bg;
 /** English content. Typed as `SiteContent`, so a missing section or field fails `tsc`. */
 const en: SiteContent = {
   home: enHome,
+  v5: enV5,
   services: enServices,
   carePlans: enCarePlans,
   projectPackages: enProjectPackages,

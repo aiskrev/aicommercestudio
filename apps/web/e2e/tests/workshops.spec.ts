@@ -78,11 +78,9 @@ test("the catalogue is reachable from navigation, hubs, service pages and indust
   await page.goto("/bg");
   const footer = page.locator("footer");
   await expect(footer.getByRole("link", { name: "Работни срещи и консултантски оценки" })).toHaveAttribute("href", "/bg/rabotni-sreshti");
-  await page.setViewportSize({ width: 1280, height: 800 });
-  const services = page.locator("header nav").first().getByRole("button", { name: "Услуги" });
-  await services.click();
-  const panel = page.locator(`[id="${await services.getAttribute("aria-controls")}"]`);
-  await expect(panel.getByTestId("menu-start-here").getByRole("link", { name: /Работни срещи и консултантски оценки/ })).toHaveAttribute("href", "/bg/rabotni-sreshti");
+  await page.setViewportSize({ width: 1440, height: 900 }); // the full V5 desktop bar
+  await page.getByTestId("menu-ai").click();
+  await expect(page.getByTestId("panel-ai").getByRole("link", { name: /Работни срещи и консултантски оценки/ })).toHaveAttribute("href", "/bg/rabotni-sreshti");
   // Industries list up to two offers per segment.
   await page.goto("/bg/za-kogo");
   await expect(page.getByTestId("industry-workshops").first().getByRole("link").first()).toHaveAttribute("href", /^\/bg\/rabotni-sreshti\//);

@@ -48,10 +48,10 @@ test.describe("reduced motion requested", () => {
     });
   }
 
-  test("the services menu opens without an entry animation", async ({ page }) => {
-    await page.setViewportSize({ width: 1280, height: 800 });
+  test("the website-development menu opens without an entry animation", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 }); // the full desktop bar (V5)
     await page.goto("/bg");
-    const services = page.locator("header nav").first().getByRole("button", { name: "Услуги" });
+    const services = page.locator("header nav").first().getByRole("button", { name: "Изработка на сайтове" });
     await services.click();
     const panel = page.locator(`[id="${await services.getAttribute("aria-controls")}"]`);
     await expect(panel).toBeVisible();

@@ -91,3 +91,27 @@ Reading: CLS is 0 and desktop is fast. On mobile the new pages are **slower than
 slowest (LCP 4.3 s). Only these four routes were measured; the configurator, the basket and the account pages (behind flags and sessions) were not.
 No optimisation was made in this follow-up: the numbers are recorded as they are, and a mobile improvement of the scenario page and the
 price page is an open item (decision D-47).
+
+## V5 redesign: before and after in one session (2026-11-12)
+
+Same harness (`apps/web/e2e/perf/lighthouse.mjs`, Lighthouse 13.5.0, median of 3, mobile = simulated slow 4G), run twice in a
+row on the same machine: **before** = commit `0c14c6a` (the tip of `feature/commercial-expansion`, built from a detached
+worktree), **after** = the V5 working tree. Isolated compose projects, production builds. Result files (not committed):
+`apps/web/e2e/perf-results/v5-before/` and `apps/web/e2e/perf-results/v5-after/`.
+
+| Preset | Route | Perf before → after | LCP before → after | TBT before → after | CLS | Transfer before → after |
+| --- | --- | --- | --- | --- | --- | --- |
+| mobile | `/bg` | 83 → 86 | 3.33 s → 3.67 s | 378 ms → 212 ms | 0 → 0 | 553 KB → 532 KB |
+| mobile | `/en` | 83 → 83 | 3.93 s → 3.97 s | 260 ms → 233 ms | 0 → 0 | 538 KB → 518 KB |
+| mobile | `/bg/uslugi` | 85 → 83 | 3.75 s → 3.99 s | 219 ms → 249 ms | 0 → 0 | 511 KB → 521 KB |
+| mobile | `/bg/paketi` | 81 → 82 | 4.15 s → 4.12 s | 256 ms → 255 ms | 0 → 0 | 482 KB → 491 KB |
+| mobile | `/bg/uslugi/interaktivni-biznes-saytove` | 85 → 87 | 3.03 s → 3.18 s | 375 ms → 282 ms | 0 → 0 | 525 KB → 532 KB |
+| mobile | `/bg/izrabotka-na-saytove` (new) | – → 81 | – → 3.96 s | – → 305 ms | 0 | – → 516 KB |
+| mobile | `/bg/online-magazini` (new) | – → 83 | – → 3.90 s | – → 241 ms | 0 | – → 515 KB |
+| desktop | all seven routes | 99–100 → 99–100 | 0.79–0.91 s → 0.81–0.94 s | 14–61 ms → 12–71 ms | 0 | 489–610 KB → 489–558 KB |
+
+Reading (honest): the redesign adds no image, font or script, CLS stays 0 and desktop stays at 99–100. Mobile is **not**
+improved: LCP stays above the 3.0 s budget candidate on every route, before and after; the homepage LCP is 0.34 s slower
+(just above the ~0.3 s noise band) while its TBT and transfer went down. The two new hubs are in the same band as the
+existing pages (LCP 3.9–4.0 s). Accessibility 100 everywhere; best-practices 74 everywhere (unchanged); SEO 92 on `/en`
+before and after (pre-existing, not investigated here). The mobile LCP work stays an open item (D-47).

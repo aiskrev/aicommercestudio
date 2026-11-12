@@ -69,7 +69,8 @@ test("case study pages do not exist until a verified case study is published", a
 
 test("quote CTAs open the quote form for the right service", async ({ page }) => {
   await page.goto("/bg/uslugi/seo-optimizatsiya");
-  await page.getByRole("link", { name: "Поискайте оферта" }).first().click();
+  // The page's own CTA (the header button is the general quote request without a service).
+  await page.locator("main").getByRole("link", { name: "Поискайте оферта" }).first().click();
   await expect(page).toHaveURL(/\/kontakti\?usluga=seo&tip=oferta/);
   await expect(page.getByRole("radio", { name: /Заявка за оферта/ })).toBeChecked();
   await expect(page.getByLabel(/Услуга/)).toHaveValue("seo");
@@ -84,20 +85,27 @@ test("message outline helper and inline validation", async ({ page }) => {
   await expect(page.getByText("Въведете валиден имейл адрес.")).toBeVisible();
 });
 
-test("navigation marks the current page", async ({ page }) => {
-  await page.goto("/bg/instrumenti");
-  const nav = page.locator("header nav").first();
-  await expect(nav.getByRole("link", { name: "Инструменти" })).toHaveAttribute("aria-current", "page");
-  await page.goto("/bg/proces");
-  const company = nav.getByRole("button", { name: "Компания" });
-  await expect(company).toHaveAttribute("data-active", "true"); // the trigger shows the current section
-  await company.click();
-  await expect(nav.getByRole("link", { name: "Как работим" })).toHaveAttribute("aria-current", "page");
-  // A domain hub marks Services and the hub link; a nested page marks only the most specific link.
-  await page.goto("/bg/uslugi/devops-sre-i-nablyudaemost");
-  await expect(nav.getByRole("button", { name: "Услуги" })).toHaveAttribute("data-active", "true");
-  await page.goto("/bg/za-nas/osnovatel");
-  await nav.getByRole("button", { name: "Компания" }).click();
-  await expect(nav.getByRole("link", { name: "За основателя" })).toHaveAttribute("aria-current", "page");
-  await expect(nav.getByRole("link", { name: "Кои сме" })).not.toHaveAttribute("aria-current", "page");
+test.describe("desktop navigation (1440 px, where the full menu is shown)", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test("navigation marks the current page", async ({ page }) => {
+    await page.goto("/bg/instrumenti");
+    const nav = page.locator("header nav").first();
+    const ai = nav.getByRole("button", { name: "AI и автоматизация" });
+    await expect(ai).toHaveAttribute("data-active", "true"); // the trigger shows the current section
+    await ai.click();
+    await expect(nav.getByRole("link", { name: "Безплатни инструменти" })).toHaveAttribute("aria-current", "page");
+    await page.goto("/bg/proces");
+    const studio = nav.getByRole("button", { name: "Студио" });
+    await expect(studio).toHaveAttribute("data-active", "true");
+    await studio.click();
+    await expect(nav.getByRole("link", { name: "Как работим" })).toHaveAttribute("aria-current", "page");
+    // A domain hub marks its group; a nested page marks only the most specific link.
+    await page.goto("/bg/uslugi/devops-sre-i-nablyudaemost");
+    await expect(nav.getByRole("button", { name: "Поддръжка" })).toHaveAttribute("data-active", "true");
+    await page.goto("/bg/za-nas/osnovatel");
+    await nav.getByRole("button", { name: "Студио" }).click();
+    await expect(nav.getByRole("link", { name: "За основателя" })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByTestId("overview-studio")).not.toHaveAttribute("aria-current", "page");
+  });
 });

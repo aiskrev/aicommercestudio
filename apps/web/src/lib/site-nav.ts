@@ -1,16 +1,19 @@
 import type { IconName } from "@/components/ui/Icon";
 import { domainByKey, getContent, serviceByKey } from "@/content";
+import type { ServiceKey } from "@/content/types";
 import type { Dictionary } from "@/i18n";
 import { type Locale, localizePath } from "@/i18n/config";
-import { BANDS, type DomainBand, domainsInBand } from "@/lib/domains";
+import { type DomainKey, domainDefinition, isDomainPublished } from "@/lib/domains";
 import { routes } from "@/lib/routes";
 import { isToolAvailable, type ToolKey, toolByKey, toolHrefs } from "@/lib/tools";
 
 /**
- * Header navigation (docs/INFORMATION_ARCHITECTURE_V2.md §4.1–4.3, phase IA-1):
- * Services ▾ (mega-menu of the published domains in three bands + "Start here"), Solutions ▾,
- * Tools, Industries, Insights, Company ▾ and the consultation CTA. Built on the server from the
- * domain registry and the content, so the header never lists an unpublished hub or an unavailable tool.
+ * Header navigation, V5 (docs/V5_LINK_AUDIT.md). Grouped by what a visitor wants, not by the internal taxonomy:
+ * Website development ▾ · E-commerce ▾ · AI & automation ▾ · Maintenance ▾ · Packages & pricing ▾ · Studio ▾ and the
+ * quote button. Built on the server from the route registry, the domain registry, the tool flags and the content,
+ * so a menu never lists an unpublished hub, an unavailable tool or a feature behind a switched-off flag (the
+ * configurator, the quote basket, quotations and customer accounts are never listed here; the sign-in icon is
+ * drawn separately and only while accounts are on).
  */
 
 export interface NavItem {
@@ -18,106 +21,197 @@ export interface NavItem {
   label: string;
 }
 
-export interface NavDomain extends NavItem {
-  description: string;
-  icon: IconName;
-  /** Existing service pages whose primary domain this is (secondary links). */
-  services: NavItem[];
+export interface NavLink extends NavItem {
+  description?: string;
+  icon?: IconName;
 }
 
-export interface NavBand {
-  key: DomainBand;
+export interface NavColumn {
   title: string;
-  domains: NavDomain[];
+  items: NavLink[];
 }
 
-export interface NavStartItem extends NavItem {
-  description: string;
-  icon: IconName;
+export interface NavMenu {
+  id: "websites" | "ecommerce" | "ai" | "maintenance" | "pricing" | "studio";
+  label: string;
+  /** Overview page of the group (first link of the panel). */
+  overview: NavLink;
+  columns: NavColumn[];
+  featured: { title: string; text: string; cta: string; href: string };
 }
 
-export interface ServiceMenu extends NavItem {
-  bands: NavBand[];
-  startHere: { title: string; items: NavStartItem[] };
-  allLabel: string;
+export interface Navigation {
+  menus: NavMenu[];
+  /** Header button: the working quote path. */
+  cta: NavItem;
 }
 
-export type NavEntry = ({ kind: "link" } & NavItem) | { kind: "menu"; id: string; label: string; items: NavItem[] };
+/** Anchor on the care plans page where the recurring-services matrix starts. */
+export const CARE_MATRIX_ANCHOR = "ongoing-services";
 
-/** Tools offered under "Start here", in order; unavailable ones are left out. */
-const START_TOOLS: ToolKey[] = ["readiness", "finder"];
-
-export function buildNavigation(locale: Locale, dict: Dictionary): { services: ServiceMenu; entries: NavEntry[] } {
+export function buildNavigation(locale: Locale, dict: Dictionary): Navigation {
   const href = (path: string) => localizePath(locale, path);
-  const { tools, workshops, demoCentre, carePlans, projectPackages, pricingPage } = getContent(locale);
+  const content = getContent(locale);
+  const { v5, tools, workshops, demoCentre, carePlans, projectPackages, pricingPage, reference, aiSolutions } = content;
+  const nav = v5.nav;
   const toolLinks = toolHrefs(locale);
-  const serviceLink = (key: Parameters<typeof serviceByKey>[1]): NavItem => {
-    const service = serviceByKey(locale, key);
-    return { href: href(routes.service(service.slug)), label: service.shortTitle };
+
+  const service = (key: ServiceKey, icon?: IconName): NavLink => {
+    const item = serviceByKey(locale, key);
+    return { href: href(routes.service(item.slug)), label: item.shortTitle, icon: icon ?? item.icon };
   };
+  const domains = (keys: DomainKey[]): NavLink[] =>
+    keys.filter(isDomainPublished).map((key) => {
+      const domain = domainByKey(locale, key);
+      return { href: href(routes.service(domain.slug)), label: domain.name, description: domain.summary, icon: domainDefinition(key).icon };
+    });
+  const tool = (key: ToolKey): NavLink[] => {
+    const link = toolLinks[key];
+    if (!link) return [];
+    const item = tools.items.find((entry) => entry.key === key)!;
+    return [{ href: link, label: item.title, icon: item.icon }];
+  };
+  const hubAnchor = (path: string, id: string) => `${href(path)}#${id}`;
 
-  const bands: NavBand[] = BANDS.map((band) => ({
-    key: band,
-    title: dict.domain.bands[band].title,
-    domains: domainsInBand(band)
-      .filter((definition) => definition.published)
-      .map((definition) => {
-        const domain = domainByKey(locale, definition.key);
-        return {
-          href: href(routes.service(domain.slug)),
-          label: domain.name,
-          description: domain.summary,
-          icon: definition.icon,
-          services: definition.primaryServices.map(serviceLink),
-        };
-      }),
-  })).filter((band) => band.domains.length > 0);
+  const websitesHub = href(routes.websites);
+  const ecommerceHub = href(routes.ecommerce);
 
-  const audit = serviceByKey(locale, "audit");
-  const startHere: NavStartItem[] = [
-    { ...serviceLink("audit"), description: audit.summary, icon: audit.icon },
-    { href: href(routes.workshops), label: workshops.page.title, description: workshops.section.lead, icon: "clipboard" },
-    ...START_TOOLS.filter((key) => toolLinks[key]).map((key) => {
-      const tool = tools.items.find((item) => item.key === key)!;
-      return { href: toolLinks[key]!, label: tool.title, description: tool.description, icon: tool.icon };
-    }),
-  ];
-
-  const solutions: NavItem[] = [
-    { href: href(routes.aiSolutions), label: dict.nav.aiSolutions },
-    { href: href(routes.demoCentre), label: demoCentre.eyebrow },
-    { href: href(routes.projectPackages), label: projectPackages.navLabel },
-    { href: href(routes.carePlans), label: carePlans.title },
-    { href: href(routes.pricing), label: pricingPage.navLabel },
-    ...(isToolAvailable(toolByKey("agents"))
-      ? [{ href: href(routes.agentLibrary), label: tools.items.find((item) => item.key === "agents")!.title }]
-      : []),
-  ];
-
-  return {
-    services: {
-      href: href(routes.services),
-      label: dict.nav.services,
-      allLabel: dict.common.allServices,
-      bands,
-      startHere: { title: dict.nav.startHere, items: startHere },
+  const menus: NavMenu[] = [
+    {
+      id: "websites",
+      label: nav.websites,
+      overview: { href: websitesHub, label: v5.websites.title, description: v5.websites.offersLead, icon: "globe" },
+      columns: [
+        {
+          title: nav.groups.websiteTypes,
+          items: v5.websites.offers.map((offer) => ({ href: hubAnchor(routes.websites, offer.id), label: offer.name, description: offer.value })),
+        },
+        {
+          title: nav.groups.websiteServices,
+          items: [service("business_websites"), service("portals_web_apps"), service("security_performance")],
+        },
+      ],
+      featured: { ...nav.featured.websites, href: hubAnchor(routes.websites, "compare") },
     },
-    entries: [
-      { kind: "menu", id: "solutions", label: dict.nav.solutions, items: solutions },
-      { kind: "link", href: href(routes.tools), label: dict.nav.tools },
-      { kind: "link", href: href(routes.industries), label: dict.nav.industries },
-      { kind: "link", href: href(routes.insights), label: dict.nav.insights },
-      {
-        kind: "menu",
-        id: "company",
-        label: dict.nav.company,
-        items: [
-          { href: href(routes.about), label: dict.nav.aboutUs },
-          { href: href(routes.founder), label: dict.nav.founder },
-          { href: href(routes.process), label: dict.nav.approach },
-          { href: href(routes.contact), label: dict.nav.contact },
-        ],
-      },
-    ],
-  };
+    {
+      id: "ecommerce",
+      label: nav.ecommerce,
+      overview: { href: ecommerceHub, label: v5.ecommerce.title, description: v5.ecommerce.offersLead, icon: "cart" },
+      columns: [
+        {
+          title: nav.groups.storePlatforms,
+          items: v5.ecommerce.offers.map((offer) => ({ href: hubAnchor(routes.ecommerce, offer.id), label: offer.name, description: offer.value })),
+        },
+        {
+          title: nav.groups.storeServices,
+          items: [
+            service("store_development"),
+            service("payments_subscriptions"),
+            service("integrations"),
+            service("maintenance"),
+            service("analytics"),
+            service("seo"),
+            ...domains(["commerce_engineering"]),
+          ],
+        },
+      ],
+      featured: { ...nav.featured.ecommerce, href: hubAnchor(routes.ecommerce, "costs") },
+    },
+    {
+      id: "ai",
+      label: nav.ai,
+      overview: { href: href(routes.aiSolutions), label: nav.labels.aiOverview, description: aiSolutions.lead, icon: "sparkles" },
+      columns: [
+        {
+          title: nav.groups.aiServices,
+          items: [
+            ...domains(["ai_strategy", "ai_agents_automation", "ai_applications", "data_integration", "ai_governance"]),
+            service("ai_agents"),
+            service("automation"),
+            service("ai_tools"),
+          ],
+        },
+        {
+          title: nav.groups.aiStart,
+          items: [
+            ...tool("advisor"),
+            ...tool("readiness"),
+            ...tool("finder"),
+            { href: href(routes.tools), label: nav.labels.tools, icon: "wrench" },
+            service("audit"),
+            { href: href(routes.workshops), label: workshops.page.title, icon: "clipboard" },
+            ...domains(["advisory_enablement"]),
+            ...(isToolAvailable(toolByKey("agents")) ? [{ href: href(routes.agentLibrary), label: tools.items.find((item) => item.key === "agents")!.title, icon: "bot" as const }] : []),
+          ],
+        },
+      ],
+      featured: { ...nav.featured.ai, href: toolLinks.advisor ?? href(routes.tools) },
+    },
+    {
+      id: "maintenance",
+      label: nav.maintenance,
+      overview: { href: href(routes.carePlans), label: carePlans.title, description: carePlans.lead, icon: "wrench" },
+      columns: [
+        {
+          title: nav.groups.care,
+          items: [service("maintenance"), service("integration_care"), service("ai_managed"), service("security_performance"), service("seo")],
+        },
+        { title: nav.groups.cloud, items: domains(["cloud_platform", "devops_sre", "managed_operations"]) },
+      ],
+      featured: { ...nav.featured.maintenance, href: `${href(routes.carePlans)}#${CARE_MATRIX_ANCHOR}` },
+    },
+    {
+      id: "pricing",
+      label: nav.pricing,
+      overview: { href: href(routes.pricing), label: pricingPage.navLabel, description: pricingPage.lead, icon: "chart" },
+      columns: [
+        {
+          title: nav.groups.packages,
+          items: [
+            { href: href(routes.projectPackages), label: projectPackages.navLabel, description: projectPackages.lead, icon: "layers" },
+            { href: href(routes.carePlans), label: carePlans.title, description: carePlans.lead, icon: "wrench" },
+            { href: href(routes.pricing), label: pricingPage.navLabel, description: pricingPage.lead, icon: "chart" },
+          ],
+        },
+      ],
+      featured: { ...nav.featured.pricing, href: href(`${routes.contact}?tip=oferta`) },
+    },
+    {
+      id: "studio",
+      label: nav.studio,
+      overview: { href: href(routes.about), label: dict.nav.aboutUs, description: content.about.lead, icon: "users" },
+      columns: [
+        {
+          title: nav.groups.examples,
+          items: [
+            { href: href(routes.demoCentre), label: nav.labels.examples, description: demoCentre.lead, icon: "eye" },
+            { href: href(routes.scenarios), label: reference.scenarios.title, icon: "target" },
+            { href: href(routes.patterns), label: reference.patterns.title, icon: "workflow" },
+            { href: href(routes.insights), label: dict.nav.insights, icon: "fileText" },
+          ],
+        },
+        {
+          title: nav.groups.company,
+          items: [
+            { href: href(routes.founder), label: dict.nav.founder, icon: "users" },
+            { href: href(routes.process), label: dict.nav.approach, icon: "workflow" },
+            { href: href(routes.industries), label: dict.nav.industries, icon: "building" },
+            { href: href(routes.services), label: nav.allServices, icon: "list" },
+            { href: href(routes.contact), label: nav.contact, icon: "mail" },
+          ],
+        },
+      ],
+      featured: { ...nav.featured.studio, href: href(routes.demoCentre) },
+    },
+  ];
+
+  return { menus, cta: { href: href(`${routes.contact}?tip=oferta`), label: nav.quoteCta } };
+}
+
+/** Every href of the navigation (tests and the link audit). */
+export function navigationHrefs(navigation: Navigation): string[] {
+  return [
+    ...navigation.menus.flatMap((menu) => [menu.overview.href, ...menu.columns.flatMap((column) => column.items.map((item) => item.href)), menu.featured.href]),
+    navigation.cta.href,
+  ];
 }

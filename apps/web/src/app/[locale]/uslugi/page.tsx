@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CatalogueBrowser } from "@/components/sections/CatalogueBrowser";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -5,7 +7,9 @@ import { DomainBands } from "@/components/sections/DomainBands";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { ServiceShowcase } from "@/components/sections/ServiceShowcase";
 import { ServiceMotif } from "@/components/sections/ServiceMotif";
+import { Icon } from "@/components/ui/Icon";
 import { ButtonLink, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
+import { UiPreview } from "@/components/v5/UiPreview";
 import { domainByKey, getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -32,10 +36,16 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/uslugi">
 
 export default async function ServicesPage({ params }: PageProps<"/[locale]/uslugi">) {
   const locale = await resolveLocale(params);
-  const { servicesPage, coreServices, home } = getContent(locale);
+  const { servicesPage, coreServices, home, v5 } = getContent(locale);
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const audit = serviceByKey(locale, "audit");
+  const startHref = {
+    website: href(routes.websites),
+    store: href(routes.ecommerce),
+    platform: href(routes.service(serviceByKey(locale, "portals_web_apps").slug)),
+    ai: href(routes.aiSolutions),
+  } as const;
   const { entries } = await getCatalogue(locale);
   const catalogueDomains = BANDS.flatMap(domainsInBand)
     .filter((domain) => isDomainPublished(domain.key))
@@ -56,6 +66,30 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
         ]}
       />
       <PageHero eyebrow={servicesPage.eyebrow} title={servicesPage.title} lead={servicesPage.lead} />
+
+      {/* V5: the four directions first, as on the homepage, then the ten service areas. */}
+      <Section labelledBy="services-start-title" density="compact">
+        <h2 id="services-start-title" className="t-h3-lg">
+          {v5.home.showcase.title}
+        </h2>
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-testid="services-start">
+          {v5.home.showcase.cards.map((card) => (
+            <li key={card.key} className="card card-interactive focus-frame flex flex-col p-5">
+              <UiPreview kind={card.preview} compact />
+              <h3 className="t-h3 mt-5">
+                <Link href={startHref[card.key]} className="after:absolute after:inset-0">
+                  {card.title}
+                </Link>
+              </h3>
+              <p className="mt-1.5 text-body-sm leading-relaxed text-fg-muted">{card.audience}</p>
+              <span className="mt-auto inline-flex items-center gap-2 pt-4 text-sm font-semibold text-brand">
+                {card.more}
+                <Icon name="arrowRight" className="arrow-nudge h-4 w-4" />
+              </span>
+            </li>
+          ))}
+        </ul>
+      </Section>
 
       <Section labelledBy="services-domains-title">
         <SectionHeading id="services-domains-title" title={dict.domain.domainsTitle} lead={dict.domain.domainsLead} />

@@ -1,166 +1,252 @@
 import Link from "next/link";
 
 import { ConfiguratorEntry } from "@/components/configurator/ConfiguratorEntry";
-import { CapabilityAreas } from "@/components/home/CapabilityAreas";
-import { ControlLanes } from "@/components/home/ControlLanes";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
-import { HeroWorkflow } from "@/components/home/HeroWorkflow";
-import { ManagedLifecycle } from "@/components/home/ManagedLifecycle";
-import { ProcessSteps } from "@/components/home/ProcessSteps";
-import { ProjectEntryPoints } from "@/components/home/ProjectEntryPoints";
-import { SolutionPatterns } from "@/components/home/SolutionPatterns";
-import { SystemMap } from "@/components/home/SystemMap";
 import { ToolsPreview } from "@/components/home/ToolsPreview";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { FounderPortrait } from "@/components/sections/Founder";
 import { Faq } from "@/components/sections/Faq";
+import { PriceTag } from "@/components/sections/PriceTag";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
 import { EditorialSplit } from "@/components/ui/patterns";
-import { ButtonLink, Container, Eyebrow, Section, SectionHeading } from "@/components/ui/primitives";
-import { domainByKey, getContent, serviceByKey } from "@/content";
+import { ButtonLink, Container, Eyebrow, Section, SectionHeading, cx } from "@/components/ui/primitives";
+import { ArrowLink, Timeline, TickList } from "@/components/v5/blocks";
+import { UiPreview } from "@/components/v5/UiPreview";
+import { getContent, serviceByKey } from "@/content";
+import type { HomeShowcaseCard } from "@/content/v5-types";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
-import { isDomainPublished } from "@/lib/domains";
-import { SCENARIO_SLUGS } from "@/lib/reference";
 import { resolveLocale } from "@/lib/params";
-import { AI_MANAGED_PRICES, SERVICE_PRICES, priceText } from "@/lib/prices";
+import { SERVICE_PRICES } from "@/lib/prices";
+import { PROJECT_PACKAGES, packagePrice } from "@/lib/project-packages";
 import { quoteWithService, routes } from "@/lib/routes";
-import { toolHrefs, toolMinutes } from "@/lib/tools";
 import { buildMetadata, faqJsonLd } from "@/lib/seo";
-
-const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+import { toolHrefs, toolMinutes } from "@/lib/tools";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
-  const { home } = getContent(locale);
+  const { v5 } = getContent(locale);
   return buildMetadata({
     locale,
-    title: home.metaTitle,
-    description: home.metaDescription,
+    title: v5.home.metaTitle,
+    description: v5.home.metaDescription,
     path: routes.home,
     absoluteTitle: true,
   });
 }
 
+/** Bento placement of the four showcase cards (docs/V5_DESIGN_SYSTEM.md → Bento). */
+const BENTO: Record<HomeShowcaseCard["key"], string> = {
+  website: "bento-wide",
+  store: "bento-narrow",
+  platform: "bento-narrow",
+  ai: "bento-wide",
+};
+
 /**
- * Homepage (docs/DESIGN_SYSTEM.md → Homepage composition, redesign v4). In order: hero; three
- * capability areas with unequal weight that link the ten domain hubs; the AI Automation Advisor as a
- * product (with the other live tools); AI Managed Services as an operating lifecycle; engineering
- * credibility (human-approval architecture and the practices we can be checked on); the delivery
- * model; example solution patterns (fictional, labelled — no fabricated proof); the founder; FAQ;
- * the final CTA. Everything is a server component; motion comes from the shared CSS system.
+ * Homepage, V5 (docs/V5_VISUAL_DIRECTION.md §6). One story in order: hero (websites, stores and AI); four
+ * directions with previews and indicative prices; website development (types, static vs interactive); online
+ * stores (three platforms); the six-stage process; free tools and labelled demonstrations; entry packages; the
+ * engineering practices we can be checked on; the founder (protected, unchanged); FAQ; the final call to action.
+ * Every link goes to a page that exists with the default flags: the configurator button is drawn only while the
+ * configurator is switched on, otherwise the quote form is the working path.
  */
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = await resolveLocale(params);
-  const { home, advisor, tools, founder, aiManaged, reference, configurator } = getContent(locale);
+  const { v5, advisor, tools, founder, home: legacyHome, projectPackages, carePlans } = getContent(locale);
+  const home = v5.home;
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
-  const managedHref = href(routes.service(serviceByKey(locale, "ai_managed").slug));
-  const entryPoints = home.entry.items.map((item) => {
-    const service = serviceByKey(locale, item.key);
-    return {
-      ...item,
-      detailsHref: href(routes.service(service.slug)),
-      quoteHref: href(quoteWithService(item.key)),
-      price: SERVICE_PRICES[item.key],
-    };
-  });
-  const areas = home.offer.areas.map((area) => ({
-    ...area,
-    domains: area.domains.filter(isDomainPublished).map((key) => {
-      const domain = domainByKey(locale, key);
-      return { key, name: domain.name, href: href(routes.service(domain.slug)) };
-    }),
-  }));
-  const patterns = home.proof.scenarios.map((key) => ({
-    key,
-    title: reference.scenarioTexts[key].title,
-    summary: reference.scenarioTexts[key].summary,
-    href: href(routes.scenario(SCENARIO_SLUGS[key].bg)),
-  }));
+  const quoteHref = href(`${routes.contact}?tip=oferta`);
+  const cardHref: Record<HomeShowcaseCard["key"], string> = {
+    website: href(routes.websites),
+    store: href(routes.ecommerce),
+    platform: href(routes.service(serviceByKey(locale, "portals_web_apps").slug)),
+    ai: href(routes.service(serviceByKey(locale, "automation").slug)),
+  };
 
   return (
     <>
       <JsonLd data={faqJsonLd(home.faq.items)} />
 
       {/* 1 ---------------------------------------------------------------- hero */}
-      <div className="relative overflow-hidden">
+      <div className="hero-v5 relative overflow-hidden">
         <div className="grid-backdrop pointer-events-none absolute inset-0" aria-hidden="true" />
-        <div className="hero-glow pointer-events-none absolute inset-0" aria-hidden="true" />
-        <Container className="relative grid items-center gap-10 pb-12 pt-10 sm:gap-12 sm:pt-14 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-14 lg:pb-16 lg:pt-16">
+        <Container size="wide" className="relative grid items-center gap-12 pb-14 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 lg:pb-20 lg:pt-16">
           <div className="min-w-0">
             <Eyebrow>{home.hero.eyebrow}</Eyebrow>
-            <h1 className="t-display mt-6">
+            <h1 className="t-hero mt-6">
               {home.hero.title} <span className="text-brand">{home.hero.titleHighlight}</span>
             </h1>
             <p className="t-lead mt-6 max-w-xl">{home.hero.lead}</p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={href(routes.contact)} size="lg" icon="arrowRight">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <ButtonLink href={href(routes.services)} size="lg" icon="arrowRight" testId="hero-primary">
                 {home.hero.primaryCta}
               </ButtonLink>
-              <ButtonLink href={href(routes.advisor)} size="lg" variant="secondary">
+              <ButtonLink href={quoteHref} size="lg" variant="secondary" testId="hero-secondary">
                 {home.hero.secondaryCta}
               </ButtonLink>
+              <ConfiguratorEntry href={href(routes.configurator)} label={home.hero.configureCta} variant="secondary" className="btn-lg" />
             </div>
-            <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-fg-secondary">
-              {home.hero.highlights.map((item) => (
+            <ul className="mt-8 grid gap-x-6 gap-y-2.5 text-sm text-fg-secondary sm:grid-cols-2">
+              {home.hero.points.map((item) => (
                 <li key={item} className="inline-flex items-center gap-2">
-                  <Icon name="check" className="h-4 w-4 text-brand" />
+                  <Icon name="check" className="h-4 w-4 shrink-0 text-brand" />
                   {item}
                 </li>
               ))}
             </ul>
           </div>
-          <SystemMap content={home.hero.systemMap} />
+          {/* Composite preview: a website, a store and an automation, one caption for all three. */}
+          <figure className="min-w-0" data-testid="hero-preview">
+            <div className="relative lg:pb-16 lg:pr-10">
+              <UiPreview kind="static" />
+              <UiPreview kind="store" compact className="absolute -bottom-4 right-0 hidden w-[50%] lg:block" />
+              <UiPreview kind="ai" compact className="absolute -left-6 bottom-6 hidden w-[42%] xl:block" />
+            </div>
+            <figcaption className="t-label mt-4">{home.hero.previewCaption}</figcaption>
+          </figure>
         </Container>
       </div>
 
-      {/* 1b --------------------------------------------------------------- commercial entry points (what do you want to build?) */}
-      <Section labelledBy="entry-title" size="wide">
-        <SectionHeading
-          id="entry-title"
-          eyebrow={home.entry.eyebrow}
-          title={home.entry.title}
-          lead={home.entry.lead}
-          action={
-            <div className="flex flex-wrap gap-3">
-              <ConfiguratorEntry href={href(routes.configurator)} label={configurator.entryLabel} />
-              <ButtonLink href={href(routes.projectPackages)} variant="secondary" icon="arrowRight">
-                {home.entry.compareLabel}
-              </ButtonLink>
+      {/* 2 ---------------------------------------------------------------- four directions (bento) */}
+      <Section labelledBy="showcase-title" size="wide">
+        <SectionHeading id="showcase-title" eyebrow={home.showcase.eyebrow} title={home.showcase.title} lead={home.showcase.lead} />
+        <ul className="bento mt-stack" data-testid="home-showcase">
+          {home.showcase.cards.map((card) => {
+            const service = serviceByKey(locale, card.service);
+            return (
+              <li key={card.key} className={cx("offer-card", BENTO[card.key])} data-testid={`showcase-${card.key}`}>
+                <div className="offer-stage">
+                  <UiPreview kind={card.preview} compact className="translate-y-px" />
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="t-h3-lg">
+                    <Link href={cardHref[card.key]} className="hover:text-brand focus-visible:outline-none" data-testid={`showcase-link-${card.key}`}>
+                      {card.title}
+                    </Link>
+                  </h3>
+                  <p className="mt-2 leading-relaxed text-fg-muted">{card.text}</p>
+                  <p className="mt-3 text-body-sm text-fg-secondary">
+                    <span className="font-semibold text-fg">{home.showcase.audienceLabel}: </span>
+                    {card.audience}
+                  </p>
+                  <div className="mt-5 flex flex-wrap items-end justify-between gap-4 border-t border-line-subtle pt-5">
+                    <div>
+                      <PriceTag locale={locale} price={SERVICE_PRICES[card.service]} testId={`showcase-price-${card.key}`} />
+                      <p className="mt-1 text-xs text-fg-subtle">{home.showcase.priceNote}</p>
+                    </div>
+                    <div className="flex flex-col items-start gap-1">
+                      <ArrowLink href={cardHref[card.key]} label={card.more} />
+                      <Link href={href(quoteWithService(card.service))} className="link text-sm" data-testid={`showcase-quote-${card.key}`} aria-label={`${home.showcase.quoteLabel}: ${service.shortTitle}`}>
+                        {home.showcase.quoteLabel}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="mt-4 text-xs text-fg-subtle">{home.hero.previewCaption}</p>
+      </Section>
+
+      {/* 3 ---------------------------------------------------------------- website development */}
+      <Section labelledBy="websites-title" tone="raised" size="wide">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14">
+          <div className="min-w-0">
+            <Eyebrow>{home.websites.eyebrow}</Eyebrow>
+            <h2 id="websites-title" className="t-h2 reveal mt-4">
+              {home.websites.title}
+            </h2>
+            <p className="t-lead mt-5">{home.websites.lead}</p>
+            <div className="mt-8 grid gap-4 rounded-[var(--radius-xl)] border border-line-subtle bg-surface-page p-5" data-testid="static-vs-interactive">
+              <p className="font-semibold text-fg">{home.websites.staticVsInteractive.title}</p>
+              <p className="text-body-sm leading-relaxed text-fg-muted">
+                <span className="badge mr-2">{home.websites.types[1].title}</span>
+                {home.websites.staticVsInteractive.static}
+              </p>
+              <p className="text-body-sm leading-relaxed text-fg-muted">
+                <span className="badge badge-accent mr-2">{home.websites.types[3].title}</span>
+                {home.websites.staticVsInteractive.interactive}
+              </p>
             </div>
-          }
-        />
-        <div className="mt-stack">
-          <ProjectEntryPoints
-            locale={locale}
-            items={entryPoints}
-            labels={{ details: home.entry.detailsLabel, quote: home.entry.quoteLabel, priceNote: home.entry.priceNote }}
-          />
+            <ButtonLink href={`${href(routes.websites)}#compare`} variant="secondary" icon="arrowRight" className="mt-6">
+              {home.websites.cta}
+            </ButtonLink>
+          </div>
+          <ul className="grid content-start gap-4 sm:grid-cols-2">
+            {home.websites.types.map((type, index) => (
+              <li key={type.id} className="card card-interactive focus-frame flex flex-col p-6">
+                <span className="flex items-center justify-between gap-3">
+                  <span className="t-index">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="badge">{type.tag}</span>
+                </span>
+                <h3 className="t-h3-lg mt-5">
+                  <Link href={`${href(routes.websites)}#${type.id}`} className="after:absolute after:inset-0">
+                    {type.title}
+                  </Link>
+                </h3>
+                <p className="mt-2 leading-relaxed text-fg-muted">{type.text}</p>
+                <Icon name="arrowRight" className="arrow-nudge mt-4 h-4 w-4 self-end text-brand" />
+              </li>
+            ))}
+          </ul>
         </div>
       </Section>
 
-      {/* 2 ---------------------------------------------------------------- capability narrative: three areas */}
-      <Section labelledBy="offer-title">
+      {/* 4 ---------------------------------------------------------------- online stores */}
+      <Section labelledBy="stores-title" size="wide">
         <SectionHeading
-          id="offer-title"
-          eyebrow={home.offer.eyebrow}
-          title={home.offer.title}
-          lead={home.offer.lead}
+          id="stores-title"
+          eyebrow={home.stores.eyebrow}
+          title={home.stores.title}
+          lead={home.stores.lead}
           action={
-            <ButtonLink href={href(routes.services)} variant="secondary" icon="arrowRight">
-              {dict.common.allServices}
+            <ButtonLink href={`${href(routes.ecommerce)}#costs`} variant="secondary" icon="arrowRight">
+              {home.stores.cta}
             </ButtonLink>
           }
         />
-        <div className="mt-stack">
-          <CapabilityAreas areas={areas} labels={home.offer.labels} />
-        </div>
+        <ul className="mt-stack grid gap-4 md:grid-cols-3">
+          {home.stores.platforms.map((platform) => (
+            <li key={platform.id} className="card card-interactive focus-frame flex flex-col p-6">
+              <Icon name={platform.id === "custom" ? "layers" : "store"} className="h-6 w-6 text-brand" />
+              <h3 className="t-h3-lg mt-4">
+                <Link href={`${href(routes.ecommerce)}#${platform.id}`} className="after:absolute after:inset-0">
+                  {platform.title}
+                </Link>
+              </h3>
+              <p className="mt-2 leading-relaxed text-fg-muted">{platform.text}</p>
+              <p className="mt-auto pt-5 text-sm font-medium text-fg-secondary">
+                <Icon name="check" className="mr-2 inline h-4 w-4 text-success" />
+                {platform.fit}
+              </p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-5 max-w-3xl text-sm text-fg-subtle">{home.stores.note}</p>
       </Section>
 
-      {/* 3 ---------------------------------------------------------------- the AI Automation Advisor as a product */}
-      <Section labelledBy="tools-title" tone="raised">
+      {/* 5 ---------------------------------------------------------------- process */}
+      <Section labelledBy="process-title" tone="deep" size="wide">
+        <SectionHeading
+          id="process-title"
+          eyebrow={home.process.eyebrow}
+          title={home.process.title}
+          lead={home.process.lead}
+          action={
+            <ButtonLink href={href(routes.process)} variant="ghost" icon="arrowRight">
+              {home.process.link}
+            </ButtonLink>
+          }
+        />
+        <Timeline steps={home.process.steps} className="mt-stack" testId="home-timeline" />
+      </Section>
+
+      {/* 6 ---------------------------------------------------------------- tools and labelled demonstrations */}
+      <Section labelledBy="tools-title" size="wide">
         <SectionHeading
           id="tools-title"
           eyebrow={home.tools.eyebrow}
@@ -168,130 +254,78 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           lead={home.tools.lead}
           action={
             <ButtonLink href={href(routes.tools)} variant="secondary" icon="arrowRight">
-              {home.tools.allTools}
+              {home.tools.toolsCta}
             </ButtonLink>
           }
         />
-        <dl className="mt-stack grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line-subtle bg-line-subtle sm:grid-cols-2 lg:grid-cols-4" data-testid="advisor-facts">
-          {home.tools.facts.map((fact) => (
-            <div key={fact.title} className="bg-surface-1 p-5">
-              <dt className="t-label">{fact.title}</dt>
-              <dd className="mt-2 text-body-sm leading-relaxed text-fg-secondary">{fact.text}</dd>
-            </div>
-          ))}
-        </dl>
-        <div className="mt-6">
-          <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} minutes={toolMinutes()} showcase={advisor.showcase} startBadge={home.tools.startBadge} compact />
-        </div>
-      </Section>
-
-      {/* 4 ---------------------------------------------------------------- AI Managed Services: operating lifecycle */}
-      <Section labelledBy="managed-title">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-14">
+        <div className="mt-stack grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]">
           <div className="min-w-0">
-            <Eyebrow>{home.managed.eyebrow}</Eyebrow>
-            <h2 id="managed-title" className="t-h2 reveal mt-4">
-              {home.managed.title}
-            </h2>
-            <p className="t-lead mt-5 max-w-xl">{home.managed.lead}</p>
-            <dl className="mt-8 grid border-t border-line-subtle">
-              {home.managed.contrast.map((item) => (
-                <div key={item.title} className="grid gap-1 border-b border-line-subtle py-3 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-4">
-                  <dt className="font-semibold text-fg">{item.title}</dt>
-                  <dd className="text-body-sm leading-relaxed text-fg-muted">{item.text}</dd>
-                </div>
-              ))}
-            </dl>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={managedHref} icon="arrowRight">
-                {home.managed.primaryCta}
-              </ButtonLink>
-              <ButtonLink href={`${managedHref}#ams-inquiry`} variant="secondary">
-                {home.managed.secondaryCta}
-              </ButtonLink>
+            <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} minutes={toolMinutes()} showcase={advisor.showcase} startBadge={legacyHome.tools.startBadge} compact />
+          </div>
+          <div className="feature-panel flex min-w-0 flex-col self-start p-6" data-testid="home-demos">
+            <UiPreview kind="ai" compact />
+            <h3 className="t-h3-lg mt-6">{home.tools.demosTitle}</h3>
+            <p className="mt-2 text-body-sm leading-relaxed text-fg-muted">{home.tools.demosText}</p>
+            <div className="flex flex-wrap gap-x-5 pt-4">
+              <ArrowLink href={href(routes.demoCentre)} label={home.tools.demosCta} />
+              <ArrowLink href={href(routes.scenarios)} label={home.tools.scenariosCta} />
             </div>
           </div>
-          <ManagedLifecycle content={home.managed.lifecycle} serviceHref={managedHref} />
-        </div>
-        <div className="mt-10 border-t border-line-subtle pt-6" data-testid="managed-packages">
-          <p className="t-label">{aiManaged.packages.title}</p>
-          <ul className="mt-4 grid gap-4 md:grid-cols-3">
-            {aiManaged.packages.items.map((item) => (
-              <li key={item.key} className="min-w-0">
-                <p className="font-semibold text-fg">{item.name}</p>
-                <p className="mt-1 text-body-sm leading-relaxed text-fg-muted">{item.summary}</p>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-4 text-sm text-fg-subtle">
-            {capitalize(priceText(locale, AI_MANAGED_PRICES.essential).from)}. {aiManaged.packages.lead}
-          </p>
         </div>
       </Section>
 
-      {/* 5 ---------------------------------------------------------------- engineering credibility: control architecture + practices */}
-      <Section labelledBy="orchestration-title" tone="deep" density="spacious">
-        <div className="max-w-4xl">
-          <Eyebrow>{home.orchestration.eyebrow}</Eyebrow>
-          <h2 id="orchestration-title" className="t-h1 reveal mt-5">
-            {home.orchestration.title}
-          </h2>
-          <p className="t-lead mt-6 max-w-3xl">{home.orchestration.lead}</p>
-        </div>
-        <div className="mt-stack grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-10">
-          <HeroWorkflow content={home.orchestration.workflow} />
-          <div className="min-w-0">
-            <ControlLanes
-              lanes={[
-                { tone: "ai", title: home.orchestration.allowedTitle, items: home.orchestration.allowed },
-                { tone: "approval", title: home.orchestration.approvalTitle, items: home.orchestration.approval },
-                { tone: "record", title: home.orchestration.auditTitle, items: home.orchestration.audit },
-              ]}
-            />
-            <ButtonLink href={href(routes.aiSolutions)} variant="ghost" icon="arrowRight" className="mt-6">
-              {home.orchestration.linkLabel}
-            </ButtonLink>
-          </div>
-        </div>
-      </Section>
-
-      <CredibilityStrip label={home.capabilities.title} lead={home.capabilities.lead} groups={home.capabilities.groups} />
-
-      {/* 6 ---------------------------------------------------------------- delivery model */}
-      <Section labelledBy="process-title">
+      {/* 7 ---------------------------------------------------------------- entry offers */}
+      <Section labelledBy="offers-title" tone="raised" size="wide">
         <SectionHeading
-          id="process-title"
-          title={home.process.title}
-          lead={home.process.lead}
+          id="offers-title"
+          eyebrow={home.offers.eyebrow}
+          title={home.offers.title}
+          lead={home.offers.lead}
           action={
-            <ButtonLink href={href(routes.process)} variant="ghost" icon="arrowRight">
-              {home.process.linkLabel}
-            </ButtonLink>
+            <div className="flex flex-wrap gap-3">
+              <ButtonLink href={href(routes.projectPackages)} variant="secondary" icon="arrowRight">
+                {home.offers.compareCta}
+              </ButtonLink>
+              <ButtonLink href={href(routes.pricing)} variant="ghost" icon="arrowRight">
+                {home.offers.pricingCta}
+              </ButtonLink>
+            </div>
           }
         />
-        <div className="mt-stack">
-          <ProcessSteps steps={home.process.steps} layout="horizontal" />
-        </div>
+        <ul className="mt-stack grid gap-4 sm:grid-cols-2 xl:grid-cols-5" data-testid="home-offers">
+          {home.offers.packages.map((key) => {
+            const definition = PROJECT_PACKAGES.find((item) => item.key === key)!;
+            const text = projectPackages.packages[key];
+            const price = packagePrice(definition);
+            return (
+              <li key={key} className="price-card" data-testid={`home-offer-${key}`}>
+                <h3 className="t-h3">{text.name}</h3>
+                <p className="mt-2 text-body-sm leading-relaxed text-fg-muted">{text.objective}</p>
+                <div className="mt-5 border-t border-line-subtle pt-4">
+                  {price ? <PriceTag locale={locale} price={price} /> : <p className="font-display text-lg font-semibold text-fg">{projectPackages.labels.priceOnQuote}</p>}
+                </div>
+                <div className="mt-auto pt-5">
+                  <ArrowLink href={`${href(routes.projectPackages)}#${key}`} label={projectPackages.labels.more} />
+                </div>
+              </li>
+            );
+          })}
+          <li className="price-card price-card-featured" data-testid="home-offer-care">
+            <h3 className="t-h3">{home.offers.careTitle}</h3>
+            <p className="mt-2 text-body-sm leading-relaxed text-fg-muted">{home.offers.careText}</p>
+            <TickList items={carePlans.plans.website.covers} className="mt-5" />
+            <div className="mt-auto pt-5">
+              <ArrowLink href={href(routes.carePlans)} label={home.offers.careCta} />
+            </div>
+          </li>
+        </ul>
+        <p className="mt-4 text-xs text-fg-subtle">{projectPackages.note}</p>
       </Section>
 
-      {/* 7 ---------------------------------------------------------------- proof: example solution patterns (fictional, labelled) */}
-      <Section labelledBy="proof-title" tone="raised">
-        <SectionHeading id="proof-title" eyebrow={home.proof.eyebrow} title={home.proof.title} lead={home.proof.lead} />
-        <div className="mt-stack">
-          <SolutionPatterns
-            items={patterns}
-            fictionalLabel={reference.scenarios.detail.fictionalLabel}
-            readLabel={reference.scenarios.open}
-            links={[
-              { href: href(routes.scenarios), label: home.proof.links.scenarios },
-              { href: href(routes.patterns), label: home.proof.links.patterns },
-              { href: href(routes.workshops), label: home.proof.links.workshops },
-            ]}
-          />
-        </div>
-      </Section>
+      {/* 8 ---------------------------------------------------------------- engineering practices (no certificates, logos or numbers) */}
+      <CredibilityStrip label={home.practices.title} lead={home.practices.lead} groups={home.practices.groups} />
 
-      {/* 8 ---------------------------------------------------------------- who builds it: founder */}
+      {/* 9 ---------------------------------------------------------------- who builds it: founder (protected content, unchanged) */}
       <Section labelledBy="founder-title">
         <div className="grid items-center gap-8 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] md:gap-12 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)]">
           <FounderPortrait alt={founder.portraitAlt} sizes="(min-width: 1024px) 17rem, (min-width: 768px) 15rem, 12rem" className="aspect-[4/5] w-48 md:w-full" />
@@ -313,7 +347,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
       </Section>
 
-      {/* 8 ---------------------------------------------------------------- FAQ */}
+      {/* 10 --------------------------------------------------------------- FAQ */}
       <Section labelledBy="faq-title" tone="raised">
         <EditorialSplit
           sticky
@@ -333,12 +367,12 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </EditorialSplit>
       </Section>
 
-      {/* 9 ---------------------------------------------------------------- final CTA */}
+      {/* 11 --------------------------------------------------------------- final CTA */}
       <CtaBand
         title={home.finalCta.title}
         lead={home.finalCta.lead}
-        primary={{ href: href(routes.contact), label: home.finalCta.primary }}
-        secondary={{ href: href(routes.advisor), label: home.finalCta.secondary }}
+        primary={{ href: quoteHref, label: home.finalCta.primary }}
+        secondary={{ href: href(routes.projectPackages), label: home.finalCta.secondary }}
         emphasis
       />
     </>

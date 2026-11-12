@@ -96,6 +96,12 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [COMMERCIAL_STAGING_RUNBOOK.md](docs/COMMERCIAL_STAGING_RUNBOOK.md) | Staging runbook, order of switching features on, Cloudflare and Hetzner checklists, release gates and rollback for the commercial expansion (a document: nothing was changed on any server) |
 | [SECURITY_GDPR_REVIEW_COMMERCIAL.md](docs/SECURITY_GDPR_REVIEW_COMMERCIAL.md) | Security and GDPR review of the commercial expansion: data map, findings and fixes, export and erasure, retention jobs, what was not checked |
 | [COMMERCIAL_RELEASE_REVIEW.md](docs/COMMERCIAL_RELEASE_REVIEW.md) | Release review of the commercial expansion: what was built, executed results, open gates, owner decisions, what was not verified, how to commit and deploy (stops at the approval gate) |
+| [V5_SITE_AUDIT.md](docs/V5_SITE_AUDIT.md) | V5 redesign, phase 01 (Bulgarian): live-site crawl and feature matrix before the redesign (routes, links, flags, problems, recommendations) |
+| [V5_VISUAL_DIRECTION.md](docs/V5_VISUAL_DIRECTION.md) | V5 visual direction (Bulgarian): principles, inspiration and what is not copied, colour, type, page compositions, mobile |
+| [V5_DESIGN_SYSTEM.md](docs/V5_DESIGN_SYSTEM.md) | V5 design system (Bulgarian): new tokens, component classes and components added to the existing system; header, footer, motion, weight |
+| [V5_LINK_AUDIT.md](docs/V5_LINK_AUDIT.md) | V5 navigation and link audit (Bulgarian): new menus, programmatic audit of every header, footer and page link, before/after counts, tests |
+| [V5_PROGRESS.md](docs/V5_PROGRESS.md) | V5 programme progress per phase (Bulgarian): status, changed files, test results, remaining issues |
+| [V5_FINAL_IMPLEMENTATION_REPORT.md](docs/V5_FINAL_IMPLEMENTATION_REPORT.md) | V5 final report (Bulgarian): what changed, links, flags and blockers, pricing decisions, visual QA, accessibility, SEO, exact test results, deployment prerequisites |
 | [COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md](docs/COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md) | Independent forensic audit of the 18-phase commercial expansion (Bulgarian): evidence, overstated claims, gaps, release decision NO_GO for activation |
 
 **Strategy and positioning**

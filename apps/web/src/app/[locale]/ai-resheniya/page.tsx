@@ -1,13 +1,15 @@
 import Link from "next/link";
 
 import { AdvisorPromo } from "@/components/advisor/AdvisorPromo";
+import { ControlLanes } from "@/components/home/ControlLanes";
+import { HeroWorkflow } from "@/components/home/HeroWorkflow";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
 import { ServiceMotif } from "@/components/sections/ServiceMotif";
 import { Icon } from "@/components/ui/Icon";
 import { EditorialSplit } from "@/components/ui/patterns";
-import { ButtonLink, CheckList, cx, FeatureIndex, FeatureMatrix, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
+import { ButtonLink, CheckList, cx, Eyebrow, FeatureIndex, FeatureMatrix, PageHero, Section, SectionHeading } from "@/components/ui/primitives";
 import { getContent, serviceByKey } from "@/content";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -35,7 +37,8 @@ const riskTone: Record<string, string> = {
 
 export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/ai-resheniya">) {
   const locale = await resolveLocale(params);
-  const { aiSolutions: page, advisor, servicesPage } = getContent(locale);
+  const { aiSolutions: page, advisor, servicesPage, home } = getContent(locale);
+  const orchestration = home.orchestration;
   const dict = getDictionary(locale);
   const href = (path: string) => localizePath(locale, path);
   const aiTools = serviceByKey(locale, "ai_tools");
@@ -56,6 +59,29 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
         <SectionHeading id="ai-types" title={page.typesTitle} size="sm" />
         <FeatureIndex items={page.types} className="mt-8" />
         <AdvisorPromo promo={advisor.promo} href={href(routes.advisor)} className="mt-10" />
+      </Section>
+
+      {/* Human-approval architecture (moved here from the V4 homepage; the demo centre links to it). */}
+      <Section labelledBy="orchestration-title" tone="deep" density="spacious">
+        <div className="max-w-4xl">
+          <Eyebrow>{orchestration.eyebrow}</Eyebrow>
+          <h2 id="orchestration-title" className="t-h1 reveal mt-5">
+            {orchestration.title}
+          </h2>
+          <p className="t-lead mt-6 max-w-3xl">{orchestration.lead}</p>
+        </div>
+        <div className="mt-stack grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-start lg:gap-10">
+          <HeroWorkflow content={orchestration.workflow} />
+          <div className="min-w-0">
+            <ControlLanes
+              lanes={[
+                { tone: "ai", title: orchestration.allowedTitle, items: orchestration.allowed },
+                { tone: "approval", title: orchestration.approvalTitle, items: orchestration.approval },
+                { tone: "record", title: orchestration.auditTitle, items: orchestration.audit },
+              ]}
+            />
+          </div>
+        </div>
       </Section>
 
       <Section labelledBy="ai-principles" tone="raised">
