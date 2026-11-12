@@ -19,6 +19,10 @@ ai-commercestudio.com {
 
 	encode zstd gzip
 
+	# Methods the site never uses. Next.js answers TRACE with a 500 and a stack line in its log (audit F-14).
+	@unused_methods method TRACE TRACK CONNECT
+	respond @unused_methods 405
+
 	reverse_proxy 127.0.0.1:3000 {
 		header_up X-Forwarded-For {client_ip}
 		header_up -CF-Connecting-IP
