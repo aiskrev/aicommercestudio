@@ -122,6 +122,14 @@ services:
     environment:
       API_INTERNAL_URL: http://api:8000
       CUSTOMER_ACCOUNTS_ENABLED: ${CUSTOMER_ACCOUNTS_ENABLED:-false}
+      # The web app reads these at run time to show or hide the pages and entry points of the commercial features. The API reads
+      # the same names from .env; both must agree (the API also refuses a production start while a release gate is open).
+      # They were missing here: with only the API flag on, the pages would have kept answering 404.
+      PROJECT_CONFIGURATOR_ENABLED: ${PROJECT_CONFIGURATOR_ENABLED:-false}
+      QUOTE_BASKET_ENABLED: ${QUOTE_BASKET_ENABLED:-false}
+      QUOTATIONS_ENABLED: ${QUOTATIONS_ENABLED:-false}
+      COMMERCIAL_PROJECTS_ENABLED: ${COMMERCIAL_PROJECTS_ENABLED:-false}
+      ADVISOR_WORKSPACE_ENABLED: ${ADVISOR_WORKSPACE_ENABLED:-false}
       # The proxy lets a project document upload carry this many bytes (the API enforces its own limit).
       PROJECT_UPLOAD_MAX_BYTES: ${PROJECT_UPLOAD_MAX_BYTES:-}
       TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}

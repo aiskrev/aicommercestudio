@@ -192,9 +192,11 @@ export const cookiePolicy: LegalDocument = {
       ],
     },
     {
-      heading: "2. Browser data (sessionStorage)",
+      heading: "2. Browser data (sessionStorage and localStorage)",
       paragraphs: [
         "If you hide the \"Request a quote\" bar on a mobile device, your browser remembers this until the session ends. The opportunity-finder and impact-calculator tools pass the process name you typed from one tool to the other until the session ends. This data is not sent to the server and disappears when you close the tab.",
+        "Project configurator (when it is switched on): the answers you choose in the form — enumerated options such as the type of project and its features, with no name, e-mail address or other personal information — are kept in sessionStorage under a key that starts with \"acs.configurator.\" followed by the model version. They are kept only while you fill in the configurator, are deleted when the request is sent or the configuration is added to the basket, and disappear when you close the tab. They are not sent to the server until you add them to a request.",
+        "Quote-request basket (when it is switched on): after you add the first item, your browser stores one key in localStorage — \"acs.quote-basket\" — holding a secret identifier of your draft and nothing else. The draft itself (the options you chose) is kept on our server without your name, e-mail address or telephone number, and only a hash of the identifier is stored there. Your contact details are sent only when you send the request. The key is needed so that we can find your draft the next time you open it; it is not used for tracking or advertising and is not shared with third parties. It is deleted when the request is sent, when you delete the basket, or when the draft expires (after 30 days by default). You can remove it at any time in your browser settings; you then lose access to that draft.",
       ],
     },
     {

@@ -15,13 +15,14 @@ from __future__ import annotations
 ACCOUNT_HEADER_LAYOUT_FIXED = True
 
 
-# BLOCKER-COM-STORAGE-01 (docs/COOKIE_AUDIT.md, docs/COMMERCIAL_EXPANSION_DECISIONS.md D-15) - OPEN.
+# BLOCKER-COM-STORAGE-01 (docs/COOKIE_AUDIT.md, docs/COMMERCIAL_EXPANSION_DECISIONS.md D-15) - CLOSED 2026-11-13.
 # The project configurator keeps the visitor's answers in sessionStorage (`acs.configurator.<version>`) and the quote
 # basket keeps a secret token in localStorage (`acs.quote-basket`). Neither holds personal data and both exist only
-# after the visitor uses the feature, but the published cookie policy (a draft awaiting a lawyer) describes the
-# browser storage the site uses and does not mention them yet. The policy text must be updated and approved first;
-# then set this constant to True in the same change that updates the policy and its registry entry.
-COMMERCIAL_STORAGE_DISCLOSED = False
+# after the visitor uses the feature. Closed in the change that added both keys to section 2 of the cookie policy
+# (BG and EN) and refreshed its registry hashes; the owner approved the wording by merging it (the owner reported on
+# 2026-11-13 that the lawyer had agreed). The registry still says `pending_lawyer_review` for the whole document:
+# this constant does not stand in for the lawyer's signature on the exact text, it only lets the two features start.
+COMMERCIAL_STORAGE_DISCLOSED = True
 
 
 # BLOCKER-COM-ACCEPT-01 (docs/QUOTATIONS.md, docs/COMMERCIAL_EXPANSION_DECISIONS.md D-06) - OPEN.

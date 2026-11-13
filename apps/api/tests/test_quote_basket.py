@@ -422,10 +422,12 @@ def test_nothing_in_the_basket_depends_on_language_or_country(client, enabled):
         assert not set(inspect.signature(function).parameters) & {"country", "ip", "market", "language"}
 
 
-def test_the_new_features_cannot_start_in_production_while_the_storage_blocker_is_open(monkeypatch):
+def test_the_new_features_cannot_start_in_production_if_the_storage_blocker_is_reopened(monkeypatch):
     from tests.test_security import _production
 
-    assert release_gates.COMMERCIAL_STORAGE_DISCLOSED is False  # flip only with the approved cookie policy
+    # The blocker is closed (2026-11-13: both keys are in the cookie policy); the refusal must still work if reopened.
+    assert release_gates.COMMERCIAL_STORAGE_DISCLOSED is True
+    monkeypatch.setattr(release_gates, "COMMERCIAL_STORAGE_DISCLOSED", False)
     for flag in ("project_configurator_enabled", "quote_basket_enabled"):
         with pytest.raises(ValidationError) as error:
             _production(**{flag: True})
