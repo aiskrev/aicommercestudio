@@ -45,7 +45,7 @@ export const en: Dictionary = {
   cookieNotice: {
     label: "Cookie notice",
     text: "We use only necessary cookies: for the language you choose and for the security of the administration area. We use no analytics, advertising or tracking cookies.",
-    more: "Learn more",
+    more: "Learn more about cookies",
     accept: "Got it",
   },
   common: {

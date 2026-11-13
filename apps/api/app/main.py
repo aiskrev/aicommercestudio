@@ -9,6 +9,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy.engine import make_url
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.assessments.registry import registry as assessment_registry
@@ -92,9 +93,20 @@ def _translate_error(error: dict[str, Any], locale: Locale = "bg") -> dict[str, 
     return {"field": field, "message": message, "type": err_type}
 
 
+def database_role_warning(settings: Settings) -> str | None:
+    """Production should connect as the restricted role (docs/SECURITY.md, H-1). Not a start-up failure (the accounts
+    and portal gates already refuse the wrong role where it matters), but never silent either."""
+    if settings.is_production and make_url(settings.database_url).username != "acs_app_api":
+        return "the API is connected to the database as a role other than acs_app_api (H-1); run db-role-check"
+    return None
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
+    explicit_settings = settings  # None: the size guard then reads the live settings on every request
     settings = settings or get_settings()
     configure_logging(settings.log_level)
+    if warning := database_role_warning(settings):
+        logger.warning("db_role_not_restricted", extra={"detail": warning})
     # Load and validate every assessment definition now: a broken definition stops the start-up
     # (and CI) instead of failing in a visitor's request.
     assessment_registry()
@@ -117,7 +129,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         max_age=600,
     )
     app.add_middleware(RequestContextMiddleware, settings=settings)
-    app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_body_bytes)
+    app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_body_bytes, settings=explicit_settings)
 
     def _request_id(request: Request) -> str | None:
         return getattr(request.state, "request_id", None)

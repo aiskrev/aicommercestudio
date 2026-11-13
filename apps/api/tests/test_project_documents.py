@@ -1059,3 +1059,61 @@ def test_the_tables_hold_the_rules_and_the_grants(customer, admin_client, config
         )
         assert not may("acs_app_api", table, "DELETE")
         assert not may("acs_app_runtime", table, "SELECT")
+
+
+# --- Upload transport: the request-size guard must agree with the upload limit (audit finding F-02) --------------
+
+LARGE = 200 * 1024  # well above the 64 KiB cap of every JSON endpoint, well below PROJECT_UPLOAD_MAX_BYTES
+
+
+def test_a_file_above_the_json_cap_but_within_the_upload_limit_is_accepted(
+    customer, admin_client, configured_lead, docs, db
+):
+    """The global 64 KiB guard used to refuse every real document before the upload route could look at it."""
+    project = active_project(admin_client, configured_lead)
+    big = pdf() + b"x" * LARGE
+    staff = staff_upload(admin_client, project["id"], big)
+    assert staff.status_code == 201, staff.text
+    assert client_upload(customer, project["id"], big, filename="brief.pdf").status_code == 201
+    versions = db.scalars(select(ProjectDocumentVersion)).all()
+    assert sorted(v.size_bytes for v in versions) == [len(big), len(big)]
+
+
+def test_a_file_new_version_above_the_json_cap_is_accepted(customer, admin_client, configured_lead, docs):
+    project = active_project(admin_client, configured_lead)
+    document = staff_upload(admin_client, project["id"]).json()["documents"][-1]
+    big = pdf("v2") + b"x" * LARGE
+    response = staff_version(admin_client, project["id"], document["id"], big, expected=1)
+    assert response.status_code == 201, response.text
+
+
+def test_the_larger_cap_applies_to_the_upload_routes_only(customer, admin_client, configured_lead, docs):
+    project = active_project(admin_client, configured_lead)
+    document = staff_upload(admin_client, project["id"]).json()["documents"][-1]
+    # Same size, same project, but a JSON route and a non-octet-stream body: the 64 KiB guard still answers.
+    oversized_json = admin_client.post(
+        f"{ADMIN}/projects/{project['id']}/documents/{document['id']}/versions/1/publish",
+        content=b"{" + b" " * LARGE + b"}",
+        headers={"content-type": "application/json"},
+    )
+    assert oversized_json.status_code == 413 and oversized_json.json()["code"] == "payload_too_large"
+    wrong_type = admin_client.post(
+        f"{ADMIN}/projects/{project['id']}/documents",
+        content=pdf() + b"x" * LARGE,
+        headers={**headers("a.pdf", "T", "design"), "content-type": "application/pdf"},
+    )
+    assert wrong_type.status_code == 413 and wrong_type.json()["code"] == "payload_too_large"
+    # And a GET with a body, or any other method on the upload path, gets no allowance.
+    patched = admin_client.patch(
+        f"{ADMIN}/projects/{project['id']}/documents", content=b"x" * LARGE, headers={"content-type": OCTET}
+    )
+    assert patched.status_code in (404, 405, 413)
+
+
+def test_the_upload_cap_is_not_granted_while_uploads_are_off(
+    customer, admin_client, configured_lead, docs, monkeypatch
+):
+    project = active_project(admin_client, configured_lead)
+    monkeypatch.setattr(get_settings(), "project_uploads_enabled", False)
+    response = staff_upload(admin_client, project["id"], pdf() + b"x" * LARGE)
+    assert response.status_code == 413 and response.json()["code"] == "payload_too_large"

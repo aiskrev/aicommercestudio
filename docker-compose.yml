@@ -81,6 +81,7 @@ services:
       QUOTE_BASKET_ENABLED: ${QUOTE_BASKET_ENABLED:-false}
       QUOTATIONS_ENABLED: ${QUOTATIONS_ENABLED:-false}
       COMMERCIAL_PROJECTS_ENABLED: ${COMMERCIAL_PROJECTS_ENABLED:-false}
+      PROJECT_UPLOAD_MAX_BYTES: ${PROJECT_UPLOAD_MAX_BYTES:-}
       TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
       # Enables POST /api/catalogue-revalidate (on-demand regeneration of the catalogue pages); empty = disabled.
       CATALOGUE_REVALIDATE_SECRET: ${CATALOGUE_REVALIDATE_SECRET:-}

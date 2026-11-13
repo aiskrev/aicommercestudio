@@ -43,10 +43,10 @@ export function CookieNotice({
   return (
     <section
       aria-label={labels.label}
-      className="fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-3xl rounded-[var(--radius-lg)] border border-line-default bg-surface-1 p-4 shadow-[var(--shadow-panel)] sm:inset-x-4 sm:bottom-4 sm:p-5"
+      className="fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-3xl rounded-[var(--radius-lg)] border border-line-default bg-surface-1 p-3.5 shadow-[var(--shadow-panel)] sm:inset-x-4 sm:bottom-4 sm:p-5"
       data-testid="cookie-notice"
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
         <p className="text-body-sm leading-relaxed text-fg-secondary">
           {labels.text}{" "}
           <Link href={href} className="link">

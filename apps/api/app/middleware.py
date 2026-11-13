@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import time
 import uuid
 from urllib.parse import urlsplit
@@ -12,7 +13,7 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
-from app.config import Settings
+from app.config import Settings, get_settings
 from app.errors import error_body
 from app.i18n import error_message, parse_locale, request_locale
 from app.logging_config import request_id_ctx
@@ -93,19 +94,53 @@ class _BodyTooLarge(Exception):
     pass
 
 
-class BodySizeLimitMiddleware:
-    """Pure ASGI middleware that caps request bodies, with or without Content-Length."""
+_UUID = r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+# The only routes that take a file: POST of the raw body (never JSON, never multipart) for a new document or a new
+# version of one, by the customer's side or by staff. Everything else keeps the small cap.
+UPLOAD_PATH = re.compile(rf"^/api/(?:admin/)?projects/{_UUID}/documents(?:/{_UUID}/versions)?$")
 
-    def __init__(self, app: ASGIApp, max_bytes: int) -> None:
+
+def upload_limit(scope: Scope, settings: Settings) -> int | None:
+    """The upload size limit when this request is a document upload that the API would read, else None.
+
+    The guard has to agree with the upload routes (`read_body`, `PROJECT_UPLOAD_MAX_BYTES`): a limit that is
+    lower than theirs refuses every real document before they can look at it. The allowance needs all of: a POST,
+    one of the two upload paths, an `application/octet-stream` body and uploads switched on. The routes still
+    authenticate first and enforce the exact limit, content checks and rate limits themselves.
+    """
+    if scope.get("method") != "POST" or not settings.project_uploads_enabled:
+        return None
+    if not UPLOAD_PATH.fullmatch(scope.get("path", "")):
+        return None
+    for name, value in scope.get("headers", []):
+        if name == b"content-type":
+            media_type = value.decode("latin-1").split(";")[0].strip().lower()
+            return settings.project_upload_max_bytes if media_type == "application/octet-stream" else None
+    return None
+
+
+class BodySizeLimitMiddleware:
+    """Pure ASGI middleware that caps request bodies, with or without Content-Length.
+
+    `max_bytes` applies everywhere; `settings` lets the document upload routes (see `upload_limit`) have their own,
+    larger limit, read per request so a changed setting takes effect without a new middleware.
+    """
+
+    def __init__(self, app: ASGIApp, max_bytes: int, settings: Settings | None = None) -> None:
         self.app = app
         self.max_bytes = max_bytes
+        self.settings = settings
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
+        limit = self.max_bytes
+        # Live settings unless a test or a caller passed its own object (the cached one can be replaced at run time).
+        # Never below the general cap: a file between the two limits then gets the route's own, clearer answer.
+        limit = max(limit, upload_limit(scope, self.settings or get_settings()) or 0)
         for name, value in scope.get("headers", []):
-            if name == b"content-length" and (not value.isdigit() or int(value) > self.max_bytes):
+            if name == b"content-length" and (not value.isdigit() or int(value) > limit):
                 await self._reject(scope, receive, send)
                 return
 
@@ -117,7 +152,7 @@ class BodySizeLimitMiddleware:
             message = await receive()
             if message["type"] == "http.request":
                 received += len(message.get("body", b""))
-                if received > self.max_bytes:
+                if received > limit:
                     raise _BodyTooLarge
             return message
 

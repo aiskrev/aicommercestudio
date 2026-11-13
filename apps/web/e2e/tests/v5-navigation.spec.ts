@@ -12,8 +12,10 @@ import { expect, type Page, test } from "@playwright/test";
 const WIDTHS = [360, 390, 768, 1024, 1440] as const;
 const FLAGGED = /^\/(bg|en)\/(konfigurator|configurator|zayavka|quote-request|oferta|quotation|konto|account|proekti|case-studies)(\/|$|\?|#)/;
 
-async function navLinks(page: Page) {
-  return page.evaluate(() => {
+type NavLink = { href: string; label: string; otherLanguage: boolean };
+
+const collectLinks = (page: Page): Promise<NavLink[]> =>
+  page.evaluate(() => {
     const scope = [...document.querySelectorAll("header a[href], [data-testid='mobile-menu'] a[href], footer a[href]")];
     return scope.map((a) => ({
       href: a.getAttribute("href") ?? "",
@@ -22,6 +24,29 @@ async function navLinks(page: Page) {
       otherLanguage: a.hasAttribute("hreflang"),
     }));
   });
+
+/**
+ * Every link of the header and footer. The menu panels exist only while open (performance, audit F-12), so the desktop
+ * panels are opened one by one at 1440 px (where the desktop menu is shown) and the mobile sheet is opened below that.
+ */
+async function navLinks(page: Page): Promise<NavLink[]> {
+  const seen = new Map<string, NavLink>();
+  const add = (links: NavLink[]) => links.forEach((link) => seen.set(`${link.href}|${link.label}`, link));
+  const original = page.viewportSize();
+  add(await collectLinks(page));
+  await page.setViewportSize({ width: 1440, height: original?.height ?? 900 });
+  const buttons = page.locator("[data-desktop-nav] button[data-testid^='menu-']");
+  for (let index = 0; index < (await buttons.count()); index++) {
+    await buttons.nth(index).click();
+    add(await collectLinks(page));
+    await page.keyboard.press("Escape");
+  }
+  await page.setViewportSize({ width: 390, height: original?.height ?? 900 });
+  await page.getByRole("button", { name: /Отворете менюто|Open menu/ }).click();
+  add(await collectLinks(page));
+  await page.keyboard.press("Escape");
+  if (original) await page.setViewportSize(original);
+  return [...seen.values()];
 }
 
 const statusCache = new Map<string, number>();

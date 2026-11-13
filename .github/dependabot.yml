@@ -1,0 +1,46 @@
+# Dependency update pull requests (security updates are a separate repository setting).
+# Updates arrive weekly, minor and patch together, so the review load stays small; a major version is its own
+# pull request. Every update runs the full CI before it can be merged. Nothing here changes a lock file by itself.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /apps/api
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      python-minor-and-patch:
+        update-types: [minor, patch]
+    labels: [dependencies, python]
+
+  - package-ecosystem: npm
+    directory: /apps/web
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      web-minor-and-patch:
+        update-types: [minor, patch]
+    labels: [dependencies, javascript]
+
+  - package-ecosystem: npm
+    directory: /apps/web/e2e
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    groups:
+      e2e-minor-and-patch:
+        update-types: [minor, patch]
+    labels: [dependencies, javascript]
+
+  - package-ecosystem: docker
+    directories: [/apps/api, /apps/web, /apps/web/e2e]
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+    labels: [dependencies, docker]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        update-types: [minor, patch]
+    labels: [dependencies, github-actions]

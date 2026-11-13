@@ -193,8 +193,14 @@ describe("Header (V5)", () => {
   it("keeps every destination of the V3 and V4 headers on desktop and mobile (migration)", async () => {
     const user = userEvent.setup();
     render(<Header {...props} />);
+    // A menu panel exists only while it is open (performance, audit F-12): collect the links of each panel in turn.
     const desktop = screen.getAllByRole("navigation", { name: "Основна навигация" })[0];
-    const desktopHrefs = new Set(Array.from(desktop.querySelectorAll("a")).map((a) => a.getAttribute("href")));
+    const desktopHrefs = new Set<string | null>();
+    for (const menu of buildNavigation("bg", bg).menus) {
+      await user.click(screen.getByTestId(`menu-${menu.id}`));
+      for (const a of Array.from(desktop.querySelectorAll("a"))) desktopHrefs.add(a.getAttribute("href"));
+    }
+    await user.keyboard("{Escape}");
     await user.click(button("Отворете менюто"));
     const sheet = screen.getByTestId("mobile-menu");
     const mobileHrefs = new Set(Array.from(sheet.querySelectorAll("a")).map((a) => a.getAttribute("href")));
@@ -243,5 +249,21 @@ describe("Header (V5)", () => {
     await user.keyboard("{Escape}");
     expect(main.inert).toBe(false);
     main.remove();
+  });
+});
+
+describe("Header weight (audit F-12)", () => {
+  it("renders no panel content while the menus are closed, and mounts it on demand", async () => {
+    const user = userEvent.setup();
+    render(<Header {...props} />);
+    const closedLinks = document.querySelectorAll("header a").length;
+    const toggle = button("Изработка на сайтове");
+    expect(panelOf(toggle)).toBeEmptyDOMElement();
+    expect(screen.getByTestId("mobile-menu")).toBeEmptyDOMElement();
+    await user.click(toggle);
+    expect(within(panelOf(toggle)).getAllByRole("link").length).toBeGreaterThan(5);
+    expect(document.querySelectorAll("header a").length).toBeGreaterThan(closedLinks + 5);
+    await user.keyboard("{Escape}");
+    expect(panelOf(toggle)).toBeEmptyDOMElement();
   });
 });

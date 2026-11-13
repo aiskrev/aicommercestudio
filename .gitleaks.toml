@@ -1,0 +1,16 @@
+# Secret-scan configuration (CI job "Secret scan" in .github/workflows/security.yml).
+# The default rules stay on. The only exception: test files, whose fixtures contain made-up passwords, keys and
+# tokens on purpose (e.g. the strings that the secret-redaction tests must recognise). 13 historical findings were
+# all of that kind (checked 2026-11-12). A real secret in a non-test file, a `.env` file or a script still fails.
+title = "A.I. Commerce Studio"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Made-up fixtures in unit, API and browser tests"
+paths = [
+  '''^apps/api/tests/''',
+  '''^apps/web/e2e/tests/''',
+  '''^apps/web/src/.*\.test\.tsx?$''',
+]

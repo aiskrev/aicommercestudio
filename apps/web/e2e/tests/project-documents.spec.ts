@@ -109,6 +109,28 @@ test.describe("project documents", () => {
     await expect(panel.locator('[data-testid="staff-document"]', { hasText: docTitle })).toContainText("одобрена");
   });
 
+  test("a real-sized document passes the web proxy (audit F-02), and one over the upload limit is refused with 413", async ({ browser }) => {
+    const admin = await staff(browser);
+    const csrf = (await admin.context().cookies()).find((cookie) => cookie.name === "acs_csrf")?.value ?? "";
+    // 300 KiB: far above the 64 KiB form cap that the proxy and the API used to apply to every body.
+    const large = Buffer.concat([Buffer.from(PDF), Buffer.alloc(300 * 1024, 0x20)]);
+    const document = await staffUpload(admin, projectId, "Голям файл (300 KiB)", "golyam.pdf", large);
+    expect(document.id).toBeTruthy();
+    const headers = { "X-CSRF-Token": csrf, "Content-Type": "application/octet-stream", "X-File-Name": "prekaleno-golyam.pdf" };
+    // 11 MiB: over PROJECT_UPLOAD_MAX_BYTES (10 MiB). The proxy stops reading and answers 413 in the site's own words.
+    const tooLarge = await admin.request.post(`/api/admin/projects/${projectId}/documents`, {
+      data: Buffer.concat([Buffer.from(PDF), Buffer.alloc(11 * 1024 * 1024, 0x20)]),
+      headers,
+    });
+    expect(tooLarge.status()).toBe(413);
+    // The same size as JSON gets no allowance: the small cap still protects every other route.
+    const json = await admin.request.post(`/api/admin/projects/${projectId}/events`, {
+      data: Buffer.alloc(100 * 1024, 0x20),
+      headers: { "X-CSRF-Token": csrf, "Content-Type": "application/json" },
+    });
+    expect(json.status()).toBe(413);
+  });
+
   test("staff publish a new draft version from the admin screen", async ({ browser }) => {
     const admin = await staff(browser);
     const csrf = (await admin.context().cookies()).find((cookie) => cookie.name === "acs_csrf")?.value ?? "";

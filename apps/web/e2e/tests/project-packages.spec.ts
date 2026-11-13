@@ -56,6 +56,9 @@ test("the packages are reachable from the homepage, the menu, a hub, a service p
   await page.locator("section[aria-labelledby='offers-title']").getByRole("link", { name: "Сравнете всички пакети" }).click();
   await expect(page).toHaveURL(/\/bg\/proektni-paketi$/);
   // The "Packages & pricing" menu of the V5 header and the packages section of the website hub.
+  // The menu panel exists only while open: show the desktop menu (1440 px) and open it.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByTestId("menu-pricing").click();
   await expect(page.getByTestId("panel-pricing").locator("a[href='/bg/proektni-paketi']")).toHaveText(/^Пакети за проекти/);
   await page.goto("/bg/izrabotka-na-saytove");
   await expect(page.getByTestId("hub-package-landing_page").getByRole("link", { name: /Технологии, дизайн/ })).toHaveAttribute("href", "/bg/proektni-paketi#landing_page");

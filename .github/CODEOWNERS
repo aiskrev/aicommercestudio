@@ -1,0 +1,28 @@
+# Required reviewers per path (GitHub applies the last matching pattern). Enforced only when the branch
+# ruleset for `main` has "Require review from Code Owners" switched on (docs/GITHUB_SETTINGS_PROPOSAL.md).
+* @aiskrev
+
+# Protected content: the founder's portrait and profile, the public contact details and the logo (CLAUDE.md).
+/CLAUDE.md                                       @aiskrev
+/apps/web/src/assets/founder/                    @aiskrev
+/apps/web/src/lib/company.ts                     @aiskrev
+/apps/web/src/lib/company.test.ts                @aiskrev
+/apps/web/src/lib/protected-content.test.ts      @aiskrev
+/apps/web/src/content/*/founder.ts               @aiskrev
+
+# Delivery chain, infrastructure and anything that can reach production.
+/.github/                                        @aiskrev
+/infra/                                          @aiskrev
+/scripts/                                        @aiskrev
+/docker-compose*.yml                             @aiskrev
+/apps/*/Dockerfile                               @aiskrev
+
+# Security-relevant code and the database schema.
+/apps/api/app/security.py                        @aiskrev
+/apps/api/app/deps.py                            @aiskrev
+/apps/api/app/middleware.py                      @aiskrev
+/apps/api/app/config.py                          @aiskrev
+/apps/api/app/release_gates.py                   @aiskrev
+/apps/api/alembic/                               @aiskrev
+/apps/web/src/app/api/                           @aiskrev
+/apps/web/next.config.ts                         @aiskrev

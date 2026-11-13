@@ -206,3 +206,20 @@ pwsh .\scripts\restore-db.ps1 -File .\backups\<file>.dump   # destructive; asks 
 
 The round trip (backup → new lead → restore → lead gone) was executed on a throw-away stack; see
 [VERIFICATION_REPORT.md](VERIFICATION_REPORT.md).
+
+## Audit probes (2026-11-12): penetration test, SEO crawl, authorisation inventory
+
+Run on a **local or test stack only**, from inside its Docker network (the scripts are read-only or rejected-write only and
+`pentest_local.py` refuses a public address). Use a project name of your own and your own ports, never a shared stack:
+
+```powershell
+# 71 non-destructive security probes mapped to OWASP Top 10 and ASVS (exit 1 on any FAIL)
+docker compose -p <name> --profile test run --rm --no-deps -v "${PWD}:/repo:ro" api-tests python -I /repo/scripts/pentest_local.py http://web:3000
+# every sitemap URL: title, description, one h1, canonical, hreflang pairs, JSON-LD, internal links
+docker compose -p <name> --profile test run --rm --no-deps -v "${PWD}:/repo:ro" api-tests python -I /repo/scripts/seo_check.py http://web:3000
+```
+
+`apps/api/tests/test_route_authorization_inventory.py` runs with the API suite: every `/api/admin` and `/api/ops` operation in the
+OpenAPI document must answer 401 without a session (all feature flags switched on for the test) and refuse a state-changing call
+without the CSRF header. A new staff route that forgets its dependency fails here.
+Lighthouse with applied throttling (the observed metric) is described in [PERFORMANCE_BEFORE_AFTER.md](PERFORMANCE_BEFORE_AFTER.md).

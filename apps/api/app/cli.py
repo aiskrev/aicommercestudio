@@ -411,6 +411,38 @@ def cmd_db_api_role(_args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_db_role_check(_args: argparse.Namespace) -> int:
+    """Report, without any secret, whether this API connection is the restricted role (audit phase 04, finding H-1).
+
+    Exit 0 only when the connected role is not a superuser, does not bypass row-level security, can neither create
+    roles nor databases, owns no table and cannot create objects in the schema. Run it where the API runs:
+    `docker compose exec api python -m app.cli db-role-check`. The output has the role name and yes/no answers only."""
+    with get_sessionmaker()() as db:
+        row = db.execute(
+            text(
+                "SELECT session_user AS role, r.rolsuper, r.rolbypassrls, r.rolcreaterole, r.rolcreatedb, "
+                "(SELECT count(*) FROM pg_tables WHERE schemaname = 'public' AND tableowner = session_user) AS owned, "
+                "has_schema_privilege(session_user, 'public', 'CREATE') AS can_create "
+                "FROM pg_roles r WHERE r.rolname = session_user"
+            )
+        ).one()
+    checks = {
+        "superuser": row.rolsuper,
+        "bypasses_row_level_security": row.rolbypassrls,
+        "can_create_roles": row.rolcreaterole,
+        "can_create_databases": row.rolcreatedb,
+        "owns_tables": row.owned > 0,
+        "can_create_objects_in_schema": row.can_create,
+    }
+    _print(f"[db-role-check] connected as {row.role}")
+    for name, value in checks.items():
+        _print(f"[db-role-check] {name}: {'YES' if value else 'no'}")
+    restricted = not any(checks.values())
+    verdict = "restricted role: OK" if restricted else "NOT restricted: the API runs with more rights than it needs"
+    _print(f"[db-role-check] {verdict}")
+    return 0 if restricted else 1
+
+
 def cmd_billing_run(_args: argparse.Namespace) -> int:
     result = billing.process_pending()
     _print("[billing-run] " + " ".join(f"{key}={value}" for key, value in result.items()))
@@ -647,6 +679,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("db-api-role", help="Enable the API login role from API_DB_PASSWORD").set_defaults(
         func=cmd_db_api_role
     )
+    sub.add_parser(
+        "db-role-check", help="Report whether the API connection is the restricted database role (no secrets printed)"
+    ).set_defaults(func=cmd_db_role_check)
     sub.add_parser(
         "purge-synthetic", help="Delete all synthetic development leads (source=synthetic_seed)"
     ).set_defaults(func=cmd_purge_synthetic)

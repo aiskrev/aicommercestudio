@@ -106,6 +106,22 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [V5_FINAL_IMPLEMENTATION_REPORT.md](docs/V5_FINAL_IMPLEMENTATION_REPORT.md) | V5 final report (Bulgarian): what changed, links, flags and blockers, pricing decisions, visual QA, accessibility, SEO, exact test results, deployment prerequisites |
 | [COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md](docs/COMMERCIAL_EXPANSION_FORENSIC_AUDIT.md) | Independent forensic audit of the 18-phase commercial expansion (Bulgarian): evidence, overstated claims, gaps, release decision NO_GO for activation |
 
+**Security, performance and product audit (2026-11-12, Bulgarian)** — owner reports; start with the first
+
+| Document | Contents |
+| --- | --- |
+| [SECURITY_AUDIT_FINAL.md](docs/SECURITY_AUDIT_FINAL.md) | Verified backlog of findings (severity P0–P3, evidence, status), controls checked, hypotheses refuted, what was not verified |
+| [PENETRATION_TEST_REPORT.md](docs/PENETRATION_TEST_REPORT.md) | Authorised local penetration test: scope, method, 71 probes mapped to OWASP Top 10 and ASVS, results before and after, limits |
+| [UI_UX_AUDIT.md](docs/UI_UX_AUDIT.md) | Review of the Future Commerce redesign: findings, what changed, what stays |
+| [PERFORMANCE_BEFORE_AFTER.md](docs/PERFORMANCE_BEFORE_AFTER.md) | Independent Lighthouse measurements (simulated and applied throttling), LCP analysis, changes and honest result against the 2.5 s target |
+| [FUNCTIONALITY_GAP_ANALYSIS.md](docs/FUNCTIONALITY_GAP_ANALYSIS.md) | Commercial features: state and release blockers; extra business features ranked by value, effort and cost |
+| [IMPLEMENTATION_CHANGELOG.md](docs/IMPLEMENTATION_CHANGELOG.md) | Every change of the audit: commit, files, problem solved, test evidence, remaining risk, deployment notes |
+| [TEST_RESULTS.md](docs/TEST_RESULTS.md) | Results of every test suite run on the final tree, with commands and failures |
+| [PRODUCTION_RELEASE_CHECKLIST.md](docs/PRODUCTION_RELEASE_CHECKLIST.md) | What the next production release carries, approvals needed, checks, rollback, features that stay off |
+| [UPLOAD_SECURITY_PLAN.md](docs/UPLOAD_SECURITY_PLAN.md) | File upload: transport fix, existing controls, scanner, quarantine, backup and restore plan, order of switching on |
+| [GITHUB_SETTINGS_PROPOSAL.md](docs/GITHUB_SETTINGS_PROPOSAL.md) | Repository settings proposed for approval: branch ruleset, Dependabot security updates, Actions policy |
+| [OBSERVABILITY_PLAN.md](docs/OBSERVABILITY_PLAN.md) | Logging, health, alerts and dashboards within the current budget: what exists, gaps, proposal |
+
 **Strategy and positioning**
 
 | Document | Contents |
