@@ -16,6 +16,11 @@ updates:
     directory: /apps/web
     schedule: { interval: weekly, day: monday }
     open-pull-requests-limit: 5
+    ignore:
+      # typescript-eslint (latest 8.72.x) declares typescript ">=4.8.4 <6.1.0" and stops with "does not support TS 7.0", so
+      # a TypeScript 7 bump can only fail the lint step (PR #92). Remove this entry when typescript-eslint supports 7.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
     groups:
       web-minor-and-patch:
         update-types: [minor, patch]
