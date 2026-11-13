@@ -102,7 +102,8 @@ export function LanguageSwitcher({
                 hrefLang={localeMeta[target].htmlLang}
                 lang={localeMeta[target].htmlLang}
                 aria-current={active ? "true" : undefined}
-                aria-label={active ? `${labels.current}: ${localeMeta[target].label}` : labels.switchTo[target]}
+                // The visible code (BG, EN) is part of the accessible name (WCAG 2.5.3 Label in Name; axe label-content-name-mismatch).
+                aria-label={`${localeMeta[target].short}: ${active ? `${labels.current}: ${localeMeta[target].label}` : labels.switchTo[target]}`}
                 onClick={(event) => onSelect(event, target)}
                 data-testid={`lang-${target}`}
                 className={cx(

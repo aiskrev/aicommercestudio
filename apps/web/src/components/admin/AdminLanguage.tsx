@@ -22,7 +22,8 @@ export function AdminLanguageSwitch() {
       <button
         type="button"
         lang={localeMeta[target].htmlLang}
-        aria-label={t.shell.switchTo}
+        // The visible code is part of the accessible name (WCAG 2.5.3 Label in Name).
+        aria-label={`${localeMeta[target].short}: ${t.shell.switchTo}`}
         onClick={() => {
           rememberLocale(target);
           router.refresh();
