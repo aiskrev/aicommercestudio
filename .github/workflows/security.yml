@@ -47,7 +47,21 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
+      - name: Is the dependency graph switched on?
+        # The review needs Settings > Code security > Dependency graph. While it is off the action fails on every pull request
+        # for a reason no change can fix, so the job says so and skips the review instead (docs/GITHUB_SETTINGS_PROPOSAL.md).
+        id: graph
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/$GITHUB_REPOSITORY/dependency-graph/sbom" --silent 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::The dependency graph is off for this repository, so the dependency review was skipped. Switch it on in Settings > Code security."
+          fi
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        if: steps.graph.outputs.enabled == 'true'
         with:
           fail-on-severity: high
           comment-summary-in-pr: never

@@ -34,12 +34,13 @@
    * администраторът може да заобиколи само чрез PR (авариен път), не с директно изпращане.
    **Важно:** имената на проверките трябва да са се изпълнили поне веднъж, за да се избират; първо слейте този PR, после включете ruleset-а.
    Предупреждение: проверките `commercial` и `legal` не са в GitHub CI (пускат се локално), затова не са в списъка; препоръка е да се добавят като ръчно стартиращ се workflow преди големи функции.
-2. **Dependabot security updates** – Settings → Code security → включване (безплатно за публично хранилище).
-3. **Actions** – Settings → Actions → General → „Allow aiskrev, and select non-aiskrev actions“ с разрешени `actions/*`, `docker/*`, `github/codeql-action/*`, `anchore/sbom-action` и включено „Require actions to be pinned to a full-length commit SHA“ (всички вече са закрепени).
-4. **Environment `production`** – вече има изискан ревюър и клон `main` според `release.yml`; проверете, че „Prevent self-review“ е изключено само докато има един човек.
-5. **Подписани комити** (по избор): `required_signatures` е умишлено извън готовия ruleset, защото автоматизираните комити от Claude Code не са подписани; включете го, ако всички комити се правят от машина с ключ.
-6. **Private vulnerability reporting** и `SECURITY.md` в корена с адрес за сигнали (контактът се взема от `lib/company.ts`, не се дублира тук).
-7. **Branch `main` → default merge method**: само „Squash“ (линейна история, лесно връщане).
+2. **Dependency graph** (Settings → Code security → Dependency graph) – изключен при одита (`gh api …/dependency-graph/sbom` → 404). Докато е изключен, задачата `Dependency review` в `security.yml` показва предупреждение и пропуска прегледа (без това падаше на всяка PR – видяно на PR #81); след включване прегледът се изпълнява сам. Включете го преди да направите проверката задължителна в ruleset-а.
+3. **Dependabot security updates** – Settings → Code security → включване (безплатно за публично хранилище).
+4. **Actions** – Settings → Actions → General → „Allow aiskrev, and select non-aiskrev actions“ с разрешени `actions/*`, `docker/*`, `github/codeql-action/*`, `anchore/sbom-action` и включено „Require actions to be pinned to a full-length commit SHA“ (всички вече са закрепени).
+5. **Environment `production`** – вече има изискан ревюър и клон `main` според `release.yml`; проверете, че „Prevent self-review“ е изключено само докато има един човек.
+6. **Подписани комити** (по избор): `required_signatures` е умишлено извън готовия ruleset, защото автоматизираните комити от Claude Code не са подписани; включете го, ако всички комити се правят от машина с ключ.
+7. **Private vulnerability reporting** и `SECURITY.md` в корена с адрес за сигнали (контактът се взема от `lib/company.ts`, не се дублира тук).
+8. **Branch `main` → default merge method**: само „Squash“ (линейна история, лесно връщане).
 
 ## 4. Какво НЕ покрива това
 
