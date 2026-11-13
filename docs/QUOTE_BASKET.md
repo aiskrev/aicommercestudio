@@ -67,9 +67,7 @@ forms already work.
 | `acs.configurator.<model version>` | `sessionStorage` | the configurator's enumerated answers | while a configuration is being filled in; removed when it is sent or added to the request |
 
 Neither holds personal data. Both are new compared with the published cookie policy, which describes the browser
-storage the site uses. **BLOCKER-COM-STORAGE-01** (`app/release_gates.py`): the API refuses a production start with
-`PROJECT_CONFIGURATOR_ENABLED` or `QUOTE_BASKET_ENABLED` until the policy text is updated and approved
-(`COMMERCIAL_STORAGE_DISCLOSED`, decision D-15). See [COOKIE_AUDIT.md](COOKIE_AUDIT.md).
+storage the site uses. **BLOCKER-COM-STORAGE-01** (`app/release_gates.py`) was closed on 2026-11-13: the policy now describes both keys (section 2) and `COMMERCIAL_STORAGE_DISCLOSED` is `True`; reopening it makes the API refuse both flags again (decision D-15). See [COOKIE_AUDIT.md](COOKIE_AUDIT.md).
 
 ## Database
 

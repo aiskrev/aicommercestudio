@@ -17,18 +17,18 @@
       "approved_content_sha256": null
     },
     "cookies": {
-      "version": "2026-11-10",
+      "version": "2026-11-13",
       "kind": "notice",
       "review": "pending_lawyer_review",
       "previous_reviewed_version": "2026-11-03",
-      "content_sha256": "19618f0bb9d9125443b66a643e87d5fb87bbb02eb7ddae14c2f6832c8d8e7938",
+      "content_sha256": "2276fbd48891e28c96e543fb02c1a385a325cc3e2cff29e855898907f0d1c7d1",
       "status": "draft",
       "languages": [
         "bg",
         "en"
       ],
-      "content_sha256_bg": "8d4faa20aaffc96e421efbd86471fa9693f80aa20fbd0ca6e471606d84f6f879",
-      "content_sha256_en": "d0060bc267390a035f4d71c1456d011814730b71e3e4d43a636bb3064bc1fb16",
+      "content_sha256_bg": "b4da6e82dc9d15538e8182865af5934fa4e597253fc1c97a74cbd1ee4d975961",
+      "content_sha256_en": "f8be42d278c867690ddbfbcdbe4c02caaf03871ea925c41fd582f59854699da3",
       "approved_content_sha256": null
     },
     "terms": {

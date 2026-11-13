@@ -58,7 +58,7 @@ Do one step, run its check, wait, then the next. Every step is undone by turning
    `/bg/konto`, `/bg/oferta`, `/bg/zayavka` and `/bg/konfigurator` answer 404, `GET /api/public/demos` answers 200.
 2. **Demonstrations and CRM** (no flag): run a scenario in both languages; sign in to `/admin/crm`, set an owner, add and finish a follow-up,
    export the CSV and check it holds no name, e-mail or phone.
-3. **Configurator and basket** (`PROJECT_CONFIGURATOR_ENABLED`, `QUOTE_BASKET_ENABLED`): in staging only, until the cookie policy is updated and approved (BLOCKER-COM-STORAGE-01).
+3. **Configurator and basket** (`PROJECT_CONFIGURATOR_ENABLED`, `QUOTE_BASKET_ENABLED`): the cookie policy was updated on 2026-11-13 and BLOCKER-COM-STORAGE-01 is closed; switch them on first in staging, then in production by setting both names in the server `.env` (the production `compose.yml` now passes them to the web app too) and running `acs-deploy deploy` again.
    Check the answers survive a reload, the server recomputes the totals, a request becomes an enquiry in the admin.
 4. **Quotations** (`QUOTATIONS_ENABLED`): publish an approved proposal, open the link (the secret is in the address fragment), answer once, see the answer in the admin.
    Production waits for the approved wording (BLOCKER-COM-ACCEPT-01).
