@@ -118,6 +118,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [IMPLEMENTATION_CHANGELOG.md](docs/IMPLEMENTATION_CHANGELOG.md) | Every change of the audit: commit, files, problem solved, test evidence, remaining risk, deployment notes |
 | [TEST_RESULTS.md](docs/TEST_RESULTS.md) | Results of every test suite run on the final tree, with commands and failures |
 | [PRODUCTION_RELEASE_CHECKLIST.md](docs/PRODUCTION_RELEASE_CHECKLIST.md) | What the next production release carries, approvals needed, checks, rollback, features that stay off |
+| [PRODUCTION_VS_GITHUB_GAP_REPORT.md](docs/PRODUCTION_VS_GITHUB_GAP_REPORT.md) | Reconciliation of `main` and production (2026-11-13): deployed commit and image digests, migrations, flags, settings applied or not, feature table, plan |
 | [UPLOAD_SECURITY_PLAN.md](docs/UPLOAD_SECURITY_PLAN.md) | File upload: transport fix, existing controls, scanner, quarantine, backup and restore plan, order of switching on |
 | [GITHUB_SETTINGS_PROPOSAL.md](docs/GITHUB_SETTINGS_PROPOSAL.md) | Repository settings proposed for approval: branch ruleset, Dependabot security updates, Actions policy |
 | [OBSERVABILITY_PLAN.md](docs/OBSERVABILITY_PLAN.md) | Logging, health, alerts and dashboards within the current budget: what exists, gaps, proposal |
