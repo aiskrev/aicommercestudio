@@ -10,4 +10,4 @@ argon2-cffi==25.1.0
 httpx==0.28.1
 stripe==16.1.0
 anthropic==2.1.0
-reportlab==4.4.4
+reportlab==5.1.0
