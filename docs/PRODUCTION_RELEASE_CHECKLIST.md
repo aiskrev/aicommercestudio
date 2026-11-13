@@ -8,8 +8,8 @@
 
 | Какво | Откъде | Забележка |
 | --- | --- | --- |
-| Целият код от `main` след последното пускане (`03e62c4`, 2026-11-11): PR #77, #78, #79, #80 и този PR | история на Git | всичко публично е ново: Future Commerce дизайн, нов хедър, нови страници |
-| Миграции `0027`–`0032` | `apps/api/alembic/versions` | добавящи (само нови таблици/колони); прилагат се само с „migrate-and-deploy“ **след резервно копие**; производството е на `0026` |
+| Само `deb387c` (PR #81 на одита): 11 изпълними файла (по-лек хедър, шрифтове, лимити на качването) – последното пускане е `88aed98` (2026-11-12, PR #80) | история на Git и Actions | виж [PRODUCTION_VS_GITHUB_GAP_REPORT.md](PRODUCTION_VS_GITHUB_GAP_REPORT.md); не е променено нищо друго: нови страници |
+| Миграции | – | **няма нови**: главата е `0032` и е приложена в производство на 2026-11-12 (журнали на Release; първоначалният текст на този ред беше грешен) |
 | Нов том `project_files` в API | `infra/deploy/compose.yml` | прилага се с новия `compose.yml` на сървъра (`/opt/ai-commerce-studio`): ръчна стъпка на собственика; без него API стартира, но качванията не са включени |
 | Нова променлива `PROJECT_UPLOAD_MAX_BYTES` в уеб услугата | `infra/deploy/compose.yml` | празна = 10 MiB; няма ефект докато качванията са изключени |
 | Caddy: отказ на `TRACE/TRACK/CONNECT` | `infra/reverse-proxy/Caddyfile.cloudflare` | по избор; приложете и `caddy validate` преди презареждане |
@@ -42,7 +42,7 @@
 
 1. Зареждане на образите: GitHub → Actions → Release → `build-only` (образите `sha-<комит>` за API и уеб, с `SITE_URL`, `PUBLIC_CONTACT_*` от променливите на хранилището).
 2. Копиране на новия `infra/deploy/compose.yml` в `/opt/ai-commerce-studio/compose.yml` (добавя том и променлива; преглед на разликата преди това).
-3. `migrate-and-deploy`: резервно копие → `alembic upgrade head` (0027–0032) → `db-api-role` → `seed` → нов образ → проверка на готовност отвън. Ако проверката падне, `rollback` се стартира автоматично.
+3. `deploy` (достатъчно: няма нови миграции; `migrate-and-deploy` също е безопасен – прави резервно копие и не променя нищо): нов образ → проверка на готовност отвън. Ако проверката падне, `rollback` се стартира автоматично.
 4. Проверка след пускане: `/api/health/ready` (`ok`), `/bg`, `/en`, `/bg/kontakti` (формата изпраща), `robots.txt`, `sitemap.xml`, вход на персонала с MFA, заглавията на сайта (`curl -I`: HSTS, CSP), `docker logs api --since 10m | grep -c '"level": "ERROR"'` = 0.
 5. Lighthouse върху живия сайт от лаптоп, мобилен профил (виж [PERFORMANCE_BEFORE_AFTER.md](PERFORMANCE_BEFORE_AFTER.md) за метода) – запис на LCP/CLS; сравнение с лабораторните стойности.
 
