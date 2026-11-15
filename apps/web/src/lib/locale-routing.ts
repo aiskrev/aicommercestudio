@@ -61,6 +61,14 @@ export function decideRoute(
     return { type: "redirect", location: `/${locale}${search}`, permanent: false };
   }
 
+  // A language prefix in the wrong case (`/BG/uslugi`, `/En/services`) is the same language: send it, in one
+  // permanent redirect, to the lower-case URL instead of treating it as a legacy path (`/bg/BG/uslugi` → 404).
+  const [firstSegment, ...otherSegments] = pathname.split("/").filter(Boolean);
+  if (firstSegment && !isLocale(firstSegment) && isLocale(firstSegment.toLowerCase())) {
+    const tail = otherSegments.length ? `/${otherSegments.join("/")}` : "";
+    return { type: "redirect", location: `/${firstSegment.toLowerCase()}${tail}${search}`, permanent: true };
+  }
+
   const parsed = splitLocale(pathname);
   if (!parsed) {
     const service = wrongLanguageService(defaultLocale, pathname);

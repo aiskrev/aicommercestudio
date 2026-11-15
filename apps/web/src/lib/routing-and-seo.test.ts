@@ -33,6 +33,18 @@ describe("decideRoute", () => {
     });
   });
 
+  it("normalises the case of the language prefix instead of treating it as a legacy path", () => {
+    expect(decideRoute("/BG/uslugi", false)).toEqual({ type: "redirect", location: "/bg/uslugi", permanent: true });
+    expect(decideRoute("/En", false)).toEqual({ type: "redirect", location: "/en", permanent: true });
+    expect(decideRoute("/EN/services/ai-managed-services", false, null, "?a=1")).toEqual({
+      type: "redirect",
+      location: "/en/services/ai-managed-services?a=1",
+      permanent: true,
+    });
+    // An unknown prefix is still a legacy unprefixed path (a 404 below /bg, as before).
+    expect(decideRoute("/xx", false)).toEqual({ type: "redirect", location: "/bg/xx", permanent: true });
+  });
+
   it("serves Bulgarian URLs as they are", () => {
     expect(decideRoute("/bg", false)).toEqual({ type: "next" });
     expect(decideRoute("/bg/kontakti", false)).toEqual({ type: "next" });
