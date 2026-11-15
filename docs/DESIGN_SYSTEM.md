@@ -297,6 +297,8 @@ size).
 
 ## Homepage composition
 
+> **Historical (updated 2026-11-15).** This table describes the V4 homepage. The homepage is now the Future Commerce composition (`FUTURE_COMMERCE_REDESIGN_REPORT.md`); `SystemMap`, `CapabilityAreas`, `ManagedLifecycle`, `SolutionPatterns` and `ProjectEntryPoints` were no longer rendered anywhere and their components were removed (audit FS-10). Their text content in `content/{bg,en}/home.ts` is kept.
+
 `app/[locale]/page.tsx`, content in `content/{bg,en}/home.ts` (EN typed against BG). Redesign v4:
 
 | # | Section | Tone | Composition |
