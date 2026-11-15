@@ -77,7 +77,8 @@ async function proxy(request: NextRequest, ctx: RouteContext<"/api/[...path]">):
   let upstream: Response;
   try {
     upstream = await fetch(target, {
-      method: request.method,
+      // FastAPI answers 405 to HEAD on its GET routes, so a HEAD (uptime checks) is asked as a GET and the body is dropped.
+      method: request.method === "HEAD" ? "GET" : request.method,
       headers,
       body,
       redirect: "manual",
@@ -96,10 +97,10 @@ async function proxy(request: NextRequest, ctx: RouteContext<"/api/[...path]">):
   });
   for (const cookie of upstream.headers.getSetCookie()) responseHeaders.append("set-cookie", cookie);
 
-  return new Response(upstream.status === 204 ? null : upstream.body, {
+  return new Response(upstream.status === 204 || request.method === "HEAD" ? null : upstream.body, {
     status: upstream.status,
     headers: responseHeaders,
   });
 }
 
-export { proxy as DELETE, proxy as GET, proxy as PATCH, proxy as POST, proxy as PUT };
+export { proxy as DELETE, proxy as GET, proxy as HEAD, proxy as PATCH, proxy as POST, proxy as PUT };
