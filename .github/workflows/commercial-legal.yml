@@ -1,0 +1,62 @@
+# Browser tests of the features that are switched OFF in production: the commercial expansion (configurator, quote basket,
+# quotations) and the legal workflows (customer accounts, projects, documents and uploads, billing routes without Stripe).
+# They need their own test-only stacks (docker-compose.commercial-e2e.yml, docker-compose.legal-e2e.yml), so the normal CI
+# does not run them and a regression there would stay invisible until someone switched a feature on (audit R-12).
+# Run it by hand before switching any of those features on, and weekly so that a dependency update cannot break them silently.
+# Nothing here deploys or touches production.
+name: Commercial and legal e2e
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 6 * * 3"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: commercial-legal-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  commercial:
+    name: Commercial expansion e2e (flags on, test stack)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Generate local .env
+        run: ./scripts/setup.ps1 6>$null | Out-Null
+      - name: Run the commercial suite (two passes)
+        run: ./scripts/test.ps1 -Suite commercial
+      - name: Service logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail 200 api web
+      - name: Stop containers
+        if: always()
+        run: docker compose --profile test down --volumes
+
+  legal:
+    name: Legal workflows e2e (accounts, projects, documents on, test stack)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Generate local .env
+        run: ./scripts/setup.ps1 6>$null | Out-Null
+      - name: Run the legal suite (throwaway database)
+        run: ./scripts/test.ps1 -Suite legal
+      - name: Service logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail 200 api web
+      - name: Stop containers
+        if: always()
+        run: docker compose --profile test down --volumes
