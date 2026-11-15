@@ -1,5 +1,8 @@
 # Commercial expansion: release review (Phase 18)
 
+> **Correction 2026-11-15 (independent audit, `FORENSIC_PRODUCTION_DRIFT.md`).** Where this document says that migrations `0027`–`0032` or phases 07–18 are not deployed, it is out of date: the Release logs show `0026` applied on 2026-11-11 and `0027`–`0032` on 2026-11-12 (04:23 and 05:05 UTC), and production has been on `main` since the Release of 2026-11-13 (`0149223`). The features stay switched off by flag; only their code and tables are in production.
+
+
 Status on 2026-11-12. **The programme stops here, at the release approval gate.** Phases 01 to 18 are implemented and tested in the
 working tree. Phases 01 to 08 are committed and pushed (pull requests #75 and #76 are merged). **Phases 09 to 18 are committed locally (`42df564`,
 `592decd`), not pushed, not merged and not deployed.**

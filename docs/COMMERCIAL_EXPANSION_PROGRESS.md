@@ -1,5 +1,8 @@
 # Commercial expansion — progress
 
+> **Correction 2026-11-15 (independent audit, `FORENSIC_PRODUCTION_DRIFT.md`).** Where this document says that migrations `0027`–`0032` or phases 07–18 are not deployed, it is out of date: the Release logs show `0026` applied on 2026-11-11 and `0027`–`0032` on 2026-11-12 (04:23 and 05:05 UTC), and production has been on `main` since the Release of 2026-11-13 (`0149223`). The features stay switched off by flag; only their code and tables are in production.
+
+
 Statuses: NOT_STARTED, IN_PROGRESS, IMPLEMENTED, TESTED, BLOCKED, DEFERRED, FAILED.
 Branch: `feature/commercial-expansion` (from `origin/main` @ `e56e5cd`). Phases 01-08 are committed and pushed (PR #75 and #76 are merged); Phases 09-18 are committed locally in `42df564` and `592decd` (not pushed, not merged). **In production** (GitHub Actions history): Release run `43033986686` (2026-11-11 13:58 UTC) deployed `03e62c4` (phases 01-06) and applied migration `0026`; no Release has run since, so phases 07-08 (`954bba9`, in `main`) are not deployed and `0027` to `0032` exist only in local and test databases. An earlier version of this line said nothing was deployed; that was wrong (corrected 2026-11-12).
 

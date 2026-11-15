@@ -1,5 +1,8 @@
 # Съгласуване на GitHub и производство: фактически опис (2026-11-13)
 
+> **Superseded 2026-11-15.** Production is no longer on `88aed98`: the Release of 2026-11-13 deployed `main` @ `0149223` (image digests and the comparison in `FORENSIC_PRODUCTION_DRIFT.md`). Everything below describes the state of 2026-11-13 morning.
+
+
 Сравнение на `origin/main` @ `deb387c` с това, което реално работи на https://ai-commercestudio.com. Всяко твърдение е отбелязано как е установено:
 
 * **[П] Проверено** – прочетено от код, Git, GitHub API/Actions или от самия сайт (само четене, единични заявки).

@@ -119,6 +119,14 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [TEST_RESULTS.md](docs/TEST_RESULTS.md) | Results of every test suite run on the final tree, with commands and failures |
 | [PRODUCTION_RELEASE_CHECKLIST.md](docs/PRODUCTION_RELEASE_CHECKLIST.md) | What the next production release carries, approvals needed, checks, rollback, features that stay off |
 | [PRODUCTION_VS_GITHUB_GAP_REPORT.md](docs/PRODUCTION_VS_GITHUB_GAP_REPORT.md) | Reconciliation of `main` and production (2026-11-13): deployed commit and image digests, migrations, flags, settings applied or not, feature table, plan |
+| [FORENSIC_FULL_PLATFORM_AUDIT.md](docs/FORENSIC_FULL_PLATFORM_AUDIT.md) | Independent forensic audit of the whole platform (2026-11-14, Bulgarian): architecture diagrams, API and flag inventory, production Lighthouse, SEO, data inventory, documentation accuracy, scores |
+| [FORENSIC_REQUIREMENT_TRACEABILITY.md](docs/FORENSIC_REQUIREMENT_TRACEABILITY.md) | Capability-by-capability matrix: claimed vs verified status, code, API, tests, production evidence, blockers |
+| [FORENSIC_SECURITY_REVIEW.md](docs/FORENSIC_SECURITY_REVIEW.md) | OWASP-style findings (FS-01…FS-11), identity separation, uploads, AI, payments, supply chain, limits |
+| [FORENSIC_UX_ACCESSIBILITY_REVIEW.md](docs/FORENSIC_UX_ACCESSIBILITY_REVIEW.md) | Live-site design, UX and accessibility review: what was and was not checked, findings A-01…A-05 |
+| [FORENSIC_TEST_EVIDENCE.md](docs/FORENSIC_TEST_EVIDENCE.md) | Fresh test runs on main: commands, counts, environment, and what the numbers do not prove |
+| [FORENSIC_PRODUCTION_DRIFT.md](docs/FORENSIC_PRODUCTION_DRIFT.md) | Local vs GitHub vs production: commits, image digests, migrations, infrastructure artefacts, drift |
+| [FORENSIC_REMEDIATION_BACKLOG.md](docs/FORENSIC_REMEDIATION_BACKLOG.md) | Prioritised corrections (not applied): fix, regression test, effort, decision owner |
+| [FORENSIC_RELEASE_DECISION.md](docs/FORENSIC_RELEASE_DECISION.md) | GO / CONDITIONAL_GO / NO_GO per question, readiness figures, top blockers, accuracy of earlier reporting |
 | [UPLOAD_SECURITY_PLAN.md](docs/UPLOAD_SECURITY_PLAN.md) | File upload: transport fix, existing controls, scanner, quarantine, backup and restore plan, order of switching on |
 | [GITHUB_SETTINGS_PROPOSAL.md](docs/GITHUB_SETTINGS_PROPOSAL.md) | Repository settings proposed for approval: branch ruleset, Dependabot security updates, Actions policy |
 | [OBSERVABILITY_PLAN.md](docs/OBSERVABILITY_PLAN.md) | Logging, health, alerts and dashboards within the current budget: what exists, gaps, proposal |
