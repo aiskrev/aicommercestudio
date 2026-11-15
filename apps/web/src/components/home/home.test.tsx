@@ -2,9 +2,6 @@ import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
-import { CapabilityAreas } from "@/components/home/CapabilityAreas";
-import { ManagedLifecycle } from "@/components/home/ManagedLifecycle";
-import { SystemMap } from "@/components/home/SystemMap";
 import { ToolsPreview } from "@/components/home/ToolsPreview";
 import { getContent } from "@/content";
 import { DOMAINS } from "@/lib/domains";
@@ -13,44 +10,12 @@ const { home, advisor, tools } = getContent("bg");
 const CYRILLIC = /[Ѐ-ӿ]/;
 
 describe("homepage sections", () => {
-  it("system map lists every layer, the approval gate and the actions in order", () => {
-    render(<SystemMap content={home.hero.systemMap} />);
-    const map = screen.getByRole("figure", { name: home.hero.systemMap.label });
-    const layers = within(map).getAllByRole("listitem").filter((li) => li.parentElement?.tagName === "OL");
-    expect(layers).toHaveLength(home.hero.systemMap.layers.length + 2);
-    expect(layers.at(-2)).toHaveTextContent(home.hero.systemMap.gate.title);
-    expect(map).toHaveTextContent(home.hero.systemMap.caption);
-  });
-
-  it("the three capability areas cover every domain exactly once, state problem, capabilities and outcome, and link the hubs", () => {
+  // The capability-area content is still part of the BG/EN content contract (the section that drew it was replaced by the
+  // Future Commerce homepage; its components were removed, audit FS-10).
+  it("the three capability areas cover every domain exactly once", () => {
     expect(home.offer.areas.map((a) => a.key)).toEqual(["automation", "engineering", "managed"]);
     const covered = home.offer.areas.flatMap((a) => a.domains);
     expect([...covered].sort()).toEqual(DOMAINS.map((d) => d.key).sort());
-    render(
-      <CapabilityAreas
-        labels={home.offer.labels}
-        areas={home.offer.areas.map((area) => ({
-          ...area,
-          domains: area.domains.map((key) => ({ key, name: `Domain ${key}`, href: `/bg/uslugi/${key}` })),
-        }))}
-      />,
-    );
-    for (const area of home.offer.areas) {
-      const card = screen.getByRole("heading", { level: 3, name: area.title }).closest("article")!;
-      expect(card).toHaveTextContent(area.problem);
-      expect(card).toHaveTextContent(area.outcome);
-      for (const capability of area.capabilities) expect(card).toHaveTextContent(capability);
-      expect(within(card).getAllByRole("link")).toHaveLength(area.domains.length);
-    }
-    // Unequal weight: the first area is the feature panel.
-    expect(screen.getByRole("heading", { level: 3, name: home.offer.areas[0].title }).closest("article")).toHaveClass("feature-panel");
-  });
-
-  it("the AI Managed Services lifecycle links every stage to the service page and is captioned as an illustration", () => {
-    render(<ManagedLifecycle content={home.managed.lifecycle} serviceHref="/bg/uslugi/ai-managed-services" />);
-    const stages = within(screen.getByTestId("managed-lifecycle")).getAllByRole("link");
-    expect(stages.map((link) => link.getAttribute("href"))).toEqual(home.managed.lifecycle.stages.map((stage) => `/bg/uslugi/ai-managed-services#${stage.anchor}`));
-    expect(screen.getByRole("figure")).toHaveTextContent(home.managed.lifecycle.caption);
   });
 
   it("tools preview marks the Advisor as the first tool, links only live tools and labels the others", () => {

@@ -468,9 +468,12 @@ def test_parallel_hits_cannot_slip_past_the_limit(client, inbox):
 
 def test_rate_limit_window_starts_over(client, db, inbox):
     limits.hit("probe", "x", 1, 60)
+    with pytest.raises(ApiError) as refused:  # refused inside the window (audit R-14)
+        limits.hit("probe", "x", 1, 60)
+    assert refused.value.status_code == 429
     db.execute(RateLimitBucket.__table__.update().values(window_start=utcnow() - timedelta(seconds=61)))
     db.commit()
-    limits.hit("probe", "x", 1, 60)
+    limits.hit("probe", "x", 1, 60)  # a new window: allowed again, so this must not raise
 
 
 def test_repeated_failures_lock_the_account_without_saying_so(client, db, inbox, monkeypatch):

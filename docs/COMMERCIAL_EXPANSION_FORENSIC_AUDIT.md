@@ -1,5 +1,8 @@
 # Независим форензичен одит на търговското разширение (18 фази)
 
+> **Correction 2026-11-15 (independent audit, `FORENSIC_PRODUCTION_DRIFT.md`).** Where this document says that migrations `0027`–`0032` or phases 07–18 are not deployed, it is out of date: the Release logs show `0026` applied on 2026-11-11 and `0027`–`0032` on 2026-11-12 (04:23 and 05:05 UTC), and production has been on `main` since the Release of 2026-11-13 (`0149223`). The features stay switched off by flag; only their code and tables are in production. Also: a test of the commercial schema on a populated database exists (`apps/api/tests/test_migration_commercial_populated.py`, 3 tests); the statement that none exists is wrong.
+
+
 Дата на одита: 2026-11-12. Одитът е само за четене: не е променян изходен код, тест или съществуващ документ; нищо не е комитвано,
 пушвано, деплойвано или включвано. Единствената промяна е този файл. Предишните отчети са третирани като твърдения за проверка,
 не като доказателство.

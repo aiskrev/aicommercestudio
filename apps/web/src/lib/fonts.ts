@@ -11,6 +11,7 @@ const interCyrillic = localFont({
   src: [{ path: "../assets/fonts/inter-cyrillic-wght-normal.woff2", weight: "100 900", style: "normal" }],
   variable: "--font-inter-cyrillic",
   display: "swap",
+  preload: false,
   adjustFontFallback: false,
   declarations: [{ prop: "unicode-range", value: "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116" }],
 });
@@ -19,6 +20,7 @@ const interLatin = localFont({
   src: [{ path: "../assets/fonts/inter-latin-wght-normal.woff2", weight: "100 900", style: "normal" }],
   variable: "--font-inter-latin",
   display: "swap",
+  preload: false,
   declarations: [{ prop: "unicode-range", value: "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD" }],
 });
 
@@ -37,6 +39,13 @@ const manropeLatin = localFont({
   declarations: [{ prop: "unicode-range", value: "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD" }],
 });
 
+/**
+ * The Inter faces (body text) are not preloaded either: with applied throttling the preloads shared the connection with
+ * the render-blocking stylesheet and the heading font. Measured on the local stack: /bg LCP 2.34 -> 2.12 s and /en
+ * 2.38 -> 2.03 s (medians of three), CLS unchanged (0 and 0.02). Body text shows in the fallback face for a moment
+ * (`font-display: swap`) and then switches. This is a lab figure; the production figure (3.0-3.1 s) is measured separately
+ * (docs/FORENSIC_FULL_PLATFORM_AUDIT.md section 7).
+ */
 /**
  * The monospace faces (small labels, numbering, the language switcher) are not preloaded: on a slow connection their
  * two files (52 KB) shared the bandwidth of the render-blocking stylesheet and delayed the first paint (audit F-12,

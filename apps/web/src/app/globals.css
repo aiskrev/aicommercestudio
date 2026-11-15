@@ -637,12 +637,15 @@
   .field::placeholder { color: var(--color-fg-placeholder); }
   .field:hover:not(:disabled) { border-color: var(--color-line-hover); }
   .field:focus { outline: none; border-color: var(--color-brand); box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-brand) 28%, transparent); }
+  /* The same 2 px ring as every link and button (audit A-02): the border change and the faint glow alone were weaker. */
+  .field:focus-visible { outline: var(--ring-width) solid var(--ring); outline-offset: 2px; }
   .field:disabled { opacity: 0.6; cursor: not-allowed; }
   .field[aria-invalid="true"] { border-color: var(--color-danger); }
   .field[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgb(244 122 138 / 0.25); }
   select.field { appearance: none; padding-right: 2.75rem; }
   .surface-light .field { background: var(--color-surface-paper-field); border-color: var(--color-ink-line); color: var(--color-ink); }
   .surface-light .field:focus { border-color: var(--color-brand-ink); box-shadow: 0 0 0 3px rgb(12 102 112 / 0.2); }
+  .surface-light .field:focus-visible { outline-color: var(--color-brand-ink); }
   .surface-light .field-label { color: var(--color-ink); }
   .surface-light .field-hint { color: var(--color-ink-muted); }
   .checkbox {

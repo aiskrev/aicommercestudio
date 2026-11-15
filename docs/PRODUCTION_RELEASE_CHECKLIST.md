@@ -1,5 +1,8 @@
 # Контролен списък за пускане в производство (след одита от 2026-11-12)
 
+> **Status 2026-11-15.** The release this checklist prepared was made on 2026-11-13 (`0149223`, `migrate-and-deploy`, no new migrations). Steps 3 (`db-role-check` on the server), 2 (new `compose.yml`) and the GitHub/Cloudflare settings are still the owner's open items (see `FORENSIC_REMEDIATION_BACKLOG.md`).
+
+
 **Този документ не пуска нищо.** Нито една от стъпките не е изпълнена от одита. Всяка се прави от собственика или с негово изрично одобрение в този момент.
 Основа: `main` @ `88aed98` + PR на одита. Подробностите за сървъра са в [infra/deploy/README.md](../infra/deploy/README.md) и [COMMERCIAL_STAGING_RUNBOOK.md](COMMERCIAL_STAGING_RUNBOOK.md);
 изводите от одита – в [SECURITY_AUDIT_FINAL.md](SECURITY_AUDIT_FINAL.md).

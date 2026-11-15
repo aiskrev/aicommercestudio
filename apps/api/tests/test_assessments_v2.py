@@ -871,3 +871,28 @@ def test_linked_results_follow_the_lead_not_the_purge(client, admin_client, db):
     assert admin_client.delete(f"/api/admin/leads/{lead.id}").status_code in (200, 204)
     db.expire_all()
     assert db.scalar(select(func.count()).select_from(AssessmentResultRecord)) == 0
+
+
+@pytest.mark.parametrize("locale", ["bg", "en"])
+def test_a_report_pdf_is_structurally_sound_with_an_embedded_font(locale):
+    """Not only a `%PDF` prefix (audit R-17, after the reportlab 4 -> 5 update): the trailer is intact, the page tree
+    counts at least one page, and a TrueType font is embedded (the Bulgarian text needs DejaVu with Cyrillic)."""
+    import re
+
+    key = ALL_CURRENT[0]
+    definition = registry().current(key)
+    answers, result = service.assess(definition, answers_for(definition))
+    view = present_result(definition, result, locale, answers)
+    document = build_document(
+        view, locale=locale, created_at=utcnow(), expires_at=utcnow() + timedelta(days=90), reference="R-PDF"
+    )
+    pdf = render_pdf(document)
+    assert pdf.startswith(b"%PDF-") and pdf.rstrip().endswith(b"%%EOF")
+    pages = len(re.findall(rb"/Type\s*/Page\b", pdf))
+    assert pages >= 1
+    counts = [int(count) for count in re.findall(rb"/Type\s*/Pages\b[^>]*?/Count\s+(\d+)", pdf)] or [
+        int(count) for count in re.findall(rb"/Count\s+(\d+)", pdf)
+    ]
+    assert counts and max(counts) == pages
+    assert b"/FontFile2" in pdf  # an embedded TrueType font program, not only the 14 standard fonts
+    assert b"/Encrypt" not in pdf

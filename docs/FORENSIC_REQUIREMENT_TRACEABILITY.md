@@ -1,0 +1,66 @@
+# Съответствие изискване → код → тест → производство (независим одит, 2026-11-14)
+
+Основа: `main` @ `0149223` (= производство според Release `43383077468` и наблюдение на живия сайт). Само четене: нищо не е променяно, комитвано или разгръщано от този одит.
+Статусите са от речника на заданието. **Проверено** значи, че е изпълнен тест или е направено наблюдение в този одит (виж [FORENSIC_TEST_EVIDENCE.md](FORENSIC_TEST_EVIDENCE.md)); „по документ“ значи, че се позовавам на съществуващ отчет, който не съм повтарял.
+
+**Забележка за независимостта.** Одиторът е същият инструмент (Claude Code), който е писал и преглеждал голяма част от кода и от предишните отчети. Затова нито един предишен отчет не е приет като доказателство; където се позовавам на тях, го отбелязвам. Конфликтът на интереси не може да бъде премахнат само с обещание: нужен е втори човек или външен преглед (виж [FORENSIC_RELEASE_DECISION.md](FORENSIC_RELEASE_DECISION.md)).
+
+Съкращения: **PS** = производство наблюдавано (единични GET заявки, без запис); **L** = локален стек `acs-audit`; ф. = флаг; ✔ = има; ✘ = няма; ~ = частично.
+
+## 1. Публичен сайт и съдържание
+
+| # | Област | Изискване | Заявен статус | Проверен статус | Уеб (път) | API / БД / миграция | Флаг | Тестове (unit / интеграция / e2e) | Производство | Блокер / бележка |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Начална страница „Future Commerce“ | 13 секции, герой, селектор, сравнения | завършено (PR #80) | **VERIFIED_PARTIAL** | `app/[locale]/page.tsx`, `components/future/*` | – | – | ✔ vitest ✘ ✔ `future-commerce.spec.ts` | **PS** `/bg` 349 106 B, 1 543 елемента, 4 шрифта за предзареждане = билдът на `0149223` | ръчен преглед с екранен четец не е правен; 5 компонента на предишната начална страница са мъртъв код (т. 31) |
+| 2 | Услуги, хъбове, 264 адреса | карта на сайта, canonical, hreflang, 1 `<h1>` | завършено | **VERIFIED_COMPLETE** (адресите) | `app/[locale]/**` | – | – | ✔ ✘ ✔ `seo*.spec.ts` | **PS** 38 от 264 адреса (всеки седми): 200, 1 `<title>`, canonical = адреса, 1 `<h1>`; **L** пълно обхождане 264 адреса / 280 връзки / 0 проблема | производствена проверка е извадка, не пълна |
+| 3 | Цени и пакети | една цена от `lib/prices.ts`, „ориентировъчни“ | завършено | **VERIFIED_PARTIAL** | `lib/prices.ts`, `lib/price-schedule.ts` | `app/price_schedule.json` (хеш = уеб) | – | ✔ `prices.test.ts`, `price-schedule.test.ts` ✔ `test_pricing.py` ✔ e2e | **PS** `/bg/tseni`, `/bg/proektni-paketi` 200; заглавие „ориентировъчни цени“ | не са проверени всички цени спрямо договор |
+| 4 | Контактна форма / запитвания | запис в БД, известие, защита от спам | завършено | **VERIFIED_PARTIAL** | `components/contact/ContactForm.tsx` | `POST /api/public/leads`; `leads`; 0001+ | – | ✔ ✔ `test_public_leads.py` ✔ `contact.spec.ts` | **не** е тествана на живо (би създала реален запис и писмо) | CONNECTED в L; в производство е само наблюдавана формата |
+| 5 | BG/EN паритет | еднаква функционалност | завършено | **VERIFIED_PARTIAL** | `content/{bg,en}`, `i18n/` | – | – | ✔ `i18n.test.ts`, e2e `i18n.spec.ts` | **PS** `/en` `lang=en`, 1 `<h1>`, canonical | езиковото качество не е оценено от човек |
+| 6 | Защитено съдържание | портрет, контакти, профил, лого | пазено | **VERIFIED_COMPLETE** | `lib/company.ts`, `Founder.tsx` | – | – | ✔ `protected-content.test.ts`, `company.test.ts` (в 1136) | **PS** контакти идват от `company.ts`; търсене за твърдо кодирани данни извън `company.ts`/тестове: 0 попадения | – |
+| 7 | Лого и икона | „orbital A“ | сменено по искане | **VERIFIED_PARTIAL** | `assets/logo*`, `icon.png` | – | – | ✔ хешове в теста | **PS** видимо в хедъра (снимка) | иконата на раздела не е гледана |
+| 8 | Известие и политика за бисквитки | честно, описва всички ключове | завършено | **VERIFIED_PARTIAL** | `CookieNotice.tsx`, `content/*/legal.ts` | регистър `legal_versions.json` | – | ✔ `cookie-notice.test.tsx`, `legal-versions.test.ts` ✔ `cookie-audit.spec.ts` | **PS** известието и страницата `/bg/biskvitki` 200 | политиката е **чернова „в преглед от юрист“** (регистър); не е подписана |
+
+## 2. Интерактивни инструменти и AI
+
+| # | Област | Изискване | Заявен статус | Проверен статус | Код | API / БД | Флаг | Тестове | Производство | Блокер / бележка |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 9 | Инструменти (готовност, екип, ROI, откриване, решение, агенти) | работят без изпращане на данни, където е заявено | завършено | **VERIFIED_PARTIAL** | `components/tools/*` | `/api/public/readiness|team|solution/*`; 0007, 0011 | `TOOL_FLAGS` (всички `true`) | ✔ `*.test.ts`, паритет на вектори уеб↔API по хеш ✔ ✔ e2e | **PS** `/bg/instrumenti` 200 | PDF отчети: `reportlab` сега 5.1.0 (голяма версия, минала CI) – визуално не е сравнявана |
+| 10 | AI съветник | схема на изхода, защита от инжекции, без инструменти | завършено | **TESTED_ONLY_WITH_MOCKS** | `app/advisor/*`, `app/ai/*` | `POST /api/public/advisor/assessments`; 0003, 0012 | `AI_PROVIDER` (подразбиране `mock`) | ✔ `test_advisor*.py`, `test_ai.py` (мок) | не е известно кой доставчик върви в производство (`.env` не се чете) | **CANNOT_VERIFY** реален модел; външен доставчик не е извикван |
+| 11 | Демонстрации на AI | стационарни, без доставчик | завършено | **VERIFIED_PARTIAL** | `app/demos/*` | `POST /api/public/demos/{scenario}/run` | – | ✔ `test_demos.py`, e2e `demos.spec.ts` | **PS** `/bg/demo-tsentar` 200 | – |
+| 12 | AI платформа (регистър, оценки, наблюдаемост) за персонала | RLS, роли | завършено | **VERIFIED_PARTIAL** | `app/ops/*`, `admin/ops/*` | 58 маршрута `/api/ops/*`; 0008, 0013 | `OPS_MODULES` | ✔ `test_ops_*.py`, `test_route_authorization_inventory.py` | **PS** `/api/ops/organizations` без сесия → 401 | |
+
+## 3. Търговски функции (всички изключени в производство)
+
+| # | Функция | Заявен статус | Проверен статус | Код | API / БД | Флаг (в производство) | Тестове | Производство | Блокер |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 13 | Конфигуратор | тестван, зад флаг | **DISABLED_BY_FEATURE_FLAG** | `ProjectConfigurator.tsx`, `app/configurator/*` | `/api/public/configurator/*`; – | `PROJECT_CONFIGURATOR_ENABLED` изкл. (**PS**: `/bg/konfigurator` 404, `/api/configurator-flag` `false`) | ✔ ✔ ✔ търговски e2e 32+12 | скрит | гейтът `COMMERCIAL_STORAGE_DISCLOSED` затворен 2026-11-13; остава само решение за включване на сървъра |
+| 14 | Кошница за оферти | тестван, зад флаг | **DISABLED_BY_FEATURE_FLAG** | `components/quote/*`, `app/quotes/*` | `/api/public/quote-basket*`; `quote_baskets` 0026 | `QUOTE_BASKET_ENABLED` изкл. (**PS** `/bg/zayavka` 404) | ✔ `test_quote_basket.py` ✔ e2e | скрит | както 13 |
+| 15 | Оферти към клиент | тестван | **BLOCKED_BY_LEGAL_REVIEW** | `app/quotations/*` | `/api/public/quotations/*`; 0027 | `QUOTATIONS_ENABLED` изкл. (**PS** 404) | ✔ ✔ ✔ | скрит | `BLOCKER-COM-ACCEPT-01` (значение на отговора на клиента) |
+| 16 | Клиентски акаунти | тестван, втвърден | **BLOCKED_BY_CONFIGURATION** | `app/accounts/*`, `components/account/*` | 17 маршрута `/api/accounts/*`; 0017 | `CUSTOMER_ACCOUNTS_ENABLED` изкл. (**PS** `/bg/konto` 404, `/api/account-flag` `false`) | ✔ `test_accounts*.py` ✔ legal e2e | скрити | няма проверена поща, срокове за запазване, правни текстове „в преглед“, роля `acs_app_api` (непроверена в производство) |
+| 17 | Работно пространство на съветника | тестван | **BLOCKED_BY_OWNER_DECISION** | `app/workspace/*` | 13 маршрута; 0019 | `ADVISOR_WORKSPACE_ENABLED` | ✔ | скрито | **кодът отказва старт в производство** с този флаг |
+| 18 | Търговски проекти | тестван | **DISABLED_BY_FEATURE_FLAG** | `app/projects/*` | 10 маршрута `/api/projects`, 0028 | `COMMERCIAL_PROJECTS_ENABLED` | ✔ ✔ legal e2e | скрити (**PS** `/api/projects` 404) | изискват акаунти |
+| 19 | Документи на проект | тестван | **DISABLED_BY_FEATURE_FLAG** | `projects/documents.py` | 0029 | `PROJECT_DOCUMENTS_ENABLED` | ✔ 62 теста | скрити | изискват проекти |
+| 20 | Качване на файлове | „транспортът е поправен“ (мой отчет) | **BLOCKED_BY_OWNER_DECISION** | `projects/filecheck.py`, `storage.py`, `middleware.py`, `lib/proxy-limits.ts` | 4 маршрута за качване | `PROJECT_UPLOADS_ENABLED`, `PROJECT_CLIENT_UPLOADS_ENABLED` изкл. | ✔ 4 нови API, 9 уеб, e2e 300 KiB/11 MiB | не е достъпно | `BLOCKER-COM-UPLOAD-01`, няма скенер, няма архив на тома, производственият `compose.yml` на сървъра няма том (непроверено) |
+| 21 | Известия по проект | тестван | **BLOCKED_BY_EXTERNAL_SERVICE** | `projects/notify.py`, `accounts/mail.py` | `outbox_messages`; 0030 | `PROJECT_NOTIFICATIONS_ENABLED` | ✔ ✔ | скрити | няма доставчик на поща, `EMAIL_DELIVERY_VERIFIED` не е зададен |
+| 22 | Таксуване / Stripe | тестван с фалшив Stripe | **TESTED_ONLY_WITH_MOCKS** | `app/billing/*` | 9 маршрута `/api/billing/*`; 0020, 0032 | `BILLING_PROVIDER=disabled`; **производството отказва `stripe`** | ✔ `test_billing*.py` (фалшив шлюз) | скрито | няма тестови ключове; нито една заявка към Stripe пясъчник; счетоводител/юрист |
+| 23 | Фактуриране | планирано | **DOCUMENTED_ONLY** (частично код) | `app/invoicing/*` | `accounting_documents` | `INVOICING_SOURCE` `none`/`demo` | ✔ част | – | не е завършено; „собствен издател“ е план |
+| 24 | CRM в администрацията | завършено, без флаг | **VERIFIED_PARTIAL** | `admin/Crm.tsx`, `app/crm/*`, `routers/admin_crm.py` | 0031 | – | ✔ `test_crm.py`, e2e `crm.spec.ts` | достъпно за `admin`; без сесия 401 (**PS**) | вътрешният достъп в производство не е тестван |
+| 25 | Клиентски портал (AI Ops) | зад флаг | **DISABLED_BY_FEATURE_FLAG** (API и уеб: страницата показва „порталът още не е отворен“; първоначалната констатация за регресия е оттеглена) | `app/portal/*`, `app/portal/page.tsx` | 13 маршрута; 0008, 0013 | `CLIENT_PORTAL_ENABLED` | ✔ ✔ портал e2e | **PS: `/portal` отговаря 200 със съобщение „Клиентският портал още не е отворен“, `/api/portal/*` е 404** | умишлено поведение, покрито от e2e |
+| 26 | Анонимна статистика | изключена | **DISABLED_BY_FEATURE_FLAG** | `analytics/*`, `SiteTracker.tsx` | `POST /api/public/analytics`; 0022 | `ANALYTICS_ENABLED` | ✔ ✔ | не е известно | събития, които съществуват: `configurator_started/step_completed/completed`, `consultation_requested` и др. (в кода); не са проверени на живо |
+| 27 | Правни процеси (отказ, права върху данни) | основа | **DISABLED_BY_FEATURE_FLAG** | `app/compliance/*` | 0023–0025 | зависи от акаунти; `LEGAL_CLEANUP_ENABLED` | ✔ ✔ legal e2e | скрити | срокове (3 г. устно съобщени; не са въведени), правни текстове `pending_lawyer_review` |
+
+## 4. Сигурност, данни, операции
+
+| # | Област | Изискване | Заявен статус | Проверен статус | Доказателство |
+| --- | --- | --- | --- | --- | --- |
+| 28 | Оторизация на маршрутите за персонал | 401 без сесия, CSRF при запис | завършено | **VERIFIED_COMPLETE** (за 153 маршрута) | `test_route_authorization_inventory.py` (155 теста) зелен; **PS** `/api/admin/auth/me` 401 |
+| 29 | Оторизация на клиентски маршрути (акаунти/проекти) | чужд достъп → 404 | завършено | **VERIFIED_PARTIAL** | „stranger“ тестове в 5 файла; не са проверени всички 277 операции поотделно; зад флаг |
+| 30 | Сесии и бисквитки | `HttpOnly`, `Secure`, `SameSite` | завършено | **VERIFIED_PARTIAL** | тестове; **PS** `Set-Cookie` не е наблюдаван (изисква вход) |
+| 31 | Мъртъв код | – | – | **REGRESSION_FOUND** (хигиена) | `components/home/{CapabilityAreas,ManagedLifecycle,ProjectEntryPoints,SolutionPatterns,SystemMap}.tsx` (443 реда) не се импортират никъде; 4 от тях се „държат живи“ само от свои тестове; `lib/sla.ts` (108 реда) – само тест |
+| 32 | Ограничаване на честотата | защита от злоупотреба | завършено | **VERIFIED_PARTIAL** | в паметта на процеса, нулира се при рестарт; проба: 429 след ≤ 40 опита |
+| 33 | Миграции | една глава, попълнена база | завършено | **VERIFIED_COMPLETE** (локално) | глава `0032` (изчислена); `test_migration_commercial_populated.py`, `test_migration_legal_populated.py`; **Л**: Release журналите показват приложени 0026–0032 (11-11 и 11-12); `alembic current` на живата база **CANNOT_VERIFY** директно |
+| 34 | Резервно копие и възстановяване | дъмп преди миграция, външно копие | завършено | **DEPLOYED_NOT_VERIFIED** | журнал: `backup ok: …acs-20261113-072359.dump (424K, 89 tables)`; **възстановяване върху сървър: няма доказателство** (само локално упражнение по документ) |
+| 35 | Мониторинг | uptime + самопроверка | завършено | **VERIFIED_PARTIAL** | `/api/health/ready` → `host: ok` (**PS**); `Uptime` workflow зелен; няма сигнал за 5xx, няма метрики |
+| 36 | CI/CD | проверки, одобрение на среда | завършено | **VERIFIED_PARTIAL** | `Release` изисква `production` ревюър + клон (API); **`main` няма защита, 0 ruleset-а, Dependabot security updates и Dependency graph изключени** (проверено днес) |
+| 37 | Cloudflare / Caddy | защитна стена, кеш, ограничения | предложения | **CANNOT_VERIFY** | **PS**: HSTS, CSP, `cf-cache-status: DYNAMIC`, `TRACE` → 405 от Cloudflare; правилата в `infra/cloudflare/` не са доказано приложени |
+| 38 | Документация | точна | – | **PARTIALLY_SUPPORTED** | виж [FORENSIC_FULL_PLATFORM_AUDIT.md](FORENSIC_FULL_PLATFORM_AUDIT.md) §10: поне 6 документа твърдят „не е в производство“ за неща, които са в производство |
