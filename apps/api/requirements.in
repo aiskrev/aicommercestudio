@@ -1,0 +1,17 @@
+# Direct runtime dependencies of the API (exact versions; Dependabot raises them one by one).
+# requirements.txt is GENERATED from this file with hashes (audit SEC-09). Do not edit requirements.txt by hand:
+#   docker run --rm -v "$PWD":/work -w /work python:3.15-slim sh -c \
+#     "pip install pip-tools==7.7.0 && pip-compile --generate-hashes --strip-extras --no-emit-index-url --output-file=requirements.txt requirements.in"
+fastapi==0.162.7
+uvicorn[standard]==0.54.0
+sqlalchemy==2.1.8
+alembic==1.20.1
+psycopg[binary]==3.3.9
+pydantic==2.14.3
+pydantic-settings==2.16.3
+email-validator==2.3.0
+argon2-cffi==25.1.0
+httpx==0.28.1
+stripe==17.0.0
+anthropic==2.8.0
+reportlab==5.1.0

@@ -1,0 +1,8 @@
+# Test and lint tools on top of the runtime lock. -c keeps every shared package at the version in requirements.txt.
+# requirements-dev.txt is GENERATED (hashes, audit SEC-09):
+#   pip-compile --generate-hashes --allow-unsafe --strip-extras --no-emit-index-url --output-file=requirements-dev.txt requirements-dev.in
+-c requirements.txt
+-r requirements.in
+pytest==9.2.0
+ruff==0.17.5
+pip-audit==2.10.1
