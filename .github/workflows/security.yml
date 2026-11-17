@@ -42,29 +42,73 @@ jobs:
     name: Dependency review
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - name: Is the dependency graph switched on?
-        # The review needs Settings > Code security > Dependency graph. While it is off the action fails on every pull request
-        # for a reason no change can fix, so the job says so and skips the review instead (docs/GITHUB_SETTINGS_PROPOSAL.md).
+      - name: Dependency graph state
+        # Fail closed (audit SEC-01). The review action needs Settings > Code security > Dependency graph. The probe tells
+        # three situations apart; none of them is allowed to end as a silent success:
+        #   200            graph on        -> dependency-review-action runs (vulnerabilities and licences)
+        #   404            graph off       -> the fallback below audits the lock files itself (vulnerabilities only) and fails on findings
+        #   401/403, 5xx, no answer, other -> the job FAILS: the gate could not run, so the change is not reviewed
         id: graph
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh api "repos/$GITHUB_REPOSITORY/dependency-graph/sbom" --silent 2>/dev/null; then
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::The dependency graph is off for this repository, so the dependency review was skipped. Switch it on in Settings > Code security."
-          fi
+          set +e
+          state=unknown
+          for attempt in 1 2 3; do
+            status=$(gh api -i "repos/$GITHUB_REPOSITORY/dependency-graph/sbom" 2>/dev/null | head -n 1 | awk '{print $2}')
+            case "$status" in
+              200) state=enabled; break ;;
+              404) state=disabled; break ;;
+              401|403) state=denied; break ;;
+              *) state="unavailable(${status:-no answer})"; sleep $((attempt * 5)) ;;
+            esac
+          done
+          echo "state=$state" >> "$GITHUB_OUTPUT"
+          case "$state" in
+            enabled) ;;
+            disabled) echo "::warning::The dependency graph is off, so the licence check of the dependency review is unavailable. The lock files are audited directly instead (next steps). Switch the graph on in Settings > Code security." ;;
+            *) echo "::error::The dependency graph state could not be read: $state. The dependency review did not run, so this job fails instead of passing."; exit 1 ;;
+          esac
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
-        if: steps.graph.outputs.enabled == 'true'
+        if: steps.graph.outputs.state == 'enabled'
         with:
           fail-on-severity: high
           comment-summary-in-pr: never
+      - name: Audit the Python lock file (graph off)
+        if: steps.graph.outputs.state == 'disabled'
+        run: |
+          python3 -m venv "$RUNNER_TEMP/audit-venv"
+          "$RUNNER_TEMP/audit-venv/bin/pip" install --quiet pip-audit==2.10.1
+          "$RUNNER_TEMP/audit-venv/bin/pip-audit" -r apps/api/requirements.txt
+      - name: Audit the npm lock files (graph off)
+        if: steps.graph.outputs.state == 'disabled'
+        run: |
+          (cd apps/web && npm audit --omit=dev --audit-level=high)
+          (cd apps/web/e2e && npm audit --audit-level=high)
+
+  deploy-config:
+    name: Deploy config guard
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: The production compose file has no quiet fallback to the owner database role (audit SEC-02)
+        working-directory: infra/deploy
+        run: |
+          : > .env
+          export POSTGRES_PASSWORD=ci-placeholder ACS_RELEASE=ci
+          if docker compose -f compose.yml config -q 2>/dev/null; then
+            echo "::error::compose.yml renders without API_DB_USER/API_DB_PASSWORD: the API could fall back to the schema owner."
+            exit 1
+          fi
+          API_DB_USER=acs_app_api API_DB_PASSWORD=ci-placeholder docker compose -f compose.yml config -q
 
   codeql:
     name: CodeQL (${{ matrix.language }})

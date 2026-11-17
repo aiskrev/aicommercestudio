@@ -3,7 +3,8 @@
 # fail (GitHub e-mails the repository owner) and opens one issue labelled `uptime`, which gets a comment
 # on each further failure and is closed automatically when the site is healthy again.
 # `host` in the readiness answer is the server's own self-check (disk, backup age, jobs, containers;
-# infra/deploy/acs-selfcheck): anything but "ok" counts as a failure; the reasons are in
+# infra/deploy/acs-selfcheck): anything but "ok" counts as a failure, a missing `host` field included (SEC-10: a monitor that
+# loses its host signal must not go quietly green); the reasons are in
 # `journalctl -u acs-selfcheck` on the server.
 # GitHub disables scheduled workflows after 60 days without any repository activity; re-enable it in the
 # Actions tab if that happens. Schedules can start a few minutes late.
@@ -41,7 +42,7 @@ jobs:
             database=$(jq -r '.database // "missing"' <<<"$ready" 2>/dev/null || echo invalid)
             host=$(jq -r '.host // "not reported"' <<<"$ready" 2>/dev/null || echo invalid)
             summary="home page HTTP $home; API $status; database $database; server self-check $host"
-            [ "$home" = 200 ] && [ "$status" = ok ] && [ "$database" = ok ] && { [ "$host" = ok ] || [ "$host" = "not reported" ]; }
+            [ "$home" = 200 ] && [ "$status" = ok ] && [ "$database" = ok ] && [ "$host" = ok ]
           }
           for attempt in 1 2 3; do
             if probe; then

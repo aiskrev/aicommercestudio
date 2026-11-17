@@ -151,7 +151,13 @@ Switching on is a production change: it needs the owner's approval and a backup 
 5. Check: `/health/ready` answers, staff sign-in works, and
    `select usename from pg_stat_activity where application_name = '' and usename = 'acs_app_api'` shows the API.
 
-To go back: remove the two lines from `.env` and restart the API. Nothing else changes.
+Since audit SEC-02 the restricted login is mandatory: `compose.yml` stops with an error when `API_DB_USER` or
+`API_DB_PASSWORD` is missing (no quiet fallback to the owner), and the API process refuses to start in production on
+any role other than `acs_app_api`. **Before the first release that contains this change, check that both lines are in
+`/opt/ai-commerce-studio/.env` and that `python -m app.cli db-role-check` returns 0**; copy the new `compose.yml` only
+after that. To go back to the owner connection (emergency only): set `API_DB_USER` and `API_DB_PASSWORD` to the owner's
+values and add `ALLOW_OWNER_DATABASE_ROLE=true`, then restart the API. Customer accounts and the client portal still
+refuse the owner connection.
 
 Switched on in production on 2026-11-10 (release `sha-7f0bf95`): backup, `db-api-role`, a test login,
 then the restart. `pg_stat_activity` shows the API only as `acs_app_api`; the maintenance timer runs

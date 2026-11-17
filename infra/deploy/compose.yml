@@ -14,7 +14,7 @@ x-logging: &logging
     max-file: "5"
 
 x-api-env: &api-env
-  DATABASE_URL: postgresql+psycopg://${API_DB_USER:-${POSTGRES_USER:-acs}}:${API_DB_PASSWORD:-${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}}@db:5432/${POSTGRES_DB:-acs}
+  DATABASE_URL: postgresql+psycopg://${API_DB_USER:?Set API_DB_USER=acs_app_api in .env (restricted API role, SEC-02)}:${API_DB_PASSWORD:?Set API_DB_PASSWORD in .env}@db:5432/${POSTGRES_DB:-acs}
   APP_ENV: production
   ENABLE_API_DOCS: "false"
   SEED_SAMPLE_DATA: "false"
