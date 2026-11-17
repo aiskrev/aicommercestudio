@@ -127,6 +127,16 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [FORENSIC_PRODUCTION_DRIFT.md](docs/FORENSIC_PRODUCTION_DRIFT.md) | Local vs GitHub vs production: commits, image digests, migrations, infrastructure artefacts, drift |
 | [FORENSIC_REMEDIATION_BACKLOG.md](docs/FORENSIC_REMEDIATION_BACKLOG.md) | Prioritised corrections (not applied): fix, regression test, effort, decision owner |
 | [FORENSIC_RELEASE_DECISION.md](docs/FORENSIC_RELEASE_DECISION.md) | GO / CONDITIONAL_GO / NO_GO per question, readiness figures, top blockers, accuracy of earlier reporting |
+| [SECURITY_AUDIT_2026_11_17.md](docs/SECURITY_AUDIT_2026_11_17.md) | Second security audit (2026-11-17): baseline, what was verified and fixed, what was not |
+| [SECURITY_FINDINGS_REGISTER.md](docs/SECURITY_FINDINGS_REGISTER.md) | Findings SEC-01…SEC-12: severity, evidence, OWASP mapping, fix, tests, production status, remaining risk |
+| [SECURITY_REMEDIATION_CHANGELOG.md](docs/SECURITY_REMEDIATION_CHANGELOG.md) | Per-fix root cause, files, impact, tests, compatibility, deployment, rollback |
+| [SECURITY_TEST_EVIDENCE.md](docs/SECURITY_TEST_EVIDENCE.md) | Commands and results of the security-hardening branch, and what was not run |
+| [SECURITY_RELEASE_DECISION.md](docs/SECURITY_RELEASE_DECISION.md) | GO / CONDITIONAL_GO / NO_GO per surface after the security audit, and owner blockers |
+| [PRODUCTION_SECURITY_DRIFT.md](docs/PRODUCTION_SECURITY_DRIFT.md) | Repository vs production (read-only observation), what cannot be verified |
+| [SUPPLY_CHAIN_AUDIT.md](docs/SUPPLY_CHAIN_AUDIT.md) | Actions, dependencies, images, Dependabot, SBOM: state and what remains |
+| [DATABASE_SECURITY_REVIEW.md](docs/DATABASE_SECURITY_REVIEW.md) | Database roles, RLS (not FORCE), the mandatory restricted API role, owner checks |
+| [CLOUDFLARE_SECURITY_CHECKLIST.md](docs/CLOUDFLARE_SECURITY_CHECKLIST.md) | Cloudflare/Caddy/trusted-proxy controls: what is verified and what only the owner can confirm |
+| [UPLOAD_RELEASE_GATE_REVIEW.md](docs/UPLOAD_RELEASE_GATE_REVIEW.md) | File uploads: gate review, missing controls, conditions to switch on |
 | [UPLOAD_SECURITY_PLAN.md](docs/UPLOAD_SECURITY_PLAN.md) | File upload: transport fix, existing controls, scanner, quarantine, backup and restore plan, order of switching on |
 | [GITHUB_SETTINGS_PROPOSAL.md](docs/GITHUB_SETTINGS_PROPOSAL.md) | Repository settings proposed for approval: branch ruleset, Dependabot security updates, Actions policy |
 | [OBSERVABILITY_PLAN.md](docs/OBSERVABILITY_PLAN.md) | Logging, health, alerts and dashboards within the current budget: what exists, gaps, proposal |
