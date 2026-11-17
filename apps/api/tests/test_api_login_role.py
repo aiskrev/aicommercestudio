@@ -180,3 +180,17 @@ def test_production_logs_a_warning_when_the_api_is_not_on_the_restricted_role():
     assert "acs_app_api" in (database_role_warning(owner) or "")
     restricted = _production(database_url="postgresql+psycopg://acs_app_api:p@db/acs")
     assert database_role_warning(restricted) is None
+
+
+def test_production_api_refuses_to_start_on_the_owner_role_unless_accepted_explicitly():
+    """Audit SEC-02: fail closed. The owner connection needs a visible, explicit opt-in."""
+    import pytest
+
+    from app.main import create_app
+    from tests.test_security import _production
+
+    owner_url = "postgresql+psycopg://acs:p@db/acs"
+    with pytest.raises(RuntimeError, match="acs_app_api"):
+        create_app(_production(database_url=owner_url))
+    create_app(_production(database_url=owner_url, allow_owner_database_role=True))
+    create_app(_production(database_url="postgresql+psycopg://acs_app_api:p@db/acs"))

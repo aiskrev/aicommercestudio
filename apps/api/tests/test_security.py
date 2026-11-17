@@ -112,7 +112,7 @@ def test_database_errors_never_log_bound_parameters():
 
 
 def test_production_forces_secure_cookies_and_hides_docs():
-    settings = _production()
+    settings = _production(database_url="postgresql+psycopg://acs_app_api:p@localhost/db")
     assert settings.secure_cookies is True
     assert settings.docs_enabled is False
     with TestClient(create_app(settings)) as prod_client:

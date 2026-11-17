@@ -106,6 +106,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings.log_level)
     if warning := database_role_warning(settings):
+        if not settings.allow_owner_database_role:
+            # Fail closed (audit SEC-02): an API running as the schema owner is not under row-level security.
+            # Only the API process gets here; migrations and the maintenance job use the owner on purpose (the CLI).
+            raise RuntimeError(
+                f"{warning}. Set API_DB_USER=acs_app_api, or ALLOW_OWNER_DATABASE_ROLE=true to accept it."
+            )
         logger.warning("db_role_not_restricted", extra={"detail": warning})
     # Load and validate every assessment definition now: a broken definition stops the start-up
     # (and CI) instead of failing in a visitor's request.

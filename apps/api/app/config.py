@@ -226,6 +226,10 @@ class Settings(BaseSettings):
     # Owner attestation, set only after every item of docs/DNS_MAILBOX_VERIFICATION.md is checked with a date. Without
     # it a production start with accounts or billing on is refused (the acknowledgements depend on working mail).
     email_delivery_verified: bool = False
+    # Audit SEC-02. In production the API process refuses to start unless it connects as the restricted role
+    # `acs_app_api` (docs/SECURITY.md, H-1). This is the visible, temporary way back to the owner connection (set it in
+    # .env, restart the API); the owner connection still refuses customer accounts and the client portal.
+    allow_owner_database_role: bool = False
     # Rate limits of the legal workflows (app/accounts/limits.py: one shared PostgreSQL window, hashed keys, no IP
     # stored). Per authenticated account or workspace, not per IP. Technical limits, not business deadlines.
     # TEST STACK ONLY (docker-compose.legal-e2e.yml): raises the plan-based per-workspace request limit so a browser
