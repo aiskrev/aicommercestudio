@@ -84,7 +84,7 @@ jobs:
         run: |
           python3 -m venv "$RUNNER_TEMP/audit-venv"
           "$RUNNER_TEMP/audit-venv/bin/pip" install --quiet pip-audit==2.10.1
-          "$RUNNER_TEMP/audit-venv/bin/pip-audit" -r apps/api/requirements.txt
+          "$RUNNER_TEMP/audit-venv/bin/pip-audit" --require-hashes -r apps/api/requirements.txt
       - name: Audit the npm lock files (graph off)
         if: steps.graph.outputs.state == 'disabled'
         run: |

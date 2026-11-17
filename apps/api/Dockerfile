@@ -11,12 +11,12 @@ RUN groupadd --system app && useradd --system --gid app --home-dir /app app && c
 # Private storage of project documents (a volume in compose): owned by the API user, outside every web root.
 RUN mkdir -p /var/lib/acs/project-files && chown -R app:app /var/lib/acs && chmod 700 /var/lib/acs/project-files
 COPY requirements.txt ./
-RUN pip install -r requirements.txt
+RUN pip install --require-hashes -r requirements.txt
 
 # --- development / test image (includes pytest, ruff, pip-audit) ---------------
 FROM base AS dev
 COPY requirements-dev.txt ./
-RUN pip install -r requirements-dev.txt
+RUN pip install --require-hashes -r requirements-dev.txt
 COPY --chown=app:app . .
 USER app
 EXPOSE 8000
