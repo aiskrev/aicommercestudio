@@ -112,8 +112,16 @@ jobs:
         run: |
           curl -fsSL https://pkg.cloudflare.com/cloudflare-public-v2.gpg | sudo tee /usr/share/keyrings/cloudflare-public-v2.gpg > /dev/null
           echo 'deb [signed-by=/usr/share/keyrings/cloudflare-public-v2.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list > /dev/null
-          sudo apt-get update -qq
-          sudo apt-get install -y -q cloudflared
+          # The package index can list a version a few minutes before its .deb is served (404, Release run 44100095463).
+          # Retry with a fresh index; the step still fails after the last attempt, so nothing is skipped silently.
+          for attempt in 1 2 3 4; do
+            sudo apt-get update -qq
+            if sudo apt-get install -y -q cloudflared; then break; fi
+            if [ "$attempt" = 4 ]; then echo "::error::cloudflared could not be installed after $attempt attempts"; exit 1; fi
+            echo "::warning::cloudflared install failed (attempt $attempt); retrying in $((attempt * 20)) s"
+            sleep $((attempt * 20))
+          done
+          cloudflared --version
 
       - name: Configure SSH through the tunnel
         env:
