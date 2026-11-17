@@ -14,7 +14,7 @@
 | `npm audit` | `apps/web --omit=dev`: 0; `apps/web/e2e`: 0 (локално, 2026-11-17) | локален изход |
 | Dependabot | седмични PR за pip/npm/docker/actions; **security updates изключени** | `.github/dependabot.yml`; `gh api` — **собственик** |
 | Docker образи | API, уеб, e2e — по digest (този клон); `postgres:17-alpine` — таг | Dockerfile-ове, `compose.yml` |
-| Python пакети с хешове | **не** (`pip-compile --generate-hashes` не е направено; променя изграждането) | `apps/api/requirements*.txt` |
+| Python пакети с хешове | **да** (SEC-09): `requirements.in` → `requirements.txt` с `--generate-hashes` (49 пакета), `requirements-dev.txt` върху него; Docker и `pip-audit` с `--require-hashes` | `apps/api/requirements*.in/.txt`, `apps/api/Dockerfile` |
 | Сканиране на образи (Trivy/Grype) | **не е изпълнявано** в този одит | – |
 | Подписи на образи/произход | **няма** | – |
 
@@ -24,7 +24,7 @@
 - **Playwright 1.65.0 → 1.65.1**: образът и npm пакетът трябва да съвпадат (поправено в #99).
 
 ## Остава
-1. `pip-compile --generate-hashes` (отделен PR и преглед).
+1. (изпълнено) `pip-compile --generate-hashes`; остава да се види първият Dependabot PR за pip след сливането (той трябва да обнови `requirements.in` и `requirements.txt` заедно).
 2. Digest на `postgres` в `compose.yml` — само след като собственикът потвърди кой образ върви.
 3. Включване на Dependency graph, Dependabot security updates и „Require actions to be pinned to a full-length SHA“ (собственик).
 4. Сканиране на образите в CI.

@@ -20,3 +20,14 @@
 - Тестове на конкурентност/рестарт на ограничителя на честота.
 - Скенер на контейнери, Lighthouse/CSP Report-Only, Playwright e2e за BG/EN, достъпност — не са пускани за тази промяна.
 - Всичко върху реалния Cloudflare, сървър, пощенски доставчик и Stripe.
+
+## SEC-09: Python пакети с хешове (добавено в същия клон)
+| Проверка | Резултат |
+| --- | --- |
+| Dev образът се сглобява с `pip install --require-hashes` | мина (49 пакета runtime, 75 dev) |
+| Умишлено развален хеш в копие на `requirements.txt` | pip: „THESE PACKAGES DO NOT MATCH THE HASHES“ — отказва |
+| `pip check` | без счупени зависимости |
+| `pip-audit --require-hashes` за `requirements.txt` и `requirements-dev.txt` | „No known vulnerabilities found“ |
+| `ruff check` | чисто |
+| API `pytest` (пълният набор, изолирана база) върху образа с хешове | **1800 минали, 1 пропуснат** (936 s), същото като преди |
+| Реално изпълнение на GitHub CI и първият Dependabot PR за pip | виж PR — **не е проверено** локално |
