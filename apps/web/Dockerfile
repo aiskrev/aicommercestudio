@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1
-FROM node:26-alpine AS deps
+FROM node:26-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5 AS deps
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
 # --- development / test image ---------------------------------------------------------
-FROM node:26-alpine AS dev
+FROM node:26-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5 AS dev
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
@@ -15,7 +15,7 @@ EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
 # --- production build -------------------------------------------------------------------
-FROM node:26-alpine AS builder
+FROM node:26-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5 AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production
 ARG SITE_URL=http://localhost:3000
@@ -30,7 +30,7 @@ COPY . .
 RUN npm run build
 
 # --- runtime image (standalone output, non-root) ----------------------------------------
-FROM node:26-alpine AS runner
+FROM node:26-alpine@sha256:6bd9ab43c0ec0190ca7b2d193906cb8b7edf6e7f4afa43ddeccd6452710bffb5 AS runner
 WORKDIR /app
 ARG SITE_URL=http://localhost:3000
 ARG PUBLIC_CONTACT_EMAIL=
