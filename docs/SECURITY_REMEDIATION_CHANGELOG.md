@@ -1,0 +1,35 @@
+# Дневник на корекциите по сигурност — 2026-11-17
+
+Клон `fix/security-hardening-2026-11-17`. Всяка промяна е малък комит. Нищо не е слято или разгърнато.
+
+## SEC-01 — Dependency review вече не се пропуска тихо
+- **Причина:** при изключен Dependency graph сондата връщаше 404 и стъпката на action-а се пропускаше; задачата оставаше „успешна“ и задължителна.
+- **Файлове:** `.github/workflows/security.yml`.
+- **Ефект върху сигурността:** задължителната проверка не може да мине без анализ: 404 → `pip-audit` и `npm audit` върху lock файловете (пада при находки); 401/403/5xx/без отговор → падане.
+- **Тестове:** логиката на сондата е изпълнена локално с подменен `gh` за 200/404/403/502; `pip-audit` и `npm audit` върху текущите lock файлове — чисти. Реално изпълнение — на PR в GitHub.
+- **Остатъчен риск:** без граф няма проверка на лицензи; `pip-audit` няма праг на тежест.
+- **Съвместимост:** името на проверката `Dependency review` е непроменено (ruleset `27436434`).
+- **Внедряване:** с сливането. **Отмяна:** отмяна на комита.
+
+## SEC-02 — Без тихо връщане към собственика на базата
+- **Причина:** `compose.yml` връщаше `POSTGRES_USER`, ако `API_DB_USER` липсва; приложението само предупреждаваше.
+- **Файлове:** `infra/deploy/compose.yml`, `infra/deploy/production.env.example`, `infra/deploy/README.md`, `apps/api/app/config.py` (`allow_owner_database_role`), `apps/api/app/main.py`, `.github/workflows/security.yml` (`Deploy config guard`), тестове.
+- **Ефект:** API процесът в производство не стартира, ако не е `acs_app_api`; compose отказва да се изобрази без променливите.
+- **Тестове:** `test_production_api_refuses_to_start_on_the_owner_role_unless_accepted_explicitly`, обновен `test_production_forces_secure_cookies_and_hides_docs`; `docker compose config` ръчно с/без променливите; CI `Deploy config guard`.
+- **Остатъчен риск:** не е проверено къде **сега** върви производственият API (нужно е `db-role-check`).
+- **Внедряване — изисква собственика:** преди Release потвърдете `API_DB_USER`/`API_DB_PASSWORD` в `.env` на сървъра и `db-role-check` = 0; новият `compose.yml` се копира на сървъра ръчно.
+- **Отмяна:** отмяна на комита; аварийно — `ALLOW_OWNER_DATABASE_ROLE=true` в `.env` (виж README).
+
+## SEC-03 — Предложение за строг ruleset (не е приложено)
+- **Файл:** `infra/github/ruleset-main-strict.json` (1 одобрение, код-собственик, одобрение след последния push, проверка `Deploy config guard`).
+- **Забележка:** проверката `Deploy config guard` трябва да се е изпълнила поне веднъж преди да се избере като задължителна.
+
+## SEC-09 — Образи по digest
+- **Файлове:** `apps/api/Dockerfile`, `apps/web/Dockerfile`, `apps/web/e2e/Dockerfile`.
+- **Ефект:** сборката не зависи от подмяна на тага; Dependabot (docker) обновява digest-а.
+- **Не е закрепен:** `postgres:17-alpine` в `compose.yml` — вж. [DATABASE_SECURITY_REVIEW.md](DATABASE_SECURITY_REVIEW.md).
+
+## SEC-10 — Наблюдението пада при липсващ сигнал от сървъра
+- **Файл:** `.github/workflows/uptime.yml`: `host` трябва да е `ok`; „not reported“ вече е повреда.
+- **Проверка:** производството връща `"host":"ok"` (прочетено днес), така че нормалното състояние остава зелено.
+- **Отмяна:** отмяна на комита.
