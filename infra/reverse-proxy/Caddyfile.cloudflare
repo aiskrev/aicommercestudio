@@ -15,7 +15,10 @@
 }
 
 ai-commercestudio.com {
-	tls /etc/caddy/origin/origin.crt /etc/caddy/origin/origin.key
+	tls /etc/caddy/origin/origin.crt /etc/caddy/origin/origin.key {
+		# Explicit (audit TLS-02): the origin leg accepts TLS 1.2 and 1.3 only, whatever the Caddy default becomes.
+		protocols tls1.2 tls1.3
+	}
 
 	encode zstd gzip
 
@@ -45,6 +48,9 @@ ai-commercestudio.com {
 }
 
 www.ai-commercestudio.com {
-	tls /etc/caddy/origin/origin.crt /etc/caddy/origin/origin.key
+	tls /etc/caddy/origin/origin.crt /etc/caddy/origin/origin.key {
+		protocols tls1.2 tls1.3
+	}
+	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 	redir https://ai-commercestudio.com{uri} permanent
 }
