@@ -4,6 +4,7 @@ python -m app.cli seed                      # bootstrap admin (+ synthetic data 
 python -m app.cli create-admin --email x@y  # password read from ADMIN_PASSWORD env or prompted
 python -m app.cli set-password --email x@y  # reset a password, clear lockout, revoke sessions
 python -m app.cli reset-mfa --email x@y     # remove a lost second factor (TOTP + recovery codes), revoke sessions
+python -m app.cli mfa-status                # read-only: how many staff accounts have a second factor
 python -m app.cli maintenance [--dry-run]   # GDPR retention + expired session cleanup
 python -m app.cli outbox-run                # Send due transactional e-mail and report delivery status
 python -m app.cli purge-synthetic           # remove synthetic development data
@@ -326,6 +327,32 @@ def cmd_reset_mfa(args: argparse.Namespace) -> int:
     return 0
 
 
+def mfa_status(db: Session) -> dict[str, object]:
+    """Read-only enrolment overview for the MFA roll-out (no secrets, no e-mail addresses): how many active staff
+    accounts have a second factor, and whether ADMIN_MFA_REQUIRED is on. Switch it on only when `missing` is 0."""
+    active = list(db.scalars(select(AdminUser).where(AdminUser.is_active.is_(True))))
+    enrolled = sum(1 for user in active if user.mfa_enabled)
+    return {
+        "required": get_settings().admin_mfa_required,
+        "active_accounts": len(active),
+        "enrolled": enrolled,
+        "missing": len(active) - enrolled,
+        "fewest_recovery_codes": min(
+            (admin_mfa.recovery_codes_remaining(db, user) for user in active if user.mfa_enabled), default=0
+        ),
+    }
+
+
+def cmd_mfa_status(_: argparse.Namespace) -> int:
+    with get_sessionmaker()() as db:
+        status = mfa_status(db)
+    for key, value in status.items():
+        _print(f"{key}: {value}")
+    if not status["required"] and status["missing"] == 0 and status["active_accounts"]:
+        _print("Every active account has a second factor: ADMIN_MFA_REQUIRED=true can be switched on.")
+    return 0
+
+
 def cmd_purge_synthetic(_: argparse.Namespace) -> int:
     settings = get_settings()
     with get_sessionmaker()() as db:
@@ -639,6 +666,9 @@ def main(argv: list[str] | None = None) -> int:
     mfa = sub.add_parser("reset-mfa", help="Remove a staff account's second factor (lost device); revokes sessions")
     mfa.add_argument("--email", required=True)
     mfa.set_defaults(func=cmd_reset_mfa)
+    sub.add_parser("mfa-status", help="Staff second-factor enrolment overview (read-only)").set_defaults(
+        func=cmd_mfa_status
+    )
     role = sub.add_parser("set-role", help="Set a staff role: admin (all), editor or viewer (service catalogue only)")
     role.add_argument("--email", required=True)
     role.add_argument("--role", required=True, choices=[r.value for r in AdminRole])

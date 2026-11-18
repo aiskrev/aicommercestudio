@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     # Staff TOTP. Off by default so a deploy never locks anyone out; when on, every staff account
     # without a second factor must enrol right after the password, and MFA cannot be switched off.
     admin_mfa_required: bool = False
+    # Where request counters live. "memory": per process, lost on restart (enough for the one-worker deployment).
+    # "postgres": shared by every API process and kept across restarts (audit SEC-05); needed when WEB_CONCURRENCY > 1.
+    rate_limit_backend: Literal["memory", "postgres"] = "memory"
     trust_proxy_headers: bool = True
     enable_api_docs: bool | None = None
     # Result file of the host self-check (infra/deploy/acs-selfcheck), mounted read-only on the server.

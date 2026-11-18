@@ -392,3 +392,18 @@ def test_cli_reset_mfa_removes_factor_and_revokes_sessions(client, mfa_admin, db
     assert cli_main(["reset-mfa", "--email", ADMIN_EMAIL]) == 0
     assert "sessions revoked: 1" in capsys.readouterr().out
     assert cli_main(["reset-mfa", "--email", "nobody@example.com"]) == 1
+
+
+def test_cli_mfa_status_counts_enrolment_without_listing_anyone(admin_user, db, settings, capsys):
+    from app.cli import cmd_mfa_status, mfa_status
+
+    before = mfa_status(db)
+    assert (before["active_accounts"], before["enrolled"], before["missing"]) == (1, 0, 1)
+    admin_user.mfa_enabled = True
+    db.commit()
+    after = mfa_status(db)
+    assert (after["enrolled"], after["missing"]) == (1, 0)
+    assert cmd_mfa_status(None) == 0
+    out = capsys.readouterr().out
+    assert "missing: 0" in out and "ADMIN_MFA_REQUIRED=true can be switched on" in out
+    assert ADMIN_EMAIL not in out
