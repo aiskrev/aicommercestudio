@@ -134,6 +134,9 @@ services:
       PROJECT_UPLOAD_MAX_BYTES: ${PROJECT_UPLOAD_MAX_BYTES:-}
       TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
       CATALOGUE_REVALIDATE_SECRET: ${CATALOGUE_REVALIDATE_SECRET:-}
+      # /.well-known/security.txt (RFC 9116) is published only when both are set to values the owner approved; empty = 404.
+      SECURITY_CONTACT: ${SECURITY_CONTACT:-}
+      SECURITY_TXT_EXPIRES: ${SECURITY_TXT_EXPIRES:-}
     depends_on:
       api:
         condition: service_healthy

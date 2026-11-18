@@ -77,23 +77,33 @@ class SharedRateLimiter:
             db.commit()
 
 
+class SharedLimiterUnavailable(RuntimeError):
+    """The shared counter could not be read or written and the caller asked to fail closed."""
+
+
 class Limiter:
     """The limiter the routes use: the in-memory one (default), or the shared one with RATE_LIMIT_BACKEND=postgres.
 
-    If the shared store cannot be reached the hit is counted in memory instead, so a database fault never
-    removes the limit and never turns into a new way of failing requests.
+    If the shared store cannot be reached, an ordinary route counts the hit in memory instead (a bounded, per-process
+    limit: a database fault never removes the limit or fails a harmless request). A sensitive route passes
+    `strict=True` (sign-in, MFA, paid AI calls): it raises `SharedLimiterUnavailable` and the caller answers 503,
+    because with several workers the per-process fallback would multiply the allowance.
     """
 
     def __init__(self) -> None:
         self.memory = RateLimiter()
         self.shared = SharedRateLimiter()
 
-    def hit(self, key: str, limit: int, window_seconds: int, now: float | None = None) -> RateLimitResult:
+    def hit(
+        self, key: str, limit: int, window_seconds: int, now: float | None = None, *, strict: bool = False
+    ) -> RateLimitResult:
         if now is None and get_settings().rate_limit_backend == "postgres":
             try:
                 return self.shared.hit(key, limit, window_seconds)
-            except Exception:  # noqa: BLE001 - any store fault degrades to the per-process limit
-                logger.warning("shared_rate_limit_unavailable", exc_info=True)
+            except Exception as exc:  # noqa: BLE001 - any store fault is handled below, never shown to the client
+                logger.warning("shared_rate_limit_unavailable", extra={"strict": strict}, exc_info=True)
+                if strict:
+                    raise SharedLimiterUnavailable from exc
         return self.memory.hit(key, limit, window_seconds, now)
 
     def reset(self) -> None:

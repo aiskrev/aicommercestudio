@@ -118,3 +118,57 @@ def test_production_refuses_several_workers_with_per_process_counters():
     assert "WEB_CONCURRENCY=2" in rate_limit_backend_error(_production(), "2")
     assert rate_limit_backend_error(_production(rate_limit_backend="postgres"), "4") is None
     assert rate_limit_backend_error(_production(), "not-a-number") is None
+
+
+# ---------------------------------------------------------------------- sensitive routes fail closed (strict)
+
+
+@pytest.fixture
+def store_down(shared, monkeypatch):
+    """The shared counter is unreachable; `restore()` brings it back."""
+    from app.accounts import limits
+
+    real = limits.consume
+
+    def broken(*_args, **_kwargs):
+        raise RuntimeError("database unavailable")
+
+    monkeypatch.setattr(limits, "consume", broken)
+    return lambda: monkeypatch.setattr(limits, "consume", real)
+
+
+def test_a_strict_hit_fails_closed_when_the_store_is_down(store_down):
+    from app.rate_limit import SharedLimiterUnavailable
+
+    with pytest.raises(SharedLimiterUnavailable):
+        limiter.hit("strict-key", 5, 60, strict=True)
+    assert limiter.hit("ordinary-key", 5, 60).allowed  # an ordinary route keeps working in degraded mode
+
+
+def test_enforce_rate_limit_answers_503_for_a_strict_route_and_recovers(store_down):
+    with pytest.raises(ApiError) as caught:
+        enforce_rate_limit("strict-route", 3, 60, strict=True)
+    assert caught.value.status_code == 503 and caught.value.code == "rate_limit_unavailable"
+    assert caught.value.headers["Retry-After"] == "5" and caught.value.headers["Cache-Control"] == "no-store"
+    enforce_rate_limit("ordinary-route", 3, 60)  # no exception
+    store_down()  # the database is back: the shared counter is used again, with its persisted state
+    enforce_rate_limit("strict-route", 3, 60, strict=True)
+    with get_sessionmaker()() as db:
+        assert db.execute(text("SELECT count(*) FROM rate_limit_buckets")).scalar() == 1
+
+
+def test_admin_sign_in_is_refused_with_503_while_the_store_is_down(client, admin_user, store_down):
+    response = client.post("/api/admin/auth/login", json={"email": "someone@example.com", "password": "x" * 12})
+    assert response.status_code == 503
+    assert response.json()["code"] == "rate_limit_unavailable"
+    assert "someone@example.com" not in response.text
+
+
+def test_a_public_read_still_works_while_the_store_is_down(client, store_down):
+    assert client.get("/api/public/catalogue").status_code != 503
+
+
+def test_every_api_answer_is_marked_no_store(client):
+    for path in ("/api/health", "/api/health/ready", "/api/public/catalogue"):
+        response = client.get(path)
+        assert response.headers.get("Cache-Control") == "no-store", path

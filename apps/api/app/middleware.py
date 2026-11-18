@@ -52,8 +52,9 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
         if self.settings.is_production:
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-        if request.url.path.startswith("/api/admin"):
-            response.headers.setdefault("Cache-Control", "no-store")
+        # Every API answer is dynamic or personal: nothing here may be kept by a cache (audit N-03). A route that
+        # sets its own Cache-Control keeps it; no API route asks for public caching.
+        response.headers.setdefault("Cache-Control", "no-store")
 
         logger.info(
             "request",

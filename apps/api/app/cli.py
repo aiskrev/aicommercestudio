@@ -337,17 +337,17 @@ def mfa_status(db: Session) -> dict[str, object]:
         "active_accounts": len(active),
         "enrolled": enrolled,
         "missing": len(active) - enrolled,
-        "fewest_recovery_codes": min(
-            (admin_mfa.recovery_codes_remaining(db, user) for user in active if user.mfa_enabled), default=0
-        ),
     }
 
 
 def cmd_mfa_status(_: argparse.Namespace) -> int:
     with get_sessionmaker()() as db:
         status = mfa_status(db)
-    for key, value in status.items():
-        _print(f"{key}: {value}")
+    # Only whole numbers and one flag are printed, each through an explicit conversion: nothing from an account row.
+    _print(f"required: {bool(status['required'])}")
+    _print(f"active_accounts: {int(status['active_accounts'])}")
+    _print(f"enrolled: {int(status['enrolled'])}")
+    _print(f"missing: {int(status['missing'])}")
     if not status["required"] and status["missing"] == 0 and status["active_accounts"]:
         _print("Every active account has a second factor: ADMIN_MFA_REQUIRED=true can be switched on.")
     return 0
