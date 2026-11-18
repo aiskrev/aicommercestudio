@@ -439,6 +439,23 @@ def test_an_oversized_file_is_refused_and_nothing_is_kept(
     assert db.scalar(select(func.count()).select_from(ProjectDocument)) == 0
 
 
+def test_a_workspace_cannot_store_more_than_its_quota_and_nothing_is_kept_when_refused(
+    customer, admin_client, configured_lead, docs, monkeypatch, db
+):
+    project = active_project(admin_client, configured_lead)
+    first, second = pdf("one"), pdf("two")
+    monkeypatch.setattr(get_settings(), "project_workspace_quota_bytes", len(first) + len(second) - 1)
+    assert staff_upload(admin_client, project["id"], first).status_code == 201
+    refused = staff_upload(admin_client, project["id"], second)
+    assert refused.status_code == 413 and refused.json()["code"] == "workspace_quota_exceeded"
+    assert client_upload(customer, project["id"], second).status_code == 413  # the customer side counts the same bytes
+    assert len(stored_files(docs)) == 1
+    assert db.scalar(select(func.count()).select_from(ProjectDocumentVersion)) == 1
+    assert db.scalar(select(func.sum(ProjectDocumentVersion.size_bytes))) == len(first)
+    monkeypatch.setattr(get_settings(), "project_workspace_quota_bytes", 10 * len(first) + 10 * len(second))
+    assert staff_upload(admin_client, project["id"], second).status_code == 201  # room again: accepted
+
+
 @pytest.mark.parametrize(
     "filename",
     [

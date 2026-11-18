@@ -204,6 +204,9 @@ class Settings(BaseSettings):
     # A directory outside every web root, owned by the API user (a Docker volume in compose).
     project_storage_dir: str = "/var/lib/acs/project-files"
     project_upload_max_bytes: int = Field(default=10 * 1024 * 1024, ge=1024, le=50 * 1024 * 1024)
+    # Total stored bytes of one workspace (every version of every document, all its projects). A new file that would
+    # go over is refused with 413 `workspace_quota_exceeded` (audit upload U-6; the owner sets the real figure).
+    project_workspace_quota_bytes: int = Field(default=200 * 1024 * 1024, ge=1024 * 1024)
     project_documents_per_project: int = Field(default=100, ge=1)
     project_versions_per_document: int = Field(default=20, ge=1)
     # Nothing is downloadable by a customer until a scan result says "clean" (no scanner ships with the project).

@@ -430,6 +430,18 @@ def upload(
             store.delete(key)
             return document, latest, False
 
+        used = db.scalar(
+            select(func.coalesce(func.sum(ProjectDocumentVersion.size_bytes), 0))
+            .select_from(ProjectDocumentVersion)
+            .join(ProjectDocument, ProjectDocument.id == ProjectDocumentVersion.document_id)
+            .join(CommercialProject, CommercialProject.id == ProjectDocument.project_id)
+            .where(CommercialProject.workspace_id == project.workspace_id)
+        )
+        if int(used or 0) + size > settings.project_workspace_quota_bytes:
+            # Checked under this project's lock only: two projects of one workspace uploading at the same moment can
+            # overshoot by one file; the per-file limit bounds that.
+            raise _error(413, "workspace_quota_exceeded", "The storage space of this workspace is used up.")
+
         number = (latest.number if latest else 0) + 1
         version = ProjectDocumentVersion(
             document_id=document.id,
