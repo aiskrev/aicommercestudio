@@ -133,6 +133,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [SECURITY_TEST_EVIDENCE.md](docs/SECURITY_TEST_EVIDENCE.md) | Commands and results of the security-hardening branch, and what was not run |
 | [SECURITY_RELEASE_DECISION.md](docs/SECURITY_RELEASE_DECISION.md) | GO / CONDITIONAL_GO / NO_GO per surface after the security audit, and owner blockers |
 | [docs/audits/SECURITY_AUDIT_2026-11-18.md](docs/audits/SECURITY_AUDIT_2026-11-18.md) | Third security pass (2026-11-18): findings, remediation, test evidence, production verification, owner actions and release decision in `docs/audits/*-2026-11-18.md` |
+| [docs/audits/TLS_HARDENING_2026-11-18.md](docs/audits/TLS_HARDENING_2026-11-18.md) | TLS finding (Cloudflare accepts TLS 1.0/1.1), evidence, the change for the owner, `scripts/verify-tls.sh`, origin and deployment plan (`docs/audits/*_2026-11-18.md`) |
 | [PRODUCTION_SECURITY_DRIFT.md](docs/PRODUCTION_SECURITY_DRIFT.md) | Repository vs production (read-only observation), what cannot be verified |
 | [SUPPLY_CHAIN_AUDIT.md](docs/SUPPLY_CHAIN_AUDIT.md) | Actions, dependencies, images, Dependabot, SBOM: state and what remains |
 | [DATABASE_SECURITY_REVIEW.md](docs/DATABASE_SECURITY_REVIEW.md) | Database roles, RLS (not FORCE), the mandatory restricted API role, owner checks |
