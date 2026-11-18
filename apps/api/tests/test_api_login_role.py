@@ -194,3 +194,31 @@ def test_production_api_refuses_to_start_on_the_owner_role_unless_accepted_expli
         create_app(_production(database_url=owner_url))
     create_app(_production(database_url=owner_url, allow_owner_database_role=True))
     create_app(_production(database_url="postgresql+psycopg://acs_app_api:p@db/acs"))
+
+
+def test_a_pooled_connection_carries_no_tenant_context_to_the_next_request(tenants):
+    """SET LOCAL ROLE / set_config(..., true) end with the transaction: the next user of the same pooled
+    connection is the restricted login role again, with no organisation, and tenant tables stay closed."""
+    org = tenants["tenant-a"]["org"]
+    with get_sessionmaker()() as first:
+        rls.bind(first, organization_id=org)
+        assert first.execute(text("SELECT current_user")).scalar() == "acs_app_runtime"
+        assert first.execute(text("SELECT current_setting('app.ops_org', true)")).scalar() == str(org)
+        first.commit()
+    for _ in range(3):  # the pool hands the same connection back; check several checkouts
+        with get_sessionmaker()() as second:
+            assert second.execute(text("SELECT current_user")).scalar() == API_ROLE
+            assert second.execute(text("SELECT coalesce(current_setting('app.ops_org', true), '')")).scalar() == ""
+            with pytest.raises(DBAPIError, match="permission denied"):
+                second.execute(text("SELECT 1 FROM ops_organizations LIMIT 1"))
+
+
+def test_a_rolled_back_binding_does_not_leak_either(tenants):
+    org = tenants["tenant-b"]["org"]
+    with get_sessionmaker()() as first:
+        rls.bind(first, organization_id=org)
+        first.execute(text("SELECT 1"))
+        first.rollback()
+    with get_sessionmaker()() as second:
+        assert second.execute(text("SELECT current_user")).scalar() == API_ROLE
+        assert second.execute(text("SELECT coalesce(current_setting('app.ops_org', true), '')")).scalar() == ""

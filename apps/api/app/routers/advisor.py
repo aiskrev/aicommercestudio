@@ -52,9 +52,14 @@ def advisor_rate_limit(request: Request) -> None:
     """Runs before body validation, so invalid requests count too (protects AI provider spend)."""
     settings = get_settings()
     enforce_rate_limit(
-        f"advisor:{client_ip(request)}", settings.advisor_rate_limit, settings.advisor_rate_window_seconds
+        f"advisor:{client_ip(request)}",
+        settings.advisor_rate_limit,
+        settings.advisor_rate_window_seconds,
+        strict=True,
     )
-    enforce_rate_limit("advisor:global", settings.advisor_global_rate_limit, settings.advisor_rate_window_seconds)
+    enforce_rate_limit(
+        "advisor:global", settings.advisor_global_rate_limit, settings.advisor_rate_window_seconds, strict=True
+    )
 
 
 @router.get("/status", response_model=AdvisorStatus)

@@ -37,7 +37,8 @@ def bucket_key(scope: str, value: str | None) -> str:
     return hashlib.sha256(material.encode()).hexdigest()
 
 
-def hit(scope: str, value: str | None, limit: int, window_seconds: int) -> None:
+def consume(scope: str, value: str | None, limit: int, window_seconds: int) -> tuple[bool, int]:
+    """Count one hit in the shared fixed window; returns (allowed, retry_after seconds)."""
     now = utcnow()
     with get_sessionmaker()() as db:
         row = db.execute(
@@ -46,7 +47,13 @@ def hit(scope: str, value: str | None, limit: int, window_seconds: int) -> None:
         ).one()
         db.commit()
     if row.hits > limit:
-        retry_after = max(1, math.ceil(window_seconds - (now - row.window_start).total_seconds()))
+        return False, max(1, math.ceil(window_seconds - (now - row.window_start).total_seconds()))
+    return True, 0
+
+
+def hit(scope: str, value: str | None, limit: int, window_seconds: int) -> None:
+    allowed, retry_after = consume(scope, value, limit, window_seconds)
+    if not allowed:
         raise ApiError(
             status.HTTP_429_TOO_MANY_REQUESTS,
             "Too many attempts. Please try again later.",

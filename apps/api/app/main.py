@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from typing import Any
 
 from fastapi import FastAPI, Request
@@ -101,10 +102,26 @@ def database_role_warning(settings: Settings) -> str | None:
     return None
 
 
+def rate_limit_backend_error(settings: Settings, workers: str | None) -> str | None:
+    """Per-process counters stop being a limit once a second API process exists (audit SEC-05)."""
+    try:
+        count = int(workers or 1)
+    except ValueError:
+        return None
+    if settings.is_production and count > 1 and settings.rate_limit_backend != "postgres":
+        return f"WEB_CONCURRENCY={count} with in-memory rate limits: each process would count separately"
+    return None
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     explicit_settings = settings  # None: the size guard then reads the live settings on every request
     settings = settings or get_settings()
     configure_logging(settings.log_level)
+    if problem := rate_limit_backend_error(settings, os.environ.get("WEB_CONCURRENCY")):
+        raise RuntimeError(f"{problem}. Set RATE_LIMIT_BACKEND=postgres, or run one API process.")
+    if settings.is_production and not settings.admin_mfa_required:
+        # Not a start-up failure (that would lock staff out): check `python -m app.cli mfa-status`, then switch it on.
+        logger.warning("admin_mfa_not_required", extra={"detail": "ADMIN_MFA_REQUIRED is off; run mfa-status"})
     if warning := database_role_warning(settings):
         if not settings.allow_owner_database_role:
             # Fail closed (audit SEC-02): an API running as the schema owner is not under row-level security.

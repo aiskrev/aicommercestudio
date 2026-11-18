@@ -26,11 +26,12 @@ from app.deps import (
     client_ip,
     client_ip_hash,
     enforce_rate_limit,
+    limit_check_unavailable,
     rate_limited,
 )
 from app.errors import ApiError
 from app.models import AdminMfaPending, AdminSession, AdminUser, utcnow
-from app.rate_limit import limiter
+from app.rate_limit import SharedLimiterUnavailable, limiter
 from app.schemas import (
     AdminSessionInfo,
     AdminUserOut,
@@ -87,8 +88,12 @@ def _email_fingerprint(email: str) -> str:
 
 def _enforce_login_limits(request: Request, settings: Settings, email: str) -> None:
     """The same buckets for the password and the MFA step: a code guess costs as much as a password guess."""
-    enforce_rate_limit(f"login-ip:{client_ip(request)}", settings.login_rate_limit, settings.login_rate_window_seconds)
-    enforce_rate_limit(f"login-email:{email.lower()}", settings.login_rate_limit, settings.login_rate_window_seconds)
+    enforce_rate_limit(
+        f"login-ip:{client_ip(request)}", settings.login_rate_limit, settings.login_rate_window_seconds, strict=True
+    )
+    enforce_rate_limit(
+        f"login-email:{email.lower()}", settings.login_rate_limit, settings.login_rate_window_seconds, strict=True
+    )
 
 
 def _register_failure(db: DbSession, settings: Settings, user: AdminUser, ip_hash: str | None) -> bool:
@@ -187,7 +192,13 @@ def login(payload: LoginIn, request: Request, response: Response, db: DbSession,
             _register_failure(db, settings, user, ip_hash)
         else:
             # Unknown e-mails get the same lockout behaviour, tracked in memory.
-            result = limiter.hit(f"login-unknown:{email}", settings.login_lockout_threshold, lockout_seconds)
+            try:
+                result = limiter.hit(
+                    f"login-unknown:{email}", settings.login_lockout_threshold, lockout_seconds, strict=True
+                )
+            except SharedLimiterUnavailable:
+                db.commit()
+                raise limit_check_unavailable() from None
             if not result.allowed:
                 db.commit()
                 raise rate_limited(result.retry_after)

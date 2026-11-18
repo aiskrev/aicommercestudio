@@ -66,6 +66,9 @@ simultaneous decisions wait on a row lock and one is recorded. The decision and 
   with `X-Content-Type-Options: nosniff`, `Cache-Control: no-store` and the API-wide `default-src 'none'` policy.
 * **Size**: `PROJECT_UPLOAD_MAX_BYTES` (10 MB by default, 50 MB at most), refused from `Content-Length` and again while the
   body streams; nothing is left on disk. Limits per project (100 documents) and per document (20 versions).
+* **Workspace quota**: `PROJECT_WORKSPACE_QUOTA_BYTES` (200 MiB by default) caps the stored bytes of every version of every
+  document in one workspace; a file that would go over is refused with 413 `workspace_quota_exceeded` and nothing is kept.
+  The owner sets the real figure before uploads are switched on.
 * **Safe names and keys**: a file name is cleaned (no path, no control characters or separators, at most 120 characters)
   for display only. The storage key is made by the server (`<project>/<document>/<random>`, hex), must match a strict
   pattern, and its resolved path must stay inside the root; tests try traversal keys.

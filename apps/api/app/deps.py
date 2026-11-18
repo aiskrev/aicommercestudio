@@ -15,7 +15,7 @@ from app.config import Settings, get_settings
 from app.db import get_db
 from app.errors import ApiError
 from app.models import AdminMfaPending, AdminRole, AdminSession, AdminUser, utcnow
-from app.rate_limit import limiter
+from app.rate_limit import SharedLimiterUnavailable, limiter
 from app.security import hash_ip, hash_token, tokens_match
 
 SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
@@ -40,10 +40,24 @@ def client_ip_hash(request: Request) -> str | None:
     return hash_ip(client_ip(request), get_settings().secret_key)
 
 
-def enforce_rate_limit(key: str, limit: int, window_seconds: int) -> None:
-    result = limiter.hit(key, limit, window_seconds)
+def enforce_rate_limit(key: str, limit: int, window_seconds: int, *, strict: bool = False) -> None:
+    """`strict=True` for sign-in, MFA and paid AI calls: if the shared counter is down, answer 503 instead of
+    falling back to a per-process count (audit SEC-05)."""
+    try:
+        result = limiter.hit(key, limit, window_seconds, strict=strict)
+    except SharedLimiterUnavailable:
+        raise limit_check_unavailable() from None
     if not result.allowed:
         raise rate_limited(result.retry_after)
+
+
+def limit_check_unavailable() -> ApiError:
+    return ApiError(
+        status.HTTP_503_SERVICE_UNAVAILABLE,
+        "Проверката на лимита е временно недостъпна. Моля, опитайте отново след малко.",
+        "rate_limit_unavailable",
+        headers={"Retry-After": "5", "Cache-Control": "no-store"},
+    )
 
 
 def rate_limited(retry_after: int) -> ApiError:

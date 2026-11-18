@@ -3,7 +3,7 @@
   "rules": [
     {
       "description": "1. Customer sign-in and recovery",
-      "expression": "http.request.method eq \"POST\" and (http.request.uri.path eq \"/api/accounts/login\" or http.request.uri.path eq \"/api/accounts/register\" or http.request.uri.path eq \"/api/accounts/password/forgot\")",
+      "expression": "http.request.method eq \"POST\" and (http.request.uri.path eq \"/api/accounts/login\" or http.request.uri.path eq \"/api/accounts/register\" or http.request.uri.path eq \"/api/accounts/password/forgot\" or http.request.uri.path eq \"/api/accounts/password/reset\")",
       "action": "block",
       "ratelimit": {
         "characteristics": [

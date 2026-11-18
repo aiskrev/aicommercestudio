@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     # Staff TOTP. Off by default so a deploy never locks anyone out; when on, every staff account
     # without a second factor must enrol right after the password, and MFA cannot be switched off.
     admin_mfa_required: bool = False
+    # Where request counters live. "memory": per process, lost on restart (enough for the one-worker deployment).
+    # "postgres": shared by every API process and kept across restarts (audit SEC-05); needed when WEB_CONCURRENCY > 1.
+    rate_limit_backend: Literal["memory", "postgres"] = "memory"
     trust_proxy_headers: bool = True
     enable_api_docs: bool | None = None
     # Result file of the host self-check (infra/deploy/acs-selfcheck), mounted read-only on the server.
@@ -201,6 +204,9 @@ class Settings(BaseSettings):
     # A directory outside every web root, owned by the API user (a Docker volume in compose).
     project_storage_dir: str = "/var/lib/acs/project-files"
     project_upload_max_bytes: int = Field(default=10 * 1024 * 1024, ge=1024, le=50 * 1024 * 1024)
+    # Total stored bytes of one workspace (every version of every document, all its projects). A new file that would
+    # go over is refused with 413 `workspace_quota_exceeded` (audit upload U-6; the owner sets the real figure).
+    project_workspace_quota_bytes: int = Field(default=200 * 1024 * 1024, ge=1024 * 1024)
     project_documents_per_project: int = Field(default=100, ge=1)
     project_versions_per_document: int = Field(default=20, ge=1)
     # Nothing is downloadable by a customer until a scan result says "clean" (no scanner ships with the project).

@@ -1,15 +1,20 @@
 """In-memory sliding-window rate limiter.
 
-Sufficient for a single API instance (V1). For horizontal scaling replace the
-storage with Redis — the `RateLimiter.hit` contract stays the same.
+Sufficient for a single API instance (V1). With more than one API process set RATE_LIMIT_BACKEND=postgres (the
+`Limiter` facade below then counts in PostgreSQL); the `hit` contract is the same for both.
 """
 
 from __future__ import annotations
 
+import logging
 import threading
 import time
 from collections import deque
 from dataclasses import dataclass
+
+from app.config import get_settings
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -49,4 +54,62 @@ class RateLimiter:
             self._hits.clear()
 
 
-limiter = RateLimiter()
+class SharedRateLimiter:
+    """Fixed-window counters in PostgreSQL, shared by every API process and kept across restarts (audit SEC-05).
+
+    One atomic upsert per hit (app/accounts/limits.py), keys are hashed, so no IP address or e-mail is stored.
+    The window is fixed rather than sliding: a client can send up to twice the limit around a window boundary.
+    """
+
+    def hit(self, key: str, limit: int, window_seconds: int) -> RateLimitResult:
+        from app.accounts import limits
+
+        allowed, retry_after = limits.consume("rl", key, limit, window_seconds)
+        return RateLimitResult(allowed, retry_after)
+
+    def reset(self) -> None:
+        from sqlalchemy import text
+
+        from app.db import get_sessionmaker
+
+        with get_sessionmaker()() as db:
+            db.execute(text("DELETE FROM rate_limit_buckets"))
+            db.commit()
+
+
+class SharedLimiterUnavailable(RuntimeError):
+    """The shared counter could not be read or written and the caller asked to fail closed."""
+
+
+class Limiter:
+    """The limiter the routes use: the in-memory one (default), or the shared one with RATE_LIMIT_BACKEND=postgres.
+
+    If the shared store cannot be reached, an ordinary route counts the hit in memory instead (a bounded, per-process
+    limit: a database fault never removes the limit or fails a harmless request). A sensitive route passes
+    `strict=True` (sign-in, MFA, paid AI calls): it raises `SharedLimiterUnavailable` and the caller answers 503,
+    because with several workers the per-process fallback would multiply the allowance.
+    """
+
+    def __init__(self) -> None:
+        self.memory = RateLimiter()
+        self.shared = SharedRateLimiter()
+
+    def hit(
+        self, key: str, limit: int, window_seconds: int, now: float | None = None, *, strict: bool = False
+    ) -> RateLimitResult:
+        if now is None and get_settings().rate_limit_backend == "postgres":
+            try:
+                return self.shared.hit(key, limit, window_seconds)
+            except Exception as exc:  # noqa: BLE001 - any store fault is handled below, never shown to the client
+                logger.warning("shared_rate_limit_unavailable", extra={"strict": strict}, exc_info=True)
+                if strict:
+                    raise SharedLimiterUnavailable from exc
+        return self.memory.hit(key, limit, window_seconds, now)
+
+    def reset(self) -> None:
+        self.memory.reset()
+        if get_settings().rate_limit_backend == "postgres":
+            self.shared.reset()
+
+
+limiter = Limiter()

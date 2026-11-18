@@ -132,6 +132,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | [SECURITY_REMEDIATION_CHANGELOG.md](docs/SECURITY_REMEDIATION_CHANGELOG.md) | Per-fix root cause, files, impact, tests, compatibility, deployment, rollback |
 | [SECURITY_TEST_EVIDENCE.md](docs/SECURITY_TEST_EVIDENCE.md) | Commands and results of the security-hardening branch, and what was not run |
 | [SECURITY_RELEASE_DECISION.md](docs/SECURITY_RELEASE_DECISION.md) | GO / CONDITIONAL_GO / NO_GO per surface after the security audit, and owner blockers |
+| [docs/audits/SECURITY_AUDIT_2026-11-18.md](docs/audits/SECURITY_AUDIT_2026-11-18.md) | Third security pass (2026-11-18): findings, remediation, test evidence, production verification, owner actions and release decision in `docs/audits/*-2026-11-18.md` |
 | [PRODUCTION_SECURITY_DRIFT.md](docs/PRODUCTION_SECURITY_DRIFT.md) | Repository vs production (read-only observation), what cannot be verified |
 | [SUPPLY_CHAIN_AUDIT.md](docs/SUPPLY_CHAIN_AUDIT.md) | Actions, dependencies, images, Dependabot, SBOM: state and what remains |
 | [DATABASE_SECURITY_REVIEW.md](docs/DATABASE_SECURITY_REVIEW.md) | Database roles, RLS (not FORCE), the mandatory restricted API role, owner checks |
