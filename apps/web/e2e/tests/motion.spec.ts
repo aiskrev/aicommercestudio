@@ -1,10 +1,14 @@
 import { expect, type Page, test } from "@playwright/test";
 
 /**
- * Reduced motion (DESIGN_SYSTEM.md → motion): with `prefers-reduced-motion: reduce` nothing on the
- * page animates or transitions for longer than an instant, scroll reveals are off (content visible at
- * once), decorative motion is hidden and menus open without an entry animation. The no-preference run
- * shows that the same checks would catch motion, so the test cannot pass vacuously.
+ * Motion system (docs/MOTION_SYSTEM.md).
+ *
+ * Reduced motion: with `prefers-reduced-motion: reduce` nothing on the page animates or transitions for longer than
+ * an instant, scroll reveals never hide anything, decorative motion is hidden and menus open without an entry
+ * animation. The no-preference run shows that the same checks would catch motion, so the test cannot pass vacuously.
+ *
+ * Scroll reveal (`data-reveal`): content is visible without JavaScript and when it is on screen at load; below the
+ * fold it is hidden only after the observer has seen it, and it is revealed once when scrolled to.
  */
 
 const PAGES = ["/bg", "/en/services", "/bg/rabotni-sreshti", "/en/tools", "/bg/referentni-stsenarii"];
@@ -30,6 +34,19 @@ async function longestMotion(page: Page): Promise<number> {
   });
 }
 
+/** Every reveal target (the element, or its children for a group) as rendered: opacity and transform. */
+async function revealStyles(page: Page) {
+  return page.locator("[data-reveal]").evaluateAll((elements) =>
+    elements.flatMap((element) => {
+      const targets = element.hasAttribute("data-reveal-children") ? Array.from(element.children) : [element];
+      return targets.map((target) => {
+        const style = getComputedStyle(target);
+        return { state: element.getAttribute("data-reveal"), opacity: style.opacity, transform: style.transform };
+      });
+    }),
+  );
+}
+
 test.describe("reduced motion requested", () => {
   test.use({ reducedMotion: "reduce" });
 
@@ -37,12 +54,12 @@ test.describe("reduced motion requested", () => {
     test(`${path}: no animation or transition, content shown at once`, async ({ page }) => {
       await page.goto(path);
       expect(await longestMotion(page)).toBeLessThan(0.01);
-      const reveals = page.locator(".reveal");
-      const count = await reveals.count();
-      for (let i = 0; i < count; i += 1) {
-        const style = await reveals.nth(i).evaluate((el) => ({ name: getComputedStyle(el).animationName, opacity: getComputedStyle(el).opacity }));
-        expect(style.name).toBe("none");
+      // Scroll through the page: no reveal is ever armed, everything stays at full opacity in place.
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      for (const style of await revealStyles(page)) {
+        expect(style.state).toBe("");
         expect(style.opacity).toBe("1");
+        expect(style.transform).toBe("none");
       }
       for (const decorative of await page.locator(".motion-decorative").all()) await expect(decorative).toBeHidden();
     });
@@ -65,14 +82,129 @@ test.describe("reduced motion requested", () => {
 test.describe("no motion preference", () => {
   test.use({ reducedMotion: "no-preference" });
 
-  test("the same check sees the site's transitions and scroll reveals", async ({ page }) => {
+  test("the same check sees the site's transitions", async ({ page }) => {
     await page.goto("/bg");
     expect(await longestMotion(page)).toBeGreaterThan(0.05);
-    const supportsTimeline = await page.evaluate(() => CSS.supports("animation-timeline: view()"));
-    if (supportsTimeline) {
-      const names = await page.locator(".reveal").evaluateAll((els) => els.map((el) => getComputedStyle(el).animationName));
-      expect(names.length).toBeGreaterThan(0);
-      expect(names.some((name) => name !== "none")).toBe(true);
+  });
+
+  for (const path of ["/bg", "/bg/online-magazini", "/bg/uslugi/avtomatizatsiya-na-procesi"]) {
+    test(`${path} hero: heading, lead and actions are fully opaque from the first frame`, async ({ page }) => {
+      await page.goto(path);
+      // fc-rise only moves (transform); the opacity is never below 1, so whichever is the LCP element (the heading,
+      // or the lead on phones) is painted at once and the actions are usable at once.
+      const opacities = await page.evaluate(() =>
+        [document.querySelector("h1"), document.querySelector("h1 ~ .t-lead"), document.querySelector("h1 ~ .fc-rise:not(.t-lead)")].map((el) =>
+          el ? `${el.classList.contains("fc-rise")}:${getComputedStyle(el).opacity}` : "missing",
+        ),
+      );
+      expect(opacities).toEqual(["true:1", "true:1", "true:1"]);
+    });
+  }
+
+  test("scroll reveal: hidden only below the fold, revealed once, never left hidden", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/bg");
+    const cards = page.getByTestId("home-showcase");
+    // Below the fold: armed (pending) by the observer, so its cards are transparent until scrolled to.
+    await expect(cards).toHaveAttribute("data-reveal", "pending");
+    await cards.scrollIntoViewIfNeeded();
+    await expect(cards).toHaveAttribute("data-reveal", /^(in|done)$/);
+    await expect(cards).toHaveAttribute("data-reveal", "done", { timeout: 3000 });
+    const after = await cards.evaluate((list) => Array.from(list.children).map((child) => getComputedStyle(child).opacity));
+    expect(after.every((opacity) => opacity === "1")).toBe(true);
+    // Once revealed it stays revealed: scrolling away and back does not hide it again.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(cards).toHaveAttribute("data-reveal", "done");
+  });
+
+  for (const width of [375, 768, 1024, 1440]) {
+    test(`scroll reveal at ${width}px: fast jumps and scrolling back never leave anything on screen hidden`, async ({ page }) => {
+      // Invariant: a target may wait hidden ("pending") only while it is off screen. Jumping to the end and back
+      // in big steps can carry a target past the viewport without a single frame on screen (the deferred
+      // `content-visibility: auto` sections change height as they render), so such a target stays pending until it
+      // is really scrolled to — which a final slow pass down the page then checks.
+      await page.setViewportSize({ width, height: 1024 });
+      await page.goto("/bg");
+      await page.waitForTimeout(500);
+      const hiddenOnScreen = () =>
+        page.evaluate(() =>
+          [...document.querySelectorAll<HTMLElement>('[data-reveal="pending"]')].filter((el) => {
+            const r = el.getBoundingClientRect();
+            // Only what is really rendered: inside a skipped `content-visibility: auto` section a forced layout
+            // can place a target "on screen" while the section is not painted at all.
+            return r.height > 0 && r.bottom > 0 && r.top < innerHeight && el.checkVisibility({ contentVisibilityAuto: true });
+          }).length,
+        );
+      await page.evaluate(() => window.scrollTo(0, document.scrollingElement!.scrollHeight));
+      await expect.poll(hiddenOnScreen, { timeout: 1500 }).toBe(0);
+      const height = await page.evaluate(() => document.scrollingElement!.scrollHeight);
+      for (let y = height; y >= 0; y -= 614) {
+        await page.evaluate((top) => window.scrollTo(0, top), y);
+        await expect.poll(hiddenOnScreen, { timeout: 1500 }).toBe(0);
+      }
+      // Slow pass down: every target is scrolled to, so none may be left waiting.
+      for (let y = 0; y < (await page.evaluate(() => document.scrollingElement!.scrollHeight)); y += 300) {
+        await page.evaluate((top) => window.scrollTo(0, top), y);
+        await page.waitForTimeout(40);
+      }
+      await expect
+        .poll(() => page.evaluate(() => document.querySelectorAll('[data-reveal="pending"], [data-reveal="in"]').length), { timeout: 4000 })
+        .toBe(0);
+    });
+  }
+
+  test("comparison: choosing a website type is announced in a polite status", async ({ page }) => {
+    await page.goto("/en");
+    const comparison = page.getByTestId("service-comparison").first();
+    const status = comparison.getByTestId("compare-announce");
+    await expect(status).toHaveAttribute("aria-live", "polite");
+    await expect(status).toHaveText("");
+    await comparison.getByTestId("compare-pick-store").check();
+    await expect(status).toContainText("Online store");
+  });
+
+  test("tabs: the product selector keeps its height and follows the arrow keys", async ({ page }) => {
+    await page.goto("/en");
+    const showcase = page.getByTestId("product-showcase");
+    const tabs = showcase.getByRole("tab");
+    await tabs.first().focus();
+    const before = await showcase.evaluate((el) => el.getBoundingClientRect().height);
+    for (let index = 1; index < 4; index += 1) {
+      await page.keyboard.press("ArrowRight");
+      await expect(tabs.nth(index)).toHaveAttribute("aria-selected", "true");
+      await expect(tabs.nth(index)).toBeFocused();
+      expect(await showcase.evaluate((el) => el.getBoundingClientRect().height)).toBe(before);
+    }
+    // Only the shown panel is exposed and reachable.
+    await expect(showcase.locator("[data-active=false]").first()).toHaveAttribute("aria-hidden", "true");
+    await expect(showcase.locator("[data-active=true]")).toHaveCount(1);
+  });
+
+  test("mobile menu: Escape closes the sheet and returns focus to the toggle", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/bg");
+    const toggle = page.locator("[data-menu-toggle]");
+    await toggle.click();
+    const sheet = page.getByTestId("mobile-menu");
+    await expect(sheet).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
+    await expect(toggle).toBeFocused();
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  });
+});
+
+test.describe("without JavaScript", () => {
+  test.use({ javaScriptEnabled: false, reducedMotion: "no-preference" });
+
+  test("every reveal target and the hero are visible", async ({ page }) => {
+    await page.goto("/bg");
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    const styles = await revealStyles(page);
+    expect(styles.length).toBeGreaterThan(0);
+    for (const style of styles) {
+      expect(style.state).toBe("");
+      expect(style.opacity).toBe("1");
     }
   });
 });

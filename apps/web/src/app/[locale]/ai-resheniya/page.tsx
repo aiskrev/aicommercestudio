@@ -3,6 +3,7 @@ import Link from "next/link";
 import { AdvisorPromo } from "@/components/advisor/AdvisorPromo";
 import { ControlLanes } from "@/components/home/ControlLanes";
 import { HeroWorkflow } from "@/components/home/HeroWorkflow";
+import { reveal } from "@/components/motion/reveal";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { ProcessTimeline } from "@/components/sections/ProcessTimeline";
@@ -63,9 +64,9 @@ export default async function AiSolutionsPage({ params }: PageProps<"/[locale]/a
 
       {/* Human-approval architecture (moved here from the V4 homepage; the demo centre links to it). */}
       <Section labelledBy="orchestration-title" tone="deep" density="spacious">
-        <div className="max-w-4xl">
+        <div className="max-w-4xl" {...reveal()}>
           <Eyebrow>{orchestration.eyebrow}</Eyebrow>
-          <h2 id="orchestration-title" className="t-h1 reveal mt-5">
+          <h2 id="orchestration-title" className="t-h1 mt-5">
             {orchestration.title}
           </h2>
           <p className="t-lead mt-6 max-w-3xl">{orchestration.lead}</p>

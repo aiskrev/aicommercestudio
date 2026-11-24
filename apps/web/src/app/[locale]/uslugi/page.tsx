@@ -79,7 +79,7 @@ export default async function ServicesPage({ params }: PageProps<"/[locale]/uslu
         <h2 id="services-start-title" className="t-h3-lg">
           {v5.home.showcase.title}
         </h2>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-testid="services-start">
+        <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4" data-testid="services-start">
           {v5.home.showcase.cards.map((card) => (
             <li key={card.key} className="card card-interactive focus-frame flex flex-col p-5">
               <UiPreview kind={card.preview} compact />

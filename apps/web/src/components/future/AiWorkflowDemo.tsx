@@ -12,7 +12,9 @@ const ACTOR_ICON: Record<AiActor, IconName> = { system: "inbox", ai: "sparkles",
  * Interactive AI workflow demonstration (Future Commerce §7). Pre-recorded steps over made-up inputs: nothing is
  * sent anywhere, no AI model is called and no real system is touched — the panel says so above the controls.
  * The run advances one step per click and stops at the human approval step, which only a person can complete.
- * Progress is announced in a polite live region.
+ * Progress is announced in a polite live region. Each step shows its real state (pending → active → done, or
+ * waiting for the person): the dot pings once when a step becomes active, the connector fills and the check mark
+ * pops in when it completes — driven only by the clicks, with no timers and no simulated "thinking" delay.
  */
 export function AiWorkflowDemo({ text }: { text: FutureContent["aiDemo"] }) {
   const [sampleKey, setSampleKey] = useState(text.samples[0].key);
@@ -97,7 +99,8 @@ export function AiWorkflowDemo({ text }: { text: FutureContent["aiDemo"] }) {
             return (
               <li key={step.key} className="fc-run-step" data-state={current}>
                 <span className="fc-run-dot" aria-hidden="true">
-                  <Icon name={current === "done" ? "check" : ACTOR_ICON[step.actor]} className="h-4 w-4" />
+                  {/* Remounted when the step completes, so the check mark pops in once (globals.css → .fc-run-step). */}
+                  <Icon key={current === "done" ? "done" : "open"} name={current === "done" ? "check" : ACTOR_ICON[step.actor]} className="h-4 w-4" />
                 </span>
                 <div className="min-w-0 pt-1">
                   <p className="flex flex-wrap items-center gap-2">

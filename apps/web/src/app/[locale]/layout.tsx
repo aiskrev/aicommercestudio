@@ -8,6 +8,7 @@ import { CookieNotice } from "@/components/layout/CookieNotice";
 import { Footer } from "@/components/layout/Footer";
 import { StickyQuoteBar } from "@/components/editorial/StickyQuoteBar";
 import { Header } from "@/components/layout/Header";
+import { MotionRuntime } from "@/components/motion/MotionRuntime";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildSlugMap, getContent } from "@/content";
 import { localeMeta, localizePath, locales } from "@/i18n/config";
@@ -77,6 +78,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
         <Footer locale={locale} dict={dict} />
         <CookieNotice labels={dict.cookieNotice} href={href(routes.cookies)} />
         <SiteTracker locale={locale} />
+        <MotionRuntime />
         <StickyQuoteBar
           href={href(`${routes.contact}?tip=oferta`)}
           label={dict.quoteBar.label}

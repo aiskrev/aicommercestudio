@@ -44,7 +44,7 @@ test("product showcase: WAI-ARIA tabs, keyboard, labelled sample data", async ({
   await expect(tabs.nth(3)).toHaveAttribute("aria-selected", "true");
   const panel = showcase.getByRole("tabpanel");
   await expect(panel).toContainText("Demonstration");
-  await expect(panel.locator("[data-mock]")).toHaveAttribute("aria-hidden", "true");
+  await expect(panel.locator("[data-active=true] [data-mock]")).toHaveAttribute("aria-hidden", "true");
   await expect(panel.getByTestId("showcase-more-saas")).toHaveAttribute("href", "/en/services/customer-portals-and-web-applications");
 });
 
@@ -54,7 +54,7 @@ test("process timeline: six stages as tabs; choosing one shows what you get and 
   await expect(stages).toHaveCount(6);
   await stages.nth(4).click();
   await expect(stages.nth(4)).toHaveAttribute("aria-selected", "true");
-  const panel = page.getByTestId("process-stage-panel");
+  const panel = page.getByTestId("process-stage-panel").locator("[data-active=true]");
   await expect(panel).toContainText("Пускане");
   await expect(panel).toContainText("Какво получавате");
   await page.keyboard.press("ArrowLeft");
@@ -99,7 +99,7 @@ test("service comparison: choosing a column highlights it and points the quote a
   await page.goto("/en");
   const comparison = page.getByTestId("service-comparison").first();
   await comparison.getByTestId("compare-pick-store").check();
-  await expect(comparison.getByTestId("compare-focus")).toContainText("Online store");
+  await expect(comparison.getByTestId("compare-focus").locator("[data-active=true]")).toContainText("Online store");
   await expect(comparison.getByTestId("compare-quote")).toHaveAttribute("href", "/en/contact?service=store_development&type=quote");
   await expect(comparison.locator("thead th.is-focus")).toHaveText("Online store");
   await expect(comparison.getByTestId("compare-price-static")).toContainText("Price on request");

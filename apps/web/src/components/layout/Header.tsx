@@ -6,6 +6,7 @@ import { type ComponentProps, type KeyboardEvent, type ReactNode, useEffect, use
 import { AccountLinks, type AccountLinksData } from "@/components/layout/AccountEntry";
 import { LanguageSwitcher, type LanguageSwitcherLabels } from "@/components/layout/LanguageSwitcher";
 import { Logo } from "@/components/layout/Logo";
+import { prefersReducedMotion } from "@/components/motion/reveal";
 import { type SearchLabels, SiteSearch } from "@/components/layout/SiteSearch";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClass, Container, cx } from "@/components/ui/primitives";
@@ -89,6 +90,13 @@ export function Header({
 }) {
   const pathname = usePublicPathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  // The sheet stays mounted for its 220 ms closing animation (skipped with reduced motion), then unmounts.
+  const [sheetClosing, setSheetClosing] = useState(false);
+  const closingTimer = useRef(0);
+  useEffect(() => {
+    const timer = closingTimer;
+    return () => window.clearTimeout(timer.current);
+  }, []);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
@@ -120,6 +128,7 @@ export function Header({
   // Close menus after navigation (state adjusted during render instead of in an effect).
   if (pathname !== lastPath) {
     setLastPath(pathname);
+    setSheetClosing(false);
     setMobileOpen(false);
     setOpenMenu(null);
     setExpanded(currentGroup ?? null);
@@ -206,6 +215,7 @@ export function Header({
     const onKey = (event: globalThis.KeyboardEvent) => {
       if (event.key === "Escape") {
         setMobileOpen(false);
+        animateSheetClose(setSheetClosing, closingTimer);
         mobileButtonRef.current?.focus();
       }
     };
@@ -366,7 +376,14 @@ export function Header({
               aria-expanded={mobileOpen}
               aria-controls={mobilePanelId}
               aria-label={mobileOpen ? labels.closeMenu : labels.openMenu}
-              onClick={() => setMobileOpen((value) => !value)}
+              onClick={() => {
+                if (mobileOpen) animateSheetClose(setSheetClosing, closingTimer);
+                else {
+                  window.clearTimeout(closingTimer.current);
+                  setSheetClosing(false);
+                }
+                setMobileOpen(!mobileOpen);
+              }}
               data-menu-toggle
             >
               <Icon key={mobileOpen ? "close" : "menu"} name={mobileOpen ? "close" : "menu"} className="menu-enter h-5 w-5" />
@@ -382,14 +399,16 @@ export function Header({
       <div
         id={mobilePanelId}
         ref={mobilePanelRef}
-        hidden={!mobileOpen}
+        hidden={!mobileOpen && !sheetClosing}
+        inert={sheetClosing || undefined}
+        data-state={sheetClosing ? "closing" : undefined}
         className="menu-sheet-enter fixed inset-x-0 bottom-0 top-16 z-[70] flex flex-col border-t border-line-subtle bg-ink-950 min-[90rem]:hidden"
         data-testid="mobile-menu"
         data-mobile-sheet
         data-compact={compact || undefined}
       >
         {/* Mounted only while the sheet is open (see the desktop panels): on a phone it was the whole menu, twice, in every page. */}
-        {mobileOpen && (
+        {(mobileOpen || sheetClosing) && (
           <>
         <div className="flex-1 overflow-y-auto overscroll-contain">
           <Container className="py-4">
@@ -551,4 +570,14 @@ function MobileLink({
       <span className="min-w-0">{item.label}</span>
     </Link>
   );
+}
+
+/** Keeps the mobile sheet mounted for its closing animation (--motion-base, globals.css → [data-mobile-sheet]). */
+function animateSheetClose(setClosing: (closing: boolean) => void, timer: { current: number }) {
+  if (prefersReducedMotion()) return;
+  window.clearTimeout(timer.current);
+  setClosing(true);
+  // The closing animation runs for --motion-base; read it, so the timer and the CSS can never drift apart.
+  const duration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--motion-base")) || 220;
+  timer.current = window.setTimeout(() => setClosing(false), duration);
 }

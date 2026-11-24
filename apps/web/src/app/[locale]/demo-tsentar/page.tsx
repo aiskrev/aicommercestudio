@@ -59,7 +59,7 @@ export default async function DemoCentrePage({ params }: PageProps<"/[locale]/de
         <h2 id="demo-legend-title" className="t-h3">
           {t.legendTitle}
         </h2>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {order.map((kind) => (
             <li key={kind} className="card p-5">
               <a href={`#${kind}`} className="font-medium text-fg hover:text-brand">
@@ -79,7 +79,7 @@ export default async function DemoCentrePage({ params }: PageProps<"/[locale]/de
           <p className="mt-2 max-w-3xl text-fg-muted">{demoTexts[locale].listLead}</p>
           <ul className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {DEMO_KEYS.map((key) => (
-              <li key={key} className="card flex flex-col p-6">
+              <li key={key} className="card motion-card flex flex-col p-6">
                 <span className="badge badge-warning">{demoTexts[locale].badge}</span>
                 <h3 className="t-h3 mt-4">{demoTexts[locale].scenarios[key].title}</h3>
                 <p className="mt-2 flex-1 text-body-sm text-fg-muted">{demoTexts[locale].scenarios[key].lead}</p>
@@ -103,7 +103,7 @@ export default async function DemoCentrePage({ params }: PageProps<"/[locale]/de
               <ul className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {kind === "demo" &&
                   t.demos.map((item) => (
-                    <li key={item.key} className="card flex flex-col p-6">
+                    <li key={item.key} className="card motion-card flex flex-col p-6">
                       <Chip kind={kind} label={t.kinds[kind].label} />
                       <h3 className="t-h3 mt-4">{item.title}</h3>
                       <p className="mt-2 flex-1 text-body-sm text-fg-muted">{item.text}</p>
@@ -116,7 +116,7 @@ export default async function DemoCentrePage({ params }: PageProps<"/[locale]/de
                   freeTools.map((tool) => {
                     const text = tools.items.find((item) => item.key === tool.key)!;
                     return (
-                      <li key={tool.key} className="card flex flex-col p-6">
+                      <li key={tool.key} className="card motion-card flex flex-col p-6">
                         <Chip kind={kind} label={t.kinds[kind].label} />
                         <h3 className="t-h3 mt-4">{text.title}</h3>
                         <p className="mt-2 flex-1 text-body-sm text-fg-muted">{text.description}</p>
@@ -130,7 +130,7 @@ export default async function DemoCentrePage({ params }: PageProps<"/[locale]/de
                   TEAM_SERVICES.map((key) => {
                     const service = serviceByKey(locale, key);
                     return (
-                      <li key={key} className="card flex flex-col p-6">
+                      <li key={key} className="card motion-card flex flex-col p-6">
                         <Chip kind={kind} label={t.kinds[kind].label} />
                         <h3 className="t-h3 mt-4">{service.shortTitle}</h3>
                         <p className="mt-2 flex-1 text-body-sm text-fg-muted">{service.summary}</p>

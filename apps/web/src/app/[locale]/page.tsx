@@ -11,6 +11,7 @@ import { ServiceComparison } from "@/components/future/ServiceComparison";
 import { ShowcaseMock } from "@/components/future/ShowcaseMock";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { ToolsPreview } from "@/components/home/ToolsPreview";
+import { revealGroup } from "@/components/motion/reveal";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { FounderPortrait } from "@/components/sections/Founder";
 import { Faq } from "@/components/sections/Faq";
@@ -129,12 +130,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
         <Container size="wide" className="relative grid items-center gap-12 pb-16 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 lg:pb-24 lg:pt-20">
           <div className="min-w-0">
-            <Eyebrow>{fc.hero.eyebrow}</Eyebrow>
-            <h1 className="t-hero mt-6">
+            {/* Entrance (CSS only, once): eyebrow → heading → lead → actions → points → preview, 55 ms apart; the heading, the lead and the actions only rise, so they are painted from the first frame (LCP). */}
+            <Eyebrow className="fc-enter [--i:0]">{fc.hero.eyebrow}</Eyebrow>
+            <h1 className="fc-rise t-hero mt-6 [--i:1]">
               {fc.hero.title} <span className="text-brand">{fc.hero.titleHighlight}</span>
             </h1>
-            <p className="t-lead mt-6 max-w-xl">{fc.hero.lead}</p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <p className="fc-rise t-lead mt-6 max-w-xl [--i:2]">{fc.hero.lead}</p>
+            <div className="fc-rise mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap [--i:3]">
               <ButtonLink href={href(routes.services)} size="lg" icon="arrowRight" testId="hero-primary">
                 {fc.hero.primaryCta}
               </ButtonLink>
@@ -143,7 +145,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               </ButtonLink>
               <ConfiguratorEntry href={href(routes.configurator)} label={fc.hero.configureCta} variant="secondary" className="btn-lg" />
             </div>
-            <ul className="mt-9 grid gap-x-6 gap-y-2.5 border-t border-line-subtle pt-6 text-sm text-fg-secondary sm:grid-cols-2">
+            <ul className="fc-enter mt-9 grid gap-x-6 gap-y-2.5 border-t border-line-subtle pt-6 text-sm text-fg-secondary sm:grid-cols-2 [--i:4]">
               {fc.hero.points.map((item) => (
                 <li key={item} className="inline-flex items-center gap-2">
                   <Icon name="check" className="h-4 w-4 shrink-0 text-brand" />
@@ -155,19 +157,19 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           {/* Layered previews: a corporate site, a store and an automation, with status chips; one caption for all. */}
           <figure className="min-w-0" data-testid="hero-preview">
             <div className="fc-stage">
-              <div className="fc-enter" style={{ ["--i" as string]: 0 }}>
+              <div className="fc-enter" style={{ ["--i" as string]: 5 }}>
                 <ShowcaseMock item={corporate} />
               </div>
-              <div data-layer="store" className="fc-enter hidden lg:block" style={{ ["--i" as string]: 2 }}>
+              <div data-layer="store" className="fc-enter hidden lg:block" style={{ ["--i" as string]: 6 }}>
                 <UiPreview kind="store" compact />
               </div>
-              <div data-layer="ai" className="fc-enter hidden xl:block" style={{ ["--i" as string]: 3 }}>
+              <div data-layer="ai" className="fc-enter hidden xl:block" style={{ ["--i" as string]: 7 }}>
                 <UiPreview kind="ai" compact />
               </div>
               <ul className="fc-stage-chips pointer-events-none" aria-hidden="true">
                 {fc.hero.chips.map((chip, index) => (
-                  <li key={chip.label} className="fc-enter" style={{ ["--i" as string]: 4 + index }}>
-                    <span className="fc-glass fc-chip fc-float" style={{ animationDelay: `${index * -2.2}s` }}>
+                  <li key={chip.label} className="fc-enter" style={{ ["--i" as string]: 8 + index }}>
+                    <span className="fc-glass fc-chip">
                       <Icon name={chip.icon} className={index === 2 ? "h-4 w-4 text-warning" : index === 1 ? "h-4 w-4 text-brand-2" : "h-4 w-4 text-success"} />
                       {chip.label}
                     </span>
@@ -184,7 +186,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       {/* 2 ---------------------------------------------------------------- four service cards */}
       <Section labelledBy="showcase-title" size="wide">
         <SectionHeading id="showcase-title" eyebrow={fc.services.eyebrow} title={fc.services.title} lead={fc.services.lead} />
-        <ul className="bento mt-stack" data-testid="home-showcase">
+        <ul {...revealGroup()} className="bento mt-stack" data-testid="home-showcase">
           {fc.services.cards.map((card, index) => {
             const service = serviceByKey(locale, card.service);
             return (
@@ -364,11 +366,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </ButtonLink>
           }
         />
-        <div className="mt-stack grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]">
+        <div {...revealGroup()} className="mt-stack grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)]">
           <div className="min-w-0">
             <ToolsPreview catalog={tools} hrefs={toolHrefs(locale)} minutes={toolMinutes()} showcase={advisor.showcase} startBadge={legacyHome.tools.startBadge} compact />
           </div>
-          <div className="feature-panel flex min-w-0 flex-col self-start p-6" data-testid="home-demos">
+          <div className="feature-panel motion-card flex min-w-0 flex-col self-start p-6" data-testid="home-demos">
             <UiPreview kind="ai" compact />
             <h3 className="t-h3-lg mt-6">{home.tools.demosTitle}</h3>
             <p className="mt-2 text-body-sm leading-relaxed text-fg-muted">{home.tools.demosText}</p>

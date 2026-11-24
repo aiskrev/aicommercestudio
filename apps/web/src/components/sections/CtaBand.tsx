@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { reveal } from "@/components/motion/reveal";
 import { Icon } from "@/components/ui/Icon";
 import { ButtonLink, Container, Eyebrow } from "@/components/ui/primitives";
 
@@ -53,7 +54,7 @@ export function CtaBand({
           <div className="fc-grid" />
         </div>
         <Container className="relative py-20 sm:py-28 lg:py-32">
-          <div className="fc-cta px-6 py-12 sm:px-12 sm:py-16 lg:px-16">
+          <div {...reveal()} className="fc-cta px-6 py-12 sm:px-12 sm:py-16 lg:px-16">
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
             <h2 id="cta-title" className="t-display mt-5 max-w-4xl">
               {title}
@@ -77,7 +78,7 @@ export function CtaBand({
   return (
     <section className="py-16 sm:py-24" aria-labelledby="cta-title">
       <Container>
-        <div className="fc-cta px-6 py-12 sm:px-12 sm:py-16">
+        <div {...reveal()} className="fc-cta px-6 py-12 sm:px-12 sm:py-16">
           <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end">
             <div>
               {eyebrow && <Eyebrow className="mb-4">{eyebrow}</Eyebrow>}

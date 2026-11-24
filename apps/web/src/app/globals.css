@@ -168,8 +168,10 @@
   --shadow-frame: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 40px 80px -40px rgb(0 0 0 / 0.8), 0 18px 40px -30px rgb(37 99 235 / 0.35);
 
   /* Motion */
+  /* Same curves as --motion-ease-out / --motion-ease-standard (:root below); kept as theme tokens so the
+     ease-out-soft / ease-standard utilities exist. */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
 
   --animate-pulse-soft: pulse-soft 3.2s ease-in-out infinite;
   --animate-shimmer: shimmer 1.6s linear infinite;
@@ -192,42 +194,32 @@
     to { background-position: 0 24px; }
   }
   @keyframes menu-enter {
-    from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+    from { opacity: 0; transform: translate3d(0, -4px, 0); }
   }
   @keyframes menu-sheet-enter {
     from { opacity: 0; transform: translateY(-8px); }
   }
-  /* Transform only: a half-faded heading would fail contrast while it scrolls in (Future Commerce a11y fix). */
-  @keyframes reveal {
-    from { transform: translateY(18px); }
-  }
   /* Future Commerce motion: transform and opacity only. */
   @keyframes fc-enter {
-    from { opacity: 0; transform: translateY(14px) scale(0.985); }
+    from { opacity: 0; transform: translate3d(0, 12px, 0); }
   }
-  @keyframes fc-drift {
-    0% { transform: translate3d(0, 0, 0) scale(1); }
-    50% { transform: translate3d(-3%, 2%, 0) scale(1.06); }
-    100% { transform: translate3d(2%, -2%, 0) scale(1.02); }
-  }
-  @keyframes fc-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-  @keyframes fc-beam-x {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(400%); }
-  }
-  @keyframes fc-beam-y {
-    from { transform: translateY(-100%); }
-    to { transform: translateY(400%); }
-  }
-  @keyframes fc-grow-x {
-    from { transform: scaleX(0); }
-    to { transform: scaleX(1); }
+  /* Hero heading and actions: transform only, so they are painted (and count for LCP) from the first frame. */
+  @keyframes fc-rise {
+    from { transform: translate3d(0, 10px, 0); }
   }
   @keyframes fc-panel {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translate3d(0, 5px, 0); }
+  }
+  @keyframes fc-pop {
+    from { opacity: 0; transform: scale(0.98); }
+  }
+  @keyframes fc-message {
+    from { opacity: 0; transform: translate3d(0, -3px, 0); }
+  }
+  @keyframes fc-ping {
+    0% { transform: scale(0.86); }
+    60% { transform: scale(1.06); }
+    100% { transform: scale(1); }
   }
 }
 
@@ -266,16 +258,39 @@
     --ring-width: 2px;
     --ring-offset: 3px;
 
-    /* Motion (docs/DESIGN_SYSTEM.md → Interaction system) */
-    --duration-press: 90ms;
-    --duration-fast: 160ms;
-    --duration-base: 220ms;
-    --duration-slow: 320ms;
-    --duration-reveal: 420ms;
-    --lift: -1px;
-    --lift-card: -2px;
-    --press-scale: 0.985;
+    /* Motion tokens (docs/MOTION_SYSTEM.md). One scale for the whole site: transform and opacity only,
+       every value is shortened to an instant by the reduced-motion block at the end of this file. */
+    --motion-instant: 100ms;
+    --motion-fast: 140ms;
+    --motion-base: 220ms;
+    --motion-slow: 360ms;
+    --motion-emphasis: 460ms;
+    --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+    --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --motion-stagger: 55ms;
+    --motion-stagger-tight: 40ms;   /* a freshly filtered set (package filter) */
+    --motion-sequence: 150ms;       /* one step of a drawn sequence (integration flow) */
+    --motion-swap-delay: 90ms;      /* incoming panel waits for the outgoing one to clear (.swap-stack) */
+    --motion-sheet: 260ms;          /* mobile menu sheet opening (brief: 220–280 ms) */
+    /* Scroll reveal (components/motion/MotionRuntime.tsx): distance and duration. */
+    --reveal-shift: 12px;
+    --reveal-duration: 380ms;
+
+    /* Interaction aliases (docs/DESIGN_SYSTEM.md → Interaction system), mapped onto the scale above. */
+    --duration-press: var(--motion-instant);
+    --duration-fast: var(--motion-fast);
+    --duration-base: var(--motion-base);
+    --duration-slow: var(--motion-slow);
+    --duration-reveal: var(--reveal-duration);
+    --lift: -2px;
+    --lift-card: -3px;
+    --press-scale: 0.99;
     --nudge: 3px;
+    --nudge-card: 2px;
+  }
+  @media (max-width: 47.99rem) {
+    :root { --reveal-shift: 8px; }
   }
   html {
     color-scheme: dark;
@@ -405,7 +420,30 @@
     }
   }
   .card-interactive:active { transform: translateY(0) scale(0.995); transition-duration: var(--duration-press); }
-  .card-interactive:has(:focus-visible) { border-color: var(--color-brand); box-shadow: 0 0 0 2px var(--color-brand); }
+  /* Keyboard focus gets the same lift as hover, plus the ring (shared card interaction, docs/MOTION_SYSTEM.md). */
+  .card-interactive:has(:focus-visible) { border-color: var(--color-brand); box-shadow: 0 0 0 2px var(--color-brand), var(--shadow-lift); transform: translateY(var(--lift-card)); }
+
+  /* Shared card interaction for cards that hold their own links (package, tool and demo cards): lift 3 px,
+     stronger border and shadow, 220 ms; the trailing arrow moves 2 px (.arrow-nudge). Hover only for fine
+     pointers, so touch never gets a stuck state; keyboard focus inside the card looks the same as hover. */
+  .motion-card {
+    transition:
+      transform var(--motion-base) var(--motion-ease-out),
+      box-shadow var(--motion-base) var(--motion-ease-standard),
+      border-color var(--motion-base) var(--motion-ease-standard);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .motion-card:hover {
+      border-color: color-mix(in oklab, var(--color-brand) 45%, transparent);
+      box-shadow: var(--shadow-lift);
+      transform: translateY(var(--lift-card));
+    }
+  }
+  .motion-card:has(:focus-visible) {
+    border-color: color-mix(in oklab, var(--color-brand) 60%, transparent);
+    box-shadow: var(--shadow-lift);
+    transform: translateY(var(--lift-card));
+  }
   /* Highlighted card: brand hairline */
   .card-accent {
     border-color: color-mix(in oklab, var(--color-brand) 35%, transparent);
@@ -521,25 +559,30 @@
       border-color var(--duration-fast) var(--ease-standard),
       color var(--duration-fast) var(--ease-standard),
       box-shadow var(--duration-base) var(--ease-standard),
-      transform var(--duration-fast) var(--ease-out-soft),
+      transform var(--motion-base) var(--motion-ease-out),
       --btn-a var(--duration-base) var(--ease-standard),
       --btn-b var(--duration-base) var(--ease-standard);
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
   /* Trailing icon (arrow) moves in the direction of travel on hover and keyboard focus. */
-  .btn-icon { flex-shrink: 0; transition: transform var(--duration-base) var(--ease-out-soft); }
+  .btn-icon { flex-shrink: 0; transition: transform var(--motion-base) var(--motion-ease-out); }
   .btn:focus-visible .btn-icon { transform: translateX(var(--nudge)); }
   @media (hover: hover) and (pointer: fine) {
-    .btn:hover:not(:disabled, [aria-busy="true"]) .btn-icon { transform: translateX(var(--nudge)); }
-    .btn-primary:hover:not(:disabled, [aria-busy="true"]),
-    .btn-secondary:hover:not(:disabled, [aria-busy="true"]) { transform: translateY(var(--lift)); }
+    .btn:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"]) .btn-icon { transform: translateX(var(--nudge)); }
+    .btn-primary:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"]),
+    .btn-secondary:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"]) { transform: translateY(var(--lift)); }
   }
-  .btn:active:not(:disabled, [aria-busy="true"]) {
+  .btn:active:not(:disabled, [aria-busy="true"], [aria-disabled="true"]) {
     transform: translateY(0) scale(var(--press-scale));
     transition-duration: var(--duration-press);
   }
-  .btn:disabled, .btn[aria-disabled="true"] { cursor: not-allowed; opacity: 0.5; box-shadow: none; }
+  .btn:disabled, .btn[aria-disabled="true"] { cursor: not-allowed; opacity: 0.5; box-shadow: none; transform: none; }
+  .btn:disabled .btn-icon, .btn[aria-disabled="true"] .btn-icon { transform: none; }
+  /* Busy label (Button with loadingLabel): both labels share one grid cell, so the button keeps the width of
+     the longer one and never changes size while the request runs. */
+  .btn-swap { display: inline-grid; }
+  .btn-swap > * { grid-area: 1 / 1; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
   .btn[aria-busy="true"] { cursor: progress; }
   .btn[aria-busy="true"] .spinner { margin-inline-start: -0.125rem; }
   .btn-md { padding: 0.65rem 1.15rem; font-size: 0.9375rem; min-height: 2.75rem; }
@@ -574,7 +617,7 @@
   }
   .btn-ghost:focus-visible .btn-label { text-decoration-color: currentColor; }
   @media (hover: hover) and (pointer: fine) {
-    .btn-primary:hover:not(:disabled, [aria-busy="true"]) {
+    .btn-primary:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"]) {
       --btn-a: var(--color-brand-glow-a);
       --btn-b: var(--color-brand-glow-b);
       box-shadow:
@@ -582,7 +625,7 @@
         0 12px 28px -14px color-mix(in oklab, var(--color-brand-fill) 75%, transparent),
         0 0 0 1px color-mix(in oklab, var(--color-brand) 45%, transparent);
     }
-    .btn-secondary:hover:not(:disabled, [aria-busy="true"]) {
+    .btn-secondary:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"]) {
       border-color: color-mix(in oklab, var(--color-brand) 55%, transparent);
       background-color: var(--color-surface-3);
       box-shadow: 0 10px 24px -18px rgb(0 0 0 / 0.9);
@@ -620,6 +663,8 @@
   .field-required { color: var(--color-danger); }
   .field-hint { margin-top: 0.5rem; font-size: 0.8125rem; line-height: 1.5; color: var(--color-fg-muted); }
   .field-error { margin-top: 0.5rem; font-size: var(--type-small); line-height: 1.45; color: var(--color-danger); }
+  /* Inline validation: the message fades in (no shake); the field's border already marks which one. */
+  .field-error, .alert[role="alert"] { animation: fc-message var(--motion-fast) var(--motion-ease-out); }
   .field {
     width: 100%;
     min-width: 0;
@@ -630,9 +675,10 @@
     color: var(--text-primary);
     font-size: 1rem;
     transition:
-      border-color var(--duration-fast) ease,
-      box-shadow var(--duration-fast) ease,
-      background var(--duration-fast) ease;
+      border-color var(--motion-fast) var(--motion-ease-standard),
+      box-shadow var(--motion-fast) var(--motion-ease-standard),
+      outline-offset var(--motion-fast) var(--motion-ease-out),
+      background var(--motion-fast) var(--motion-ease-standard);
   }
   .field::placeholder { color: var(--color-fg-placeholder); }
   .field:hover:not(:disabled) { border-color: var(--color-line-hover); }
@@ -900,21 +946,28 @@
     border-radius: 2px;
     background: var(--color-brand);
     transform: scaleX(0);
-    transition: transform var(--duration-base) var(--ease-out-soft);
   }
   .nav-link[aria-current="page"]::after,
-  .nav-link[aria-expanded="true"]::after { transform: scaleX(1); }
-  /* Hover/focus preview: the underline grows at half strength; the current page keeps it at full. */
-  .nav-link::after { transition: transform var(--duration-base) var(--ease-out-soft), opacity var(--duration-fast) ease; }
-  .nav-link:focus-visible:not([aria-current="page"], [aria-expanded="true"])::after { transform: scaleX(1); opacity: 0.45; }
+  .nav-link[aria-expanded="true"]::after,
+  .nav-link[data-active]::after { transform: scaleX(1); }
+  /* Hover/focus preview: the underline grows at half strength (220 ms); the current section keeps it at full. */
+  .nav-link::after { transition: transform var(--motion-base) var(--motion-ease-out), opacity var(--motion-base) var(--motion-ease-standard); }
+  .nav-link:focus-visible:not([aria-current="page"], [aria-expanded="true"], [data-active])::after { transform: scaleX(1); opacity: 0.45; }
   @media (hover: hover) and (pointer: fine) {
-    .nav-link:hover:not([aria-current="page"], [aria-expanded="true"])::after { transform: scaleX(1); opacity: 0.45; }
+    .nav-link:hover:not([aria-current="page"], [aria-expanded="true"], [data-active])::after { transform: scaleX(1); opacity: 0.45; }
   }
 
   /* Menus and dropdowns: entry animation each time the panel is shown (display none → block).
      Closing is instant so the UI never waits on an animation. */
-  .menu-enter { animation: menu-enter var(--duration-base) var(--ease-out-soft); }
-  .menu-sheet-enter { animation: menu-sheet-enter var(--duration-slow) var(--ease-out-soft); }
+  .menu-enter { animation: menu-enter var(--motion-base) var(--motion-ease-out); }
+  .menu-sheet-enter { animation: menu-sheet-enter var(--motion-sheet) var(--motion-ease-out); }
+  /* Mobile sheet closing (Header.tsx keeps it mounted for 220 ms with data-state="closing"). */
+  [data-mobile-sheet][data-state="closing"] { animation: menu-sheet-exit var(--motion-base) var(--motion-ease-in) forwards; pointer-events: none; }
+  @keyframes menu-sheet-exit {
+    to { opacity: 0; transform: translate3d(0, -8px, 0); }
+  }
+  /* One-off entrance of a confirmation (form success). */
+  .fc-pop { animation: fc-pop var(--motion-base) var(--motion-ease-out); }
 
   /* Multi-step tools: each newly shown step eases in (skipped when reduced motion is requested). */
   @media (prefers-reduced-motion: no-preference) {
@@ -926,9 +979,10 @@
   /* Arrow/icon nudge inside a hovered or keyboard-focused link group (cards, rows, text links). */
   .arrow-nudge { flex-shrink: 0; transition: transform var(--duration-base) var(--ease-out-soft), color var(--duration-fast) var(--ease-standard); }
   .group:focus-visible .arrow-nudge,
-  .group:has(:focus-visible) .arrow-nudge { transform: translateX(var(--nudge)); }
+  .group:has(:focus-visible) .arrow-nudge,
+  .motion-card:has(:focus-visible) .arrow-nudge { transform: translateX(var(--nudge-card)); }
   @media (hover: hover) and (pointer: fine) {
-    .group:hover .arrow-nudge { transform: translateX(var(--nudge)); }
+    .group:hover .arrow-nudge, .motion-card:hover .arrow-nudge, .fc-card:hover .arrow-nudge { transform: translateX(var(--nudge-card)); }
   }
 
   /* Text link: brand colour, underline appears on hover/focus (always underlined inside prose). */
@@ -960,9 +1014,24 @@
   .accordion details::details-content {
     block-size: 0;
     overflow: hidden;
-    transition: block-size 250ms var(--ease-out-soft), content-visibility 250ms allow-discrete;
+    transition: block-size var(--motion-base) var(--motion-ease-out), content-visibility var(--motion-base) allow-discrete;
   }
   .accordion details[open]::details-content { block-size: auto; }
+  /* The answer fades in with the height; the summary's chevron turns in the same 220 ms. */
+  .accordion details > :not(summary) { opacity: 0; transition: opacity var(--motion-base) var(--motion-ease-standard); }
+  .accordion details[open] > :not(summary) { opacity: 1; }
+  .accordion summary [data-chevron] { transition: rotate var(--motion-base) var(--motion-ease-out), transform var(--motion-base) var(--motion-ease-out), border-color var(--motion-base) var(--motion-ease-standard), background-color var(--motion-base) var(--motion-ease-standard); }
+
+  /* Selectable option cards (contact form enquiry type): border, tint and the radio mark change together; the
+     native radio stays visible, so the state is never shown by colour alone. */
+  .choice-card {
+    transition:
+      border-color var(--motion-fast) var(--motion-ease-standard),
+      background-color var(--motion-fast) var(--motion-ease-standard),
+      box-shadow var(--motion-fast) var(--motion-ease-standard);
+  }
+  .choice-card:has(:checked) { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-brand) 55%, transparent); }
+  .choice-card:has(:focus-visible) { outline: var(--ring-width) solid var(--ring); outline-offset: 2px; }
 
   /* ============================================================ V5 (docs/V5_DESIGN_SYSTEM.md) */
   /* Hero headline: the largest type on the site, used once per page. */
@@ -1061,7 +1130,7 @@
       transform var(--duration-base) var(--ease-out-soft),
       box-shadow var(--duration-base) var(--ease-standard);
   }
-  .offer-card:has(:focus-visible) { border-color: var(--color-brand); box-shadow: 0 0 0 2px var(--color-brand); }
+  .offer-card:has(:focus-visible) { border-color: var(--color-brand); box-shadow: 0 0 0 2px var(--color-brand), var(--shadow-lift); transform: translateY(var(--lift-card)); }
   @media (hover: hover) and (pointer: fine) {
     .offer-card:hover {
       border-color: color-mix(in oklab, var(--color-brand) 45%, transparent);
@@ -1200,10 +1269,7 @@
     bottom: -14rem;
     background: radial-gradient(closest-side, color-mix(in oklab, var(--color-brand-2) 14%, transparent), transparent);
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .fc-backdrop::before { animation: fc-drift 22s ease-in-out infinite alternate; }
-    .fc-backdrop::after { animation: fc-drift 28s ease-in-out -9s infinite alternate-reverse; }
-  }
+  /* The colour fields are static: no permanent motion in the hero (docs/MOTION_SYSTEM.md). */
   .fc-grid {
     position: absolute;
     inset: 0;
@@ -1221,10 +1287,12 @@
   /* A thin brand hairline along the bottom edge of a hero. */
   .fc-horizon { position: absolute; inset-inline: 0; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--color-brand) 60%, transparent), color-mix(in oklab, var(--color-brand-2) 50%, transparent), transparent); }
 
-  /* Entrance: elements of a hero ease in once, staggered by --i. Never on the LCP heading. */
+  /* Hero entrance: eyebrow → heading → lead → actions → preview ease in once, staggered by --i (55 ms), CSS only,
+     so it also runs without JavaScript and ends with everything shown. `.fc-enter` fades and rises; `.fc-rise`
+     (the heading, the lead and the actions: each can be the LCP element or must be usable at once) only rises, so they are painted from the first frame (LCP, no hidden CTA). */
   @media (prefers-reduced-motion: no-preference) {
-    .fc-enter { animation: fc-enter 640ms var(--ease-out-soft) both; animation-delay: calc(var(--i, 0) * 90ms + 80ms); }
-    .fc-float { animation: fc-float 7s ease-in-out infinite; }
+    .fc-enter, .fc-rise { animation: fc-enter var(--motion-emphasis) var(--motion-ease-out) both; animation-delay: calc(var(--i, 0) * var(--motion-stagger)); }
+    .fc-rise { animation-name: fc-rise; }
   }
 
   /* Moderate glass: a translucent raised surface for floating chips over previews. */
@@ -1261,10 +1329,6 @@
     .fc-stage-chips > li:nth-child(2) { right: 1.5rem; bottom: -1.4rem; }
     .fc-stage-chips > li:nth-child(3) { left: 0; bottom: -0.4rem; }
   }
-  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-    .fc-stage > [data-layer="store"] .ui-frame { animation: fc-float 9s ease-in-out infinite; }
-    .fc-stage > [data-layer="ai"] .ui-frame { animation: fc-float 11s ease-in-out -4s infinite; }
-  }
 
   /* Reveal card: summary always visible; the details and the action open on hover and on keyboard focus within
      (hover pointers only). On touch screens and narrow screens the details are always shown. Links inside stay
@@ -1281,11 +1345,11 @@
       radial-gradient(28rem 14rem at 100% 0%, color-mix(in oklab, var(--fc-tone, var(--color-brand)) 12%, transparent), transparent 70%),
       var(--color-surface-1);
     transition:
-      border-color var(--duration-base) var(--ease-standard),
-      transform var(--duration-slow) var(--ease-out-soft),
-      box-shadow var(--duration-base) var(--ease-standard);
+      border-color var(--motion-base) var(--motion-ease-standard),
+      transform var(--motion-base) var(--motion-ease-out),
+      box-shadow var(--motion-base) var(--motion-ease-standard);
   }
-  .fc-card:has(:focus-visible) { border-color: var(--color-brand); }
+  .fc-card:has(:focus-visible) { border-color: var(--color-brand); box-shadow: var(--shadow-lift); transform: translateY(var(--lift-card)); }
   /* The details panel: in the flow on touch and narrow screens; on wide hover screens it slides up over the lower
      part of the card (transform only, so opening it never moves the layout). `overflow: clip` keeps focus from
      scrolling the card while the panel is still below its edge. */
@@ -1309,7 +1373,7 @@
     .fc-card:hover {
       border-color: color-mix(in oklab, var(--fc-tone, var(--color-brand)) 50%, transparent);
       box-shadow: var(--shadow-lift);
-      transform: translateY(-4px);
+      transform: translateY(var(--lift-card));
     }
   }
   .fc-card-icon {
@@ -1329,7 +1393,58 @@
   .tabs-segmented .tab { border-radius: var(--radius-md); min-height: 2.75rem; }
   .tabs-segmented .tab::after { display: none; }
   .tabs-segmented .tab[aria-selected="true"] { background: var(--color-surface-3); color: var(--color-fg); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-brand) 45%, transparent); }
-  .fc-panel-enter { animation: fc-panel var(--duration-slow) var(--ease-out-soft); }
+  /* Sliding indicator (components/ui/Tabs.tsx): one pill moves to the selected tab. Until it has been measured
+     (and without JavaScript) the selected tab keeps its own background above. */
+  .tabs-segmented { position: relative; }
+  .tabs-segmented .tab { z-index: 1; }
+  .tab-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 0;
+    border-radius: var(--radius-md);
+    background: var(--color-surface-3);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-brand) 45%, transparent);
+    pointer-events: none;
+    opacity: 0;
+  }
+  .tabs-segmented[data-indicator] > .tab-indicator { opacity: 1; }
+  .tabs-segmented[data-indicator] > .tab[aria-selected="true"] { background: transparent; box-shadow: none; }
+  .tabs-segmented[data-indicator="animate"] > .tab-indicator {
+    transition:
+      transform var(--motion-base) var(--motion-ease-out),
+      width var(--motion-base) var(--motion-ease-out),
+      height var(--motion-base) var(--motion-ease-out);
+  }
+  .surface-light .tab-indicator { background: var(--color-surface-paper-field); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-brand) 45%, transparent), var(--shadow-paper); }
+  .fc-panel-enter { animation: fc-panel var(--motion-base) var(--motion-ease-out); }
+  /* Staggered entry of a freshly shown set (package filter): --i is the item's index, 40 ms apart. */
+  .fc-panel-stagger { animation-fill-mode: both; animation-delay: calc(var(--i, 0) * var(--motion-stagger-tight)); }
+
+  /* Cross-fading panel stack (product showcase, comparison summary, process stages): every panel sits in the same
+     grid cell, so the frame always has the height of the tallest one (no collapse, no jump when switching). The
+     outgoing panel fades out in 140 ms and is then hidden (visibility: out of the accessibility tree and the tab
+     order); the incoming one fades in over 220 ms, 5 px, after a short overlap. */
+  .swap-stack { display: grid; }
+  /* align-content: start — a shorter panel keeps its own spacing; the spare height of the stack stays below it. */
+  .swap-stack > * { grid-area: 1 / 1; min-width: 0; align-content: start; }
+  .swap-stack > [data-active="false"] {
+    visibility: hidden;
+    opacity: 0;
+    transform: translate3d(0, -4px, 0);
+    pointer-events: none;
+    transition:
+      opacity var(--motion-fast) var(--motion-ease-in),
+      transform var(--motion-fast) var(--motion-ease-in),
+      visibility 0s linear var(--motion-fast);
+  }
+  .swap-stack > [data-active="true"] { animation: fc-panel var(--motion-base) var(--motion-ease-out) var(--motion-swap-delay) both; }
+  /* Product showcase: on one-column layouts the panels differ by up to ~270 px, so below 64rem only the shown panel
+     takes space (the change follows a tap, which CLS excludes); from 64rem they keep the shared cell. */
+  @media (max-width: 63.99rem) {
+    .swap-stack-fluid > [data-active="false"] { display: none; }
+  }
+  .swap-stack[data-swapped="false"] > [data-active="true"] { animation: none; }
 
   /* Product showcase mock-ups: readable sample text inside a frame (aria-hidden; the caption says "sample"). */
   .fc-mock { font-size: 0.75rem; line-height: 1.35; color: var(--color-fg-secondary); }
@@ -1339,13 +1454,15 @@
   .fc-mock-bar { display: block; border-radius: 3px 3px 0 0; background: color-mix(in oklab, var(--color-brand) 70%, transparent); }
   .fc-mock-bar.is-cyan { background: color-mix(in oklab, var(--color-brand-2) 70%, transparent); }
 
-  /* Process stepper: a hairline that fills as the section scrolls into view (scroll-driven, CSS only). */
+  /* Process stepper: a progress hairline filled up to the selected stage (--progress, 0–1), 220 ms. */
   .fc-steps-track { position: relative; height: 2px; border-radius: 2px; background: var(--border-default); overflow: hidden; }
-  .fc-steps-track > span { position: absolute; inset: 0; transform-origin: left; background: linear-gradient(90deg, var(--color-brand), var(--color-brand-2)); }
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      .fc-steps-track > span { animation: fc-grow-x linear both; animation-timeline: view(); animation-range: entry 10% cover 45%; }
-    }
+  .fc-steps-track > span {
+    position: absolute;
+    inset: 0;
+    transform-origin: left;
+    transform: scaleX(var(--progress, 1));
+    background: linear-gradient(90deg, var(--color-brand), var(--color-brand-2));
+    transition: transform var(--motion-base) var(--motion-ease-out);
   }
   .fc-step {
     position: relative;
@@ -1360,16 +1477,20 @@
     background: var(--color-surface-1);
     padding: 0.75rem 0.9rem;
     text-align: left;
-    transition: border-color var(--duration-fast) var(--ease-standard), background-color var(--duration-fast) var(--ease-standard), transform var(--duration-base) var(--ease-out-soft);
+    transition:
+      border-color var(--motion-base) var(--motion-ease-standard),
+      background-color var(--motion-base) var(--motion-ease-standard),
+      box-shadow var(--motion-base) var(--motion-ease-out),
+      transform var(--motion-base) var(--motion-ease-out);
   }
-  .fc-step[aria-selected="true"] { border-color: color-mix(in oklab, var(--color-brand) 60%, transparent); background: var(--color-surface-3); }
+  .fc-step[aria-selected="true"] { border-color: color-mix(in oklab, var(--color-brand) 60%, transparent); background: var(--color-surface-3); box-shadow: inset 0 -2px 0 var(--color-brand); }
   .fc-step[aria-selected="true"] .t-index { color: var(--color-brand-2); }
   @media (hover: hover) and (pointer: fine) {
     .fc-step:hover:not([aria-selected="true"]) { border-color: var(--border-default); transform: translateY(-2px); }
   }
 
-  /* Integration flow: nodes joined by beams. The beam is a hairline with a short light travelling along it
-     (transform only); the light is hidden with reduced motion. Horizontal from 64rem, vertical below. */
+  /* Integration flow: nodes joined by beams (brand hairlines). Horizontal from 64rem, vertical below. Drawn once
+     when the figure scrolls into view (node → connector → node, see [data-reveal] below), then static. */
   .fc-flow { display: grid; gap: 0; grid-template-columns: minmax(0, 1fr); }
   .fc-flow > li { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); }
   .fc-node {
@@ -1383,25 +1504,49 @@
     padding: 1rem 1.1rem;
     box-shadow: var(--shadow-panel);
   }
-  .fc-beam { position: relative; display: block; overflow: hidden; margin-inline: auto; width: 2px; height: 2rem; background: var(--border-default); }
-  .fc-beam::after { content: ""; position: absolute; inset: 0; height: 30%; background: linear-gradient(180deg, transparent, var(--color-brand-2), transparent); }
-  @media (prefers-reduced-motion: no-preference) {
-    .fc-beam::after { animation: fc-beam-y 2.6s linear infinite; animation-delay: calc(var(--i, 0) * 0.45s); }
+  .fc-beam {
+    position: relative;
+    display: block;
+    margin-inline: auto;
+    width: 2px;
+    height: 2rem;
+    transform-origin: top;
+    background: linear-gradient(180deg, color-mix(in oklab, var(--color-brand) 70%, transparent), color-mix(in oklab, var(--color-brand-2) 70%, transparent));
   }
   @media (min-width: 64rem) {
     .fc-flow { grid-template-columns: repeat(var(--nodes, 5), minmax(0, 1fr)); gap: 1.25rem; align-items: stretch; }
     .fc-flow > li { grid-template-columns: minmax(0, 1fr); }
-    .fc-beam { position: absolute; top: 2.15rem; left: calc(100% + 0.05rem); width: 1.15rem; height: 2px; margin: 0; z-index: 2; }
-    .fc-beam::after { height: auto; width: 45%; background: linear-gradient(90deg, transparent, var(--color-brand-2), transparent); }
-  }
-  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-    .fc-beam::after { animation-name: fc-beam-x; }
+    .fc-beam {
+      position: absolute;
+      top: 2.15rem;
+      left: calc(100% + 0.05rem);
+      width: 1.15rem;
+      height: 2px;
+      margin: 0;
+      z-index: 2;
+      transform-origin: left;
+      background: linear-gradient(90deg, color-mix(in oklab, var(--color-brand) 70%, transparent), color-mix(in oklab, var(--color-brand-2) 70%, transparent));
+    }
   }
 
   /* AI workflow demo: steps light up as the scripted run advances. */
   .fc-run-step { position: relative; display: grid; grid-template-columns: 2.25rem minmax(0, 1fr); gap: 0.85rem; padding-bottom: 1.1rem; }
-  .fc-run-step::after { content: ""; position: absolute; left: 1.1rem; top: 2.4rem; bottom: 0.2rem; width: 1px; background: var(--border-default); }
-  .fc-run-step:last-child::after { display: none; }
+  .fc-run-step::after,
+  .fc-run-step::before { content: ""; position: absolute; left: 1.1rem; top: 2.4rem; bottom: 0.2rem; width: 1px; background: var(--border-default); }
+  /* Completed connector: fills from the top when the step is done (follows the demo's state, no timers). */
+  .fc-run-step::before {
+    z-index: 1;
+    background: color-mix(in oklab, var(--color-success) 70%, transparent);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform var(--motion-base) var(--motion-ease-out);
+  }
+  .fc-run-step[data-state="done"]::before { transform: scaleY(1); }
+  .fc-run-step:last-child::after, .fc-run-step:last-child::before { display: none; }
+  /* A step that becomes active (or waits for a person) pings once; a completed step's check mark pops in. */
+  .fc-run-step[data-state="active"] .fc-run-dot,
+  .fc-run-step[data-state="waiting"] .fc-run-dot { animation: fc-ping var(--motion-slow) var(--motion-ease-out); }
+  .fc-run-step[data-state="done"] .fc-run-dot > svg { animation: fc-pop var(--motion-base) var(--motion-ease-out); }
   .fc-run-dot {
     display: inline-flex;
     width: 2.25rem;
@@ -1445,6 +1590,10 @@
   .fc-choice > input[type="checkbox"] + span .fc-choice-mark { border-radius: 4px; }
   .fc-choice > input:checked + span .fc-choice-mark { border-color: var(--color-brand); background: var(--color-brand); color: var(--color-surface-page); }
 
+  .fc-choice-mark { transition: border-color var(--motion-fast) var(--motion-ease-standard), background-color var(--motion-fast) var(--motion-ease-standard), box-shadow var(--motion-fast) var(--motion-ease-out); }
+  .fc-choice > input[type="radio"]:checked + span .fc-choice-mark { box-shadow: inset 0 0 0 3px var(--color-surface-1); }
+  /* The chosen column of the comparison table: its tint moves with the choice (220 ms). */
+  .compare-table th, .compare-table td { transition: background-color var(--motion-base) var(--motion-ease-standard), color var(--motion-base) var(--motion-ease-standard), box-shadow var(--motion-base) var(--motion-ease-out); }
   .compare-table td.is-focus, .compare-table th.is-focus { background: color-mix(in oklab, var(--color-brand) 9%, transparent); color: var(--text-primary); }
   .compare-table thead th.is-focus { box-shadow: inset 0 -2px 0 var(--color-brand); }
   .surface-light .compare-table thead th { background: var(--color-paper-surface-3); }
@@ -1481,20 +1630,49 @@
 @property --btn-a { syntax: "<color>"; inherits: false; initial-value: #69d9df; }
 @property --btn-b { syntax: "<color>"; inherits: false; initial-value: #69d9df; }
 
-/* ---------------------------------------------------------------- section reveal */
-/* Scroll-driven, CSS only, progressive: browsers without view timelines (and reduced motion,
-   and print) show the content immediately. Applied centrally by SectionHeading and DiagramFrame. */
+/* ---------------------------------------------------------------- scroll reveal */
+/* One primitive (components/motion/reveal.ts + MotionRuntime.tsx). The server renders `data-reveal=""`, which is
+   always visible: without JavaScript, with reduced motion, in print and for anything already on screen when the
+   page loads, nothing is hidden. The runtime marks an element "pending" only when an IntersectionObserver reports
+   it outside the viewport, flips it to "in" once when it enters (380 ms, 12 px; 8 px on phones), then to "done",
+   which drops the reveal styles so the element's own hover transitions apply again.
+   `data-reveal-children`: the direct children reveal instead, 55 ms apart (card groups, CTA clusters). */
 @media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .reveal {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 22%;
-    }
+  [data-reveal="pending"]:not([data-reveal-children], .fc-flow),
+  [data-reveal="pending"][data-reveal-children] > * {
+    opacity: 0;
+    transform: translate3d(0, var(--reveal-shift), 0);
+  }
+  [data-reveal="in"]:not([data-reveal-children], .fc-flow),
+  [data-reveal="in"][data-reveal-children] > * {
+    transition:
+      opacity var(--reveal-duration) var(--motion-ease-out),
+      transform var(--reveal-duration) var(--motion-ease-out);
+  }
+  [data-reveal="in"][data-reveal-children] > :nth-child(2) { transition-delay: calc(var(--motion-stagger) * 1); }
+  [data-reveal="in"][data-reveal-children] > :nth-child(3) { transition-delay: calc(var(--motion-stagger) * 2); }
+  [data-reveal="in"][data-reveal-children] > :nth-child(4) { transition-delay: calc(var(--motion-stagger) * 3); }
+  [data-reveal="in"][data-reveal-children] > :nth-child(5) { transition-delay: calc(var(--motion-stagger) * 4); }
+  [data-reveal="in"][data-reveal-children] > :nth-child(6) { transition-delay: calc(var(--motion-stagger) * 5); }
+  [data-reveal="in"][data-reveal-children] > :nth-child(n + 7) { transition-delay: calc(var(--motion-stagger) * 6); }
+
+  /* Integration flow (data-reveal="…" on .fc-flow): node → connector → node, 150 ms apart, drawn once. */
+  .fc-flow[data-reveal="pending"] .fc-node { opacity: 0; transform: translate3d(0, var(--reveal-shift), 0); }
+  .fc-flow[data-reveal="pending"] .fc-beam { transform: scaleY(0); }
+  .fc-flow[data-reveal="in"] .fc-node {
+    transition: opacity var(--motion-slow) var(--motion-ease-out), transform var(--motion-slow) var(--motion-ease-out);
+    transition-delay: calc(var(--i, 0) * var(--motion-sequence));
+  }
+  .fc-flow[data-reveal="in"] .fc-beam {
+    transition: transform var(--motion-base) var(--motion-ease-out);
+    transition-delay: calc(var(--i, 0) * var(--motion-sequence) + var(--motion-instant));
+  }
+  @media (min-width: 64rem) {
+    .fc-flow[data-reveal="pending"] .fc-beam { transform: scaleX(0); }
   }
 }
 @media print {
-  .reveal { animation: none !important; }
+  [data-reveal], [data-reveal] > *, [data-reveal] .fc-node, [data-reveal] .fc-beam { opacity: 1 !important; transform: none !important; }
 }
 
 /* ---------------------------------------------------------------- forced colours */
@@ -1512,13 +1690,14 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  /* No movement: state is still shown through colour, border and focus rings. */
-  .card-interactive:hover, .card-interactive:active,
-  .btn:hover, .btn:active, .btn .btn-icon, .arrow-nudge, .offer-card:hover,
-  .fc-card:hover, .fc-step:hover { transform: none !important; }
-  .menu-enter, .menu-sheet-enter, .reveal, .fc-enter, .fc-float, .fc-panel-enter { animation: none !important; }
-  .fc-beam::after, .fc-backdrop::before, .fc-backdrop::after { animation: none !important; }
-  .fc-beam::after { display: none; }
+  /* No movement: state is still shown through colour, border, focus rings and text. Scroll reveals never hide
+     anything here (their rules only exist under no-preference); the flow diagram is drawn complete at once. */
+  .card-interactive:hover, .card-interactive:active, .card-interactive:has(:focus-visible),
+  .motion-card:hover, .motion-card:has(:focus-visible),
+  .btn:hover, .btn:active, .btn .btn-icon, .arrow-nudge, .offer-card:hover, .offer-card:has(:focus-visible),
+  .fc-card:hover, .fc-card:has(:focus-visible), .fc-step:hover { transform: none !important; }
+  .menu-enter, .menu-sheet-enter, .fc-enter, .fc-rise, .fc-panel-enter, .swap-stack > *, .fc-run-dot, .fc-run-dot > svg,
+  .field-error, .alert, .fc-pop, [data-mobile-sheet] { animation: none !important; }
   .fc-card-more { transition: none; }
   .motion-decorative { display: none !important; }
   .skeleton { animation: none; }

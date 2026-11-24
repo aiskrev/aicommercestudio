@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
+import { reveal } from "@/components/motion/reveal";
 import { Icon, type IconName } from "@/components/ui/Icon";
 
 export function cx(...classes: (string | false | null | undefined)[]): string {
@@ -116,14 +117,11 @@ export function SectionHeading({
   className?: string;
 }) {
   const headingClass = Heading === "h1" ? "t-h1" : size === "sm" || Heading === "h3" ? "t-h3-lg" : "t-h2";
+  // Section headings reveal once on scroll (components/motion/reveal.ts); a page's h1 never does.
   const text = (
     <div
-      className={cx(
-        "max-w-3xl min-w-0",
-        Heading !== "h1" && "reveal",
-        align === "center" && "mx-auto text-center",
-        !action && className,
-      )}
+      {...(Heading !== "h1" ? reveal() : {})}
+      className={cx("max-w-3xl min-w-0", align === "center" && "mx-auto text-center", !action && className)}
     >
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
       <Heading id={id} className={cx(headingClass, eyebrow && (size === "sm" ? "mt-3" : "mt-4"))}>
@@ -179,6 +177,33 @@ export function Button({
   loadingLabel?: string;
   icon?: IconName;
 }) {
+  if (loadingLabel) {
+    // Both states share one grid cell (.btn-swap): the button keeps the width of the longer label, so it never
+    // changes size while busy. The hidden state is `visibility: hidden` (inline, so it holds without the
+    // stylesheet too): out of the accessible name and invisible, but still measured.
+    const shown = { visibility: "visible" } as const;
+    const kept = { visibility: "hidden" } as const;
+    return (
+      <button
+        type="button"
+        {...props}
+        disabled={disabled || loading}
+        aria-busy={loading || undefined}
+        className={cx(buttonClass(variant, size), className)}
+      >
+        <span className="btn-swap">
+          <span style={loading ? kept : shown} aria-hidden={loading || undefined}>
+            <span className="btn-label">{children}</span>
+            {icon && <Icon name={icon} className="btn-icon h-4 w-4" />}
+          </span>
+          <span style={loading ? shown : kept} aria-hidden={!loading || undefined}>
+            {loading && <Spinner />}
+            <span className="btn-label">{loadingLabel}</span>
+          </span>
+        </span>
+      </button>
+    );
+  }
   return (
     <button
       type="button"
@@ -188,7 +213,7 @@ export function Button({
       className={cx(buttonClass(variant, size), className)}
     >
       {loading && <Spinner />}
-      <span className="btn-label">{loading && loadingLabel ? loadingLabel : children}</span>
+      <span className="btn-label">{children}</span>
       {!loading && icon && <Icon name={icon} className="btn-icon h-4 w-4" />}
     </button>
   );
@@ -356,13 +381,14 @@ export function PageHero({
         <div className="fc-grid" />
       </div>
       <Container className={cx("relative pb-14 pt-12 sm:pb-20 sm:pt-16", Boolean(aside) && "grid items-center gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14")}>
+        {/* Entrance (CSS only, once): eyebrow → heading → lead → actions → aside; the heading, the lead and the actions only rise (LCP). */}
         <div className="min-w-0">
-          <Eyebrow>{eyebrow}</Eyebrow>
-          <h1 className="t-h1 mt-5 max-w-4xl">{title}</h1>
-          <p className="t-lead mt-6 max-w-3xl">{lead}</p>
-          {children}
+          <Eyebrow className="fc-enter [--i:0]">{eyebrow}</Eyebrow>
+          <h1 className="fc-rise t-h1 mt-5 max-w-4xl [--i:1]">{title}</h1>
+          <p className="fc-rise t-lead mt-6 max-w-3xl [--i:2]">{lead}</p>
+          {children && <div className="fc-rise [--i:3]">{children}</div>}
         </div>
-        {aside && <div className="fc-enter min-w-0">{aside}</div>}
+        {aside && <div className="fc-enter min-w-0 [--i:4]">{aside}</div>}
       </Container>
       <span className="fc-horizon" aria-hidden="true" />
     </div>

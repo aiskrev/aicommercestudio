@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { reveal } from "@/components/motion/reveal";
 import { Icon } from "@/components/ui/Icon";
 import { cx } from "@/components/ui/primitives";
 
@@ -61,7 +62,8 @@ export function DiagramFrame({
 }) {
   return (
     <figure
-      className={cx("diagram-frame diagram-grid reveal p-5 sm:p-6", className)}
+      {...reveal()}
+      className={cx("diagram-frame diagram-grid p-5 sm:p-6", className)}
       aria-labelledby={titleId}
       data-testid={testId}
     >

@@ -143,3 +143,60 @@ selector, comparison, demo — and larger HTML). Mobile LCP is **still above the
 and is not improved overall: it moved by −0.22 s to +0.59 s per route, several of these inside the run-to-run noise seen
 in the three runs. Mobile TBT went down on six of eight routes. Best practices 74 and `/en` SEO 92 are unchanged from
 before (pre-existing). The mobile LCP work stays an open item (D-47).
+
+## Motion system (2026-11-24)
+
+Same method (production build in an isolated compose project `acs-motion`, fresh data, Lighthouse 13.5.0 in the
+Playwright container, three runs per route and preset, the median-score run reported). "Before" is `main` @ `561018c`,
+"after" is `feature/motion-system`, measured in the same session on the same machine. JavaScript bytes: every script a
+cold page load fetches (Playwright, desktop viewport), compressed.
+
+| Preset | Route | Perf | LCP | TBT | CLS | JS (compressed) |
+| --- | --- | --- | --- | --- | --- | --- |
+| mobile | `/bg` | 89 → 88 | 3.32 s → 3.39 s | 120 → 143 ms | 0 → 0 | 193.9 → 195.0 KB |
+| mobile | `/en` | 91 → 92 | 3.12 s → 3.12 s | 127 → 123 ms | 0.02 → 0.017 | 193.9 → 195.0 KB |
+| mobile | `/bg/izrabotka-na-saytove` | 89 → 91 | 3.51 s → 3.04 s | 104 → 126 ms | 0 → 0 | 188.5 → 189.5 KB |
+| mobile | `/bg/online-magazini` | 92 → 91 | 3.05 s → 3.05 s | 105 → 158 ms | 0.007 → 0.007 | 188.5 → 189.5 KB |
+| mobile | `/bg/uslugi/avtomatizatsiya-na-procesi` | 91 → 91 | 3.05 s → 3.05 s | 142 → 129 ms | 0 → 0 | 193.9 → 195.0 KB |
+| mobile | `/bg/kontakti` | 91 → 90 | 3.12 s → 3.11 s | 123 → 168 ms | 0 → 0 | 188.5 → 189.5 KB |
+| desktop | `/bg` | 100 → 100 | 0.73 s → 0.69 s | 23 → 12 ms | 0 → 0 | — |
+| desktop | `/en` | 100 → 100 | 0.66 s → 0.66 s | 22 → 16 ms | 0 → 0 | — |
+| desktop | `/bg/izrabotka-na-saytove` | 100 → 100 | 0.80 s → 0.81 s | 24 → 17 ms | 0.002 → 0.002 | — |
+| desktop | `/bg/online-magazini` | 100 → 100 | 0.80 s → 0.79 s | 25 → 4 ms | 0.002 → 0.002 | — |
+| desktop | `/bg/uslugi/avtomatizatsiya-na-procesi` | 100 → 100 | 0.81 s → 0.65 s | 27 → 44 ms | 0 → 0 | — |
+| desktop | `/bg/kontakti` | 99 → 99 | 0.97 s → 0.95 s | 31 → 16 ms | 0 → 0 | — |
+
+Reading (honest): accessibility stays 100 and CLS is unchanged on every route. The motion layer adds about 1.1 KB of
+compressed JavaScript per page (the reveal observer, the tab indicator, the sheet closing state); no dependency was
+added. Mobile LCP is unchanged within run-to-run noise (−0.47 s to +0.07 s) and **is still above the 3.0 s budget on
+every route** (open item D-47). Mobile TBT moved by −13 to +53 ms, which is inside the spread of the three runs
+(for example `/bg/kontakti` scored 90, 91 and 75 in the after runs); desktop TBT went down on five of six routes. The
+LCP element on phones is the hero H1 (homepage) or the hero lead (service and hub pages): both are kept fully opaque
+from the first frame (`.fc-rise`, transform only), so the entrance cannot delay it. INP was not measured (no field
+data, and Lighthouse navigation runs do not report it).
+
+### Motion system after the self-audit (2026-11-24, same method and session)
+
+Final build of `feature/motion-system` (after the corrections of the self-audit), three runs, median-score run:
+
+| Preset | Route | Perf | LCP | TBT | CLS | JS (compressed) |
+| --- | --- | --- | --- | --- | --- | --- |
+| mobile | `/bg` | 89 | 3.39 s | 134 ms | 0 | 195.1 KB |
+| mobile | `/en` | 92 | 3.12 s | 112 ms | 0.017 | 195.1 KB |
+| mobile | `/bg/izrabotka-na-saytove` | 91 | 3.05 s | 148 ms | 0 | 189.6 KB |
+| mobile | `/bg/online-magazini` | 92 | 3.06 s | 106 ms | 0.007 | 189.6 KB |
+| mobile | `/bg/uslugi/avtomatizatsiya-na-procesi` | 92 | 3.05 s | 107 ms | 0 | 195.1 KB |
+| mobile | `/bg/kontakti` | 91 | 3.12 s | 127 ms | 0 | 189.6 KB |
+| desktop | all six routes | 99–100 | 0.64–0.95 s | 9–23 ms | 0–0.002 | — |
+
+Accessibility 100 and SEO 100 everywhere. **Best practices 74 is caused by the local test environment only**: the
+three failing audits are `is-on-https`, `redirects-http` and `errors-in-console`, and the only console message is
+Chromium ignoring the `Cross-Origin-Opener-Policy` header on an untrusted (plain-HTTP) origin. One Lighthouse run of
+the production site (`https://ai-commercestudio.com/bg`, current `main`, same Lighthouse version, run while the e2e
+suite was busy, so its performance figure is not comparable) gave best practices **100**, accessibility 100, SEO 100;
+mobile performance 88 with LCP 2.67 s, desktop 100.
+
+Root cause of the mobile LCP above budget (lab, simulated slow 4G; unchanged by the motion layer): the observed LCP is
+~0.24 s, the simulated 3.0–3.4 s comes from the render-blocking stylesheet (26.5 KB, Lighthouse estimates ~1 s of
+savings) and HTTP/1.1 in the local stack ("modern HTTP" audit, ~0.76 s; production is served over HTTP/2+ through the
+CDN). Inlining the critical CSS is outside the motion scope and is left to D-47.
