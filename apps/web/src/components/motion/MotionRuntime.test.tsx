@@ -7,7 +7,7 @@ import { prefersReducedMotion, reveal, revealGroup } from "@/components/motion/r
 vi.mock("next/navigation", () => ({ usePathname: () => "/bg" }));
 
 type Callback = (entries: Partial<IntersectionObserverEntry>[]) => void;
-let observers: { callback: Callback; observed: Element[]; disconnect: ReturnType<typeof vi.fn> }[] = [];
+let observers: FakeObserver[] = [];
 
 class FakeObserver {
   callback: Callback;

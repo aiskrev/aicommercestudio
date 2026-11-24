@@ -152,8 +152,8 @@ Fluid sizes are CSS variables on `:root` (`--type-*`), consumed by the `t-*` cla
 * Focus: `--ring` (2 px `brand`; `brand-ink` inside `.surface-light`), offset 3 px. Composite
   links use `.card-interactive` or `.focus-frame` so the ring outlines the whole card/row; under
   `forced-colors` the ring falls back to a system colour outline.
-* Motion tokens: `--duration-fast` 140 ms (buttons, fields), `--duration-base` 200 ms (cards, nav),
-  `--duration-slow` 320 ms; easing `ease-out-soft`, `ease-standard`. Under
+* Motion tokens: see [Interaction system](#interaction-system) and `MOTION_SYSTEM.md` (`--motion-*`; the
+  `--duration-*` aliases map onto them). Under
   `prefers-reduced-motion: reduce` all transitions/animations are cut, card hover lift is removed and
   `.motion-decorative` elements are hidden; every diagram is complete when static.
 
@@ -245,12 +245,13 @@ indicator measurement (`components/ui/Tabs.tsx`) and the mobile sheet's closing 
 | Token | Value | Use |
 | --- | --- | --- |
 | `--motion-instant` (`--duration-press`) | 100 ms | pressed state |
-| `--motion-fast` (`--duration-fast`) | 140 ms | colour, border, focus, icon nudge, outgoing panels |
+| `--motion-fast` (`--duration-fast`) | 140 ms | colour, border, focus, outgoing panels |
 | `--motion-base` (`--duration-base`) | 220 ms | transforms, shadows, cards, menus, tabs, accordion |
 | `--motion-slow` (`--duration-slow`) | 360 ms | step ping, larger moves |
 | `--motion-emphasis` | 460 ms | hero entrance |
 | `--motion-ease-standard` / `-out` / `-in` | `(.4,0,.2,1)` / `(.22,1,.36,1)` / `(.4,0,1,1)` | state changes / entering / leaving |
-| `--motion-stagger` | 55 ms | hero entrance, reveal groups (package filter: 40 ms) |
+| `--motion-stagger` / `-stagger-tight` | 55 ms / 40 ms | hero entrance, reveal groups / package filter |
+| `--motion-sequence` / `--motion-swap-delay` / `--motion-sheet` | 150 / 90 / 260 ms | flow drawing step / panel swap overlap / mobile sheet |
 | `--reveal-shift` / `--reveal-duration` | 12 px (8 px below 48rem) / 380 ms | scroll reveal |
 | `--lift` / `--lift-card` | −2 px / −3 px | hover lift for buttons / cards |
 | `--press-scale` | 0.99 | pressed buttons (cards 0.995) |
@@ -264,7 +265,7 @@ indicator measurement (`components/ui/Tabs.tsx`) and the mobile sheet's closing 
 | Text link `.link` | brand → `brand-soft`, underline 35 % → 100 % | underline 100 % + ring | — | `.surface-light` uses `brand-ink` |
 | Cards `.card-interactive`, `.motion-card`, `.fc-card`, `.offer-card` | lift 3 px, brand border, lift shadow; arrow +2 px | same lift + brand ring (`:has(:focus-visible)`) | scale 0.995 | — |
 | Rows `.focus-frame` + `group` | heading turns brand; arrow nudge | outline around the row; arrow nudge | — | — |
-| Nav link `.nav-link` | underline grows at 45 % (160 ms) | underline at 45 % + ring | — | current section / open menu: underline 100 % |
+| Nav link `.nav-link` | underline grows at 45 % (220 ms) | underline at 45 % + ring | — | current section / open menu: underline 100 % |
 | Dropdown / mobile sheet | — | Escape closes, focus returns | — | dropdown fades in from −4 px (220 ms); sheet 260 ms in, 220 ms out |
 | Section headings, diagram frames, CTA bands, card groups | — | — | — | `data-reveal` (once, IntersectionObserver): fade + 12 px rise |
 | Tab `.tab` | colour → `fg`, `surface-2` wash | inset 2 px ring | — | selected: underline; segmented tabs: one sliding indicator (220 ms) |

@@ -269,6 +269,10 @@
     --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
     --motion-stagger: 55ms;
+    --motion-stagger-tight: 40ms;   /* a freshly filtered set (package filter) */
+    --motion-sequence: 150ms;       /* one step of a drawn sequence (integration flow) */
+    --motion-swap-delay: 90ms;      /* incoming panel waits for the outgoing one to clear (.swap-stack) */
+    --motion-sheet: 260ms;          /* mobile menu sheet opening (brief: 220–280 ms) */
     /* Scroll reveal (components/motion/MotionRuntime.tsx): distance and duration. */
     --reveal-shift: 12px;
     --reveal-duration: 380ms;
@@ -555,14 +559,14 @@
       border-color var(--duration-fast) var(--ease-standard),
       color var(--duration-fast) var(--ease-standard),
       box-shadow var(--duration-base) var(--ease-standard),
-      transform var(--duration-fast) var(--ease-out-soft),
+      transform var(--motion-base) var(--motion-ease-out),
       --btn-a var(--duration-base) var(--ease-standard),
       --btn-b var(--duration-base) var(--ease-standard);
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
   /* Trailing icon (arrow) moves in the direction of travel on hover and keyboard focus. */
-  .btn-icon { flex-shrink: 0; transition: transform var(--motion-fast) var(--motion-ease-out); }
+  .btn-icon { flex-shrink: 0; transition: transform var(--motion-base) var(--motion-ease-out); }
   .btn:focus-visible .btn-icon { transform: translateX(var(--nudge)); }
   @media (hover: hover) and (pointer: fine) {
     .btn:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"]) .btn-icon { transform: translateX(var(--nudge)); }
@@ -946,8 +950,8 @@
   .nav-link[aria-current="page"]::after,
   .nav-link[aria-expanded="true"]::after,
   .nav-link[data-active]::after { transform: scaleX(1); }
-  /* Hover/focus preview: the underline grows at half strength (160 ms); the current section keeps it at full. */
-  .nav-link::after { transition: transform 160ms var(--motion-ease-out), opacity var(--motion-fast) var(--motion-ease-standard); }
+  /* Hover/focus preview: the underline grows at half strength (220 ms); the current section keeps it at full. */
+  .nav-link::after { transition: transform var(--motion-base) var(--motion-ease-out), opacity var(--motion-base) var(--motion-ease-standard); }
   .nav-link:focus-visible:not([aria-current="page"], [aria-expanded="true"], [data-active])::after { transform: scaleX(1); opacity: 0.45; }
   @media (hover: hover) and (pointer: fine) {
     .nav-link:hover:not([aria-current="page"], [aria-expanded="true"], [data-active])::after { transform: scaleX(1); opacity: 0.45; }
@@ -956,14 +960,14 @@
   /* Menus and dropdowns: entry animation each time the panel is shown (display none → block).
      Closing is instant so the UI never waits on an animation. */
   .menu-enter { animation: menu-enter var(--motion-base) var(--motion-ease-out); }
-  .menu-sheet-enter { animation: menu-sheet-enter 260ms var(--motion-ease-out); }
+  .menu-sheet-enter { animation: menu-sheet-enter var(--motion-sheet) var(--motion-ease-out); }
   /* Mobile sheet closing (Header.tsx keeps it mounted for 220 ms with data-state="closing"). */
   [data-mobile-sheet][data-state="closing"] { animation: menu-sheet-exit var(--motion-base) var(--motion-ease-in) forwards; pointer-events: none; }
   @keyframes menu-sheet-exit {
     to { opacity: 0; transform: translate3d(0, -8px, 0); }
   }
   /* One-off entrance of a confirmation (form success). */
-  .fc-pop { animation: fc-pop 280ms var(--motion-ease-out); }
+  .fc-pop { animation: fc-pop var(--motion-base) var(--motion-ease-out); }
 
   /* Multi-step tools: each newly shown step eases in (skipped when reduced motion is requested). */
   @media (prefers-reduced-motion: no-preference) {
@@ -1415,7 +1419,7 @@
   .surface-light .tab-indicator { background: var(--color-surface-paper-field); box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-brand) 45%, transparent), var(--shadow-paper); }
   .fc-panel-enter { animation: fc-panel var(--motion-base) var(--motion-ease-out); }
   /* Staggered entry of a freshly shown set (package filter): --i is the item's index, 40 ms apart. */
-  .fc-panel-stagger { animation-fill-mode: both; animation-delay: calc(var(--i, 0) * 40ms); }
+  .fc-panel-stagger { animation-fill-mode: both; animation-delay: calc(var(--i, 0) * var(--motion-stagger-tight)); }
 
   /* Cross-fading panel stack (product showcase, comparison summary, process stages): every panel sits in the same
      grid cell, so the frame always has the height of the tallest one (no collapse, no jump when switching). The
@@ -1434,7 +1438,7 @@
       transform var(--motion-fast) var(--motion-ease-in),
       visibility 0s linear var(--motion-fast);
   }
-  .swap-stack > [data-active="true"] { animation: fc-panel var(--motion-base) var(--motion-ease-out) 90ms both; }
+  .swap-stack > [data-active="true"] { animation: fc-panel var(--motion-base) var(--motion-ease-out) var(--motion-swap-delay) both; }
   /* Product showcase: on one-column layouts the panels differ by up to ~270 px, so below 64rem only the shown panel
      takes space (the change follows a tap, which CLS excludes); from 64rem they keep the shared cell. */
   @media (max-width: 63.99rem) {
@@ -1450,7 +1454,7 @@
   .fc-mock-bar { display: block; border-radius: 3px 3px 0 0; background: color-mix(in oklab, var(--color-brand) 70%, transparent); }
   .fc-mock-bar.is-cyan { background: color-mix(in oklab, var(--color-brand-2) 70%, transparent); }
 
-  /* Process stepper: a progress hairline filled up to the selected stage (--progress, 0–1), 260 ms. */
+  /* Process stepper: a progress hairline filled up to the selected stage (--progress, 0–1), 220 ms. */
   .fc-steps-track { position: relative; height: 2px; border-radius: 2px; background: var(--border-default); overflow: hidden; }
   .fc-steps-track > span {
     position: absolute;
@@ -1458,7 +1462,7 @@
     transform-origin: left;
     transform: scaleX(var(--progress, 1));
     background: linear-gradient(90deg, var(--color-brand), var(--color-brand-2));
-    transition: transform 260ms var(--motion-ease-out);
+    transition: transform var(--motion-base) var(--motion-ease-out);
   }
   .fc-step {
     position: relative;
@@ -1535,7 +1539,7 @@
     background: color-mix(in oklab, var(--color-success) 70%, transparent);
     transform: scaleY(0);
     transform-origin: top;
-    transition: transform 260ms var(--motion-ease-out);
+    transition: transform var(--motion-base) var(--motion-ease-out);
   }
   .fc-run-step[data-state="done"]::before { transform: scaleY(1); }
   .fc-run-step:last-child::after, .fc-run-step:last-child::before { display: none; }
@@ -1656,12 +1660,12 @@
   .fc-flow[data-reveal="pending"] .fc-node { opacity: 0; transform: translate3d(0, var(--reveal-shift), 0); }
   .fc-flow[data-reveal="pending"] .fc-beam { transform: scaleY(0); }
   .fc-flow[data-reveal="in"] .fc-node {
-    transition: opacity 320ms var(--motion-ease-out), transform 320ms var(--motion-ease-out);
-    transition-delay: calc(var(--i, 0) * 150ms);
+    transition: opacity var(--motion-slow) var(--motion-ease-out), transform var(--motion-slow) var(--motion-ease-out);
+    transition-delay: calc(var(--i, 0) * var(--motion-sequence));
   }
   .fc-flow[data-reveal="in"] .fc-beam {
-    transition: transform 180ms var(--motion-ease-out);
-    transition-delay: calc(var(--i, 0) * 150ms + 110ms);
+    transition: transform var(--motion-base) var(--motion-ease-out);
+    transition-delay: calc(var(--i, 0) * var(--motion-sequence) + var(--motion-instant));
   }
   @media (min-width: 64rem) {
     .fc-flow[data-reveal="pending"] .fc-beam { transform: scaleX(0); }

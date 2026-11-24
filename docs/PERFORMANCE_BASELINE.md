@@ -174,3 +174,29 @@ every route** (open item D-47). Mobile TBT moved by −13 to +53 ms, which is in
 LCP element on phones is the hero H1 (homepage) or the hero lead (service and hub pages): both are kept fully opaque
 from the first frame (`.fc-rise`, transform only), so the entrance cannot delay it. INP was not measured (no field
 data, and Lighthouse navigation runs do not report it).
+
+### Motion system after the self-audit (2026-11-24, same method and session)
+
+Final build of `feature/motion-system` (after the corrections of the self-audit), three runs, median-score run:
+
+| Preset | Route | Perf | LCP | TBT | CLS | JS (compressed) |
+| --- | --- | --- | --- | --- | --- | --- |
+| mobile | `/bg` | 89 | 3.39 s | 134 ms | 0 | 195.1 KB |
+| mobile | `/en` | 92 | 3.12 s | 112 ms | 0.017 | 195.1 KB |
+| mobile | `/bg/izrabotka-na-saytove` | 91 | 3.05 s | 148 ms | 0 | 189.6 KB |
+| mobile | `/bg/online-magazini` | 92 | 3.06 s | 106 ms | 0.007 | 189.6 KB |
+| mobile | `/bg/uslugi/avtomatizatsiya-na-procesi` | 92 | 3.05 s | 107 ms | 0 | 195.1 KB |
+| mobile | `/bg/kontakti` | 91 | 3.12 s | 127 ms | 0 | 189.6 KB |
+| desktop | all six routes | 99–100 | 0.64–0.95 s | 9–23 ms | 0–0.002 | — |
+
+Accessibility 100 and SEO 100 everywhere. **Best practices 74 is caused by the local test environment only**: the
+three failing audits are `is-on-https`, `redirects-http` and `errors-in-console`, and the only console message is
+Chromium ignoring the `Cross-Origin-Opener-Policy` header on an untrusted (plain-HTTP) origin. One Lighthouse run of
+the production site (`https://ai-commercestudio.com/bg`, current `main`, same Lighthouse version, run while the e2e
+suite was busy, so its performance figure is not comparable) gave best practices **100**, accessibility 100, SEO 100;
+mobile performance 88 with LCP 2.67 s, desktop 100.
+
+Root cause of the mobile LCP above budget (lab, simulated slow 4G; unchanged by the motion layer): the observed LCP is
+~0.24 s, the simulated 3.0–3.4 s comes from the render-blocking stylesheet (26.5 KB, Lighthouse estimates ~1 s of
+savings) and HTTP/1.1 in the local stack ("modern HTTP" audit, ~0.76 s; production is served over HTTP/2+ through the
+CDN). Inlining the critical CSS is outside the motion scope and is left to D-47.

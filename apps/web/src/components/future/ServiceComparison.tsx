@@ -92,7 +92,12 @@ export function ServiceComparison({
 
         {/* One summary per option in a shared grid cell (.swap-stack): the chosen one cross-fades in, the panel keeps
             the height of the longest and never jumps; only the shown one is in the accessibility tree and tab order. */}
-        <aside className="feature-panel order-first p-6" aria-live="polite" data-testid="compare-focus">
+        <aside className="feature-panel order-first p-6" data-testid="compare-focus">
+          {/* Toggling aria-hidden on the panels is not announced reliably, so a polite status repeats the chosen
+              summary as text (empty on load, so nothing is read before the visitor chooses). */}
+          <p className="sr-only" aria-live="polite" data-testid="compare-announce">
+            {swapped ? `${option.label}. ${option.summary}` : ""}
+          </p>
           <div className="swap-stack" data-swapped={swapped}>
             {text.options.map((item) => {
               const active = item.key === option.key;

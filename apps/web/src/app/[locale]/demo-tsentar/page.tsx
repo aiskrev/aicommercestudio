@@ -59,7 +59,7 @@ export default async function DemoCentrePage({ params }: PageProps<"/[locale]/de
         <h2 id="demo-legend-title" className="t-h3">
           {t.legendTitle}
         </h2>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {order.map((kind) => (
             <li key={kind} className="card p-5">
               <a href={`#${kind}`} className="font-medium text-fg hover:text-brand">

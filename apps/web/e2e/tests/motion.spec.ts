@@ -117,6 +117,52 @@ test.describe("no motion preference", () => {
     await expect(cards).toHaveAttribute("data-reveal", "done");
   });
 
+  for (const width of [375, 768, 1024, 1440]) {
+    test(`scroll reveal at ${width}px: fast jumps and scrolling back never leave anything on screen hidden`, async ({ page }) => {
+      // Invariant: a target may wait hidden ("pending") only while it is off screen. Jumping to the end and back
+      // in big steps can carry a target past the viewport without a single frame on screen (the deferred
+      // `content-visibility: auto` sections change height as they render), so such a target stays pending until it
+      // is really scrolled to — which a final slow pass down the page then checks.
+      await page.setViewportSize({ width, height: 1024 });
+      await page.goto("/bg");
+      await page.waitForTimeout(500);
+      const hiddenOnScreen = () =>
+        page.evaluate(() =>
+          [...document.querySelectorAll<HTMLElement>('[data-reveal="pending"]')].filter((el) => {
+            const r = el.getBoundingClientRect();
+            // Only what is really rendered: inside a skipped `content-visibility: auto` section a forced layout
+            // can place a target "on screen" while the section is not painted at all.
+            return r.height > 0 && r.bottom > 0 && r.top < innerHeight && el.checkVisibility({ contentVisibilityAuto: true });
+          }).length,
+        );
+      await page.evaluate(() => window.scrollTo(0, document.scrollingElement!.scrollHeight));
+      await expect.poll(hiddenOnScreen, { timeout: 1500 }).toBe(0);
+      const height = await page.evaluate(() => document.scrollingElement!.scrollHeight);
+      for (let y = height; y >= 0; y -= 614) {
+        await page.evaluate((top) => window.scrollTo(0, top), y);
+        await expect.poll(hiddenOnScreen, { timeout: 1500 }).toBe(0);
+      }
+      // Slow pass down: every target is scrolled to, so none may be left waiting.
+      for (let y = 0; y < (await page.evaluate(() => document.scrollingElement!.scrollHeight)); y += 300) {
+        await page.evaluate((top) => window.scrollTo(0, top), y);
+        await page.waitForTimeout(40);
+      }
+      await expect
+        .poll(() => page.evaluate(() => document.querySelectorAll('[data-reveal="pending"], [data-reveal="in"]').length), { timeout: 4000 })
+        .toBe(0);
+    });
+  }
+
+  test("comparison: choosing a website type is announced in a polite status", async ({ page }) => {
+    await page.goto("/en");
+    const comparison = page.getByTestId("service-comparison").first();
+    const status = comparison.getByTestId("compare-announce");
+    await expect(status).toHaveAttribute("aria-live", "polite");
+    await expect(status).toHaveText("");
+    await comparison.getByTestId("compare-pick-store").check();
+    await expect(status).toContainText("Online store");
+  });
+
   test("tabs: the product selector keeps its height and follows the arrow keys", async ({ page }) => {
     await page.goto("/en");
     const showcase = page.getByTestId("product-showcase");

@@ -93,6 +93,10 @@ export function Header({
   // The sheet stays mounted for its 220 ms closing animation (skipped with reduced motion), then unmounts.
   const [sheetClosing, setSheetClosing] = useState(false);
   const closingTimer = useRef(0);
+  useEffect(() => {
+    const timer = closingTimer;
+    return () => window.clearTimeout(timer.current);
+  }, []);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
   const [lastPath, setLastPath] = useState(pathname);
@@ -568,10 +572,12 @@ function MobileLink({
   );
 }
 
-/** Keeps the mobile sheet mounted for its closing animation (220 ms, globals.css → [data-mobile-sheet]). */
+/** Keeps the mobile sheet mounted for its closing animation (--motion-base, globals.css → [data-mobile-sheet]). */
 function animateSheetClose(setClosing: (closing: boolean) => void, timer: { current: number }) {
   if (prefersReducedMotion()) return;
   window.clearTimeout(timer.current);
   setClosing(true);
-  timer.current = window.setTimeout(() => setClosing(false), 220);
+  // The closing animation runs for --motion-base; read it, so the timer and the CSS can never drift apart.
+  const duration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--motion-base")) || 220;
+  timer.current = window.setTimeout(() => setClosing(false), duration);
 }

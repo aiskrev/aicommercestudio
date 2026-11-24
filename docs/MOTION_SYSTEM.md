@@ -28,14 +28,17 @@ Interaction tables per element: [`DESIGN_SYSTEM.md` → Interaction system](DESI
 | Token | Value | Use |
 | --- | --- | --- |
 | `--motion-instant` | 100 ms | press feedback |
-| `--motion-fast` | 140 ms | colour/border, icon nudge, focus halo, outgoing panel |
+| `--motion-fast` | 140 ms | colour/border, focus halo, outgoing panel |
 | `--motion-base` | 220 ms | cards, menus, tabs indicator, incoming panel, accordion |
 | `--motion-slow` | 360 ms | active-step ping |
 | `--motion-emphasis` | 460 ms | hero entrance |
 | `--motion-ease-standard` | `cubic-bezier(0.4, 0, 0.2, 1)` | state changes |
 | `--motion-ease-out` | `cubic-bezier(0.22, 1, 0.36, 1)` | entering, movement |
 | `--motion-ease-in` | `cubic-bezier(0.4, 0, 1, 1)` | leaving |
-| `--motion-stagger` | 55 ms | hero entrance and reveal groups (package filter: 40 ms) |
+| `--motion-stagger` / `--motion-stagger-tight` | 55 ms / 40 ms | hero entrance and reveal groups / a freshly filtered set |
+| `--motion-sequence` | 150 ms | one step of a drawn sequence (integration flow) |
+| `--motion-swap-delay` | 90 ms | incoming panel waits for the outgoing one (`.swap-stack`) |
+| `--motion-sheet` | 260 ms | mobile menu sheet opening |
 | `--reveal-shift` | 12 px (8 px below 48rem) | scroll-reveal distance |
 | `--reveal-duration` | 380 ms | scroll-reveal duration |
 | `--lift` / `--lift-card` | −2 px / −3 px | hover/focus lift: buttons / cards |
@@ -98,13 +101,13 @@ without JavaScript) the selected tab keeps its own background. WAI-ARIA tabs wit
 
 | Area | Behaviour |
 | --- | --- |
-| Primary/secondary buttons | hover −2 px, press back to 0 px + scale 0.99 (100 ms), arrow +3 px on hover and focus, strong focus ring; disabled/busy: no movement. Busy label keeps the button width. |
-| Navigation | underline grows from the left (160 ms), 45 % on hover/focus, 100 % for the current section or open menu; dropdowns fade in from −4 px (220 ms), close instantly; mobile sheet 260 ms in / 220 ms out, Escape closes and returns focus to the toggle. The header fit measurement (`data-compact`) is unchanged. |
+| Primary/secondary buttons | hover −2 px (220 ms), press back to 0 px + scale 0.99 (100 ms), arrow +3 px (220 ms) on hover and focus, strong focus ring; disabled/busy: no movement. Busy label keeps the button width. |
+| Navigation | underline grows from the left (220 ms), 45 % on hover/focus, 100 % for the current section or open menu; dropdowns fade in from −4 px (220 ms), close instantly; mobile sheet 260 ms in / 220 ms out, Escape closes and returns focus to the toggle. The header fit measurement (`data-compact`) is unchanged. |
 | Hero | staggered entrance above; static backdrop and preview (the former drifting colour fields and floating previews/chips were removed). |
 | Cards | one behaviour for the four service cards (`.fc-card`), package cards, tool cards and demo cards (`.motion-card` / `.card-interactive`): lift 3 px, stronger border and shadow, 220 ms, arrow +2 px; keyboard focus inside the card looks the same plus a ring. |
 | Product/demo selector | sliding indicator + cross-fade, constant height, ARIA tabs with arrow keys. |
-| Website-type comparison | the chosen column's tint and header underline transition (220 ms); the summary cross-fades; radio marks animate. |
-| Process stepper (6 stages) | progress hairline fills to the selected stage (260 ms, transform), selected stage gets a brand underline, panel cross-fades; ARIA tabs with ← → ↑ ↓ Home End. |
+| Website-type comparison | the chosen column's tint and header underline transition (220 ms); the summary cross-fades; radio marks animate; a polite `sr-only` status announces the chosen type and its summary (toggling `aria-hidden` alone is not announced reliably). |
+| Process stepper (6 stages) | progress hairline fills to the selected stage (220 ms, transform), selected stage gets a brand underline, panel cross-fades; ARIA tabs with ← → ↑ ↓ Home End. |
 | Integration flow | drawn once when scrolled to: node → connector → node, 150 ms apart; static afterwards; whole diagram at once without JS / reduced motion. |
 | Package filters | segmented indicator; the newly shown set fades in 40 ms apart, only after a filter change (not on load). |
 | AI workflow demo | each step shows its real state: the dot pings once when it becomes active/waiting, the connector fills and the check mark pops when done — only on clicks, no timers. The disclosure stays above the controls. |
@@ -129,3 +132,20 @@ without JavaScript) the selected tab keeps its own background. WAI-ARIA tabs wit
   that already existed (tabs, stepper, comparison, demo, header) only gained small state.
 * The LCP heading is never transparent; reveal never applies above the fold at load; no scroll
   handlers. Measurements: see the PR description and `PERFORMANCE_BASELINE.md`.
+
+## Verification notes
+
+* **Fast scrolling and deferred sections.** Sections with `.fc-defer` (`content-visibility: auto`,
+  placeholder 60rem) change height as they render. A jump in large steps can carry a reveal target past
+  the viewport without a single rendered frame on screen; it then stays `pending` (hidden only while off
+  screen) and is revealed when it is really scrolled to. The invariant tested in
+  `e2e/tests/motion.spec.ts` is therefore: no `pending` target is ever on screen, and after a slow pass
+  through the page nothing is left pending (375, 768, 1024 and 1440 px). "On screen" means rendered
+  (`checkVisibility({ contentVisibilityAuto: true })`): inside a skipped deferred section a forced layout
+  can report a target inside the viewport although the section is not painted at all; such a target is
+  revealed as soon as its section renders near the viewport (verified at 320 px).
+* **Segmented-tab indicator** transitions `width`/`height` as well as `transform`: it is absolutely
+  positioned, so this never moves other content (no CLS); a transform-only version would distort the
+  rounded corners when the tabs differ in width.
+* **Not implemented (optional in the brief):** magnetic hero CTA and pointer tilt of the hero preview —
+  they need pointer listeners on every page for a 2–3 px effect.
