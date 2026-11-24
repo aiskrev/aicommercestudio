@@ -76,13 +76,35 @@ describe("interaction system hooks", () => {
 
   it("drops the trailing icon while loading", () => {
     render(
+      <Button icon="arrowRight" loading>
+        Изпрати
+      </Button>,
+    );
+    const button = screen.getByRole("button", { name: "Изпрати" });
+    expect(button.querySelector(".btn-icon")).toBeNull();
+    expect(button.querySelector(".spinner")).not.toBeNull();
+  });
+
+  it("keeps its size while busy: the busy label takes the idle label's cell, which stays measured but hidden", () => {
+    const { rerender } = render(
+      <Button icon="arrowRight" loadingLabel="Изпращане…">
+        Изпрати
+      </Button>,
+    );
+    const idle = screen.getByRole("button", { name: "Изпрати" });
+    expect(idle.querySelector(".spinner")).toBeNull();
+    rerender(
       <Button icon="arrowRight" loading loadingLabel="Изпращане…">
         Изпрати
       </Button>,
     );
     const button = screen.getByRole("button", { name: "Изпращане…" });
-    expect(button.querySelector(".btn-icon")).toBeNull();
+    expect(button).toBeDisabled();
+    expect(button).toHaveAttribute("aria-busy", "true");
     expect(button.querySelector(".spinner")).not.toBeNull();
+    const kept = button.querySelector(".btn-icon")!.closest<HTMLElement>("[aria-hidden='true']")!;
+    expect(kept.style.visibility).toBe("hidden");
+    expect(kept.parentElement).toHaveClass("btn-swap");
   });
 
   it("reveals section headings on scroll but never the page H1", () => {
@@ -92,7 +114,8 @@ describe("interaction system hooks", () => {
         <SectionHeading title="Процес" />
       </>,
     );
-    expect(screen.getByRole("heading", { level: 1 }).parentElement).not.toHaveClass("reveal");
-    expect(screen.getByRole("heading", { level: 2 }).parentElement).toHaveClass("reveal");
+    expect(screen.getByRole("heading", { level: 1 }).parentElement).not.toHaveAttribute("data-reveal");
+    // Rendered visible (data-reveal=""): only the client runtime may hide it, and only while it is off screen.
+    expect(screen.getByRole("heading", { level: 2 }).parentElement).toHaveAttribute("data-reveal", "");
   });
 });

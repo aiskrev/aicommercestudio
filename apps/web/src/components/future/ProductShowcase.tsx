@@ -11,8 +11,10 @@ import type { ShowcaseItem, ShowcaseKey } from "@/content/v5-types";
 
 /**
  * Tabbed product showcase (Future Commerce §3): a corporate site, an interactive site, a storefront and a SaaS
- * dashboard. WAI-ARIA tabs (components/ui/Tabs); each panel pairs a large mock-up (sample data, captioned) with
- * what is behind it and a link to the page that describes it. The store tab also links the three platforms.
+ * dashboard. WAI-ARIA tabs (components/ui/Tabs, sliding indicator); each panel pairs a large mock-up (sample data,
+ * captioned) with what is behind it and a link to the page that describes it. The store tab also links the three
+ * platforms. The four panels share one grid cell (.swap-stack): switching cross-fades them (out 140 ms, in 220 ms)
+ * and the frame never collapses or jumps; the hidden ones are out of the accessibility tree and the tab order.
  */
 export function ProductShowcase({
   items,
@@ -31,7 +33,11 @@ export function ProductShowcase({
   platformsLabel: string;
 }) {
   const [value, setValue] = useState<ShowcaseKey>(items[0].key);
-  const item = items.find((entry) => entry.key === value) ?? items[0];
+  const [swapped, setSwapped] = useState(false);
+  const select = (key: ShowcaseKey) => {
+    setValue(key);
+    setSwapped(true);
+  };
   return (
     <div data-testid="product-showcase">
       <Tabs
@@ -39,38 +45,52 @@ export function ProductShowcase({
         label={label}
         items={items.map((entry) => ({ value: entry.key, label: entry.label }))}
         value={value}
-        onChange={setValue}
+        onChange={select}
         variant="segmented"
         panelClassName="pt-8"
       >
-        <div key={item.key} className="fc-panel-enter grid items-center gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] lg:gap-12" data-testid={`showcase-panel-${item.key}`}>
-          <figure className="min-w-0">
-            <ShowcaseMock item={item} />
-            <figcaption className="t-label mt-3">{caption}</figcaption>
-          </figure>
-          <div className="min-w-0">
-            <span className="fc-card-icon">
-              <Icon name={item.icon} className="h-5 w-5" />
-            </span>
-            <h3 className="t-h3-lg mt-5">{item.title}</h3>
-            <p className="mt-3 leading-relaxed text-fg-muted">{item.text}</p>
-            <TickList items={item.points} className="mt-5" />
-            {item.key === "store" && (
-              <div className="mt-6">
-                <p className="t-label">{platformsLabel}</p>
-                <ul className="mt-2 flex flex-wrap gap-2">
-                  {platforms.map((platform) => (
-                    <li key={platform.id}>
-                      <Link href={platform.href} className="badge badge-accent min-h-9 hover:border-brand">
-                        {platform.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+        <div className="swap-stack" data-swapped={swapped}>
+          {items.map((item) => {
+            const active = item.key === value;
+            return (
+              <div
+                key={item.key}
+                data-active={active}
+                aria-hidden={!active || undefined}
+                inert={!active}
+                className="grid items-center gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] lg:gap-12"
+                data-testid={`showcase-panel-${item.key}`}
+              >
+                <figure className="min-w-0">
+                  <ShowcaseMock item={item} />
+                  <figcaption className="t-label mt-3">{caption}</figcaption>
+                </figure>
+                <div className="min-w-0">
+                  <span className="fc-card-icon">
+                    <Icon name={item.icon} className="h-5 w-5" />
+                  </span>
+                  <h3 className="t-h3-lg mt-5">{item.title}</h3>
+                  <p className="mt-3 leading-relaxed text-fg-muted">{item.text}</p>
+                  <TickList items={item.points} className="mt-5" />
+                  {item.key === "store" && (
+                    <div className="mt-6">
+                      <p className="t-label">{platformsLabel}</p>
+                      <ul className="mt-2 flex flex-wrap gap-2">
+                        {platforms.map((platform) => (
+                          <li key={platform.id}>
+                            <Link href={platform.href} className="badge badge-accent min-h-9 hover:border-brand">
+                              {platform.title}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <ArrowLink href={hrefs[item.key]} label={item.link} className="mt-5" testId={`showcase-more-${item.key}`} />
+                </div>
               </div>
-            )}
-            <ArrowLink href={hrefs[item.key]} label={item.link} className="mt-5" testId={`showcase-more-${item.key}`} />
-          </div>
+            );
+          })}
         </div>
       </Tabs>
     </div>

@@ -202,7 +202,7 @@ export function ContactForm({
         ref={successRef}
         tabIndex={-1}
         role="status"
-        className="panel border-success/40 p-8 outline-none sm:p-10"
+        className="fc-pop panel border-success/40 p-8 outline-none sm:p-10"
         data-testid="contact-success"
       >
         <span className="inline-flex h-14 w-14 items-center justify-center rounded-[var(--radius-md)] border border-success/40 bg-success/10 text-success">
@@ -278,7 +278,7 @@ export function ContactForm({
             <label
               key={kind}
               className={cx(
-                "flex cursor-pointer gap-3 rounded-xl border p-4 transition-colors",
+                "choice-card flex cursor-pointer gap-3 rounded-xl border p-4",
                 values.inquiry_type === kind
                   ? "border-brand-strong/60 bg-brand-strong/[0.07]"
                   : "border-line-default hover:border-line-strong",

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { type ReactNode, useState } from "react";
 
+import { revealGroup } from "@/components/motion/reveal";
 import { Icon } from "@/components/ui/Icon";
 import { Tabs } from "@/components/ui/Tabs";
 import { cx } from "@/components/ui/primitives";
@@ -53,13 +54,20 @@ export function PackageExplorer({
   cards: PackageCard[];
   care: { title: string; text: string; cta: string; href: string; covers: string[] };
 }) {
-  const [filter, setFilter] = useState<Filter>("all");
+  const [filter, setFilterState] = useState<Filter>("all");
+  // After the first change of filter the newly shown set fades in (220 ms, 40 ms apart); on page load it does not.
+  const [changed, setChanged] = useState(false);
+  const setFilter = (next: Filter) => {
+    setFilterState(next);
+    setChanged(true);
+  };
+  const enter = (index: number) => (changed ? { className: "fc-panel-enter fc-panel-stagger", style: { ["--i" as string]: index } } : { className: "", style: undefined });
   const visible = cards.filter((card) => filter === "all" || GROUP[card.key] === filter);
   return (
     <Tabs id="package-filter" label={text.filterLabel} items={text.filters.map((item) => ({ value: item.key, label: item.label }))} value={filter} onChange={setFilter} variant="segmented" panelClassName="pt-8">
-      <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-testid="home-offers">
-        {visible.map((card) => (
-          <li key={card.key} className={cx("price-card fc-panel-enter", card.featured && "price-card-featured")} data-testid={`home-offer-${card.key}`}>
+      <ul key={filter} {...revealGroup()} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-testid="home-offers">
+        {visible.map((card, index) => (
+          <li key={card.key} className={cx("price-card motion-card", enter(index).className, card.featured && "price-card-featured")} style={enter(index).style} data-testid={`home-offer-${card.key}`}>
             <div className="flex items-start justify-between gap-3">
               <h3 className="t-h3-lg">{card.name}</h3>
               <span className="badge shrink-0">{card.delivery}</span>
@@ -94,7 +102,7 @@ export function PackageExplorer({
           </li>
         ))}
         {(filter === "all" || filter === "websites" || filter === "stores") && (
-          <li className="price-card fc-panel-enter border-dashed" data-testid="home-offer-care">
+          <li className={cx("price-card motion-card border-dashed", enter(visible.length).className)} style={enter(visible.length).style} data-testid="home-offer-care">
             <span className="fc-card-icon h-10 w-10" style={{ ["--fc-tone" as string]: "var(--color-brand-2)" }}>
               <Icon name="wrench" className="h-4.5 w-4.5" />
             </span>

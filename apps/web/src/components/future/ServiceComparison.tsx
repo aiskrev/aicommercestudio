@@ -26,7 +26,12 @@ export function ServiceComparison({
   links: Record<CompareOptionKey, { href: string; quote: string }>;
   initial?: CompareOptionKey;
 }) {
-  const [focus, setFocus] = useState<CompareOptionKey>(initial);
+  const [focus, setFocusState] = useState<CompareOptionKey>(initial);
+  const [swapped, setSwapped] = useState(false);
+  const setFocus = (key: CompareOptionKey) => {
+    setFocusState(key);
+    setSwapped(true);
+  };
   const name = useId();
   const option = text.options.find((item) => item.key === focus) ?? text.options[0];
   const focusIndex = text.options.indexOf(option);
@@ -85,20 +90,35 @@ export function ServiceComparison({
           </table>
         </div>
 
-        <aside className="feature-panel order-first grid gap-4 p-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-10" aria-live="polite" data-testid="compare-focus">
-          <div className="min-w-0">
-          <p className="t-label">{text.focusLabel}</p>
-          <h3 key={option.key} className="fc-panel-enter t-h3-lg mt-2">
-            {option.label}
-          </h3>
-          <p className="mt-2 max-w-3xl text-body-sm leading-relaxed text-fg-secondary">{option.summary}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <Link href={links[option.key].quote} className={buttonClass("primary", "md")} data-testid="compare-quote">
-              <span className="btn-label">{text.quote}</span>
-              <Icon name="arrowRight" className="btn-icon h-4 w-4" />
-            </Link>
-            <ArrowLink href={links[option.key].href} label={`${text.more}: ${option.label}`} />
+        {/* One summary per option in a shared grid cell (.swap-stack): the chosen one cross-fades in, the panel keeps
+            the height of the longest and never jumps; only the shown one is in the accessibility tree and tab order. */}
+        <aside className="feature-panel order-first p-6" aria-live="polite" data-testid="compare-focus">
+          <div className="swap-stack" data-swapped={swapped}>
+            {text.options.map((item) => {
+              const active = item.key === option.key;
+              return (
+                <div
+                  key={item.key}
+                  data-active={active}
+                  aria-hidden={!active || undefined}
+                  inert={!active}
+                  className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-10"
+                >
+                  <div className="min-w-0">
+                    <p className="t-label">{text.focusLabel}</p>
+                    <h3 className="t-h3-lg mt-2">{item.label}</h3>
+                    <p className="mt-2 max-w-3xl text-body-sm leading-relaxed text-fg-secondary">{item.summary}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                    <Link href={links[item.key].quote} className={buttonClass("primary", "md")} data-testid={active ? "compare-quote" : undefined}>
+                      <span className="btn-label">{text.quote}</span>
+                      <Icon name="arrowRight" className="btn-icon h-4 w-4" />
+                    </Link>
+                    <ArrowLink href={links[item.key].href} label={`${text.more}: ${item.label}`} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </aside>
       </div>

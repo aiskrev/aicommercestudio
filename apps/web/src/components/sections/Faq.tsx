@@ -3,7 +3,9 @@ import type { FaqItem } from "@/content/types";
 
 /**
  * Native <details> accordion: keyboard accessible and works without JavaScript.
- * Height animates in browsers that support ::details-content (see .accordion in globals.css).
+ * Height (220 ms) and the answer's opacity animate in browsers that support ::details-content (see .accordion in
+ * globals.css); elsewhere it opens at once. The browser exposes the summary as a button with its expanded state,
+ * so no aria-expanded/aria-controls wiring (or client JavaScript) is needed.
  */
 export function Faq({ items }: { items: FaqItem[] }) {
   return (
@@ -12,7 +14,7 @@ export function Faq({ items }: { items: FaqItem[] }) {
         <details key={item.question} className="group">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-left text-lead-sm font-semibold text-fg transition-colors hover:text-brand focus-visible:-outline-offset-2 [&::-webkit-details-marker]:hidden">
             <span>{item.question}</span>
-            <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default text-brand transition-all duration-200 group-open:rotate-180 group-open:border-brand/50 group-open:bg-brand/10">
+            <span data-chevron className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default text-brand group-open:rotate-180 group-open:border-brand/50 group-open:bg-brand/10">
               <Icon name="chevronDown" className="h-4 w-4" />
             </span>
           </summary>

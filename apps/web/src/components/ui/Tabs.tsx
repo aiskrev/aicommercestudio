@@ -1,6 +1,6 @@
 "use client";
 
-import { type KeyboardEvent, type ReactNode, useRef } from "react";
+import { type KeyboardEvent, type ReactNode, useLayoutEffect, useRef } from "react";
 
 export interface TabItem<T extends string> {
   value: T;
@@ -39,9 +39,41 @@ export function Tabs<T extends string>({
   className?: string;
 }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const listRef = useRef<HTMLDivElement>(null);
+  const indicatorRef = useRef<HTMLSpanElement>(null);
   const selected = Math.max(0, items.findIndex((item) => item.value === value));
   const tabId = (index: number) => `${id}-tab-${index}`;
   const panelId = `${id}-panel`;
+
+  // Segmented variant: one indicator slides to the selected tab (transform, 220 ms; globals.css → .tab-indicator).
+  // Measured only when the selection or the list's size changes, never on scroll. Until the first measurement
+  // the selected tab keeps its own background, so nothing depends on this script.
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    const indicator = indicatorRef.current;
+    if (variant !== "segmented" || !list || !indicator) return;
+    const place = () => {
+      const tab = refs.current[selected];
+      if (!tab) return;
+      indicator.style.width = `${tab.offsetWidth}px`;
+      indicator.style.height = `${tab.offsetHeight}px`;
+      indicator.style.transform = `translate3d(${tab.offsetLeft}px, ${tab.offsetTop}px, 0)`;
+    };
+    place();
+    let frame = 0;
+    if (!list.dataset.indicator) {
+      list.dataset.indicator = "ready"; // placed without a transition the first time
+      frame = requestAnimationFrame(() => {
+        list.dataset.indicator = "animate";
+      });
+    }
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(place);
+    observer?.observe(list);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+    };
+  }, [selected, variant]);
 
   function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     const last = items.length - 1;
@@ -56,7 +88,8 @@ export function Tabs<T extends string>({
 
   return (
     <div className={className}>
-      <div role="tablist" aria-label={label} className={variant === "segmented" ? "tabs tabs-segmented" : "tabs"} onKeyDown={onKeyDown}>
+      <div ref={listRef} role="tablist" aria-label={label} className={variant === "segmented" ? "tabs tabs-segmented" : "tabs"} onKeyDown={onKeyDown}>
+        {variant === "segmented" && <span ref={indicatorRef} className="tab-indicator" aria-hidden="true" />}
         {items.map((item, index) => (
           <button
             key={item.value}

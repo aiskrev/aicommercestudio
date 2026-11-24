@@ -174,13 +174,13 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
         </div>
         <Container className="relative grid gap-12 pb-14 pt-10 sm:pb-16 sm:pt-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:pb-20">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="fc-enter flex items-center gap-3 [--i:0]">
               <IconBadge name={service.icon} />
               <Eyebrow>{service.shortTitle}</Eyebrow>
             </div>
-            <h1 className="t-h1 mt-6">{service.title}</h1>
-            <p className="t-lead mt-6 max-w-2xl">{service.intro}</p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <h1 className="fc-rise t-h1 mt-6 [--i:1]">{service.title}</h1>
+            <p className="fc-enter t-lead mt-6 max-w-2xl [--i:2]">{service.intro}</p>
+            <div className="fc-rise mt-8 flex flex-col gap-3 sm:flex-row [--i:3]">
               <ButtonLink href={quoteHref} size="lg" icon="arrowRight">
                 {dict.common.requestQuote}
               </ButtonLink>
@@ -189,7 +189,9 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
               </ButtonLink>
             </div>
           </div>
-          <ServiceConcept service={service.key} steps={service.workflow} label={dict.service.conceptLabel} />
+          <div className="fc-enter min-w-0 [--i:4]">
+            <ServiceConcept service={service.key} steps={service.workflow} label={dict.service.conceptLabel} />
+          </div>
         </Container>
 
         {/* summary strip */}
