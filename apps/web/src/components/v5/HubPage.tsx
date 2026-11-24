@@ -60,7 +60,7 @@ export function HubPage({ locale, hub, path, primaryService }: { locale: Locale;
           <div className="min-w-0">
             <Eyebrow className="fc-enter [--i:0]">{hub.eyebrow}</Eyebrow>
             <h1 className="fc-rise t-hero mt-6 [--i:1]">{hub.title}</h1>
-            <p className="fc-enter t-lead mt-6 max-w-2xl [--i:2]">{hub.lead}</p>
+            <p className="fc-rise t-lead mt-6 max-w-2xl [--i:2]">{hub.lead}</p>
             <div className="fc-rise mt-8 flex flex-col gap-3 sm:flex-row [--i:3]">
               <ButtonLink href={href(quoteWithService(primaryService))} size="lg" icon="arrowRight" testId="hub-quote">
                 {hub.primaryCta}

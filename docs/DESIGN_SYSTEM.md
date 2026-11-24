@@ -237,48 +237,53 @@ approval, green = completed outcome.
 ## Interaction system
 
 All interaction styling lives in `app/globals.css` and the shared primitives; pages only apply
-class names. No animation library and no extra client JavaScript (the scroll reveal is CSS-only).
+class names. The full motion system (tokens, reveal primitive, per-component behaviour, reduced
+motion, performance budget) is in [`MOTION_SYSTEM.md`](MOTION_SYSTEM.md). No animation library; the
+only motion JavaScript is the scroll-reveal observer (`components/motion/MotionRuntime.tsx`), the tab
+indicator measurement (`components/ui/Tabs.tsx`) and the mobile sheet's closing timer.
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `--duration-press` | 90 ms | pressed state |
-| `--duration-fast` | 160 ms | colour, border, focus, text links |
-| `--duration-base` | 220 ms | transforms, shadows, cards, nav underline, menus |
-| `--duration-slow` | 320 ms | mobile menu sheet |
-| `--duration-reveal` | 420 ms | reference for larger transitions |
-| `--ease-out-soft` / `--ease-standard` | `cubic-bezier(.22,1,.36,1)` / `(.2,0,0,1)` | entering & movement / state changes |
-| `--lift` / `--lift-card` | −1 px / −2 px | hover lift for buttons / cards |
-| `--press-scale` | 0.985 | pressed buttons (cards 0.995) |
-| `--nudge` | 3 px | arrow/icon movement |
+| `--motion-instant` (`--duration-press`) | 100 ms | pressed state |
+| `--motion-fast` (`--duration-fast`) | 140 ms | colour, border, focus, icon nudge, outgoing panels |
+| `--motion-base` (`--duration-base`) | 220 ms | transforms, shadows, cards, menus, tabs, accordion |
+| `--motion-slow` (`--duration-slow`) | 360 ms | step ping, larger moves |
+| `--motion-emphasis` | 460 ms | hero entrance |
+| `--motion-ease-standard` / `-out` / `-in` | `(.4,0,.2,1)` / `(.22,1,.36,1)` / `(.4,0,1,1)` | state changes / entering / leaving |
+| `--motion-stagger` | 55 ms | hero entrance, reveal groups (package filter: 40 ms) |
+| `--reveal-shift` / `--reveal-duration` | 12 px (8 px below 48rem) / 380 ms | scroll reveal |
+| `--lift` / `--lift-card` | −2 px / −3 px | hover lift for buttons / cards |
+| `--press-scale` | 0.99 | pressed buttons (cards 0.995) |
+| `--nudge` / `--nudge-card` | 3 px / 2 px | arrow movement in buttons / cards |
 
 | Element | Hover (fine pointers only) | Keyboard focus | Pressed | Other states |
 | --- | --- | --- | --- | --- |
-| Primary button | lifts 1 px; fill interpolates brand cyan → `#8fe5ea`/`#93c5fd` (registered `@property --btn-a/--btn-b`, text ≥ 10:1); azure glow; arrow +3 px | 2 px ring + arrow +3 px | scale 0.985 | disabled 50 % opacity, no motion; loading = spinner + `aria-busy`, label swap, no icon |
-| Secondary button | lifts 1 px, brand border, `surface-3`, soft shadow; arrow +3 px | ring + arrow | scale 0.985 | as above |
-| Tertiary (ghost) | lighter colour, underline fades in (`.btn-label`) | underline + ring | scale 0.985 | — |
+| Primary button | lifts 2 px; fill interpolates brand cyan → `#8fe5ea`/`#93c5fd` (registered `@property --btn-a/--btn-b`, text ≥ 10:1); azure glow; arrow +3 px | 2 px ring + arrow +3 px | back to 0 px, scale 0.99 | disabled 50 % opacity, no motion; loading = spinner + `aria-busy`, both labels share one grid cell (constant width) |
+| Secondary button | lifts 2 px, brand border, `surface-3`, soft shadow; arrow +3 px | ring + arrow | scale 0.99 | as above |
+| Tertiary (ghost) | lighter colour, underline fades in (`.btn-label`) | underline + ring | scale 0.99 | — |
 | Text link `.link` | brand → `brand-soft`, underline 35 % → 100 % | underline 100 % + ring | — | `.surface-light` uses `brand-ink` |
-| Card `.card-interactive` | lifts 2 px, brand border, `surface-2`, lift shadow; `.arrow-nudge` +3 px | 2 px brand ring around the card (`:has(:focus-visible)`) | scale 0.995 | — |
+| Cards `.card-interactive`, `.motion-card`, `.fc-card`, `.offer-card` | lift 3 px, brand border, lift shadow; arrow +2 px | same lift + brand ring (`:has(:focus-visible)`) | scale 0.995 | — |
 | Rows `.focus-frame` + `group` | heading turns brand; arrow nudge | outline around the row; arrow nudge | — | — |
-| Nav link `.nav-link` | underline grows at 45 % | underline at 45 % + ring | — | current page / open menu: underline 100 % |
-| Services dropdown / mobile sheet | — | Escape closes, focus returns | — | `.menu-enter` / `.menu-sheet-enter` on open (fade + 6–8 px drop); closing is instant |
-| Section headings, diagram frames | — | — | — | `.reveal`: fade + 16 px rise driven by `animation-timeline: view()` |
-| Tab `.tab` | colour → `fg`, `surface-2` wash | inset 2 px ring | — | selected: `fg` + 2 px brand underline that scales in (`--duration-base`); paper: `brand-ink` underline |
+| Nav link `.nav-link` | underline grows at 45 % (160 ms) | underline at 45 % + ring | — | current section / open menu: underline 100 % |
+| Dropdown / mobile sheet | — | Escape closes, focus returns | — | dropdown fades in from −4 px (220 ms); sheet 260 ms in, 220 ms out |
+| Section headings, diagram frames, CTA bands, card groups | — | — | — | `data-reveal` (once, IntersectionObserver): fade + 12 px rise |
+| Tab `.tab` | colour → `fg`, `surface-2` wash | inset 2 px ring | — | selected: underline; segmented tabs: one sliding indicator (220 ms) |
 
 Rules:
 * Every hover rule written in CSS sits in `@media (hover: hover) and (pointer: fine)`; Tailwind
   `hover:` utilities already behave that way. Touch devices never get a stuck hover and nothing
   is reachable only by hover.
 * Focus always shows a visible ring; anything that moves on hover also moves on keyboard focus.
-* Only `transform`, `opacity`, colours and shadows animate.
-* Reveals are progressive enhancement: without view timelines (e.g. Firefox today), with reduced
-  motion, or when printing, content is simply shown. They are never applied to a page H1.
+* Only `transform` and `opacity` move; colours and shadows may transition.
+* Reveals are progressive enhancement: without JavaScript, with reduced motion, when printing and
+  for anything already on screen at load, content is simply shown. They are never applied to a page H1.
 * `prefers-reduced-motion: reduce`: all transforms and entry/reveal animations are removed;
   colour and border feedback stay because they carry state.
-* No infinite decorative animation was added (the existing flowing connector in the hero workflow
-  remains the only loop and is reduced-motion aware).
-* New interactive pieces reuse `.arrow-nudge`, `.link`, `.btn-*`, `.card-interactive`,
-  `.focus-frame`, `.menu-enter` and `.reveal` instead of page-level `transition-*`/`hover:translate`
-  utilities.
+* No permanent decorative motion in heroes or diagrams; the hero workflow's flowing connector is
+  the only loop and is reduced-motion aware.
+* New interactive pieces reuse `.arrow-nudge`, `.link`, `.btn-*`, `.card-interactive`/`.motion-card`,
+  `.focus-frame`, `.menu-enter`, `.swap-stack` and `reveal()` instead of page-level
+  `transition-*`/`hover:translate` utilities.
 
 ### State coverage
 

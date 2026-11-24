@@ -130,12 +130,12 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </div>
         <Container size="wide" className="relative grid items-center gap-12 pb-16 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 lg:pb-24 lg:pt-20">
           <div className="min-w-0">
-            {/* Entrance (CSS only, once): eyebrow → heading → lead → actions → points → preview, 55 ms apart; the heading and the actions only rise, so they are painted from the first frame. */}
+            {/* Entrance (CSS only, once): eyebrow → heading → lead → actions → points → preview, 55 ms apart; the heading, the lead and the actions only rise, so they are painted from the first frame (LCP). */}
             <Eyebrow className="fc-enter [--i:0]">{fc.hero.eyebrow}</Eyebrow>
             <h1 className="fc-rise t-hero mt-6 [--i:1]">
               {fc.hero.title} <span className="text-brand">{fc.hero.titleHighlight}</span>
             </h1>
-            <p className="fc-enter t-lead mt-6 max-w-xl [--i:2]">{fc.hero.lead}</p>
+            <p className="fc-rise t-lead mt-6 max-w-xl [--i:2]">{fc.hero.lead}</p>
             <div className="fc-rise mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap [--i:3]">
               <ButtonLink href={href(routes.services)} size="lg" icon="arrowRight" testId="hero-primary">
                 {fc.hero.primaryCta}

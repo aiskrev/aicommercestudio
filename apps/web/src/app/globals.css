@@ -194,7 +194,7 @@
     to { background-position: 0 24px; }
   }
   @keyframes menu-enter {
-    from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+    from { opacity: 0; transform: translate3d(0, -4px, 0); }
   }
   @keyframes menu-sheet-enter {
     from { opacity: 0; transform: translateY(-8px); }
@@ -1285,7 +1285,7 @@
 
   /* Hero entrance: eyebrow → heading → lead → actions → preview ease in once, staggered by --i (55 ms), CSS only,
      so it also runs without JavaScript and ends with everything shown. `.fc-enter` fades and rises; `.fc-rise`
-     (the heading and the actions) only rises, so they are painted from the first frame (LCP, no hidden CTA). */
+     (the heading, the lead and the actions: each can be the LCP element or must be usable at once) only rises, so they are painted from the first frame (LCP, no hidden CTA). */
   @media (prefers-reduced-motion: no-preference) {
     .fc-enter, .fc-rise { animation: fc-enter var(--motion-emphasis) var(--motion-ease-out) both; animation-delay: calc(var(--i, 0) * var(--motion-stagger)); }
     .fc-rise { animation-name: fc-rise; }
@@ -1422,7 +1422,8 @@
      outgoing panel fades out in 140 ms and is then hidden (visibility: out of the accessibility tree and the tab
      order); the incoming one fades in over 220 ms, 5 px, after a short overlap. */
   .swap-stack { display: grid; }
-  .swap-stack > * { grid-area: 1 / 1; min-width: 0; }
+  /* align-content: start — a shorter panel keeps its own spacing; the spare height of the stack stays below it. */
+  .swap-stack > * { grid-area: 1 / 1; min-width: 0; align-content: start; }
   .swap-stack > [data-active="false"] {
     visibility: hidden;
     opacity: 0;
@@ -1434,6 +1435,11 @@
       visibility 0s linear var(--motion-fast);
   }
   .swap-stack > [data-active="true"] { animation: fc-panel var(--motion-base) var(--motion-ease-out) 90ms both; }
+  /* Product showcase: on one-column layouts the panels differ by up to ~270 px, so below 64rem only the shown panel
+     takes space (the change follows a tap, which CLS excludes); from 64rem they keep the shared cell. */
+  @media (max-width: 63.99rem) {
+    .swap-stack-fluid > [data-active="false"] { display: none; }
+  }
   .swap-stack[data-swapped="false"] > [data-active="true"] { animation: none; }
 
   /* Product showcase mock-ups: readable sample text inside a frame (aria-hidden; the caption says "sample"). */

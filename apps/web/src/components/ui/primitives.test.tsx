@@ -102,7 +102,8 @@ describe("interaction system hooks", () => {
     expect(button).toBeDisabled();
     expect(button).toHaveAttribute("aria-busy", "true");
     expect(button.querySelector(".spinner")).not.toBeNull();
-    const kept = button.querySelector(".btn-icon")!.closest<HTMLElement>("[aria-hidden='true']")!;
+    const kept = button.querySelector(".btn-icon")!.closest<HTMLElement>(".btn-swap > *")!;
+    expect(kept).toHaveAttribute("aria-hidden", "true");
     expect(kept.style.visibility).toBe("hidden");
     expect(kept.parentElement).toHaveClass("btn-swap");
   });

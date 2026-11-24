@@ -179,7 +179,7 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
               <Eyebrow>{service.shortTitle}</Eyebrow>
             </div>
             <h1 className="fc-rise t-h1 mt-6 [--i:1]">{service.title}</h1>
-            <p className="fc-enter t-lead mt-6 max-w-2xl [--i:2]">{service.intro}</p>
+            <p className="fc-rise t-lead mt-6 max-w-2xl [--i:2]">{service.intro}</p>
             <div className="fc-rise mt-8 flex flex-col gap-3 sm:flex-row [--i:3]">
               <ButtonLink href={quoteHref} size="lg" icon="arrowRight">
                 {dict.common.requestQuote}

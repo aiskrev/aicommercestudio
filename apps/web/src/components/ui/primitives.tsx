@@ -381,11 +381,11 @@ export function PageHero({
         <div className="fc-grid" />
       </div>
       <Container className={cx("relative pb-14 pt-12 sm:pb-20 sm:pt-16", Boolean(aside) && "grid items-center gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14")}>
-        {/* Entrance (CSS only, once): eyebrow → heading → lead → actions → aside; the heading and the actions only rise. */}
+        {/* Entrance (CSS only, once): eyebrow → heading → lead → actions → aside; the heading, the lead and the actions only rise (LCP). */}
         <div className="min-w-0">
           <Eyebrow className="fc-enter [--i:0]">{eyebrow}</Eyebrow>
           <h1 className="fc-rise t-h1 mt-5 max-w-4xl [--i:1]">{title}</h1>
-          <p className="fc-enter t-lead mt-6 max-w-3xl [--i:2]">{lead}</p>
+          <p className="fc-rise t-lead mt-6 max-w-3xl [--i:2]">{lead}</p>
           {children && <div className="fc-rise [--i:3]">{children}</div>}
         </div>
         {aside && <div className="fc-enter min-w-0 [--i:4]">{aside}</div>}

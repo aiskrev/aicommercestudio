@@ -13,8 +13,10 @@ import type { ShowcaseItem, ShowcaseKey } from "@/content/v5-types";
  * Tabbed product showcase (Future Commerce §3): a corporate site, an interactive site, a storefront and a SaaS
  * dashboard. WAI-ARIA tabs (components/ui/Tabs, sliding indicator); each panel pairs a large mock-up (sample data,
  * captioned) with what is behind it and a link to the page that describes it. The store tab also links the three
- * platforms. The four panels share one grid cell (.swap-stack): switching cross-fades them (out 140 ms, in 220 ms)
- * and the frame never collapses or jumps; the hidden ones are out of the accessibility tree and the tab order.
+ * platforms. From 64rem the four panels share one grid cell (.swap-stack): switching cross-fades them (out 140 ms,
+ * in 220 ms) and the frame never collapses or jumps. On one-column layouts (.swap-stack-fluid) only the shown panel
+ * takes space and fades in, so a phone has no blank area under the shorter panels. The hidden panels are out of the
+ * accessibility tree and the tab order.
  */
 export function ProductShowcase({
   items,
@@ -49,7 +51,7 @@ export function ProductShowcase({
         variant="segmented"
         panelClassName="pt-8"
       >
-        <div className="swap-stack" data-swapped={swapped}>
+        <div className="swap-stack swap-stack-fluid" data-swapped={swapped}>
           {items.map((item) => {
             const active = item.key === value;
             return (
