@@ -2563,6 +2563,27 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
   to { transform: translate3d(3%, 2%, 0) scale(1.06); }
 }
 
+/* Section dividers (Velora): a hairline that draws from the centre as the section is reached (reveal states). */
+@layer components {
+  section:has(> .vl-section-line) { position: relative; }
+  .vl-section-line {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 0;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgb(59 130 246 / 0.55) 30%, rgb(56 189 248 / 0.55) 70%, transparent);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vl-section-line[data-reveal="pending"] { opacity: 0; transform: scaleX(0); }
+  .vl-section-line[data-reveal="in"] { transition-duration: 900ms; }
+}
+@media (forced-colors: active) {
+  .vl-section-line { display: none; }
+}
+
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
 @keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
 @keyframes orbit {

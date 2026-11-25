@@ -85,6 +85,8 @@ export function Section({
       aria-labelledby={labelledBy}
       className={cx(densityClass[density], toneClass[tone ?? (alt ? "raised" : "default")], className)}
     >
+      {/* Velora section divider: a blue-cyan hairline that draws from the centre when the section is reached. */}
+      <span className="vl-section-line" aria-hidden="true" {...reveal()} />
       <Container size={size}>{children}</Container>
     </section>
   );
