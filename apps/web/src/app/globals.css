@@ -2293,9 +2293,9 @@
 @keyframes aurora-2 { 0% { transform: translate(12%, 10%) scale(1.1); } 50% { transform: translate(-14%, -6%) scale(0.9); } 100% { transform: translate(8%, -12%) scale(1.2); } }
 @keyframes aurora-3 { 0% { transform: translate(0%, 16%) scale(0.95); } 50% { transform: translate(10%, -10%) scale(1.15); } 100% { transform: translate(-12%, 4%) scale(1); } }
 /* Velora loops pause off screen like ours (data-loop → data-offscreen). */
-[data-offscreen] :is(.animate-marquee, .animate-marquee-vertical, .animate-orbit, .animate-aurora-1, .animate-aurora-2, .animate-aurora-3) { animation-play-state: paused; }
+[data-offscreen] :is([class*="animate-marquee"], [class*="animate-orbit"], [class*="animate-aurora-"]) { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee, .animate-marquee-vertical, .animate-orbit, .animate-aurora-1, .animate-aurora-2, .animate-aurora-3 { animation: none !important; }
+  [class*="animate-marquee"], [class*="animate-orbit"], [class*="animate-aurora-"] { animation: none !important; }
 }
 
 /* ---------------------------------------------------------------- forced colours */
