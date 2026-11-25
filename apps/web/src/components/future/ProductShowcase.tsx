@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { ShowcaseMock } from "@/components/future/ShowcaseMock";
+import { useSwapDirection } from "@/components/motion/indicator";
 import { Icon } from "@/components/ui/Icon";
 import { Tabs } from "@/components/ui/Tabs";
 import { ArrowLink, TickList } from "@/components/v5/blocks";
@@ -13,8 +14,9 @@ import type { ShowcaseItem, ShowcaseKey } from "@/content/v5-types";
  * Tabbed product showcase (Future Commerce §3): a corporate site, an interactive site, a storefront and a SaaS
  * dashboard. WAI-ARIA tabs (components/ui/Tabs, sliding indicator); each panel pairs a large mock-up (sample data,
  * captioned) with what is behind it and a link to the page that describes it. The store tab also links the three
- * platforms. From 64rem the four panels share one grid cell (.swap-stack): switching cross-fades them (out 140 ms,
- * in 220 ms) and the frame never collapses or jumps. On one-column layouts (.swap-stack-fluid) only the shown panel
+ * platforms. From 64rem the four panels share one grid cell (.swap-stack): switching moves them in the direction of the choice
+ * (out 240 ms to x ∓16 px, in 360 ms from x ±18 px, scale 0.985) and the mock-up's pieces follow 60 ms apart; the frame never collapses or jumps.
+ * On one-column layouts (.swap-stack-fluid) only the shown panel
  * takes space and fades in, so a phone has no blank area under the shorter panels. The hidden panels are out of the
  * accessibility tree and the tab order.
  */
@@ -35,11 +37,7 @@ export function ProductShowcase({
   platformsLabel: string;
 }) {
   const [value, setValue] = useState<ShowcaseKey>(items[0].key);
-  const [swapped, setSwapped] = useState(false);
-  const select = (key: ShowcaseKey) => {
-    setValue(key);
-    setSwapped(true);
-  };
+  const direction = useSwapDirection(items.map((entry) => entry.key), value);
   return (
     <div data-testid="product-showcase">
       <Tabs
@@ -47,11 +45,11 @@ export function ProductShowcase({
         label={label}
         items={items.map((entry) => ({ value: entry.key, label: entry.label }))}
         value={value}
-        onChange={select}
+        onChange={setValue}
         variant="segmented"
         panelClassName="pt-8"
       >
-        <div className="swap-stack swap-stack-fluid" data-swapped={swapped}>
+        <div className="swap-stack swap-stack-fluid swap-stack-showcase" data-swapped={direction !== null} data-dir={direction ?? undefined}>
           {items.map((item) => {
             const active = item.key === value;
             return (

@@ -230,7 +230,7 @@ Every file in `docs/` is listed here. `scripts/test.ps1` fails when one is missi
 | Document | Contents |
 | --- | --- |
 | [DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) | Tokens, contrast, typography, components, motion, accessibility (current) |
-| [MOTION_SYSTEM.md](docs/MOTION_SYSTEM.md) | Motion and interaction system: tokens, once-only scroll reveal, per-component behaviour, reduced motion, performance budget |
+| [MOTION_SYSTEM.md](docs/MOTION_SYSTEM.md) | Motion system ("Operational AI in motion"): tokens, scroll reveal, pointer layer, kinetic headline, scroll narrative, per-section behaviour, reduced motion, performance budget |
 | [VISUAL_DIRECTION_V3.md](docs/VISUAL_DIRECTION_V3.md) | Visual direction "Signal" (partly implemented) |
 | [UI_AUDIT.md](docs/UI_AUDIT.md) | UI audit before the redesign (historical) |
 | [UI_IMPLEMENTATION_REPORT.md](docs/UI_IMPLEMENTATION_REPORT.md) | First premium UI redesign (historical) |

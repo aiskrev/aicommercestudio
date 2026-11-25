@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode, useId, useState } from "react";
+import { type ReactNode, useId, useRef, useState } from "react";
 
+import { useSlidingIndicator, useSwapDirection } from "@/components/motion/indicator";
 import { Icon } from "@/components/ui/Icon";
 import { buttonClass, cx } from "@/components/ui/primitives";
 import { ArrowLink } from "@/components/v5/blocks";
@@ -26,23 +27,32 @@ export function ServiceComparison({
   links: Record<CompareOptionKey, { href: string; quote: string }>;
   initial?: CompareOptionKey;
 }) {
-  const [focus, setFocusState] = useState<CompareOptionKey>(initial);
-  const [swapped, setSwapped] = useState(false);
-  const setFocus = (key: CompareOptionKey) => {
-    setFocusState(key);
-    setSwapped(true);
-  };
+  const [focus, setFocus] = useState<CompareOptionKey>(initial);
+  const direction = useSwapDirection(text.options.map((item) => item.key), focus);
+  const swapped = direction !== null;
+  const railRef = useRef<HTMLDivElement>(null);
+  const markerRef = useRef<HTMLSpanElement>(null);
+  const chipRefs = useRef<(HTMLLabelElement | null)[]>([]);
   const name = useId();
   const option = text.options.find((item) => item.key === focus) ?? text.options[0];
   const focusIndex = text.options.indexOf(option);
+  // Active rail: one ring slides to the chosen option (components/motion/indicator.ts, 360 ms).
+  useSlidingIndicator(railRef, markerRef, chipRefs, focusIndex);
 
   return (
     <div className="grid gap-6" data-testid="service-comparison">
       <fieldset>
         <legend className="t-label">{text.focusLabel}</legend>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {text.options.map((item) => (
-            <label key={item.key} className="fc-choice">
+        <div ref={railRef} className="compare-rail mt-3 flex flex-wrap gap-2">
+          <span ref={markerRef} className="compare-rail-marker" aria-hidden="true" />
+          {text.options.map((item, index) => (
+            <label
+              key={item.key}
+              className="fc-choice"
+              ref={(el) => {
+                chipRefs.current[index] = el;
+              }}
+            >
               <input type="radio" name={name} value={item.key} checked={focus === item.key} onChange={() => setFocus(item.key)} data-testid={`compare-pick-${item.key}`} />
               <span>
                 <span className="fc-choice-mark" aria-hidden="true" />
@@ -98,7 +108,7 @@ export function ServiceComparison({
           <p className="sr-only" aria-live="polite" data-testid="compare-announce">
             {swapped ? `${option.label}. ${option.summary}` : ""}
           </p>
-          <div className="swap-stack" data-swapped={swapped}>
+          <div className="swap-stack swap-stack-detail" data-swapped={swapped} data-dir={direction ?? undefined}>
             {text.options.map((item) => {
               const active = item.key === option.key;
               return (
