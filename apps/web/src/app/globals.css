@@ -2537,6 +2537,32 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* Global ambient light (Velora background): navy and cyan glows drifting slowly behind every transparent section.
+   Gradients only (no blur filter); still with reduced motion; stopped by the pause control. */
+@layer components {
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -15%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(38rem 26rem at 18% 12%, rgb(16 32 57 / 0.75), transparent 70%),
+      radial-gradient(30rem 22rem at 86% 64%, rgb(56 189 248 / 0.06), transparent 70%),
+      radial-gradient(34rem 24rem at 40% 96%, rgb(59 130 246 / 0.07), transparent 70%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  body::before { animation: vl-ambient 24s var(--motion-ease-standard) infinite alternate; }
+}
+@media (forced-colors: active) {
+  body::before { display: none; }
+}
+@keyframes vl-ambient {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to { transform: translate3d(3%, 2%, 0) scale(1.06); }
+}
+
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
 @keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
 @keyframes orbit {
