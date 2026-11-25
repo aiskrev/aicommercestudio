@@ -200,3 +200,24 @@ Root cause of the mobile LCP above budget (lab, simulated slow 4G; unchanged by 
 ~0.24 s, the simulated 3.0–3.4 s comes from the render-blocking stylesheet (26.5 KB, Lighthouse estimates ~1 s of
 savings) and HTTP/1.1 in the local stack ("modern HTTP" audit, ~0.76 s; production is served over HTTP/2+ through the
 CDN). Inlining the critical CSS is outside the motion scope and is left to D-47.
+
+## Velora original dark foundation (2026-11-25, `feature/velora-original-dark-fully-animated` af7e835)
+
+Same method and local stack as the motion-system tables above (Lighthouse 13.5.0, 3 runs, median-score run).
+
+| Preset | Route | Perf (runs) | A11y | BP | SEO | FCP | LCP | TBT | CLS | Transfer |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mobile | `/bg` | **83** (69, 83, 83) | 100 | 74 | 100 | 2.12 s | 4.09 s | 146 ms | 0.018 | 685 KB |
+| mobile | `/en` | **81** (77, 81, 82) | 100 | 74 | 100 | 1.97 s | 3.95 s | 270 ms | 0 | 637 KB |
+| mobile | `/bg/izrabotka-na-saytove` | **91** (91, 91, 91) | 100 | 74 | 100 | 1.97 s | 3.13 s | 115 ms | 0 | 592 KB |
+| mobile | `/bg/online-magazini` | **91** (91, 91, 88) | 100 | 74 | 100 | 1.97 s | 3.13 s | 136 ms | 0.007 | 592 KB |
+| mobile | `/bg/uslugi/avtomatizatsiya-na-procesi` | **91** (88, 91, 91) | 100 | 74 | 100 | 1.97 s | 3.13 s | 108 ms | 0 | 618 KB |
+| mobile | `/bg/kontakti` | **91** (91, 91, 90) | 100 | 74 | 100 | 1.97 s | 3.19 s | 118 ms | 0 | 555 KB |
+| desktop | `/bg` | **99** (99, 99, 99) | 100 | 74 | 100 | 0.54 s | 0.95 s | 10 ms | 0 | 704 KB |
+| desktop | `/en` | **99** (99, 99, 99) | 100 | 74 | 100 | 0.46 s | 0.97 s | 33 ms | 0 | 655 KB |
+| desktop | `/bg/izrabotka-na-saytove` | **100** (100, 100, 100) | 100 | 74 | 100 | 0.50 s | 0.82 s | 31 ms | 0.002 | 590 KB |
+| desktop | `/bg/online-magazini` | **100** (100, 100, 100) | 100 | 74 | 100 | 0.50 s | 0.82 s | 27 ms | 0.002 | 589 KB |
+| desktop | `/bg/uslugi/avtomatizatsiya-na-procesi` | **100** (100, 100, 100) | 100 | 74 | 100 | 0.50 s | 0.80 s | 13 ms | 0 | 615 KB |
+| desktop | `/bg/kontakti` | **99** (99, 99, 99) | 100 | 74 | 100 | 0.50 s | 0.95 s | 17 ms | 0 | 564 KB |
+
+Reading (honest): compared with the motion-system build above, **mobile `/bg` fell 89 → 83 (LCP 3.39 → 4.09 s) and `/en` 92 → 81 (LCP 3.12 → 3.95 s)**: the Velora hero (aurora blur layers, the bento, the lazily loaded demo chunk with `motion`) costs performance on the homepage. The other routes stay at 91 with LCP ~3.1 s. **Mobile FCP is 1.97 s on every route (about 0.95 s before) and desktop FCP 0.46–0.54 s (about 0.27 s before): a site-wide regression that is not diagnosed yet** (open; first suspects: the grown render-blocking stylesheet and the new global rules). Accessibility 100, SEO 100, CLS ≤ 0.018 everywhere; best practices 74 is the plain-HTTP local stack only (see above). Not yet acceptable against the owner targets (mobile ≥ 85, LCP ≤ 2.5 s).
