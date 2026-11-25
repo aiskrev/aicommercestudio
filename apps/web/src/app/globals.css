@@ -1678,9 +1678,10 @@
   [data-reveal="in"][data-reveal-children] > :nth-child(6) { transition-delay: calc(var(--motion-stagger) * 5); }
   [data-reveal="in"][data-reveal-children] > :nth-child(n + 7) { transition-delay: calc(var(--motion-stagger) * 6); }
 
-  /* Service portals enter from different axes (data-from on the cards of a reveal group), and take longer. */
-  [data-reveal="pending"][data-reveal-children] > [data-from="left"] { transform: translate3d(calc(var(--reveal-shift) * -2.5), 0, 0); }
-  [data-reveal="pending"][data-reveal-children] > [data-from="right"] { transform: translate3d(calc(var(--reveal-shift) * 2.5), 0, 0); }
+  /* Service portals enter from different axes (data-from on the cards of a reveal group), and take longer. The
+     sideways shift is one --reveal-shift, so a card never leaves the screen while it enters (home-entry.spec.ts). */
+  [data-reveal="pending"][data-reveal-children] > [data-from="left"] { transform: translate3d(calc(var(--reveal-shift) * -1), 0, 0); }
+  [data-reveal="pending"][data-reveal-children] > [data-from="right"] { transform: translate3d(var(--reveal-shift), 0, 0); }
   [data-reveal="pending"][data-reveal-children] > [data-from="rise"] { transform: translate3d(0, calc(var(--reveal-shift) * 2.5), 0); }
   [data-reveal="pending"][data-reveal-children] > [data-from="scale"] { transform: translate3d(0, var(--reveal-shift), 0) scale(0.92); }
   [data-reveal="in"][data-reveal-children] > [data-from] { transition-duration: var(--motion-hero); }
