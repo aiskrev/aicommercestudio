@@ -61,18 +61,18 @@ test.describe("no motion preference, fine pointer", () => {
     expect(await translate(page, '[data-testid="hero-primary"]')).toMatch(/^(none|0px( 0px)?)$/);
   });
 
-  test("hero field follows the pointer within 14 px; the scan loop pauses off screen", async ({ page }) => {
+  test("Velora showcase: every live demo mounts, the marquee and the orbit move, loops pause off screen", async ({ page }) => {
     await page.goto("/bg");
-    const hero = page.locator(".fc-hero");
-    await page.mouse.move(1400, 120, { steps: 6 });
-    await expect.poll(() => hero.evaluate((el) => el.style.getPropertyValue("--fx"))).not.toBe("");
-    await page.waitForTimeout(800);
-    const [fx, fy] = (await translate(page, ".fc-field-front")).split(" ").map(parseFloat);
-    expect(Math.abs(fx)).toBeGreaterThan(4);
-    expect(Math.max(Math.abs(fx), Math.abs(fy || 0))).toBeLessThanOrEqual(14.01);
+    const hero = page.locator(".vl-hero");
+    for (const name of ["globe", "morphing-text", "border-beam", "dock", "3d-card", "animated-list"]) {
+      await expect(page.locator(`[data-demo="${name}"]`)).toHaveAttribute("data-mounted", "true", { timeout: 8000 });
+    }
+    const names = await page.evaluate(() => document.getAnimations().map((a) => (a as CSSAnimation).animationName).filter(Boolean));
+    expect(names).toContain("marquee");
+    expect(names).toContain("orbit");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await expect(hero).toHaveAttribute("data-offscreen", "");
-    expect(await page.locator(".fc-scan").evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
+    expect(await page.locator(".vl-hero .animate-orbit").first().evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
   });
 
   test("service portals: lift, spotlight and a tilt of at most 2°", async ({ page }) => {
@@ -191,7 +191,7 @@ test.describe("reduced motion", () => {
     await page.waitForTimeout(300);
     expect(await cta.evaluate((el) => el.style.getPropertyValue("--mag-x"))).toBe("");
     expect(await translate(page, '[data-testid="hero-primary"]')).toBe("none");
-    for (const selector of [".fc-scan", ".fc-packet", ".fc-trace"]) await expect(page.locator(selector).first()).toBeHidden();
+    for (const selector of [".fc-packet", ".fc-trace"]) await expect(page.locator(selector).first()).toBeHidden();
     // Not pinned, all six stages reachable without a scroll narrative; the flow and the checks are complete.
     expect(await page.locator(".process-sticky").evaluate((el) => getComputedStyle(el).position)).toBe("static");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
@@ -209,7 +209,7 @@ test.describe("touch", () => {
     await page.goto("/bg");
     await page.getByTestId("hero-primary").tap({ trial: true });
     await page.touchscreen.tap(200, 300);
-    expect(await page.locator(".fc-hero").evaluate((el) => el.style.getPropertyValue("--fx"))).toBe("");
+    expect(await page.locator(".vl-hero").evaluate((el) => el.style.getPropertyValue("--fx"))).toBe("");
     expect(await page.locator(".process-sticky").evaluate((el) => getComputedStyle(el).position)).toBe("static");
     expect(await page.getByTestId("home-timeline").evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(1);
     // The service cards show their details without hover.

@@ -10,7 +10,7 @@ import { cx } from "@/components/ui/primitives";
  * partly inside its mask, so the heading is painted at once and stays the LCP element. CSS only (runs without
  * JavaScript); with reduced motion the words are simply static.
  */
-export function KineticHeading({ title, highlight, className }: { title: string; highlight: string; className?: string }) {
+export function KineticHeading({ id, title, highlight, className }: { id?: string; title: string; highlight: string; className?: string }) {
   const phrases = title.split(/(?<=[,;:])\s+/).filter(Boolean);
   const word = (text: string, phrase: number, index: number, last: boolean) => (
     <Fragment key={`${phrase}-${index}`}>
@@ -24,7 +24,7 @@ export function KineticHeading({ title, highlight, className }: { title: string;
   );
   const highlightWords = highlight.split(/\s+/).filter(Boolean);
   return (
-    <h1 className={cx("fc-kinetic", className)}>
+    <h1 id={id} className={cx("fc-kinetic", className)}>
       {phrases.map((phrase, p) => phrase.split(/\s+/).map((text, w) => word(text, p, w, false)))}
       <span className="text-brand">{highlightWords.map((text, w) => word(text, phrases.length, w, w === highlightWords.length - 1))}</span>
     </h1>

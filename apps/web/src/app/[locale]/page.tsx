@@ -3,16 +3,13 @@ import Link from "next/link";
 import { ConfiguratorEntry } from "@/components/configurator/ConfiguratorEntry";
 import { AiWorkflowDemo } from "@/components/future/AiWorkflowDemo";
 import { compareData } from "@/components/future/compare-data";
-import { HeroField } from "@/components/future/HeroField";
 import { IntegrationFlow } from "@/components/future/IntegrationFlow";
 import { PackageExplorer, type PackageCard } from "@/components/future/PackageExplorer";
 import { ProcessStepper } from "@/components/future/ProcessStepper";
 import { ProductShowcase } from "@/components/future/ProductShowcase";
 import { ServiceComparison } from "@/components/future/ServiceComparison";
-import { ShowcaseMock } from "@/components/future/ShowcaseMock";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { ToolsPreview } from "@/components/home/ToolsPreview";
-import { KineticHeading } from "@/components/motion/KineticHeading";
 import { revealGroup } from "@/components/motion/reveal";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { FounderPortrait } from "@/components/sections/Founder";
@@ -21,10 +18,12 @@ import { PriceTag } from "@/components/sections/PriceTag";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { Icon } from "@/components/ui/Icon";
 import { EditorialSplit } from "@/components/ui/patterns";
-import { ButtonLink, Container, Eyebrow, Section, SectionHeading, cx } from "@/components/ui/primitives";
+import { ButtonLink, Eyebrow, Section, SectionHeading, cx } from "@/components/ui/primitives";
 import { ArrowLink, TickList } from "@/components/v5/blocks";
 import { type PreviewKind, UiPreview } from "@/components/v5/UiPreview";
+import { VeloraHero } from "@/components/velora-home/VeloraHero";
 import { getContent, serviceByKey } from "@/content";
+import { veloraHomeCopy } from "@/content/velora-home";
 import type { FutureCardKey, ShowcaseKey } from "@/content/v5-types";
 import { localizePath } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
@@ -89,7 +88,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     store: href(routes.ecommerce),
     saas: servicePage("portals_web_apps"),
   };
-  const corporate = fc.showcase.items[0];
+  const velora = veloraHomeCopy(locale);
 
   const compare = compareData(locale);
 
@@ -129,67 +128,38 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <JsonLd data={faqJsonLd(home.faq.items)} />
 
       {/* 1 ---------------------------------------------------------------- interactive hero */}
-      {/* Hero signature (docs/MOTION_SYSTEM.md): kinetic headline, a pointer-reactive technical field (data-field, fine
-          pointers only) with one ambient scan (data-loop, paused off screen) and a subtle CSS scroll response. */}
-      <div className="fc-hero relative isolate overflow-hidden" data-field="" data-loop="">
-        <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid fc-depth [--d:5]" />
-          <HeroField />
-        </div>
-        <Container size="wide" className="relative grid items-center gap-12 pb-16 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 lg:pb-24 lg:pt-20">
-          <div className="min-w-0">
-            {/* Entrance (CSS only, once): eyebrow → kinetic heading (phrases 80 ms apart, words rise into their masks) →
-                lead → actions → points → preview layers from three directions. The heading, the lead and the actions
-                are opaque from the first frame (LCP, usable CTA). */}
-            <Eyebrow className="fc-enter [--i:0]">{fc.hero.eyebrow}</Eyebrow>
-            <KineticHeading title={fc.hero.title} highlight={fc.hero.titleHighlight} className="fc-rise t-hero mt-6 [--i:1]" />
-            <p className="fc-rise t-lead mt-6 max-w-xl [--i:2]">{fc.hero.lead}</p>
-            <div className="fc-rise mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap [--i:3]">
-              <ButtonLink href={href(routes.services)} size="lg" icon="arrowRight" testId="hero-primary" magnetic>
-                {fc.hero.primaryCta}
-              </ButtonLink>
-              <ButtonLink href={quoteHref} size="lg" variant="secondary" testId="hero-secondary">
-                {fc.hero.secondaryCta}
-              </ButtonLink>
-              <ConfiguratorEntry href={href(routes.configurator)} label={fc.hero.configureCta} variant="secondary" className="btn-lg" />
-            </div>
-            <ul className="fc-enter mt-9 grid gap-x-6 gap-y-2.5 border-t border-line-subtle pt-6 text-sm text-fg-secondary sm:grid-cols-2 [--i:4]">
-              {fc.hero.points.map((item) => (
-                <li key={item} className="inline-flex items-center gap-2">
-                  <Icon name="check" className="h-4 w-4 shrink-0 text-brand" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          {/* Layered previews: a corporate site, a store and an automation, with status chips; one caption for all. */}
-          <figure className="min-w-0" data-testid="hero-preview">
-            <div className="fc-stage">
-              <div className="fc-enter fc-from-rise fc-depth [--d:-6]" style={{ ["--i" as string]: 5 }}>
-                <ShowcaseMock item={corporate} />
-              </div>
-              <div data-layer="store" className="fc-enter fc-from-right fc-depth hidden [--d:-11] lg:block" style={{ ["--i" as string]: 6 }}>
-                <UiPreview kind="store" compact />
-              </div>
-              <div data-layer="ai" className="fc-enter fc-from-left fc-depth hidden [--d:12] xl:block" style={{ ["--i" as string]: 7 }}>
-                <UiPreview kind="ai" compact />
-              </div>
-              <ul className="fc-stage-chips pointer-events-none" aria-hidden="true">
-                {fc.hero.chips.map((chip, index) => (
-                  <li key={chip.label} className="fc-enter fc-from-pop" style={{ ["--i" as string]: 8 + index }}>
-                    <span className="fc-glass fc-chip">
-                      <Icon name={chip.icon} className={index === 2 ? "h-4 w-4 text-warning" : index === 1 ? "h-4 w-4 text-brand-2" : "h-4 w-4 text-success"} />
-                      {chip.label}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <figcaption className="t-label mt-5 lg:mt-10">{fc.hero.previewCaption}</figcaption>
-          </figure>
-        </Container>
-        <span className="fc-horizon" aria-hidden="true" />
-      </div>
+      {/* Hero on the original Velora dark composition (docs/audits/velora-upstream-audit.md → source map). */}
+      <VeloraHero
+        eyebrow={fc.hero.eyebrow}
+        title={fc.hero.title}
+        highlight={fc.hero.titleHighlight}
+        lead={fc.hero.lead}
+        primary={{ href: href(routes.services), label: fc.hero.primaryCta }}
+        secondary={{ href: quoteHref, label: fc.hero.secondaryCta }}
+        extra={<ConfiguratorEntry href={href(routes.configurator)} label={fc.hero.configureCta} variant="secondary" className="btn-lg" />}
+        copy={velora}
+        links={[
+          { label: fc.services.cards[0].title, href: cardHref.website, icon: "layers" },
+          { label: fc.services.cards[1].title, href: cardHref.store, icon: "cart" },
+          { label: fc.services.cards[2].title, href: cardHref.platform, icon: "dashboard" },
+          { label: fc.services.cards[3].title, href: cardHref.ai, icon: "workflow" },
+          { label: fc.flow.cta, href: servicePage("integrations"), icon: "plug" },
+          { label: fc.packages.careTitle, href: href(routes.carePlans), icon: "wrench" },
+          { label: fc.hero.secondaryCta, href: quoteHref, icon: "mail" },
+        ]}
+        tileHrefs={{
+          globe: servicePage("integrations"),
+          morph: href(routes.services),
+          beam: href(routes.process),
+          dock: href(routes.services),
+          card: servicePage("portals_web_apps"),
+          list: servicePage("automation"),
+          marquee: href(routes.services),
+          orbit: servicePage("integrations"),
+          loaders: href(routes.demoCentre),
+        }}
+        caption={fc.hero.previewCaption}
+      />
 
       {/* 2 ---------------------------------------------------------------- four service cards */}
       <Section className="overflow-x-clip" labelledBy="showcase-title" size="wide">
