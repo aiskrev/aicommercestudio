@@ -2283,6 +2283,32 @@
   .vl-in { animation: vl-tile-in var(--motion-hero) var(--motion-ease-out) both; animation-delay: calc(120ms + var(--i, 0) * var(--motion-stagger)); }
 }
 @keyframes vl-tile-in { from { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.97); } }
+/* Velora section label (upstream SectionHeading: `text-sm font-medium text-primary`): sans, no square marker, on
+   every page. The hero label is a pill (upstream "New in …" link chip). */
+@layer components {
+  .t-eyebrow { font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500; letter-spacing: 0; color: var(--color-brand); }
+  .t-eyebrow::before { display: none; }
+  .t-eyebrow.vl-pill {
+    gap: 0.5rem;
+    max-width: 100%;
+    border-radius: 9999px;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    background: rgb(20 22 24 / 0.6);
+    padding: 0.3rem 0.85rem 0.3rem 0.35rem;
+    color: var(--color-fg-secondary);
+    backdrop-filter: blur(8px);
+  }
+  /* A status dot instead of upstream's version badge (no invented text). */
+  .t-eyebrow.vl-pill::before { display: inline-block; width: 0.5rem; height: 0.5rem; margin-left: 0.45rem; border-radius: 9999px; background: var(--color-brand-2); box-shadow: 0 0 10px 1px rgb(56 189 248 / 0.6); }
+}
+/* Pause control (components/motion/MotionToggle.tsx): every CSS animation stops where it is. */
+html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-motion="paused"] *::after { animation-play-state: paused !important; }
+@layer components {
+  .vl-motion-toggle { display: inline-flex; min-height: 2.75rem; align-items: center; gap: 0.4rem; border-radius: 9999px; padding: 0 0.75rem; font-size: 0.8125rem; font-weight: 500; color: var(--color-fg-muted); transition: color var(--motion-fast) var(--motion-ease-standard), background-color var(--motion-fast) var(--motion-ease-standard); }
+  .vl-motion-toggle:hover { color: var(--color-fg); background: rgb(255 255 255 / 0.05); }
+  .vl-motion-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  .vl-motion-toggle[aria-pressed="true"] { color: var(--color-brand); }
+}
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
 @keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
 @keyframes orbit {

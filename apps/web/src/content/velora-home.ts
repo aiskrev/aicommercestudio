@@ -24,6 +24,8 @@ export interface VeloraHomeCopy {
   illustrative: string;
   stackLabel: string;
   stack: string[];
+  pauseLabel: string;
+  playLabel: string;
 }
 
 const bg: VeloraHomeCopy = {
@@ -65,6 +67,8 @@ const bg: VeloraHomeCopy = {
   illustrative: "Илюстрация",
   stackLabel: "Технологиите, на които работи и този сайт",
   stack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Python", "FastAPI", "PostgreSQL", "Docker", "Playwright"],
+  pauseLabel: "Спрете анимациите",
+  playLabel: "Пуснете анимациите",
 };
 
 const en: VeloraHomeCopy = {
@@ -106,6 +110,8 @@ const en: VeloraHomeCopy = {
   illustrative: "Illustration",
   stackLabel: "The technologies this website runs on",
   stack: ["Next.js", "React", "TypeScript", "Tailwind CSS", "Python", "FastAPI", "PostgreSQL", "Docker", "Playwright"],
+  pauseLabel: "Pause animations",
+  playLabel: "Play animations",
 };
 
 export function veloraHomeCopy(locale: Locale): VeloraHomeCopy {

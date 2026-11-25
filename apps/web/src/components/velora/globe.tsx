@@ -2,9 +2,11 @@
 
 // Adapted from Velora UI (MIT, (c) 2026 Aigars Silkalns), github.com/ColorlibHQ/velora-ui @ 2db0612,
 // src/components/velora/globe.tsx. See THIRD_PARTY_NOTICES.md.
+// Local change: honours the site-wide pause flag (components/motion/pause.ts).
 
 import { useEffect, useRef } from "react";
 
+import { motionPaused } from "@/components/motion/pause";
 import { cn } from "@/components/velora/cn";
 
 // Land mask derived from Natural Earth (public domain): 240×120 cells, run-length encoded.
@@ -223,7 +225,7 @@ export function Globe({
         v.lat += v.vy;
         v.vx *= 0.9;
         v.vy *= 0.9;
-        if (!reduced && !hover && !focus) v.lng -= speed * dt;
+        if (!reduced && !hover && !focus && !motionPaused()) v.lng -= speed * dt;
       }
       v.lat = Math.max(-70, Math.min(70, v.lat));
       draw(now / 1000);

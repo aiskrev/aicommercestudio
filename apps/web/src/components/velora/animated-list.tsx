@@ -2,10 +2,12 @@
 
 // Adapted from Velora UI (MIT, (c) 2026 Aigars Silkalns), github.com/ColorlibHQ/velora-ui @ 2db0612,
 // src/components/velora/animated-list.tsx. See THIRD_PARTY_NOTICES.md.
+// Local change: honours the site-wide pause flag (components/motion/pause.ts).
 
 import React, { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
+import { motionPaused } from "@/components/motion/pause";
 import { cn } from "@/components/velora/cn";
 
 const noopSubscribe = () => () => {};
@@ -41,7 +43,9 @@ export function AnimatedList({
   useEffect(() => {
     if (reducedMotion || paused) return;
     const interval = setInterval(
-      () => setIndex((i) => (i + 1) % items.length),
+      () => {
+        if (!motionPaused()) setIndex((i) => (i + 1) % items.length);
+      },
       delay
     );
     return () => clearInterval(interval);

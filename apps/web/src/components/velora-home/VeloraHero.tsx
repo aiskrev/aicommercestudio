@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { KineticHeading } from "@/components/motion/KineticHeading";
+import { MotionToggle } from "@/components/motion/MotionToggle";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { ButtonLink, Eyebrow } from "@/components/ui/primitives";
 import { AuroraBackground } from "@/components/velora/aurora-background";
@@ -65,9 +66,9 @@ export function VeloraHero({
       <section className="vl-hero relative isolate overflow-hidden pb-16 pt-10 sm:pt-14 lg:pt-20" data-velora="" data-loop="" data-field="" aria-labelledby="hero-title">
         <AuroraBackground intensity="subtle" />
         <GridPattern width={48} height={48} className="fill-transparent stroke-line-subtle mask-[radial-gradient(ellipse_70%_50%_at_30%_0%,black,transparent)]" />
-        <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 lg:grid-cols-2 lg:gap-12 lg:px-8">
+        <div className="relative mx-auto grid w-full max-w-wide grid-cols-1 items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:px-8">
           <div className="min-w-0">
-            <Eyebrow className="fc-enter [--i:0]">{eyebrow}</Eyebrow>
+            <Eyebrow className="vl-pill fc-enter [--i:0]">{eyebrow}</Eyebrow>
             <KineticHeading id="hero-title" title={title} highlight={highlight} className="fc-rise vl-h1 mt-6 [--i:1]" />
             <p className="fc-rise t-lead mt-5 max-w-xl [--i:2]">{lead}</p>
             <div className="fc-rise mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center [--i:3]">
@@ -86,6 +87,7 @@ export function VeloraHero({
               <span className="text-fg-secondary">{copy.stripLabel}:</span>
               <span className="min-w-0 truncate">{copy.strip.join(" → ")}</span>
             </p>
+            <MotionToggle pauseLabel={copy.pauseLabel} playLabel={copy.playLabel} className="fc-enter mt-3 [--i:5]" />
           </div>
 
           <div className="grid min-w-0 grid-cols-2 gap-3 lg:auto-rows-[10.5rem]" data-testid="hero-preview">
@@ -106,7 +108,7 @@ export function VeloraHero({
           </div>
         </div>
 
-        <div className="relative mx-auto mt-3 grid max-w-7xl grid-cols-2 gap-3 px-4 lg:auto-rows-[11rem] lg:grid-cols-4 lg:px-8">
+        <div className="relative mx-auto mt-3 grid w-full max-w-wide grid-cols-2 gap-3 px-4 sm:px-6 lg:auto-rows-[11rem] lg:grid-cols-4 lg:px-8">
           <Tile title={copy.tiles.card} href={tileHrefs.card} className="vl-in col-span-2 h-80 sm:col-span-1 lg:row-span-2 lg:h-auto [--i:6]">
             <div className="flex size-full items-center justify-center p-4">{demo("3d-card")}</div>
           </Tile>

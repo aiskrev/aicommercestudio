@@ -2,9 +2,11 @@
 
 // Adapted from Velora UI (MIT, (c) 2026 Aigars Silkalns), github.com/ColorlibHQ/velora-ui @ 2db0612,
 // src/components/velora/morphing-text.tsx. See THIRD_PARTY_NOTICES.md.
+// Local change: honours the site-wide pause flag (components/motion/pause.ts).
 
 import { useEffect, useRef, useState } from "react";
 
+import { motionPaused } from "@/components/motion/pause";
 import { cn } from "@/components/velora/cn";
 
 interface MorphingTextProps {
@@ -44,7 +46,7 @@ export function MorphingText({
 
     const cycle = window.setInterval(
       () => {
-        if (paused.current || document.hidden) return;
+        if (paused.current || document.hidden || motionPaused()) return;
         setBlurred(true);
         window.setTimeout(() => {
           setIndex((i) => (i + 1) % texts.length);

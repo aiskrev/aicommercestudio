@@ -234,3 +234,24 @@ test.describe("without JavaScript", () => {
     await expect(page.getByTestId("process-stage-panel").locator("[data-active=true]")).toBeVisible();
   });
 });
+
+test.describe("pause control (WCAG 2.2.2)", () => {
+  test.use({ reducedMotion: "no-preference", viewport: { width: 1440, height: 900 } });
+
+  test("one button pauses every animation for the visit and resumes it", async ({ page }) => {
+    await page.goto("/bg");
+    const toggle = page.getByTestId("motion-toggle");
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    const marquee = page.locator('.vl-hero [class*="animate-marquee"]').first();
+    expect(await marquee.evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("running");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "paused");
+    expect(await marquee.evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
+    // No storage is written: the choice lasts for this visit only.
+    expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    expect(await marquee.evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("running");
+  });
+});
