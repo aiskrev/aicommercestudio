@@ -163,3 +163,29 @@ contentful paint and stays the LCP element (verified: LCP − FCP ≤ 17 ms in `
 * **New tests**: `e2e/tests/motion-signature.spec.ts` (headline text and LCP, magnetic bounds and release, keyboard,
   field bounds and loop pausing, portal tilt ≤ 2°, narrative stage order and controls, packet and pulses, FLIP and
   prices, demo scenes, checks order, reduced motion, touch, no JavaScript) and `components/motion/pointer.test.ts`.
+
+## Site-wide Velora motion (all public pages)
+
+Applied through the shared templates, so every page gets it without per-page code:
+
+| Element | Where | Behaviour | Reduced motion / touch |
+| --- | --- | --- | --- |
+| Velora hero backdrop | `PageHero` (29 pages), `VeloraBackdrop` (hubs, offers, service, workshop, scenario, agent, integration-pattern, contact pages) | 48 px grid masked to the top left; aurora glows from `lg` (phones: grid only) | aurora still |
+| Kinetic H1 | `PageHero`, `HubPage`, service pages (`KineticHeading`) | words rise into masks, phrases 80 ms apart; text unchanged | static |
+| Kinetic section headings | every `SectionHeading` (`fc-kinetic-scroll`) | words rise when the heading is scrolled to (reveal `in`) | static |
+| Pill label + line | hero labels (`vl-pill`), section labels draw a blue line on reveal | — | static |
+| Card spotlight + tilt | `.motion-card`, `.card-interactive`, `.price-card`, `.offer-card`, `.vl-tile`, `.feature-panel`, `.ui-frame` (pointer layer) | light follows a fine pointer; tilt ≤ 1.5° (frames 2.5°); card icons hop | no tilt; touch: press only |
+| Auto reveals | grids of cards/lists in `main` without their own reveal (`MotionRuntime → autoReveal`) | rise / scale / alternating sides, 60 ms stagger, once; never grids with form controls | no reveal |
+| Tick marks | `TickList` (`.tick-list`) | marks pop in order when their card is revealed | static |
+| Section dividers | every `Section` (`.vl-section-line`) | hairline draws from the centre when reached | drawn |
+| Scroll progress | locale layout (`.vl-scroll-progress`) | 2 px blue→cyan bar scrubbed by `animation-timeline: scroll()` | hidden |
+| Border beam | `CtaBand` panels, featured price/package cards (`.vl-beam`) | a light runs round the border every 8 s, paused off screen | hidden |
+| Service concept | `ServiceConcept` on every service page | the steps light up one after another (6 s) | static |
+| Hero edge sweep | `.fc-horizon` | a light runs along the hero's bottom edge every 7 s | hidden |
+| Primary button shimmer | `.btn-primary` | a sheen passes on hover (fine pointer) | none |
+| Ambient light | `body::before` | navy/cyan glows drift (24 s, gradients only) | still |
+| Footer links | `.vl-link` | underline draws on hover/focus | instant |
+
+Every loop stops with the pause control (`data-motion="paused"`) and with reduced motion. Page transitions: no
+route-level transform wrapper (it would break `position: fixed` elements such as the mobile CTA bar); each page's
+hero choreography runs on every navigation instead.
