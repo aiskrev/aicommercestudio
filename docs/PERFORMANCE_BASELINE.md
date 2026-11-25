@@ -221,3 +221,12 @@ Same method and local stack as the motion-system tables above (Lighthouse 13.5.0
 | desktop | `/bg/kontakti` | **99** (99, 99, 99) | 100 | 74 | 100 | 0.50 s | 0.95 s | 17 ms | 0 | 564 KB |
 
 Reading (honest): compared with the motion-system build above, **mobile `/bg` fell 89 → 83 (LCP 3.39 → 4.09 s) and `/en` 92 → 81 (LCP 3.12 → 3.95 s)**: the Velora hero (aurora blur layers, the bento, the lazily loaded demo chunk with `motion`) costs performance on the homepage. The other routes stay at 91 with LCP ~3.1 s. Mobile FCP 1.97 s / desktop 0.46–0.54 s is **not** a regression: the measurement taken on 2026-11-24 right before the motion work (same stack and method) had mobile FCP 1.82–2.12 s and desktop 0.46–0.54 s (an earlier version of this note compared against the October baseline by mistake). The homepage regression is real: mobile `/bg` 89 → 83 and `/en` 91 → 81 against that same pre-motion measurement. Accessibility 100, SEO 100, CLS ≤ 0.018 everywhere; best practices 74 is the plain-HTTP local stack only (see above). Not yet acceptable against the owner targets (mobile ≥ 85, LCP ≤ 2.5 s).
+
+### After the homepage LCP fixes (abee160: demos mount after load + idle, no aurora on phones), mobile, 3 runs
+
+| Preset | Route | Perf (runs) | A11y | BP | SEO | FCP | LCP | TBT | CLS | Transfer |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| mobile | `/bg` | **83** (82, 83, 86) | 100 | 74 | 100 | 2.12 s | 3.75 s | 233 ms | 0.018 | 685 KB |
+| mobile | `/en` | **87** (87, 88, 72) | 100 | 74 | 100 | 1.97 s | 3.12 s | 253 ms | 0 | 637 KB |
+
+LCP element on both homepages is the hero lead (`p.t-lead`). `/en` is back at its pre-motion level (87, LCP 3.12 s); `/bg` improved its LCP (4.09 → 3.75 s) but stays at 83 (TBT 233 ms) against 89 before the motion work: **still open** (next: reduce homepage main-thread work and the 67 KB HTML document).
