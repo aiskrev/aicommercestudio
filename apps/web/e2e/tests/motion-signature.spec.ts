@@ -77,7 +77,7 @@ test.describe("no motion preference, fine pointer", () => {
     expect(names).toContain("orbit");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await expect(hero).toHaveAttribute("data-offscreen", "");
-    expect(await page.locator(".vl-hero .animate-orbit").first().evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
+    expect(await page.locator('.vl-hero [data-slot="orbiting-circle"]').first().evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
   });
 
   test("service portals: lift, spotlight and a tilt of at most 2°", async ({ page }) => {
