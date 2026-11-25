@@ -23,11 +23,15 @@ test.describe("no motion preference, fine pointer", () => {
     const timing = await page.evaluate(
       () =>
         new Promise<{ fcp: number; lcp: number; element: string }>((resolve) => {
-          const fcp = performance.getEntriesByName("first-contentful-paint")[0]?.startTime ?? -1;
+          // Both from buffered observers: the load event can resolve before the paint entries exist.
+          let fcp = -1;
+          new PerformanceObserver((list) => {
+            fcp = list.getEntriesByName("first-contentful-paint")[0]?.startTime ?? fcp;
+          }).observe({ type: "paint", buffered: true });
           new PerformanceObserver((list) => {
             const entries = list.getEntries() as (PerformanceEntry & { element?: Element })[];
             const last = entries[entries.length - 1];
-            resolve({ fcp, lcp: last.startTime, element: last.element?.closest("h1, p, figure, div")?.tagName ?? "?" });
+            setTimeout(() => resolve({ fcp, lcp: last.startTime, element: last.element?.closest("h1, p, figure, div")?.tagName ?? "?" }), 50);
           }).observe({ type: "largest-contentful-paint", buffered: true });
         }),
     );
@@ -43,7 +47,8 @@ test.describe("no motion preference, fine pointer", () => {
     await expect(cta).toHaveAttribute("data-magnetic", "");
     const box = (await cta.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.move(box.x + box.width - 2, box.y + 2, { steps: 4 });
+    // Right edge, vertically centred: the pill shape has no hit area in its corners.
+    await page.mouse.move(box.x + box.width - 8, box.y + box.height / 2, { steps: 4 });
     await expect.poll(() => cta.evaluate((el) => el.style.getPropertyValue("--mag-x"))).not.toBe("");
     await page.waitForTimeout(400);
     const [x, y] = (await translate(page, '[data-testid="hero-primary"]')).split(" ").map(parseFloat);

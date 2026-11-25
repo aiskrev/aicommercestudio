@@ -3,6 +3,14 @@
 /* The marketing site is dark only (Velora dark identity): `dark:` utilities always apply, whatever the OS prefers. */
 @custom-variant dark (&:is(:root, :root *));
 
+/* Velora animations that read a per-element --duration: `inline`, so the var() is resolved on the element and not
+   on :root (where it does not exist, which would make the animation invalid). */
+@theme inline {
+  --animate-marquee: marquee var(--duration, 40s) linear infinite;
+  --animate-marquee-vertical: marquee-vertical var(--duration, 40s) linear infinite;
+  --animate-orbit: orbit calc(var(--duration) * 1s) linear infinite;
+}
+
 /* =============================================================================
    A.I. Commerce Studio — design system v3 ("Enterprise systems", on v2 "Engineering editorial")
    Full reference: docs/DESIGN_SYSTEM.md
@@ -117,9 +125,6 @@
   --color-brand-via: #60a5fa;
   --color-brand-to: #38bdf8;
   --color-navy-glow: #102039;
-  --animate-marquee: marquee var(--duration, 40s) linear infinite;
-  --animate-marquee-vertical: marquee-vertical var(--duration, 40s) linear infinite;
-  --animate-orbit: orbit calc(var(--duration) * 1s) linear infinite;
   --animate-aurora-1: aurora-1 14s ease-in-out infinite alternate;
   --animate-aurora-2: aurora-2 18s ease-in-out infinite alternate;
   --animate-aurora-3: aurora-3 22s ease-in-out infinite alternate;

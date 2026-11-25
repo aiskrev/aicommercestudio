@@ -17,8 +17,9 @@ const box: Record<LoaderSize, string> = {
   lg: "size-8",
 };
 
-// Under reduced motion every loader swaps its movement for a slow fade.
-const calm = "motion-reduce:animate-pulse motion-reduce:[animation-duration:2s]!";
+// Upstream swaps the movement for an endless slow fade under reduced motion; here reduced motion removes every
+// loop (owner brief, docs/MOTION_SYSTEM.md), so the loaders simply stand still.
+const calm = "";
 
 // Shared shell: a status region with a visually hidden label.
 function Shell({
