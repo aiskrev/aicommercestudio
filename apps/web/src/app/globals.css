@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* The marketing site is dark only (Velora dark identity): `dark:` utilities always apply, whatever the OS prefers. */
+@custom-variant dark (&:is(:root, :root *));
+
+/* Velora animations that read a per-element --duration: `inline`, so the var() is resolved on the element and not
+   on :root (where it does not exist, which would make the animation invalid). */
+@theme inline {
+  --animate-marquee: marquee var(--duration, 40s) linear infinite;
+  --animate-marquee-vertical: marquee-vertical var(--duration, 40s) linear infinite;
+  --animate-orbit: orbit calc(var(--duration) * 1s) linear infinite;
+}
+
 /* =============================================================================
    A.I. Commerce Studio — design system v3 ("Enterprise systems", on v2 "Engineering editorial")
    Full reference: docs/DESIGN_SYSTEM.md
@@ -19,39 +30,39 @@
 
 @theme {
   /* Surfaces (dark) — legacy aliases kept for existing utilities */
-  --color-ink-950: #06101d;
-  --color-ink-900: #0b1520;
-  --color-ink-850: #0e1926;
-  --color-ink-800: #111c2b;
-  --color-ink-700: #192a3d;
-  --color-ink-600: #22364d;
-  --color-line: #5a6e85;
+  --color-ink-950: #0b0c0e;
+  --color-ink-900: #0e1012;
+  --color-ink-850: #121417;
+  --color-ink-800: #141618;
+  --color-ink-700: #1f2328;
+  --color-ink-600: #2b3036;
+  --color-line: #6b6b75;
 
   /* Semantic colour */
-  --color-surface-deep: #040a13;
-  --color-surface-page: #06101d;
-  --color-surface-1: #0c1929;
-  --color-surface-2: #101f32;
-  --color-surface-3: #172a42;
-  --color-surface-light: #f4f1ea;
-  --color-surface-light-2: #ebe6dc;
-  --color-surface-paper-card: #fbfaf6;
-  --color-fg: #f4f7fb;
-  --color-fg-secondary: #d3dee8;
-  --color-fg-muted: #a9b9c9;
-  --color-fg-subtle: #8798ab;
-  --color-fg-placeholder: #8698ac;
+  --color-surface-deep: #090a0b;
+  --color-surface-page: #0b0c0e;
+  --color-surface-1: #141618;
+  --color-surface-2: #191c20;
+  --color-surface-3: #23272c;
+  --color-surface-light: #0e1012;
+  --color-surface-light-2: #121417;
+  --color-surface-paper-card: #141618;
+  --color-fg: #f5f5f5;
+  --color-fg-secondary: #d4d4d8;
+  --color-fg-muted: #a1a1aa;
+  --color-fg-subtle: #909099;
+  --color-fg-placeholder: #909099;
   --color-brand: #60a5fa;
   --color-brand-strong: #3b82f6;
   --color-brand-soft: #93c5fd;
-  --color-brand-2: #22d3ee;
-  --color-brand-ink: #0c6670;
-  --color-ink: #14232d;
-  --color-ink-muted: #45606e;
-  --color-ink-line: #7a8a93;
-  --color-line-subtle: rgb(169 185 201 / 0.12);
-  --color-line-default: rgb(169 185 201 / 0.2);
-  --color-line-strong: #5a6e85;
+  --color-brand-2: #38bdf8;
+  --color-brand-ink: #38bdf8;
+  --color-ink: #f5f5f5;
+  --color-ink-muted: #a1a1aa;
+  --color-ink-line: #6b6b75;
+  --color-line-subtle: rgb(255 255 255 / 0.07);
+  --color-line-default: rgb(255 255 255 / 0.11);
+  --color-line-strong: #6b6b75;
   --color-success: #5fd4a0;
   --color-warning: #f2c46d;
   --color-danger: #f47a8a;
@@ -62,7 +73,7 @@
   --color-brand-fill: #2563eb;
   --color-on-brand-fill: #ffffff;
   /* Section dividers and the faint top tint of feature panels. */
-  --color-divider: rgb(148 178 214 / 0.1);
+  --color-divider: rgb(255 255 255 / 0.07);
   --color-on-success: #c9f2df;
   --color-on-warning: #fbe8c2;
   --color-on-danger: #ffd4da;
@@ -72,9 +83,9 @@
   --color-on-danger-fill: #ffffff;
   --color-brand-glow-a: #1d4ed8;
   --color-brand-glow-b: #1e40af;
-  --color-line-hover: #71859c;
-  --color-surface-paper-field: #ffffff;
-  --color-window-chrome: #3c4d60;
+  --color-line-hover: #80808a;
+  --color-surface-paper-field: #191c20;
+  --color-window-chrome: #2b3036;
   /* Chart series (categorical, fixed order): dark steps validated on surface-1 #0d1724 with the
      dataviz validator, all pairs — lightness band, chroma, CVD ΔE ≥ 9.4, normal-vision ΔE ≥ 20.9, ≥ 3:1. */
   --color-viz-1: #3987e5;
@@ -82,22 +93,41 @@
   --color-viz-3: #199e70;
   /* V5 (docs/V5_DESIGN_SYSTEM.md): the screen inside a product preview frame and the decorative
      skeleton lines drawn on it. Neither carries text, so the contrast table is unchanged. */
-  --color-surface-4: #1c3250;
+  --color-surface-4: #2b3036;
   --color-ui-skeleton: rgb(169 185 201 / 0.22);
   /* Future Commerce (docs/FUTURE_COMMERCE_REDESIGN_REPORT.md): the warm "paper" theme. `.surface-light` maps the
      semantic tokens (fg*, surface-*, line-*, brand*) onto these, so any section and component can sit on paper.
      Text pairs are asserted in design-tokens.test.ts. */
-  --color-paper-fg-secondary: #263a46;
-  --color-paper-fg-subtle: #52697a;
-  --color-paper-brand: #1d4ed8;
-  --color-paper-brand-soft: #1e40af;
-  --color-paper-surface-3: #e9e4d9;
-  --color-paper-surface-4: #e3ddd0;
-  --color-paper-success: #157a55;
-  --color-paper-warning: #8a5a00;
-  --color-paper-danger: #b42339;
+  --color-paper-fg-secondary: #d4d4d8;
+  --color-paper-fg-subtle: #909099;
+  --color-paper-brand: #60a5fa;
+  --color-paper-brand-soft: #93c5fd;
+  --color-paper-surface-3: #1f2328;
+  --color-paper-surface-4: #262a30;
+  --color-paper-success: #5fd4a0;
+  --color-paper-warning: #f2c46d;
+  --color-paper-danger: #f47a8a;
   /* Graphite: the neutral dark band between navy sections. */
-  --color-graphite: #10151c;
+  --color-graphite: #111315;
+  /* Velora UI dark theme names (docs/audits/velora-upstream-audit.md), for the adapted components in
+     components/velora. Same values as the semantic tokens above. */
+  --color-background: #0b0c0e;
+  --color-foreground: #f5f5f5;
+  --color-card: #141618;
+  --color-card-foreground: #f5f5f5;
+  --color-muted: #23272c;
+  --color-muted-foreground: #a1a1aa;
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #0b0c0e;
+  --color-border: rgb(255 255 255 / 0.1);
+  --color-input: rgb(255 255 255 / 0.15);
+  --color-brand-from: #3b82f6;
+  --color-brand-via: #60a5fa;
+  --color-brand-to: #38bdf8;
+  --color-navy-glow: #102039;
+  --animate-aurora-1: aurora-1 14s ease-in-out infinite alternate;
+  --animate-aurora-2: aurora-2 18s ease-in-out infinite alternate;
+  --animate-aurora-3: aurora-3 22s ease-in-out infinite alternate;
 
   /* Brand-tuned Tailwind scales (see header comment) */
   --color-slate-50: #f4f7fb;
@@ -1678,8 +1708,7 @@
   [data-reveal="in"][data-reveal-children] > :nth-child(6) { transition-delay: calc(var(--motion-stagger) * 5); }
   [data-reveal="in"][data-reveal-children] > :nth-child(n + 7) { transition-delay: calc(var(--motion-stagger) * 6); }
 
-  /* Service portals enter from different axes (data-from on the cards of a reveal group), and take longer. The
-     sideways shift is one --reveal-shift, so a card never leaves the screen while it enters (home-entry.spec.ts). */
+  /* Service portals enter from different axes (data-from on the cards of a reveal group), and take longer. */
   [data-reveal="pending"][data-reveal-children] > [data-from="left"] { transform: translate3d(calc(var(--reveal-shift) * -1), 0, 0); }
   [data-reveal="pending"][data-reveal-children] > [data-from="right"] { transform: translate3d(var(--reveal-shift), 0, 0); }
   [data-reveal="pending"][data-reveal-children] > [data-from="rise"] { transform: translate3d(0, calc(var(--reveal-shift) * 2.5), 0); }
@@ -2163,6 +2192,137 @@
 }
 @keyframes hero-stage-out { to { transform: translate3d(0, -56px, 0) scale(0.97); } }
 @keyframes hero-field-out { to { opacity: 0.2; transform: translate3d(0, 72px, 0); } }
+
+/* ================================================================ Velora dark identity (docs/audits/velora-upstream-audit.md) */
+@layer components {
+  /* The former paper sections stay dark: the paper palette tokens now hold dark values; these are the remaining
+     light-only values of .surface-light (borders, shadows, colour scheme). */
+  .surface-light {
+    --color-line-subtle: rgb(255 255 255 / 0.07);
+    --color-line-default: rgb(255 255 255 / 0.11);
+    --color-ui-skeleton: rgb(255 255 255 / 0.1);
+    --border-subtle: rgb(255 255 255 / 0.07);
+    --border-default: rgb(255 255 255 / 0.11);
+    --shadow-frame: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 40px 80px -40px rgb(0 0 0 / 0.8);
+    --shadow-lift: 0 18px 40px -26px rgb(0 0 0 / 0.85), 0 10px 30px -24px rgb(59 130 246 / 0.28);
+    color-scheme: dark;
+  }
+  .surface-light .card { border-color: var(--color-line-default); box-shadow: none; }
+  .surface-light .fc-grid {
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+  }
+
+  /* Velora components use `border` without a colour (upstream base: `* { border-color: var(--border) }`). */
+  [data-velora], [data-velora] * { border-color: var(--color-border); }
+
+  /* Buttons: Velora pills. Primary = near-white surface, near-black text, blue glow; secondary = dark surface,
+     neutral border that turns blue. Magnetic / press / arrow motion as before (docs/MOTION_SYSTEM.md). */
+  .btn { border-radius: 9999px; }
+  .btn-primary {
+    --btn-a: var(--color-fg);
+    --btn-b: var(--color-fg);
+    color: var(--color-surface-page);
+    background-color: var(--color-fg);
+    background-image: none;
+    box-shadow: 0 10px 26px -12px rgb(59 130 246 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.7);
+  }
+  .btn-secondary {
+    color: var(--color-fg);
+    background-color: rgb(11 12 14 / 0.6);
+    border: 1px solid rgb(255 255 255 / 0.14);
+    backdrop-filter: blur(8px);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"]) {
+      background-color: rgb(255 255 255);
+      box-shadow: 0 0 0 4px rgb(59 130 246 / 0.18), 0 16px 34px -12px rgb(59 130 246 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.8);
+    }
+    .btn-secondary:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"]) {
+      background-color: var(--color-surface-3);
+      border-color: color-mix(in oklab, var(--color-brand) 55%, transparent);
+    }
+  }
+
+  /* Velora bento tile (upstream `Tile`: figure, rounded-2xl, border, bg-card/50, caption with a link). */
+  .vl-tile {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border);
+    background: rgb(20 22 24 / 0.5);
+    transition: border-color var(--motion-base) var(--motion-ease-standard), transform var(--motion-base) var(--motion-ease-out);
+  }
+  .vl-tile > figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.125rem 0.75rem;
+    border-top: 1px solid rgb(255 255 255 / 0.06);
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .vl-tile:hover { border-color: color-mix(in oklab, var(--color-brand) 35%, transparent); }
+  }
+  .vl-tile:has(:focus-visible) { border-color: var(--color-brand); }
+}
+
+/* Velora hero: headline (upstream text-4xl → xl:text-6xl, semibold, tight), blue→cyan emphasis per word (the words
+   are separate masks, so each carries the gradient), and the bento tiles entering 60 ms apart. */
+@layer components {
+  .vl-h1 { font-family: var(--font-display); font-feature-settings: "locl" 0; font-size: clamp(2.25rem, 1.35rem + 3.1vw, 3.75rem); font-weight: 700; line-height: 1.06; letter-spacing: -0.03em; color: var(--color-fg); text-wrap: balance; }
+  .vl-h1 .text-brand .kw-in { background-image: linear-gradient(90deg, var(--color-brand-from), var(--color-brand-via) 55%, var(--color-brand-to)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vl-in { animation: vl-tile-in var(--motion-hero) var(--motion-ease-out) both; animation-delay: calc(120ms + var(--i, 0) * var(--motion-stagger)); }
+}
+@keyframes vl-tile-in { from { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.97); } }
+/* Velora section label (upstream SectionHeading: `text-sm font-medium text-primary`): sans, no square marker, on
+   every page. The hero label is a pill (upstream "New in …" link chip). */
+@layer components {
+  .t-eyebrow { font-family: var(--font-sans); font-size: 0.875rem; font-weight: 500; letter-spacing: 0; color: var(--color-brand); }
+  .t-eyebrow::before { display: none; }
+  .t-eyebrow.vl-pill {
+    gap: 0.5rem;
+    max-width: 100%;
+    border-radius: 9999px;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    background: rgb(20 22 24 / 0.6);
+    padding: 0.3rem 0.85rem 0.3rem 0.35rem;
+    color: var(--color-fg-secondary);
+    backdrop-filter: blur(8px);
+  }
+  /* A status dot instead of upstream's version badge (no invented text). */
+  .t-eyebrow.vl-pill::before { display: inline-block; width: 0.5rem; height: 0.5rem; margin-left: 0.45rem; border-radius: 9999px; background: var(--color-brand-2); box-shadow: 0 0 10px 1px rgb(56 189 248 / 0.6); }
+}
+/* Pause control (components/motion/MotionToggle.tsx): every CSS animation stops where it is. */
+html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-motion="paused"] *::after { animation-play-state: paused !important; }
+@layer components {
+  .vl-motion-toggle { display: inline-flex; min-height: 2.75rem; align-items: center; gap: 0.4rem; border-radius: 9999px; padding: 0 0.75rem; font-size: 0.8125rem; font-weight: 500; color: var(--color-fg-muted); transition: color var(--motion-fast) var(--motion-ease-standard), background-color var(--motion-fast) var(--motion-ease-standard); }
+  .vl-motion-toggle:hover { color: var(--color-fg); background: rgb(255 255 255 / 0.05); }
+  .vl-motion-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  .vl-motion-toggle[aria-pressed="true"] { color: var(--color-brand); }
+}
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
+@keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
+@keyframes orbit {
+  0% { transform: rotate(calc(var(--angle) * 1deg)) translateY(calc(var(--radius) * -1px)) rotate(calc(var(--angle) * -1deg)); }
+  100% { transform: rotate(calc(var(--angle) * 1deg + 360deg)) translateY(calc(var(--radius) * -1px)) rotate(calc((var(--angle) * 1deg + 360deg) * -1)); }
+}
+@keyframes aurora-1 { 0% { transform: translate(-10%, -12%) scale(1); } 50% { transform: translate(12%, 8%) scale(1.25); } 100% { transform: translate(-6%, 14%) scale(0.95); } }
+@keyframes aurora-2 { 0% { transform: translate(12%, 10%) scale(1.1); } 50% { transform: translate(-14%, -6%) scale(0.9); } 100% { transform: translate(8%, -12%) scale(1.2); } }
+@keyframes aurora-3 { 0% { transform: translate(0%, 16%) scale(0.95); } 50% { transform: translate(10%, -10%) scale(1.15); } 100% { transform: translate(-12%, 4%) scale(1); } }
+/* Velora loops pause off screen like ours (data-loop → data-offscreen). */
+[data-offscreen] :is([class*="animate-marquee"], [class*="animate-orbit"], [class*="animate-aurora-"]) { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  [class*="animate-marquee"], [class*="animate-orbit"], [class*="animate-aurora-"] { animation: none !important; }
+}
 
 /* ---------------------------------------------------------------- forced colours */
 /* Box-shadow rings disappear in Windows High Contrast; fall back to a system-colour outline. */

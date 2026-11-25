@@ -23,11 +23,15 @@ test.describe("no motion preference, fine pointer", () => {
     const timing = await page.evaluate(
       () =>
         new Promise<{ fcp: number; lcp: number; element: string }>((resolve) => {
-          const fcp = performance.getEntriesByName("first-contentful-paint")[0]?.startTime ?? -1;
+          // Both from buffered observers: the load event can resolve before the paint entries exist.
+          let fcp = -1;
+          new PerformanceObserver((list) => {
+            fcp = list.getEntriesByName("first-contentful-paint")[0]?.startTime ?? fcp;
+          }).observe({ type: "paint", buffered: true });
           new PerformanceObserver((list) => {
             const entries = list.getEntries() as (PerformanceEntry & { element?: Element })[];
             const last = entries[entries.length - 1];
-            resolve({ fcp, lcp: last.startTime, element: last.element?.closest("h1, p, figure, div")?.tagName ?? "?" });
+            setTimeout(() => resolve({ fcp, lcp: last.startTime, element: last.element?.closest("h1, p, figure, div")?.tagName ?? "?" }), 50);
           }).observe({ type: "largest-contentful-paint", buffered: true });
         }),
     );
@@ -43,7 +47,8 @@ test.describe("no motion preference, fine pointer", () => {
     await expect(cta).toHaveAttribute("data-magnetic", "");
     const box = (await cta.boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.move(box.x + box.width - 2, box.y + 2, { steps: 4 });
+    // Right edge, vertically centred: the pill shape has no hit area in its corners.
+    await page.mouse.move(box.x + box.width - 8, box.y + box.height / 2, { steps: 4 });
     await expect.poll(() => cta.evaluate((el) => el.style.getPropertyValue("--mag-x"))).not.toBe("");
     await page.waitForTimeout(400);
     const [x, y] = (await translate(page, '[data-testid="hero-primary"]')).split(" ").map(parseFloat);
@@ -61,18 +66,18 @@ test.describe("no motion preference, fine pointer", () => {
     expect(await translate(page, '[data-testid="hero-primary"]')).toMatch(/^(none|0px( 0px)?)$/);
   });
 
-  test("hero field follows the pointer within 14 px; the scan loop pauses off screen", async ({ page }) => {
+  test("Velora showcase: every live demo mounts, the marquee and the orbit move, loops pause off screen", async ({ page }) => {
     await page.goto("/bg");
-    const hero = page.locator(".fc-hero");
-    await page.mouse.move(1400, 120, { steps: 6 });
-    await expect.poll(() => hero.evaluate((el) => el.style.getPropertyValue("--fx"))).not.toBe("");
-    await page.waitForTimeout(800);
-    const [fx, fy] = (await translate(page, ".fc-field-front")).split(" ").map(parseFloat);
-    expect(Math.abs(fx)).toBeGreaterThan(4);
-    expect(Math.max(Math.abs(fx), Math.abs(fy || 0))).toBeLessThanOrEqual(14.01);
+    const hero = page.locator(".vl-hero");
+    for (const name of ["globe", "morphing-text", "border-beam", "dock", "3d-card", "animated-list"]) {
+      await expect(page.locator(`[data-demo="${name}"]`)).toHaveAttribute("data-mounted", "true", { timeout: 8000 });
+    }
+    const names = await page.evaluate(() => document.getAnimations().map((a) => (a as CSSAnimation).animationName).filter(Boolean));
+    expect(names).toContain("marquee");
+    expect(names).toContain("orbit");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await expect(hero).toHaveAttribute("data-offscreen", "");
-    expect(await page.locator(".fc-scan").evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
+    expect(await page.locator('.vl-hero [data-slot="orbiting-circle"]').first().evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
   });
 
   test("service portals: lift, spotlight and a tilt of at most 2°", async ({ page }) => {
@@ -191,7 +196,7 @@ test.describe("reduced motion", () => {
     await page.waitForTimeout(300);
     expect(await cta.evaluate((el) => el.style.getPropertyValue("--mag-x"))).toBe("");
     expect(await translate(page, '[data-testid="hero-primary"]')).toBe("none");
-    for (const selector of [".fc-scan", ".fc-packet", ".fc-trace"]) await expect(page.locator(selector).first()).toBeHidden();
+    for (const selector of [".fc-packet", ".fc-trace"]) await expect(page.locator(selector).first()).toBeHidden();
     // Not pinned, all six stages reachable without a scroll narrative; the flow and the checks are complete.
     expect(await page.locator(".process-sticky").evaluate((el) => getComputedStyle(el).position)).toBe("static");
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
@@ -209,7 +214,7 @@ test.describe("touch", () => {
     await page.goto("/bg");
     await page.getByTestId("hero-primary").tap({ trial: true });
     await page.touchscreen.tap(200, 300);
-    expect(await page.locator(".fc-hero").evaluate((el) => el.style.getPropertyValue("--fx"))).toBe("");
+    expect(await page.locator(".vl-hero").evaluate((el) => el.style.getPropertyValue("--fx"))).toBe("");
     expect(await page.locator(".process-sticky").evaluate((el) => getComputedStyle(el).position)).toBe("static");
     expect(await page.getByTestId("home-timeline").evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(1);
     // The service cards show their details without hover.
@@ -227,5 +232,26 @@ test.describe("without JavaScript", () => {
     expect(await page.locator(".process-narrative").evaluate((el) => el.getBoundingClientRect().height)).toBeLessThan(900 * 1.5);
     for (const tick of await page.locator(".sys-tick").all()) expect(await tick.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
     await expect(page.getByTestId("process-stage-panel").locator("[data-active=true]")).toBeVisible();
+  });
+});
+
+test.describe("pause control (WCAG 2.2.2)", () => {
+  test.use({ reducedMotion: "no-preference", viewport: { width: 1440, height: 900 } });
+
+  test("one button pauses every animation for the visit and resumes it", async ({ page }) => {
+    await page.goto("/bg");
+    const toggle = page.getByTestId("motion-toggle");
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    const marquee = page.locator('.vl-hero [class*="animate-marquee"]').first();
+    expect(await marquee.evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("running");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "paused");
+    expect(await marquee.evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("paused");
+    // No storage is written: the choice lasts for this visit only.
+    expect(await page.evaluate(() => localStorage.length + sessionStorage.length)).toBe(0);
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    expect(await marquee.evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("running");
   });
 });
