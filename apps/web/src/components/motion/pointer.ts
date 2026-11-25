@@ -13,7 +13,7 @@
  */
 const MAGNETIC = ["--mag-x", "--mag-y"];
 /** Cards that get the pointer spotlight (and, in CSS, a light tilt): the homepage portals and every card type. */
-const PORTAL_TARGETS = "[data-portal], .motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel";
+const PORTAL_TARGETS = "[data-portal], .motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel, .ui-frame";
 const PORTAL = ["--px", "--py", "--tx", "--ty"];
 const FIELD = ["--fx", "--fy"];
 

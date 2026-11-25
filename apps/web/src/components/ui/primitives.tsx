@@ -127,9 +127,8 @@ export function SectionHeading({
       className={cx("max-w-3xl min-w-0", align === "center" && "mx-auto text-center", !action && className)}
     >
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <Heading id={id} className={cx(headingClass, eyebrow && (size === "sm" ? "mt-3" : "mt-4"))}>
-        {title}
-      </Heading>
+      {/* The words rise into place when the heading is scrolled to (KineticHeading, fc-kinetic-scroll). */}
+      <KineticHeading as={Heading} id={id} title={title} className={cx(headingClass, Heading !== "h1" && "fc-kinetic-scroll", eyebrow && (size === "sm" ? "mt-3" : "mt-4"))} />
       {lead && <p className={cx("t-lead", size === "sm" ? "mt-3" : "mt-4")}>{lead}</p>}
     </div>
   );

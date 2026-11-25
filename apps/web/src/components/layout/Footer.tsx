@@ -134,7 +134,7 @@ function FooterColumn({
       <ul className="mt-4 grid gap-y-2.5">
         {links.map((link) => (
           <li key={link.href}>
-            <Link href={link.href} className="text-body-sm text-fg-secondary transition-colors hover:text-brand">
+            <Link href={link.href} className="vl-link text-body-sm text-fg-secondary transition-colors hover:text-brand">
               {link.label}
             </Link>
           </li>

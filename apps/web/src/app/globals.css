@@ -2477,6 +2477,66 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
   30%, 100% { opacity: 0; }
 }
 
+/* Even more Velora life: section headings reveal word by word on scroll, tick marks pop in order, product frames
+   answer the pointer, footer links draw their underline. Transform and opacity only; reduced motion: none of it. */
+@layer components {
+  :is(.ui-frame) { isolation: isolate; transition: transform var(--motion-slow) var(--motion-ease-out); }
+  .ui-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(20rem circle at var(--px, 50%) var(--py, 0%), rgb(56 189 248 / 0.12), transparent 60%);
+    opacity: 0;
+    transition: opacity var(--motion-slow) var(--motion-ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ui-frame:hover { transform: perspective(1200px) rotateX(calc(var(--ty, 0) * -2.5deg)) rotateY(calc(var(--tx, 0) * 2.5deg)) translate3d(0, -3px, 0); }
+    .ui-frame:hover::after { opacity: 1; }
+  }
+  .vl-link { position: relative; }
+  .vl-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 1px;
+    transform-origin: left;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, var(--color-brand-from), var(--color-brand-to));
+    transition: transform var(--motion-base) var(--motion-ease-out);
+  }
+  .vl-link:hover::after, .vl-link:focus-visible::after { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Section headings: still while waiting off screen, the words rise into their masks as the heading is revealed. */
+  .fc-kinetic-scroll .kw-in { animation: none; }
+  [data-reveal="pending"] .fc-kinetic-scroll .kw-in { transform: translate3d(0, 0.95em, 0); }
+  [data-reveal="in"] .fc-kinetic-scroll .kw-in {
+    animation: kw-rise var(--motion-hero) var(--motion-ease-out) both;
+    animation-delay: calc(80ms + var(--p, 0) * var(--motion-stagger-hero) + var(--w, 0) * 28ms);
+  }
+  /* Tick lists: the marks pop one after another when their card is revealed. */
+  [data-reveal="pending"] .tick-list > li > svg:first-child { opacity: 0; transform: scale(0.4); }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li > svg:first-child { animation: vl-tick var(--motion-emphasis) var(--motion-ease-out) both; animation-delay: 260ms; }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li:nth-child(2) > svg:first-child { animation-delay: 340ms; }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li:nth-child(3) > svg:first-child { animation-delay: 420ms; }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li:nth-child(4) > svg:first-child { animation-delay: 500ms; }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li:nth-child(n + 5) > svg:first-child { animation-delay: 580ms; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-frame:hover { transform: none !important; }
+  .vl-link::after { transition: none; }
+}
+@keyframes vl-tick {
+  0% { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+  60% { opacity: 1; transform: scale(1.25) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
 @keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
 @keyframes orbit {

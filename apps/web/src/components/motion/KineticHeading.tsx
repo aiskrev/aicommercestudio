@@ -10,7 +10,20 @@ import { cn } from "@/components/velora/cn";
  * partly inside its mask, so the heading is painted at once and stays the LCP element. CSS only (runs without
  * JavaScript); with reduced motion the words are simply static.
  */
-export function KineticHeading({ id, title, highlight = "", className }: { id?: string; title: string; highlight?: string; className?: string }) {
+export function KineticHeading({
+  id,
+  title,
+  highlight = "",
+  className,
+  as: Tag = "h1",
+}: {
+  id?: string;
+  title: string;
+  highlight?: string;
+  className?: string;
+  /** Section headings (h2/h3, SectionHeading) reveal their words when scrolled to (`fc-kinetic-scroll`). */
+  as?: "h1" | "h2" | "h3";
+}) {
   const phrases = title.split(/(?<=[,;:])\s+/).filter(Boolean);
   const word = (text: string, phrase: number, index: number, last: boolean) => (
     <Fragment key={`${phrase}-${index}`}>
@@ -24,13 +37,13 @@ export function KineticHeading({ id, title, highlight = "", className }: { id?: 
   );
   const highlightWords = highlight.split(/\s+/).filter(Boolean);
   return (
-    <h1 id={id} className={cn("fc-kinetic", className)}>
+    <Tag id={id} className={cn("fc-kinetic", className)}>
       {phrases.map((phrase, p) => {
         const words = phrase.split(/\s+/);
         // Without a highlight the title's own last word ends the heading (no trailing space).
         return words.map((text, w) => word(text, p, w, highlightWords.length === 0 && p === phrases.length - 1 && w === words.length - 1));
       })}
       {highlightWords.length > 0 && <span className="text-brand">{highlightWords.map((text, w) => word(text, phrases.length, w, w === highlightWords.length - 1))}</span>}
-    </h1>
+    </Tag>
   );
 }
