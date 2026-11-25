@@ -31,7 +31,7 @@ export interface VeloraHomeCopy {
 const bg: VeloraHomeCopy = {
   stripLabel: "Процес",
   strip: ["обхват", "дизайн", "изработка", "тестове", "пускане", "поддръжка"],
-  morph: ["Сайтове", "Магазини", "Интеграции", "Автоматизация", "Поддръжка"],
+  morph: ["Сайтове", "Онлайн магазини", "AI и облачни системи"],
   beamTitle: "Писмена оферта с ясен обхват",
   beamText: "Описваме какво влиза и какво не, преди да започнем.",
   dockLabel: "Бърз достъп до услугите",
@@ -74,7 +74,7 @@ const bg: VeloraHomeCopy = {
 const en: VeloraHomeCopy = {
   stripLabel: "Process",
   strip: ["scope", "design", "build", "test", "launch", "care"],
-  morph: ["Websites", "Stores", "Integrations", "Automation", "Care"],
+  morph: ["Websites", "Online stores", "AI and cloud systems"],
   beamTitle: "A written quote with a clear scope",
   beamText: "We write down what is in and what is out before we start.",
   dockLabel: "Quick access to the services",
