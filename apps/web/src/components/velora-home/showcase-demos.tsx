@@ -33,7 +33,14 @@ export function MorphingTextDemo({ copy }: { copy: VeloraHomeCopy }) {
   return (
     <div className="flex w-full flex-col items-center gap-2 px-4 text-center">
       <MorphingText texts={copy.morph} hold={2600} className="text-xl font-semibold tracking-tight sm:text-2xl" />
-      <p className="text-xs text-muted-foreground">{copy.morph.join(" · ")}</p>
+      <p className="text-xs text-muted-foreground">
+        {copy.morph.map((item, index) => (
+          <span key={item} className="whitespace-nowrap">
+            {index > 0 && " · "}
+            {item}
+          </span>
+        ))}
+      </p>
     </div>
   );
 }
