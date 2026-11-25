@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { VeloraBackdrop } from "@/components/velora/VeloraBackdrop";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { ContactFormWithParams } from "@/components/contact/ContactFormWithParams";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
@@ -40,9 +41,7 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/konta
         ]}
       />
       <div className="relative overflow-hidden">
-        <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
-        </div>
+        <VeloraBackdrop />
         <Container className="relative grid gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div>
             <Eyebrow>{dict.contact.eyebrow}</Eyebrow>

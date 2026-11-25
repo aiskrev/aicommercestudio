@@ -1,8 +1,11 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
+import { KineticHeading } from "@/components/motion/KineticHeading";
 import { reveal } from "@/components/motion/reveal";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { AuroraBackground } from "@/components/velora/aurora-background";
+import { GridPattern } from "@/components/velora/grid-pattern";
 
 export function cx(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
@@ -379,15 +382,15 @@ export function PageHero({
   aside?: ReactNode;
 }) {
   return (
-    <div className="relative isolate overflow-hidden border-b border-line-subtle">
-      <div className="fc-backdrop" aria-hidden="true">
-        <div className="fc-grid" />
-      </div>
+    <div className="vl-page-hero relative isolate overflow-hidden border-b border-line-subtle" data-velora="" data-loop="">
+      {/* Velora backdrop (docs/audits/velora-upstream-audit.md): aurora from lg (phones: the grid only), masked grid. */}
+      <AuroraBackground intensity="subtle" className="hidden lg:block" />
+      <GridPattern width={48} height={48} className="fill-transparent stroke-line-subtle mask-[radial-gradient(ellipse_70%_60%_at_30%_0%,black,transparent)]" />
       <Container className={cx("relative pb-14 pt-12 sm:pb-20 sm:pt-16", Boolean(aside) && "grid items-center gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14")}>
         {/* Entrance (CSS only, once): eyebrow → heading → lead → actions → aside; the heading, the lead and the actions only rise (LCP). */}
         <div className="min-w-0">
-          <Eyebrow className="fc-enter [--i:0]">{eyebrow}</Eyebrow>
-          <h1 className="fc-rise t-h1 mt-5 max-w-4xl [--i:1]">{title}</h1>
+          <Eyebrow className="vl-pill fc-enter [--i:0]">{eyebrow}</Eyebrow>
+          <KineticHeading title={title} className="fc-rise t-h1 mt-5 max-w-4xl [--i:1]" />
           <p className="fc-rise t-lead mt-6 max-w-3xl [--i:2]">{lead}</p>
           {children && <div className="fc-rise [--i:3]">{children}</div>}
         </div>

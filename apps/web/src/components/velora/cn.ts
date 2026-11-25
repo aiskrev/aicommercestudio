@@ -1,6 +1,4 @@
-import { cx } from "@/components/ui/primitives";
-
-/** Velora's `cn` (clsx + tailwind-merge) on top of our `cx`; later classes are appended, not merged. */
+/** Velora's `cn` (clsx + tailwind-merge): here a plain join of the truthy classes; later classes are appended. */
 export function cn(...classes: (string | false | null | undefined)[]): string {
-  return cx(...classes);
+  return classes.filter(Boolean).join(" ");
 }

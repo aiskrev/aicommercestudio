@@ -12,6 +12,8 @@
  * so it eases back to rest through its CSS transition.
  */
 const MAGNETIC = ["--mag-x", "--mag-y"];
+/** Cards that get the pointer spotlight (and, in CSS, a light tilt): the homepage portals and every card type. */
+const PORTAL_TARGETS = "[data-portal], .motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel";
 const PORTAL = ["--px", "--py", "--tx", "--ty"];
 const FIELD = ["--fx", "--fy"];
 
@@ -63,7 +65,7 @@ export function installPointerLayer(): () => void {
       }
     }
 
-    const nextPortal = target?.closest<HTMLElement>("[data-portal]") ?? null;
+    const nextPortal = target?.closest<HTMLElement>(PORTAL_TARGETS) ?? null;
     if (nextPortal !== portal) clear(portal, PORTAL);
     portal = nextPortal;
     if (portal) {

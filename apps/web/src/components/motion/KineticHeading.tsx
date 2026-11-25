@@ -1,6 +1,6 @@
 import { type CSSProperties, Fragment } from "react";
 
-import { cx } from "@/components/ui/primitives";
+import { cn } from "@/components/velora/cn";
 
 /**
  * Kinetic headline (docs/MOTION_SYSTEM.md → Hero signature). The heading is split into phrases at commas, and each
@@ -10,7 +10,7 @@ import { cx } from "@/components/ui/primitives";
  * partly inside its mask, so the heading is painted at once and stays the LCP element. CSS only (runs without
  * JavaScript); with reduced motion the words are simply static.
  */
-export function KineticHeading({ id, title, highlight, className }: { id?: string; title: string; highlight: string; className?: string }) {
+export function KineticHeading({ id, title, highlight = "", className }: { id?: string; title: string; highlight?: string; className?: string }) {
   const phrases = title.split(/(?<=[,;:])\s+/).filter(Boolean);
   const word = (text: string, phrase: number, index: number, last: boolean) => (
     <Fragment key={`${phrase}-${index}`}>
@@ -24,9 +24,13 @@ export function KineticHeading({ id, title, highlight, className }: { id?: strin
   );
   const highlightWords = highlight.split(/\s+/).filter(Boolean);
   return (
-    <h1 id={id} className={cx("fc-kinetic", className)}>
-      {phrases.map((phrase, p) => phrase.split(/\s+/).map((text, w) => word(text, p, w, false)))}
-      <span className="text-brand">{highlightWords.map((text, w) => word(text, phrases.length, w, w === highlightWords.length - 1))}</span>
+    <h1 id={id} className={cn("fc-kinetic", className)}>
+      {phrases.map((phrase, p) => {
+        const words = phrase.split(/\s+/);
+        // Without a highlight the title's own last word ends the heading (no trailing space).
+        return words.map((text, w) => word(text, p, w, highlightWords.length === 0 && p === phrases.length - 1 && w === words.length - 1));
+      })}
+      {highlightWords.length > 0 && <span className="text-brand">{highlightWords.map((text, w) => word(text, phrases.length, w, w === highlightWords.length - 1))}</span>}
     </h1>
   );
 }

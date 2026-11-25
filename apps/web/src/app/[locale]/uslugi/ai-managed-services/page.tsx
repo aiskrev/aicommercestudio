@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { VeloraBackdrop } from "@/components/velora/VeloraBackdrop";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { AiOpsDiagram } from "@/components/sections/AiOpsDiagram";
@@ -114,9 +115,7 @@ export default async function AiManagedServicesPage({ params }: PageProps<"/[loc
 
       {/* 1. hero */}
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
-        </div>
+        <VeloraBackdrop />
         <Container className="relative grid gap-12 pb-14 pt-10 sm:pb-20 sm:pt-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-center">
           <div>
           <Eyebrow>{page.hero.eyebrow}</Eyebrow>

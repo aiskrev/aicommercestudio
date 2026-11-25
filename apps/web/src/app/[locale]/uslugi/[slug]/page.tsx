@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { KineticHeading } from "@/components/motion/KineticHeading";
+import { VeloraBackdrop } from "@/components/velora/VeloraBackdrop";
 import { ArticleCard } from "@/components/editorial/ArticleCard";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CatalogueOfferings, ManagedRelation } from "@/components/sections/Catalogue";
@@ -169,16 +171,14 @@ export default async function ServicePage({ params }: PageProps<"/[locale]/uslug
 
       {/* ------------------------------------------------------------ hero */}
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
-        </div>
+        <VeloraBackdrop />
         <Container className="relative grid gap-12 pb-14 pt-10 sm:pb-16 sm:pt-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:pb-20">
           <div>
             <div className="fc-enter flex items-center gap-3 [--i:0]">
               <IconBadge name={service.icon} />
               <Eyebrow>{service.shortTitle}</Eyebrow>
             </div>
-            <h1 className="fc-rise t-h1 mt-6 [--i:1]">{service.title}</h1>
+            <KineticHeading title={service.title} className="fc-rise t-h1 mt-6 [--i:1]" />
             <p className="fc-rise t-lead mt-6 max-w-2xl [--i:2]">{service.intro}</p>
             <div className="fc-rise mt-8 flex flex-col gap-3 sm:flex-row [--i:3]">
               <ButtonLink href={quoteHref} size="lg" icon="arrowRight">

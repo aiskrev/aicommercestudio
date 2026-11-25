@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { KineticHeading } from "@/components/motion/KineticHeading";
+import { VeloraBackdrop } from "@/components/velora/VeloraBackdrop";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { Faq } from "@/components/sections/Faq";
@@ -53,13 +55,11 @@ export function HubPage({ locale, hub, path, primaryService }: { locale: Locale;
 
       {/* ------------------------------------------------------------ hero */}
       <div className="relative isolate overflow-hidden border-b border-line-subtle">
-        <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
-        </div>
+        <VeloraBackdrop />
         <Container className="relative grid items-center gap-12 pb-14 pt-10 sm:pt-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:pb-20">
           <div className="min-w-0">
             <Eyebrow className="fc-enter [--i:0]">{hub.eyebrow}</Eyebrow>
-            <h1 className="fc-rise t-hero mt-6 [--i:1]">{hub.title}</h1>
+            <KineticHeading title={hub.title} className="fc-rise t-hero mt-6 [--i:1]" />
             <p className="fc-rise t-lead mt-6 max-w-2xl [--i:2]">{hub.lead}</p>
             <div className="fc-rise mt-8 flex flex-col gap-3 sm:flex-row [--i:3]">
               <ButtonLink href={href(quoteWithService(primaryService))} size="lg" icon="arrowRight" testId="hub-quote">

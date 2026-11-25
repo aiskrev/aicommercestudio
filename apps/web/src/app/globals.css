@@ -2309,6 +2309,92 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
   .vl-motion-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .vl-motion-toggle[aria-pressed="true"] { color: var(--color-brand); }
 }
+/* Site-wide cards (Velora spotlight cards): a light that follows a fine pointer (--px/--py from the pointer layer)
+   and a tilt of at most 1.5° on hover. Touch: press feedback only; reduced motion: no tilt (the pointer layer is not
+   installed, so the light stays centred). */
+@layer components {
+  :is(.motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel) { position: relative; isolation: isolate; }
+  :is(.motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(22rem circle at var(--px, 50%) var(--py, 0%), rgb(59 130 246 / 0.16), transparent 62%);
+    opacity: 0;
+    transition: opacity var(--motion-slow) var(--motion-ease-out);
+  }
+  :is(.motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel):has(:focus-visible)::after { opacity: 0.8; }
+  @media (hover: hover) and (pointer: fine) {
+    :is(.motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel):hover::after { opacity: 1; }
+    :is(.motion-card, .card-interactive, .price-card, .offer-card):hover {
+      transform: perspective(1000px) translate3d(0, var(--lift-card), 0) rotateX(calc(var(--ty, 0) * -1.5deg)) rotateY(calc(var(--tx, 0) * 1.5deg));
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.motion-card, .card-interactive, .price-card, .offer-card):hover { transform: none !important; }
+}
+/* Site-wide Velora motion: scroll progress, CTA border beam, auto-reveal variants (docs/MOTION_SYSTEM.md). */
+@layer components {
+  /* Scroll progress (upstream scroll-progress): a 2 px blue→cyan bar on the top edge, scrubbed by the page scroll. */
+  .vl-scroll-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 60;
+    height: 2px;
+    transform-origin: left;
+    transform: scaleX(0);
+    pointer-events: none;
+    background: linear-gradient(90deg, var(--color-brand-from), var(--color-brand-via), var(--color-brand-to));
+    box-shadow: 0 0 12px rgb(56 189 248 / 0.5);
+  }
+  /* Border beam (upstream border-beam, CSS only): a light runs round the call-to-action panel every 8 s. */
+  .vl-beam {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    mask-image: linear-gradient(black 0 0), linear-gradient(black 0 0);
+    mask-clip: content-box, border-box;
+    mask-composite: exclude;
+  }
+  .vl-beam > span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 160%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    background: conic-gradient(from 0deg, transparent 0 78%, var(--color-brand-from) 88%, var(--color-brand-to) 94%, transparent 100%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vl-beam > span { animation: vl-beam 8s linear infinite; }
+  [data-offscreen] .vl-beam > span { animation-play-state: paused; }
+  /* Auto-reveal variants (MotionRuntime → autoReveal). */
+  [data-reveal="pending"][data-reveal-variant="scale"] > * { transform: translate3d(0, var(--reveal-shift), 0) scale(0.94); }
+  [data-reveal="pending"][data-reveal-variant="sides"] > :nth-child(odd) { transform: translate3d(calc(var(--reveal-shift) * -1), 0, 0); }
+  [data-reveal="pending"][data-reveal-variant="sides"] > :nth-child(even) { transform: translate3d(var(--reveal-shift), 0, 0); }
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .vl-scroll-progress { animation: vl-progress linear both; animation-timeline: scroll(root block); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vl-beam { display: none; }
+}
+@media (forced-colors: active) {
+  .vl-beam, .vl-scroll-progress { display: none; }
+}
+@keyframes vl-beam { to { transform: rotate(1turn); } }
+@keyframes vl-progress { to { transform: scaleX(1); } }
+
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
 @keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
 @keyframes orbit {
