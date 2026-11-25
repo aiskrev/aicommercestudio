@@ -38,7 +38,8 @@ export function ServiceConcept({ service, steps, label }: { service: ServiceKey;
   const items = steps.slice(0, 4);
   return (
     <DiagramFrame title={label} titleId="service-concept-title">
-      <div>
+      {/* The steps light up one after another (a running process, 6 s); paused off screen and with the pause control. */}
+      <div className="vl-concept" data-loop="">
         {layout === "cycle" && <Cycle items={items} />}
         {layout === "tree" && <Tree items={items} />}
         {layout === "stack" && <Stack items={items} />}
@@ -54,8 +55,9 @@ export function ServiceConcept({ service, steps, label }: { service: ServiceKey;
 function Node({ step, index, accent = false, className }: { step: Step; index: number; accent?: boolean; className?: string }) {
   return (
     <div
+      style={{ ["--n" as string]: index }}
       className={cx(
-        "rounded-[var(--radius-md)] border px-3.5 py-3",
+        "vl-node relative rounded-[var(--radius-md)] border px-3.5 py-3",
         accent ? "border-brand/45 bg-brand/[0.07]" : "border-line-default bg-surface-2",
         className,
       )}
@@ -159,7 +161,7 @@ function Checklist({ items }: { items: Step[] }) {
   return (
     <ul className="grid gap-2">
       {items.map((step, i) => (
-        <li key={step.title} className="flex items-center gap-3 rounded-[var(--radius-md)] border border-line-default bg-surface-2 px-3.5 py-3">
+        <li key={step.title} className="vl-node relative flex items-center gap-3 rounded-[var(--radius-md)] border border-line-default bg-surface-2 px-3.5 py-3" style={{ ["--n" as string]: i }}>
           <span className={cx("inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[5px] border", i < items.length - 1 ? "border-brand/50 text-brand" : "border-line-strong text-fg-subtle")} aria-hidden="true">
             <Icon name="check" className="h-3.5 w-3.5" />
           </span>

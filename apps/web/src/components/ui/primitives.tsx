@@ -256,7 +256,7 @@ export function IconBadge({ name, className }: { name: IconName; className?: str
   return (
     <span
       className={cx(
-        "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand",
+        "icon-badge inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand",
         className,
       )}
     >

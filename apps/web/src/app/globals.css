@@ -2395,6 +2395,88 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
 @keyframes vl-beam { to { transform: rotate(1turn); } }
 @keyframes vl-progress { to { transform: scaleX(1); } }
 
+/* More Velora-style life (docs/MOTION_SYSTEM.md): section labels draw a light line as they reveal, a light sweeps the
+   bottom edge of every hero, the primary button shimmers on hover, card icons react to their card. Transform and
+   opacity only; all of it stops with reduced motion. */
+@layer components {
+  .t-eyebrow::after {
+    content: "";
+    display: inline-block;
+    width: 2.25rem;
+    height: 1px;
+    margin-left: 0.25rem;
+    transform-origin: left;
+    background: linear-gradient(90deg, var(--color-brand-via), transparent);
+  }
+  .t-eyebrow.vl-pill::after { display: none; }
+  .fc-horizon { overflow: hidden; }
+  .fc-horizon::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgb(56 189 248 / 0.95), transparent);
+    transform: translateX(-100%);
+  }
+  .btn-primary { overflow: hidden; }
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 30%, rgb(59 130 246 / 0.22) 50%, transparent 70%);
+    transform: translateX(-120%);
+  }
+  :is(.fc-card-icon, .icon-badge) { transition: transform var(--motion-base) var(--motion-ease-out), box-shadow var(--motion-base) var(--motion-ease-standard); }
+  @media (hover: hover) and (pointer: fine) {
+    :is(.motion-card, .card-interactive, .price-card, .offer-card, .fc-card, .feature-panel):hover :is(.fc-card-icon, .icon-badge) {
+      transform: translateY(-2px) rotate(-6deg) scale(1.08);
+      box-shadow: 0 8px 22px -10px rgb(59 130 246 / 0.7);
+    }
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="in"] .t-eyebrow::after { animation: vl-draw var(--motion-hero) var(--motion-ease-out) 200ms both; }
+  [data-reveal="pending"] .t-eyebrow::after { transform: scaleX(0); }
+  .fc-horizon::after { animation: vl-sweep 7s linear 1s infinite; }
+  [data-offscreen] .fc-horizon::after { animation-play-state: paused; }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"])::after { animation: vl-shimmer 900ms var(--motion-ease-out) both; }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fc-horizon::after, .btn-primary::after { display: none; }
+  :is(.fc-card-icon, .icon-badge) { transform: none !important; }
+}
+@keyframes vl-draw { from { transform: scaleX(0); } }
+@keyframes vl-sweep { to { transform: translateX(460%); } }
+@keyframes vl-shimmer { to { transform: translateX(120%); } }
+
+/* Service concept diagrams: the steps light up one after another (a running process). */
+@layer components {
+  .vl-node::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    border: 1px solid var(--color-brand-to);
+    box-shadow: 0 0 0 3px rgb(56 189 248 / 0.14), 0 0 26px -6px rgb(56 189 248 / 0.65);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vl-concept .vl-node::after { animation: vl-step 6s var(--motion-ease-standard) infinite; animation-delay: calc(var(--n, 0) * 1.5s); }
+  [data-offscreen] .vl-node::after, .vl-concept[data-offscreen] .vl-node::after { animation-play-state: paused; }
+}
+@keyframes vl-step {
+  0% { opacity: 0; }
+  6%, 22% { opacity: 1; }
+  30%, 100% { opacity: 0; }
+}
+
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
 @keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
 @keyframes orbit {

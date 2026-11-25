@@ -207,6 +207,11 @@ export function HubPage({ locale, hub, path, primaryService }: { locale: Locale;
               const price = packagePrice(definition);
               return (
                 <li key={key} className={cx("price-card", price && "price-card-featured")} data-testid={`hub-package-${key}`}>
+                  {price && (
+                    <span className="vl-beam" aria-hidden="true">
+                      <span />
+                    </span>
+                  )}
                   <h3 className="t-h3">{text.name}</h3>
                   <p className="mt-2 text-body-sm leading-relaxed text-fg-muted">{text.audience}</p>
                   <div className="mt-5 border-t border-line-subtle pt-5">
