@@ -227,6 +227,7 @@ export function ButtonLink({
   icon,
   className,
   testId,
+  magnetic = false,
 }: {
   href: string;
   children: ReactNode;
@@ -235,9 +236,11 @@ export function ButtonLink({
   icon?: IconName;
   className?: string;
   testId?: string;
+  /** Magnetic primary CTA (hero, final CTA): follows a fine pointer a few pixels (components/motion/pointer.ts). */
+  magnetic?: boolean;
 }) {
   return (
-    <Link href={href} className={cx(buttonClass(variant, size), className)} data-testid={testId}>
+    <Link href={href} className={cx(buttonClass(variant, size), className)} data-testid={testId} data-magnetic={magnetic ? "" : undefined}>
       <span className="btn-label">{children}</span>
       {icon && <Icon name={icon} className="btn-icon h-4 w-4" />}
     </Link>

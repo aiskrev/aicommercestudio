@@ -365,7 +365,7 @@ export function Header({
             <LanguageSwitcher locale={locale} slugs={slugs} labels={languageLabels} className="hidden lg:block" />
             {account && <AccountLinks links={account} variant="header" />}
             <div className="hidden sm:block">
-              <Link href={cta.href} className={buttonClass("primary", "sm")} data-testid="header-cta">
+              <Link href={cta.href} className={buttonClass("primary", "sm")} data-testid="header-cta" data-magnetic="">
                 {cta.label}
               </Link>
             </div>

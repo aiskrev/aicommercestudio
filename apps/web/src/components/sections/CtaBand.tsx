@@ -49,9 +49,16 @@ export function CtaBand({
 
   if (emphasis) {
     return (
-      <section className="relative isolate overflow-hidden border-t border-line-subtle" aria-labelledby="cta-title">
+      <section className="relative isolate overflow-hidden border-t border-line-subtle" aria-labelledby="cta-title" data-loop="">
+        {/* Slow drift (docs/MOTION_SYSTEM.md → Final call to action): the grid moves one cell in 12 s and an orbit
+            turns every 14 s; transform only, paused off screen (data-loop), removed with reduced motion. */}
         <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
+          <div className="fc-grid-mask">
+            <div className="fc-grid fc-grid-drift" />
+          </div>
+          <div className="fc-orbit">
+            <i />
+          </div>
         </div>
         <Container className="relative py-20 sm:py-28 lg:py-32">
           <div {...reveal()} className="fc-cta px-6 py-12 sm:px-12 sm:py-16 lg:px-16">
@@ -62,7 +69,7 @@ export function CtaBand({
             <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
               <p className="t-lead max-w-2xl">{lead}</p>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-                <ButtonLink href={primary.href} size="lg" icon="arrowRight" className="w-full sm:w-auto">
+                <ButtonLink href={primary.href} size="lg" icon="arrowRight" className="w-full sm:w-auto" magnetic>
                   {primary.label}
                 </ButtonLink>
                 {secondaryLink}

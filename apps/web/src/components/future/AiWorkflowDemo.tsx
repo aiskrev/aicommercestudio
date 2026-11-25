@@ -1,12 +1,101 @@
 "use client";
 
-import { useState } from "react";
+import { type CSSProperties, type ReactNode, useState } from "react";
 
+import { useSwapDirection } from "@/components/motion/indicator";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { Button, cx } from "@/components/ui/primitives";
 import type { AiActor, FutureContent } from "@/content/v5-types";
 
 const ACTOR_ICON: Record<AiActor, IconName> = { system: "inbox", ai: "sparkles", human: "users" };
+
+/** A piece of a stage scene: its order (--k) sets when it enters after the scene changes. */
+const piece = (k: number): CSSProperties => ({ ["--k" as string]: k });
+
+/**
+ * The stage above the steps: one abstract scene per state (idle, receive, classify, extract, draft, approval), in
+ * a directional .swap-stack. Shapes only, no invented data; decorative (aria-hidden) because the steps list and the
+ * status below carry the same information as text. Scene pieces enter 90 ms apart (globals.css → .ai-stage).
+ */
+const SCENES: Record<string, ReactNode> = {
+  idle: (
+    <div className="ai-tray">
+      <i className="ai-slot" />
+      <i className="ai-slot" />
+      <i className="ai-slot" />
+    </div>
+  ),
+  receive: (
+    <div className="ai-row">
+      <span className="ai-env ai-piece ai-in-left" style={piece(0)}>
+        <Icon name="mail" className="h-5 w-5" />
+        <b />
+        <b className="w-2/3" />
+      </span>
+      <Icon name="arrowRight" className="ai-piece ai-in-fade h-4 w-4 text-fg-subtle" style={piece(1)} />
+      <span className="ai-box ai-piece ai-in-pop" style={piece(2)}>
+        <Icon name="inbox" className="h-5 w-5" />
+      </span>
+    </div>
+  ),
+  classify: (
+    <div className="ai-row">
+      <span className="ai-box is-ai ai-piece ai-in-pop" style={piece(0)}>
+        <Icon name="sparkles" className="h-5 w-5" />
+      </span>
+      <span className="ai-tags">
+        <i className="ai-tag ai-piece ai-in-rise" style={piece(1)} />
+        <i className="ai-tag is-hit ai-piece ai-in-hit" style={piece(2)} />
+        <i className="ai-tag ai-piece ai-in-rise" style={piece(3)} />
+      </span>
+    </div>
+  ),
+  extract: (
+    <div className="ai-row">
+      <span className="ai-doc">
+        <b />
+        <b className="is-mark ai-piece ai-in-mark" style={piece(0)} />
+        <b />
+        <b className="is-mark ai-piece ai-in-mark" style={piece(1)} />
+        <b className="w-1/2" />
+      </span>
+      <Icon name="arrowRight" className="ai-piece ai-in-fade h-4 w-4 text-fg-subtle" style={piece(2)} />
+      <span className="ai-fields">
+        <i className="ai-piece ai-in-left" style={piece(3)} />
+        <i className="ai-piece ai-in-left" style={piece(4)} />
+        <i className="ai-piece ai-in-left" style={piece(5)} />
+      </span>
+    </div>
+  ),
+  draft: (
+    <div className="ai-row">
+      <span className="ai-box is-ai ai-piece ai-in-pop" style={piece(0)}>
+        <Icon name="pen" className="h-5 w-5" />
+      </span>
+      <span className="ai-lines">
+        <i className="ai-piece ai-in-draw" style={piece(1)} />
+        <i className="ai-piece ai-in-draw" style={piece(2)} />
+        <i className="ai-piece ai-in-draw" style={piece(3)} />
+        <i className="w-1/2 ai-piece ai-in-draw" style={piece(4)} />
+      </span>
+    </div>
+  ),
+  approve: (
+    <div className="ai-row">
+      <span className="ai-box is-human ai-piece ai-in-pop" style={piece(0)}>
+        <Icon name="users" className="h-5 w-5" />
+      </span>
+      <span className="ai-gate ai-piece ai-in-rise" style={piece(1)}>
+        <i className="is-yes" />
+        <i />
+      </span>
+      <span className="ai-verdict">
+        <Icon name="check" className="ai-verdict-yes h-5 w-5" />
+        <Icon name="refresh" className="ai-verdict-no h-5 w-5" />
+      </span>
+    </div>
+  ),
+};
 
 /**
  * Interactive AI workflow demonstration (Future Commerce §7). Pre-recorded steps over made-up inputs: nothing is
@@ -24,6 +113,9 @@ export function AiWorkflowDemo({ text }: { text: FutureContent["aiDemo"] }) {
   const sample = text.samples.find((item) => item.key === sampleKey) ?? text.samples[0];
   const last = text.steps.length - 1;
   const waiting = position === last && decision === null;
+  const scene = position < 0 ? "idle" : text.steps[position].key;
+  const scenes = ["idle", ...text.steps.map((step) => step.key)];
+  const direction = useSwapDirection(scenes, scene);
 
   const choose = (key: typeof sampleKey) => {
     setSampleKey(key);
@@ -93,7 +185,20 @@ export function AiWorkflowDemo({ text }: { text: FutureContent["aiDemo"] }) {
       </div>
 
       <div className="min-w-0">
-        <ol className="grid" data-testid="ai-demo-steps">
+        <div className="ai-stage" aria-hidden="true" data-scene={scene} data-decision={decision ?? undefined} data-testid="ai-demo-stage">
+          <p className="ai-stage-head">
+            <span className="ai-stage-led" />
+            {position < 0 ? text.samplesLabel : text.steps[position].title}
+          </p>
+          <div className="swap-stack swap-stack-detail" data-swapped={direction !== null} data-dir={direction ?? undefined}>
+            {scenes.map((key) => (
+              <div key={key} data-active={key === scene} className="ai-scene">
+                {SCENES[key] ?? SCENES.idle}
+              </div>
+            ))}
+          </div>
+        </div>
+        <ol className="mt-5 grid" data-testid="ai-demo-steps">
           {text.steps.map((step, index) => {
             const current = state(index);
             return (

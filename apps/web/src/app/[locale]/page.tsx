@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ConfiguratorEntry } from "@/components/configurator/ConfiguratorEntry";
 import { AiWorkflowDemo } from "@/components/future/AiWorkflowDemo";
 import { compareData } from "@/components/future/compare-data";
+import { HeroField } from "@/components/future/HeroField";
 import { IntegrationFlow } from "@/components/future/IntegrationFlow";
 import { PackageExplorer, type PackageCard } from "@/components/future/PackageExplorer";
 import { ProcessStepper } from "@/components/future/ProcessStepper";
@@ -11,6 +12,7 @@ import { ServiceComparison } from "@/components/future/ServiceComparison";
 import { ShowcaseMock } from "@/components/future/ShowcaseMock";
 import { CredibilityStrip } from "@/components/home/CredibilityStrip";
 import { ToolsPreview } from "@/components/home/ToolsPreview";
+import { KineticHeading } from "@/components/motion/KineticHeading";
 import { revealGroup } from "@/components/motion/reveal";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { FounderPortrait } from "@/components/sections/Founder";
@@ -53,6 +55,9 @@ const BENTO: Record<FutureCardKey, string> = { website: "bento-wide", store: "be
 const CARD_PREVIEW: Partial<Record<FutureCardKey, PreviewKind>> = { website: "static", ai: "ai" };
 
 const CARD_TONE: Partial<Record<FutureCardKey, string>> = { ai: "var(--color-brand-2)" };
+
+/** Service portals enter from different axes (docs/MOTION_SYSTEM.md → Service portals). */
+const CARD_FROM: Record<FutureCardKey, string> = { website: "left", store: "right", platform: "rise", ai: "scale" };
 
 /**
  * Homepage, Future Commerce (docs/FUTURE_COMMERCE_REDESIGN_REPORT.md), on the V5 tokens and components.
@@ -124,20 +129,23 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <JsonLd data={faqJsonLd(home.faq.items)} />
 
       {/* 1 ---------------------------------------------------------------- interactive hero */}
-      <div className="relative isolate overflow-hidden">
+      {/* Hero signature (docs/MOTION_SYSTEM.md): kinetic headline, a pointer-reactive technical field (data-field, fine
+          pointers only) with one ambient scan (data-loop, paused off screen) and a subtle CSS scroll response. */}
+      <div className="fc-hero relative isolate overflow-hidden" data-field="" data-loop="">
         <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
+          <div className="fc-grid fc-depth [--d:5]" />
+          <HeroField />
         </div>
         <Container size="wide" className="relative grid items-center gap-12 pb-16 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12 lg:pb-24 lg:pt-20">
           <div className="min-w-0">
-            {/* Entrance (CSS only, once): eyebrow → heading → lead → actions → points → preview, 55 ms apart; the heading, the lead and the actions only rise, so they are painted from the first frame (LCP). */}
+            {/* Entrance (CSS only, once): eyebrow → kinetic heading (phrases 80 ms apart, words rise into their masks) →
+                lead → actions → points → preview layers from three directions. The heading, the lead and the actions
+                are opaque from the first frame (LCP, usable CTA). */}
             <Eyebrow className="fc-enter [--i:0]">{fc.hero.eyebrow}</Eyebrow>
-            <h1 className="fc-rise t-hero mt-6 [--i:1]">
-              {fc.hero.title} <span className="text-brand">{fc.hero.titleHighlight}</span>
-            </h1>
+            <KineticHeading title={fc.hero.title} highlight={fc.hero.titleHighlight} className="fc-rise t-hero mt-6 [--i:1]" />
             <p className="fc-rise t-lead mt-6 max-w-xl [--i:2]">{fc.hero.lead}</p>
             <div className="fc-rise mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap [--i:3]">
-              <ButtonLink href={href(routes.services)} size="lg" icon="arrowRight" testId="hero-primary">
+              <ButtonLink href={href(routes.services)} size="lg" icon="arrowRight" testId="hero-primary" magnetic>
                 {fc.hero.primaryCta}
               </ButtonLink>
               <ButtonLink href={quoteHref} size="lg" variant="secondary" testId="hero-secondary">
@@ -157,18 +165,18 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           {/* Layered previews: a corporate site, a store and an automation, with status chips; one caption for all. */}
           <figure className="min-w-0" data-testid="hero-preview">
             <div className="fc-stage">
-              <div className="fc-enter" style={{ ["--i" as string]: 5 }}>
+              <div className="fc-enter fc-from-rise fc-depth [--d:-6]" style={{ ["--i" as string]: 5 }}>
                 <ShowcaseMock item={corporate} />
               </div>
-              <div data-layer="store" className="fc-enter hidden lg:block" style={{ ["--i" as string]: 6 }}>
+              <div data-layer="store" className="fc-enter fc-from-right fc-depth hidden [--d:-11] lg:block" style={{ ["--i" as string]: 6 }}>
                 <UiPreview kind="store" compact />
               </div>
-              <div data-layer="ai" className="fc-enter hidden xl:block" style={{ ["--i" as string]: 7 }}>
+              <div data-layer="ai" className="fc-enter fc-from-left fc-depth hidden [--d:12] xl:block" style={{ ["--i" as string]: 7 }}>
                 <UiPreview kind="ai" compact />
               </div>
               <ul className="fc-stage-chips pointer-events-none" aria-hidden="true">
                 {fc.hero.chips.map((chip, index) => (
-                  <li key={chip.label} className="fc-enter" style={{ ["--i" as string]: 8 + index }}>
+                  <li key={chip.label} className="fc-enter fc-from-pop" style={{ ["--i" as string]: 8 + index }}>
                     <span className="fc-glass fc-chip">
                       <Icon name={chip.icon} className={index === 2 ? "h-4 w-4 text-warning" : index === 1 ? "h-4 w-4 text-brand-2" : "h-4 w-4 text-success"} />
                       {chip.label}
@@ -184,13 +192,16 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       </div>
 
       {/* 2 ---------------------------------------------------------------- four service cards */}
-      <Section labelledBy="showcase-title" size="wide">
+      <Section className="overflow-x-clip" labelledBy="showcase-title" size="wide">
         <SectionHeading id="showcase-title" eyebrow={fc.services.eyebrow} title={fc.services.title} lead={fc.services.lead} />
         <ul {...revealGroup()} className="bento mt-stack" data-testid="home-showcase">
           {fc.services.cards.map((card, index) => {
             const service = serviceByKey(locale, card.service);
             return (
-              <li key={card.key} className={cx("fc-card", BENTO[card.key])} style={CARD_TONE[card.key] ? { ["--fc-tone" as string]: CARD_TONE[card.key] } : undefined} data-testid={`showcase-${card.key}`}>
+              <li key={card.key} className={cx("fc-card", BENTO[card.key])} style={CARD_TONE[card.key] ? { ["--fc-tone" as string]: CARD_TONE[card.key] } : undefined} data-testid={`showcase-${card.key}`} data-portal="" data-from={CARD_FROM[card.key]}>
+                <span className="fc-trace" aria-hidden="true">
+                  <span />
+                </span>
                 {CARD_PREVIEW[card.key] && (
                   <div className="pointer-events-none absolute right-6 top-6 hidden w-[42%] lg:block">
                     <UiPreview kind={CARD_PREVIEW[card.key]!} compact />
@@ -281,7 +292,8 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       </Section>
 
       {/* 5 ---------------------------------------------------------------- interactive process timeline */}
-      <Section className="fc-defer" labelledBy="process-title" tone="deep" size="wide">
+      {/* Not deferred: the pinned narrative is three viewport heights tall, far from the 60rem placeholder of .fc-defer. */}
+      <Section labelledBy="process-title" tone="deep" size="wide">
         <SectionHeading
           id="process-title"
           eyebrow={fc.process.eyebrow}

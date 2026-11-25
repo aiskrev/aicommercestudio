@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
+import { installLoopPausing, installPointerLayer } from "@/components/motion/pointer";
 import { prefersReducedMotion } from "@/components/motion/reveal";
 
 /** After this the reveal styles are dropped ("done"), so an element's own hover transitions apply again. */
@@ -17,6 +18,17 @@ const SETTLE_MS = 1400;
  */
 export function MotionRuntime() {
   const pathname = usePathname();
+
+  // Pointer layer (magnetic CTAs, service portals, hero field) and off-screen pausing of the ambient loops.
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const removePointer = installPointerLayer();
+    const removeLoops = installLoopPausing();
+    return () => {
+      removePointer();
+      removeLoops();
+    };
+  }, [pathname]);
 
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined" || prefersReducedMotion()) return;
