@@ -11,24 +11,13 @@ const SETTLE_MS = 1400;
 
 /**
  * The one client script behind the scroll reveal (components/motion/reveal.ts). Mounted once in the locale
- * layout; renders nothing. One IntersectionObserver per page: no scroll or pointer listeners and no layout
- * reads. An element is hidden ("pending") only after the observer has reported it outside the viewport, so
+ * layout; renders nothing. The reveal uses one IntersectionObserver per page, with no scroll listeners and no
+ * layout reads; the pointer layer (fine pointers only) and the loop pausing are installed beside it. An element is hidden ("pending") only after the observer has reported it outside the viewport, so
  * nothing that is visible at load ever blinks; it is revealed once ("in") when it enters, then left alone.
  * Off with reduced motion and where IntersectionObserver is missing: the content simply stays as rendered.
  */
 export function MotionRuntime() {
   const pathname = usePathname();
-
-  // Pointer layer (magnetic CTAs, service portals, hero field) and off-screen pausing of the ambient loops.
-  useEffect(() => {
-    if (prefersReducedMotion()) return;
-    const removePointer = installPointerLayer();
-    const removeLoops = installLoopPausing();
-    return () => {
-      removePointer();
-      removeLoops();
-    };
-  }, [pathname]);
 
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined" || prefersReducedMotion()) return;
@@ -56,6 +45,18 @@ export function MotionRuntime() {
       for (const timer of timers) window.clearTimeout(timer);
       // Never leave anything hidden behind (fast navigation away while an element was pending).
       for (const element of document.querySelectorAll<HTMLElement>('[data-reveal="pending"], [data-reveal="in"]')) element.dataset.reveal = "done";
+    };
+  }, [pathname]);
+
+  // Pointer layer (magnetic CTAs, service portals, hero field) and off-screen pausing of the ambient loops
+  // (components/motion/pointer.ts). Not installed at all with reduced motion.
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const removePointer = installPointerLayer();
+    const removeLoops = installLoopPausing();
+    return () => {
+      removePointer();
+      removeLoops();
     };
   }, [pathname]);
 
