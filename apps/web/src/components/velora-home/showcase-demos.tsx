@@ -29,7 +29,13 @@ export function GlobeDemo({ copy }: { copy: VeloraHomeCopy }) {
 }
 
 export function MorphingTextDemo({ copy }: { copy: VeloraHomeCopy }) {
-  return <MorphingText texts={copy.morph} hold={2600} className="text-3xl font-semibold tracking-tight sm:text-4xl" />;
+  // The words morph one after another; the line below lists them all at once, so nothing depends on the rotation.
+  return (
+    <div className="flex w-full flex-col items-center gap-2 px-4 text-center">
+      <MorphingText texts={copy.morph} hold={2600} className="text-xl font-semibold tracking-tight sm:text-2xl" />
+      <p className="text-xs text-muted-foreground">{copy.morph.join(" · ")}</p>
+    </div>
+  );
 }
 
 export function BorderBeamDemo({ copy }: { copy: VeloraHomeCopy }) {
