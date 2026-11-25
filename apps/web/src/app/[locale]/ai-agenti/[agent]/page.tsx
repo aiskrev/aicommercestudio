@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { VeloraBackdrop } from "@/components/velora/VeloraBackdrop";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { CtaBand } from "@/components/sections/CtaBand";
 import { LIBRARY_ICONS } from "@/components/tools/team/AgentCard";
@@ -98,9 +99,7 @@ export default async function AgentPage({ params }: PageProps<"/[locale]/ai-agen
         ]}
       />
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
-        </div>
+        <VeloraBackdrop />
         <Container className="relative pb-14 pt-12 sm:pb-16 sm:pt-16">
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <div className="mt-5 flex items-start gap-4">

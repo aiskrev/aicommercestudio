@@ -96,6 +96,11 @@ export function PackageExplorer({
       <ul ref={listRef} {...revealGroup()} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-testid="home-offers">
         {visible.map((card) => (
           <li key={card.key} data-flip={card.key} className={cx("price-card motion-card", card.featured && "price-card-featured")} data-testid={`home-offer-${card.key}`}>
+            {card.featured && (
+              <span className="vl-beam" aria-hidden="true">
+                <span />
+              </span>
+            )}
             <div className="flex items-start justify-between gap-3">
               <h3 className="t-h3-lg">{card.name}</h3>
               <span className="badge shrink-0">{card.delivery}</span>

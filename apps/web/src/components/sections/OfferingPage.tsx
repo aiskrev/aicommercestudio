@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { VeloraBackdrop } from "@/components/velora/VeloraBackdrop";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { ManagedRelation } from "@/components/sections/Catalogue";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -60,9 +61,7 @@ export function OfferingPage({ entry, locale, dict }: { entry: CatalogueDetail; 
 
       {/* ------------------------------------------------------------ hero */}
       <div className="relative overflow-hidden border-b border-line-subtle" data-testid="offering-page" data-offering-type={entry.offeringType}>
-        <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
-        </div>
+        <VeloraBackdrop />
         <Container className="relative pb-12 pt-10 sm:pb-14 sm:pt-12">
           <div className="flex flex-wrap items-center gap-2">
             <span className="badge badge-accent">{labels.types[entry.offeringType]}</span>

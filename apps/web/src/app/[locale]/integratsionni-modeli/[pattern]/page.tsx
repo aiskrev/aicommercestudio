@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { VeloraBackdrop } from "@/components/velora/VeloraBackdrop";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Bullets, FlowDiagram, LinkList, StatusBadge, TextBlock } from "@/components/reference/ReferenceBlocks";
 import { Alert, Container, Eyebrow, Section } from "@/components/ui/primitives";
@@ -52,9 +53,7 @@ export default async function PatternPage({ params }: PageProps<"/[locale]/integ
         ]}
       />
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
-        </div>
+        <VeloraBackdrop />
         <Container className="relative pb-12 pt-12 sm:pt-16">
           <Eyebrow>{t.eyebrow}</Eyebrow>
           <h1 className="t-h1 mt-5 max-w-4xl">{p.title}</h1>

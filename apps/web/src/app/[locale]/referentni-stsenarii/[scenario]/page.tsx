@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { VeloraBackdrop } from "@/components/velora/VeloraBackdrop";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { Bullets, FlowDiagram, LinkList, TextBlock } from "@/components/reference/ReferenceBlocks";
 import { CtaBand } from "@/components/sections/CtaBand";
@@ -62,9 +63,7 @@ export default async function ScenarioPage({ params }: PageProps<"/[locale]/refe
         ]}
       />
       <div className="relative overflow-hidden border-b border-line-subtle">
-        <div className="fc-backdrop" aria-hidden="true">
-          <div className="fc-grid" />
-        </div>
+        <VeloraBackdrop />
         <Container className="relative pb-12 pt-12 sm:pt-16">
           <Eyebrow>{t.categories[def.category].title}</Eyebrow>
           <h1 className="t-h1 mt-5 max-w-4xl">{s.title}</h1>

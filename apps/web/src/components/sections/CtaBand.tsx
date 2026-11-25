@@ -62,6 +62,9 @@ export function CtaBand({
         </div>
         <Container className="relative py-20 sm:py-28 lg:py-32">
           <div {...reveal()} className="fc-cta px-6 py-12 sm:px-12 sm:py-16 lg:px-16">
+            <span className="vl-beam" aria-hidden="true">
+              <span />
+            </span>
             {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
             <h2 id="cta-title" className="t-display mt-5 max-w-4xl">
               {title}
@@ -83,9 +86,12 @@ export function CtaBand({
   }
 
   return (
-    <section className="py-16 sm:py-24" aria-labelledby="cta-title">
+    <section className="py-16 sm:py-24" aria-labelledby="cta-title" data-loop="">
       <Container>
         <div {...reveal()} className="fc-cta px-6 py-12 sm:px-12 sm:py-16">
+          <span className="vl-beam" aria-hidden="true">
+            <span />
+          </span>
           <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-end">
             <div>
               {eyebrow && <Eyebrow className="mb-4">{eyebrow}</Eyebrow>}
@@ -95,7 +101,7 @@ export function CtaBand({
               <p className="t-lead mt-5 max-w-xl">{lead}</p>
             </div>
             <div className="flex flex-col gap-4 lg:items-end">
-              <ButtonLink href={primary.href} size="lg" icon="arrowRight" className="w-full sm:w-auto">
+              <ButtonLink href={primary.href} size="lg" icon="arrowRight" className="w-full sm:w-auto" magnetic>
                 {primary.label}
               </ButtonLink>
               {secondaryLink}

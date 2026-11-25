@@ -255,3 +255,55 @@ test.describe("pause control (WCAG 2.2.2)", () => {
     expect(await marquee.evaluate((el) => getComputedStyle(el).animationPlayState)).toBe("running");
   });
 });
+
+test.describe("site-wide Velora motion (inner pages)", () => {
+  test.use({ reducedMotion: "no-preference", viewport: { width: 1440, height: 900 } });
+
+  test("inner page hero: Velora backdrop, kinetic H1 with unchanged text, pill label", async ({ page }) => {
+    await page.goto("/bg/uslugi");
+    const h1 = page.locator("h1");
+    await expect(h1).toHaveClass(/fc-kinetic/);
+    const text = await h1.textContent();
+    expect(text).toBe(text?.trim());
+    expect(await h1.locator(".kw-in").count()).toBeGreaterThan(1);
+    await expect(page.locator(".vl-page-hero [class*='animate-aurora']").first()).toBeAttached();
+    await expect(page.locator(".vl-page-hero .t-eyebrow.vl-pill")).toBeVisible();
+  });
+
+  test("scroll progress follows the page scroll", async ({ page }) => {
+    await page.goto("/bg/paketi");
+    const bar = page.locator(".vl-scroll-progress");
+    const scale = () => bar.evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).a);
+    expect(await scale()).toBeLessThan(0.05);
+    await page.evaluate(() => window.scrollTo(0, (document.documentElement.scrollHeight - innerHeight) / 2));
+    await expect.poll(scale).toBeGreaterThan(0.3);
+  });
+
+  test("card grids reveal in varied ways and cards answer the pointer (spotlight, tilt ≤ 1.5°)", async ({ page }) => {
+    await page.goto("/bg/uslugi");
+    const variants = () => page.locator("[data-reveal-variant]").evaluateAll((els) => new Set(els.map((el) => el.getAttribute("data-reveal-variant"))).size);
+    await expect.poll(variants).toBeGreaterThan(1);
+    const card = page.locator("main :is(.motion-card, .card-interactive, .offer-card)").first();
+    await card.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(1500);
+    const box = (await card.boundingBox())!;
+    // hover() checks that the card itself receives the pointer (nothing on top of it).
+    await card.hover({ position: { x: box.width * 0.85, y: box.height * 0.5 } });
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.55, { steps: 3 });
+    await page.waitForTimeout(500);
+    const state = await card.evaluate((el) => {
+      const m = new DOMMatrix(getComputedStyle(el).transform);
+      return { spot: getComputedStyle(el, "::after").opacity, rotateY: (Math.asin(Math.max(-1, Math.min(1, m.m13))) * 180) / Math.PI };
+    });
+    expect(state.spot).toBe("1");
+    expect(Math.abs(state.rotateY)).toBeGreaterThan(0.2);
+    expect(Math.abs(state.rotateY)).toBeLessThanOrEqual(1.51);
+  });
+
+  test("call-to-action panels carry a moving border beam", async ({ page }) => {
+    await page.goto("/bg/uslugi/avtomatizatsiya-na-procesi");
+    const beam = page.locator(".fc-cta .vl-beam > span").first();
+    await beam.scrollIntoViewIfNeeded();
+    expect(await beam.evaluate((el) => getComputedStyle(el).animationName)).toBe("vl-beam");
+  });
+});

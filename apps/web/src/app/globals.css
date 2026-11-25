@@ -2309,6 +2309,281 @@ html[data-motion="paused"] *, html[data-motion="paused"] *::before, html[data-mo
   .vl-motion-toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
   .vl-motion-toggle[aria-pressed="true"] { color: var(--color-brand); }
 }
+/* Site-wide cards (Velora spotlight cards): a light that follows a fine pointer (--px/--py from the pointer layer)
+   and a tilt of at most 1.5° on hover. Touch: press feedback only; reduced motion: no tilt (the pointer layer is not
+   installed, so the light stays centred). */
+@layer components {
+  :is(.motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel) { position: relative; isolation: isolate; }
+  :is(.motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(22rem circle at var(--px, 50%) var(--py, 0%), rgb(59 130 246 / 0.16), transparent 62%);
+    opacity: 0;
+    transition: opacity var(--motion-slow) var(--motion-ease-out);
+  }
+  :is(.motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel):has(:focus-visible)::after { opacity: 0.8; }
+  @media (hover: hover) and (pointer: fine) {
+    :is(.motion-card, .card-interactive, .price-card, .offer-card, .vl-tile, .feature-panel):hover::after { opacity: 1; }
+    :is(.motion-card, .card-interactive, .price-card, .offer-card):hover {
+      transform: perspective(1000px) translate3d(0, var(--lift-card), 0) rotateX(calc(var(--ty, 0) * -1.5deg)) rotateY(calc(var(--tx, 0) * 1.5deg));
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.motion-card, .card-interactive, .price-card, .offer-card):hover { transform: none !important; }
+}
+/* Site-wide Velora motion: scroll progress, CTA border beam, auto-reveal variants (docs/MOTION_SYSTEM.md). */
+@layer components {
+  /* Scroll progress (upstream scroll-progress): a 2 px blue→cyan bar on the top edge, scrubbed by the page scroll. */
+  .vl-scroll-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 60;
+    height: 2px;
+    transform-origin: left;
+    transform: scaleX(0);
+    pointer-events: none;
+    background: linear-gradient(90deg, var(--color-brand-from), var(--color-brand-via), var(--color-brand-to));
+    box-shadow: 0 0 12px rgb(56 189 248 / 0.5);
+  }
+  /* Border beam (upstream border-beam, CSS only): a light runs round the call-to-action panel every 8 s. */
+  .vl-beam {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    overflow: hidden;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    mask-image: linear-gradient(black 0 0), linear-gradient(black 0 0);
+    mask-clip: content-box, border-box;
+    mask-composite: exclude;
+  }
+  .vl-beam > span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 160%;
+    aspect-ratio: 1;
+    translate: -50% -50%;
+    background: conic-gradient(from 0deg, transparent 0 78%, var(--color-brand-from) 88%, var(--color-brand-to) 94%, transparent 100%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vl-beam > span { animation: vl-beam 8s linear infinite; }
+  [data-offscreen] .vl-beam > span { animation-play-state: paused; }
+  /* Auto-reveal variants (MotionRuntime → autoReveal). */
+  [data-reveal="pending"][data-reveal-variant="scale"] > * { transform: translate3d(0, var(--reveal-shift), 0) scale(0.94); }
+  [data-reveal="pending"][data-reveal-variant="sides"] > :nth-child(odd) { transform: translate3d(calc(var(--reveal-shift) * -1), 0, 0); }
+  [data-reveal="pending"][data-reveal-variant="sides"] > :nth-child(even) { transform: translate3d(var(--reveal-shift), 0, 0); }
+}
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .vl-scroll-progress { animation: vl-progress linear both; animation-timeline: scroll(root block); }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vl-beam { display: none; }
+}
+@media (forced-colors: active) {
+  .vl-beam, .vl-scroll-progress { display: none; }
+}
+@keyframes vl-beam { to { transform: rotate(1turn); } }
+@keyframes vl-progress { to { transform: scaleX(1); } }
+
+/* More Velora-style life (docs/MOTION_SYSTEM.md): section labels draw a light line as they reveal, a light sweeps the
+   bottom edge of every hero, the primary button shimmers on hover, card icons react to their card. Transform and
+   opacity only; all of it stops with reduced motion. */
+@layer components {
+  .t-eyebrow::after {
+    content: "";
+    display: inline-block;
+    width: 2.25rem;
+    height: 1px;
+    margin-left: 0.25rem;
+    transform-origin: left;
+    background: linear-gradient(90deg, var(--color-brand-via), transparent);
+  }
+  .t-eyebrow.vl-pill::after { display: none; }
+  .fc-horizon { overflow: hidden; }
+  .fc-horizon::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgb(56 189 248 / 0.95), transparent);
+    transform: translateX(-100%);
+  }
+  .btn-primary { overflow: hidden; }
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 30%, rgb(59 130 246 / 0.22) 50%, transparent 70%);
+    transform: translateX(-120%);
+  }
+  :is(.fc-card-icon, .icon-badge) { transition: transform var(--motion-base) var(--motion-ease-out), box-shadow var(--motion-base) var(--motion-ease-standard); }
+  @media (hover: hover) and (pointer: fine) {
+    :is(.motion-card, .card-interactive, .price-card, .offer-card, .fc-card, .feature-panel):hover :is(.fc-card-icon, .icon-badge) {
+      transform: translateY(-2px) rotate(-6deg) scale(1.08);
+      box-shadow: 0 8px 22px -10px rgb(59 130 246 / 0.7);
+    }
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal="in"] .t-eyebrow::after { animation: vl-draw var(--motion-hero) var(--motion-ease-out) 200ms both; }
+  [data-reveal="pending"] .t-eyebrow::after { transform: scaleX(0); }
+  .fc-horizon::after { animation: vl-sweep 7s linear 1s infinite; }
+  [data-offscreen] .fc-horizon::after { animation-play-state: paused; }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover:not(:disabled, [aria-busy="true"], [aria-disabled="true"])::after { animation: vl-shimmer 900ms var(--motion-ease-out) both; }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fc-horizon::after, .btn-primary::after { display: none; }
+  :is(.fc-card-icon, .icon-badge) { transform: none !important; }
+}
+@keyframes vl-draw { from { transform: scaleX(0); } }
+@keyframes vl-sweep { to { transform: translateX(460%); } }
+@keyframes vl-shimmer { to { transform: translateX(120%); } }
+
+/* Service concept diagrams: the steps light up one after another (a running process). */
+@layer components {
+  .vl-node::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    border: 1px solid var(--color-brand-to);
+    box-shadow: 0 0 0 3px rgb(56 189 248 / 0.14), 0 0 26px -6px rgb(56 189 248 / 0.65);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vl-concept .vl-node::after { animation: vl-step 6s var(--motion-ease-standard) infinite; animation-delay: calc(var(--n, 0) * 1.5s); }
+  [data-offscreen] .vl-node::after, .vl-concept[data-offscreen] .vl-node::after { animation-play-state: paused; }
+}
+@keyframes vl-step {
+  0% { opacity: 0; }
+  6%, 22% { opacity: 1; }
+  30%, 100% { opacity: 0; }
+}
+
+/* Even more Velora life: section headings reveal word by word on scroll, tick marks pop in order, product frames
+   answer the pointer, footer links draw their underline. Transform and opacity only; reduced motion: none of it. */
+@layer components {
+  :is(.ui-frame) { isolation: isolate; transition: transform var(--motion-slow) var(--motion-ease-out); }
+  .ui-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(20rem circle at var(--px, 50%) var(--py, 0%), rgb(56 189 248 / 0.12), transparent 60%);
+    opacity: 0;
+    transition: opacity var(--motion-slow) var(--motion-ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ui-frame:hover { transform: perspective(1200px) rotateX(calc(var(--ty, 0) * -2.5deg)) rotateY(calc(var(--tx, 0) * 2.5deg)) translate3d(0, -3px, 0); }
+    .ui-frame:hover::after { opacity: 1; }
+  }
+  .vl-link { position: relative; }
+  .vl-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 1px;
+    transform-origin: left;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, var(--color-brand-from), var(--color-brand-to));
+    transition: transform var(--motion-base) var(--motion-ease-out);
+  }
+  .vl-link:hover::after, .vl-link:focus-visible::after { transform: scaleX(1); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Section headings: still while waiting off screen, the words rise into their masks as the heading is revealed. */
+  .fc-kinetic-scroll .kw-in { animation: none; }
+  [data-reveal="pending"] .fc-kinetic-scroll .kw-in { transform: translate3d(0, 0.95em, 0); }
+  [data-reveal="in"] .fc-kinetic-scroll .kw-in {
+    animation: kw-rise var(--motion-hero) var(--motion-ease-out) both;
+    animation-delay: calc(80ms + var(--p, 0) * var(--motion-stagger-hero) + var(--w, 0) * 28ms);
+  }
+  /* Tick lists: the marks pop one after another when their card is revealed. */
+  [data-reveal="pending"] .tick-list > li > svg:first-child { opacity: 0; transform: scale(0.4); }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li > svg:first-child { animation: vl-tick var(--motion-emphasis) var(--motion-ease-out) both; animation-delay: 260ms; }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li:nth-child(2) > svg:first-child { animation-delay: 340ms; }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li:nth-child(3) > svg:first-child { animation-delay: 420ms; }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li:nth-child(4) > svg:first-child { animation-delay: 500ms; }
+  :is([data-reveal="in"], [data-reveal="done"]) .tick-list > li:nth-child(n + 5) > svg:first-child { animation-delay: 580ms; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ui-frame:hover { transform: none !important; }
+  .vl-link::after { transition: none; }
+}
+@keyframes vl-tick {
+  0% { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+  60% { opacity: 1; transform: scale(1.25) rotate(0deg); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Global ambient light (Velora background): navy and cyan glows drifting slowly behind every transparent section.
+   Gradients only (no blur filter); still with reduced motion; stopped by the pause control. */
+@layer components {
+  body::before {
+    content: "";
+    position: fixed;
+    inset: -15%;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(38rem 26rem at 18% 12%, rgb(16 32 57 / 0.75), transparent 70%),
+      radial-gradient(30rem 22rem at 86% 64%, rgb(56 189 248 / 0.06), transparent 70%),
+      radial-gradient(34rem 24rem at 40% 96%, rgb(59 130 246 / 0.07), transparent 70%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  body::before { animation: vl-ambient 24s var(--motion-ease-standard) infinite alternate; }
+}
+@media (forced-colors: active) {
+  body::before { display: none; }
+}
+@keyframes vl-ambient {
+  from { transform: translate3d(-3%, -2%, 0) scale(1); }
+  to { transform: translate3d(3%, 2%, 0) scale(1.06); }
+}
+
+/* Section dividers (Velora): a hairline that draws from the centre as the section is reached (reveal states). */
+@layer components {
+  section:has(> .vl-section-line) { position: relative; }
+  .vl-section-line {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 0;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgb(59 130 246 / 0.55) 30%, rgb(56 189 248 / 0.55) 70%, transparent);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .vl-section-line[data-reveal="pending"] { opacity: 0; transform: scaleX(0); }
+  .vl-section-line[data-reveal="in"] { transition-duration: 900ms; }
+}
+@media (forced-colors: active) {
+  .vl-section-line { display: none; }
+}
+
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
 @keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
 @keyframes orbit {

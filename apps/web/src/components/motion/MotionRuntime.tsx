@@ -16,6 +16,25 @@ const SETTLE_MS = 1400;
  * nothing that is visible at load ever blinks; it is revealed once ("in") when it enters, then left alone.
  * Off with reduced motion and where IntersectionObserver is missing: the content simply stays as rendered.
  */
+/** Grids of cards and lists in the page body that have no reveal of their own (most inner pages): their items reveal
+ * as a group, in one of three ways (rise, scale, alternating sides) so neighbouring sections do not move alike. Set only
+ * on the client, so server markup and pages without JavaScript are unchanged; nothing on screen at load is hidden. */
+const AUTO_REVEAL =
+  "main :is(ul, ol).grid:not([data-reveal]):not([role]), main div.grid:not([data-reveal]):has(> :is(.motion-card, .card-interactive, .price-card, .offer-card, .card))";
+const VARIANTS = ["rise", "scale", "sides"] as const;
+
+function autoReveal() {
+  let index = 0;
+  for (const element of document.querySelectorAll<HTMLElement>(AUTO_REVEAL)) {
+    // Never interactive widgets (forms, live results, tabs): they must not fade while someone uses them.
+    if (element.closest("[data-reveal], form, nav, [role=tablist], [inert]") || element.children.length < 2) continue;
+    if (element.querySelector("form, fieldset, input, select, textarea, [role=tablist]")) continue;
+    element.dataset.reveal = "";
+    element.dataset.revealChildren = "";
+    element.dataset.revealVariant = VARIANTS[index++ % VARIANTS.length];
+  }
+}
+
 export function MotionRuntime() {
   const pathname = usePathname();
 
@@ -39,6 +58,7 @@ export function MotionRuntime() {
         }
       }
     });
+    autoReveal();
     for (const element of document.querySelectorAll<HTMLElement>('[data-reveal=""]')) observer.observe(element);
     return () => {
       observer.disconnect();

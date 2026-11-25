@@ -105,7 +105,7 @@ export function JumpNav({ label, items, className }: { label: string; items: { i
 /** Icon + text list with a check, for "what you get" style lists. */
 export function TickList({ items, tone = "brand", className }: { items: string[]; tone?: "brand" | "muted"; className?: string }) {
   return (
-    <ul className={cx("grid gap-2.5", className)}>
+    <ul className={cx("tick-list grid gap-2.5", className)}>
       {items.map((item) => (
         <li key={item} className="flex gap-3 text-body-sm leading-relaxed text-fg-secondary">
           <Icon name={tone === "brand" ? "check" : "close"} className={cx("mt-1 h-4 w-4 shrink-0", tone === "brand" ? "text-brand" : "text-fg-subtle")} />

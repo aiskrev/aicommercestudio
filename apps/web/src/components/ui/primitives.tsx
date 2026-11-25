@@ -1,8 +1,11 @@
 import Link from "next/link";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
+import { KineticHeading } from "@/components/motion/KineticHeading";
 import { reveal } from "@/components/motion/reveal";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { AuroraBackground } from "@/components/velora/aurora-background";
+import { GridPattern } from "@/components/velora/grid-pattern";
 
 export function cx(...classes: (string | false | null | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
@@ -82,6 +85,8 @@ export function Section({
       aria-labelledby={labelledBy}
       className={cx(densityClass[density], toneClass[tone ?? (alt ? "raised" : "default")], className)}
     >
+      {/* Velora section divider: a blue-cyan hairline that draws from the centre when the section is reached. */}
+      <span className="vl-section-line" aria-hidden="true" {...reveal()} />
       <Container size={size}>{children}</Container>
     </section>
   );
@@ -124,9 +129,8 @@ export function SectionHeading({
       className={cx("max-w-3xl min-w-0", align === "center" && "mx-auto text-center", !action && className)}
     >
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <Heading id={id} className={cx(headingClass, eyebrow && (size === "sm" ? "mt-3" : "mt-4"))}>
-        {title}
-      </Heading>
+      {/* The words rise into place when the heading is scrolled to (KineticHeading, fc-kinetic-scroll). */}
+      <KineticHeading as={Heading} id={id} title={title} className={cx(headingClass, Heading !== "h1" && "fc-kinetic-scroll", eyebrow && (size === "sm" ? "mt-3" : "mt-4"))} />
       {lead && <p className={cx("t-lead", size === "sm" ? "mt-3" : "mt-4")}>{lead}</p>}
     </div>
   );
@@ -253,7 +257,7 @@ export function IconBadge({ name, className }: { name: IconName; className?: str
   return (
     <span
       className={cx(
-        "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand",
+        "icon-badge inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-line-default bg-surface-2 text-brand",
         className,
       )}
     >
@@ -379,15 +383,15 @@ export function PageHero({
   aside?: ReactNode;
 }) {
   return (
-    <div className="relative isolate overflow-hidden border-b border-line-subtle">
-      <div className="fc-backdrop" aria-hidden="true">
-        <div className="fc-grid" />
-      </div>
+    <div className="vl-page-hero relative isolate overflow-hidden border-b border-line-subtle" data-velora="" data-loop="">
+      {/* Velora backdrop (docs/audits/velora-upstream-audit.md): aurora from lg (phones: the grid only), masked grid. */}
+      <AuroraBackground intensity="subtle" className="hidden lg:block" />
+      <GridPattern width={48} height={48} className="fill-transparent stroke-line-subtle mask-[radial-gradient(ellipse_70%_60%_at_30%_0%,black,transparent)]" />
       <Container className={cx("relative pb-14 pt-12 sm:pb-20 sm:pt-16", Boolean(aside) && "grid items-center gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-14")}>
         {/* Entrance (CSS only, once): eyebrow → heading → lead → actions → aside; the heading, the lead and the actions only rise (LCP). */}
         <div className="min-w-0">
-          <Eyebrow className="fc-enter [--i:0]">{eyebrow}</Eyebrow>
-          <h1 className="fc-rise t-h1 mt-5 max-w-4xl [--i:1]">{title}</h1>
+          <Eyebrow className="vl-pill fc-enter [--i:0]">{eyebrow}</Eyebrow>
+          <KineticHeading title={title} className="fc-rise t-h1 mt-5 max-w-4xl [--i:1]" />
           <p className="fc-rise t-lead mt-6 max-w-3xl [--i:2]">{lead}</p>
           {children && <div className="fc-rise [--i:3]">{children}</div>}
         </div>

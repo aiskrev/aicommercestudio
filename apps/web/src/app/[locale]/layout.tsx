@@ -72,6 +72,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
             overview: getContent(locale).v5.nav.overview,
           }}
         />
+        {/* Velora scroll progress: CSS scroll-driven, decorative; hidden without support and with reduced motion. */}
+        <div className="vl-scroll-progress" aria-hidden="true" />
         <main id="main" className="flex-1">
           {children}
         </main>
