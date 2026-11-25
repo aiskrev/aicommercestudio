@@ -281,13 +281,15 @@ test.describe("site-wide Velora motion (inner pages)", () => {
 
   test("card grids reveal in varied ways and cards answer the pointer (spotlight, tilt ≤ 1.5°)", async ({ page }) => {
     await page.goto("/bg/uslugi");
-    const variants = await page.locator("[data-reveal-variant]").evaluateAll((els) => [...new Set(els.map((el) => el.getAttribute("data-reveal-variant")))]);
-    expect(variants.length).toBeGreaterThan(1);
+    const variants = () => page.locator("[data-reveal-variant]").evaluateAll((els) => new Set(els.map((el) => el.getAttribute("data-reveal-variant"))).size);
+    await expect.poll(variants).toBeGreaterThan(1);
     const card = page.locator("main :is(.motion-card, .card-interactive, .offer-card)").first();
     await card.scrollIntoViewIfNeeded();
     await page.waitForTimeout(1500);
     const box = (await card.boundingBox())!;
-    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.2, { steps: 5 });
+    // hover() checks that the card itself receives the pointer (nothing on top of it).
+    await card.hover({ position: { x: box.width * 0.85, y: box.height * 0.5 } });
+    await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.55, { steps: 3 });
     await page.waitForTimeout(500);
     const state = await card.evaluate((el) => {
       const m = new DOMMatrix(getComputedStyle(el).transform);

@@ -26,7 +26,9 @@ const VARIANTS = ["rise", "scale", "sides"] as const;
 function autoReveal() {
   let index = 0;
   for (const element of document.querySelectorAll<HTMLElement>(AUTO_REVEAL)) {
+    // Never interactive widgets (forms, live results, tabs): they must not fade while someone uses them.
     if (element.closest("[data-reveal], form, nav, [role=tablist], [inert]") || element.children.length < 2) continue;
+    if (element.querySelector("form, fieldset, input, select, textarea, [role=tablist]")) continue;
     element.dataset.reveal = "";
     element.dataset.revealChildren = "";
     element.dataset.revealVariant = VARIANTS[index++ % VARIANTS.length];
