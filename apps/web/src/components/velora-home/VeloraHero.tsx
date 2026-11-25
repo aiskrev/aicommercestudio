@@ -64,7 +64,8 @@ export function VeloraHero({
   return (
     <>
       <section className="vl-hero relative isolate overflow-hidden pb-16 pt-10 sm:pt-14 lg:pt-20" data-velora="" data-loop="" data-field="" aria-labelledby="hero-title">
-        <AuroraBackground intensity="subtle" />
+        {/* Phones: the grid only (lighter variant); the blurred aurora layers are expensive to raster before the LCP. */}
+        <AuroraBackground intensity="subtle" className="hidden lg:block" />
         <GridPattern width={48} height={48} className="fill-transparent stroke-line-subtle mask-[radial-gradient(ellipse_70%_50%_at_30%_0%,black,transparent)]" />
         <div className="relative mx-auto grid w-full max-w-wide grid-cols-1 items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:px-8">
           <div className="min-w-0">

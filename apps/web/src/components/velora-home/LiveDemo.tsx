@@ -26,19 +26,35 @@ export function LiveDemo({ name, copy, links }: { name: LiveDemoName; copy: Velo
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
+  // Mounted only after the page has loaded and the browser is idle, so the demo chunk (and `motion`) never
+  // competes with the hero text for the LCP — on phones the bento is within 200 px of the first screen.
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        setVisible(true);
-        observer.disconnect();
-      },
-      { rootMargin: "200px" },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
+    let observer: IntersectionObserver | null = null;
+    let idle = 0;
+    const watch = () => {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          setVisible(true);
+          observer?.disconnect();
+        },
+        { rootMargin: "200px" },
+      );
+      observer.observe(el);
+    };
+    const afterLoad = () => {
+      idle = typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(watch, { timeout: 1500 }) : window.setTimeout(watch, 300);
+    };
+    if (document.readyState === "complete") afterLoad();
+    else window.addEventListener("load", afterLoad, { once: true });
+    return () => {
+      window.removeEventListener("load", afterLoad);
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
+      window.clearTimeout(idle);
+      observer?.disconnect();
+    };
   }, []);
 
   const Demo = demos[name] as React.ComponentType<{ copy: VeloraHomeCopy; links: typeof links }>;
